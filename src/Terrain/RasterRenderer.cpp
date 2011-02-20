@@ -62,7 +62,7 @@ TerrainShading(const short illum, uint8_t &r, uint8_t &g, uint8_t &b)
 }
 
 RasterRenderer::RasterRenderer()
-  :quantisation_pixels(2),
+  :quantisation_pixels(1),
    image(NULL)
 {
   // scale quantisation_pixels so resolution is not too high on old hardware
