@@ -696,6 +696,7 @@ DEBUG_PROGRAM_NAMES = \
 
 ifeq ($(TARGET),UNIX)
 DEBUG_PROGRAM_NAMES += FeedNMEA \
+	FeedNMEASerial \
 	FeedVega \
 	FeedTCP \
 	FeedTCPServer \
@@ -704,6 +705,7 @@ endif
 
 ifeq ($(TARGET),PC)
 DEBUG_PROGRAM_NAMES += FeedTCP \
+  FeedNMEASerial \
   FeedTCPServer \
   FeedFlyNetData
 endif
@@ -2102,6 +2104,22 @@ $(eval $(call link-program,TestNotify,TEST_NOTIFY))
 FEED_NMEA_SOURCES = \
 	$(TEST_SRC_DIR)/FeedNMEA.cpp
 $(eval $(call link-program,FeedNMEA,FEED_NMEA))
+
+FEED_NMEA_SERIAL_SOURCES = \
+	$(TEST_SRC_DIR)/FeedNMEASerial.cpp \
+	$(SRC)/Device/Port/Port.cpp \
+	$(SRC)/Thread/Thread.cpp \
+	$(SRC)/Thread/StoppableThread.cpp \
+	$(SRC)/OS/Clock.cpp
+ifeq ($(HAVE_POSIX),y)
+FEED_NMEA_SERIAL_SOURCES += \
+	$(SRC)/Device/Port/TTYPort.cpp
+else
+FEED_NMEA_SERIAL_SOURCES += \
+	$(SRC)/Device/Port/SerialPort.cpp
+endif
+$(eval $(call link-program,FeedNMEASerial,FEED_NMEA_SERIAL))
+
 
 FEED_VEGA_SOURCES = \
 	$(TEST_SRC_DIR)/FeedVega.cpp
