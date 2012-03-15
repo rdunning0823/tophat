@@ -97,15 +97,19 @@ $(PNG5): $(DRAWABLE_DIR)/%.png: $(DATA)/graphics/%.bmp | $(DRAWABLE_DIR)/dirstam
 PNG_FILES = $(DRAWABLE_DIR)/icon.png $(PNG1) $(PNG2) $(PNG3) $(PNG4) $(PNG5)
 
 ifeq ($(TESTING),y)
-MANIFEST = android/testing/AndroidManifest.xml
+	MANIFEST = android/testing/AndroidManifest.xml
 else
-MANIFEST = android/AndroidManifest.xml
+ifeq ($(NO_HORIZON),y)
+	MANIFEST = android/nohorizon/AndroidManifest.xml
+else
+	MANIFEST = android/AndroidManifest.xml
+endif
 endif
 
 # symlink some important files to $(ANDROID_BUILD) and let the Android
 # SDK generate build.xml
-$(ANDROID_BUILD)/build.xml: $(MANIFEST) $(PNG_FILES) build/r.sed | $(TARGET_BIN_DIR)/dirstamp
-	@$(NQ)echo "  ANDROID $@"
+$(ANDROID_BUILD)/build.xml: $(MANIFEST) $(PNG_FILES) build/r.testing.sed build/r.nohorizon.sed | $(TARGET_BIN_DIR)/dirstamp
+	echo "  ANDROID $@"
 	$(Q)rm -r -f $@ $(@D)/AndroidManifest.xml $(@D)/src $(@D)/bin $(@D)/res/values
 	$(Q)mkdir -p $(ANDROID_BUILD)/res $(ANDROID_BUILD)/src
 	$(Q)ln -s ../../../$(MANIFEST) ../bin $(@D)/
@@ -121,9 +125,17 @@ endif
 	$(Q)$(ANDROID_SDK)/tools/android update project --path $(@D) --target $(ANDROID_PLATFORM)
 ifeq ($(TESTING),y)
 ifeq ($(HOST_IS_DARWIN),y)
-	$(Q)sed -i "" -f build/r.sed $@
+	$(Q)sed -i "" -f build/r.testing.sed $@
 else
-	$(Q)sed -i -f build/r.sed $@
+	$(Q)sed -i -f build/r.testing.sed $@
+endif
+else
+ifeq ($(NO_HORIZON),y)
+ifeq ($(HOST_IS_DARWIN),y)
+	$(Q)sed -i "" -f build/r.nohorizon.sed $@
+else
+	$(Q)sed -i -f build/r.nohorizon.sed $@
+endif
 endif
 endif
 	@touch $@
