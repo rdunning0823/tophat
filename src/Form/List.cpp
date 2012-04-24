@@ -46,6 +46,7 @@ ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
                          PixelRect rc, const WindowStyle style,
                          UPixelScalar _item_height)
   :look(_look),
+   has_scroll_bar(true),
    item_height(_item_height),
    length(0),
    origin(0), pixel_pan(0),
@@ -91,7 +92,7 @@ ListControl::show_or_hide_scroll_bar()
 {
   const PixelSize size = GetSize();
 
-  if (length > items_visible)
+  if (length > items_visible && has_scroll_bar)
     // enable the scroll bar
     scroll_bar.SetSize(size);
   else
