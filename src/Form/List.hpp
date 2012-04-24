@@ -106,6 +106,11 @@ protected:
   /** The ScrollBar object */
   ScrollBar scroll_bar;
 
+  /**
+   * Show the scrollbar?
+   */
+  bool has_scroll_bar;
+
   /** The height of one item on the screen, in pixels. */
   UPixelScalar item_height;
   /** The number of items in the list. */
@@ -193,6 +198,13 @@ public:
   void SetHandler(Handler *_handler) {
     SetItemRenderer(_handler);
     SetCursorHandler(_handler);
+  }
+
+  /**
+   * Sets whether scroll bar should be used
+   */
+  void SetHasScrollBar(bool value) {
+    has_scroll_bar = value;
   }
 
   /**
