@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Form/CheckBox.hpp"
 #include "Look/DialogLook.hpp"
+#include "Form/ActionListener.hpp"
 
 CheckBoxControl::CheckBoxControl(ContainerWindow &parent,
                                  const DialogLook &look,
@@ -30,15 +31,47 @@ CheckBoxControl::CheckBoxControl(ContainerWindow &parent,
                                  const PixelRect &rc,
                                  const CheckBoxStyle style,
                                  ClickNotifyCallback _click_notify_callback)
-  :click_notify_callback(_click_notify_callback)
+  :listener(NULL), click_notify_callback(_click_notify_callback)
 {
   set(parent, caption, rc, style);
+  SetFont(*look.text_font);
+}
+
+
+
+CheckBoxControl::CheckBoxControl(ContainerWindow &parent,
+                                 const DialogLook &look,
+                                 const TCHAR *caption,
+                                 const PixelRect &rc,
+                                 const CheckBoxStyle style,
+                                 ActionListener *_listener, int _id) :
+#ifdef USE_GDI
+  id(_id),
+#endif
+  listener(_listener),
+  click_notify_callback(NULL)
+{
+#ifdef USE_GDI
+  set(parent, caption, rc, style);
+#else
+  /* our custom SDL/OpenGL button doesn't need this hack */
+  set(parent, caption, _id, rc, style);
+#endif
   SetFont(*look.text_font);
 }
 
 bool
 CheckBoxControl::OnClicked()
 {
+  if (listener != NULL) {
+#ifndef USE_GDI
+    unsigned id = GetID();
+#endif
+
+    listener->OnAction(id);
+    return true;
+  }
+
   // Call the OnClick function
   if (click_notify_callback != NULL) {
     click_notify_callback(*this);
