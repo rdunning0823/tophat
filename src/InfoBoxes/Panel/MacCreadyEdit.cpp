@@ -22,101 +22,187 @@ Copyright_License {
 */
 
 #include "MacCreadyEdit.hpp"
+#include "Base.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
-#include "Simulator.hpp"
-#include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/dlgInfoBoxAccess.hpp"
-#include "Form/TabBar.hpp"
-#include "Form/Button.hpp"
-#include "Form/XMLWidget.hpp"
-#include "InfoBoxes/InfoBoxManager.hpp"
-#include "Util/Macros.hpp"
+#include "Components.hpp"
+#include "Task/ProtectedTaskManager.hpp"
+#include "Form/SymbolButton.hpp"
+#include "Form/CheckBox.hpp"
+#include "Form/Frame.hpp"
+#include "Form/Panel.hpp"
+#include "Screen/Fonts.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Units/Units.hpp"
+#include "UIGlobals.hpp"
+#include "Interface.hpp"
+#include "Screen/Layout.hpp"
+#include "Screen/PaintWindow.hpp"
+#include "Renderer/FinalGlideBarRenderer.hpp"
+#include "Look/Look.hpp"
+#include "Profile/Profile.hpp"
 
-class MacCreadyEditPanel : public XMLWidget {
-  unsigned id;
+enum ControlIndex {
+  BigPlus,
+  LittlePlus,
+  LittleMinus,
+  BigMinus,
+  AutoMc,
+};
+
+class MacCreadyEditPanel : public BaseAccessPanel, NumberButtonLayout {
+protected:
+
+  /**
+   * These 4 buttons and the mc_value frame use the layout rectangles
+   * calculated in NumberButtonLayout
+   */
+  WndSymbolButton *big_plus, *big_minus, *little_plus, *little_minus;
+  WndFrame *mc_value;
+  CheckBoxControl *auto_mc;
 
 public:
-  MacCreadyEditPanel(unsigned _id):id(_id) {}
-
-  void QuickAccess(const TCHAR *value) {
-    InfoBoxManager::ProcessQuickAccess(id, value);
-  }
+  MacCreadyEditPanel(unsigned _id)
+    :BaseAccessPanel(_id) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
+
+  void Refresh();
+
+protected:
+  /* methods from ActionListener */
+  virtual void OnAction(int id);
 };
 
-/** XXX this hack is needed because the form callbacks don't get a
-    context pointer - please refactor! */
-static MacCreadyEditPanel *instance;
-
-static void
-PnlEditOnPlusSmall(gcc_unused WndButton &Sender)
+void
+MacCreadyEditPanel::OnAction(int action_id)
 {
-  instance->QuickAccess(_T("+0.1"));
+  if (protected_task_manager == NULL)
+    return;
+
+  const ComputerSettings &settings_computer =
+    CommonInterface::GetComputerSettings();
+  const GlidePolar &polar = settings_computer.polar.glide_polar_task;
+  TaskBehaviour &task_behaviour = CommonInterface::SetComputerSettings().task;
+  fixed mc = polar.GetMC();
+
+  switch (action_id) {
+  case BigPlus:
+    mc = std::min(mc + Units::ToSysVSpeed(GetUserVerticalSpeedStep() * 5),
+                  fixed(5));
+    ActionInterface::SetManualMacCready(mc);
+    break;
+  case LittlePlus:
+    mc = std::min(mc + Units::ToSysVSpeed(GetUserVerticalSpeedStep()),
+                  fixed(5));
+    ActionInterface::SetManualMacCready(mc);
+    break;
+  case LittleMinus:
+    mc = std::max(mc - Units::ToSysVSpeed(GetUserVerticalSpeedStep()),
+                  fixed_zero);
+    ActionInterface::SetManualMacCready(mc);
+    break;
+  case BigMinus:
+    mc = std::max(mc - Units::ToSysVSpeed(GetUserVerticalSpeedStep() * 5),
+                  fixed_zero);
+    ActionInterface::SetManualMacCready(mc);
+    break;
+  case AutoMc:
+    task_behaviour.auto_mc = !task_behaviour.auto_mc;
+    Profile::Set(ProfileKeys::AutoMc, task_behaviour.auto_mc);
+    break;
+  default:
+    BaseAccessPanel::OnAction(action_id);
+    return;
+  }
+  Refresh();
 }
 
-static void
-PnlEditOnPlusBig(gcc_unused WndButton &Sender)
+void
+MacCreadyEditPanel::Refresh()
 {
-  instance->QuickAccess(_T("+0.5"));
+  const ComputerSettings &settings_computer =
+    CommonInterface::GetComputerSettings();
+  auto_mc->SetState(XCSoarInterface::GetComputerSettings().task.auto_mc);
+  TCHAR buffer[32];
+  fixed value = settings_computer.polar.glide_polar_task.GetMC();
+  FormatUserVerticalSpeed(value, buffer, false);
+  mc_value->SetCaption(buffer);
+  mc_value->SetEnabled(!auto_mc->GetState());
 }
-
-static void
-PnlEditOnMinusSmall(gcc_unused WndButton &Sender)
-{
-  instance->QuickAccess(_T("-0.1"));
-}
-
-static void
-PnlEditOnMinusBig(gcc_unused WndButton &Sender)
-{
-  instance->QuickAccess(_T("-0.5"));
-}
-
-static constexpr CallBackTableEntry call_back_table[] = {
-  DeclareCallBackEntry(PnlEditOnPlusSmall),
-  DeclareCallBackEntry(PnlEditOnPlusBig),
-  DeclareCallBackEntry(PnlEditOnMinusSmall),
-  DeclareCallBackEntry(PnlEditOnMinusBig),
-  DeclareCallBackEntry(NULL)
-};
 
 void
 MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  LoadWindow(call_back_table, parent, _T("IDR_XML_INFOBOXMACCREADYEDIT"));
+  BaseAccessPanel::Prepare(parent, rc);
+  NumberButtonLayout::Prepare(parent, content_rc);
 
-  TCHAR caption[16];
+  const DialogLook &look = UIGlobals::GetDialogLook();
 
-  WndButton *button = (WndButton *)form.FindByName(_T("cmdPlusBig"));
-  assert(button != NULL);
-  FormatUserVerticalSpeed(
-      Units::ToSysVSpeed(GetUserVerticalSpeedStep() * 5), caption, false);
-  button->SetCaption(caption);
+  ButtonWindowStyle button_style;
+  button_style.TabStop();
+  button_style.multiline();
+  big_plus = new WndSymbolButton(GetClientAreaWindow(), look, _T("^"),
+                                 big_plus_rc,
+                                 button_style, this, BigPlus);
+  big_plus->SetFont(Fonts::infobox);
 
-  button = (WndButton *)form.FindByName(_T("cmdPlusSmall"));
-  assert(button != NULL);
-  FormatUserVerticalSpeed(
-      Units::ToSysVSpeed(GetUserVerticalSpeedStep()), caption, false);
-  button->SetCaption(caption);
+  little_plus = new WndSymbolButton(GetClientAreaWindow(), look, _T("^"),
+                                    little_plus_rc,
+                                    button_style, this, LittlePlus);
+  little_plus->SetFont(Fonts::infobox);
 
-  button = (WndButton *)form.FindByName(_T("cmdMinusBig"));
-  assert(button != NULL);
-  FormatUserVerticalSpeed(
-      Units::ToSysVSpeed(-GetUserVerticalSpeedStep() * 5), caption, false);
-  button->SetCaption(caption);
+  big_minus = new WndSymbolButton(GetClientAreaWindow(), look, _T("v"),
+                                  big_minus_rc,
+                                  button_style, this, BigMinus);
+  big_minus->SetFont(Fonts::infobox);
 
-  button = (WndButton *)form.FindByName(_T("cmdMinusSmall"));
-  assert(button != NULL);
-  FormatUserVerticalSpeed(
-      Units::ToSysVSpeed(-GetUserVerticalSpeedStep()), caption, false);
-  button->SetCaption(caption);
+  little_minus = new WndSymbolButton(GetClientAreaWindow(), look, _T("v"),
+                                     little_minus_rc,
+                                     button_style, this, LittleMinus);
+  little_minus->SetFont(Fonts::infobox);
+
+  WindowStyle style_frame;
+  mc_value = new WndFrame(GetClientAreaWindow(), look,
+                          value_rc.left, value_rc.top,
+                          value_rc.right - value_rc.left,
+                          value_rc.bottom - value_rc.top,
+                          style_frame);
+  mc_value->SetVAlignCenter();
+  mc_value->SetAlignCenter();
+  mc_value->SetFont(Fonts::infobox);
+
+  PixelRect checkbox_rc;
+  checkbox_rc.bottom = content_rc.bottom -
+    (content_rc.bottom - big_minus_rc.bottom) / 4;
+  checkbox_rc.top = big_minus_rc.bottom +
+    (content_rc.bottom - big_minus_rc.bottom) / 4;
+  checkbox_rc.left = big_minus_rc.left;
+  checkbox_rc.right = big_minus_rc.right;
+
+  ButtonWindowStyle checkbox_style;
+  checkbox_style.TabStop();
+
+  auto_mc = new CheckBoxControl(GetClientAreaWindow(), look, _T("Auto MC"),
+                                checkbox_rc, checkbox_style,
+                                this, AutoMc);
+  Refresh();
+}
+
+void
+MacCreadyEditPanel::Unprepare()
+{
+  delete big_plus;
+  delete big_minus;
+  delete little_plus;
+  delete little_minus;
+  delete mc_value;
+  delete auto_mc;
+  BaseAccessPanel::Unprepare();
 }
 
 Widget *
 LoadMacCreadyEditPanel(unsigned id)
 {
-  return instance = new MacCreadyEditPanel(id);
+  return new MacCreadyEditPanel(id);
 }

@@ -282,8 +282,6 @@ IDR_XML_POLARCONFIGPANEL XMLDIALOG DISCARDABLE "../output/data/dialogs/Configura
 IDR_XML_POLARCONFIGPANEL_L XMLDIALOG DISCARDABLE "../output/data/dialogs/Configuration/PolarConfigPanel_L.xml.gz"
 
 // infobox access
-IDR_XML_INFOBOXMACCREADYEDIT XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxMacCreadyEdit.xml.gz"
-IDR_XML_INFOBOXMACCREADYSETUP XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxMacCreadySetup.xml.gz"
 IDR_XML_INFOBOXALTITUDEINFO XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxAltitudeInfo.xml.gz"
 IDR_XML_INFOBOXALTITUDESIMULATOR XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxAltitudeSimulator.xml.gz"
 IDR_XML_INFOBOXALTITUDESETUP XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxAltitudeSetup.xml.gz"

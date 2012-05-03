@@ -24,7 +24,6 @@ Copyright_License {
 #include "InfoBoxes/Content/MacCready.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "InfoBoxes/Panel/MacCreadyEdit.hpp"
-#include "InfoBoxes/Panel/MacCreadySetup.hpp"
 #include "Interface.hpp"
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
@@ -57,14 +56,10 @@ static constexpr InfoBoxContentMacCready::PanelContent panels[] = {
   InfoBoxContentMacCready::PanelContent (
     N_("Edit"),
     LoadMacCreadyEditPanel),
-
-  InfoBoxContentMacCready::PanelContent (
-    N_("Setup"),
-    LoadMacCreadySetupPanel),
 };
 
 const InfoBoxContentMacCready::DialogContent InfoBoxContentMacCready::dlgContent = {
-  ARRAY_SIZE(panels), &panels[0], true,
+  ARRAY_SIZE(panels), &panels[0], false,
 };
 
 const InfoBoxContentMacCready::DialogContent*
@@ -88,89 +83,4 @@ InfoBoxContentMacCready::Update(InfoBoxData &data)
 
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
   data.SetCommentFromSpeed(common_stats.V_block, false);
-}
-
-bool
-InfoBoxContentMacCready::HandleKey(const InfoBoxKeyCodes keycode)
-{
-  if (protected_task_manager == NULL)
-    return false;
-
-  const ComputerSettings &settings_computer =
-    CommonInterface::GetComputerSettings();
-  const GlidePolar &polar = settings_computer.polar.glide_polar_task;
-  TaskBehaviour &task_behaviour = CommonInterface::SetComputerSettings().task;
-  fixed mc = polar.GetMC();
-
-  switch (keycode) {
-  case ibkUp:
-    mc = std::min(mc + Units::ToSysVSpeed(GetUserVerticalSpeedStep()),
-                  fixed(5));
-    ActionInterface::SetManualMacCready(mc);
-    return true;
-
-  case ibkDown:
-    mc = std::max(mc - Units::ToSysVSpeed(GetUserVerticalSpeedStep()),
-                  fixed_zero);
-    ActionInterface::SetManualMacCready(mc);
-    return true;
-
-  case ibkLeft:
-    task_behaviour.auto_mc = false;
-    Profile::Set(ProfileKeys::AutoMc, false);
-    return true;
-
-  case ibkRight:
-    task_behaviour.auto_mc = true;
-    Profile::Set(ProfileKeys::AutoMc, true);
-    return true;
-
-  case ibkEnter:
-    task_behaviour.auto_mc = !task_behaviour.auto_mc;
-    Profile::Set(ProfileKeys::AutoMc, task_behaviour.auto_mc);
-    return true;
-  }
-  return false;
-}
-
-bool
-InfoBoxContentMacCready::HandleQuickAccess(const TCHAR *misc)
-{
-  if (protected_task_manager == NULL)
-    return false;
-
-  const ComputerSettings &settings_computer =
-    CommonInterface::GetComputerSettings();
-  const GlidePolar &polar = settings_computer.polar.glide_polar_task;
-  fixed mc = polar.GetMC();
-
-  if (_tcscmp(misc, _T("+0.1")) == 0) {
-    mc = std::min(mc + Units::ToSysVSpeed(GetUserVerticalSpeedStep()),
-                  fixed(5));
-    ActionInterface::SetManualMacCready(mc);
-    return true;
-
-  } else if (_tcscmp(misc, _T("+0.5")) == 0) {
-    mc = std::min(mc + Units::ToSysVSpeed(GetUserVerticalSpeedStep() * 5),
-                  fixed(5));
-    ActionInterface::SetManualMacCready(mc);
-    return true;
-
-  } else if (_tcscmp(misc, _T("-0.1")) == 0) {
-    mc = std::max(mc - Units::ToSysVSpeed(GetUserVerticalSpeedStep()),
-                  fixed_zero);
-    ActionInterface::SetManualMacCready(mc);
-    return true;
-
-  } else if (_tcscmp(misc, _T("-0.5")) == 0) {
-    mc = std::max(mc - Units::ToSysVSpeed(GetUserVerticalSpeedStep() * 5),
-                  fixed_zero);
-    ActionInterface::SetManualMacCready(mc);
-    return true;
-
-  } else if (_tcscmp(misc, _T("mode")) == 0) {
-    return HandleKey(ibkEnter);
-  }
-
-  return false;
 }
