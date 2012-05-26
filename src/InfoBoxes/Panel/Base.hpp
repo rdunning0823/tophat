@@ -96,4 +96,54 @@ protected:
    */
   void Close();
 };
+
+
+/**
+ *  Base class that sizes the rectangles needed to layout four buttons
+ *  and a frame so there are two "up" buttons and two "down" buttons
+ *  above and below the frame.
+ *  The user is responsible for creating the buttons and frame
+ *  objects.  Layout looks like:
+ *    +    +
+ *     xxxx
+ *    -    -
+ */
+class NumberButtonLayout {
+protected:
+
+
+  /**
+   *  positioned above the frame, 50% of its width, and flush left
+   */
+  PixelRect big_plus_rc;
+
+  /**
+   *  positioned above the frame, 50% of its width, and flush right
+   */
+  PixelRect little_plus_rc;
+
+  /**
+   *  positioned below the frame, 50% of its width, and flush left
+   */
+  PixelRect big_minus_rc;
+
+  /**
+   *  positioned below the frame, 50% of its width, and flush right
+   */
+  PixelRect little_minus_rc;
+
+  /**
+   * the frame between the buttons that contains the value to be changed
+   * when the buttons are pressed
+   */
+  PixelRect value_rc;
+
+protected:
+  /*
+   * Sizes the rectangles for the layout of the buttons and the frame in the center
+   * of the rc
+   * @param parent_rc The rc of the parent window's usable area
+   */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &parent_rc);
+};
 #endif

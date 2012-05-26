@@ -156,3 +156,47 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   content_rc = base_rc;
   content_rc.top += GetHeaderHeight();
 }
+
+
+void
+NumberButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &parent_rc)
+{
+  fixed ratio = Layout::landscape ? fixed(0.65) : fixed(0.6);
+  PixelRect rc_bound = parent_rc;
+  PixelSize sz_parent;
+  sz_parent.cx = (PixelScalar)((parent_rc.right - parent_rc.left) * ratio);
+  sz_parent.cy = (PixelScalar)((parent_rc.bottom - parent_rc.top) * ratio);
+
+  rc_bound.top = parent_rc.top + (parent_rc.bottom - parent_rc.top - sz_parent.cy)
+    / 2;
+  rc_bound.bottom = rc_bound.top + sz_parent.cy;
+  rc_bound.left = parent_rc.left + (parent_rc.right - parent_rc.left - sz_parent.cx)
+    / 2;
+  rc_bound.right = rc_bound.left + sz_parent.cx;
+
+  big_plus_rc.left = rc_bound.left;
+  big_plus_rc.top = rc_bound.top;
+  big_plus_rc.bottom = big_plus_rc.top + sz_parent.cy / 3;
+  big_plus_rc.right = big_plus_rc.left + sz_parent.cx / 2;
+
+  little_plus_rc.right = rc_bound.right;
+  little_plus_rc.top = rc_bound.top;
+  little_plus_rc.bottom = little_plus_rc.top + sz_parent.cy / 3;
+  little_plus_rc.left = little_plus_rc.right - sz_parent.cx / 2;
+
+  big_minus_rc.left = rc_bound.left;
+  big_minus_rc.bottom = rc_bound.bottom;
+  big_minus_rc.top = big_minus_rc.bottom - sz_parent.cy / 3;
+  big_minus_rc.right = big_minus_rc.left + sz_parent.cx / 2;
+
+  little_minus_rc.right = rc_bound.right;
+  little_minus_rc.bottom = rc_bound.bottom;
+  little_minus_rc.top = little_minus_rc.bottom - sz_parent.cy / 3;
+  little_minus_rc.left = little_minus_rc.right - sz_parent.cx / 2;
+
+  value_rc.left = big_plus_rc.left;
+  value_rc.right = little_plus_rc.right;
+  value_rc.top = big_plus_rc.bottom;
+  value_rc.bottom = big_minus_rc.top;
+}
+
