@@ -471,6 +471,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/InfoBoxLayout.cpp \
 	$(SRC)/InfoBoxes/InfoBoxManager.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeInfo.cpp \
+	$(SRC)/InfoBoxes/Panel/Base.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeSimulator.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeSetup.cpp \
 	$(SRC)/InfoBoxes/Panel/MacCreadyEdit.cpp \
