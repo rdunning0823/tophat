@@ -257,6 +257,19 @@ InfoBoxManager::ProcessQuickAccess(const int id, const TCHAR *Value)
   SetDirty();
 }
 
+
+gcc_pure unsigned
+InfoBoxManager::GetQuickAccess(const int id)
+{
+  if (id < 0)
+    return 0;
+
+  if (InfoBoxes[id] != NULL)
+    return InfoBoxes[id]->GetQuickAccess();
+
+  return 0;
+}
+
 bool
 InfoBoxManager::HasFocus()
 {

@@ -60,6 +60,12 @@ public:
    */
   virtual bool HandleQuickAccess(const TCHAR *misc);
 
+  /**
+   * This is a generic handler for the InfoBox. It return an unsigned value
+   * @return a value to be interpreted by the caller
+   */
+  virtual unsigned GetQuickAccess();
+
   struct PanelContent {
     constexpr
     PanelContent(const TCHAR* _name,

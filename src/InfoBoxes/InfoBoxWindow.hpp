@@ -152,6 +152,12 @@ public:
    */
   bool HandleQuickAccess(const TCHAR *value);
 
+  /**
+   * This is a generic handler for the InfoBox. It returns an unsigned value
+   * @return a value determined by the content or 0 if no content exists
+   */
+  virtual gcc_pure unsigned GetQuickAccess();
+
   const InfoBoxContent::DialogContent *GetDialogContent();
 
   const PixelRect GetValueRect() const {

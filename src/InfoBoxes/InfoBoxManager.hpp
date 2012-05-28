@@ -61,6 +61,14 @@ namespace InfoBoxManager
    */
   void ProcessQuickAccess(const int id, const TCHAR *Value);
 
+  /**
+   * GetQuickAccess takes the id of the InfoBox and returns the value
+   * determined by the InfoBox. It doesn't expect the target InfoBox to be focussed.
+   * @param id
+   * @return value set by InfoBoxContent or 0 if no content exists.
+   */
+  gcc_pure unsigned GetQuickAccess(const int id);
+
   bool Click(InfoBoxWindow &ib);
 
   void ProcessTimer();

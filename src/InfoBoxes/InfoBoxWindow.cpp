@@ -396,6 +396,15 @@ InfoBoxWindow::HandleQuickAccess(const TCHAR *value)
   return false;
 }
 
+gcc_pure unsigned
+InfoBoxWindow::GetQuickAccess()
+{
+  if (content == NULL)
+    return 0;
+
+  return content->GetQuickAccess();
+}
+
 const InfoBoxContent::DialogContent *
 InfoBoxWindow::GetDialogContent()
 {
