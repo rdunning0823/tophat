@@ -34,6 +34,9 @@ Copyright_License {
 #include "Screen/BufferCanvas.hpp"
 #include "Screen/Key.h"
 #include "Dialogs/dlgInfoBoxAccess.hpp"
+#include "InfoBoxes/Panel/InfoBoxDescription.hpp"
+#include "Interface.hpp"
+#include "MainWindow.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/SubCanvas.hpp"
@@ -335,9 +338,42 @@ InfoBoxWindow::ShowDialog()
 {
   force_draw_selector = true;
 
-  dlgInfoBoxAccessShowModeless(id, GetDialogContent());
+  ShowDialog(id, GetDialogContent());
 
   force_draw_selector = false;
+}
+
+void
+InfoBoxWindow::ShowDialog(const int id,
+                          const InfoBoxContent::DialogContent *dlgContent)
+{
+  assert (id > -1);
+
+  Widget *widget = NULL;
+
+  if (dlgContent != NULL) {
+    if (dlgContent->GetShowInTabLayout()) {
+      dlgInfoBoxAccessShowModeless(id, dlgContent);
+      return;
+    } else {
+      for (int i = 0; i < dlgContent->PANELSIZE; i++) {
+        assert(dlgContent->Panels[i].load != NULL);
+
+        widget = dlgContent->Panels[i].load(id);
+
+        // only use the first non-NULL widget
+        if (widget != NULL)
+          break;
+      }
+    }
+  }
+
+  if (widget == NULL)
+    CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id));
+  else
+    CommonInterface::main_window->SetWidget(widget);
+
+  CommonInterface::main_window->ActivateMap();
 }
 
 bool

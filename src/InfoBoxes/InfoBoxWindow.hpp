@@ -127,7 +127,19 @@ public:
   void UpdateContent();
 
 protected:
+  /**
+   * shows dialog and also sets and clears force_draw_selector
+   */
   void ShowDialog();
+
+  /**
+   * shows dialog
+   * @param id id of box whose content to show
+   * @param dlgContent Content to be displayed
+   */
+  void ShowDialog(const int id,
+                  const InfoBoxContent::DialogContent *dlgContent);
+
 
   bool HandleKey(InfoBoxContent::InfoBoxKeyCodes keycode);
 
