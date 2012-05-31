@@ -220,6 +220,11 @@ NumberButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &parent_rc)
   value_rc.right = little_plus_rc.right;
   value_rc.top = big_plus_rc.bottom;
   value_rc.bottom = big_minus_rc.top;
+
+  double_size_plus_rc = big_plus_rc;
+  double_size_plus_rc.right = little_plus_rc.right;
+  double_size_minus_rc = big_minus_rc;
+  double_size_minus_rc.right = little_minus_rc.right;
 }
 
 void

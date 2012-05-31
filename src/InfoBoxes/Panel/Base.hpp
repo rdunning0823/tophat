@@ -108,11 +108,14 @@ protected:
  *    +    +
  *     xxxx
  *    -    -
+ *
+ *  An alternative layout with only one "up" and one "dn" button is also provided:
+ *      +
+ *    xxxxx
+ *      -
  */
 class NumberButtonLayout {
 protected:
-
-
   /**
    *  positioned above the frame, 50% of its width, and flush left
    */
@@ -138,6 +141,17 @@ protected:
    * when the buttons are pressed
    */
   PixelRect value_rc;
+
+
+  /**
+   *  positioned above the value frame, 100% of its width
+   */
+  PixelRect double_size_plus_rc;
+
+  /**
+   *  positioned below the value frame, 100% of its width
+   */
+  PixelRect double_size_minus_rc;
 
 protected:
   /*
