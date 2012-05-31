@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Trace.hpp"
 #include "InfoBoxes/InfoBoxWindow.hpp"
+#include "InfoBoxes/Panel/Barogram.hpp"
 #include "Renderer/BarographRenderer.hpp"
 #include "Renderer/TraceHistoryRenderer.hpp"
 #include "Renderer/ThermalBandRenderer.hpp"
@@ -40,6 +41,7 @@ Copyright_License {
 #include "Dialogs/dlgInfoBoxAccess.hpp"
 #include "Dialogs/dlgAnalysis.hpp"
 #include "Util/Macros.hpp"
+#include "Language/Language.hpp"
 
 static PixelRect
 get_spark_rect(const InfoBoxWindow &infobox)
@@ -118,6 +120,21 @@ InfoBoxContentCirclingAverageSpark::Update(InfoBoxData &data)
 }
 
 
+static constexpr InfoBoxContentBarogram::PanelContent panels[] = {
+  InfoBoxContentBarogram::PanelContent (
+    N_("Edit"),
+    LoadBarogramPanel),
+};
+
+const InfoBoxContentBarogram::DialogContent InfoBoxContentBarogram::dlgContent = {
+  ARRAY_SIZE(panels), &panels[0], false,
+};
+
+const InfoBoxContentBarogram::DialogContent*
+InfoBoxContentBarogram::GetDialogContent() {
+  return &dlgContent;
+}
+
 void
 InfoBoxContentBarogram::Update(InfoBoxData &data)
 {
@@ -144,28 +161,6 @@ InfoBoxContentBarogram::OnCustomPaint(InfoBoxWindow &infobox, Canvas &canvas)
                        glide_computer->GetFlightStats(),
                        XCSoarInterface::Basic(),
                        XCSoarInterface::Calculated(), protected_task_manager);
-}
-
-bool
-InfoBoxContentBarogram::HandleKey(const InfoBoxKeyCodes keycode)
-{
-  switch (keycode) {
-  case ibkEnter:
-    dlgAnalysisShowModal(UIGlobals::GetMainWindow(),
-                         UIGlobals::GetLook(),
-                         CommonInterface::Full(), *glide_computer,
-                         protected_task_manager,
-                         &airspace_database,
-                         terrain, 0);
-    return true;
-
-  case ibkUp:
-  case ibkDown:
-  case ibkLeft:
-  case ibkRight:
-    break;
-  }
-  return false;
 }
 
 
