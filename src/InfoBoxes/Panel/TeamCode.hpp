@@ -21,37 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_INFOBOX_CONTENT_TEAM_HPP
-#define XCSOAR_INFOBOX_CONTENT_TEAM_HPP
+#ifndef XCSOAR_TEAM_CODE_PANEL_HPP
+#define XCSOAR_TEAM_CODE_PANEL_HPP
 
-#include "InfoBoxes/Content/Base.hpp"
+class Widget;
 
-class InfoBoxContentTeamCode : public InfoBoxContent
-{
-public:
-  virtual const DialogContent *GetDialogContent();
-
-  static const DialogContent dlgContent;
-
-  virtual void Update(InfoBoxData &data);
-};
-
-class InfoBoxContentTeamBearing : public InfoBoxContent
-{
-public:
-  virtual void Update(InfoBoxData &data);
-};
-
-class InfoBoxContentTeamBearingDiff : public InfoBoxContent
-{
-public:
-  virtual void Update(InfoBoxData &data);
-};
-
-class InfoBoxContentTeamDistance : public InfoBoxContent
-{
-public:
-  virtual void Update(InfoBoxData &data);
-};
+Widget *
+LoadTeamCodePanel(unsigned id);
 
 #endif
