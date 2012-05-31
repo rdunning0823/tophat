@@ -359,7 +359,8 @@ Update()
               ContestToString(settings_computer.task.contest));
     wf->SetCaption(sTmp);
     SetCalcCaption(_T(""));
-    FlightStatisticsRenderer::CaptionOLC(sTmp, settings_computer.task, calculated);
+    FlightStatisticsRenderer::CaptionOLC(sTmp, settings_computer.task,
+                                         calculated, false);
     wInfo->SetCaption(sTmp);
     break;
 

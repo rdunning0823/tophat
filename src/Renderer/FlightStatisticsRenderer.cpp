@@ -101,9 +101,10 @@ FlightStatisticsRenderer::RenderOLC(Canvas &canvas, const PixelRect rc,
 }
 
 void
-FlightStatisticsRenderer::CaptionOLC(TCHAR *sTmp,
+FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
                                      const TaskBehaviour &task_behaviour,
-                                     const DerivedInfo &derived)
+                                     const DerivedInfo &derived,
+                                     bool long_line)
 {
   if (task_behaviour.contest == OLC_Plus) {
     const ContestResult& result =
@@ -123,10 +124,12 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *sTmp,
     FormatUserDistanceSmart(result_fai.distance, distance_fai, 100);
     TCHAR speed[100];
     FormatUserTaskSpeed(result.GetSpeed(), speed, ARRAY_SIZE(speed));
-    _stprintf(sTmp,
-              (Layout::landscape
-               ? _T("%s:\r\n%s\r\n%s (FAI)\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
-               : _T("%s: %s\r\n%s (FAI)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n")),
+    _stprintf(buffer,
+              (long_line
+               ? _T("%s: %s, %s (FAI)\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
+                 (Layout::landscape
+                  ? _T("%s:\r\n%s\r\n%s (FAI)\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
+                  : _T("%s: %s\r\n%s (FAI)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
               _("Distance"), distance_classic, distance_fai,
               _("Score"), (double)result.score, _("pts"),
               _("Time"), timetext1,
@@ -147,10 +150,12 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *sTmp,
     FormatUserDistanceSmart(result_triangle.distance, distance_fai, 100);
     TCHAR speed[100];
     FormatUserTaskSpeed(result_free.GetSpeed(), speed, ARRAY_SIZE(speed));
-    _stprintf(sTmp,
-              (Layout::landscape
-               ? _T("%s:\r\n%s (Free)\r\n%s (Triangle)\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
-               : _T("%s: %s (Free)\r\n%s (Triangle)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n")),
+    _stprintf(buffer,
+              (long_line
+               ? _T("%s: %s (Free), %s (Triangle)\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
+                 (Layout::landscape
+                  ? _T("%s:\r\n%s (Free)\r\n%s (Triangle)\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
+                  : _T("%s: %s (Free)\r\n%s (Triangle)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
               _("Distance"), distance, distance_fai,
               _("Score"), (double)result_free.score, _("pts"),
               _("Time"), timetext1,
@@ -175,10 +180,12 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *sTmp,
     FormatUserDistanceSmart(result_olc.distance, distance, 100);
     TCHAR speed[100];
     FormatUserTaskSpeed(result_olc.GetSpeed(), speed, ARRAY_SIZE(speed));
-    _stprintf(sTmp,
-              (Layout::landscape
-               ? _T("%s:\r\n%s\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
-               : _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n")),
+    _stprintf(buffer,
+              (long_line
+               ? _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
+                 (Layout::landscape
+                  ? _T("%s:\r\n%s\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
+                  : _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
               _("Distance"), distance,
               _("Score"), (double)result_olc.score, _("pts"),
               _("Time"), timetext1,
