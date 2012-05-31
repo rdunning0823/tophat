@@ -144,8 +144,9 @@ public:
 class InfoBoxContentOLC: public InfoBoxContent
 {
 public:
+  virtual const DialogContent *GetDialogContent();
+  static const DialogContent dlgContent;
   virtual void Update(InfoBoxData &data);
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode);
 };
 
 class InfoBoxContentTaskSpeed : public InfoBoxContent
