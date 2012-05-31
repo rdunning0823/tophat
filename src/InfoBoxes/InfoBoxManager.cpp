@@ -264,8 +264,8 @@ InfoBoxManager::GetQuickAccess(const int id)
   if (id < 0)
     return 0;
 
-  if (InfoBoxes[id] != NULL)
-    return InfoBoxes[id]->GetQuickAccess();
+  if (infoboxes[id] != NULL)
+    return infoboxes[id]->GetQuickAccess();
 
   return 0;
 }

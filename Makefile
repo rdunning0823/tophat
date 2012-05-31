@@ -470,6 +470,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/InfoBoxWindow.cpp \
 	$(SRC)/InfoBoxes/InfoBoxLayout.cpp \
 	$(SRC)/InfoBoxes/InfoBoxManager.cpp \
+	$(SRC)/InfoBoxes/Panel/Alternates.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeInfo.cpp \
 	$(SRC)/InfoBoxes/Panel/Base.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeSimulator.cpp \
