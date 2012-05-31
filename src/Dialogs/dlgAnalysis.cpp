@@ -287,7 +287,7 @@ Update()
     _stprintf(sTmp, _T("%s: %s"), _("Analysis"),
               _("Barograph"));
     wf->SetCaption(sTmp);
-    BarographCaption(sTmp, glide_computer->GetFlightStats());
+    BarographCaption(sTmp, glide_computer->GetFlightStats(), false);
     wInfo->SetCaption(sTmp);
     SetCalcCaption(_("Settings"));
     break;

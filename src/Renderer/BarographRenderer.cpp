@@ -34,19 +34,25 @@ Copyright_License {
 #include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 
 void
-BarographCaption(TCHAR *sTmp, const FlightStatistics &fs)
+BarographCaption(TCHAR *temp, const FlightStatistics &fs, bool long_line)
 {
   ScopeLock lock(fs.mutex);
   if (fs.altitude_ceiling.sum_n < 2) {
-    sTmp[0] = _T('\0');
+    temp[0] = _T('\0');
   } else if (fs.altitude_ceiling.sum_n < 4) {
-    _stprintf(sTmp, _T("%s:\r\n  %.0f-%.0f %s"),
+    _stprintf(temp,
+              (long_line
+               ? _T("%s: %.0f-%.0f %s")
+               : _T("%s:\r\n  %.0f-%.0f %s")),
               _("Working band"),
               (double)Units::ToUserAltitude(fixed(fs.altitude_base.y_ave)),
               (double)Units::ToUserAltitude(fixed(fs.altitude_ceiling.y_ave)),
               Units::GetAltitudeName());
   } else {
-    _stprintf(sTmp, _T("%s:\r\n  %.0f-%.0f %s\r\n\r\n%s:\r\n  %.0f %s/hr"),
+    _stprintf(temp,
+              (long_line
+               ? _T("%s: %.0f-%.0f %s\r\n%s: %.0f %s/hr")
+               : _T("%s:\r\n  %.0f-%.0f %s\r\n\r\n%s:\r\n  %.0f %s/hr")),
               _("Working band"),
               (double)Units::ToUserAltitude(fixed(fs.altitude_base.y_ave)),
               (double)Units::ToUserAltitude(fixed(fs.altitude_ceiling.y_ave)),

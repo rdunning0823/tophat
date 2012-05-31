@@ -37,8 +37,13 @@ struct DerivedInfo;
 class ProtectedTaskManager;
 class TaskManager;
 
+/**
+* @param buffer buffer for result
+* @param fs
+* @long_line if true formats output to use fewer lines of text
+*/
 void
-BarographCaption(TCHAR *buffer, const FlightStatistics &fs);
+BarographCaption(TCHAR *buffer, const FlightStatistics &fs, bool long_line);
 
 void
 RenderBarographSpark(Canvas &canvas, const PixelRect rc,
