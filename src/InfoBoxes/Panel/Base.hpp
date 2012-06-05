@@ -147,4 +147,41 @@ protected:
    */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &parent_rc);
 };
+
+
+/**
+ *  Base class that sizes the rectangles needed to layout a
+ *  list with two big 1/2 height buttons up/dn on the right,
+ *  and one full width button below the list.
+ *  To be used as an alternative to a Scrollbar for the list.
+ *  These controls are flush with the borders of the parent rc
+ */
+class RatchetListLayout {
+protected:
+  /**
+   * "Up" button located to the right of the list, 50% of the height of the
+   * list, flush with the top
+   */
+  PixelRect ratchet_up_rc;
+
+  /**
+   * "Dn" button located to the right of the list, 50% of the height of the
+   * list, flush with the bottom
+   */
+  PixelRect ratchet_down_rc;
+
+  /**
+   * The list is in the upper left of the area
+   */
+  PixelRect ratchet_list_rc;
+
+protected:
+  /*
+   * Sizes the rectangles for the layout in the center
+   * of the rc
+   * @param parent_rc The rc of the parent window's usable area
+   */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+};
+
 #endif
