@@ -64,7 +64,7 @@ InfoBoxContentAltitude::PanelContent Panels[] = {
 
 static constexpr
 InfoBoxContentAltitude::DialogContent dlgContent = {
-  ARRAY_SIZE(Panels), &Panels[0],
+  ARRAY_SIZE(Panels), &Panels[0], true,
 };
 
 const InfoBoxContentAltitude::DialogContent *

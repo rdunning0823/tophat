@@ -114,7 +114,7 @@ InfoBoxContentWind::PanelContent (
 };
 
 const InfoBoxContentWind::DialogContent InfoBoxContentWind::dlgContent = {
-  ARRAY_SIZE(Panels), &Panels[0],
+  ARRAY_SIZE(Panels), &Panels[0], true,
 };
 
 const InfoBoxContentWind::DialogContent *

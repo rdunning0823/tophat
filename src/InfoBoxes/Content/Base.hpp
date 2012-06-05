@@ -73,6 +73,14 @@ public:
   struct DialogContent {
     const int PANELSIZE;
     const PanelContent *Panels;
+    /**
+     * Tells consumer of content whether to display it
+     * in a tab format or not.
+     */
+    bool show_in_tab_layout;
+    bool GetShowInTabLayout() const {
+      return show_in_tab_layout;
+    }
   };
 
   virtual const DialogContent *GetDialogContent();
