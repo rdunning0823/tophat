@@ -40,7 +40,7 @@ class WndFrame : public PaintWindow {
 
   unsigned mCaptionStyle;
 
-  StaticString<300> text;
+  StaticString<512> text;
 
 public:
   WndFrame(ContainerWindow &parent, const DialogLook &look,
