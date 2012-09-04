@@ -69,6 +69,16 @@ private:
   PeriodClock click_clock;
 
   /**
+   * Used during double click event
+   */
+  bool ignore_single_click;
+
+  /**
+   * a timer that allows detection of double clicks and single clicks
+   */
+  WindowTimer single_click_timer;
+
+  /**
    * Paints the InfoBox title to the given canvas
    * @param canvas The canvas to paint on
    */

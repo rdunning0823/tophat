@@ -62,7 +62,9 @@ InfoBoxWindow::InfoBoxWindow(ContainerWindow &parent,
    border_kind(border_flags),
    id(_id),
    force_draw_selector(false),
-   focus_timer(*this)
+   focus_timer(*this),
+   ignore_single_click(false),
+   single_click_timer(*this)
 {
   data.Clear();
 
@@ -500,6 +502,11 @@ InfoBoxWindow::OnKeyDown(unsigned key_code)
 bool
 InfoBoxWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
+  if (ignore_single_click)
+    return true;
+
+  single_click_timer.Cancel();
+
   SetCapture();
   click_clock.Update();
 
@@ -511,6 +518,12 @@ InfoBoxWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 InfoBoxWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 {
+  // Ignore single click event if double click detected
+  if (ignore_single_click) {
+    ignore_single_click = false;
+    return true;
+  }
+
   if (!HasFocus())
     return PaintWindow::OnMouseUp(x, y);
 
@@ -518,7 +531,7 @@ InfoBoxWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     ReleaseCapture();
 
     if ((unsigned)x < GetWidth() && (unsigned)y < GetHeight())
-      ShowDialog();
+      single_click_timer.Schedule(200);
 
     click_clock.Reset();
     return true;
@@ -529,8 +542,12 @@ InfoBoxWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 bool
 InfoBoxWindow::OnMouseDouble(PixelScalar x, PixelScalar y)
 {
-  if (!IsAltair())
+  single_click_timer.Cancel();
+
+  if (!IsAltair()) {
     InputEvents::ShowMenu();
+    ignore_single_click = true;
+  }
 
   return true;
 }
@@ -583,6 +600,10 @@ InfoBoxWindow::OnTimer(WindowTimer &timer)
   if (timer == focus_timer) {
     focus_timer.Cancel();
     FocusParent();
+    return true;
+  } else if (timer == single_click_timer) {
+    single_click_timer.Cancel();
+    ShowDialog();
     return true;
   } else
     return PaintWindow::OnTimer(timer);
