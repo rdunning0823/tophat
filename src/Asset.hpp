@@ -182,6 +182,29 @@ IsGalaxyTab22()
 }
 
 /**
+ * Returns whether the application is running on Nook Simple Touch
+ */
+static inline bool
+IsNookSimpleTouch()
+{
+#if defined(ANDROID)
+  static int cached_type = -1;
+  if (native_view == NULL)
+    return false;
+
+  if (cached_type == -1) {
+    if (_tcscmp(native_view->GetProduct(), _T("NOOK")) == 0)
+      cached_type = 1;
+    else
+      cached_type = 0;
+  }
+  return cached_type == 1;
+#else
+  return false;
+#endif
+}
+
+/**
  * Does this device have little main memory?  On those, some expensive
  * features are disabled.
  */
