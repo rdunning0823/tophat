@@ -49,6 +49,7 @@ Copyright_License {
 #include "Java/Global.hpp"
 #include "Android/InternalSensors.hpp"
 #include "Android/Main.hpp"
+#include "Android/Nook.hpp"
 #endif
 
 #include <assert.h>
@@ -250,6 +251,11 @@ DeviceDescriptor::Open(OperationEnvironment &env)
 
   if (is_simulator() || !config.IsAvailable())
     return;
+
+#ifdef ANDROID
+  if (IsNookSimpleTouch())
+    Nook::InitUsb();
+#endif
 
   CancelAsync();
 

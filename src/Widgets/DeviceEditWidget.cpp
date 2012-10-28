@@ -39,6 +39,8 @@
 #ifdef ANDROID
 #include "Java/Global.hpp"
 #include "Android/BluetoothHelper.hpp"
+#include "Asset.hpp"
+#include "Android/Nook.hpp"
 #ifdef IOIOLIB
 #include "Device/Port/AndroidIOIOUartPort.hpp"
 #endif
@@ -104,6 +106,11 @@ DetectSerialPorts(DataFieldEnum &df)
     return false;
 
   unsigned sort_start = df.Count();
+
+#ifdef ANDROID
+  if (IsNookSimpleTouch())
+    Nook::InitUsb();
+#endif
 
   bool found = false;
   struct dirent *ent;

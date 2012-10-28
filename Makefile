@@ -795,6 +795,7 @@ XCSOAR_SOURCES += \
 	$(SRC)/Android/Vibrator.cpp \
 	$(SRC)/Android/Context.cpp \
 	$(SRC)/Android/LogCat.cpp \
+	$(SRC)/Android/Nook.cpp \
 	$(SRC)/Android/Main.cpp
 ifneq ($(IOIOLIB_DIR),)
 XCSOAR_SOURCES += \
