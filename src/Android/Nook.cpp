@@ -33,6 +33,7 @@ static char cmd_fast_mode_enter[] = "echo 1 > /sys/class/graphics/fb0/fmode";
 static char cmd_fast_mode_exit[] = "echo 0 > /sys/class/graphics/fb0/fmode";
 static char cmd_epd_refresh_0[] = " echo 0 > /sys/class/graphics/fb0/epd_refresh";
 static char cmd_epd_refresh_1[] = " echo 1 > /sys/class/graphics/fb0/epd_refresh";
+static char cmd_set_charge_500[] = "su -c 'echo 500000 > /sys/class/regulator/regulator.5/device/force_current'";
 
 void
 Nook::EnterFastMode()
@@ -63,4 +64,10 @@ Nook::InitUsb()
   system(cmd_sleep);
 
   system(cmd_usb_rw);
+}
+
+void
+Nook::SetCharge500()
+{
+  system(cmd_set_charge_500);
 }

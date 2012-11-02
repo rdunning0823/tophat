@@ -43,6 +43,12 @@ namespace Nook {
    */
   void ExitFastMode();
 
+  /**
+   * Set charge rate to 500mA.
+   */
+  void SetCharge500();
+
+
 }
 
 #endif
