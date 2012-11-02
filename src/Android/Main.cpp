@@ -158,8 +158,10 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   ScreenInitialized();
   AllowLanguage();
 
-  if (IsNookSimpleTouch())
+  if (IsNookSimpleTouch()) {
     Nook::EnterFastMode();
+    Nook::SetCharge500();
+  }
 
   return Startup();
 }
