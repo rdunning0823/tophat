@@ -31,7 +31,7 @@ LogoView::LogoView()
    title(IDB_TITLE), big_title(IDB_TITLE_HD)
 {
 #ifndef USE_GDI
-  font.Set(_T("Droid Sans"), 12);
+  font.Set(_T("Droid Sans"), 18);
 #endif
 }
 
@@ -106,11 +106,12 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   canvas.Select(font);
 #endif
 
+  const int text_height = canvas.CalcTextSize(TopHat_ProductToken).cy;
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
-  canvas.text(2, 2, XCSoar_ProductToken);
+  canvas.text(2, 2, TopHat_ProductToken);
+  canvas.text(2, 4 + text_height, XCSoar_ProductToken);
 #ifdef NO_HORIZON
-  const int text_height = canvas.CalcTextSize(XCSoar_ProductToken).cy;
-  canvas.text(2, 4 + text_height, _T("Horizon: disabled"));
+  canvas.text(2, 6 + text_height * 2, _T("Horizon: disabled"));
 #endif
 }
