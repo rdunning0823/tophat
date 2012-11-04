@@ -35,7 +35,7 @@ import android.util.Log;
 class MultiPort implements AndroidPort, InputListener {
   private InputListener listener;
 
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private Collection<AndroidPort> ports = new LinkedList<AndroidPort>();
 

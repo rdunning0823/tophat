@@ -46,7 +46,7 @@ import android.util.Log;
 import android.provider.Settings;
 
 public class XCSoar extends Activity {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   /**
    * Hack: this is set by onCreate(), to support the "testing"

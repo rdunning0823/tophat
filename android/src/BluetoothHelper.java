@@ -35,7 +35,7 @@ import android.bluetooth.BluetoothSocket;
  * code.
  */
 final class BluetoothHelper {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
   private static final UUID THE_UUID =
         UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 

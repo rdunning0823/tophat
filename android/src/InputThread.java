@@ -31,7 +31,7 @@ import android.util.Log;
  * A wrapper for an InputStream which allows reading with a timeout.
  */
 class InputThread extends Thread {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   static final int BUFFER_SIZE = 256;
 

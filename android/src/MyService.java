@@ -47,7 +47,7 @@ import android.util.Log;
  * unless you have an excuse as good as ours ;-)
  */
 public class MyService extends Service {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   /**
    * Hack: this is set by onCreate(), to support the "testing"
@@ -74,7 +74,7 @@ public class MyService extends Service {
     Intent intent2 = new Intent(this, mainActivityClass);
     PendingIntent contentIntent =
       PendingIntent.getActivity(this, 0, intent2, 0);
-    notification.setLatestEventInfo(this, "XCSoar", "XCSoar is running",
+    notification.setLatestEventInfo(this, "XCSoar", "Top Hat is running",
                                     contentIntent);
     notification.flags |= Notification.FLAG_ONGOING_EVENT;
 

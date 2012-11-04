@@ -47,7 +47,7 @@ import java.lang.Math;
  */
 public class InternalGPS
   implements LocationListener, SensorEventListener, Runnable {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private static Handler handler;
 

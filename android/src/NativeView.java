@@ -53,7 +53,7 @@ import android.webkit.MimeTypeMap;
  */
 class NativeView extends SurfaceView
   implements SurfaceHolder.Callback, Runnable {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   Handler quitHandler;
 

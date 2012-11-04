@@ -26,7 +26,7 @@ package org.tophat;
 import android.util.Log;
 
 public class Loader {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   public static boolean loaded = false;
   public static String error;

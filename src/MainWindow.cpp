@@ -130,7 +130,7 @@ NoFontsAvailable()
 
   /* now try to get a GUI error message out to the user */
 #ifdef WIN32
-  MessageBox(NULL, msg, _T("XCSoar"), MB_ICONEXCLAMATION|MB_OK);
+  MessageBox(NULL, msg, _T("Top Hat"), MB_ICONEXCLAMATION|MB_OK);
 #elif !defined(ANDROID)
   execl("/usr/bin/xmessage", "xmessage", msg, NULL);
   execl("/usr/X11/bin/xmessage", "xmessage", msg, NULL);

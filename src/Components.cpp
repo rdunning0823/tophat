@@ -222,7 +222,7 @@ XCSoarInterface::Startup()
   VerboseOperationEnvironment operation;
 
   // Set the application title to "XCSoar"
-  TCHAR szTitle[] = _T("XCSoar");
+  TCHAR szTitle[] = _T("Top Hat");
 
   //If "XCSoar" is already running, stop this instance
   if (MainWindow::find(szTitle))

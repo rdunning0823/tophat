@@ -254,6 +254,6 @@ XCSoarInterface::CheckShutdown()
   if (force_shutdown)
     return true;
 
-  return ShowMessageBox(_("Quit program?"), _T("XCSoar"),
+  return ShowMessageBox(_("Quit program?"), _T("Top Hat"),
                      MB_YESNO | MB_ICONQUESTION) == IDYES;
 }
