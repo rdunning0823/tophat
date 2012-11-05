@@ -23,12 +23,14 @@ Copyright_License {
 
 #include "Base.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Form.hpp"
 #include "Interface.hpp"
 #include "Units/Units.hpp"
 #include "Units/Group.hpp"
 #include "UIGlobals.hpp"
+#include "Look/IconLook.hpp"
 #include "Look/DialogLook.hpp"
 #include "Screen/Fonts.hpp"
 #include "Language/Language.hpp"
@@ -59,7 +61,11 @@ BaseAccessPanel::BaseAccessPanel(unsigned _id)
 
 gcc_pure PixelScalar
 BaseAccessPanel::GetHeaderHeight() {
-  return Layout::Scale(20);
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *bmp = &icons.hBmpTabSettings;
+  const PixelSize bitmap_size = bmp->GetSize();
+  return (PixelScalar)max((unsigned)Layout::Scale(20),
+                          (unsigned)bitmap_size.cy + (unsigned)Layout::Scale(2));
 }
 
 void
@@ -124,10 +130,10 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  setup_button = new WndButton(GetClientAreaWindow(), look,
-                               _("Setup"), setup_button_rc,
-                               button_style,
-                               this, SetUp);
+  setup_button = new WndSymbolButton(GetClientAreaWindow(), look,
+                                     _("Setup"), setup_button_rc,
+                                     button_style,
+                                     this, SetUp);
 
   WindowStyle style_frame;
   PixelRect frame_rc = base_rc;

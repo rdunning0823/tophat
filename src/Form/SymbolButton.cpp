@@ -25,6 +25,7 @@ Copyright_License {
 #include "Form/Control.hpp"
 #include "Formatter/HexColor.hpp"
 #include "Look/DialogLook.hpp"
+#include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
 #include "resource.h"
@@ -132,5 +133,28 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   else if (ParseHexColor(caption.c_str(), color)) {
     GrowRect(rc, -3, -3);
     canvas.DrawFilledRectangle(rc, color);
+  }
+
+  //draw gear for set up icon
+  else if (caption == _("Setup")) {
+    Bitmap bmp(Layout::scale == 1 ? IDB_SETTINGS : IDB_SETTINGS_HD);
+
+    const PixelSize bitmap_size = bmp.GetSize();
+    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
+    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
+    if (is_down())
+      canvas.CopyNotOr(rc.left + offsetx,
+                       rc.top + offsety,
+                       bitmap_size.cx / 2,
+                       bitmap_size.cy,
+                       bmp,
+                       bitmap_size.cx / 2, 0);
+    else
+      canvas.CopyAnd(rc.left + offsetx,
+                      rc.top + offsety,
+                      bitmap_size.cx / 2,
+                      bitmap_size.cy,
+                      bmp,
+                      bitmap_size.cx / 2, 0);
   }
 }
