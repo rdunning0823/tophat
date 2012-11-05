@@ -43,6 +43,7 @@ class BaseAccessPanel : public NullWidget, protected WndForm {
 protected:
   unsigned id;
   WndButton *setup_button;
+  WndButton *close_button;
   WndFrame *header_text;
 
   /**

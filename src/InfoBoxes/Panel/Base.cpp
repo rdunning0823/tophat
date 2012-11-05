@@ -40,6 +40,7 @@ Copyright_License {
 
 enum ControlIndex {
   SetUp = 1000,
+  CloseButton = 1001,
 };
 
 gcc_const
@@ -68,6 +69,11 @@ BaseAccessPanel::GetHeaderHeight() {
                           (unsigned)bitmap_size.cy + (unsigned)Layout::Scale(2));
 }
 
+static gcc_pure PixelScalar
+GetFooterHeight() {
+  return Layout::Scale(40);
+}
+
 void
 BaseAccessPanel::Close()
 {
@@ -92,7 +98,8 @@ BaseAccessPanel::OnAction(int action_id)
   if (action_id == SetUp) {
     InfoBoxManager::ShowInfoBoxPicker(id);
     Close();
-  }
+  } else if (action_id == CloseButton)
+    Close();
 }
 void
 BaseAccessPanel::Show(const PixelRect &rc)
@@ -105,6 +112,7 @@ BaseAccessPanel::Unprepare()
 {
   delete header_text;
   delete setup_button;
+  delete close_button;
   NullWidget::Unprepare();
 }
 
@@ -122,14 +130,21 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   base_rc.right = rc.right - rc.left;
   base_rc.bottom = rc.bottom - rc.top;
 
+  ButtonWindowStyle button_style;
+  button_style.TabStop();
+  button_style.multiline();
+
+  PixelRect close_button_rc = base_rc;
+  close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
+  close_button = new WndButton(GetClientAreaWindow(), look,
+                               _("Close"), close_button_rc,
+                               button_style,
+                               this, CloseButton);
+
   PixelScalar setup_button_width = 0.2 * (rc.right - rc.left);
   PixelRect setup_button_rc = base_rc;
   setup_button_rc.left = setup_button_rc.right - setup_button_width;
   setup_button_rc.bottom = setup_button_rc.top + GetHeaderHeight();
-
-  ButtonWindowStyle button_style;
-  button_style.TabStop();
-  button_style.multiline();
   setup_button = new WndSymbolButton(GetClientAreaWindow(), look,
                                      _("Setup"), setup_button_rc,
                                      button_style,
@@ -161,6 +176,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   content_rc = base_rc;
   content_rc.top += GetHeaderHeight();
+  content_rc.bottom -= GetFooterHeight();
 }
 
 

@@ -737,7 +737,7 @@ MainWindow::KillWidget()
 }
 
 void
-MainWindow::SetWidget(Widget *_widget)
+MainWindow::SetWidget(Widget *_widget, bool full_screen)
 {
   assert(_widget != NULL);
 
@@ -758,7 +758,7 @@ MainWindow::SetWidget(Widget *_widget)
 
   widget = _widget;
 
-  const PixelRect rc = FullScreen ? GetClientRect() : map_rect;
+  const PixelRect rc = (FullScreen || full_screen) ? GetClientRect() : map_rect;
   widget->Initialise(*this, rc);
   widget->Prepare(*this, rc);
   widget->Show(rc);
