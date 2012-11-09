@@ -31,6 +31,7 @@ Copyright_License {
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
 
+
 gcc_const
 static WindowStyle
 GetDialogStyle()
@@ -42,9 +43,12 @@ GetDialogStyle()
 }
 
 WidgetDialog::WidgetDialog(const TCHAR *caption, const PixelRect &rc,
-                           Widget *_widget)
+                           Widget *_widget,
+                           DialogFooter::Listener *_listener,
+                           UPixelScalar _footer_height)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            rc, caption, GetDialogStyle()),
+   dialog_footer(GetClientAreaWindow(), _listener, _footer_height),
    buttons(GetClientAreaWindow(), UIGlobals::GetDialogLook()),
    widget(GetClientAreaWindow(), _widget),
    auto_size(false),
@@ -53,16 +57,30 @@ WidgetDialog::WidgetDialog(const TCHAR *caption, const PixelRect &rc,
   widget.Move(buttons.UpdateLayout());
 }
 
-WidgetDialog::WidgetDialog(const TCHAR *caption, Widget *_widget)
+WidgetDialog::WidgetDialog(const TCHAR *caption, Widget *_widget,
+                           DialogFooter::Listener *_listener,
+                           UPixelScalar _footer_height)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            UIGlobals::GetMainWindow().GetClientRect(),
            caption, GetDialogStyle()),
+   dialog_footer(GetClientAreaWindow(), _listener, _footer_height),
    buttons(GetClientAreaWindow(), UIGlobals::GetDialogLook()),
    widget(GetClientAreaWindow(), _widget),
    auto_size(true),
    changed(false)
 {
   widget.Move(buttons.UpdateLayout());
+}
+
+WidgetDialog::DialogFooter::DialogFooter(ContainerWindow &parent,
+                                         Listener *_listener,
+                                         UPixelScalar _height)
+  :listener(_listener), height(_height)
+{
+  WindowStyle style;
+  // TODO: hack - this creates a 1 pixel footer if no footer exists
+  set(parent, 0, parent.GetHeight() - height, parent.GetWidth(),
+      (height > 0) ? height : 1, style);
 }
 
 void
@@ -82,6 +100,7 @@ WidgetDialog::AutoSize()
   const PixelScalar max_height_with_buttons =
     max_size.cy + Layout::GetMaximumControlHeight();
   if (/* need full dialog height even for minimum widget height? */
+      /*landscape */
       min_height_with_buttons >= parent_size.cy ||
       /* try to avoid putting buttons left on portrait screens; try to
          comply with maximum widget height only on landscape
@@ -99,11 +118,14 @@ WidgetDialog::AutoSize()
       rc.right -= remaining_size.cx - max_size.cx;
 
     Move(rc);
-    widget.Move(buttons.LeftLayout());
+    rc.bottom -= dialog_footer.GetHeight();
+    rc.bottom -= GetTitleHeight();
+    widget.Move(buttons.LeftLayout(rc));
     return;
   }
 
   /* see if buttons fit at the bottom */
+  /* portrait */
 
   PixelRect rc = parent_rc;
   if (max_size.cx < parent_size.cx)
@@ -116,7 +138,9 @@ WidgetDialog::AutoSize()
     rc.bottom -= remaining_size.cy - max_size.cy;
 
   Move(rc);
-  widget.Move(buttons.BottomLayout());
+  rc.bottom -= dialog_footer.GetHeight();
+  rc.bottom -= GetTitleHeight();
+  widget.Move(buttons.BottomLayout(rc));
 }
 
 int
@@ -147,6 +171,18 @@ WidgetDialog::OnDestroy()
   widget.Unprepare();
 }
 
+
+PixelRect
+WidgetDialog::GetFooterRect()
+{
+  PixelRect rc;
+  rc.left = 0;
+  rc.right = GetWidth();
+  rc.top = GetHeight() - dialog_footer.GetHeight();
+  rc.bottom = GetHeight();
+  return rc;
+}
+
 void
 WidgetDialog::OnResize(UPixelScalar width, UPixelScalar height)
 {
@@ -156,6 +192,7 @@ WidgetDialog::OnResize(UPixelScalar width, UPixelScalar height)
     return;
 
   widget.Move(buttons.UpdateLayout());
+  dialog_footer.Move(0, height - dialog_footer.GetHeight());
 }
 
 bool
