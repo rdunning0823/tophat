@@ -205,6 +205,15 @@ IsNookSimpleTouch()
 }
 
 /**
+ * Returns whether the application is running a device with a gray-scale screen
+ */
+static inline bool
+IsGrayScaleScreen()
+{
+  return IsNookSimpleTouch();
+}
+
+/**
  * Does this device have little main memory?  On those, some expensive
  * features are disabled.
  */
