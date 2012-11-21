@@ -239,6 +239,16 @@ HasIOIOLib()
 }
 
 /**
+ * Does this device an Android internal GPS?
+ */
+constexpr
+static inline bool
+HasAndroidInternalGPS()
+{
+  return IsAndroid() && !IsNookSimpleTouch();
+}
+
+/**
  * Does this device have a pointer device? (mouse or touch screen)
  * @return True if a touch screen or mouse is assumed for the hardware
  * that XCSoar is running on, False if the hardware has only buttons
