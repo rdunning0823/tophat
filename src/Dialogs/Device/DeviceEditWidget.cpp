@@ -48,6 +48,7 @@
 #include "Android/BluetoothHelper.hpp"
 #include "Asset.hpp"
 #include "Android/Nook.hpp"
+#include "Android/Product.hpp"
 #ifdef IOIOLIB
 #include "Device/Port/AndroidIOIOUartPort.hpp"
 #endif

@@ -29,6 +29,7 @@ Copyright_License {
 #include "LogFile.hpp"
 #include "Interface.hpp"
 #include "Operation/PopupOperationEnvironment.hpp"
+#include "Asset.hpp"
 
 #include <assert.h>
 
@@ -116,8 +117,9 @@ devStartup()
     devInitOne(*device_list[i]);
   }
 
-  if (none_available) {
+  if (none_available && HasAndroidInternalGPS()) {
 #ifdef ANDROID
+
     /* fall back to built-in GPS when no configured device is
        available on this platform */
     LogFormat("Falling back to built-in GPS");

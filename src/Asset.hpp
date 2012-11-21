@@ -25,7 +25,9 @@ Copyright_License {
 
 #include "Hardware/ModelType.hpp"
 #include "Compiler.h"
+#ifdef ANDROID
 #include "Android/Product.hpp"
+#endif
 
 #include <tchar.h>
 
@@ -199,6 +201,19 @@ HasIOIOLib()
   return true;
 #else
   return false;
+#endif
+}
+
+/**
+ * Does this device an Android internal GPS?
+ */
+static inline bool
+HasAndroidInternalGPS()
+{
+#ifdef ANDROID
+  return !IsNookSimpleTouch();
+#else
+  return true;
 #endif
 }
 
