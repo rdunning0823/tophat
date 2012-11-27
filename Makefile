@@ -752,6 +752,8 @@ XCSOAR_SOURCES := \
 	$(SRC)/Widgets/BigThermalAssistantWidget.cpp \
 	$(SRC)/Widgets/DeviceEditWidget.cpp \
 	$(SRC)/Widgets/PolarShapeEditWidget.cpp \
+	$(SRC)/Widgets/MainMenuButtonWidget.cpp \
+	$(SRC)/Widgets/MapOverlayButton.cpp \
 	\
 	$(SRC)/Device/Driver.cpp \
 	$(SRC)/Device/Declaration.cpp \

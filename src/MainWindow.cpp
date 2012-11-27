@@ -54,6 +54,7 @@ Copyright_License {
 #include "DrawThread.hpp"
 #include "MapWindow/MapWidgetOverlays.hpp"
 #include "Pan.hpp"
+#include "Widgets/MainMenuButtonWidget.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
@@ -214,6 +215,7 @@ MainWindow::InitialiseConfigured()
   map = new GlueMapWindow(*look);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+  widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 

@@ -42,6 +42,8 @@ struct IconLook {
   Bitmap hBmpTabRules;
   Bitmap hBmpTabTimes;
 
+  Bitmap hBmpMenuButton;
+
   void Initialise();
 };
 

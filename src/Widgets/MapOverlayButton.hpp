@@ -21,23 +21,20 @@ Copyright_License {
 }
 */
 
-#include "IconLook.hpp"
-#include "Screen/Layout.hpp"
+#ifndef XCSOAR_MAP_OVERLAY_BUTTON_SIZE_HPP
+#define XCSOAR_MAP_OVERLAY_BUTTON_SIZE_HPP
 
-#include "resource.h"
+/**
+ * a shared properties of all the map overlay buttons
+ */
 
-void
-IconLook::Initialise()
-{
-  hBmpTabTask.Load(Layout::scale > 1 ? IDB_TASK_HD : IDB_TASK);
-  hBmpTabWrench.Load(Layout::scale > 1 ? IDB_WRENCH_HD : IDB_WRENCH);
-  hBmpTabSettings.Load(Layout::scale > 1 ? IDB_SETTINGS_HD : IDB_SETTINGS);
-  hBmpTabCalculator.Load(Layout::scale > 1 ? IDB_CALCULATOR_HD : IDB_CALCULATOR);
+namespace MapOverlayButton {
 
-  hBmpTabFlight.Load(Layout::scale > 1 ? IDB_GLOBE_HD : IDB_GLOBE);
-  hBmpTabSystem.Load(Layout::scale > 1 ? IDB_DEVICE_HD : IDB_DEVICE);
-  hBmpTabRules.Load(Layout::scale > 1 ? IDB_RULES_HD : IDB_RULES);
-  hBmpTabTimes.Load(Layout::scale > 1 ? IDB_CLOCK_HD : IDB_CLOCK);
+  /**
+   * size from 2 (tiny) to 6 (huge) of map overlay buttons
+   */
+  unsigned GetScale();
 
-  hBmpMenuButton.Load(Layout::scale > 1 ? IDB_MENU_BUTTON_HD : IDB_MENU_BUTTON);
 }
+
+#endif

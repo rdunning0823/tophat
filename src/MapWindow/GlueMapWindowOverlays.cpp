@@ -24,6 +24,8 @@ Copyright_License {
 #include "GlueMapWindow.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/TaskLook.hpp"
+#include "Look/IconLook.hpp"
+#include "UIGlobals.hpp"
 #include "Screen/Icon.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Layout.hpp"
@@ -170,7 +172,11 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
 void
 GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 {
-  PixelScalar offset = 0;
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *menu_bitmap = &icons.hBmpMenuButton;
+  const PixelSize menu_bitmap_size = menu_bitmap->GetSize();
+
+  PixelScalar offset = menu_bitmap_size.cx / 2 + Layout::Scale(2);
 
   // draw logger status
   if (logger != NULL && logger->IsLoggerActive()) {
