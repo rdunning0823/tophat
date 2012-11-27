@@ -30,6 +30,7 @@ Copyright_License {
 #include "PopupMessage.hpp"
 #include "BatteryTimer.hpp"
 #include "Form/ManagedWidget.hpp"
+#include "MapWindow/MapWidgetOverlays.hpp"
 
 #include <stdint.h>
 #include <assert.h>
@@ -105,6 +106,11 @@ private:
 #endif
 
   bool airspace_warning_pending;
+
+  /**
+   * collection of widgets displayed over the map
+   */
+  MapWidgetOverlays widget_overlays;
 
 public:
   MainWindow(const StatusMessageList &status_messages);
