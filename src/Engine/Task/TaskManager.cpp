@@ -27,6 +27,7 @@
 #include "Ordered/Points/OrderedTaskPoint.hpp"
 #include "Ordered/Points/AATPoint.hpp"
 #include "Util/StringUtil.hpp"
+#include "OS/Clock.hpp"
 
 TaskManager::TaskManager(const TaskBehaviour &_task_behaviour,
                          const Waypoints &wps)
@@ -36,7 +37,8 @@ TaskManager::TaskManager(const TaskBehaviour &_task_behaviour,
    task_goto(task_behaviour, wps),
    task_abort(task_behaviour, wps),
    mode(MODE_NULL),
-   active_task(NULL) {
+   active_task(NULL),
+   task_time_stamp(0) {
   null_stats.reset();
 }
 
@@ -59,12 +61,14 @@ TaskManager::SetMode(const TaskMode _mode)
   case (MODE_ABORT):
     active_task = &task_abort;
     mode = MODE_ABORT;
+    task_time_stamp = MonotonicClockMS();
     break;
 
   case (MODE_ORDERED):
     if (task_ordered.TaskSize()) {
       active_task = &task_ordered;
       mode = MODE_ORDERED;
+      task_time_stamp = MonotonicClockMS();
       break;
     }
 
@@ -72,12 +76,14 @@ TaskManager::SetMode(const TaskMode _mode)
     if (task_goto.GetActiveTaskPoint()) {
       active_task = &task_goto;
       mode = MODE_GOTO;
+      task_time_stamp = MonotonicClockMS();
       break;
     }
 
   case (MODE_NULL):
     active_task = NULL;
     mode = MODE_NULL;
+    task_time_stamp = MonotonicClockMS();
     break;
   };
   return mode;
@@ -350,6 +356,7 @@ TaskManager::DoGoto(const Waypoint &wp)
 {
   if (task_goto.DoGoto(wp)) {
     SetMode(MODE_GOTO);
+    task_time_stamp = MonotonicClockMS();
     return true;
   }
 
@@ -373,6 +380,7 @@ TaskManager::Reset()
   task_abort.Reset();
   common_stats.Reset();
   glide_polar.SetCruiseEfficiency(fixed_one);
+  task_time_stamp = MonotonicClockMS();
 }
 
 unsigned
@@ -561,6 +569,8 @@ TaskManager::Commit(const OrderedTask &other)
   bool retval = task_ordered.Commit(other);
 
   if (other.TaskSize()) {
+    task_time_stamp = MonotonicClockMS();
+
     // if valid, resume the task
     switch (mode) {
     case MODE_NULL:

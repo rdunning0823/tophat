@@ -33,6 +33,7 @@
 #include "GlideSolvers/GlidePolar.hpp"
 #include "TaskBehaviour.hpp"
 #include "Navigation/Aircraft.hpp"
+#include "PeriodClock.hpp"
 
 class AbstractTaskFactory;
 class TaskEvents;
@@ -77,6 +78,11 @@ private:
   TaskStats null_stats;
 
   CommonStats common_stats;
+
+  /**
+   * time stamp of when the ordered task last was committed
+   */
+  unsigned task_time_stamp;
 
 public:
   friend class Serialiser;
@@ -557,6 +563,13 @@ public:
    * appropriate waypoint within 1000m of the takeoff location.
    */
   void TakeoffAutotask(const GeoPoint &ref, const fixed terrain_alt);
+
+  /**
+   * returns time stamp when ordered task was last committed
+   */
+  unsigned GetTaskTimeStamp() const {
+    return task_time_stamp;
+  }
 
 private:
   TaskMode SetMode(const TaskMode mode);
