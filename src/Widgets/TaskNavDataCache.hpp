@@ -1,0 +1,246 @@
+/*
+Copyright_License {
+
+  XCSoar Glide Computer - http://www.xcsoar.org/
+  Copyright (C) 2000-2012 The XCSoar Project
+  A detailed list of copyright holders can be found in the file "AUTHORS".
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+}
+*/
+
+#ifndef XCSOAR_TASK_NAV_DATA_CACHE_HPP
+#define XCSOAR_TASK_NAV_DATA_CACHE_HPP
+
+#include "Task/AbstractTask.hpp"
+#include "Engine/Task/TaskManager.hpp"
+#include "Util/StaticString.hpp"
+
+#include <assert.h>
+
+
+struct ComputerSettings;
+struct NMEAInfo;
+class TaskStats;
+class GotoTask;
+
+/**
+ * a class for calculating glide solutions ordered task points and storing them
+ * This class will never lock the task manager
+ */
+class TaskNavDataCache
+{
+public:
+  enum {
+    MAX_TURNPOINTS = 13,
+    CACHE_LATENCY = 1000
+  };
+
+  struct tp_info {
+    unsigned timestamp;
+
+    /**
+     * The waypoint of the task point
+     */
+    const Waypoint* waypoint;
+
+    fixed distance;
+    /**
+     * true if distance was computable
+     */
+    bool distance_valid;
+    Angle delta_bearing;
+    /**
+     * true if delta_bearing was computable
+     */
+    bool bearing_valid;
+    fixed altitude_difference;
+    /**
+     * true if altidude difference was computable
+     */
+    bool altitude_difference_valid;
+
+    /*
+     * For ordered, true if the ScoredTaskPoint has been entered
+     * For non-ordered, undefined.
+     */
+    bool has_entered;
+
+    /*
+     * For ordered, true if the ScoredTaskPoint has been exited
+     * For non-ordered, undefined.
+     */
+    bool has_exited;
+
+    tp_info() : timestamp(0), waypoint(nullptr) {};
+
+    bool IsValid() {
+      return timestamp > 0u;
+    };
+
+    void Invalidate() {
+      timestamp = 0u;
+    }
+
+    bool IsCurrent() {
+      return MonotonicClockMS() < timestamp + CACHE_LATENCY;
+    }
+
+    /**
+     * has the plane entered the sector?
+     */
+    bool GetHasEntered() {
+      return has_entered;
+    };
+  };
+
+private:
+  const ComputerSettings &settings;
+  const NMEAInfo &basic;
+  const TaskStats &task_stats;
+
+protected:
+  tp_info tps[MAX_TURNPOINTS];
+
+  /**
+   * tp info for the active turnpoint.  For Goto task, abort mode and home task
+   */
+  tp_info active_tp;
+
+  /**
+   * size of the ordered_task
+   */
+  unsigned ordered_task_size;
+
+  /**
+   * timestamp from the task manager when task was last read
+   */
+  unsigned task_manager_time_stamp;
+
+  /**
+   * the mode
+   */
+  TaskManager::TaskMode mode;
+
+  /**
+   * the active task point index from the task manager
+   */
+  unsigned active_task_point_index;
+
+  /**
+   * the timestamp the transitions were last updated
+   */
+  unsigned transition_time_stamp;
+
+public:
+  TaskNavDataCache(const ComputerSettings &_settings,
+                   const NMEAInfo &_basic,
+                   const TaskStats &_task_stats);
+
+  void UpdateOrderedTask(const OrderedTask &ordered_task,
+                         TaskManager::TaskMode _mode,
+                         unsigned _active_task_point_index,
+                         int _task_manager_time_stamp);
+
+  void SetActiveWaypoint(TaskWaypoint* twp) {
+    if (twp == nullptr)
+      active_tp.waypoint = nullptr;
+    else
+      active_tp.waypoint = &twp->GetWaypoint();
+    active_tp.Invalidate();
+  }
+
+  void SetActiveTaskPointIndex(unsigned i) {
+    active_task_point_index = i;
+  }
+
+  unsigned GetActiveTaskPointIndex() {
+      return active_task_point_index;
+  }
+
+  /**
+   * returns timestamp that task manager provided when task was read
+   */
+  unsigned GetTaskManagerTimeStamp() {
+      return task_manager_time_stamp;
+  }
+
+  unsigned GetOrderedTaskSize() {
+    return ordered_task_size;
+  }
+
+  /**
+   * returns the mode
+   */
+  TaskManager::TaskMode GetTaskMode() {
+    return mode;
+  }
+
+  tp_info &GetPoint(unsigned i);
+
+  /**
+   * invalidates all items in cache
+   */
+  void SetDirty();
+
+  /**
+   * Calcs the active tp cache from the waypoint in active_tp
+   * @return active_tp info
+   */
+  tp_info &CalcActivePoint();
+
+  /**
+   * caches the waypoint for the task point
+   * @param ordered_task.  the current ordered_task
+   * @param idx. the index of the point to be cached
+   */
+  void SetTaskPoint(const OrderedTask &ordered_task, unsigned idx);
+
+  /**
+   * updates the has_entered transition value for the ordered task points
+   * assumes the task is current and SetTaskPoint has been called for each
+   * task point
+   */
+  void UpdateTransitions(const OrderedTask &ordered_task);
+
+  /**
+   * returns true if the transitions are current (with delay)
+   */
+  bool AreTransistionsCurrent() {
+    return NowStamp() < transition_time_stamp + 2000;
+  }
+
+  /**
+   * Calcs the glide solution of the ith Task TP cache if it's old.
+   * Does not calculate the has_entered status.
+   * Must only be called after SetTaskPoint is called.
+   * @param i.  index of ordered task
+   * @param ordered_task.  The ordered task.
+   * @return The udpated ith Task TP info
+   */
+  tp_info &CalcTaskPoint(unsigned i);
+
+  /**
+   * Calcs the ith Task TP cache if it's old
+   * @param tp_data. the tp_data item to be calc'd
+   * @param wp. The waypoint from which to calc the tp_data
+   * @return the calcd tp_data item
+   */
+  tp_info &CalcPoint(TaskNavDataCache::tp_info &tp_data,
+                       const Waypoint &wp);
+
+  unsigned NowStamp();
+};
+#endif
