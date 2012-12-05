@@ -30,6 +30,7 @@
 #include "GlideSolvers/GlidePolar.hpp"
 #include "TaskBehaviour.hpp"
 #include "Time/PeriodClock.hpp"
+#include "Task/TaskType.hpp"
 
 class AbstractTaskFactory;
 class TaskEvents;
