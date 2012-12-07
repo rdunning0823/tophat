@@ -26,12 +26,78 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Input/InputEvents.hpp"
 
+#include "LogFile.hpp" //debug
+
 #include <assert.h>
+
+/**
+ * creates button positions 15 to MAX_BUTTONS -1
+ * 16-20 are always on the left side of the screen
+ * 21-25 are always on the right side of the screen
+ * 26 is the "Cancel" position, and is bottom left
+ * for portrait, Bottom right for Landscape
+ * 27 is "More/Less" and located next to the Cancel button
+ */
+gcc_pure
+static PixelRect
+GetButtonPositionFixed(unsigned i, PixelRect rc)
+{
+  if (i < 16 || i > 31)
+    i = 0;
+  else
+    i -= 15;
+
+  UPixelScalar hwidth = rc.right - rc.left;
+  UPixelScalar hheight = rc.bottom - rc.top;
+  const bool portrait = hheight > hwidth;
+
+  if (portrait)
+    hwidth /= 3;
+  else
+    hwidth /= 4;
+
+  hheight /= 6;
+
+  if (i == 0) {
+    rc.left = rc.right;
+    rc.top = rc.bottom;
+  } else {
+
+    // Cancel button
+    if (i == 11) {
+      if (!portrait)
+        rc.left = rc.right - hwidth;
+      rc.top = 5 * hheight;
+
+      // More/less button
+    } else if (i == 12) {
+      if (!portrait)
+        rc.left = rc.right - hwidth * 2;
+      else
+        rc.left += hwidth;
+      rc.top = 5 * hheight;
+
+    } else {
+      rc.top += ((i - 1) % 5) * hheight;
+      if (i > 5)
+        rc.left = rc.right - hwidth;
+    }
+  }
+
+  rc.right = rc.left + hwidth;
+  rc.bottom = rc.top + hheight;
+
+  return rc;
+}
+
 
 gcc_pure
 static PixelRect
 GetButtonPosition(unsigned i, PixelRect rc)
 {
+  if (i > 15)
+    return GetButtonPositionFixed(i, rc);
+
   UPixelScalar hwidth = rc.right - rc.left;
   UPixelScalar hheight = rc.bottom - rc.top;
 
