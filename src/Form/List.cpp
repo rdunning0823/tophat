@@ -44,7 +44,7 @@ using std::max;
 
 ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
                          PixelRect rc, const WindowStyle style,
-                         UPixelScalar _item_height)
+                         UPixelScalar _item_height, int stopping_time)
   :look(_look),
    has_scroll_bar(true),
    item_height(_item_height),
@@ -56,9 +56,8 @@ ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
    activate_callback(NULL),
    cursor_callback(NULL),
    paint_item_callback(NULL)
-#ifndef _WIN32_WCE
-   , kinetic_timer(*this)
-#endif
+   , kinetic(stopping_time),
+   kinetic_timer(*this)
 {
   set(parent, rc, style);
 }
@@ -81,8 +80,9 @@ ListControl::ActivateItem()
 
   unsigned index = GetCursorIndex();
   assert(index < GetLength());
-  if (handler != NULL)
+  if (handler != NULL) {
     handler->OnActivateItem(index);
+  }
   else if (activate_callback != NULL)
     activate_callback(index);
 }
@@ -196,8 +196,8 @@ void
 ListControl::OnPaint(Canvas &canvas, const PixelRect &dirty)
 {
   if (handler != NULL || paint_item_callback != NULL)
-    DrawItems(canvas, origin + (dirty.top + pixel_pan) / item_height,
-              origin + (dirty.bottom + pixel_pan + item_height - 1) / item_height);
+    DrawItems(canvas, origin + (dirty.top + GetPixelPanUnsigned()) / item_height,
+              origin + (dirty.bottom + GetPixelPanUnsigned() + item_height - 1) / item_height);
 
   DrawScrollBar(canvas);
 }
@@ -207,7 +207,7 @@ ListControl::DrawScrollBar(Canvas &canvas) {
   if (!scroll_bar.IsDefined())
     return;
 
-  scroll_bar.SetSlider(length * item_height, GetHeight(), GetPixelOrigin());
+  scroll_bar.SetSlider(length * item_height, GetHeight(), (GetPixelOrigin() < 0) ? 0 : GetPixelOrigin());
   scroll_bar.Paint(canvas);
 }
 
@@ -305,7 +305,7 @@ ListControl::MoveCursor(int delta)
 }
 
 void
-ListControl::SetPixelPan(UPixelScalar _pixel_pan)
+ListControl::SetPixelPan(PixelScalar _pixel_pan)
 {
   if (pixel_pan == _pixel_pan)
     return;
@@ -328,18 +328,18 @@ ListControl::SetOrigin(int i)
   if ((unsigned)i == origin)
     return;
 
-#ifdef USE_GDI
+#ifdef USE_GDIXX
   int delta = origin - i;
 #endif
 
   origin = i;
 
-#ifdef USE_GDI
+#ifdef USE_GDIXX
   if ((unsigned)abs(delta) < items_visible) {
     PixelRect rc = GetClientRect();
     rc.right = scroll_bar.GetLeft(GetSize());
     Scroll(0, delta * item_height, rc);
-
+zz
     /* repaint the scrollbar synchronously; we could Invalidate its
        area and repaint asynchronously via WM_PAINT, but then the clip
        rect passed to OnPaint() would be the whole client area */
@@ -537,6 +537,8 @@ ListControl::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 #ifndef _WIN32_WCE
     kinetic.MouseMove(GetPixelOrigin());
 #endif
+    if (handler != nullptr)
+      handler->OnPixelMove();
     return true;
   }
 
@@ -648,11 +650,10 @@ ListControl::OnCancelMode()
   return false;
 }
 
-#ifndef _WIN32_WCE
-
 bool
 ListControl::OnTimer(WindowTimer &timer)
 {
+#ifndef _WIN32_WCE
   if (timer == kinetic_timer) {
     if (kinetic.IsSteady()) {
       kinetic_timer.Cancel();
@@ -661,6 +662,7 @@ ListControl::OnTimer(WindowTimer &timer)
 
     return true;
   }
+#endif
 
   return PaintWindow::OnTimer(timer);
 }
@@ -672,5 +674,3 @@ ListControl::OnDestroy()
 
   PaintWindow::OnDestroy();
 }
-
-#endif

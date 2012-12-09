@@ -28,10 +28,8 @@ Copyright_License {
 #include "Form/ScrollBar.hpp"
 #include "Compiler.h"
 
-#ifndef _WIN32_WCE
 #include "Screen/Timer.hpp"
 #include "KineticManager.hpp"
-#endif
 
 struct DialogLook;
 class ContainerWindow;
@@ -59,6 +57,11 @@ public:
     }
 
     virtual void OnActivateItem(unsigned index) {}
+
+    /**
+     * called when the list scrolls a pixel
+     */
+    virtual void OnPixelMove() {}
   };
 
 protected:
@@ -82,8 +85,9 @@ protected:
   /**
    * Which pixel row of the "origin" item is being displayed at the
    * top of the Window?
+   * May be negative if used by HorizontalList with over_scroll_max
    */
-  UPixelScalar pixel_pan;
+  PixelScalar pixel_pan;
 
   /** The number of items visible at a time. */
   unsigned items_visible;
@@ -131,10 +135,8 @@ protected:
   CursorCallback cursor_callback;
   PaintItemCallback paint_item_callback;
 
-#ifndef _WIN32_WCE
   KineticManager kinetic;
   WindowTimer kinetic_timer;
-#endif
 
 public:
   /**
@@ -143,7 +145,7 @@ public:
    */
   ListControl(ContainerWindow &parent, const DialogLook &look,
               PixelRect rc, const WindowStyle style,
-              UPixelScalar _item_height);
+              UPixelScalar _item_height, int stopping_time = 1000);
 
   void SetHandler(Handler *_handler) {
     assert(handler == NULL);
@@ -242,18 +244,26 @@ public:
   /**
    * Pan the "origin item" to the specified pixel position.
    */
-  void SetPixelPan(UPixelScalar _pixel_pan);
+  void SetPixelPan(PixelScalar _pixel_pan);
+
+  /**
+   * returns max of 0 or pixel_pan
+   */
+  UPixelScalar GetPixelPanUnsigned() const {
+    return (UPixelScalar)max((PixelScalar)0, pixel_pan);
+  }
 
   /**
    * Scrolls to the specified index.
    */
   void SetOrigin(int i);
 
-  unsigned GetPixelOrigin() const {
+  PixelScalar GetPixelOrigin() const {
     return origin * item_height + pixel_pan;
   }
 
-  void SetPixelOrigin(int pixel_origin) {
+  virtual void SetPixelOrigin(int pixel_origin) {
+
     int max = length * item_height - GetHeight();
     if (pixel_origin > max)
       pixel_origin = max;
@@ -271,6 +281,15 @@ public:
    */
   void MoveOrigin(int delta);
 
+  /**
+   * allow these to be overrided
+   */
+  virtual UPixelScalar GetHeight() {
+    return PaintWindow::GetHeight();
+  }
+  virtual UPixelScalar GetWidth() {
+    return PaintWindow::GetWidth();
+  }
 protected:
   gcc_pure
   bool CanActivateItem() const;
@@ -283,7 +302,7 @@ protected:
    * Scroll to the ListItem defined by i
    * @param i The ListItem array id
    */
-  void EnsureVisible(unsigned i);
+  virtual void EnsureVisible(unsigned i);
 
   /**
    * Determine which list item resides at the specified pixel row.
@@ -291,11 +310,11 @@ protected:
    */
   gcc_pure
   int ItemIndexAt(int y) const {
-    int i = (y + pixel_pan) / item_height + origin;
+    int i = (y + GetPixelPanUnsigned()) / item_height + origin;
     return i >= 0 && (unsigned)i < length ? i : -1;
   }
 
-  gcc_pure
+  virtual gcc_pure
   PixelRect item_rect(unsigned i) const {
     PixelRect rc;
     rc.left = 0;
@@ -311,7 +330,7 @@ protected:
 
   void drag_end();
 
-  void DrawItems(Canvas &canvas, unsigned start, unsigned end) const;
+  virtual void DrawItems(Canvas &canvas, unsigned start, unsigned end) const;
 
   /** Draws the ScrollBar */
   void DrawScrollBar(Canvas &canvas);
@@ -364,10 +383,8 @@ protected:
   virtual void OnPaint(Canvas &canvas);
   virtual void OnPaint(Canvas &canvas, const PixelRect &dirty);
 
-#ifndef _WIN32_WCE
   virtual bool OnTimer(WindowTimer &timer);
   virtual void OnDestroy();
-#endif
 };
 
 #endif
