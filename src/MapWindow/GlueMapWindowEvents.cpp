@@ -205,7 +205,7 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 
   case DRAG_GESTURE:
     const TCHAR* gesture = gestures.Finish();
-    if (gesture && OnMouseGesture(gesture))
+    if (y > (int)compass_offset_y && gesture && OnMouseGesture(gesture))
       return true;
 
     break;

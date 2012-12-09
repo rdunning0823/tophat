@@ -55,7 +55,8 @@ MapWindow::MapWindow(const MapLook &_look,
 #ifdef HAVE_NOAA
    noaa_store(NULL),
 #endif
-   compass_visible(true)
+   compass_visible(true),
+   compass_offset_y(0)
 #ifndef ENABLE_OPENGL
    , ui_generation(1), buffer_generation(0),
    scale_buffer(0)

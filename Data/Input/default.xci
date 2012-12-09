@@ -83,7 +83,7 @@ event=Beep 1
 # mode=default
 # ------------
 
-mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Config3 Info1 Info2 Menu Vario1 Vario2
+mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Config3 Info1 Info2 Menu Vario1 Vario2 NavOrdered NavGoto
 type=key
 data=ESCAPE
 event=Mode default
@@ -333,6 +333,94 @@ event=Setup Target
 #event=ArmAdvance show
 #event=ArmAdvance toggle
 
+# -------------
+# mode=NavOrdered
+# -------------
+
+mode=NavOrdered
+type=key
+data=6
+event=Mode default
+event=Status task
+label=Stats
+location=17
+
+mode=NavOrdered
+type=key
+data=6
+event=Calculator
+event=Mode default
+label=Edit Task
+location=18
+
+mode=NavOrdered
+type=key
+data=0
+event=WaypointDetails current
+event=Mode default
+label=TP Details$(CheckTask)
+location=22
+
+mode=NavOrdered
+type=key
+data=0
+event=Setup Alternates
+event=Mode default
+label=Alternates$(CheckWaypointFile)
+location=23
+
+mode=NavOrdered
+type=key
+data=9
+event=WaypointDetails select
+event=Mode default
+label=Waypoint\nList$(CheckWaypointFile)
+location=24
+
+# -------------
+# mode=NavGoto
+# -------------
+
+mode=NavGoto
+type=key
+data=6
+event=Calculator
+event=Mode default
+label=Edit Task
+location=18
+
+mode=NavGoto
+type=key
+data=6
+event=Mode default
+event=AbortTask toggle
+label=Resume$(CheckTask)
+location=21
+
+
+mode=NavGoto
+type=key
+data=0
+event=WaypointDetails current
+event=Mode default
+label=TP Details$(CheckTask)
+location=22
+
+mode=NavGoto
+type=key
+data=0
+event=Setup Alternates
+event=Mode default
+label=Alternates$(CheckWaypointFile)
+location=23
+
+mode=NavGoto
+type=key
+data=9
+event=WaypointDetails select
+event=Mode default
+label=Waypoint\nList$(CheckWaypointFile)
+location=24
 
 # -------------
 # mode=Nav1
@@ -903,12 +991,12 @@ location=9
 # mode=Menu
 # -------------
 
-mode=Menu
-type=key
-data=APP1
-event=Mode Nav1
-label=Nav
-location=1
+#mode=Menu
+#type=key
+#data=APP1
+#event=Mode Nav1
+#label=Nav
+#location=1
 
 mode=Menu
 type=key

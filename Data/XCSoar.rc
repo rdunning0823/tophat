@@ -70,6 +70,8 @@ IDB_CLOCK               BITMAP  DISCARDABLE     "../output/data/icons/clock.bmp"
 IDB_CLOCK_HD            BITMAP  DISCARDABLE     "../output/data/icons/clock_160.bmp"
 IDB_MENU_BUTTON         BITMAP  DISCARDABLE     "../output/data/icons/menu_button.bmp"
 IDB_MENU_BUTTON_HD      BITMAP  DISCARDABLE     "../output/data/icons/menu_button_160.bmp"
+IDB_CHECK_MARK          BITMAP  DISCARDABLE     "../output/data/icons/checkmark.bmp"
+IDB_CHECK_MARK_HD       BITMAP  DISCARDABLE     "../output/data/icons/checkmark_160.bmp"
 
 #ifdef EYE_CANDY
 #ifdef TESTING

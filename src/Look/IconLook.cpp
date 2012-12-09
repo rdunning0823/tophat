@@ -40,4 +40,5 @@ IconLook::Initialise()
   hBmpTabTimes.Load(Layout::scale > 1 ? IDB_CLOCK_HD : IDB_CLOCK);
 
   hBmpMenuButton.Load(Layout::scale > 1 ? IDB_MENU_BUTTON_HD : IDB_MENU_BUTTON);
+  hBmpCheckMark.Load(Layout::scale > 1 ? IDB_CHECK_MARK_HD : IDB_CHECK_MARK);
 }
