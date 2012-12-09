@@ -998,12 +998,12 @@ location=9
 #label=Nav
 #location=1
 
-mode=Menu
-type=key
-data=APP2
-event=Mode Display1
-label=Display
-location=2
+#mode=Menu
+#type=key
+#data=APP2
+#event=Mode Display1
+#label=Display
+#location=2
 
 mode=Menu
 type=key

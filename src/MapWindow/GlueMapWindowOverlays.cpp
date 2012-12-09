@@ -204,32 +204,82 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
             rc.bottom - bmp->GetSize().cy - Layout::Scale(4));
 
   // draw flarm status
-  if (!GetMapSettings().show_flarm_alarm_level)
+  if (GetMapSettings().show_flarm_alarm_level) {
     // Don't show indicator when the gauge is indicating the traffic anyway
-    return;
 
-  const FlarmStatus &flarm = Basic().flarm.status;
-  if (!flarm.available)
-    return;
+    const FlarmStatus &flarm = Basic().flarm.status;
+    if (flarm.available) {
 
-  switch (flarm.alarm_level) {
-  case FlarmTraffic::AlarmType::NONE:
-    bmp = &look.traffic_safe_icon;
-    break;
-  case FlarmTraffic::AlarmType::LOW:
-  case FlarmTraffic::AlarmType::INFO_ALERT:
-    bmp = &look.traffic_warning_icon;
-    break;
-  case FlarmTraffic::AlarmType::IMPORTANT:
-  case FlarmTraffic::AlarmType::URGENT:
-    bmp = &look.traffic_alarm_icon;
-    break;
-  };
+      switch (flarm.alarm_level) {
+      case FlarmTraffic::AlarmType::NONE:
+        bmp = &look.traffic_safe_icon;
+        break;
+      case FlarmTraffic::AlarmType::LOW:
+      case FlarmTraffic::AlarmType::INFO_ALERT:
+        bmp = &look.traffic_warning_icon;
+        break;
+      case FlarmTraffic::AlarmType::IMPORTANT:
+      case FlarmTraffic::AlarmType::URGENT:
+        bmp = &look.traffic_alarm_icon;
+        break;
+      };
 
-  offset += bmp->GetSize().cx + Layout::Scale(6);
+      offset += bmp->GetSize().cx + Layout::Scale(6);
 
-  bmp->Draw(canvas, rc.right - offset,
-            rc.bottom - bmp->GetSize().cy - Layout::Scale(2));
+      bmp->Draw(canvas, rc.right - offset,
+                rc.bottom - bmp->GetSize().cy - Layout::Scale(2));
+    }
+  }
+  // draw "Simulator/Replay & InfoBox name
+  StaticString<80> buffer;
+  const UIState &ui_state = GetUIState();
+
+  canvas.Select(Fonts::title);
+  canvas.SetBackgroundOpaque();
+  canvas.SetBackgroundColor(COLOR_WHITE);
+  canvas.SetTextColor(COLOR_BLACK);
+
+  buffer.clear();
+
+  if (Basic().gps.replay)
+    buffer += _T(" REPLAY");
+  else if (Basic().gps.simulator) {
+    buffer += _(" Simulator");
+  }
+
+  if (weather != NULL && weather->GetParameter() > 0) {
+    const TCHAR *label = weather->ItemLabel(weather->GetParameter());
+    if (label != NULL) {
+      buffer += _T(" ");
+      buffer += label;
+    }
+  }
+
+  if (ui_state.auxiliary_enabled) {
+    if (!buffer.empty())
+      buffer += _T(", ");
+    buffer += ui_state.panel_name;
+  }
+
+  if (!buffer.empty()) {
+    offset += canvas.CalcTextWidth(buffer) + Layout::Scale(2);
+
+    canvas.text(rc.right - offset, rc.bottom - canvas.CalcTextSize(buffer).cy, buffer);
+  }
+
+  const PolarSettings &polar_settings = GetComputerSettings().polar;
+  // calc "Ballast"
+  if (((int)polar_settings.glide_polar_task.GetBallastLitres() > 0 ||
+      !Calculated().flight.flying)
+      && polar_settings.glide_polar_task.IsBallastable()) {
+    buffer = _("Ballast");
+    buffer.AppendFormat(
+      _T(" %d L"),
+      (int)computer_settings.polar.glide_polar_task.GetBallastLitres());
+
+    offset += canvas.CalcTextWidth(buffer) + Layout::Scale(2);
+    canvas.text(rc.right - offset, rc.bottom - canvas.CalcTextSize(buffer).cy, buffer);
+ }
 }
 
 void
@@ -238,86 +288,6 @@ GlueMapWindow::DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const
   final_glide_bar_renderer.Draw(canvas, rc, Calculated(),
                                 GetComputerSettings().task.glide,
                                 GetMapSettings().final_glide_bar_mc0_enabled);
-}
-
-void
-GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
-                            const MapWindowProjection &projection) const
-{
-  StaticString<80> buffer;
-
-  fixed map_width = projection.GetScreenWidthMeters();
-
-  canvas.Select(Fonts::map_bold);
-  FormatUserMapScale(map_width, buffer.buffer(), true);
-  PixelSize text_size = canvas.CalcTextSize(buffer);
-
-  const PixelScalar text_padding_x = Layout::Scale(2);
-  const PixelScalar height = Fonts::map_bold.GetCapitalHeight() + Layout::Scale(2);
-
-  PixelScalar x = 0;
-  look.map_scale_left_icon.Draw(canvas, 0, rc.bottom - height);
-
-  x += look.map_scale_left_icon.GetSize().cx;
-  canvas.DrawFilledRectangle(x, rc.bottom - height,
-                             x + 2 * text_padding_x + text_size.cx,
-                             rc.bottom, COLOR_WHITE);
-
-  canvas.SetBackgroundTransparent();
-  canvas.SetTextColor(COLOR_BLACK);
-  x += text_padding_x;
-  canvas.text(x, rc.bottom - Fonts::map_bold.GetAscentHeight() - Layout::Scale(1),
-              buffer);
-
-  x += text_padding_x + text_size.cx;
-  look.map_scale_right_icon.Draw(canvas, x, rc.bottom - height);
-
-  buffer.clear();
-  if (GetMapSettings().auto_zoom_enabled)
-    buffer = _T("AUTO ");
-
-  switch (follow_mode) {
-  case FOLLOW_SELF:
-    break;
-
-  case FOLLOW_PAN:
-    buffer += _T("PAN ");
-    break;
-  }
-
-  const UIState &ui_state = GetUIState();
-  if (ui_state.auxiliary_enabled) {
-    buffer += ui_state.panel_name;
-    buffer += _T(" ");
-  }
-
-  if (Basic().gps.replay)
-    buffer += _T("REPLAY ");
-  else if (Basic().gps.simulator) {
-    buffer += _("Simulator");
-    buffer += _T(" ");
-  }
-
-  if (GetComputerSettings().polar.ballast_timer_active)
-    buffer.AppendFormat(
-        _T("BALLAST %d LITERS "),
-        (int)GetComputerSettings().polar.glide_polar_task.GetBallastLitres());
-
-  if (weather != NULL && weather->GetParameter() > 0) {
-    const TCHAR *label = weather->ItemLabel(weather->GetParameter());
-    if (label != NULL)
-      buffer += label;
-  }
-
-  if (!buffer.empty()) {
-    int y = rc.bottom - height;
-
-    canvas.Select(Fonts::title);
-    canvas.SetBackgroundOpaque();
-    canvas.SetBackgroundColor(COLOR_WHITE);
-
-    canvas.text(0, y - canvas.CalcTextSize(buffer).cy, buffer);
-  }
 }
 
 void

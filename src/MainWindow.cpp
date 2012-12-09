@@ -219,6 +219,7 @@ MainWindow::InitialiseConfigured()
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   task_nav_slider_widget = new TaskNavSliderWidget();
   widget_overlays.Add(task_nav_slider_widget, rc_current);
+
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 
