@@ -26,6 +26,7 @@ Copyright_License {
 #include "Dialogs/XML.hpp"
 #include "Form/Form.hpp"
 #include "Form/TabBar.hpp"
+#include "Form/ActionWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "StatusPanels/FlightStatusPanel.hpp"
@@ -123,6 +124,10 @@ dlgStatusShowModal(int start_page)
 
   Widget *times_panel = new TimesStatusPanel(look);
   wTabBar->AddTab(times_panel, _T("Times"), TimesIcon);
+
+  Widget *wClose = new ActionWidget(*wf, mrOK);
+  wTabBar->AddTab(wClose, _("Close"));
+
 
   /* restore previous page */
 
