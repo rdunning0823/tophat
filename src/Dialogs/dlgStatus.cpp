@@ -30,9 +30,9 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "StatusPanels/FlightStatusPanel.hpp"
-#include "StatusPanels/TaskStatusPanel.hpp"
 #include "StatusPanels/RulesStatusPanel.hpp"
 #include "StatusPanels/SystemStatusPanel.hpp"
+#include "TaskManager/TaskCalculatorPanel.hpp"
 #include "StatusPanels/TimesStatusPanel.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
@@ -116,7 +116,8 @@ dlgStatusShowModal(int start_page)
   Widget *system_panel = new SystemStatusPanel(look);
   wTabBar->AddTab(system_panel, _T("System"), SystemIcon);
 
-  Widget *task_panel = new TaskStatusPanel(look);
+  static bool modified = false;
+  Widget *task_panel = new TaskCalculatorPanel(look, &modified);
   wTabBar->AddTab(task_panel, _T("Task"), TaskIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
