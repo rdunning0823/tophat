@@ -273,7 +273,9 @@ ExpandTaskMacros(TCHAR *OutBuffer, size_t Size,
         ReplaceInString(OutBuffer, _T("$(WaypointPreviousArm)"), _("Disarm turn"), Size);
         break;
       }
-    } 
+    } else if (_tcscmp(OutBuffer, _T("Resume")) == 0) {
+      invalid = true;
+    }
   }
 
   if (_tcsstr(OutBuffer, _T("$(AdvanceArmed)"))) {
