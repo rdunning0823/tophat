@@ -191,5 +191,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     canvas.Select(Pen(Layout::Scale(1), COLOR_BLACK));
     canvas.SelectHollowBrush();
     canvas.DrawCircle(left, (rc.top + rc.bottom) / 2, (UPixelScalar)(size * 1.5));
+  } else {
+    WndButton::OnPaint(canvas);
   }
 }
