@@ -43,6 +43,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
+#include "LogFile.hpp"
 
 #include <vector>
 #include <assert.h>
@@ -121,14 +122,16 @@ OnPlaneListPaint(Canvas &canvas, const PixelRect rc, unsigned i)
 
   canvas.Select(name_font);
 
+  canvas.text_clipped(rc.left + Layout::FastScale(2),
+                      rc.top + Layout::FastScale(2), rc, list[i].name);
+
   if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path)) {
     StaticString<256> buffer;
-    buffer.Format(_T("%s - %s"), list[i].name.c_str(), _("Active"));
-    canvas.text_clipped(rc.left + Layout::FastScale(2),
+    buffer.Format(_T("** %s **"), _("Active"));
+    canvas.text_clipped(rc.right - Layout::FastScale(2) -
+                        canvas.CalcTextSize(buffer).cx,
                         rc.top + Layout::FastScale(2), rc, buffer);
   } else
-    canvas.text_clipped(rc.left + Layout::FastScale(2),
-                        rc.top + Layout::FastScale(2), rc, list[i].name);
 
   canvas.Select(details_font);
 
