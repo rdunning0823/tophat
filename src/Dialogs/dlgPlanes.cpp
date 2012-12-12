@@ -307,8 +307,7 @@ ListItemSelected(unsigned i)
              list[i].name.c_str());
 
   if (ShowMessageBox(tmp, _("Load"), MB_YESNO) == IDYES)
-    if (LoadWithDialog(i))
-      dialog->SetModalResult(mrOK);
+    LoadWithDialog(i);
 }
 
 static constexpr CallBackTableEntry CallBackTable[] = {
