@@ -119,7 +119,6 @@ OnPlaneListPaint(Canvas &canvas, const PixelRect rc, unsigned i)
   const Font &name_font = *look.list.font;
   const Font &details_font = *look.small_font;
 
-  canvas.SetTextColor(COLOR_BLACK);
   canvas.Select(name_font);
 
   if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path)) {
