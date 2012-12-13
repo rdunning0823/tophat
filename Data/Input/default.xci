@@ -58,6 +58,7 @@ type=gce
 data=LANDING
 event=StatusMessage Landing
 event=AutoLogger stop
+event=DownloadFlightLog
 
 mode=default
 type=gce
