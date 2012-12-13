@@ -30,7 +30,8 @@ Copyright_License {
 #include "TaskPointRenderer.hpp"
 
 TaskRenderer::TaskRenderer(TaskPointRenderer &_tpv, GeoBounds _screen_bounds)
-  :tpv(_tpv), screen_bounds(_screen_bounds) {}
+  :tpv(_tpv), screen_bounds(_screen_bounds),
+   show_only_ordered_outlines(false) {}
 
 void 
 TaskRenderer::Draw(const AbortTask &task)
@@ -50,7 +51,13 @@ TaskRenderer::Draw(const OrderedTask &task)
 {
   tpv.SetBoundingBox(task.GetBoundingBox(screen_bounds));
   tpv.SetActiveIndex(task.GetActiveIndex());
-  for (unsigned i = 0; i < 4; i++) {
+  unsigned layer_start = 0;
+  unsigned layer_end = 3;
+  if (show_only_ordered_outlines) {
+    layer_start = layer_end = 2;
+  }
+
+  for (unsigned i = layer_start; i <= layer_end; i++) {
     tpv.ResetIndex();
 
     if (i != TaskPointRenderer::LAYER_SYMBOLS &&
@@ -80,19 +87,28 @@ TaskRenderer::Draw(const GotoTask &task)
 }
 
 void
-TaskRenderer::Draw(const TaskInterface &task)
+TaskRenderer::Draw(const TaskInterface &active_task,
+                   const OrderedTask &ordered_task)
 {
-  switch (task.GetType()) {
+  switch (active_task.GetType()) {
   case TaskInterface::ORDERED:
-    Draw((const OrderedTask &)task);
+    Draw((const OrderedTask &)active_task);
     break;
 
   case TaskInterface::ABORT:
-    Draw((const AbortTask &)task);
+    Draw((const AbortTask &)active_task);
+    if (ordered_task.TaskSize() > 1) {
+      show_only_ordered_outlines = true;
+      Draw(ordered_task);
+    }
     break;
 
   case TaskInterface::GOTO:
-    Draw((const GotoTask &)task);
+    Draw((const GotoTask &)active_task);
+    if (ordered_task.TaskSize() > 1) {
+      show_only_ordered_outlines = true;
+      Draw(ordered_task);
+    }
     break;
   }
 }
