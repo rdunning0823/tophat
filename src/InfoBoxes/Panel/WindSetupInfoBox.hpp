@@ -21,12 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_WIND_EDIT_PANEL_HPP
-#define XCSOAR_WIND_EDIT_PANEL_HPP
+#ifndef XCSOAR_WIND_SETUP_INFOBOX_PANEL_HPP
+#define XCSOAR_WIND_SETUP_INFOBOX_PANEL_HPP
 
 class Widget;
 
 Widget *
-LoadWindEditPanel(unsigned id);
+LoadWindSetupInfoBoxPanel(unsigned id);
 
 #endif

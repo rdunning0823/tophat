@@ -27,6 +27,7 @@ Copyright_License {
 #include "Screen/Point.hpp"
 #include "Form/Widget.hpp"
 #include "Form/Form.hpp"
+#include "Form/ManagedWidget.hpp"
 
 class WndButton;
 class WndFrame;
@@ -39,12 +40,15 @@ class WndFrame;
  * It also calculates the "content_rc"  (below the header) where derived
  * classes may display controls related to the InfoBox
  */
-class BaseAccessPanel : public NullWidget, protected WndForm {
+class BaseAccessPanel : public NullWidget, protected WndForm
+{
 protected:
   unsigned id;
+
   WndButton *setup_button;
   WndButton *close_button;
   WndFrame *header_text;
+  ManagedWidget managed_widget;
 
   /**
    * Follow widget API for calling.
@@ -76,6 +80,8 @@ protected:
 public:
   BaseAccessPanel(unsigned _id);
 
+  BaseAccessPanel(unsigned _id, Widget *widget);
+
   /**
    * Called at the start of a derived class Prepare()
    * Draws the header text and the Setup button
@@ -85,6 +91,7 @@ public:
   /*
    * Called at the end of derived class Unprepare()
    * Unprepares the header and tells InfoBox window that the popup is closed.
+   * Unprepares and deletes the managed widget
    */
   virtual void Unprepare();
 
