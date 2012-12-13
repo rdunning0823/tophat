@@ -30,6 +30,7 @@ Copyright_License {
 #include "Device/List.hpp"
 #include "Device/Descriptor.hpp"
 #include "Operation/PopupOperationEnvironment.hpp"
+#include "Simulator.hpp"
 
 #include <assert.h>
 
@@ -76,6 +77,29 @@ InputEvents::eventDevice(const TCHAR *misc)
   assert(misc != NULL);
 
   if (StringIsEqual(misc, _T("list")))
+    ShowDeviceList(UIGlobals::GetMainWindow(),
+                   UIGlobals::GetDialogLook(),
+                   UIGlobals::GetLook().terminal);
+}
+
+
+void
+InputEvents::eventDownloadFlightLog(const TCHAR *misc)
+{
+  if (is_simulator())
+    return;
+
+  bool found_logger = false;
+
+  for (unsigned i = 0; i < NUMDEV; ++i) {
+    DeviceDescriptor &device = *device_list[i];
+
+    if (device.IsLogger() && device.IsAlive()) {
+      found_logger = true;
+      break;
+    }
+  }
+  if (found_logger)
     ShowDeviceList(UIGlobals::GetMainWindow(),
                    UIGlobals::GetDialogLook(),
                    UIGlobals::GetLook().terminal);

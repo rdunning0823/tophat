@@ -181,6 +181,7 @@ namespace InputEvents
   void eventAutoLogger(const TCHAR *misc);
   void eventGotoLookup(const TCHAR *misc);
   void eventAddWaypoint(const TCHAR *misc);
+  void eventDownloadFlightLog(const TCHAR *misc);
   void eventOrientation(const TCHAR *misc);
   void eventTraffic(const TCHAR *misc);
   void eventFlarmTraffic(const TCHAR *misc);
