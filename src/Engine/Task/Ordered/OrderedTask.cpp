@@ -1325,6 +1325,7 @@ OrderedTask::GetFactoryTypes(bool all) const
   std::vector<TaskFactoryType> f_list;
   f_list.push_back(TaskFactoryType::RACING);
   f_list.push_back(TaskFactoryType::AAT);
+  f_list.push_back(TaskFactoryType::MAT);
   f_list.push_back(TaskFactoryType::FAI_GENERAL);
   return f_list;
 }

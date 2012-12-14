@@ -30,6 +30,7 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/Factory/FAIORTaskFactory.cpp \
 	$(TASK_SRC_DIR)/Factory/FAIGoalTaskFactory.cpp \
 	$(TASK_SRC_DIR)/Factory/AATTaskFactory.cpp \
+	$(TASK_SRC_DIR)/Factory/MatTaskFactory.cpp \
 	$(TASK_SRC_DIR)/Factory/MixedTaskFactory.cpp \
 	$(TASK_SRC_DIR)/Factory/TouringTaskFactory.cpp \
 	$(TASK_SRC_DIR)/Factory/Create.cpp \
@@ -41,6 +42,7 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/ObservationZones/ObservationZoneClient.cpp \
 	$(TASK_SRC_DIR)/ObservationZones/ObservationZonePoint.cpp \
 	$(TASK_SRC_DIR)/ObservationZones/CylinderZone.cpp \
+	$(TASK_SRC_DIR)/ObservationZones/MatCylinderZone.cpp \
 	$(TASK_SRC_DIR)/ObservationZones/SectorZone.cpp \
 	$(TASK_SRC_DIR)/ObservationZones/LineSectorZone.cpp \
 	$(TASK_SRC_DIR)/ObservationZones/SymmetricSectorZone.cpp \

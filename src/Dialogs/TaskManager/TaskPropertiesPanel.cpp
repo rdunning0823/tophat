@@ -51,7 +51,7 @@ TaskPropertiesPanel::RefreshView()
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   const OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
 
-  bool aat_types = (ftype == TaskFactoryType::AAT);
+  bool aat_types = (ftype == TaskFactoryType::AAT || ftype == TaskFactoryType::MAT);
   bool fai_start_finish = p.fai_finish;
 
   SetRowVisible(MIN_TIME, aat_types);

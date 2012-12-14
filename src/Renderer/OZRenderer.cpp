@@ -122,6 +122,7 @@ OZRenderer::Draw(Canvas &canvas, Layer layer, const Projection &projection,
     break;
   }
 
+  case ObservationZonePoint::MAT_CYLINDER:
   case ObservationZonePoint::CYLINDER: {
     const CylinderZone &oz = (const CylinderZone &)_oz;
 

@@ -21,8 +21,8 @@
 }
 */
 
-#ifndef CYLINDERZONE_HPP
-#define CYLINDERZONE_HPP
+#ifndef MAT_CYLINDERZONE_HPP
+#define MAT_CYLINDERZONE_HPP
 
 #include "ObservationZonePoint.hpp"
 
@@ -30,25 +30,23 @@
 
 /**
  * Observation zone represented as a circular area with specified
- * radius from a center point
+ * radius is fixed at 1 sm
  */
-class CylinderZone : public ObservationZonePoint
+class MatCylinderZone : public ObservationZonePoint
 {
 protected:
   /** radius (m) of OZ */
   fixed radius;
 
 protected:
-  CylinderZone(Shape _shape, const GeoPoint &loc,
-               const fixed _radius = fixed(10000.0))
-    :ObservationZonePoint(_shape, loc), radius(_radius) {
+  MatCylinderZone(Shape _shape, const GeoPoint &loc)
+    :ObservationZonePoint(_shape, loc), radius(fixed(1609.344)) {
     assert(positive(radius));
   }
 
-  CylinderZone(const CylinderZone &other, const GeoPoint &reference)
+  MatCylinderZone(const MatCylinderZone &other, const GeoPoint &reference)
     :ObservationZonePoint((const ObservationZonePoint &)other, reference),
-     radius(other.radius) {
-    assert(positive(radius));
+     radius(fixed(1609.344)) {
   }
 
 public:
@@ -60,19 +58,18 @@ public:
    *
    * @return Initialised object
    */
-  CylinderZone(const GeoPoint &loc, const fixed _radius = fixed(10000.0))
-    :ObservationZonePoint(CYLINDER, loc), radius(_radius) {
-    assert(positive(radius));
+  MatCylinderZone(const GeoPoint &loc)
+    :ObservationZonePoint(MAT_CYLINDER, loc), radius(fixed(1609.344)) {
   }
 
   /**
    * Set radius property
+   * Noop
    *
    * @param new_radius Radius (m) of cylinder
    */
   virtual void SetRadius(fixed new_radius) {
-    assert(positive(new_radius));
-    radius = new_radius;
+    //TODO Remove this??
   }
 
   /**
@@ -103,7 +100,7 @@ public:
   virtual GeoPoint GetRandomPointInSector(const fixed mag) const;
 
   virtual ObservationZonePoint *Clone(const GeoPoint &_reference) const {
-    return new CylinderZone(*this, _reference);
+    return new MatCylinderZone(*this, _reference);
   }
 };
 

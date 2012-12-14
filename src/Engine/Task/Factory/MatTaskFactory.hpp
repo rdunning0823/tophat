@@ -1,4 +1,5 @@
-/* Copyright_License {
+/*
+Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
   Copyright (C) 2000-2012 The XCSoar Project
@@ -20,28 +21,38 @@
 }
  */
 
-#ifndef FACTORY_TYPE_HPP
-#define FACTORY_TYPE_HPP
+#ifndef MAT_TASK_FACTORY_HPP
+#define MAT_TASK_FACTORY_HPP
 
-#include <stdint.h>
+#include "AbstractTaskFactory.hpp"
 
 /**
- * Enumeration of factory types.  This is the set of
- * types of ordered task that can be created.
+ * Factory for construction of legal Modified Area Tasks
  */
-enum class TaskFactoryType: uint8_t {
-  FAI_GENERAL = 0,
-  FAI_TRIANGLE,
-  FAI_OR,
-  FAI_GOAL,
-  RACING,
-  AAT,
+class MatTaskFactory : public AbstractTaskFactory
+{
+public:
+/** 
+ * Constructor
+ * 
+ * @param _task Ordered task to be managed by this factory
+ * @param tb Behaviour (options)
+ */  
+  MatTaskFactory(OrderedTask& _task,
+                 const TaskBehaviour &tb);
+
+  ~MatTaskFactory() {};
+
   /**
-   * Modified Area Task.
+   * converts all intermediate points to AAT Cylinders
+   * Leaves starts and finishes unchanged
+   * @param tp
+   * @return: point type compatible with current factory, most
+   * similar to type of tp
    */
-  MAT,
-  MIXED,
-  TOURING
+  virtual gcc_pure
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
 };
+
 
 #endif

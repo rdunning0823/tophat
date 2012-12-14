@@ -34,7 +34,10 @@
 #include "Task/ObservationZones/BGAEnhancedOptionZone.hpp"
 #include "Task/ObservationZones/BGAStartSectorZone.hpp"
 #include "Task/ObservationZones/CylinderZone.hpp"
+#include "Task/ObservationZones/MatCylinderZone.hpp"
 #include "Task/ObservationZones/AnnularSectorZone.hpp"
+
+#include "LogFile.hpp" //debug
 
 #include <algorithm>
 
@@ -49,6 +52,7 @@ GetOZSize(const ObservationZonePoint &oz)
     return ((const LineSectorZone &)oz).GetLength();
 
   case ObservationZonePoint::CYLINDER:
+  case ObservationZonePoint::MAT_CYLINDER:
     return ((const CylinderZone &)oz).GetRadius();
 
   case ObservationZonePoint::ANNULAR_SECTOR:
@@ -186,6 +190,7 @@ AbstractTaskFactory::GetType(const OrderedTaskPoint &point) const
       return TaskPointFactoryType::START_LINE;
 
     case ObservationZonePoint::CYLINDER:
+    case ObservationZonePoint::MAT_CYLINDER:
     case ObservationZonePoint::SECTOR:
     case ObservationZonePoint::KEYHOLE:
     case ObservationZonePoint::BGAFIXEDCOURSE:
@@ -208,10 +213,15 @@ AbstractTaskFactory::GetType(const OrderedTaskPoint &point) const
     case ObservationZonePoint::BGA_START:
     case ObservationZonePoint::LINE:
       return TaskPointFactoryType::AAT_SEGMENT;
+
     case ObservationZonePoint::ANNULAR_SECTOR:
       return TaskPointFactoryType::AAT_ANNULAR_SECTOR;
+
     case ObservationZonePoint::CYLINDER:
       return TaskPointFactoryType::AAT_CYLINDER;
+
+    case ObservationZonePoint::MAT_CYLINDER:
+      return TaskPointFactoryType::MAT_CYLINDER;
     }
     break;
 
@@ -231,6 +241,7 @@ AbstractTaskFactory::GetType(const OrderedTaskPoint &point) const
 
     case ObservationZonePoint::BGA_START:
     case ObservationZonePoint::CYLINDER:
+    case ObservationZonePoint::MAT_CYLINDER:
     case ObservationZonePoint::SECTOR:
     case ObservationZonePoint::LINE:
     case ObservationZonePoint::ANNULAR_SECTOR:
@@ -248,6 +259,7 @@ AbstractTaskFactory::GetType(const OrderedTaskPoint &point) const
       return TaskPointFactoryType::FINISH_LINE;
 
     case ObservationZonePoint::CYLINDER:
+    case ObservationZonePoint::MAT_CYLINDER:
     case ObservationZonePoint::SECTOR:
     case ObservationZonePoint::KEYHOLE:
     case ObservationZonePoint::BGAFIXEDCOURSE:
@@ -323,6 +335,8 @@ AbstractTaskFactory::CreatePoint(const TaskPointFactoryType type,
     return CreateASTPoint(new BGAEnhancedOptionZone(wp.location), wp);
   case TaskPointFactoryType::AST_CYLINDER:
     return CreateASTPoint(new CylinderZone(wp.location, turnpoint_radius), wp);
+  case TaskPointFactoryType::MAT_CYLINDER:
+    return CreateAATPoint(new MatCylinderZone(wp.location), wp);
   case TaskPointFactoryType::AAT_CYLINDER:
     return CreateAATPoint(new CylinderZone(wp.location, turnpoint_radius), wp);
   case TaskPointFactoryType::AAT_SEGMENT:
@@ -394,15 +408,17 @@ AbstractTaskFactory::Append(const OrderedTaskPoint &new_tp,
       }
     }
 
-    // non-empty task
+    if (task.TaskSize() > 1) {
+      const OrderedTaskPoint &tp_before = task.GetTaskPoint(task.TaskSize() - 1);
 
-    if (task.HasFinish()) {
-      // old finish must be mutated into an intermediate point
-      IntermediateTaskPoint* sp =
-        CreateIntermediate(task.GetTaskPoint(task.TaskSize() - 1).GetWaypoint());
+      if (!IsValidIntermediateType(GetType(tp_before))) {
+        // old finish must be mutated into an intermediate point
+        IntermediateTaskPoint* sp =
+          CreateIntermediate(task.GetTaskPoint(task.TaskSize() - 1).GetWaypoint());
 
-      task.Replace(*sp, task.TaskSize()-1);
-      delete sp;
+        task.Replace(*sp, task.TaskSize()-1);
+        delete sp;
+      }
     }
 
     if (IsValidType(new_tp, task.TaskSize()))
@@ -468,6 +484,7 @@ AbstractTaskFactory::Insert(const OrderedTaskPoint &new_tp,
         task.Replace(*sp, 0);
         delete sp;
       }
+
 
       if (IsValidType(new_tp, 0)) {
         return task.Insert(new_tp, 0);
@@ -625,6 +642,7 @@ AbstractTaskFactory::ValidAbstractType(LegalAbstractPointType type,
   case POINT_AAT:
     return is_intermediate &&
       (IsValidIntermediateType(TaskPointFactoryType::AAT_CYLINDER)
+       || IsValidIntermediateType(TaskPointFactoryType::MAT_CYLINDER)
        || IsValidIntermediateType(TaskPointFactoryType::AAT_SEGMENT)
        || IsValidIntermediateType(TaskPointFactoryType::AAT_ANNULAR_SECTOR));
   };
@@ -776,6 +794,7 @@ AbstractTaskFactory::ValidateFAIOZs()
     case TaskPointFactoryType::KEYHOLE_SECTOR:
     case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
     case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
+    case TaskPointFactoryType::MAT_CYLINDER:
     case TaskPointFactoryType::AAT_CYLINDER:
     case TaskPointFactoryType::AAT_SEGMENT:
     case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
@@ -803,10 +822,56 @@ AbstractTaskFactory::ValidateFAIOZs()
 }
 
 bool
+AbstractTaskFactory::ValidateMATOZs()
+{
+  ClearValidationErrors();
+  bool valid = true;
+
+  for (unsigned i = 0; i < task.TaskSize() && valid; i++) {
+    const OrderedTaskPoint &tp = task.GetPoint(i);
+
+    switch (GetType(tp)) {
+    case TaskPointFactoryType::START_CYLINDER:
+    case TaskPointFactoryType::START_LINE:
+    case TaskPointFactoryType::START_SECTOR:
+      break;
+
+    case TaskPointFactoryType::START_BGA:
+      valid = false;
+      break;
+
+    case TaskPointFactoryType::MAT_CYLINDER:
+      break;
+
+    case TaskPointFactoryType::AAT_CYLINDER:
+    case TaskPointFactoryType::FAI_SECTOR:
+    case TaskPointFactoryType::AST_CYLINDER:
+    case TaskPointFactoryType::KEYHOLE_SECTOR:
+    case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
+    case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
+    case TaskPointFactoryType::AAT_SEGMENT:
+    case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
+    case TaskPointFactoryType::FINISH_SECTOR:
+      valid = false;
+      break;
+
+    case TaskPointFactoryType::FINISH_LINE:
+    case TaskPointFactoryType::FINISH_CYLINDER:
+      break;
+    }
+  }
+
+  if (!valid)
+    AddValidationError(NON_MAT_OZS);
+
+  return valid;
+}
+
+
+bool
 AbstractTaskFactory::Validate()
 {
   ClearValidationErrors();
-
   bool valid = true;
 
   if (!task.HasStart()) {
@@ -974,7 +1039,8 @@ AbstractTaskFactory::MutateTPsToTaskType()
   for (unsigned int i = 0; i < task.TaskSize(); i++) {
     const OrderedTaskPoint &tp = task.GetPoint(i);
     if (!IsValidType(tp, i) ||
-        task.GetFactoryType() == TaskFactoryType::FAI_GENERAL) {
+        task.GetFactoryType() == TaskFactoryType::FAI_GENERAL ||
+        task.GetFactoryType() == TaskFactoryType::MAT ) {
 
       TaskPointFactoryType newtype = GetMutatedPointType(tp);
       if (IsPositionFinish(i)) {

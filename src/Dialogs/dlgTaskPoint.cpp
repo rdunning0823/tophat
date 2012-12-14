@@ -131,6 +131,7 @@ RefreshView()
     break;
 
   case ObservationZonePoint::CYLINDER:
+  case ObservationZonePoint::MAT_CYLINDER:
     ShowFormControl(*wf, _T("frmOZCylinder"), true);
 
     LoadFormProperty(*wf, _T("prpOZCylinderRadius"), UnitGroup::DISTANCE,
@@ -163,7 +164,17 @@ RefreshView()
     wb->SetCaption(tmp);
   }
 
-  EnableSizeEdit(ordered_task->GetFactoryType() != TaskFactoryType::FAI_GENERAL);
+  bool edit_disabled = (ordered_task->GetFactoryType() ==
+      TaskFactoryType::FAI_GENERAL) ||
+      ((ordered_task->GetFactoryType() == TaskFactoryType::MAT) &&
+      (active_index != ordered_task->TaskSize() - 1 && active_index != 0));
+
+  EnableSizeEdit(!edit_disabled);
+
+  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
+  assert (button_type != nullptr);
+  button_type->SetVisible(ordered_task->GetFactoryType()
+                          != TaskFactoryType::MAT);
 
   StaticString<100> name_prefix_buffer, type_buffer;
 
@@ -255,6 +266,7 @@ ReadValues()
     break;
   }
 
+  case ObservationZonePoint::MAT_CYLINDER:
   case ObservationZonePoint::CYLINDER: {
     fixed radius = Units::ToSysDistance(
         GetFormValueFixed(*wf, _T("prpOZCylinderRadius")));

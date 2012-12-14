@@ -420,6 +420,7 @@ protected:
    */
   void set_tp_search_achieved(unsigned tp, const SearchPoint &sol);
 
+public:
   /**
    * Scan task for valid start/finish points
    *

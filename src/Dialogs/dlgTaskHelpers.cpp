@@ -55,6 +55,8 @@ OrderedTaskFactoryName(TaskFactoryType type)
     return _("FAI goal");
   case TaskFactoryType::AAT:
     return _("AAT");
+  case TaskFactoryType::MAT:
+    return _("MAT");
   case TaskFactoryType::MIXED:
     return _("Mixed");
   case TaskFactoryType::TOURING:
@@ -84,6 +86,9 @@ OrderedTaskFactoryDescription(TaskFactoryType type)
   case TaskFactoryType::AAT:
     return _("Task through assigned areas, minimum task time applies.  Restricted to cylinder "
         "and sector observation zones.");
+  case TaskFactoryType::MAT:
+    return _("Task with at least one predefined point.  Pilot can add additional as needed.  Minimum task time applies.  Restricted to 1-mile cylinder "
+        "observation zones.");
   case TaskFactoryType::MIXED:
     return _("Racing task with a mix of assigned areas and turn points, minimum task time applies.");
   case TaskFactoryType::TOURING:
@@ -248,6 +253,7 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
     return;
 
   case ObservationZonePoint::CYLINDER:
+  case ObservationZonePoint::MAT_CYLINDER:
     _stprintf(buffer,_T("%s  - %s: %.1f%s"), _("Cylinder"), _("Radius"),
               (double)Units::ToUserDistance(((const CylinderZone &)ozp).GetRadius()),
               Units::GetDistanceName());
@@ -301,6 +307,8 @@ OrderedTaskPointDescription(TaskPointFactoryType type)
         "Scored from center.");
   case TaskPointFactoryType::AAT_CYLINDER:
     return _("A cylinder.  Scored by farthest point reached in area.");
+  case TaskPointFactoryType::MAT_CYLINDER:
+    return _("A cylinder.  Scored by farthest point reached in area.  One-mile radius.");
   case TaskPointFactoryType::AAT_SEGMENT:
     return _("A sector that can vary in angle and radius.  Scored by farthest point reached "
         "inside area.");
@@ -343,6 +351,8 @@ OrderedTaskPointName(TaskPointFactoryType type)
     return _("Turn point cylinder");
   case TaskPointFactoryType::AAT_CYLINDER:
     return _("Area cylinder");
+  case TaskPointFactoryType::MAT_CYLINDER:
+    return _("MAT Area cylinder.  One mile radius.");
   case TaskPointFactoryType::AAT_SEGMENT:
     return _("Area sector");
   case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
@@ -422,6 +432,8 @@ TaskValidationError(AbstractTaskFactory::TaskValidationErrorType type)
     return _("Empty task.\n");
   case AbstractTaskFactory::NON_FAI_OZS:
     return _("non-FAI turn points");
+  case AbstractTaskFactory::NON_MAT_OZS:
+    return _("non-MAT turn points");
   }
 
   assert(false);

@@ -29,6 +29,7 @@
 #include "Task/Ordered/Points/ASTPoint.hpp"
 #include "Task/ObservationZones/LineSectorZone.hpp"
 #include "Task/ObservationZones/AnnularSectorZone.hpp"
+#include "Task/ObservationZones/MatCylinderZone.hpp"
 #include "Task/Factory/AbstractTaskFactory.hpp"
 #include "XML/DataNode.hpp"
 
@@ -95,6 +96,10 @@ Serialiser::Serialise(const ObservationZonePoint &data)
 
   case ObservationZonePoint::LINE:
     Visit((const LineSectorZone &)data);
+    break;
+
+  case ObservationZonePoint::MAT_CYLINDER:
+    Visit((const MatCylinderZone &)data);
     break;
 
   case ObservationZonePoint::CYLINDER:
@@ -184,6 +189,13 @@ Serialiser::Visit(const CylinderZone &data)
 }
 
 void 
+Serialiser::Visit(const MatCylinderZone &data)
+{
+  node.SetAttribute(_T("type"), _T("MatCylinder"));
+  node.SetAttribute(_T("radius"), data.GetRadius());
+}
+
+void
 Serialiser::Serialise(const GeoPoint &data)
 {
   node.SetAttribute(_T("longitude"), data.longitude);
@@ -256,6 +268,8 @@ Serialiser::GetTaskFactoryType(TaskFactoryType type) const
     return _T("RT");
   case TaskFactoryType::AAT:
     return _T("AAT");
+  case TaskFactoryType::MAT:
+    return _T("MAT");
   case TaskFactoryType::MIXED:
     return _T("Mixed");
   case TaskFactoryType::TOURING:

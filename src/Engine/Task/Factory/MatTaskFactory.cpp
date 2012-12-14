@@ -21,11 +21,11 @@ Copyright_License {
 }
  */
 
-#include "AATTaskFactory.hpp"
+#include "MatTaskFactory.hpp"
 #include "TaskFactoryConstraints.hpp"
 #include "Util/Macros.hpp"
 
-static constexpr TaskFactoryConstraints aat_constraints = {
+static constexpr TaskFactoryConstraints mat_constraints = {
   true,
   false,
   false,
@@ -34,73 +34,68 @@ static constexpr TaskFactoryConstraints aat_constraints = {
   2, 13,
 };
 
-static constexpr TaskPointFactoryType aat_start_types[] = {
+static constexpr TaskPointFactoryType mat_start_types[] = {
   TaskPointFactoryType::START_LINE,
   TaskPointFactoryType::START_CYLINDER,
-  TaskPointFactoryType::START_SECTOR,
-  TaskPointFactoryType::START_BGA,
 };
 
-static constexpr TaskPointFactoryType aat_im_types[] = {
-  TaskPointFactoryType::AAT_CYLINDER,
-  TaskPointFactoryType::AAT_SEGMENT,
-  TaskPointFactoryType::AAT_ANNULAR_SECTOR,
+static constexpr TaskPointFactoryType mat_im_types[] = {
+  TaskPointFactoryType::MAT_CYLINDER,
 };
 
-static constexpr TaskPointFactoryType aat_finish_types[] = {
+static constexpr TaskPointFactoryType mat_finish_types[] = {
   TaskPointFactoryType::FINISH_LINE,
   TaskPointFactoryType::FINISH_CYLINDER,
-  TaskPointFactoryType::FINISH_SECTOR,
 };
 
-AATTaskFactory::AATTaskFactory(OrderedTask& _task, const TaskBehaviour &tb)
-  :AbstractTaskFactory(aat_constraints, _task, tb,
-                       LegalPointConstArray(aat_start_types,
-                                            ARRAY_SIZE(aat_start_types)),
-                       LegalPointConstArray(aat_im_types,
-                                            ARRAY_SIZE(aat_im_types)),
-                       LegalPointConstArray(aat_finish_types,
-                                            ARRAY_SIZE(aat_finish_types)))
+MatTaskFactory::MatTaskFactory(OrderedTask& _task, const TaskBehaviour &tb)
+:AbstractTaskFactory(mat_constraints, _task, tb,
+                     LegalPointConstArray(mat_start_types,
+                                          ARRAY_SIZE(mat_start_types)),
+                     LegalPointConstArray(mat_im_types,
+                                          ARRAY_SIZE(mat_im_types)),
+                     LegalPointConstArray(mat_finish_types,
+                                          ARRAY_SIZE(mat_finish_types)))
 {
 }
 
 TaskPointFactoryType
-AATTaskFactory::GetMutatedPointType(const OrderedTaskPoint &tp) const
+MatTaskFactory::GetMutatedPointType(const OrderedTaskPoint &tp) const
 {
   const TaskPointFactoryType oldtype = GetType(tp);
   TaskPointFactoryType newtype = oldtype;
 
   switch (oldtype) {
-  case TaskPointFactoryType::START_SECTOR:
   case TaskPointFactoryType::START_LINE:
   case TaskPointFactoryType::START_CYLINDER:
+    break;
+
   case TaskPointFactoryType::START_BGA:
+  case TaskPointFactoryType::START_SECTOR:
+    newtype = TaskPointFactoryType::START_CYLINDER;
     break;
 
-  case TaskPointFactoryType::KEYHOLE_SECTOR:
-  case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
-  case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
-    newtype = AbstractTaskFactory::GetMutatedPointType(tp);
-    break;
-
-  case TaskPointFactoryType::FINISH_SECTOR:
   case TaskPointFactoryType::FINISH_LINE:
   case TaskPointFactoryType::FINISH_CYLINDER:
     break;
 
+  case TaskPointFactoryType::FINISH_SECTOR:
+    newtype = TaskPointFactoryType::FINISH_CYLINDER;
+    break;
+
+
+  case TaskPointFactoryType::KEYHOLE_SECTOR:
+  case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
+  case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
   case TaskPointFactoryType::FAI_SECTOR:
-    newtype = TaskPointFactoryType::AAT_CYLINDER;
-    //ToDo: create a 90 degree symmetric AAT sector
-    break;
-
   case TaskPointFactoryType::AST_CYLINDER:
-  case TaskPointFactoryType::MAT_CYLINDER:
-    newtype = TaskPointFactoryType::AAT_CYLINDER;
-    break;
-
   case TaskPointFactoryType::AAT_SEGMENT:
   case TaskPointFactoryType::AAT_CYLINDER:
   case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
+    newtype = TaskPointFactoryType::MAT_CYLINDER;
+    break;
+
+  case TaskPointFactoryType::MAT_CYLINDER:
     break;
   }
 

@@ -37,6 +37,7 @@ class ObservationZonePoint;
 class FAISectorZone;
 class SectorZone;
 class LineSectorZone;
+class MatCylinderZone;
 class CylinderZone;
 class KeyholeZone;
 class BGAFixedCourseZone;
@@ -86,6 +87,7 @@ public:
   void Visit(const SectorZone &data);
   void Visit(const LineSectorZone &data);
   void Visit(const CylinderZone &data);
+  void Visit(const MatCylinderZone &data);
   void Visit(const AnnularSectorZone &data);
 
 protected:

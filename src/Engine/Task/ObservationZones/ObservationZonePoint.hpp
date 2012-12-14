@@ -42,6 +42,7 @@ public:
   enum Shape {
     LINE,
     CYLINDER,
+    MAT_CYLINDER,
     SECTOR,
     FAI_SECTOR,
     KEYHOLE,
