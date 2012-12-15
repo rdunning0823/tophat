@@ -477,6 +477,11 @@ public:
 
   void UpdateCommonStatsTask();
   /**
+   * is the current ordered task a Mat?
+   * return True if so.
+   */
+  bool IsMat() const;
+  /**
    * returns time stamp when ordered task was last committed
    */
   unsigned GetTaskTimeStamp() const {

@@ -649,3 +649,9 @@ TaskManager::TakeoffAutotask(const GeoPoint &loc, const fixed terrain_alt)
   if (!active_task && goto_task->TakeoffAutotask(loc, terrain_alt))
     SetMode(TaskType::GOTO);
 }
+
+bool
+TaskManager::IsMat() const
+{
+  return ordered_task->GetFactoryType() == TaskFactoryType::MAT;
+}
