@@ -93,7 +93,7 @@ test_replay()
 
   OrderedTask* t = task_load(blank);
   if (t) {
-    task_manager.Commit(*t);
+    task_manager.Commit(*t, waypoints);
     task_manager.Resume();
   } else {
     return false;

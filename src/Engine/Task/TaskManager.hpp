@@ -320,7 +320,7 @@ public:
    * @param that OrderedTask to copy
    * @return True if this task changed
    */
-  bool Commit(const OrderedTask& that);
+  bool Commit(const OrderedTask& that, const Waypoints &waypoints);
 
   /**
    * Accessor for task advance system

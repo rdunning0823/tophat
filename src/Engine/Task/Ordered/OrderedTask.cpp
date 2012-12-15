@@ -40,9 +40,9 @@
 #include "Task/Factory/Create.hpp"
 #include "Task/Factory/AbstractTaskFactory.hpp"
 #include "Task/Factory/TaskFactoryConstraints.hpp"
+#include "Task/ObservationZones/MatCylinderZone.hpp"
 
 #include "Waypoint/Waypoints.hpp"
-
 #include "Geo/Flat/FlatBoundingBox.hpp"
 #include "Geo/GeoBounds.hpp"
 #include "Task/Stats/TaskSummary.hpp"
@@ -74,7 +74,7 @@ OrderedTask::~OrderedTask()
     delete *v;
     optional_start_points.erase(v);
   }
-
+  ClearMatPoints();
   delete active_factory;
 
 #if defined(__clang__) || GCC_VERSION >= 40700
@@ -139,6 +139,16 @@ OrderedTask::UpdateGeometry()
 
     (*i)->ScanProjection(task_projection);
   }
+
+  // scan location of mat control points
+  for (auto begin = GetMatPoints().cbegin(), end = GetMatPoints().cend(), i = begin;
+       i != end; ++i) {
+    if (i == begin)
+      task_projection.Reset((*i)->GetLocation());
+
+    (*i)->ScanProjection(task_projection);
+  }
+
   // ... and optional start points
   for (const OrderedTaskPoint *tp : optional_start_points)
     tp->ScanProjection(task_projection);
@@ -148,10 +158,14 @@ OrderedTask::UpdateGeometry()
 
   // update OZ's for items that depend on next-point geometry 
   UpdateObservationZones(task_points, task_projection);
+  UpdateObservationZones(SetMatPoints(), task_projection);
   UpdateObservationZones(optional_start_points, task_projection);
 
   // now that the task projection is stable, and oz is stable,
   // calculate the bounding box in projected coordinates
+  for (const auto tp : GetMatPoints())
+    tp->UpdateBoundingBox(task_projection);
+
   for (const auto tp : task_points)
     tp->UpdateBoundingBox(task_projection);
 
@@ -1199,7 +1213,7 @@ OrderedTask::CheckDuplicateWaypoints(Waypoints& waypoints)
 }
 
 bool
-OrderedTask::Commit(const OrderedTask& that)
+OrderedTask::Commit(const OrderedTask& that, const Waypoints &waypoints)
 {
   bool modified = false;
 
@@ -1246,6 +1260,9 @@ OrderedTask::Commit(const OrderedTask& that)
       modified = true;
     }
   }
+
+  // don't assume has the Mat points filled event if it was a MAT
+  FillMatPoints(waypoints, false);
 
   if (modified)
     UpdateGeometry();
@@ -1432,3 +1449,22 @@ unsigned
 OrderedTask::OptionalStartsSize() const {
   return optional_start_points.size();
 }
+
+void
+OrderedTask::FillMatPoints(const Waypoints &wps, bool update_geometry)
+{
+  ClearMatPoints();
+
+  if (GetFactoryType() == TaskFactoryType::MAT)
+    mat_points.FillMatPoints(wps, GetFactory());
+
+  if (update_geometry)
+    UpdateGeometry();
+}
+
+void
+OrderedTask::ClearMatPoints()
+{
+  mat_points.ClearMatPoints();
+}
+

@@ -89,7 +89,7 @@ public:
    * @param other OrderedTask to copy
    * @return True if this task changed
    */
-  bool TaskCommit(const OrderedTask& that);
+  bool TaskCommit(const OrderedTask& that, const Waypoints &waypoints);
 
   bool TaskSave(const TCHAR *path);
 

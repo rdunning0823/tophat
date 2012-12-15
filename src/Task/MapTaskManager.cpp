@@ -109,7 +109,7 @@ MapTaskManager::AppendToTask(const Waypoint &waypoint)
     OrderedTask *task = task_manager->Clone(GetTaskBehaviour());
     result = AppendToTask(task, waypoint);
     if (result == SUCCESS)
-      task_manager->Commit(*task);
+      task_manager->Commit(*task, way_points);
     delete task;
   } else { // ordered task invalid
     switch (task_manager->GetMode()) {
@@ -129,7 +129,7 @@ MapTaskManager::AppendToTask(const Waypoint &waypoint)
       const Waypoint &OldGotoWp = OldGotoTWP->GetWaypoint();
       result = MutateFromGoto(task, waypoint, OldGotoWp);
       if (result == MUTATED_FROM_GOTO)
-        task_manager->Commit(*task);
+        task_manager->Commit(*task, way_points);
 
       delete task;
       break;
@@ -184,7 +184,7 @@ MapTaskManager::InsertInTask(const Waypoint &waypoint)
 
     result = InsertInTask(task, waypoint);
     if (result == SUCCESS)
-      task_manager->Commit(*task);
+      task_manager->Commit(*task, way_points);
     delete task;
   } else { // ordered task invalid
     switch (task_manager->GetMode()) {
@@ -203,7 +203,7 @@ MapTaskManager::InsertInTask(const Waypoint &waypoint)
       const Waypoint &OldGotoWp = OldGotoTWP->GetWaypoint();
       result = MutateFromGoto(task, OldGotoWp, waypoint);
       if (result == MUTATED_FROM_GOTO)
-        task_manager->Commit(*task);
+        task_manager->Commit(*task, way_points);
       delete task;
       break;
     }
@@ -239,7 +239,7 @@ MapTaskManager::ReplaceInTask(const Waypoint &waypoint)
 
   TaskEditResult result = ReplaceInTask(task, waypoint);
   if (result == SUCCESS)
-    task_manager->Commit(*task);
+    task_manager->Commit(*task, way_points);
 
   delete task;
   return result;
@@ -311,7 +311,7 @@ MapTaskManager::RemoveFromTask(const Waypoint &wp)
 
   TaskEditResult result = RemoveFromTask(task, wp);
   if (result == SUCCESS)
-    task_manager->Commit(*task);
+    task_manager->Commit(*task, way_points);
 
   delete task;
   return result;

@@ -196,7 +196,7 @@ XCSoarInterface::AfterStartup()
       defaultTask->CheckDuplicateWaypoints(way_points);
       way_points.Optimise();
     }
-    protected_task_manager->TaskCommit(*defaultTask);
+    protected_task_manager->TaskCommit(*defaultTask, way_points);
     delete defaultTask;
   }
 

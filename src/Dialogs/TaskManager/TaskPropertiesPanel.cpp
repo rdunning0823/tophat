@@ -33,6 +33,7 @@ Copyright_License {
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Units/Units.hpp"
 #include "Language/Language.hpp"
+#include "Components.hpp"
 
 enum Controls {
   MIN_TIME,
@@ -143,6 +144,7 @@ TaskPropertiesPanel::OnTaskTypeChange(DataFieldEnum &df)
   if (newtype != ordered_task->GetFactoryType()) {
     ReadValues();
     ordered_task->SetFactory(newtype);
+    ordered_task->FillMatPoints(way_points);
     *task_changed =true;
     RefreshView();
   }

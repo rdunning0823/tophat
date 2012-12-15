@@ -8,6 +8,7 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/FAITrianglePointValidator.cpp \
 	$(TASK_SRC_DIR)/Ordered/OrderedTaskBehaviour.cpp \
 	$(TASK_SRC_DIR)/Ordered/OrderedTask.cpp \
+	$(TASK_SRC_DIR)/Ordered/MatPoints.cpp \
 	$(TASK_SRC_DIR)/Ordered/TaskAdvance.cpp \
 	$(TASK_SRC_DIR)/Ordered/TaskAdvanceSmart.cpp \
 	$(TASK_SRC_DIR)/Ordered/Points/IntermediatePoint.cpp \

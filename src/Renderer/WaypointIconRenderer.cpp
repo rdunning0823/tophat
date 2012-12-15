@@ -201,9 +201,15 @@ void
 WaypointIconRenderer::Draw(const Waypoint &waypoint, const RasterPoint &point,
                            Reachability reachable, bool in_task)
 {
-  if (waypoint.IsLandable())
+  if (waypoint.IsLandable()) {
     DrawLandable(waypoint, point, reachable);
-  else
+    //TODO This is supposed to draw the TaskWP on top of the landable icon.
+    // It works for MAT, but fails for landable AAT & AST task points because the
+    // QuadTree waypoint VisitWithinRage iterates Landable wps twice
+    // (once as a wp and once as a tp) and the wp draws after the tp, covering it up.
+    if (in_task)
+      look.task_turn_point_icon.Draw(canvas, point);
+  } else
     // non landable turnpoint
     GetWaypointIcon(look, waypoint, small_icons, in_task).Draw(canvas, point);
 }

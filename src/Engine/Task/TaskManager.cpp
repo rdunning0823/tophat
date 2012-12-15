@@ -564,9 +564,9 @@ TaskManager::Clone(const TaskBehaviour &tb) const
 }
 
 bool
-TaskManager::Commit(const OrderedTask &other)
+TaskManager::Commit(const OrderedTask &other, const Waypoints &waypoints)
 {
-  bool retval = task_ordered.Commit(other);
+  bool retval = task_ordered.Commit(other, waypoints);
 
   if (other.TaskSize()) {
     task_time_stamp = MonotonicClockMS();

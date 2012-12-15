@@ -117,7 +117,7 @@ int main(int argc, char **argv)
   }
 
   TaskManager task_manager(task_behaviour, way_points);
-  if (!task_manager.Commit(*task)) {
+  if (!task_manager.Commit(*task, way_points)) {
     fprintf(stderr, "Failed to commit task\n");
     return EXIT_FAILURE;
   }

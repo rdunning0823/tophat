@@ -268,7 +268,7 @@ InputEvents::eventTaskLoad(const TCHAR *misc)
         task->CheckDuplicateWaypoints(way_points);
         way_points.Optimise();
       }
-      protected_task_manager->TaskCommit(*task);
+      protected_task_manager->TaskCommit(*task, way_points);
       delete task;
     }
   }

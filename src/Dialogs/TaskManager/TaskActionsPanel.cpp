@@ -87,6 +87,7 @@ TaskActionsPanel::OnNewTaskClicked()
                    MB_YESNO|MB_ICONQUESTION) == IDYES)) {
     (*active_task)->Clear();
     (*active_task)->SetFactory(XCSoarInterface::GetComputerSettings().task.task_type_default);
+    (*active_task)->FillMatPoints(way_points);
     *task_modified = true;
     tab_bar.SetCurrentPage(dlgTaskManager::GetPropertiesTab());
     tab_bar.SetFocus();

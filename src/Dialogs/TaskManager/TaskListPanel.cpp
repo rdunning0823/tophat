@@ -205,6 +205,7 @@ TaskListPanel::LoadTask()
   OrderedTask* temptask = orig->Clone(CommonInterface::GetComputerSettings().task);
   delete *active_task;
   *active_task = temptask;
+  (*active_task)->FillMatPoints(way_points);
   RefreshView();
   *task_modified = true;
 

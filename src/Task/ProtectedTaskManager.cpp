@@ -157,10 +157,10 @@ ProtectedTaskManager::TaskClone() const
 }
 
 bool
-ProtectedTaskManager::TaskCommit(const OrderedTask& that)
+ProtectedTaskManager::TaskCommit(const OrderedTask& that, const Waypoints &waypoints)
 {
   ExclusiveLease lease(*this);
-  return lease->Commit(that);
+  return lease->Commit(that, waypoints);
 }
 
 bool 

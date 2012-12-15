@@ -168,7 +168,7 @@ dlgTaskManager::CommitTaskChanges()
       way_points.Optimise();
     }
 
-    protected_task_manager->TaskCommit(*active_task);
+    protected_task_manager->TaskCommit(*active_task, way_points);
     protected_task_manager->TaskSaveDefault();
 
     task_modified = false;
@@ -226,6 +226,7 @@ dlgTaskManager::dlgTaskManagerShowModal(SingleWindow &parent)
   assert(wf != NULL);
 
   active_task = protected_task_manager->TaskClone();
+  active_task->FillMatPoints(way_points);
   task_modified = false;
 
   // Load tabs
