@@ -52,12 +52,13 @@ Copyright_License {
 #include "ResourceLoader.hpp"
 
 enum {
-  NUM_OZ_TYPES = 9,
+  NUM_OZ_TYPES = 10,
 };
 
 static const TCHAR *const oz_type_names[NUM_OZ_TYPES] = {
   _T("Line"),
   _T("Cylinder"),
+  _T("MAT Cylinder"),
   _T("Sector"),
   _T("FAI Sector"),
   _T("Keyhole"),
