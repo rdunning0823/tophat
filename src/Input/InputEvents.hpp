@@ -64,6 +64,13 @@ namespace InputEvents
   void LeaveMode(const TCHAR *mode);
 
   /**
+   * Is the current mode this mode?
+   * @param mode.  The mode to check against
+   * @return. true if the current mode is the same.
+   */
+  bool IsMode(const TCHAR *mode);
+
+  /**
    * Set the "flavour" of the current mode.  It is an optional string
    * that gets appended to the current mode name, separated with a
    * dot, to build a new "overlay" mode.  This may be used to replace

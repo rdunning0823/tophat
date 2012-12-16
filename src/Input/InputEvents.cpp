@@ -151,6 +151,14 @@ InputEvents::setMode(const TCHAR *mode)
     setMode((InputEvents::Mode)m);
 }
 
+bool
+InputEvents::IsMode(const TCHAR *mode)
+{
+  assert(mode != NULL);
+
+  return input_config.modes[current_mode] == mode;
+}
+
 void
 InputEvents::LeaveMode(const TCHAR *mode)
 {
