@@ -341,6 +341,10 @@ GlueMapWindow::OnTimer(WindowTimer &timer)
 {
   if (timer == map_item_timer) {
     map_item_timer.Cancel();
+    if (!InputEvents::IsDefault() && !IsPanning()) {
+      InputEvents::HideMenu();
+      return true;
+    }
     ShowMapItems(drag_start_geopoint, false);
     return true;
   } else
