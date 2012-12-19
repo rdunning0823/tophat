@@ -27,7 +27,7 @@ Copyright_License {
 #include "Java/Class.hpp"
 #include "../Timer.hpp"
 #include "Screen/Android/Event.hpp"
-#include "org_xcsoar_Timer.h"
+#include "org_tophat_Timer.h"
 #include "Compiler.h"
 
 #include <assert.h>
@@ -43,7 +43,7 @@ AndroidTimer::Bridge::Initialise(JNIEnv *env)
   assert(cls == NULL);
   assert(env != NULL);
 
-  cls.Find(env, "org/xcsoar/Timer");
+  cls.Find(env, "org/tophat/Timer");
 
   ctor = env->GetMethodID(cls, "<init>", "(JI)V");
   install_method = env->GetMethodID(cls, "install", "()V");
@@ -111,7 +111,7 @@ AndroidTimer::run()
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_Timer_run(JNIEnv *env, jobject obj, jlong ptr)
+Java_org_tophat_Timer_run(JNIEnv *env, jobject obj, jlong ptr)
 {
   AndroidTimer *timer = (AndroidTimer *)(void *)ptr;
 

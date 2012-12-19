@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.util.Log;
 import android.graphics.Bitmap;
@@ -31,7 +31,7 @@ import android.opengl.GLUtils;
  * Utilities for dealing with #Bitmap objects and OpenGL.
  */
 final class BitmapUtil {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   public static int validateTextureSize(int i) {
     return NativeView.validateTextureSize(i);

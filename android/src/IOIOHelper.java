@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.util.Timer;
 import java.util.TimerTask;

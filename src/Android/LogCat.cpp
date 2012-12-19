@@ -93,7 +93,7 @@ CheckLogCat()
   FileLineReaderA reader(path);
   char *line;
   while ((line = reader.read()) != NULL) {
-    if (strstr(line, ">>> org.xcsoar") != NULL) {
+    if (strstr(line, ">>> org.tophat") != NULL) {
       const char *p = strstr(line, "pid:");
       if (p != NULL)
         found_xcsoar = atoi(p + 4);

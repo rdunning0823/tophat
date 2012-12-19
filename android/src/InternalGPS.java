@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.os.Handler;
 import android.os.Bundle;
