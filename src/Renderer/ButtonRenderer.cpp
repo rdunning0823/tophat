@@ -29,11 +29,12 @@ Copyright_License {
 
 void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
-                           bool pressed)
+                           bool pressed, bool transparent)
 {
   const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
 
-  canvas.DrawFilledRectangle(rc, _look.background_color);
+  if (!transparent)
+    canvas.DrawFilledRectangle(rc, _look.background_color);
 
   canvas.Select(pressed ? _look.dark_border_pen : _look.light_border_pen);
   canvas.DrawTwoLines(rc.left, rc.bottom - 2, rc.left, rc.top, rc.right - 2,

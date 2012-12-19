@@ -35,7 +35,12 @@ class ButtonRenderer
 public:
   ButtonRenderer(const ButtonLook &_look):look(_look) {}
 
-  void DrawButton(Canvas &canvas, PixelRect rc, bool focused, bool pressed);
+  /**
+   * @parm transparent. if True, the background is not drawn
+   * so the button is transparent
+   */
+  void DrawButton(Canvas &canvas, PixelRect rc, bool focused, bool pressed,
+                  bool transparent = false);
   PixelRect GetDrawingRect(PixelRect rc, bool pressed);
 };
 
