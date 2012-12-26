@@ -64,7 +64,6 @@ KineticManager::IsMoveTo()
 void
 KineticManager::MouseDown(int x)
 {
-  steady = false;
   mode = NORMAL;
   mouse_down_x = last = x;
   stopping_time = default_stopping_time;
@@ -75,6 +74,7 @@ KineticManager::MouseDown(int x)
 void
 KineticManager::MouseMove(int x)
 {
+  steady = false;
   // Get time since last position update
   int dt = clock.Elapsed();
 
