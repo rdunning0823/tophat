@@ -140,7 +140,6 @@ protected:
   virtual bool CheckExitTransition(const AircraftState &ref_now,
                                    const AircraftState &ref_last) const = 0;
 
-private:
   /**
    * Set OZ entry state
    *
@@ -150,6 +149,16 @@ private:
     state_entered = state;
   }
 
+  /**
+   * Set OZ exit state
+   *
+   * @param state State at exit
+   */
+  void SetHasExited(bool _has_exited) {
+    has_exited = _has_exited;
+  }
+
+private:
   gcc_pure
   virtual bool EntryPrecondition() const {
     return true;

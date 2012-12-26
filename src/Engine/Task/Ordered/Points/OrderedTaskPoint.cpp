@@ -154,23 +154,29 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
   if (waypoint == NULL)
     waypoint = &GetWaypoint();
 
+  OrderedTaskPoint* tp_temp;
+
   switch (GetType()) {
   case START:
-    return new StartPoint(GetObservationZone().Clone(waypoint->location),
-                          *waypoint, task_behaviour, ordered_task_behaviour);
+    tp_temp = new StartPoint(GetObservationZone().Clone(waypoint->location),
+                             *waypoint, task_behaviour, ordered_task_behaviour);
+    break;
 
   case AST:
-    return new ASTPoint(GetObservationZone().Clone(waypoint->location),
-                        *waypoint, task_behaviour, ordered_task_behaviour);
+    tp_temp = new ASTPoint(GetObservationZone().Clone(waypoint->location),
+                           *waypoint, task_behaviour, ordered_task_behaviour);
+    break;
 
   case AAT:
-    return new AATPoint(GetObservationZone().Clone(waypoint->location),
-                        *waypoint, task_behaviour, ordered_task_behaviour);
+    tp_temp = new AATPoint(GetObservationZone().Clone(waypoint->location),
+                           *waypoint, task_behaviour, ordered_task_behaviour);
 
+    break;
   case FINISH:
-    return new FinishPoint(GetObservationZone().Clone(waypoint->location),
-                           *waypoint, task_behaviour, ordered_task_behaviour,
-                           boundary_scored);
+    tp_temp = new FinishPoint(GetObservationZone().Clone(waypoint->location),
+                              *waypoint, task_behaviour, ordered_task_behaviour,
+                              boundary_scored);
+    break;
 
   case UNORDERED:
   case ROUTE:
@@ -179,7 +185,11 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
     break;
   }
 
-  return NULL;
+  assert(tp_temp != nullptr);
+  tp_temp->SetStateEntered(GetEnteredState());
+  tp_temp->SetHasExited(HasExited());
+
+  return tp_temp;
 }
 
 void
