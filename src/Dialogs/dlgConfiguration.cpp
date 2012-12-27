@@ -116,7 +116,6 @@ static const TabMenuControl::PageItem pages[] = {
   {N_("Screen Layout"), 5, CreateLayoutConfigPanel },
   {N_("InfoBox Pages"), 5, CreatePagesConfigPanel },
   {N_("InfoBox Modes"), 5, CreateInfoBoxesConfigPanel },
-  {N_("Devices"), 6, CreateDevicesConfigPanel },
   {N_("Logger"), 6, CreateLoggerConfigPanel },
   {N_("Logger Info"), 6, CreateLoggerInfoConfigPanel },
   {N_("Units"), 6, CreateUnitsConfigPanel },
