@@ -39,6 +39,7 @@ Copyright_License {
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Look/Look.hpp"
 #include "Profile/Profile.hpp"
+#include "Language/Language.hpp"
 
 enum ControlIndex {
   BigPlus,
@@ -302,9 +303,20 @@ MacCreadyEditPanel::FinalGlideChart::OnPaint(Canvas &canvas)
   PaintWindow::OnPaint(canvas);
   canvas.SelectNullPen();
   canvas.Clear(look.dialog.background_color);
+  StaticString<64> description;
+
+  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+  if (task_manager->GetMode() == TaskManager::MODE_ORDERED)
+    description = _("Task");
+  else {
+    const TaskWaypoint* wp = task_manager->GetActiveTaskPoint();
+    description = wp->GetWaypoint().name.c_str();
+  }
+
 
   final_glide_bar_renderer->Draw(canvas, GetClientRect(),
                                  CommonInterface::Calculated(),
                                  CommonInterface::GetComputerSettings().task.glide,
-    CommonInterface::GetUISettings().map.final_glide_bar_mc0_enabled);
+    CommonInterface::GetUISettings().map.final_glide_bar_mc0_enabled,
+    description.c_str());
 }
