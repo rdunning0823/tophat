@@ -142,13 +142,6 @@ event=Zoom out
 label=Zoom -
 location=3
 
-mode=pan
-type=key
-data=APP4
-event=NearestMapItems pan
-label=What's\nhere?
-location=4
-
 ###### main entry buttons
 
 mode=default
