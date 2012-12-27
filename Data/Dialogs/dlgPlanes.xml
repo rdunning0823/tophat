@@ -7,7 +7,7 @@
     <Button Name="NewButton" Caption="New" X="0" Y="0" Height="30" Width="45" OnClick="NewClicked" />
     <Button Name="EditButton" Caption="Edit" X="45" Y="0" Height="30" Width="45" OnClick="EditClicked" />
     <Button Name="DeleteButton" Caption="Delete" X="90" Y="0" Height="30" Width="45" OnClick="DeleteClicked" />
-    <Button Name="LoadButton" Caption="Load" X="-90" Y="0" Height="30" Width="45" OnClick="LoadClicked" />
+    <Button Name="LoadButton" Caption="Activate" X="-90" Y="0" Height="30" Width="45" OnClick="LoadClicked" />
     <Button Name="CloseButton" Caption="Close" X="-45" Y="0" Height="30" Width="45" OnClick="CloseClicked" />
   </Panel>
 </Form>
