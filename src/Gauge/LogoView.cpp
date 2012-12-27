@@ -111,7 +111,4 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   canvas.SetBackgroundTransparent();
   canvas.text(2, 2, TopHat_ProductToken);
   canvas.text(2, 4 + text_height, XCSoar_ProductToken);
-#ifdef NO_HORIZON
-  canvas.text(2, 6 + text_height * 2, _T("Horizon: disabled"));
-#endif
 }
