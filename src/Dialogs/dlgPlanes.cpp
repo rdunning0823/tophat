@@ -49,6 +49,8 @@ Copyright_License {
 #include <assert.h>
 #include <windef.h> /* for MAX_PATH */
 
+static bool Load(unsigned i);
+
 static WndForm *dialog = NULL;
 static ListControl *plane_list = NULL;
 
@@ -82,6 +84,30 @@ GetRowHeight(const DialogLook &look)
     + look.small_font->GetHeight();
 }
 
+/**
+ * is any plane in the list active?
+ * @return true if one of the planes in the list is active
+ */
+static bool
+IsAnyActive()
+{
+  for (unsigned i = 0; i < list.size(); i++)
+    if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path))
+      return true;
+
+  return false;
+}
+
+/**
+ * if no planes in the list are active, it loads the first in the list
+ */
+static void
+LoadFirstIfNoneActive()
+{
+  if (!IsAnyActive() && list.size() > 0)
+    Load(0);
+}
+
 static void
 UpdateList()
 {
@@ -109,6 +135,8 @@ UpdateList()
   b = (WndButton*)dialog->FindByName(_T("DeleteButton"));
   assert(b != NULL);
   b->SetEnabled(len > 0);
+
+  LoadFirstIfNoneActive();
 }
 
 static void
