@@ -148,12 +148,10 @@ OnLogoPaint(gcc_unused WndOwnerDrawFrame *Sender, Canvas &canvas)
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
 
-  canvas.text(x, y, _T("version: "));
-  canvas.text(x + Layout::FastScale(80), y, XCSoar_VersionString);
+  canvas.text(x, y, TopHat_ProductToken);
   y += Layout::FastScale(22);
 
-  canvas.text(x, y, _T("date: "));
-  canvas.text(x + Layout::FastScale(80), y, _T(__DATE__));
+  canvas.text(x, y, XCSoar_ProductTokenShort);
 #ifdef GIT_COMMIT_ID
   y += Layout::FastScale(22);
 
@@ -166,7 +164,7 @@ OnLogoPaint(gcc_unused WndOwnerDrawFrame *Sender, Canvas &canvas)
   y += Layout::FastScale(22);
 
   canvas.SetTextColor(COLOR_XCSOAR);
-  canvas.text(x, y, _T("http://www.xcsoar.org"));
+  canvas.text(x, y, _T("http://xcsoar-robd.wikispaces.com/Top+Hat"));
 }
 
 static void
