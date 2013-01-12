@@ -121,21 +121,7 @@ type=key
 data=APP1
 event=Pan off
 label=Pan\nOff
-location=1
-
-mode=pan
-type=key
-data=APP2
-event=Zoom in
-label=Zoom +
-location=2
-
-mode=pan
-type=key
-data=APP3
-event=Zoom out
-label=Zoom -
-location=3
+location=20
 
 ###### main entry buttons
 
