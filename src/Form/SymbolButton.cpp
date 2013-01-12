@@ -41,7 +41,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
 
   bool pressed = is_down();
 
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed);
+  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
   // If button has text on it
   tstring caption = get_text();
   if (caption.empty())
