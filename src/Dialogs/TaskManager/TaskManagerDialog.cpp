@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "Internal.hpp"
-#include "TaskCalculatorPanel.hpp"
 #include "TaskEditPanel.hpp"
 #include "TaskPropertiesPanel.hpp"
 #include "TaskMiscPanel.hpp"
@@ -250,10 +249,6 @@ dlgTaskManager::dlgTaskManagerShowModal(SingleWindow &parent)
   TaskClosePanel *wClose = new TaskClosePanel(&task_modified);
   wClose->SetTaskView(task_view);
 
-  TaskCalculatorPanel *wCalculator =
-    new TaskCalculatorPanel(UIGlobals::GetDialogLook(), &task_modified);
-  wCalculator->SetTargetButton((WndButton *)wf->FindByName(_T("Target")));
-
   TaskEditPanel *wEdit = new TaskEditPanel(*wf, look.task, look.airspace,
                                            &active_task, &task_modified);
   wEdit->SetTaskView(task_view);
@@ -267,21 +262,19 @@ dlgTaskManager::dlgTaskManagerShowModal(SingleWindow &parent)
     == DialogSettings::TabStyle::Icon;
 
   const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *CalcIcon = enable_icons ? &icons.hBmpTabCalculator : NULL;
   const Bitmap *TurnPointIcon = enable_icons ? &icons.hBmpTabTask : NULL;
   const Bitmap *BrowseIcon = enable_icons ? &icons.hBmpTabWrench : NULL;
   const Bitmap *PropertiesIcon = enable_icons ? &icons.hBmpTabSettings : NULL;
 
-  wTabBar->AddTab(wCalculator, _("Calculator"), CalcIcon);
 
   if (Layout::landscape) {
     wTabBar->AddTab(wEdit, _("Turn Points"), TurnPointIcon);
-    TurnpointTab = 1;
+    TurnpointTab = 0;
 
     wTabBar->AddTab(list_tab, _("Manage"), BrowseIcon);
 
     wTabBar->AddTab(wProps, _("Rules"), PropertiesIcon);
-    PropertiesTab = 3;
+    PropertiesTab = 2;
 
     wTabBar->AddTab(wClose, _("Close"));
 
@@ -290,14 +283,14 @@ dlgTaskManager::dlgTaskManagerShowModal(SingleWindow &parent)
     wTabBar->AddTab(wClose, _("Close"));
 
     wTabBar->AddTab(wEdit, _("Turn Points"), TurnPointIcon);
-    TurnpointTab = 2;
+    TurnpointTab = 1;
 
     wTabBar->AddTab(list_tab, _("Manage"), BrowseIcon);
 
     wTabBar->AddTab(wProps, _("Rules"), PropertiesIcon);
-    PropertiesTab = 4;
+    PropertiesTab = 3;
 
-    wTabBar->SetCurrentPage(0);
+    wTabBar->SetCurrentPage(1);
   }
 
   fullscreen = false;
