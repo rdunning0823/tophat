@@ -56,6 +56,8 @@ Copyright_License {
 #include "MapWindow/MapWidgetOverlays.hpp"
 #include "Widgets/MainMenuButtonWidget.hpp"
 #include "Widgets/TaskNavSliderWidget.hpp"
+#include "Widgets/ZoomInButtonWidget.hpp"
+#include "Widgets/ZoomOutButtonWidget.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
@@ -215,6 +217,8 @@ MainWindow::InitialiseConfigured()
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   task_nav_slider_widget = new TaskNavSliderWidget();
   widget_overlays.Add(task_nav_slider_widget, rc_current);
+  widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
+  widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
 
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
