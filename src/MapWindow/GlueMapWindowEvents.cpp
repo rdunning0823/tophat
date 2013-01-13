@@ -71,6 +71,11 @@ GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
   switch (drag_mode) {
   case DRAG_NONE:
     break;
+  case DRAG_GESTURE:
+    if ((abs(drag_start.x - x) + abs(drag_start.y - y)) < Layout::Scale(threshold))
+      break;
+    drag_projection = visible_projection;
+    follow_mode = FOLLOW_PAN;
 
 #ifdef HAVE_MULTI_TOUCH
   case DRAG_MULTI_TOUCH_PAN:
@@ -80,11 +85,6 @@ GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
                                       + drag_start_geopoint
                                       - drag_projection.ScreenToGeo(x, y));
     QuickRedraw();
-    return true;
-
-  case DRAG_GESTURE:
-    gestures.Update(x, y);
-    Invalidate();
     return true;
 
   case DRAG_SIMULATOR:
@@ -128,7 +128,6 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
                         Layout::Scale(30)) != 1)
         drag_mode = DRAG_SIMULATOR;
   if (drag_mode == DRAG_NONE ) {
-    gestures.Start(x, y, Layout::Scale(20));
     drag_mode = DRAG_GESTURE;
   }
 
@@ -204,11 +203,17 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     break;
 
   case DRAG_GESTURE:
-    const TCHAR* gesture = gestures.Finish();
-    if (y > (int)compass_offset_y && gesture && OnMouseGesture(gesture))
-      return true;
+  {
+    /* allow a bigger threshold on touch screens */
+    const int threshold = IsEmbedded() ? 50 : 10;
+    if ((abs(drag_start.x - x) + abs(drag_start.y - y)) > Layout::Scale(threshold)) {
+      follow_mode = FOLLOW_SELF;
+      EnterPan();
+    } else
+      LeavePan();
 
     break;
+  }
   }
 
   if (arm_mapitem_list && click_time > 50) {
