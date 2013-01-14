@@ -175,6 +175,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/dlgFlarmDetailsList.cpp \
 	$(SRC)/Dialogs/dlgAnalysis.cpp \
 	$(SRC)/Dialogs/dlgBasicSettings.cpp \
+	$(SRC)/Dialogs/dlgQNH.cpp \
 	$(SRC)/Dialogs/dlgBrightness.cpp \
 	$(SRC)/Dialogs/dlgChecklist.cpp \
 	$(SRC)/Dialogs/dlgPlanes.cpp \

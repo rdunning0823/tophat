@@ -31,6 +31,7 @@ class SingleWindow;
 void dlgAlternatesListShowModal(SingleWindow &parent);
 
 void dlgBasicSettingsShowModal();
+void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();

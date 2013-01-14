@@ -1116,10 +1116,10 @@ location=17
 
 mode=MenuLast
 type=key
-data=6
-event=Credits
+data=0
+event=Setup QNH
 event=Mode default
-label=Credits
+label=QNH
 location=18
 
 mode=MenuLast

@@ -28,7 +28,6 @@ Copyright_License {
 #include "ComputerSettings.hpp"
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
-#include "Atmosphere/Temperature.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "UIGlobals.hpp"
@@ -50,29 +49,24 @@ enum ControlIndex {
   Ballast,
   WingLoading,
   Bugs,
-  QNH,
-  Altitude,
 };
 
 enum Actions {
   DUMP = 100,
 };
 
-class FlightSetupPanel : public RowFormWidget,
-                         DataFieldListener,
-                         public ActionListener {
+class FlightSetupPanel
+  : public RowFormWidget, DataFieldListener, public ActionListener
+{
   WndButton *dump_button;
 
   PolarSettings &polar_settings;
-
-  fixed last_altitude;
 
 public:
   FlightSetupPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()),
      dump_button(NULL),
-     polar_settings(CommonInterface::SetComputerSettings().polar),
-     last_altitude(-2)
+     polar_settings(CommonInterface::SetComputerSettings().polar)
   {}
 
   void SetDumpButton(WndButton *_dump_button) {
@@ -96,10 +90,7 @@ public:
     SetBallast();
   }
 
-  void ShowAltitude(fixed altitude);
-  void RefreshAltitudeControl();
   void SetBugs(fixed bugs);
-  void SetQNH(AtmosphericPressure qnh);
 
   void OnTimer();
 
@@ -174,32 +165,6 @@ FlightSetupPanel::FlipBallastTimer()
 }
 
 void
-FlightSetupPanel::ShowAltitude(fixed altitude)
-{
-  if (fabs(altitude - last_altitude) >= fixed_one) {
-    last_altitude = altitude;
-    LoadValue(Altitude, altitude, UnitGroup::ALTITUDE);
-  }
-
-  ShowRow(Altitude);
-}
-
-void
-FlightSetupPanel::RefreshAltitudeControl()
-{
-  const NMEAInfo &basic = CommonInterface::Basic();
-  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
-
-  if (basic.pressure_altitude_available && settings_computer.pressure_available)
-    ShowAltitude(settings_computer.pressure.PressureAltitudeToQNHAltitude(
-                 basic.pressure_altitude));
-  else if (basic.baro_altitude_available)
-    ShowAltitude(basic.baro_altitude);
-  else
-    HideRow(Altitude);
-}
-
-void
 FlightSetupPanel::SetBugs(fixed bugs) {
   polar_settings.SetBugs(bugs);
   PublishPolarSettings();
@@ -211,23 +176,6 @@ FlightSetupPanel::SetBugs(fixed bugs) {
 }
 
 void
-FlightSetupPanel::SetQNH(AtmosphericPressure qnh)
-{
-  const NMEAInfo &basic = CommonInterface::Basic();
-  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
-
-  settings_computer.pressure = qnh;
-  settings_computer.pressure_available.Update(basic.clock);
-
-  if (device_blackboard != NULL) {
-    MessageOperationEnvironment env;
-    device_blackboard->SetQNH(qnh, env);
-  }
-
-  RefreshAltitudeControl();
-}
-
-void
 FlightSetupPanel::OnTimer()
 {
   const PolarSettings &settings = CommonInterface::GetComputerSettings().polar;
@@ -236,8 +184,6 @@ FlightSetupPanel::OnTimer()
     /* display the new values on the screen */
     SetBallast();
   }
-
-  RefreshAltitudeControl();
 }
 
 void
@@ -249,9 +195,6 @@ FlightSetupPanel::OnModified(DataField &df)
   } else if (IsDataField(Bugs, df)) {
     const DataFieldFloat &dff = (const DataFieldFloat &)df;
     SetBugs(fixed_one - (dff.GetAsFixed() / 100));
-  } else if (IsDataField(QNH, df)) {
-    const DataFieldFloat &dff = (const DataFieldFloat &)df;
-    SetQNH(Units::FromUserPressure(dff.GetAsFixed()));
   }
 }
 
@@ -266,8 +209,6 @@ void
 FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   RowFormWidget::Prepare(parent, rc);
-
-  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
 
   AddFloat(_("Ballast"),
            _("Ballast of the glider.  Increase this value if the pilot/cockpit load is greater than the reference pilot weight of the glide polar (typically 75kg).  Press ENTER on this field to toggle count-down of the ballast volume according to the dump rate specified in the configuration settings."),
@@ -285,23 +226,6 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed_zero, fixed(50), fixed_one, false,
            (fixed_one - polar_settings.bugs) * 100,
            this);
-
-  WndProperty *wp;
-  wp = AddFloat(_("QNH"),
-                _("Area pressure for barometric altimeter calibration.  This is set automatically if Vega connected."),
-                GetUserPressureFormat(), GetUserPressureFormat(),
-                Units::ToUserPressure(Units::ToSysUnit(fixed(850), Unit::HECTOPASCAL)),
-                Units::ToUserPressure(Units::ToSysUnit(fixed(1300), Unit::HECTOPASCAL)),
-                GetUserPressureStep(), false,
-                Units::ToUserPressure(settings.pressure), this);
-  {
-    DataFieldFloat &df = *(DataFieldFloat *)wp->GetDataField();
-    df.SetUnits(Units::GetPressureName());
-    wp->RefreshDisplay();
-  }
-
-  AddReadOnly(_("Altitude"), NULL, _T("%.0f %s"),
-              UnitGroup::ALTITUDE, fixed_zero);
 
   OnTimer();
   SetButtons();
@@ -323,7 +247,7 @@ FlightSetupPanel::OnAction(int id)
 
 /**
  * This function is called repeatedly by the timer and updates the
- * current altitude and ballast. The ballast can change without user
+ * current ballast. The ballast can change without user
  * input due to the dump function.
  */
 static void
@@ -337,7 +261,7 @@ dlgBasicSettingsShowModal()
 {
   instance = new FlightSetupPanel();
 
-  WidgetDialog dialog(_("Bugs, ballast & QNH"), instance);
+  WidgetDialog dialog(_("Bugs & ballast"), instance);
   dialog.SetTimerNotify(OnTimerNotify);
   instance->SetDumpButton(dialog.AddButton(_("Dump"), instance, DUMP));
   dialog.AddButton(_("OK"), mrOK);
