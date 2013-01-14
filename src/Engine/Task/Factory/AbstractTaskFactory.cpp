@@ -37,12 +37,10 @@
 #include "Task/ObservationZones/MatCylinderZone.hpp"
 #include "Task/ObservationZones/AnnularSectorZone.hpp"
 
-#include "LogFile.hpp" //debug
-
 #include <algorithm>
 
-static fixed
-GetOZSize(const ObservationZonePoint &oz)
+fixed
+AbstractTaskFactory::GetOZSize(const ObservationZonePoint &oz) const
 {
   switch (oz.shape) {
   case ObservationZonePoint::SECTOR:
