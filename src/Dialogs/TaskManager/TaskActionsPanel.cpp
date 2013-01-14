@@ -89,7 +89,7 @@ TaskActionsPanel::OnNewTaskClicked()
     (*active_task)->SetFactory(XCSoarInterface::GetComputerSettings().task.task_type_default);
     (*active_task)->FillMatPoints(way_points);
     *task_modified = true;
-    tab_bar.SetCurrentPage(dlgTaskManager::GetPropertiesTab());
+    tab_bar.SetCurrentPage(dlgTaskManager::GetTurnpointTab());
     tab_bar.SetFocus();
   }
 }
