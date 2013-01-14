@@ -34,8 +34,8 @@
 
 #include <algorithm>
 
-static fixed
-GetOZSize(const ObservationZonePoint &oz)
+fixed
+AbstractTaskFactory::GetOZSize(const ObservationZonePoint &oz) const
 {
   switch (oz.GetShape()) {
   case ObservationZone::Shape::SECTOR:

@@ -364,6 +364,11 @@ public:
   StartPoint* CreateStart(ObservationZonePoint* pt, const Waypoint &wp) const;
 
   /**
+   * returns size of OZ in meters
+   */
+  fixed GetOZSize(const ObservationZonePoint &oz) const;
+
+  /**
    * Creates new OrderedTaskPoint of a different type with the
    * same radius.
    * Does not validate the new type against the current task type.
