@@ -49,6 +49,10 @@ Copyright_License {
 #include "Form/Draw.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
+#include "Profile/Profile.hpp"
+#include "Task/Factory/AbstractTaskFactory.hpp"
+#include "Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Task/ObservationZones/ObservationZonePoint.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
@@ -151,6 +155,89 @@ dlgTaskManager::OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas)
             terrain, &airspace_database);
 }
 
+/*template<typename T>
+bool SetKeyEnum(unsigned i, const TCHAR *registry_key, T &value) const {
+
+  int value2 = (int)value;
+  if (!SaveValue(i, registry_key, value2))
+    return false;
+
+  value = (T)value2;
+  return true;
+}*/
+
+/**
+ * updates profile values for task defaults so
+ */
+static void UpdateTaskDefaults(OrderedTask &task)
+{
+  if (task.TaskSize() < 2)
+    return;
+
+  const AbstractTaskFactory& factory = task.GetFactory();
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &task_behaviour = settings_computer.task;
+  const OrderedTaskBehaviour &otb = task.GetOrderedTaskBehaviour();
+
+  unsigned index = 0;
+  auto point_type = factory.GetType(task.GetPoint(index));
+  Profile::Set(ProfileKeys::StartType, (unsigned)point_type);
+  task_behaviour.sector_defaults.start_type = (TaskPointFactoryType)point_type;
+
+  fixed radius = factory.GetOZSize(task.GetPoint(index).GetObservationZone());
+  Profile::Set(ProfileKeys::StartRadius, radius);
+  task_behaviour.sector_defaults.start_radius = radius;
+
+  index = task.TaskSize() - 1;
+  point_type = factory.GetType(task.GetPoint(index));
+  Profile::Set(ProfileKeys::FinishType, (unsigned)point_type);
+  task_behaviour.sector_defaults.finish_type = (TaskPointFactoryType)point_type;
+
+  radius = factory.GetOZSize(task.GetPoint(index).GetObservationZone());
+  Profile::Set(ProfileKeys::FinishRadius, radius);
+  task_behaviour.sector_defaults.finish_radius = radius;
+
+  if (task.TaskSize() > 2) {
+    index = 1;
+    point_type = (TaskPointFactoryType)factory.GetType(task.GetPoint(index));
+    Profile::Set(ProfileKeys::TurnpointType, (unsigned)point_type);
+    task_behaviour.sector_defaults.turnpoint_type = (TaskPointFactoryType)point_type;
+
+    radius = factory.GetOZSize(task.GetPoint(index).GetObservationZone());
+    Profile::Set(ProfileKeys::TurnpointRadius, radius);
+    task_behaviour.sector_defaults.turnpoint_radius = radius;
+  }
+
+  auto factory_type = task.GetFactoryType();
+  Profile::Set(ProfileKeys::TaskType, (unsigned)factory_type);
+  task_behaviour.task_type_default = task.GetFactoryType();
+
+
+  if (task.GetFactoryType() == TaskFactoryType::AAT ||
+      task.GetFactoryType() == TaskFactoryType::MAT) {
+
+    task_behaviour.ordered_defaults.aat_min_time = otb.aat_min_time;
+    Profile::Set(ProfileKeys::AATMinTime, otb.aat_min_time);
+  }
+
+  task_behaviour.ordered_defaults.start_max_speed = otb.start_max_speed;
+  Profile::Set(ProfileKeys::StartMaxSpeed, otb.start_max_speed);
+
+  task_behaviour.ordered_defaults.start_max_height = otb.start_max_height;
+  Profile::Set(ProfileKeys::StartMaxHeight, otb.start_max_height);
+
+  task_behaviour.ordered_defaults.start_max_height_ref = otb.start_max_height_ref;
+  Profile::Set(ProfileKeys::StartHeightRef, (unsigned)otb.start_max_height_ref);
+
+  task_behaviour.ordered_defaults.finish_min_height = otb.finish_min_height;
+  Profile::Set(ProfileKeys::FinishMinHeight, otb.finish_min_height);
+
+  task_behaviour.ordered_defaults.finish_min_height_ref = otb.finish_min_height_ref;
+  Profile::Set(ProfileKeys::FinishHeightRef, (unsigned)otb.finish_min_height_ref);
+
+  Profile::Save();
+}
+
 bool
 dlgTaskManager::CommitTaskChanges()
 {
@@ -170,6 +257,7 @@ dlgTaskManager::CommitTaskChanges()
 
     protected_task_manager->TaskCommit(*active_task, way_points);
     protected_task_manager->TaskSaveDefault();
+    UpdateTaskDefaults(*active_task);
 
     task_modified = false;
     return true;

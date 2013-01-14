@@ -28,18 +28,13 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Form/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
+#include "Profile/Profile.hpp"
 
 enum ControlIndex {
-  StartMaxSpeed,
   StartMaxSpeedMargin,
-  spacer_1,
-  StartMaxHeight,
   StartMaxHeightMargin,
-  StartHeightRef,
-  spacer_2,
-  FinishMinHeight,
-  FinishHeightRef,
-  spacer_3,
+  AATTimeMargin,
+  spacer_1,
   Contests,
   PREDICT_CONTEST,
 };
@@ -62,26 +57,11 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  AddFloat(_("Start max. speed"), _("Maximum speed allowed in start observation zone.  Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5), false, UnitGroup::HORIZONTAL_SPEED,
-           task_behaviour.ordered_defaults.start_max_speed);
-  SetExpertRow(StartMaxSpeed);
-
   AddFloat(_("Start max. speed margin"),
            _("Maximum speed above maximum start speed to tolerate.  Set to 0 for no tolerance."),
            _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5), false, UnitGroup::HORIZONTAL_SPEED,
            task_behaviour.start_max_speed_margin);
   SetExpertRow(StartMaxSpeedMargin);
-
-  AddSpacer();
-  SetExpertRow(spacer_1);
-
-  AddFloat(_("Start max. height"),
-           _("Maximum height based on start height reference (AGL or MSL) while starting the task.  "
-               "Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(10000), fixed(50), false, UnitGroup::ALTITUDE,
-           fixed(task_behaviour.ordered_defaults.start_max_height));
-  SetExpertRow(StartMaxHeight);
 
   AddFloat(_("Start max. height margin"),
            _("Maximum height above maximum start height to tolerate.  Set to 0 for no tolerance."),
@@ -89,36 +69,14 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(task_behaviour.start_max_height_margin));
   SetExpertRow(StartMaxHeightMargin);
 
-  static constexpr StaticEnumChoice start_max_height_ref_list[] = {
-    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for start maximum height rule (above start point).") },
-    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for start maximum height rule (above sea level).") },
-    { 0 }
-  };
-  AddEnum(_("Start height ref."), NULL, start_max_height_ref_list,
-          (unsigned)task_behaviour.ordered_defaults.start_max_height_ref);
-  SetExpertRow(StartHeightRef);
+  AddTime(_("Optimisation margin"),
+          _("Safety margin for AAT task optimisation.  Optimisation "
+            "seeks to complete the task at the minimum time plus this margin time."),
+          0, 30 * 60, 60, (unsigned)task_behaviour.optimise_targets_margin);
+  SetExpertRow(AATTimeMargin);
 
   AddSpacer();
-  SetExpertRow(spacer_2);
-
-  AddFloat(_("Finish min. height"),
-           _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  "
-               "Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(10000), fixed(50), false, UnitGroup::ALTITUDE,
-           fixed(task_behaviour.ordered_defaults.finish_min_height));
-  SetExpertRow(FinishMinHeight);
-
-  static constexpr StaticEnumChoice finish_min_height_ref_list[] = {
-    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for finish minimum height rule (above finish point).") },
-    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for finish minimum height rule (above sea level).") },
-    { 0 }
-  };
-  AddEnum(_("Finish height ref."), NULL, finish_min_height_ref_list,
-          (unsigned)task_behaviour.ordered_defaults.finish_min_height_ref);
-  SetExpertRow(FinishHeightRef);
-
-  AddSpacer();
-  SetExpertRow(spacer_3);
+  SetExpertRow(spacer_1);
 
   const StaticEnumChoice contests_list[] = {
     { OLC_FAI, ContestToString(OLC_FAI),
@@ -156,24 +114,19 @@ TaskRulesConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
   TaskBehaviour &task_behaviour = settings_computer.task;
-  OrderedTaskBehaviour &otb = task_behaviour.ordered_defaults;
-
-  changed |= SaveValue(StartMaxSpeed, UnitGroup::HORIZONTAL_SPEED, ProfileKeys::StartMaxSpeed, otb.start_max_speed);
 
   changed |= SaveValue(StartMaxSpeedMargin, UnitGroup::HORIZONTAL_SPEED, ProfileKeys::StartMaxSpeedMargin,
                        task_behaviour.start_max_speed_margin);
 
-  changed |= SaveValue(StartMaxHeight, UnitGroup::ALTITUDE, ProfileKeys::StartMaxHeight, otb.start_max_height);
-
   changed |= SaveValue(StartMaxHeightMargin, UnitGroup::ALTITUDE, ProfileKeys::StartMaxHeightMargin,
                        task_behaviour.start_max_height_margin);
 
-  changed |= SaveValueEnum(StartHeightRef, ProfileKeys::StartHeightRef, otb.start_max_height_ref);
-
-  changed |= SaveValue(FinishMinHeight, UnitGroup::ALTITUDE, ProfileKeys::FinishMinHeight,
-                       otb.finish_min_height);
-
-  changed |= SaveValueEnum(FinishHeightRef, ProfileKeys::FinishHeightRef, otb.finish_min_height_ref);
+  unsigned aatmargin = task_behaviour.optimise_targets_margin;
+  if (SaveValue(AATTimeMargin, aatmargin)) {
+    task_behaviour.optimise_targets_margin = aatmargin;
+    Profile::Set(ProfileKeys::AATTimeMargin, aatmargin);
+    changed = true;
+  }
 
   changed |= SaveValueEnum(Contests, ProfileKeys::OLCRules, task_behaviour.contest);
   changed |= SaveValueEnum(PREDICT_CONTEST, ProfileKeys::PredictContest,

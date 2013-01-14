@@ -227,7 +227,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/ConfigPanels/SiteConfigPanel.cpp \
 	$(SRC)/Dialogs/ConfigPanels/SymbolsConfigPanel.cpp \
 	$(SRC)/Dialogs/ConfigPanels/TaskRulesConfigPanel.cpp \
-	$(SRC)/Dialogs/ConfigPanels/TaskDefaultsConfigPanel.cpp \
 	$(SRC)/Dialogs/ConfigPanels/TerrainDisplayConfigPanel.cpp \
 	$(SRC)/Dialogs/ConfigPanels/UnitsConfigPanel.cpp \
 	$(SRC)/Dialogs/ConfigPanels/TimeConfigPanel.cpp \
