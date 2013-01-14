@@ -198,13 +198,8 @@ LoadWithDialog(unsigned i)
     title = _("Error");
     text.Format(_("Activating plane profile \"%s\" failed!"),
                 list[i].name.c_str());
-  } else {
-    title = _(" ");
-    text.Format(_("Plane profile \"%s\" activated."),
-                list[i].name.c_str());
+    ShowMessageBox(text, title, MB_OK);
   }
-
-  ShowMessageBox(text, title, MB_OK);
 
   return result;
 }
@@ -212,8 +207,7 @@ LoadWithDialog(unsigned i)
 static void
 LoadClicked(gcc_unused WndButton &button)
 {
-  if (LoadWithDialog(plane_list->GetCursorIndex()))
-    dialog->SetModalResult(mrOK);
+  LoadWithDialog(plane_list->GetCursorIndex());
 }
 
 static void
