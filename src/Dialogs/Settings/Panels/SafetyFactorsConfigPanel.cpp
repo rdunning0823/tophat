@@ -63,13 +63,13 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const TaskBehaviour &task_behaviour = settings_computer.task;
 
   AddFloat(_("Arrival height"),
-           _("The height above terrain that the glider should arrive at for a safe landing."),
+           _("The height above terrain that the glider should arrive at for a safe landing.  This is also added to height to complete a task."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival);
 
   AddFloat(_("Terrain height"),
-           _("The height above terrain that the glider must clear during final glide."),
+           _("The height above terrain that the glider must clear during final glide.  This does not affect arrival height, but displays warnings on the screen where a mountain will be hit or an X in the final glide bar."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.route_planner.safety_height_terrain);
