@@ -52,6 +52,7 @@ Copyright_License {
 #include "FLARM/Record.hpp"
 #include "Weather/Features.hpp"
 #include "FLARM/List.hpp"
+#include "Task/Points/TaskPoint.hpp"
 
 #ifdef HAVE_NOAA
 #include "Renderer/NOAAListRenderer.hpp"
@@ -433,8 +434,8 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   // Draw waypoint name
   canvas.Select(name_font);
-  OrderedTaskPointLabel(item.tp_type, waypoint.name.c_str(),
-                        item.index, buffer);
+  OrderedTaskPointLabelMapAction(item.tp_type, waypoint.name.c_str(),
+                                 item.index, buffer);
   canvas.text_clipped(left, rc.top + Layout::FastScale(2),
                       rc.right - left, buffer);
 
@@ -444,8 +445,8 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                                             - Layout::FastScale(4)),
                                 Layout::FastScale(10));
   OZPreviewRenderer::Draw(canvas, oz, pt, radius, look,
-                          airspace_settings, airspace_look);
-
+                          airspace_settings, airspace_look,
+                          item.tp_type == TaskPoint::AAT);
 }
 
 void

@@ -43,6 +43,13 @@ const TCHAR* OrderedTaskFactoryName(TaskFactoryType type);
 void OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks);
 void OrderedTaskPointLabel(TaskPoint::Type type, const TCHAR *name,
                            unsigned index, TCHAR* buffer);
+
+/**
+ * label for task points with actionable labels
+ * when clicked on the Map List popup
+ */
+void OrderedTaskPointLabelMapAction(TaskPoint::Type type, const TCHAR *name,
+                                    unsigned index, TCHAR* buffer);
 void OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* radius);
 bool OrderedTaskSave(SingleWindow &parent,
                      const OrderedTask& task, bool noask=false);

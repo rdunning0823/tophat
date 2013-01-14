@@ -264,6 +264,31 @@ OrderedTaskPointLabel(TaskPoint::Type type, const TCHAR *name,
 }
 
 void
+OrderedTaskPointLabelMapAction(TaskPoint::Type type, const TCHAR *name,
+                               unsigned index, TCHAR* buffer)
+{
+  switch (type) {
+  case TaskPoint::START:
+    _stprintf(buffer, _T("Zoom to start: %s"), name);
+    break;
+
+  case TaskPoint::AST:
+    _stprintf(buffer, _T("Zoom to T%d: %s"), index, name);
+    break;
+
+  case TaskPoint::AAT:
+    _stprintf(buffer, _T("Drag target %d: %s"), index, name);
+    break;
+
+  case TaskPoint::FINISH:
+    _stprintf(buffer, _T("Zoom to finish:  %s"), name);
+    break;
+
+  default:
+    break;
+  }
+}
+void
 OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 {
   switch (ozp.shape) {

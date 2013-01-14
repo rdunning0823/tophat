@@ -39,7 +39,8 @@ namespace OZPreviewRenderer
             const RasterPoint pt, unsigned radius,
             const TaskLook &look,
             const AirspaceRendererSettings &airspace_settings,
-            const AirspaceLook &airspace_look);
+            const AirspaceLook &airspace_look,
+            bool has_target =  false);
 }
 
 #endif
