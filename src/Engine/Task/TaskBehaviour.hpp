@@ -24,6 +24,7 @@
 #define TASK_BEHAVIOUR_HPP
 
 #include "Contest/Solvers/Contests.hpp"
+#include "Task/TaskNationalities.hpp"
 #include "Ordered/OrderedTaskBehaviour.hpp"
 #include "Task/Factory/TaskPointFactoryType.hpp"
 #include "Engine/Route/Config.hpp"
@@ -122,6 +123,9 @@ struct TaskBehaviour : public TaskStartMargins {
    * next turn point?
    */
   bool predict_contest;
+
+  /** Options available for task building and behaviour */
+  ContestNationalities contest_nationality;
 
   /** Rule set to scan for in OLC */
   Contests contest;

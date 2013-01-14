@@ -87,6 +87,7 @@ Profile::Load(TaskBehaviour &settings)
     if (settings.contest == OLC_Sprint)
       settings.contest = OLC_League;
   }
+  GetEnum(ProfileKeys::ContestNationality, settings.contest_nationality);
 
   Get(ProfileKeys::PredictContest, settings.predict_contest);
 
