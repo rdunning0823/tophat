@@ -580,6 +580,9 @@ void
 AbstractTaskFactory::UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to)
 {
   to.fai_finish = constraints.fai_finish;
+  to.start_max_speed = fixed_zero;
+  to.start_max_height_ref = HeightReferenceType::MSL;
+  to.finish_min_height_ref = HeightReferenceType::MSL;
 }
 
 bool 

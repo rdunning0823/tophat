@@ -31,9 +31,11 @@ Copyright_License {
 #include "Form/Edit.hpp"
 #include "Form/Draw.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Task/TaskNationalities.hpp"
 #include "Units/Units.hpp"
 #include "Language/Language.hpp"
 #include "Components.hpp"
+#include "Interface.hpp"
 
 enum Controls {
   MIN_TIME,
@@ -51,27 +53,33 @@ TaskPropertiesPanel::RefreshView()
 {
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   const OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
 
   bool aat_types = (ftype == TaskFactoryType::AAT || ftype == TaskFactoryType::MAT);
   bool fai_start_finish = p.fai_finish;
+  bool is_usa = tb.contest_nationality == ContestNationalities::USA;
 
   SetRowVisible(MIN_TIME, aat_types);
   LoadValueTime(MIN_TIME, (int)p.aat_min_time);
 
-  SetRowVisible(START_MAX_SPEED, !fai_start_finish);
+  SetRowVisible(START_MAX_SPEED, !fai_start_finish &&
+                (!is_usa || positive(p.start_max_speed)));
   LoadValue(START_MAX_SPEED, p.start_max_speed, UnitGroup::HORIZONTAL_SPEED);
 
   SetRowVisible(START_MAX_HEIGHT, !fai_start_finish);
   LoadValue(START_MAX_HEIGHT, fixed(p.start_max_height), UnitGroup::ALTITUDE);
 
-  SetRowVisible(START_HEIGHT_REF, !fai_start_finish);
+  SetRowVisible(START_HEIGHT_REF, !fai_start_finish &&
+                (!is_usa || p.start_max_height_ref == HeightReferenceType::AGL));
   LoadValueEnum(START_HEIGHT_REF, p.start_max_height_ref);
 
   SetRowVisible(FINISH_MIN_HEIGHT, !fai_start_finish);
   LoadValue(FINISH_MIN_HEIGHT, fixed(p.finish_min_height),
             UnitGroup::ALTITUDE);
 
-  SetRowVisible(FINISH_HEIGHT_REF, !fai_start_finish);
+  SetRowVisible(FINISH_HEIGHT_REF, !fai_start_finish &&
+                (!is_usa || p.finish_min_height_ref == HeightReferenceType::AGL));
   LoadValueEnum(FINISH_HEIGHT_REF, p.finish_min_height_ref);
 
   LoadValue(FAI_FINISH_HEIGHT, p.fai_finish);
