@@ -21,33 +21,42 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_ICON_LOOK_HPP
-#define XCSOAR_ICON_LOOK_HPP
+#ifndef XCSOAR_ZOOM_BUTTON_HPP
+#define XCSOAR_ZOOM_BUTTON_HPP
 
-#include "Screen/Bitmap.hpp"
+#include "Form/Button.hpp"
+
+struct DialogLook;
+struct IconLook;
+class ContainerWindow;
+struct PixelRect;
 
 /**
- * This class manages the icons of various XCSoar dialogs.
+ * a class that is a button that draws the Map Scale information
  */
-struct IconLook {
-  // task dialog
-  Bitmap hBmpTabTask;
-  Bitmap hBmpTabWrench;
-  Bitmap hBmpTabSettings;
-  Bitmap hBmpTabCalculator;
+class ZoomButton : public WndButton {
+public:
+  /**
+   * if  true, paint zoom in, else zoom out
+   */
+  bool zoom_in;
 
-  // status dialog
-  Bitmap hBmpTabFlight;
-  Bitmap hBmpTabSystem;
-  Bitmap hBmpTabRules;
-  Bitmap hBmpTabTimes;
+  const IconLook &icon_look;
 
-  Bitmap hBmpMenuButton;
-  Bitmap hBmpCheckMark;
-  Bitmap hBmpZoomOutButton;
-  Bitmap hBmpZoomInButton;
+  ZoomButton(ContainerWindow &parent, const DialogLook &dialog_look,
+             const IconLook &_icon_look,
+             const PixelRect &rc,
+             ButtonWindowStyle style,
+             bool _zoom_in,
+             ActionListener *listener, int id)
+  :WndButton(parent, dialog_look, _T(""), rc, style, listener, id),
+  zoom_in(_zoom_in), icon_look(_icon_look) {};
 
-  void Initialise();
+  /**
+   * The OnPaint event is called when the button needs to be drawn
+   * (derived from PaintWindow)
+   */
+  virtual void OnPaint(Canvas &canvas);
 };
 
 #endif

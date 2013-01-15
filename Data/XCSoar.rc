@@ -72,6 +72,10 @@ IDB_MENU_BUTTON         BITMAP  DISCARDABLE     "../output/data/icons/menu_butto
 IDB_MENU_BUTTON_HD      BITMAP  DISCARDABLE     "../output/data/icons/menu_button_160.bmp"
 IDB_CHECK_MARK          BITMAP  DISCARDABLE     "../output/data/icons/checkmark.bmp"
 IDB_CHECK_MARK_HD       BITMAP  DISCARDABLE     "../output/data/icons/checkmark_160.bmp"
+IDB_ZOOM_OUT_BUTTON     BITMAP  DISCARDABLE     "../output/data/icons/zoom_out_button.bmp"
+IDB_ZOOM_OUT_BUTTON_HD  BITMAP  DISCARDABLE     "../output/data/icons/zoom_out_button_160.bmp"
+IDB_ZOOM_IN_BUTTON      BITMAP  DISCARDABLE     "../output/data/icons/zoom_in_button.bmp"
+IDB_ZOOM_IN_BUTTON_HD   BITMAP  DISCARDABLE     "../output/data/icons/zoom_in_button_160.bmp"
 
 #ifdef EYE_CANDY
 #ifdef TESTING

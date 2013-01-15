@@ -24,6 +24,7 @@ Copyright_License {
 #include "ZoomInButtonWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
+#include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
 #include "Input/InputEvents.hpp"
@@ -33,25 +34,8 @@ Copyright_License {
 #include "Look/Look.hpp"
 #include "UIState.hpp"
 #include "Screen/Fonts.hpp"
-#include "Form/SymbolButton.hpp"
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
-
-void
-ZoomInButton::OnPaint(Canvas &canvas)
-{
-  UPixelScalar width = (UPixelScalar)Layout::Scale(1);
-  PixelRect rc = {
-    PixelScalar(width), PixelScalar(width),
-    PixelScalar(canvas.get_width() - width),
-    PixelScalar(canvas.get_height() - width)
-  };
-
-  WndSymbolButton::OnPaint(canvas);
-
-  canvas.Select(Pen(width, COLOR_BLACK));
-  canvas.DrawOutlineRectangle(rc.left, rc.top, rc.right, rc.bottom);
-}
 
 void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
@@ -63,10 +47,9 @@ ZoomInButtonWidget::Prepare(ContainerWindow &parent,
   white_look.button.standard.background_color = COLOR_WHITE;
   white_look.button.focused.background_color = COLOR_WHITE;
 
-  button_size_raw = Fonts::map_bold.TextSize(_T("A"));
-  button_size_raw.cx = button_size_raw.cy;
+  button_size_raw.cx = button_size_raw.cy = Fonts::map_bold.GetHeight();
 
-  CreateButton(parent, white_look, rc);
+  CreateButton(parent, white_look, UIGlobals::GetIconLook(), rc);
   Move(rc);
 }
 
@@ -101,9 +84,9 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
     rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
   } else {
     rc.left = rc_map.left;
-    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
-    rc.bottom = rc_map.bottom - GetHeight() - 2 * clear_border_width;
-    rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+    rc.right = rc.left + (GetWidth() + 2 * clear_border_width);;
+    rc.bottom = rc_map.bottom;
+    rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
   }
 
   WindowWidget::Move(rc);
@@ -150,19 +133,17 @@ ZoomInButtonWidget::HeightFromBottomLeft()
     return GetHeight() * 2 + Layout::Scale(3);
 }
 
-ZoomInButton &
+ZoomButton &
 ZoomInButtonWidget::CreateButton(ContainerWindow &parent,
                                  const DialogLook &dialog_look,
+                                 const IconLook &icon_look,
                                  const PixelRect &rc_map)
 {
   ButtonWindowStyle button_style;
   button_style.multiline();
 
-  ZoomInButton *button =
-    new ZoomInButton(parent, dialog_look, rc_map, button_style, this, 0);
-
-  button->SetTransparent(true);
-
+  ZoomButton *button = new ZoomButton(parent, dialog_look, icon_look, rc_map,
+                                      button_style, true, this, 0);
   SetWindow(button);
   return *button;
 }
