@@ -87,9 +87,9 @@ TaskStore::Scan(bool extra)
   // scan files
   TaskFileVisitor tfv(store);
   VisitDataFiles(_T("*.tsk"), tfv);
+  VisitDataFiles(_T("*.cup"), tfv);
 
   if (extra) {
-    VisitDataFiles(_T("*.cup"), tfv);
     VisitDataFiles(_T("*.igc"), tfv);
   }
 
