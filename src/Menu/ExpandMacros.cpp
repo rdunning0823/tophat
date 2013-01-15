@@ -542,16 +542,16 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
 		                  _("Manual"), _("Auto"), Size);
   CondReplaceInString(GetMapSettings().topography_enabled, OutBuffer,
                       _T("$(TopologyToggleActionName)"),
-                      _("Off"), _("On"), Size);
+                      _("Hide"), _("Show"), Size);
   CondReplaceInString(GetMapSettings().topography_enabled, OutBuffer,
                       _T("$(TopographyToggleActionName)"),
-                      _("Off"), _("On"), Size);
+                      _("Hide"), _("Show"), Size);
   CondReplaceInString(GetMapSettings().terrain.enable, OutBuffer,
                       _T("$(TerrainToggleActionName)"),
-                      _("Off"), _("On"), Size);
+                      _("Hide"), _("Show"), Size);
   CondReplaceInString(GetMapSettings().airspace.enable, OutBuffer,
                       _T("$(AirspaceToggleActionName)"),
-                      _("Off"), _("On"), Size);
+                      _("Hide"), _("Show"), Size);
 
   if (_tcsstr(OutBuffer, _T("$(MapLabelsToggleActionName)"))) {
     static const TCHAR *const labels[] = {
