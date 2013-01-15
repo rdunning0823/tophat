@@ -269,18 +269,27 @@ PlaneListWidget::Load(unsigned i)
 bool
 PlaneListWidget::LoadWithDialog(unsigned i)
 {
-  const TCHAR *title;
-  StaticString<256> text;
+  assert(i < list.size());
 
-  bool result = Load(i);
-  if (!result) {
-    title = _("Error");
-    text.Format(_("Activating plane profile \"%s\" failed!"),
-                list[i].name.c_str());
-    ShowMessageBox(text, title, MB_OK);
+  StaticString<256> tmp;
+  tmp.Format(_("Do you want to activate plane profile \"%s\"?"),
+             list[i].name.c_str());
+
+  if (ShowMessageBox(tmp, _(" "), MB_YESNO) == IDYES) {
+
+    const TCHAR *title;
+    StaticString<256> text;
+
+    bool result = Load(i);
+    if (!result) {
+      title = _("Error");
+      text.Format(_("Activating plane profile \"%s\" failed!"),
+                  list[i].name.c_str());
+      ShowMessageBox(text, title, MB_OK);
+    }
+    return result;
   }
-
-  return result;
+  return false;
 }
 
 inline void
@@ -417,14 +426,7 @@ PlaneListWidget::OnAction(int id)
 void
 PlaneListWidget::OnActivateItem(unsigned i)
 {
-  assert(i < list.size());
-
-  StaticString<256> tmp;
-  tmp.Format(_("Do you want to activate plane profile \"%s\"?"),
-             list[i].name.c_str());
-
-  if (ShowMessageBox(tmp, _(" "), MB_YESNO) == IDYES)
-    LoadWithDialog(i);
+  LoadWithDialog(i);
 }
 
 void
