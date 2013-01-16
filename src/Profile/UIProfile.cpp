@@ -108,6 +108,8 @@ Profile::Load(UISettings &settings)
 
   Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 
+  Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
+
   Get(ProfileKeys::UseCustomFonts, settings.custom_fonts);
 
   Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);

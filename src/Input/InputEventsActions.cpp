@@ -232,6 +232,14 @@ InputEvents::eventChecklist(gcc_unused const TCHAR *misc)
   dlgChecklistShowModal();
 }
 
+// Startup Tips
+// Displays the Startup Assistant dialog
+void
+InputEvents::eventStartupTips(gcc_unused const TCHAR *misc)
+{
+  dlgStartupAssistantShowModal(false);
+}
+
 // FLARM Traffic
 // Displays the FLARM traffic dialog
 //  See the checklist dialog section of the reference manual for more info.

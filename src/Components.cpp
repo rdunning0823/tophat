@@ -512,6 +512,8 @@ XCSoarInterface::Startup()
 
   main_window->ResumeThreads();
 
+  dlgStartupAssistantShowModal(true);
+
   return true;
 }
 

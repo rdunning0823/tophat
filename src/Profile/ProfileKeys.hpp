@@ -194,6 +194,8 @@ extern const TCHAR EnableNMEALogger[];
 extern const TCHAR MapFile[];
 extern const TCHAR BallastSecsToEmpty[];
 extern const TCHAR AccelerometerZero[];
+extern const TCHAR StartupTipId[];
+extern const TCHAR StartupTipDeclineVersion[];
 extern const TCHAR UseCustomFonts[];
 extern const TCHAR FontInfoWindowFont[];
 extern const TCHAR FontTitleWindowFont[];
