@@ -209,7 +209,13 @@ protected:
       return;
     }
     details_button->SetEnabled(HasDetails(*list[current]));
+    if (CanDragItem(current))
+      details_button->SetCaption(_("Drag Target"));
+    else
+      details_button->SetCaption(_("Details"));
+
     goto_button->SetEnabled(CanGotoItem(current));
+
   }
 
 public:
@@ -235,6 +241,12 @@ public:
     assert(index < list.size());
     return protected_task_manager != NULL &&
       list[index]->type == MapItem::WAYPOINT;
+  }
+
+  bool CanDragItem(unsigned index) const {
+    assert(index < list.size());
+    return protected_task_manager != NULL &&
+      list[index]->type == MapItem::TASK_OZ;
   }
 
   virtual void OnActivateItem(unsigned index);
