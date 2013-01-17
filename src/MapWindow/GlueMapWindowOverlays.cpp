@@ -45,6 +45,7 @@ Copyright_License {
 #include "Util/Macros.hpp"
 #include "Look/GestureLook.hpp"
 #include "Input/InputEvents.hpp"
+#include "Widgets/MapOverlayButton.hpp"
 
 #include <stdio.h>
 
@@ -173,6 +174,45 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc_unadjusted,
   TextInBox(canvas, txt, x, y, mode, rc, NULL);
 }
 
+
+void
+GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
+                            const MapWindowProjection &projection) const
+{
+  StaticString<80> buffer;
+
+  fixed map_width = projection.GetScreenWidthMeters();
+
+  canvas.Select(Fonts::map_bold);
+  FormatUserMapScale(map_width, buffer.buffer(), true);
+  PixelSize text_size = canvas.CalcTextSize(buffer);
+
+  const PixelScalar text_padding_x = Layout::Scale(2);
+  PixelSize bmp_size = look.map_scale_left_icon.GetSize();
+  const PixelScalar bmp_y = (text_size.cy + bmp_size.cy) / 2;
+
+
+  UPixelScalar zoom_button_width = Fonts::map_bold.GetHeight() *
+      MapOverlayButton::GetScale() + 2 * Layout::Scale(2);
+
+  PixelScalar x = rc.left + (Layout::landscape ? 2 : 1) * zoom_button_width;
+
+  canvas.DrawFilledRectangle(x, rc.bottom - text_size.cy - Layout::Scale(1),
+                             x + 2 * bmp_size.cx + text_size.cx + Layout::Scale(2),
+                             rc.bottom, COLOR_WHITE);
+
+  look.map_scale_left_icon.Draw(canvas, x, rc.bottom - bmp_y);
+  x += bmp_size.cx;
+
+  canvas.SetBackgroundOpaque();
+  canvas.SetTextColor(COLOR_BLACK);
+  canvas.text(x, rc.bottom - text_size.cy - Layout::Scale(1),
+              buffer);
+
+  x += text_padding_x + text_size.cx;
+  look.map_scale_right_icon.Draw(canvas, x, rc.bottom - bmp_y);
+}
+
 void
 GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 {
@@ -180,13 +220,13 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   const Bitmap *menu_bitmap = &icons.hBmpMenuButton;
   const PixelSize menu_bitmap_size = menu_bitmap->GetSize();
 
-  PixelScalar offset = menu_bitmap_size.cx / 2 + Layout::Scale(2);
+  PixelScalar offset = menu_bitmap_size.cx / 2;
 
   // draw logger status
   if (logger != NULL && logger->IsLoggerActive()) {
     bool flip = (Basic().date_time_utc.second % 2) == 0;
     const MaskedIcon &icon = flip ? look.logger_on_icon : look.logger_off_icon;
-    offset = icon.GetSize().cx;
+    offset += icon.GetSize().cx;
     icon.Draw(canvas, rc.right - offset, rc.bottom - icon.GetSize().cy);
   }
 
@@ -272,7 +312,7 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   }
 
   const PolarSettings &polar_settings = GetComputerSettings().polar;
-  // calc "Ballast"
+  // calc "Ballast" and draw above sim/replay info
   if (((int)polar_settings.glide_polar_task.GetBallastLitres() > 0 ||
       !Calculated().flight.flying)
       && polar_settings.glide_polar_task.IsBallastable()) {
