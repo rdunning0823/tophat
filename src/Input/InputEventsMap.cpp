@@ -210,7 +210,6 @@ InputEvents::sub_SetZoom(fixed value)
       !IsPanning()) {
     settings_map.auto_zoom_enabled = false;  // disable autozoom if user manually changes zoom
     Profile::Set(ProfileKeys::AutoZoom, false);
-    Message::AddMessage(_("Auto. zoom off"));
   }
 
   fixed vmin = CommonInterface::GetComputerSettings().polar.glide_polar_task.GetVMin();
