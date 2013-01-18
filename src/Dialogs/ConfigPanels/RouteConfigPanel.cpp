@@ -39,7 +39,6 @@ enum ControlIndex {
   empty_spacer,
   TurningReach,
   FinalGlideTerrain,
-  ReachPolarMode
 };
 
 class RouteConfigPanel
@@ -72,7 +71,6 @@ void
 RouteConfigPanel::ShowReachControls(bool show)
 {
   SetRowVisible(FinalGlideTerrain, show);
-  SetRowVisible(ReachPolarMode, show);
 }
 
 void
@@ -152,19 +150,6 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Reach display"), NULL, final_glide_terrain_list,
           settings_computer.features.final_glide_terrain);
 
-  static constexpr StaticEnumChoice reach_polar_list[] = {
-    { (unsigned)RoutePlannerConfig::Polar::TASK, N_("Task"),
-      N_("Uses task glide polar.") },
-    { (unsigned)RoutePlannerConfig::Polar::SAFETY, N_("Safety MC"),
-      N_("Uses safety MacCready value") },
-    { 0 }
-  };
-
-  AddEnum(_("Reach polar"),
-          _("This determines the glide performance used in reach, landable arrival, abort and alternate calculations."),
-          reach_polar_list, (unsigned)route_planner.reach_polar_mode);
-  SetExpertRow(ReachPolarMode);
-
   ShowRouteControls(route_planner.mode != RoutePlannerConfig::Mode::NONE);
   ShowReachControls(route_planner.reach_calc_mode != RoutePlannerConfig::ReachMode::OFF);
 }
@@ -178,9 +163,6 @@ RouteConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   changed |= SaveValueEnum(RoutePlannerMode, ProfileKeys::RoutePlannerMode,
                            route_planner.mode);
-
-  changed |= SaveValueEnum(ReachPolarMode, ProfileKeys::ReachPolarMode,
-                           route_planner.reach_polar_mode);
 
   changed |= SaveValueEnum(FinalGlideTerrain, ProfileKeys::FinalGlideTerrain,
                            settings_computer.features.final_glide_terrain);

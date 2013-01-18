@@ -38,7 +38,6 @@ enum ControlIndex {
   TerrainHeight,
   AlternateMode,
   PolarDegradation,
-  SafetyMC,
   RiskFactor,
 };
 
@@ -91,13 +90,6 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            (fixed_one - settings_computer.polar.degradation_factor) * 100);
   SetExpertRow(PolarDegradation);
 
-  AddFloat(_("Safety MC"),
-           _("The MacCready setting used, when safety MC is enabled for reach calculations, in task abort mode and for determining arrival altitude at airfields."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed_zero, fixed_ten, fixed(0.1), false,
-           UnitGroup::VERTICAL_SPEED, task_behaviour.safety_mc);
-  SetExpertRow(SafetyMC);
-
   AddFloat(_("STF risk factor"),
            _("The STF risk factor reduces the MacCready setting used to calculate speed to fly as the glider gets low, in order to compensate for risk. Set to 0.0 for no compensation, 1.0 scales MC linearly with current height (with reference to height of the maximum climb). If considered, 0.3 is recommended."),
            _T("%.1f %s"), _T("%.1f"),
@@ -132,12 +124,6 @@ SafetyFactorsConfigPanel::Save(bool &_changed, bool &_require_restart)
                  settings_computer.polar.degradation_factor);
     if (protected_task_manager != NULL)
       protected_task_manager->SetGlidePolar(settings_computer.polar.glide_polar_task);
-    changed = true;
-  }
-
-  if (SaveValue(SafetyMC, UnitGroup::VERTICAL_SPEED, task_behaviour.safety_mc)) {
-    Profile::Set(ProfileKeys::SafetyMacCready,
-                 iround(task_behaviour.safety_mc * 10));
     changed = true;
   }
 

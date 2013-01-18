@@ -95,11 +95,6 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                     settings.polar.glide_polar_task,
                                     glide_state));
 
-    AddGlideResult(_("Alt. diff. MC safety"),
-                   MacCready::Solve(settings.task.glide,
-                                    calculated.glide_polar_safety,
-                                    glide_state));
-
     GlidePolar gp0 = settings.polar.glide_polar_task;
     gp0.SetMC(fixed_zero);
     AddGlideResult(_("Alt. diff. MC 0"),

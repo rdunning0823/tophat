@@ -91,8 +91,8 @@ Profile::Load(TaskBehaviour &settings)
 
   Get(ProfileKeys::PredictContest, settings.predict_contest);
 
-  if (Get(ProfileKeys::SafetyMacCready, Temp))
-    settings.safety_mc = fixed(Temp) / 10;
+  // ignore safety MC -- hard code to zero
+  settings.safety_mc = fixed_zero;
 
   Get(ProfileKeys::SafetyAltitudeArrival, settings.safety_height_arrival);
   GetEnum(ProfileKeys::TaskType, settings.task_type_default);
