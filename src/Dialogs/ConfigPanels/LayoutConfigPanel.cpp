@@ -40,7 +40,6 @@ enum ControlIndex {
   AppFlarmLocation,
   TabDialogStyle,
   AppStatusMessageAlignment,
-  DialogStyle,
   AppInverseInfoBox,
   AppInfoBoxColors,
 };
@@ -131,14 +130,6 @@ static const StaticEnumChoice popup_msg_position_list[] = {
   { 0 }
 };
 
-static const StaticEnumChoice dialog_style_list[] = {
-  { 0, N_("Full width") },
-  { 1, N_("Scaled") },
-  { 2, N_("Scaled centered") },
-  { 3, N_("Fixed") },
-  { 0 }
-};
-
 class LayoutConfigPanel : public RowFormWidget {
 public:
   LayoutConfigPanel()
@@ -177,10 +168,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Message display"), NULL,
           popup_msg_position_list, ui_settings.popup_message_position);
   SetExpertRow(AppStatusMessageAlignment);
-
-  AddEnum(_("Dialog size"), _("Choose the display size of dialogs."),
-          dialog_style_list, ui_settings.dialog.dialog_style);
-  SetExpertRow(DialogStyle);
 
   AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
              ui_settings.info_boxes.inverse);
@@ -223,9 +210,6 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   changed |= SaveValueEnum(AppStatusMessageAlignment, ProfileKeys::AppStatusMessageAlignment,
                            ui_settings.popup_message_position);
-
-  changed |= SaveValueEnum(DialogStyle, ProfileKeys::AppDialogStyle,
-                           ui_settings.dialog.dialog_style);
 
   changed |= require_restart |=
     SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
