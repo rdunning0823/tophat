@@ -36,7 +36,8 @@ Profile::Load(MapSettings &settings)
 
   LoadTerrainRendererSettings(settings.terrain);
 
-  GetEnum(ProfileKeys::AircraftSymbol, settings.aircraft_symbol);
+// hard code aircraft_symbol to default
+//  GetEnum(ProfileKeys::AircraftSymbol, settings.aircraft_symbol);
 
   Get(ProfileKeys::DetourCostMarker, settings.detour_cost_markers_enabled);
   GetEnum(ProfileKeys::DisplayTrackBearing, settings.display_ground_track);

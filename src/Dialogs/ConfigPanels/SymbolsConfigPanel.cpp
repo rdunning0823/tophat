@@ -42,7 +42,6 @@ enum ControlIndex {
   TRAIL_TYPE,
   TRAIL_WIDTH,
   ENABLE_DETOUR_COST_MARKERS,
-  AIRCRAFT_SYMBOL,
   WIND_ARROW_STYLE
 };
 
@@ -107,20 +106,6 @@ static const StaticEnumChoice  trail_type_list[] = {
   { 0 }
 };
 
-static const StaticEnumChoice  aircraft_symbol_list[] = {
-  { acSimple, N_("Simple"),
-    N_("Simplified line graphics, black with white contours.") },
-  { acSimpleLarge, N_("Simple (large)"),
-    N_("Enlarged simple graphics.") },
-  { acDetailed, N_("Detailed"),
-    N_("Detailed rendered aircraft graphics.") },
-  { acHangGlider, N_("HangGlider"),
-    N_("Simplified hang glider as line graphics, white with black contours.") },
-  { acParaGlider, N_("ParaGlider"),
-    N_("Simplified para glider as line graphics, white with black contours.") },
-  { 0 }
-};
-
 static const StaticEnumChoice  wind_arrow_list[] = {
   { (unsigned)WindArrowStyle::NO_ARROW, N_("Off"), N_("No wind arrow is drawn.") },
   { (unsigned)WindArrowStyle::ARROW_HEAD, N_("Arrow head"), N_("Draws an arrow head only.") },
@@ -165,9 +150,6 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings_map.detour_cost_markers_enabled);
   SetExpertRow(ENABLE_DETOUR_COST_MARKERS);
 
-  AddEnum(_("Aircraft symbol"), NULL, aircraft_symbol_list, settings_map.aircraft_symbol);
-  SetExpertRow(AIRCRAFT_SYMBOL);
-
   AddEnum(_("Wind arrow"), _("Determines the way the wind arrow is drawn on the map."),
           wind_arrow_list, (unsigned)settings_map.wind_arrow_style);
   SetExpertRow(WIND_ARROW_STYLE);
@@ -200,9 +182,7 @@ SymbolsConfigPanel::Save(bool &_changed, bool &_require_restart)
   changed |= SaveValue(ENABLE_DETOUR_COST_MARKERS, ProfileKeys::DetourCostMarker,
                        settings_map.detour_cost_markers_enabled);
 
-  changed |= SaveValueEnum(AIRCRAFT_SYMBOL, ProfileKeys::AircraftSymbol, settings_map.aircraft_symbol);
-
-  changed |= SaveValueEnum(WIND_ARROW_STYLE, ProfileKeys::WindArrowStyle, settings_map.wind_arrow_style);
+    changed |= SaveValueEnum(WIND_ARROW_STYLE, ProfileKeys::WindArrowStyle, settings_map.wind_arrow_style);
 
   _changed |= changed;
   _require_restart |= require_restart;
