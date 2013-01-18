@@ -41,7 +41,8 @@ Profile::Load(MapSettings &settings)
 
 // hard code detour_cost_markers_enabled to default
 //  Get(ProfileKeys::DetourCostMarker, settings.detour_cost_markers_enabled);
-  GetEnum(ProfileKeys::DisplayTrackBearing, settings.display_ground_track);
+// hard code display_ground_track to default
+//  GetEnum(ProfileKeys::DisplayTrackBearing, settings.display_ground_track);
   Get(ProfileKeys::AutoZoom, settings.auto_zoom_enabled);
 
   GetEnum(ProfileKeys::WindArrowStyle, settings.wind_arrow_style);
