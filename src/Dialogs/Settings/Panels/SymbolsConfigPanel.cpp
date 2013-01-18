@@ -35,7 +35,6 @@ Copyright_License {
 #include "MapSettings.hpp"
 
 enum ControlIndex {
-  DISPLAY_TRACK_BEARING,
   ENABLE_FLARM_MAP,
   TRAIL_LENGTH,
   TRAIL_DRIFT,
@@ -120,10 +119,6 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
 
-  AddEnum(_("Ground track"),
-          _("Display the ground track as a grey line on the map."),
-          ground_track_mode_list, (unsigned)settings_map.display_ground_track);
-
   AddBoolean(_("FLARM traffic"), _("This enables the display of FLARM traffic on the map window."),
              settings_map.show_flarm_on_map);
 
@@ -158,9 +153,6 @@ SymbolsConfigPanel::Save(bool &_changed)
   bool changed = false;
 
   MapSettings &settings_map = CommonInterface::SetMapSettings();
-
-  changed |= SaveValueEnum(DISPLAY_TRACK_BEARING, ProfileKeys::DisplayTrackBearing,
-                           settings_map.display_ground_track);
 
   changed |= SaveValue(ENABLE_FLARM_MAP, ProfileKeys::EnableFLARMMap,
                        settings_map.show_flarm_on_map);
