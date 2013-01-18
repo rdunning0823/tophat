@@ -258,6 +258,7 @@ PrepareConfigurationDialog()
 
   dialog->SetKeyDownNotify(FormKeyDown);
 
+  CommonInterface::SetUISettings().dialog.expert = false;
   bool expert_mode = CommonInterface::GetUISettings().dialog.expert;
   CheckBox *cb = (CheckBox *)dialog->FindByName(_T("Expert"));
   cb->SetState(expert_mode);
