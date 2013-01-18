@@ -41,7 +41,6 @@ enum ControlIndex {
   TRAIL_DRIFT,
   TRAIL_TYPE,
   TRAIL_WIDTH,
-  ENABLE_DETOUR_COST_MARKERS,
   WIND_ARROW_STYLE
 };
 
@@ -143,13 +142,6 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings_map.trail.scaling_enabled);
   SetExpertRow(TRAIL_WIDTH);
 
-  AddBoolean(_("Detour cost markers"),
-             _("If the aircraft heading deviates from the current waypoint, markers are displayed "
-                 "at points ahead of the aircraft. The value of each marker is the extra distance "
-                 "required to reach that point as a percentage of straight-line distance to the waypoint."),
-             settings_map.detour_cost_markers_enabled);
-  SetExpertRow(ENABLE_DETOUR_COST_MARKERS);
-
   AddEnum(_("Wind arrow"), _("Determines the way the wind arrow is drawn on the map."),
           wind_arrow_list, (unsigned)settings_map.wind_arrow_style);
   SetExpertRow(WIND_ARROW_STYLE);
@@ -178,9 +170,6 @@ SymbolsConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   changed |= SaveValue(TRAIL_WIDTH, ProfileKeys::SnailWidthScale,
                        settings_map.trail.scaling_enabled);
-
-  changed |= SaveValue(ENABLE_DETOUR_COST_MARKERS, ProfileKeys::DetourCostMarker,
-                       settings_map.detour_cost_markers_enabled);
 
     changed |= SaveValueEnum(WIND_ARROW_STYLE, ProfileKeys::WindArrowStyle, settings_map.wind_arrow_style);
 

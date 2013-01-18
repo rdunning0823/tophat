@@ -39,7 +39,8 @@ Profile::Load(MapSettings &settings)
 // hard code aircraft_symbol to default
 //  GetEnum(ProfileKeys::AircraftSymbol, settings.aircraft_symbol);
 
-  Get(ProfileKeys::DetourCostMarker, settings.detour_cost_markers_enabled);
+// hard code detour_cost_markers_enabled to default
+//  Get(ProfileKeys::DetourCostMarker, settings.detour_cost_markers_enabled);
   GetEnum(ProfileKeys::DisplayTrackBearing, settings.display_ground_track);
   Get(ProfileKeys::AutoZoom, settings.auto_zoom_enabled);
 
