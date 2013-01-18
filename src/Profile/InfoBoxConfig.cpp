@@ -59,8 +59,6 @@ Profile::Load(InfoBoxSettings &settings)
   Get(ProfileKeys::AppInverseInfoBox, settings.inverse);
   Get(ProfileKeys::AppInfoBoxColors, settings.use_colors);
 
-  GetEnum(ProfileKeys::AppInfoBoxBorder, settings.border_style);
-
   GetV60InfoBoxManagerConfig(settings);
   TCHAR profileKey[32];
   for (unsigned i = 0; i < settings.MAX_PANELS; ++i) {

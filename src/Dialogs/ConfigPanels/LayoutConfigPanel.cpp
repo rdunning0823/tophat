@@ -43,7 +43,6 @@ enum ControlIndex {
   DialogStyle,
   AppInverseInfoBox,
   AppInfoBoxColors,
-  AppInfoBoxBorder
 };
 
 static const StaticEnumChoice display_orientation_list[] = {
@@ -140,12 +139,6 @@ static const StaticEnumChoice dialog_style_list[] = {
   { 0 }
 };
 
-static const StaticEnumChoice infobox_border_list[] = {
-  { 0, N_("Box"), N_("Draws boxes around each InfoBox.") },
-  { 1, N_("Tab"), N_("Draws a tab at the top of the InfoBox across the title.") },
-  { 0 }
-};
-
 class LayoutConfigPanel : public RowFormWidget {
 public:
   LayoutConfigPanel()
@@ -198,9 +191,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                  "InfoBox will be blue when the glider is above final glide."),
              ui_settings.info_boxes.use_colors);
   SetExpertRow(AppInfoBoxColors);
-
-  AddEnum(_("InfoBox border"), NULL, infobox_border_list, ui_settings.info_boxes.border_style);
-  SetExpertRow(AppInfoBoxBorder);
 }
 
 bool
@@ -236,9 +226,6 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   changed |= SaveValueEnum(DialogStyle, ProfileKeys::AppDialogStyle,
                            ui_settings.dialog.dialog_style);
-
-  changed |= require_restart |=
-    SaveValueEnum(AppInfoBoxBorder, ProfileKeys::AppInfoBoxBorder, ui_settings.info_boxes.border_style);
 
   changed |= require_restart |=
     SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
