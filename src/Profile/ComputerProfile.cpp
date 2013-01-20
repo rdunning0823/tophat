@@ -62,7 +62,6 @@ Profile::Load(LoggerSettings &settings)
 {
   Get(ProfileKeys::LoggerTimeStepCruise, settings.time_step_cruise);
   Get(ProfileKeys::LoggerTimeStepCircling, settings.time_step_circling);
-  Get(ProfileKeys::LoggerShort, settings.short_name);
 
   Get(ProfileKeys::LoggerID, settings.logger_id.buffer(),
       settings.logger_id.MAX_SIZE);

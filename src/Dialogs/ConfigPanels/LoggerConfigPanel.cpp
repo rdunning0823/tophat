@@ -34,7 +34,6 @@ enum ControlIndex {
   PilotName,
   LoggerTimeStepCruise,
   LoggerTimeStepCircling,
-  LoggerShortName,
   EnableNMEALogger,
   EnableFlightLogger,
   LoggerID,
@@ -76,13 +75,6 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           1, 30, 1, logger.time_step_circling);
   SetExpertRow(LoggerTimeStepCircling);
 
-  AddBoolean(_("Short file name"),
-             _("This determines whether the logger uses the short IGC file name or the "
-                 "long IGC file name. Example short name (81HXABC1.IGC), long name "
-                 "(2008-01-18-XXX-ABC-01.IGC)."),
-             logger.short_name);
-  SetExpertRow(LoggerShortName);
-
   AddBoolean(_("NMEA logger"),
              _("Enable the NMEA logger on startup? If this option is disabled, "
                  "the NMEA logger can still be started manually."),
@@ -112,9 +104,6 @@ LoggerConfigPanel::Save(bool &changed, bool &require_restart)
 
   changed |= SaveValue(LoggerTimeStepCircling, ProfileKeys::LoggerTimeStepCircling,
                        logger.time_step_circling);
-
-  changed |= SaveValue(LoggerShortName, ProfileKeys::LoggerShort,
-                       logger.short_name);
 
   changed |= SaveValue(EnableNMEALogger, ProfileKeys::EnableNMEALogger,
                        logger.enable_nmea_logger);
