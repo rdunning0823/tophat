@@ -36,9 +36,6 @@ Copyright_License {
 #include "Screen/WindowCanvas.hpp"
 #endif
 
-#include "LogFile.hpp"
-
-
 HorizontalListControl::HorizontalListControl(ContainerWindow &parent,
                                              const DialogLook &_look,
                                              PixelRect _rc,
@@ -57,12 +54,7 @@ HorizontalListControl::EnsureVisible(unsigned i)
 {
   assert(i < length);
   kinetic_timer.Cancel();
-//  LogDebug(_T("HorizontalListControl::EnsureVisible i:%u"), i);
-  //SetOrigin(i);
-  //bounce_pixel_origin = i * item_height - over_scroll_max;
-  //kinetic_timer.Schedule(30);
 
-  //SetPixelOrigin(i * item_height - over_scroll_max);
   SetPixelOriginAndCenter(i * item_height - over_scroll_max);
 }
 
@@ -78,8 +70,6 @@ HorizontalListControl::GetItemFromPixelOrigin(PixelScalar pixel_origin)
   if (modulus > (item_height / 2 - over_scroll_max / 2))
     index++;
 
-  //LogDebug(_T("HorizontalListControl::GetItemFromPixelOrigin origin:%i item_hght:%u index:%u modulus:%u [item_height/2-over_scroll_max/2:%u"),
-  //         origin, item_height, index, modulus, item_height / 2 - over_scroll_max / 2);
   return (index < length) ? index : length - 1;
 }
 
@@ -92,10 +82,7 @@ HorizontalListControl::GetCenteredItem()
 void
 HorizontalListControl::SetOverScrollMax(UPixelScalar pixels)
 {
-//  const PixelScalar old_origin = GetPixelOrigin();
-//  const PixelScalar delta = (PixelScalar)pixels - (PixelScalar)over_scroll_max;
   over_scroll_max = pixels;
-//  SetPixelOrigin(old_origin + delta);
 }
 
 void
@@ -109,11 +96,7 @@ HorizontalListControl::SetLength(unsigned n)
 void
 HorizontalListControl::SetPixelOrigin(int pixel_origin)
 {
-   //const int pixel_origin_debug = pixel_origin;
    int max = length * item_height - GetHeight() + over_scroll_max;
-
-//   LogDebug(_T("HorizontalListControl::SetPixelOrigin ENTER pixel_origin:%i overscroll_max:%u max:%i pixel_pan:%i"),
-//            pixel_origin, over_scroll_max, max, pixel_pan);
 
    if (pixel_origin > max)
      pixel_origin = max;
@@ -123,24 +106,13 @@ HorizontalListControl::SetPixelOrigin(int pixel_origin)
 
     UPixelScalar pixel_origin_unsigned = (UPixelScalar) (pixel_origin < 0 ? 0 : pixel_origin);
     SetOrigin(pixel_origin_unsigned / item_height);
-//   SetOrigin(GetItemFromPixelOrigin(pixel_origin));
     SetPixelPan(pixel_origin % (int)item_height);
-
-   /* LogDebug(_T("HorizontalListControl::SetPixelOrigin pixel_origin:%i item_height:%u pixel_origin/item_height:%i"),
-            pixel_origin, item_height, pixel_origin/(int)item_height);
-   LogDebug(_T("HorizontalListControl::SetPixelOrigin EXIT pixel_origin:%i, pixel_origin:%i pixel_pan:%i"),
-            pixel_origin, pixel_origin_debug, pixel_pan);
-            */
- }
+}
 
 void
 HorizontalListControl::SetPixelOriginAndCenter(int pixel_origin)
 {
-   //const int pixel_origin_debug = pixel_origin;
    int max = length * item_height - GetHeight() + over_scroll_max;
-
-   //LogDebug(_T("HorizontalListControl::SetPixelOrigin ENTER pixel_origin:%i overscroll_max:%u max:%i pixel_pan:%i"),
-   //         pixel_origin, over_scroll_max, max, pixel_pan);
 
    if (pixel_origin > max)
      pixel_origin = max;
@@ -148,17 +120,8 @@ HorizontalListControl::SetPixelOriginAndCenter(int pixel_origin)
    if (pixel_origin < -1 * (int)over_scroll_max)
      pixel_origin = -1 * (int)over_scroll_max;
 
-//    UPixelScalar pixel_origin_unsigned = (UPixelScalar) (pixel_origin < 0 ? 0 : pixel_origin);
-//    SetOrigin(pixel_origin_unsigned / item_height);
    SetOrigin(GetItemFromPixelOrigin(pixel_origin));
    SetPixelPan(-1 * (int)over_scroll_max); //TODO : this pan value should be adjusted for centering
-/*
-   LogDebug(_T("HorizontalListControl::SetPixelOrigin pixel_origin:%i item_height:%u pixel_origin/item_height:%i"),
-            pixel_origin, item_height, pixel_origin/(int)item_height);
-   LogDebug(_T("HorizontalListControl::SetPixelOrigin EXIT pixel_origin:%i, pixel_pan:%i"),
-            pixel_origin, pixel_pan);
-*/
-
 }
 
 void
@@ -168,9 +131,6 @@ HorizontalListControl::OnPaint(Canvas &canvas)
     unsigned first = origin;
     if (first > 0)
       first--;
-//    LogDebug(_T("ListControl::OnPaint() origin:%u items_visible:%u first:%i"),
-//             origin, items_visible, first);
-
     DrawItems(canvas, first, first + items_visible + 3);
   }
 }
@@ -178,9 +138,6 @@ HorizontalListControl::OnPaint(Canvas &canvas)
 void
 HorizontalListControl::OnPaint(Canvas &canvas, const PixelRect &dirty)
 {
-  LogDebug(_T("HorizontalListControl::OnPaint() dirty left:%u top:%u right:%u bot:%u"),
-           dirty.left, dirty.top, dirty.right, dirty.bottom);
-
   if (handler != NULL || paint_item_callback != NULL) {
     unsigned first = origin + (dirty.top + GetPixelPanUnsigned()) / item_height;
     unsigned last = origin + (dirty.bottom + GetPixelPanUnsigned() + item_height - 1) / item_height;
@@ -196,15 +153,9 @@ void
 HorizontalListControl::DrawItems(Canvas &canvas, unsigned start, unsigned end) const
 {
   PixelRect rc = item_rect(start);
-//  LogDebug(_T("HorizontalListControl::DrawItems (%i-%i) startrc L:%i T:%i R:%i B:%i origin:%i"),
-//           start, end, rc.left, rc.top, rc.right, rc.bottom, origin);
-  //canvas.SetBackgroundColor(look.list.background_color);
   canvas.SetBackgroundTransparent();
   canvas.SelectNullPen();
   canvas.Select(*look.list.font);
-#ifdef _WIN32
-  //canvas.Clear();
-#endif
 
 #ifdef ENABLE_OPENGL
   /* enable clipping */
@@ -227,22 +178,16 @@ HorizontalListControl::DrawItems(Canvas &canvas, unsigned start, unsigned end) c
                                                             false));
 #endif
     canvas.SetTextColor(look.list.GetTextColor(selected, false, pressed));
-    //if (rc.right > 0 && rc.left < (PixelScalar)GetWidth()) {
       if (handler != NULL)
         handler->OnPaintItem(canvas, rc, i);
       else
         paint_item_callback(canvas, rc, i);
-    //}
-    //if (focused && selected)
-      //canvas.DrawFocusRectangle(rc);
 
     ::MoveRect(rc, rc.right - rc.left, 0);
   }
 
   /* paint the bottom part below the last item */
   rc.bottom = canvas.get_height();
-//  if (rc.bottom > rc.top)
-//    canvas.DrawFilledRectangle(rc, look.list.background_color);
 }
 
 void
@@ -268,33 +213,18 @@ HorizontalListControl::OnMouseUp(PixelScalar x, PixelScalar y)
 
   if (drag_mode == DragMode::CURSOR &&
       y >= 0 && y <= ((PixelScalar)GetWidth())) {
-//    LogDebug(_T("HorizontalListControl::OnMouseUp CURSOR"));
     if (mouse_down_clock.Elapsed() > (int)click_duration) {
       drag_end();
       ActivateItem();
     }
-    //return true;
   }
 
   if (drag_mode == DragMode::SCROLL || drag_mode == DragMode::CURSOR) {
     //EnsureVisible(GetCenteredItem());
     drag_end();
 
-//    drag_y = GetPixelOrigin() + x;
-//    drag_y_window = x;
-//#ifndef _WIN32_WCE
-    //assume x is getting bigger:
-
-    //const int stop_distance = (PixelScalar)item_height -
-    //  abs(GetPixelOrigin() - start_pixel_origin) + start_pixel_origin;
     kinetic.MouseUp(GetPixelOrigin(), (item_height));
     kinetic_timer.Schedule(30);
-//#endif
-
-    // figure out which item is in center of screen and "recenter" that item.
-//    LogDebug(_T("HorizontalListControl::OnMouseUp x:%i pixelorigin:%i drag_y:%i, drag_y_w:%i (item_height*4)/3:%u, old_px_orig:%i"),
-//             x, GetPixelOrigin(), drag_y, drag_y_window, (item_height * 3) / 3, drag_y - drag_y_window);
-
 
     return true;
   } else
@@ -311,29 +241,19 @@ if (drag_mode == DragMode::CURSOR) {
     if (abs(x - drag_y_window) > ((int)item_height / 25)) {  /** TODO: adjust this behaviour for horizontal **/
       drag_mode = DragMode::SCROLL;
       Invalidate_item(cursor);
-      //LogDebug(_T("HorizontalListControl::OnMouseMove exit 1: mode Cursor to Scroll"));
     } else
-      //LogDebug(_T("HorizontalListControl::OnMouseMove exit 2: mode Cursor"));
       return true;
   }
 
   if (drag_mode == DragMode::SCROLL) {
     cursor_down_index = -1;
-//    LogDebug(_T("HorizontalListControl::OnMouseMove cursor_down_index:%i"), cursor_down_index);
     int new_origin = drag_y - x;
     SetPixelOrigin(new_origin);
-//#ifndef _WIN32_WCE
     kinetic.MouseMove(GetPixelOrigin());
-//#endif
     if (handler != nullptr)
       handler->OnPixelMove();
-    //int item_index = GetPixelOrigin() / item_height;
-    //unsigned scroll_offset = GetPixelOrigin() % item_height;
-    //LogDebug(_T("HorizontalListControl::OnMousemove index:%i offset:%u screenwidth:%u"),
-    //         item_index, scroll_offset, GetHeight());
     return true;
   }
-  //LogDebug(_T("HorizontalListControl::OnMouseMove exit 4: mode not scroll or cursor"));
   return PaintWindow::OnMouseMove(x, y, keys);
 }
 
@@ -348,18 +268,13 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
 
   mouse_down_clock.Update();
 
-//#ifndef _WIN32_WCE
   kinetic_timer.Cancel();
-//#endif
 
   // if click in ListBox area
   // -> select appropriate item
-
   int index = ItemIndexAt(x);
   // If mouse was clicked outside the list items -> cancel
   if (index < 0) {
-//      LogDebug(_T("HorizontalListControl::OnMouseDown 1 - error - click outside of list"));
-    //assert(false);
     return false;
   }
 
@@ -367,30 +282,15 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
   drag_y_window = x;
   drag_mode = DragMode::SCROLL;
   cursor_down_index = GetItemFromPixelOrigin(GetPixelOrigin());
-//    LogDebug(_T("HorizontalListControl::OnMouseDown 1.5 index:%i GetCursorIndex():%i CanActIt():%i"),
-//             index, GetCursorIndex(), CanActivateItem());
   Invalidate_item(cursor);
   if ((unsigned)index == GetCursorIndex() &&
       CanActivateItem()) {
-//      LogDebug(_T("HorizontalListControl::OnMouseDown 2 setting mode to CURSOR"));
     drag_mode = DragMode::CURSOR;
 
     Invalidate_item(cursor);
-  } else {
-    // If item was not selected before
-    // -> select it
-    //SetCursorIndex(index); // dont set cursor index when item is clicked.  SHould be done on mouse up
-    //    of whatever location is in the center of the screen.
-    /*
-    LogDebug(_T("HorizontalListControl::OnMouseDown cursor_down_index:%i"), cursor_down_index);
-    LogDebug(_T("HorizontalListControl::OnMouseDown 3 setting mode to SCROLL"));
-    LogDebug(_T("HorizontalListControl::OnMouseDown x:%u pixelorigin:%i drag_y:%i, drag_y_w:%i item_height:%u"),
-             x, GetPixelOrigin(), drag_y, drag_y_window, item_height);
-             */
   }
-//#ifndef _WIN32_WCE
+
   kinetic.MouseDown(GetPixelOrigin());
-//#endif
   SetCapture();
 
   return true;
@@ -399,7 +299,6 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 HorizontalListControl::ScrollAdvance(bool forward)
 {
-//  LogDebug(_T("HorizontalListControl::ScrollAdvance 1"));
   unsigned old_item = GetItemFromPixelOrigin(GetPixelOrigin());
   if ((forward && (old_item >= (GetLength() - 1))) ||
       (!forward && old_item == 0))
@@ -407,8 +306,6 @@ HorizontalListControl::ScrollAdvance(bool forward)
 
   unsigned new_item = old_item + (forward ? 1 : -1);
   int to_location = new_item * GetItemHeight() - over_scroll_max;
-//  LogDebug(_T("HorizontalListControl::ScrollAdvance old:%i new:%i to_loc:%i"),
-//           old_item, new_item, to_location);
   kinetic.MoveTo(to_location);
   kinetic_timer.Schedule(30);
   return true;
@@ -430,27 +327,18 @@ HorizontalListControl::OnTimer(WindowTimer &timer)
       {
         kinetic_timer.Cancel();
         int new_item = GetItemFromPixelOrigin(GetPixelOrigin());
-//        LogDebug(_T("HorizontalListControl::OnTimer steady# setting cursor index:%i"),
-//                 new_item);
         SetCursorIndex(new_item);
         EnsureVisible(new_item);
-//        LogDebug(_T("HorizontalListControl::OnTimer steady#1 new_item:%i origin:%i, pixel_pan:%i GetPixelOrigin:%i"),
-//                 new_item, origin, pixel_pan, GetPixelOrigin());
         break;
       }
       case KineticManager::NORMAL:
         if (GetItemFromPixelOrigin(GetPixelOrigin()) ==
               GetItemFromPixelOrigin(kinetic.GetMouseDownX())) {
           kinetic.Reverse();
- //         LogDebug(_T("HorizontalListControl::OnTimer steady#2-just reversed origin:%i, pixel_pan:%i GetPixelOrigin:%i"),
- //                  origin, pixel_pan, GetPixelOrigin());
-       } else {// move to next item!
+       } else { // move to next item!
         int item_temp = GetItemFromPixelOrigin(GetPixelOrigin());
         int to_location = item_temp * GetItemHeight() - over_scroll_max;
         kinetic.MoveTo(to_location);
-//        LogDebug(_T("HorizontalListControl::OnTimer steady#3-just MoveTo'd origin:%i, pixel_pan:%i GetPixelOrigin:%i new-item:%i i_height:%i, item:%u over_scroll:%i to_pixels:%i"),
-//                 origin, pixel_pan, GetPixelOrigin(), item_temp, GetItemHeight(),
-//                 GetItemFromPixelOrigin(GetPixelOrigin()), over_scroll_max, to_location);
         }
       }
     } else // continue scrolling
@@ -461,6 +349,3 @@ HorizontalListControl::OnTimer(WindowTimer &timer)
 
   return PaintWindow::OnTimer(timer);
 }
-
-
-

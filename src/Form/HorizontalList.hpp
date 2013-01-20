@@ -27,8 +27,6 @@ Copyright_License {
 #include "Form/List.hpp"
 #include "PeriodClock.hpp"
 
-#include "LogFile.hpp"
-
 struct DialogLook;
 class ContainerWindow;
 struct PixelRect;
@@ -142,12 +140,10 @@ public:
    */
   virtual UPixelScalar GetHeight()
   {
-    //LogDebug(_T("HorizontalListControl::GetHeight"));
     return PaintWindow::GetWidth();
   }
   virtual UPixelScalar GetWidth()
   {
-    //LogDebug(_T("HorizontalListControl::GetWidth"));
     return PaintWindow::GetHeight();
   }
 
