@@ -35,7 +35,6 @@ enum ControlIndex {
   LoggerTimeStepCruise,
   LoggerTimeStepCircling,
   LoggerShortName,
-  DisableAutoLogger,
   EnableNMEALogger,
   EnableFlightLogger,
   LoggerID,
@@ -84,12 +83,6 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              logger.short_name);
   SetExpertRow(LoggerShortName);
 
-  AddEnum(_("Auto. logger"),
-          _("Enables the automatic starting and stopping of logger on takeoff and landing "
-            "respectively. Disable when flying paragliders."),
-          auto_logger_list, (unsigned)logger.auto_logger);
-  SetExpertRow(DisableAutoLogger);
-
   AddBoolean(_("NMEA logger"),
              _("Enable the NMEA logger on startup? If this option is disabled, "
                  "the NMEA logger can still be started manually."),
@@ -122,10 +115,6 @@ LoggerConfigPanel::Save(bool &changed, bool &require_restart)
 
   changed |= SaveValue(LoggerShortName, ProfileKeys::LoggerShort,
                        logger.short_name);
-
-  /* GUI label is "Enable Auto Logger" */
-  changed |= SaveValueEnum(DisableAutoLogger, ProfileKeys::AutoLogger,
-                           logger.auto_logger);
 
   changed |= SaveValue(EnableNMEALogger, ProfileKeys::EnableNMEALogger,
                        logger.enable_nmea_logger);
