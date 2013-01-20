@@ -164,7 +164,7 @@ OnLogoPaint(gcc_unused WndOwnerDrawFrame *Sender, Canvas &canvas)
   y += Layout::FastScale(22);
 
   canvas.SetTextColor(COLOR_XCSOAR);
-  canvas.text(x, y, _T("http://xcsoar-robd.wikispaces.com/Top+Hat"));
+  canvas.text(x, y, _T("http://tophatsoaring.org"));
 }
 
 static void
