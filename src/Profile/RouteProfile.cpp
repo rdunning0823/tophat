@@ -29,10 +29,14 @@ void
 Profile::Load(RoutePlannerConfig &settings)
 {
   Get(ProfileKeys::SafetyAltitudeTerrain, settings.safety_height_terrain);
-  GetEnum(ProfileKeys::RoutePlannerMode, settings.mode);
-  Get(ProfileKeys::RoutePlannerAllowClimb, settings.allow_climb);
-  Get(ProfileKeys::RoutePlannerUseCeiling, settings.use_ceiling);
+
+  // turn off Route planning for Top Hat
+  settings.mode = RoutePlannerConfig::Mode::NONE;
+  settings.allow_climb = false;
+  settings.use_ceiling = false;
+
   GetEnum(ProfileKeys::TurningReach, settings.reach_calc_mode);
+
   /** Hard code to Task MC.
    *  Leave architecture in place, but remove option from UI
    */
