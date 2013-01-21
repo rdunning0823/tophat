@@ -30,7 +30,7 @@ static constexpr TaskFactoryConstraints aat_constraints = {
   false,
   false,
   false,
-  true,
+  false,
   2, 13,
 };
 
