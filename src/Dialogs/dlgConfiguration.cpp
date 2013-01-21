@@ -103,7 +103,6 @@ static const TabMenuControl::PageItem pages[] = {
   {N_("Safety Factors"), 2, CreateSafetyFactorsConfigPanel },
   {N_("Glide Computer"), 2, CreateGlideComputerConfigPanel },
   {N_("Wind"), 2, CreateWindConfigPanel },
-  {N_("Route"), 2, CreateRouteConfigPanel },
   {N_("FLARM, Other"), 3, CreateGaugesConfigPanel },
 #ifdef HAVE_PCM_PLAYER
   {N_("Audio Vario"), 3, CreateAudioVarioConfigPanel },
