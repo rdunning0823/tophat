@@ -36,6 +36,9 @@ Profile::Load(RoutePlannerConfig &settings)
   settings.use_ceiling = false;
 
   GetEnum(ProfileKeys::TurningReach, settings.reach_calc_mode);
+  // Turning has problems and is unnecessary
+  if (settings.reach_calc_mode == RoutePlannerConfig::ReachMode::TURNING)
+    settings.reach_calc_mode = RoutePlannerConfig::ReachMode::STRAIGHT;
 
   /** Hard code to Task MC.
    *  Leave architecture in place, but remove option from UI

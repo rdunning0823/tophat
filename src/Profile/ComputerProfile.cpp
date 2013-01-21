@@ -102,7 +102,9 @@ Profile::Load(PlacesOfInterestSettings &settings)
 void
 Profile::Load(FeaturesSettings &settings)
 {
-  GetEnum(ProfileKeys::FinalGlideTerrain, settings.final_glide_terrain);
+  // hard code to line for Top Hat
+  settings.final_glide_terrain = FeaturesSettings::FinalGlideTerrain::FGT_LINE;
+
   Get(ProfileKeys::BlockSTF, settings.block_stf_enabled);
   Get(ProfileKeys::EnableNavBaroAltitude, settings.nav_baro_altitude_enabled);
 }

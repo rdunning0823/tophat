@@ -34,7 +34,6 @@ Copyright_License {
 
 enum ControlIndex {
   TurningReach,
-  FinalGlideTerrain,
 };
 
 class RouteConfigPanel
@@ -44,32 +43,14 @@ public:
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 public:
-  void ShowReachControls(bool show);
 
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed, bool &require_restart);
 
 private:
-  /* methods from DataFieldListener */
-  virtual void OnModified(DataField &df);
 };
 
-void
-RouteConfigPanel::ShowReachControls(bool show)
-{
-  SetRowVisible(FinalGlideTerrain, show);
-}
-
-void
-RouteConfigPanel::OnModified(DataField &df)
-{
-if (IsDataField(TurningReach, df)) {
-    RoutePlannerConfig::ReachMode mode =
-      (RoutePlannerConfig::ReachMode)df.GetAsInteger();
-    ShowReachControls(mode != RoutePlannerConfig::ReachMode::OFF);
-  }
-}
 
 void
 RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
@@ -81,11 +62,9 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   static constexpr StaticEnumChoice turning_reach_list[] = {
     { (unsigned)RoutePlannerConfig::ReachMode::OFF, N_("Off"),
-      N_("Reach calculations disabled.") },
-    { (unsigned)RoutePlannerConfig::ReachMode::STRAIGHT, N_("Straight"),
-      N_("The reach is from straight line paths from the glider.") },
-    { (unsigned)RoutePlannerConfig::ReachMode::TURNING, N_("Turning"),
-      N_("The reach is calculated allowing turns around terrain obstacles.") },
+      N_("Reachable terrain circle not displayed.") },
+    { (unsigned)RoutePlannerConfig::ReachMode::STRAIGHT, N_("On"),
+      N_("A circular shape is displayed over the contours of the terrain indicating how far the glider can reach in each direction.") },
     { 0 }
   };
 
@@ -94,17 +73,6 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           turning_reach_list, (unsigned)route_planner.reach_calc_mode,
           this);
 
-  static constexpr StaticEnumChoice final_glide_terrain_list[] = {
-    { FeaturesSettings::FGT_OFF, N_("Off"), N_("Disables the reach display.") },
-    { FeaturesSettings::FGT_LINE, N_("Line"), N_("Draws a dashed line at the glide reach.") },
-    { FeaturesSettings::FGT_SHADE, N_("Shade"), N_("Shades terrain outside glide reach.") },
-    { 0 }
-  };
-
-  AddEnum(_("Reach display"), NULL, final_glide_terrain_list,
-          settings_computer.features.final_glide_terrain);
-
-  ShowReachControls(route_planner.reach_calc_mode != RoutePlannerConfig::ReachMode::OFF);
 }
 
 bool
@@ -114,11 +82,9 @@ RouteConfigPanel::Save(bool &_changed, bool &_require_restart)
   ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
   RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
 
-  changed |= SaveValueEnum(FinalGlideTerrain, ProfileKeys::FinalGlideTerrain,
-                           settings_computer.features.final_glide_terrain);
-
   changed |= SaveValueEnum(TurningReach, ProfileKeys::TurningReach,
                            route_planner.reach_calc_mode);
+
   _changed |= changed;
   _require_restart |= require_restart;
 
