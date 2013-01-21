@@ -287,23 +287,30 @@ InfoBoxLayout::ValidateGeometry(InfoBoxSettings::Geometry geometry,
 
     switch (geometry) {
     case InfoBoxSettings::Geometry::TOP_4_BOTTOM_4:
+    case InfoBoxSettings::Geometry::TOP_8:
+      return InfoBoxSettings::Geometry::BOTTOM_8;
+
+    case InfoBoxSettings::Geometry::TOP_4:
+      return InfoBoxSettings::Geometry::BOTTOM_4;
+
+    case InfoBoxSettings::Geometry::TOP_12:
+      return InfoBoxSettings::Geometry::BOTTOM_12;
+
+
     case InfoBoxSettings::Geometry::BOTTOM_8:
     case InfoBoxSettings::Geometry::BOTTOM_4:
     case InfoBoxSettings::Geometry::BOTTOM_8_VARIO:
     case InfoBoxSettings::Geometry::BOTTOM_12:
-    case InfoBoxSettings::Geometry::TOP_8:
-    case InfoBoxSettings::Geometry::TOP_4:
-    case InfoBoxSettings::Geometry::TOP_12:
       break;
 
     case InfoBoxSettings::Geometry::LEFT_4_RIGHT_4:
-      return InfoBoxSettings::Geometry::TOP_4_BOTTOM_4;
+      return InfoBoxSettings::Geometry::BOTTOM_8;
 
     case InfoBoxSettings::Geometry::LEFT_8:
-      return InfoBoxSettings::Geometry::TOP_8;
+      return InfoBoxSettings::Geometry::BOTTOM_8;
 
     case InfoBoxSettings::Geometry::LEFT_4:
-       return InfoBoxSettings::Geometry::TOP_4;
+      return InfoBoxSettings::Geometry::BOTTOM_4;
 
     case InfoBoxSettings::Geometry::RIGHT_8:
     case InfoBoxSettings::Geometry::RIGHT_9_VARIO:
