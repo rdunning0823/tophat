@@ -37,7 +37,6 @@ Copyright_License {
 enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
-  AppFlarmLocation,
   TabDialogStyle,
   AppStatusMessageAlignment,
   AppInverseInfoBox,
@@ -98,24 +97,6 @@ static const StaticEnumChoice info_box_geometry_list[] = {
   { 0 }
 };
 
-static const StaticEnumChoice flarm_display_location_list[] = {
-  { (unsigned)TrafficSettings::GaugeLocation::Auto,
-    N_("Auto (follow infoboxes)") },
-  { (unsigned)TrafficSettings::GaugeLocation::TopLeft,
-    N_("Top Left") },
-  { (unsigned)TrafficSettings::GaugeLocation::TopRight,
-    N_("Top Right") },
-  { (unsigned)TrafficSettings::GaugeLocation::BottomLeft,
-    N_("Bottom Left") },
-  { (unsigned)TrafficSettings::GaugeLocation::BottomRight,
-    N_("Bottom Right") },
-  { (unsigned)TrafficSettings::GaugeLocation::CentreTop,
-    N_("Centre Top") },
-  { (unsigned)TrafficSettings::GaugeLocation::CentreBottom,
-    N_("Centre Bottom") },
-  { 0 }
-};
-
 static const StaticEnumChoice tabdialog_style_list[] = {
   { (unsigned)DialogSettings::TabStyle::Text, N_("Text"),
     N_("Show text on tabbed dialogs.") },
@@ -157,11 +138,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
 
-  AddEnum(_("FLARM display"), _("Choose a location for the FLARM display."),
-          flarm_display_location_list,
-          (unsigned)ui_settings.traffic.gauge_location);
-  SetExpertRow(AppFlarmLocation);
-
   AddEnum(_("Tab dialog style"), NULL,
           tabdialog_style_list, (unsigned)ui_settings.dialog.tab_style);
 
@@ -201,10 +177,6 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
   info_box_geometry_changed |=
     SaveValueEnum(AppInfoBoxGeom, ProfileKeys::InfoBoxGeometry,
                   ui_settings.info_boxes.geometry);
-
-  info_box_geometry_changed |=
-    SaveValueEnum(AppFlarmLocation, ProfileKeys::FlarmLocation,
-                  ui_settings.traffic.gauge_location);
 
   changed |= info_box_geometry_changed;
 
