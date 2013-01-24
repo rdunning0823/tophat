@@ -32,11 +32,16 @@
  */
 class MatWaypointVisitorVector: public WaypointVisitor
 {
+public:
+  enum MaxMattPoints {
+    MAX_MAT_POINTS=256,
+  };
+
 private:
   MatPoints::MatVector &vector;
 
   /**
-   * only load 128 items for sanity
+   * only load MAX_MAT_POINTS items for sanity
    */
   unsigned count;
 
@@ -57,7 +62,7 @@ public:
    * @param wp Waypoint that is visited
    */
   void Visit(const Waypoint& wp) {
-    if (wp.IsTurnpoint() && count <= 128) {
+    if (wp.IsTurnpoint() && count <= MAX_MAT_POINTS) {
       count++;
 
       OrderedTaskPoint* tp = (OrderedTaskPoint*)factory.CreateIntermediate(wp);
@@ -70,7 +75,7 @@ void
 MatPoints::FillMatPoints(const Waypoints &wps,
                          const AbstractTaskFactory &factory)
 {
-  mat_point_vector.reserve(128);
+  mat_point_vector.reserve(MatWaypointVisitorVector::MAX_MAT_POINTS);
   MatWaypointVisitorVector wvv(mat_point_vector, factory);
   wps.VisitNamePrefix(_T(""), wvv);
 }
