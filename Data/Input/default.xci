@@ -1114,22 +1114,6 @@ event=Mode default
 label=Weather
 location=17
 
-mode=MenuLast
-type=key
-data=0
-event=Setup QNH
-event=Mode default
-label=QNH
-location=18
-
-
-mode=MenuLast
-type=key
-data=0
-event=StartupTips
-event=Mode default
-label=Help
-location=19
 
 mode=MenuLast
 type=key
@@ -1137,7 +1121,7 @@ data=6
 event=Credits
 event=Mode default
 label=Credits
-location=19
+location=18
 
 mode=MenuLast
 type=key
@@ -1145,7 +1129,7 @@ data=0
 event=StartupTips
 event=Mode default
 label=Help
-location=20
+location=19
 
 mode=MenuLast
 type=key
