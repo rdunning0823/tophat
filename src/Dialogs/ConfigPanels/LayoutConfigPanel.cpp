@@ -37,7 +37,6 @@ Copyright_License {
 enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
-  AppStatusMessageAlignment,
   AppInverseInfoBox,
   AppInfoBoxColors,
 };
@@ -96,12 +95,6 @@ static const StaticEnumChoice info_box_geometry_list[] = {
   { 0 }
 };
 
-static const StaticEnumChoice popup_msg_position_list[] = {
-  { 0, N_("Center"), N_("Center the status message boxes.") },
-  { 1, N_("Topleft"), N_("Show status message boxes in the top left corner.") },
-  { 0 }
-};
-
 class LayoutConfigPanel : public RowFormWidget {
 public:
   LayoutConfigPanel()
@@ -128,10 +121,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("InfoBox geometry"),
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
-
-  AddEnum(_("Message display"), NULL,
-          popup_msg_position_list, ui_settings.popup_message_position);
-  SetExpertRow(AppStatusMessageAlignment);
 
   AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
              ui_settings.info_boxes.inverse);
@@ -167,9 +156,6 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
                   ui_settings.info_boxes.geometry);
 
   changed |= info_box_geometry_changed;
-
-  changed |= SaveValueEnum(AppStatusMessageAlignment, ProfileKeys::AppStatusMessageAlignment,
-                           ui_settings.popup_message_position);
 
   changed |= require_restart |=
     SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
