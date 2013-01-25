@@ -292,7 +292,7 @@ InputEvents::eventStatus(const TCHAR *misc)
   if (StringIsEqual(misc, _T("system"))) {
     dlgStatusShowModal(1);
   } else if (StringIsEqual(misc, _T("task"))) {
-    dlgStatusShowModal(2);
+    ShowTaskStatusDialog();
   } else if (StringIsEqual(misc, _T("aircraft"))) {
     dlgStatusShowModal(0);
   } else {

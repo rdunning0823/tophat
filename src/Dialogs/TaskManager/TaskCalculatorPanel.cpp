@@ -41,7 +41,6 @@ Copyright_License {
 #include "Formatter/TimeFormatter.hpp"
 
 enum Controls {
-  WARNING,
   SPEED_ACHIEVED,
   DISTANCE,
   AAT_TIME,
@@ -60,9 +59,6 @@ TaskCalculatorPanel::Refresh()
 {
   const CommonStats &common_stats = XCSoarInterface::Calculated().common_stats;
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
-
-  if (target_button != NULL)
-    target_button->SetVisible(common_stats.ordered_has_targets);
 
   SetRowVisible(AAT_TIME, task_stats.has_targets);
   if (task_stats.has_targets) {
@@ -118,12 +114,6 @@ TaskCalculatorPanel::Refresh()
     ClearValue(SPEED_ACHIEVED);
 }
 
-static void
-OnTargetClicked(gcc_unused WndButton &Sender)
-{
-  dlgTargetShowModal();
-}
-
 void
 TaskCalculatorPanel::OnModified(DataField &df)
 {
@@ -150,34 +140,6 @@ TaskCalculatorPanel::OnSpecial(DataField &df)
   }
 }
 
-static void
-OnWarningPaint(gcc_unused WndOwnerDrawFrame *Sender, Canvas &canvas)
-{
-  const DialogLook &look = UIGlobals::GetDialogLook();
-
-  if (instance->IsTaskModified()) {
-    const UPixelScalar textheight = canvas.GetFontHeight();
-    const TCHAR* message = _("Calculator excludes unsaved task changes!");
-    canvas.Select(*look.small_font);
-
-    const AirspaceLook &look = UIGlobals::GetMapLook().airspace;
-    const MaskedIcon *bmp = &look.intercept_icon;
-    const int offsetx = bmp->GetSize().cx;
-    const int offsety = canvas.get_height() - bmp->GetSize().cy;
-    canvas.Clear(COLOR_YELLOW);
-    bmp->Draw(canvas, offsetx, offsety);
-
-    canvas.SetBackgroundColor(COLOR_YELLOW);
-    canvas.SetTextColor(COLOR_BLACK);
-    canvas.text(offsetx * 2 + Layout::Scale(2),
-                (int)(canvas.get_height() - textheight) / 2,
-                message);
-  }
-  else {
-    canvas.Clear(look.background_color);
-  }
-}
-
 void
 TaskCalculatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
@@ -185,12 +147,6 @@ TaskCalculatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   instance = this;
 
-  if (target_button != NULL)
-    target_button->SetOnClickNotify(OnTargetClicked);
-
-  Add(new WndOwnerDrawFrame(*(ContainerWindow *)GetWindow(),
-                            PixelRect{0, 0, 100, Layout::Scale(17)},
-                            WindowStyle(), OnWarningPaint));
   AddReadOnly(_("Achieved speed"), NULL, _T("%.0f %s"),
               UnitGroup::TASK_SPEED, fixed_zero);
 
@@ -227,9 +183,6 @@ TaskCalculatorPanel::Show(const PixelRect &rc)
 void
 TaskCalculatorPanel::Hide()
 {
-  if (target_button != NULL)
-    target_button->Hide();
-
   CommonInterface::GetLiveBlackboard().RemoveListener(*this);
 
   RowFormWidget::Hide();

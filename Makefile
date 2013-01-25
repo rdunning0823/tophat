@@ -255,6 +255,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/dlgWaypointEdit.cpp \
 	$(SRC)/Dialogs/WaypointList.cpp \
 	$(SRC)/Dialogs/WindSettingsDialog.cpp \
+	$(SRC)/Dialogs/TaskStatusDialog.cpp \
 	$(SRC)/Dialogs/FontEdit.cpp \
 	$(SRC)/Dialogs/dlgCredits.cpp \
 	$(SRC)/Dialogs/dlgQuickMenu.cpp \

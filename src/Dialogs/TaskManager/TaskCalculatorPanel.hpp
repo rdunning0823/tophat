@@ -28,6 +28,7 @@ Copyright_License {
 #include "Form/DataField/Listener.hpp"
 #include "Blackboard/BlackboardListener.hpp"
 #include "Math/fixed.hpp"
+#include "UIGlobals.hpp"
 
 class WndForm;
 class WndButton;
@@ -35,27 +36,11 @@ class WndButton;
 class TaskCalculatorPanel : public RowFormWidget,
                             private DataFieldListener,
                             private NullBlackboardListener {
-  WndButton *target_button;
-
-  const bool *task_modified;
-
   fixed emc;
 
 public:
-  TaskCalculatorPanel(const DialogLook &look, const bool *_task_modified)
-    :RowFormWidget(look),
-     target_button(NULL), task_modified(_task_modified) {}
-
-  void SetTargetButton(WndButton *_target_button) {
-    assert(target_button == NULL);
-    assert(_target_button != NULL);
-
-    target_button = _target_button;
-  }
-
-  bool IsTaskModified() const {
-    return *task_modified;
-  }
+  TaskCalculatorPanel(const DialogLook &look)
+    :RowFormWidget(look) {}
 
   void Refresh();
 

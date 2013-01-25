@@ -32,7 +32,6 @@ Copyright_License {
 #include "StatusPanels/FlightStatusPanel.hpp"
 #include "StatusPanels/RulesStatusPanel.hpp"
 #include "StatusPanels/SystemStatusPanel.hpp"
-#include "TaskManager/TaskCalculatorPanel.hpp"
 #include "StatusPanels/TimesStatusPanel.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
@@ -106,7 +105,6 @@ dlgStatusShowModal(int start_page)
   const IconLook &icons = UIGlobals::GetIconLook();
   const Bitmap *FlightIcon = enable_icons ? &icons.hBmpTabFlight : NULL;
   const Bitmap *SystemIcon = enable_icons ? &icons.hBmpTabSystem : NULL;
-  const Bitmap *TaskIcon = enable_icons ? &icons.hBmpTabTask : NULL;
   const Bitmap *RulesIcon = enable_icons ? &icons.hBmpTabRules : NULL;
   const Bitmap *TimesIcon = enable_icons ? &icons.hBmpTabTimes : NULL;
 
@@ -115,10 +113,6 @@ dlgStatusShowModal(int start_page)
 
   Widget *system_panel = new SystemStatusPanel(look);
   wTabBar->AddTab(system_panel, _T("System"), SystemIcon);
-
-  static bool modified = false;
-  Widget *task_panel = new TaskCalculatorPanel(look, &modified);
-  wTabBar->AddTab(task_panel, _T("Task"), TaskIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
   wTabBar->AddTab(rules_panel, _T("Task Start"), RulesIcon);
