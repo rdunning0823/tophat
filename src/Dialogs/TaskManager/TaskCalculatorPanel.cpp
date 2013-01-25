@@ -44,7 +44,6 @@ enum Controls {
   SPEED_ACHIEVED,
   DISTANCE,
   AAT_TIME,
-  MC,
   AAT_ESTIMATED,
 };
 
@@ -59,41 +58,16 @@ TaskCalculatorPanel::Refresh()
 {
   const CommonStats &common_stats = XCSoarInterface::Calculated().common_stats;
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+  StaticString<32> time;
 
   SetRowVisible(AAT_TIME, task_stats.has_targets);
-  if (task_stats.has_targets) {
-    StaticString<5> sign;
-    StaticString<32> both;
-    if (!positive(common_stats.aat_time_remaining))
-      sign = _T("-");
-    else
-      sign = _T("");
-
-    unsigned seconds = abs((int)common_stats.aat_time_remaining % 60);
-    unsigned minutes = ((int)common_stats.aat_time_remaining - seconds)
-        / 60;
-    both.Format(_T("%s%u min %u sec"), sign.c_str(), minutes, seconds);
-    SetText(AAT_TIME, both.c_str());
-  }
+  FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
+  SetText(AAT_TIME, time.c_str());
 
   SetRowVisible(AAT_ESTIMATED, task_stats.has_targets);
   if (task_stats.has_targets) {
-    StaticString<5> sign;
-    StaticString<32> both;
-    if (!positive(common_stats.task_time_remaining
-        + common_stats.task_time_elapsed))
-      sign = _T("-");
-    else
-      sign = _T("");
-
-    unsigned seconds = abs((int)(common_stats.task_time_remaining
-        + common_stats.task_time_elapsed) % 60);
-    unsigned minutes = ((int)(common_stats.task_time_remaining
-        + common_stats.task_time_elapsed) - seconds)
-        / 60;
-    both.Format(_T("%s%u min"), sign.c_str(), minutes);
-    SetText(AAT_ESTIMATED, both.c_str());
-
+    FormatTimespanSmart(time.buffer(), (int)common_stats.task_time_remaining, 2);
+    SetText(AAT_ESTIMATED, time.c_str());
   }
   fixed rPlanned = task_stats.total.solution_remaining.IsDefined()
     ? task_stats.total.solution_remaining.vector.distance
