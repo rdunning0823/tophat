@@ -25,7 +25,6 @@ Copyright_License {
 #define XCSOAR_TASK_CALCULATOR_PANEL_HPP
 
 #include "Form/RowFormWidget.hpp"
-#include "Form/DataField/Listener.hpp"
 #include "Blackboard/BlackboardListener.hpp"
 #include "Math/fixed.hpp"
 #include "UIGlobals.hpp"
@@ -34,7 +33,6 @@ class WndForm;
 class WndButton;
 
 class TaskCalculatorPanel : public RowFormWidget,
-                            private DataFieldListener,
                             private NullBlackboardListener {
   fixed emc;
 
@@ -50,9 +48,6 @@ public:
   virtual void Hide();
 
 private:
-  /* virtual methods from DataFieldListener */
-  virtual void OnModified(DataField &df);
-  virtual void OnSpecial(DataField &df);
 
   /* virtual methods from NullBlackboardListener */
   virtual void OnCalculatedUpdate(const MoreData &basic,

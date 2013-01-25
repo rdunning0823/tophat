@@ -104,40 +104,11 @@ TaskCalculatorPanel::Refresh()
   else
     ClearValue(DISTANCE);
 
-  LoadValue(MC, CommonInterface::GetComputerSettings().polar.glide_polar_task.GetMC(),
-            UnitGroup::VERTICAL_SPEED);
-
   if (task_stats.total.travelled.IsDefined())
     LoadValue(SPEED_ACHIEVED, task_stats.total.travelled.GetSpeed(),
               UnitGroup::TASK_SPEED);
   else
     ClearValue(SPEED_ACHIEVED);
-}
-
-void
-TaskCalculatorPanel::OnModified(DataField &df)
-{
-  if (IsDataField(MC, df)) {
-    const DataFieldFloat &dff = (const DataFieldFloat &)df;
-    fixed mc = Units::ToSysVSpeed(dff.GetAsFixed());
-    ActionInterface::SetManualMacCready(mc);
-    Refresh();
-  }
-}
-
-void
-TaskCalculatorPanel::OnSpecial(DataField &df)
-{
-  if (IsDataField(MC, df)) {
-    const DerivedInfo &calculated = CommonInterface::Calculated();
-    if (positive(calculated.time_climb)) {
-      fixed mc = calculated.total_height_gain / calculated.time_climb;
-      DataFieldFloat &dff = (DataFieldFloat &)df;
-      dff.Set(Units::ToUserVSpeed(mc));
-      ActionInterface::SetManualMacCready(mc);
-      Refresh();
-    }
-  }
 }
 
 void
@@ -153,17 +124,6 @@ TaskCalculatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddReadOnly(_("Distance remaining"), NULL, _T("%.0f %s"),
               UnitGroup::DISTANCE, fixed_zero);
   AddReadOnly(_("AAT Time remaining"), NULL, _T(""));
-
-  AddFloat(_("Set MacCready"),
-           _("Adjusts MC value used in the calculator.  "
-             "Use this to determine the effect on estimated task time due to changes in conditions.  "
-             "This value will not affect the main computer's setting if the dialog is exited with the Cancel button."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed_zero, Units::ToUserVSpeed(fixed(5)),
-           GetUserVerticalSpeedStep(), false, fixed_zero,
-           this);
-  DataFieldFloat &mc_df = (DataFieldFloat &)GetDataField(MC);
-  mc_df.SetFormat(GetUserVerticalSpeedFormat(false, false));
 
   AddReadOnly(_("Estimated total time"), NULL, _T(""));
 }
