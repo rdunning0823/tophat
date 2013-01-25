@@ -38,7 +38,6 @@ enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
   AppInverseInfoBox,
-  AppInfoBoxColors,
 };
 
 static const StaticEnumChoice display_orientation_list[] = {
@@ -125,12 +124,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
              ui_settings.info_boxes.inverse);
   SetExpertRow(AppInverseInfoBox);
-
-  AddBoolean(_("Colored InfoBoxes"),
-             _("If true, certain InfoBoxes will have coloured text.  For example, the active waypoint "
-                 "InfoBox will be blue when the glider is above final glide."),
-             ui_settings.info_boxes.use_colors);
-  SetExpertRow(AppInfoBoxColors);
 }
 
 bool
@@ -159,9 +152,6 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   changed |= require_restart |=
     SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
-
-  changed |= require_restart |=
-    SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors, ui_settings.info_boxes.use_colors);
 
   if (orientation_changed) {
     assert(Display::RotateSupported());
