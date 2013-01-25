@@ -121,7 +121,7 @@ dlgStatusShowModal(int start_page)
   wTabBar->AddTab(task_panel, _T("Task"), TaskIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
-  wTabBar->AddTab(rules_panel, _T("Rules"), RulesIcon);
+  wTabBar->AddTab(rules_panel, _T("Task Start"), RulesIcon);
 
   Widget *times_panel = new TimesStatusPanel(look);
   wTabBar->AddTab(times_panel, _T("Times"), TimesIcon);
