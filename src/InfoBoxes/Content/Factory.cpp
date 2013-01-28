@@ -83,6 +83,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeGPS>::Create,
     e_HeightAGL, // H AGL
     e_FlightLevel, // Flight Level
+    STANDARD,
   },
 
   // e_HeightAGL
@@ -93,6 +94,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeAGL>::Create,
     e_H_Terrain, // H GND
     e_HeightGPS, // H GPS
+    STANDARD,
   },
 
   // e_Thermal_30s
@@ -103,6 +105,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermal30s>::Create,
     e_TL_Avg, // TL Avg
     e_VerticalSpeed_Netto, // Netto
+    STANDARD,
   },
 
   // e_Bearing
@@ -113,6 +116,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBearing>::Create,
     e_Speed_GPS, // V GND
     e_Horizon,
+    DEPRECATED,
   },
 
   // e_GR_Instantaneous
@@ -123,6 +127,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentGRInstant>::Create,
     e_GR_Cruise, // GR Cruise
     e_GR_Avg, // GR Avg
+    STANDARD,
   },
 
   // e_GR_Cruise
@@ -133,6 +138,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentGRCruise>::Create,
     e_Fin_GR_TE, // Final LD
     e_GR_Instantaneous, // LD Inst
+    STANDARD,
   },
 
   // e_Speed_GPS
@@ -143,6 +149,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeedGround>::Create,
     e_Track_GPS, // Track
     e_Bearing, // Bearing
+    STANDARD,
   },
 
   // e_TL_Avg
@@ -153,6 +160,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalLastAvg>::Create,
     e_TL_Gain, // TL Gain
     e_Thermal_30s, // TC 30s
+    STANDARD,
   },
 
   // e_TL_Gain
@@ -163,6 +171,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalLastGain>::Create,
     e_TL_Time, // TL Time
     e_TL_Avg, // TL Avg
+    STANDARD,
   },
 
   // e_TL_Time
@@ -173,6 +182,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalLastTime>::Create,
     e_Thermal_Avg, // TC Avg
     e_TL_Gain, // TL Gain
+    STANDARD,
   },
 
   // e_MacCready
@@ -183,6 +193,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentMacCready>::Create,
     e_WP_Speed_MC, // V MC
     NextLegEqThermal,
+    STANDARD,
   },
 
   // e_WP_Distance
@@ -193,6 +204,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextDistance>::Create,
     e_WP_AltDiff, // WP AltD
     e_TaskProgress, // Progress
+    DEPRECATED,
   },
 
   // e_WP_AltDiff
@@ -203,6 +215,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextAltitudeDiff>::Create,
     e_WP_MC0AltDiff, // WP MC0 AltD
     e_WP_Distance, // WP Dist
+    DEPRECATED,
   },
 
   // e_WP_AltReq
@@ -213,6 +226,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextAltitudeRequire>::Create,
     e_Fin_AltDiff, // Fin AltD
     e_WP_AltDiff, // WP AltD
+    DEPRECATED,
   },
 
   // e_WP_Name
@@ -223,6 +237,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextWaypoint>::Create,
     e_TimeSinceTakeoff, // Time flt
     e_TaskMaxHeightTime, // Start height
+    DEPRECATED,
   },
 
   // e_Fin_AltDiff
@@ -233,6 +248,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalAltitudeDiff>::Create,
     e_Fin_AltReq, // Fin AltR
     e_WP_AltReq, // WP AltR
+    DEPRECATED,
   },
 
   // e_Fin_AltReq
@@ -243,6 +259,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalAltitudeRequire>::Create,
     e_SpeedTaskAvg, // V Task Av
     e_Fin_AltDiff, // Fin AltD
+    DEPRECATED,
   },
 
   // e_SpeedTaskAvg
@@ -253,6 +270,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskSpeed>::Create,
     e_CC_SpeedInst, // V Task Inst
     e_Fin_AltReq, // Fin AltR
+    STANDARD,
   },
 
   // e_Fin_Distance
@@ -263,6 +281,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalDistance>::Create,
     e_AA_Time, // AA Time
     e_CC_Speed, // V Task Ach
+    STANDARD,
   },
 
   // e_Fin_GR_TE
@@ -273,6 +292,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalGRTE>::Create,
     e_Fin_GR, // Final GR
     e_GR_Cruise, // GR Cruise
+    DEPRECATED,
   },
 
   // e_H_Terrain
@@ -283,6 +303,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTerrainHeight>::Create,
     e_H_Baro, // H Baro
     e_HeightAGL, // H AGL
+    STANDARD,
   },
 
   // e_Thermal_Avg
@@ -293,6 +314,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalAvg>::Create,
     e_Thermal_Gain, // TC Gain
     e_TL_Time, // TL Time
+    STANDARD,
   },
 
   // e_Thermal_Gain
@@ -303,6 +325,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalGain>::Create,
     e_Climb_Avg, // TC All
     e_Thermal_Avg, // TC Avg
+    STANDARD,
   },
 
   // e_Track_GPS
@@ -313,6 +336,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTrack>::Create,
     e_AirSpeed_Ext, // V IAS
     e_Speed_GPS, // V GND
+    STANDARD,
   },
 
   // e_VerticalSpeed_GPS
@@ -323,6 +347,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVario>::Create,
     e_VerticalSpeed_Netto, // Netto
     e_Climb_Avg, // TC All
+    DEPRECATED,
   },
 
   // e_WindSpeed_Est
@@ -333,6 +358,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentWindSpeed>::Create,
     e_WindBearing_Est, // Wind B
     e_Home_Temperature, // Max Temp
+    STANDARD,
   },
 
   // e_WindBearing_Est
@@ -343,6 +369,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentWindBearing>::Create,
     HeadWindSimplified,
     e_WindSpeed_Est, // Wind V
+    STANDARD,
   },
 
   // e_AA_Time
@@ -353,6 +380,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAATime>::Create,
     e_AA_TimeDiff, // AA dTime
     e_Fin_Distance, // Fin Dis
+    STANDARD,
   },
 
   // e_AA_DistanceMax
@@ -363,6 +391,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAADistanceMax>::Create,
     e_AA_DistanceMin, // AA Dmin
     e_AA_TimeDiff, // AA dTime
+    DEPRECATED,
   },
 
   // e_AA_DistanceMin
@@ -373,6 +402,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAADistanceMin>::Create,
     e_AA_SpeedMax, // AA Vmax
     e_AA_DistanceMax, // AA Dmax
+    DEPRECATED,
   },
 
   // e_AA_SpeedMax
@@ -383,6 +413,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAASpeedMax>::Create,
     e_AA_SpeedMin, // AA Vmin
     e_AA_DistanceMin, // AA Dmin
+    DEPRECATED,
   },
 
   // e_AA_SpeedMin
@@ -393,6 +424,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAASpeedMin>::Create,
     e_Fin_AA_Distance, // AA Dtgt
     e_AA_SpeedMax, // AA Vmax
+    DEPRECATED,
   },
 
   // e_AirSpeed_Ext
@@ -403,6 +435,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeedIndicated>::Create,
     e_Load_G, // G load
     e_Track_GPS, // Track
+    DEPRECATED,
   },
 
   // e_H_Baro
@@ -413,6 +446,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeBaro>::Create,
     e_H_QFE, // QFE GPS
     e_H_Terrain, // H GND
+    STANDARD,
   },
 
   // e_WP_Speed_MC
@@ -423,6 +457,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeedMacCready>::Create,
     e_Climb_Perc, // % Climb
     e_MacCready, // MC
+    DEPRECATED,
   },
 
   // e_Climb_Perc
@@ -433,6 +468,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalRatio>::Create,
     e_Act_Speed, // V Opt
     e_WP_Speed_MC, // V MC
+    STANDARD,
   },
 
   // e_TimeSinceTakeoff
@@ -443,6 +479,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTimeFlight>::Create,
     e_TimeLocal, // Time local
     e_WP_Name, // Next
+    STANDARD,
   },
 
   // e_Load_G
@@ -453,6 +490,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentGLoad>::Create,
     e_WP_BearingDiff, // Bearing D
     e_AirSpeed_Ext, // Track
+    DEPRECATED,
   },
 
   // e_WP_GR
@@ -463,6 +501,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextGR>::Create,
     e_LD, // LD Vario
     e_Fin_GR, // Final GR
+    DEPRECATED,
   },
 
   // e_TimeLocal
@@ -473,6 +512,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTimeLocal>::Create,
     e_TimeUTC, // Time UTC
     e_TimeSinceTakeoff, // Time flt
+    STANDARD,
   },
 
   // e_TimeUTC
@@ -483,6 +523,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTimeUTC>::Create,
     e_Fin_Time, // Fin ETE
     e_TimeLocal, // Time local
+    DEPRECATED,
   },
 
   // e_Fin_Time
@@ -493,6 +534,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalETE>::Create,
     e_Fin_ETE_VMG,
     e_TimeUTC, // Time UTC
+    DEPRECATED,
   },
 
   // e_WP_Time
@@ -502,7 +544,8 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     N_("Estimated time required to reach next waypoint, assuming performance of ideal MacCready cruise/climb cycle."),
     IBFHelper<InfoBoxContentNextETE>::Create,
     e_WP_ETE_VMG,
-    e_Fin_ETE_VMG
+    e_Fin_ETE_VMG,
+    STANDARD,
   },
 
   // e_Act_Speed
@@ -512,7 +555,8 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     N_("The instantaneous MacCready speed-to-fly, making use of netto vario calculations to determine dolphin cruise speed in the glider's current bearing. In cruise flight mode, this speed-to-fly is calculated for maintaining altitude. In final glide mode, this speed-to-fly is calculated for descent. In climb mode, this switches to the speed for minimum sink at the current load factor (if an accelerometer is connected). When Block mode speed to fly is selected, this InfoBox displays the MacCready speed."),
     IBFHelper<InfoBoxContentSpeedDolphin>::Create,
     NextLegEqThermal,
-    e_Climb_Perc // % Climb
+    e_Climb_Perc, // % Climb
+    STANDARD,
   },
 
   // e_VerticalSpeed_Netto
@@ -523,6 +567,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVarioNetto>::Create,
     e_Vario_spark, // Vario trace
     e_VerticalSpeed_GPS, // Vario
+    STANDARD,
   },
 
   // e_Fin_TimeLocal
@@ -533,6 +578,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalETA>::Create,
     e_WP_TimeLocal, // WP ETA
     e_WP_ETE_VMG,
+    STANDARD,
   },
 
   // e_WP_TimeLocal
@@ -543,6 +589,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextETA>::Create,
     e_RH_Trend, // RH Trend
     e_Fin_TimeLocal, // Fin ETA
+    STANDARD,
   },
 
   // e_WP_BearingDiff
@@ -553,6 +600,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBearingDiff>::Create,
     e_Speed, // V TAS
     e_Load_G, // G load
+    DEPRECATED,
   },
 
   // e_Temperature
@@ -563,6 +611,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTemperature>::Create,
     e_HumidityRel, // RelHum
     e_HeadWind,
+    STANDARD,
   },
 
   // e_HumidityRel
@@ -573,6 +622,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHumidity>::Create,
     e_Home_Temperature, // MaxTemp
     e_Temperature, // OAT
+    DEPRECATED,
   },
 
   // e_Home_Temperature
@@ -583,6 +633,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTemperatureForecast>::Create,
     e_WindSpeed_Est, // Wind V
     e_HumidityRel, // RelHum
+    DEPRECATED,
   },
 
   // e_Fin_AA_Distance
@@ -593,6 +644,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAADistance>::Create,
     e_AA_SpeedAvg, // AA Vtgt
     e_AA_SpeedMin, // AA Vmin
+    STANDARD,
   },
 
   // e_AA_SpeedAvg
@@ -603,6 +655,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAASpeed>::Create,
     e_Home_Distance, // Home Dis
     e_Fin_AA_Distance, // AA Dtgt
+    DEPRECATED,
   },
 
   // e_LD
@@ -613,6 +666,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentLDVario>::Create,
     e_GR_Avg, // GR Avg
     e_WP_GR, // Next LD
+    DEPRECATED,
   },
 
   // e_Speed
@@ -623,6 +677,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeed>::Create,
     e_Horizon,
     e_WP_BearingDiff, // Bearing Diff
+    DEPRECATED,
   },
 
   // e_Team_Code
@@ -633,6 +688,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamCode>::Create,
     e_Team_Bearing, // Team Bearing
     e_Team_Range, // Team Range
+    DEPRECATED,
   },
 
   // e_Team_Bearing
@@ -643,6 +699,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamBearing>::Create,
     e_Team_BearingDiff, // Team Bearing Diff
     e_Team_Code, // Team Code
+    DEPRECATED,
   },
 
   // e_Team_BearingDiff
@@ -653,6 +710,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamBearingDiff>::Create,
     e_Team_Range, // Team Range
     e_Team_Bearing, // Team Bearing
+    DEPRECATED,
   },
 
   // e_Team_Range
@@ -663,6 +721,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamDistance>::Create,
     e_Team_Code, // Team Code
     e_Team_BearingDiff, // Team Bearing Diff
+    DEPRECATED,
   },
 
   // e_CC_SpeedInst
@@ -673,6 +732,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskSpeedInstant>::Create,
     e_CC_Speed, // V Task Ach
     e_SpeedTaskAvg, // V Task Av
+    DEPRECATED,
   },
 
   // e_Home_Distance
@@ -683,6 +743,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHomeDistance>::Create,
     e_OC_Distance, // OLC
     e_AA_SpeedAvg, // AA Vtgt
+    STANDARD,
   },
 
   // e_CC_Speed
@@ -693,6 +754,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskSpeedAchieved>::Create,
     e_Fin_Distance, // Fin Dis
     e_CC_SpeedInst, // V Task Inst
+    STANDARD,
   },
 
   // e_AA_TimeDiff
@@ -703,6 +765,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAATimeDelta>::Create,
     e_AA_DistanceMax, // AA Dmax
     e_AA_Time, // AA Time
+    STANDARD,
   },
 
   // e_Climb_Avg
@@ -713,6 +776,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalAllAvg>::Create,
     e_VerticalSpeed_GPS, // Vario
     e_Thermal_Gain, // TC Gain
+    STANDARD,
   },
 
   // e_RH_Trend
@@ -723,6 +787,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVarioDistance>::Create,
     e_TaskMaxHeightTime, // Start height
     e_WP_TimeLocal, // WP ETA
+    DEPRECATED,
   },
 
   // e_Battery
@@ -737,6 +802,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBattery>::Create,
     e_CPU_Load, // CPU
     e_CPU_Load, // CPU
+    STANDARD,
   },
 
   // e_Fin_GR
@@ -747,6 +813,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalGR>::Create,
     e_WP_GR, // Next LD
     e_Fin_GR_TE, // Fin LD
+    DEPRECATED,
   },
 
   // e_Alternate_1_Name
@@ -757,6 +824,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelperInt<InfoBoxContentAlternateName, 0>::Create,
     e_Alternate_2_Name, // Altern2 name
     e_Alternate_1_GR, // Altern1 GR
+    STANDARD,
   },
 
   // e_Alternate_2_Name
@@ -767,6 +835,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelperInt<InfoBoxContentAlternateName, 1>::Create,
     e_Alternate_1_GR, // Altern1 GR
     e_Alternate_1_Name, // Altern1 name
+    STANDARD,
   },
 
   // e_Alternate_1_GR
@@ -777,6 +846,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
     e_Alternate_1_Name, // Altern1 name
     e_Alternate_2_Name, // Altern2 name
+    STANDARD,
   },
 
   // e_H_QFE
@@ -787,6 +857,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeQFE>::Create,
     e_FlightLevel, // Flight Level
     e_H_Baro, // H Baro
+    DEPRECATED,
   },
 
   // e_GR_Avg
@@ -797,6 +868,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentGRAvg>::Create,
     e_GR_Instantaneous, // LD Inst
     e_LD, // LD Vario
+    DEPRECATED,
   },
 
   // e_Experimental
@@ -807,6 +879,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentExperimental1>::Create,
     e_Experimental2, // Exp2
     e_Experimental2, // Exp2
+    DEPRECATED,
   },
 
   // e_OC_Distance
@@ -817,6 +890,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentOLC>::Create,
     e_TaskProgress, // Progress
     e_Home_Distance, // Home Dis
+    STANDARD,
   },
 
   // e_Experimental2
@@ -827,6 +901,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentExperimental2>::Create,
     e_Experimental1, // Exp1
     e_Experimental1, // Exp1
+    DEPRECATED,
   },
 
   // e_CPU_Load
@@ -837,6 +912,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentCPULoad>::Create,
     e_Battery, // Battery
     e_Battery, // Battery
+    DEPRECATED,
   },
 
   // e_WP_H
@@ -847,6 +923,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextAltitudeArrival>::Create,
     e_WP_AltReq, // WP AltR
     e_WP_AltDiff, // WP AltD
+    DEPRECATED,
   },
 
   // e_Free_RAM
@@ -857,6 +934,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFreeRAM>::Create,
     e_CPU_Load, // CPU Load
     e_CPU_Load, // CPU Load
+    DEPRECATED,
   },
 
   // e_FlightLevel
@@ -867,6 +945,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFlightLevel>::Create,
     e_Barogram, // Barogram
     e_H_QFE, // QFE GPS
+    DEPRECATED,
   },
 
   // e_Barogram
@@ -877,6 +956,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBarogram>::Create,
     e_HeightGPS, // H GPS
     e_FlightLevel, // Flight level
+    DEPRECATED,
   },
 
   // e_Vario_spark
@@ -887,6 +967,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVarioSpark>::Create,
     e_NettoVario_spark, // Netto trace
     e_VerticalSpeed_Netto, // Netto
+    DEPRECATED,
   },
 
   // e_NettoVario_spark
@@ -897,6 +978,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNettoVarioSpark>::Create,
     e_CirclingAverage_spark, // TC trace
     e_Vario_spark, // Vario trace
+    DEPRECATED,
   },
   
   // e_CirclingAverage_spark
@@ -907,6 +989,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentCirclingAverageSpark>::Create,
     e_ThermalBand, // Climb band
     e_NettoVario_spark, // Netto trace
+    DEPRECATED,
   },
 
   // e_ThermalBand
@@ -917,6 +1000,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalBand>::Create,
     e_Thermal_30s, // TC 30s
     e_CirclingAverage_spark, // TC trace
+    DEPRECATED,
   },
 
   // e_TaskProgress
@@ -927,6 +1011,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskProgress>::Create,
     e_WP_Distance, // WP Dist
     e_OC_Distance, // OLC
+    DEPRECATED,
   },
 
   // e_TaskMaxHeightTime
@@ -937,6 +1022,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskTimeUnderMaxHeight>::Create,
     e_WP_Name, // Next WP
     e_RH_Trend, // RH Trend
+    STANDARD,
   },
 
   // e_Fin_ETE_VMG
@@ -947,6 +1033,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalETEVMG>::Create,
     e_WP_Time, // WP ETE
     e_Fin_Time,
+    STANDARD,
   },
 
   // e_WP_ETE_VMG
@@ -957,6 +1044,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextETEVMG>::Create,
     e_Fin_TimeLocal, // Fin ETA
     e_WP_Time,
+    STANDARD,
   },
 
   // e_Horizon
@@ -967,6 +1055,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHorizon>::Create,
     e_Bearing,
     e_Speed,
+    DEPRECATED,
   },
 
   // e_NearestAirspaceHorizontal
@@ -977,6 +1066,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNearestAirspaceHorizontal>::Create,
     e_NearestAirspaceVertical,
     TerrainCollision,
+    DEPRECATED,
   },
 
   // e_NearestAirspaceVertical
@@ -987,6 +1077,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNearestAirspaceVertical>::Create,
     TerrainCollision,
     e_NearestAirspaceHorizontal,
+    DEPRECATED,
   },
 
   // e_WP_MC0AltDiff
@@ -997,6 +1088,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextMC0AltitudeDiff>::Create,
     e_WP_H, // WP AltA
     e_WP_AltDiff, // WP AltD
+    DEPRECATED,
   },
 
   // e_HeadWind
@@ -1007,6 +1099,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHeadWind>::Create,
     e_Temperature, // OAT
     HeadWindSimplified,
+    STANDARD,
   },
 
   // TerrainCollision
@@ -1017,6 +1110,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTerrainCollision>::Create,
     e_NearestAirspaceHorizontal,
     e_NearestAirspaceVertical,
+    DEPRECATED,
   },
 
   {
@@ -1026,6 +1120,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeNav>::Create,
     NavAltitude,
     NavAltitude,
+    DEPRECATED,
   },
 
   // NextLegEqThermal
@@ -1036,6 +1131,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextLegEqThermal>::Create,
     e_MacCready, // MC
     e_Act_Speed, // V Opt
+    DEPRECATED,
   },
 
   // HeadWindSimplified
@@ -1046,6 +1142,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHeadWindSimplified>::Create,
     e_HeadWind, // OAT
     e_WindBearing_Est,
+    DEPRECATED,
   },
 
   {
@@ -1057,6 +1154,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentCruiseEfficiency>::Create,
     CruiseEfficiency,
     CruiseEfficiency,
+    DEPRECATED,
   },
 
   {
@@ -1066,6 +1164,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentWindArrow>::Create,
     WIND_ARROW,
     WIND_ARROW,
+    DEPRECATED,
   },
 
 };

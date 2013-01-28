@@ -145,12 +145,28 @@ namespace InfoBoxFactory
     e_NUM_TYPES /* Last item */
   };
 
+  /**
+   * category for each InfoBox
+   */
+  enum Category {
+    /**
+     * valid type
+     */
+    STANDARD,
+
+    /**
+     * deprecated type
+     */
+    DEPRECATED,
+  };
+
   struct MetaData {
     const TCHAR *name;
     const TCHAR *caption;
     const TCHAR *description;
     InfoBoxContent *(*Create)();
     Type next, previous;
+    Category category;
   };
 
   static constexpr Type NUM_TYPES = e_NUM_TYPES;
@@ -208,6 +224,14 @@ namespace InfoBoxFactory
     assert(type < NUM_TYPES);
 
     return meta_data[type].previous;
+  }
+
+  static inline Category
+  GetCategory(Type type)
+  {
+    assert(type < NUM_TYPES);
+
+    return meta_data[type].category;
   }
 
   bool
