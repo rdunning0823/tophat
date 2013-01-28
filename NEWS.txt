@@ -11,3 +11,4 @@ Top Hat 0.1.1 is based on XCSoar 6.4.4.
 * Added "one stop shopping" for all navigation needs with a clickable/slidable 
   task bar at top of screen that shows destination information
 * Add menu button and zoom buttons to the main screen
+* Simplified InfoBox selection by removing redundant items
