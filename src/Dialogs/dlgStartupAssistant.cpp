@@ -49,6 +49,7 @@ const TCHAR* tips [] = {
     N_("Click the Nav Bar at the top to show the navigation menu."),
     N_("Slide the Nav Bar to the left or right to advance the task turnpoint."),
     N_("Click the 'M' button to show the Main menu.  Try clicking it again."),
+    N_("To cancel a menu, click anywhere on the screen in the background to hide it."),
     N_("While flying, you should be able to do anything from either the Nav Bar or the primary 'M' menu."),
     N_("After you've entered a task cylinder, the Nav Bar shows a checkmark by the turnpoint name."),
     N_("Add your glider's polar with the 'Plane' menu option."),
