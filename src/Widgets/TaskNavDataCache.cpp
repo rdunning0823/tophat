@@ -83,6 +83,17 @@ TaskNavDataCache::UpdateTransitions(const OrderedTask &ordered_task)
   transition_time_stamp = NowStamp();
 }
 
+void
+TaskNavDataCache::UpdateTargets(const OrderedTask &ordered_task)
+{
+  assert(ordered_task_size == ordered_task.TaskSize());
+
+  for (unsigned i = 0; i < ordered_task_size; i++) {
+    const OrderedTaskPoint &tp = ordered_task.GetTaskPoint(i);
+    tps[i].target = &tp.GetLocationRemaining();
+  }
+}
+
 TaskNavDataCache::tp_info &
 TaskNavDataCache::GetPoint(unsigned i)
 {
@@ -114,8 +125,8 @@ TaskNavDataCache::CalcActivePoint()
     return active_tp;
 
   assert(active_tp.waypoint != nullptr);
+  assert(active_tp.target == nullptr);
   return CalcPoint(active_tp, *active_tp.waypoint);
-
 }
 
 void
@@ -123,6 +134,7 @@ TaskNavDataCache::SetTaskPoint(const OrderedTask &ordered_task, unsigned idx)
 {
   const OrderedTaskPoint &tp = ordered_task.GetTaskPoint(idx);
   tps[idx].waypoint = &tp.GetWaypoint();
+  tps[idx].target = &tp.GetLocationRemaining();
 }
 
 TaskNavDataCache::tp_info &
@@ -134,7 +146,34 @@ TaskNavDataCache::CalcTaskPoint(unsigned idx)
     return tps[idx];
   }
 
+  CalcTarget(tps[idx]);
   return CalcPoint(tps[idx], *tps[idx].waypoint);
+}
+
+TaskNavDataCache::tp_info &
+TaskNavDataCache::ValidateTarget(TaskNavDataCache::tp_info &tp_data,
+                                 bool valid)
+{
+  tp_data.delta_bearing_remaining_valid = valid;
+  tp_data.distance_remaining_valid = valid;
+
+  return tp_data;
+}
+
+TaskNavDataCache::tp_info &
+TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data)
+{
+  assert(tp_data.target != nullptr);
+  // New dist & bearing
+  if (basic.location_available) {
+    const GeoVector vector = basic.location.DistanceBearing(*tp_data.target);
+
+    tp_data.distance_remaining = vector.distance;
+    tp_data.delta_bearing_remaining = vector.bearing - basic.track;
+  }
+  ValidateTarget(tp_data, basic.location_available);
+
+  return tp_data;
 }
 
 TaskNavDataCache::tp_info &
@@ -169,7 +208,7 @@ TaskNavDataCache::CalcPoint(TaskNavDataCache::tp_info &tp_data,
     tp_data.altitude_difference_valid = true;
   }
 
-  // New dest & bearing
+  // New dist & bearing
   if (basic.location_available) {
     const GeoVector vector = basic.location.DistanceBearing(wp.location);
 

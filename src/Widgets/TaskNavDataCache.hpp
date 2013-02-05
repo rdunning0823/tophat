@@ -57,6 +57,13 @@ public:
      */
     const Waypoint* waypoint;
 
+    /**
+     * the location of the target if available
+     * if nullptr, then no target is available, else target is available
+     * and used for distance_remaining and delta_bearing_remaining calculations
+     */
+    const GeoPoint* target;
+
     fixed distance;
     /**
      * true if distance was computable
@@ -73,6 +80,18 @@ public:
      */
     bool altitude_difference_valid;
 
+    /**
+     * distance to target
+     */
+    fixed distance_remaining;
+    bool distance_remaining_valid;
+
+    /**
+     *  bearing to the target
+     */
+    Angle delta_bearing_remaining;
+    bool delta_bearing_remaining_valid;
+
     /*
      * For ordered, true if the ScoredTaskPoint has been entered
      * For non-ordered, undefined.
@@ -85,7 +104,7 @@ public:
      */
     bool has_exited;
 
-    tp_info() : timestamp(0), waypoint(nullptr) {};
+    tp_info() : timestamp(0), waypoint(nullptr), target(nullptr) {};
 
     bool IsValid() {
       return timestamp > 0u;
@@ -217,9 +236,14 @@ public:
   void UpdateTransitions(const OrderedTask &ordered_task);
 
   /**
-   * returns true if the transitions are current (with delay)
+   * updates the target positions of the ordered task points
    */
-  bool AreTransistionsCurrent() {
+  void UpdateTargets(const OrderedTask &ordered_task);
+
+  /**
+   * returns true if the transitions and targets are current (with delay)
+   */
+  bool AreTransistionsAndTargetsCurrent() {
     return NowStamp() < transition_time_stamp + 2000;
   }
 
@@ -241,6 +265,18 @@ public:
    */
   tp_info &CalcPoint(TaskNavDataCache::tp_info &tp_data,
                        const Waypoint &wp);
+
+  /**
+   * calculates the target bearing and distance for ordered tasks
+   * using "distance remaining"
+   */
+  tp_info &CalcTarget(tp_info &tp_data);
+
+  /**
+   * validates or invalidates the target-specific information
+   * @param valid
+   */
+  tp_info &ValidateTarget(tp_info &tp_data, bool valid);
 
   unsigned NowStamp();
 };

@@ -90,9 +90,10 @@ TaskNavSliderWidget::RefreshTask()
 
   // only update if it's been changed
   if (TaskIsCurrent()) {
-    if (!task_data_cache.AreTransistionsCurrent()) {
+    if (!task_data_cache.AreTransistionsAndTargetsCurrent()) {
       ProtectedTaskManager::Lease task_manager(*protected_task_manager);
       task_data_cache.UpdateTransitions(task_manager->GetOrderedTask());
+      task_data_cache.UpdateTargets(task_manager->GetOrderedTask());
     }
 
     ReadWaypointIndex();
