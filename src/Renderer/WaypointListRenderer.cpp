@@ -70,7 +70,7 @@ UPixelScalar
 WaypointListRenderer::GetHeight(const DialogLook &look)
 {
   return look.list.font->GetHeight() + Layout::Scale(6)
-    + look.small_font->GetHeight();
+    + look.text_font->GetHeight();
 }
 
 void
@@ -104,13 +104,13 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const PixelScalar line_height = rc.bottom - rc.top;
 
   const Font &name_font = *dialog_look.list.font;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   // Y-Coordinate of the second row
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
 
   // Use small font for details
-  canvas.Select(small_font);
+  canvas.Select(text_font);
 
   // Draw distance and arrival altitude
   StaticString<256> buffer;
@@ -155,7 +155,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const PixelScalar line_height = rc.bottom - rc.top;
 
   const Font &name_font = *dialog_look.list.font;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   Buffer buffer;
 
@@ -163,7 +163,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
 
   // Use small font for details
-  canvas.Select(small_font);
+  canvas.Select(text_font);
 
   // Draw leg distance
   UPixelScalar leg_info_width = 0;
@@ -172,7 +172,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer.c_str());
     canvas.text(rc.right - Layout::FastScale(2) - width,
                 rc.top + Layout::FastScale(2) +
-                (name_font.GetHeight() - small_font.GetHeight()) / 2,
+                (name_font.GetHeight() - text_font.GetHeight()) / 2,
                 buffer.c_str());
 
     // Draw leg bearing
