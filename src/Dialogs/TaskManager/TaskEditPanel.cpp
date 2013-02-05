@@ -135,7 +135,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   TCHAR buffer[120];
 
   const Font &name_font = *wf.GetLook().list.font;
-  const Font &small_font = *wf.GetLook().small_font;
+  const Font &text_font = *wf.GetLook().text_font;
 
   // Draw "Add turnpoint" label
   if (DrawListIndex == ordered_task->TaskSize()) {
@@ -169,7 +169,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
 
   // Use small font for details
-  canvas.Select(small_font);
+  canvas.Select(text_font);
 
   UPixelScalar leg_info_width = 0;
   if (show_leg_info) {
@@ -178,7 +178,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer);
     canvas.text(rc.right - Layout::FastScale(2) - width,
                 rc.top + Layout::FastScale(2) +
-                (name_font.GetHeight() - small_font.GetHeight()) / 2, buffer);
+                (name_font.GetHeight() - text_font.GetHeight()) / 2, buffer);
 
     // Draw leg bearing
     FormatBearing(buffer, ARRAY_SIZE(buffer), leg.bearing);
@@ -398,7 +398,7 @@ TaskEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   assert(wSummary);
 
   UPixelScalar line_height = wf.GetLook().list.font->GetHeight()
-    + Layout::Scale(6) + wf.GetLook().small_font->GetHeight();
+    + Layout::Scale(6) + wf.GetLook().text_font->GetHeight();
   wTaskPoints->SetItemHeight(line_height);
   wTaskPoints->SetHandler(this);
 }
