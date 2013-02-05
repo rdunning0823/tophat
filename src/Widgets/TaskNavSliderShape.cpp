@@ -86,7 +86,7 @@ SliderShape::Resize(UPixelScalar map_width)
   const UPixelScalar small_font_height = GetSmallFont().GetHeight();
 
   const UPixelScalar total_height = large_font_height + 2 * small_font_height
-      - Layout::Scale(9);
+      - Layout::Scale(3);
   const UPixelScalar arrow_point_bluntness = Layout::Scale(4);
 
 
