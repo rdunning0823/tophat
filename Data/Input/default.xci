@@ -344,9 +344,9 @@ location=22
 mode=NavOrdered
 type=key
 data=0
-event=Setup Alternates
+event=GotoLookup
 event=Mode default
-label=Alternates$(CheckWaypointFile)
+label=Goto
 location=23
 
 mode=NavOrdered
@@ -389,9 +389,9 @@ location=22
 mode=NavGoto
 type=key
 data=0
-event=Setup Alternates
+event=GotoLookup
 event=Mode default
-label=Alternates$(CheckWaypointFile)
+label=Goto
 location=23
 
 mode=NavGoto
