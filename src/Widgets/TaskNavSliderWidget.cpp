@@ -198,6 +198,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   StaticString<120> buffer;
   const Font &name_font = slider_shape.GetLargeFont();
   const Font &small_font = slider_shape.GetSmallFont();
+  const Font &medium_font = slider_shape.GetMediumFont();
   UPixelScalar width;
   PixelRect rc = rc_outer;
   rc.left += slider_shape.GetHintWidth();
@@ -223,7 +224,6 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
   canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
     selected, true, false)));
-//  canvas.SelectHollowBrush(); //transparent background
   slider_shape.Draw(canvas, rc_outer);
 #ifdef _WIN32
     TaskNavSliderWidget::PaintBackground(canvas, idx, dialog_look, rc_outer);
@@ -280,6 +280,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
     FormatUserDistanceSmart(tp.distance, buffer.buffer(), true);
     width = canvas.CalcTextWidth(buffer.c_str());
+    canvas.Select(medium_font);
     canvas.text(rc.right - Layout::FastScale(2) - width,
                 line_three_y_offset, buffer.c_str());
   }
@@ -309,6 +310,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     break;
   }
   width = canvas.CalcTextWidth(buffer.c_str());
+  canvas.Select(small_font);
   canvas.text(rc.left + Layout::FastScale(2),
               line_one_y_offset, buffer.c_str());
 
@@ -318,6 +320,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
     FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE, tp.delta_bearing);
     width = canvas.CalcTextWidth(buffer.c_str());
+    canvas.Select(small_font);
     canvas.text(rc.right - Layout::FastScale(2) - width,
                 line_one_y_offset, buffer.c_str());
   }

@@ -87,6 +87,11 @@ public:
   const Font &GetSmallFont();
 
   /**
+   * the font used to display the Distance about the turnpoint
+   */
+  const Font &GetMediumFont();
+
+  /**
    * the y position of line one text for painting
    */
   void SetLine1Y(UPixelScalar y) {
