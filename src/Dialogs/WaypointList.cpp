@@ -465,7 +465,8 @@ static constexpr CallBackTableEntry callback_table[] = {
 
 const Waypoint*
 ShowWaypointListDialog(SingleWindow &parent, const GeoPoint &_location,
-                       OrderedTask *_ordered_task, unsigned _ordered_task_index)
+                       OrderedTask *_ordered_task, unsigned _ordered_task_index,
+                       bool goto_button)
 {
   dialog = LoadDialog(callback_table, parent, Layout::landscape ?
       _T("IDR_XML_WAYPOINTSELECT_L") : _T("IDR_XML_WAYPOINTSELECT"));
@@ -482,6 +483,11 @@ ShowWaypointListDialog(SingleWindow &parent, const GeoPoint &_location,
   waypoint_list_control->SetActivateCallback(OnWaypointListEnter);
   waypoint_list_control->SetPaintItemCallback(OnPaintListItem);
   waypoint_list_control->SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
+  if (goto_button) {
+    WndButton *button_select = (WndButton*)dialog->FindByName(_T("cmdSelect"));
+    assert (button_select != nullptr);
+    button_select->SetCaption(_T("Goto"));
+  }
 
   name_button = (WndButton*)dialog->FindByName(_T("cmdFltName"));
   name_button->SetOnLeftNotify(OnFilterNameButtonLeft);

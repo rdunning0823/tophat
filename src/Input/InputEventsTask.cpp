@@ -112,7 +112,8 @@ InputEvents::eventGotoLookup(gcc_unused const TCHAR *misc)
     return;
 
   const Waypoint* wp = ShowWaypointListDialog(UIGlobals::GetMainWindow(),
-                                         basic.location);
+                                              basic.location,
+                                              nullptr, 0, true);
   if (wp != NULL) {
     protected_task_manager->DoGoto(*wp);
     trigger_redraw();
