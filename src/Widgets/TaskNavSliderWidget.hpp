@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Widgets/MapOverlayWidget.hpp"
 #include "Widgets/TaskNavDataCache.hpp"
+#include "Widgets/TaskNavSliderShape.hpp"
 #include "Form/HorizontalList.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
 #include "PeriodClock.hpp"
@@ -45,106 +46,6 @@ class ContainerWindow;
 
 class TaskNavSliderWidget : public MapOverlayWidget, protected HorizontalListControl::Handler {
 protected:
-
-  class SliderShape {
-  private:
-    PixelRect inner_rect;
-
-  protected:
-    RasterPoint points[8];
-
-    const DialogLook &dialog_look;
-    const InfoBoxLook &infobox_look;
-
-    /**
-     * the y positions relative to the top of the slider for each line of text
-     */
-    UPixelScalar text_line_one_y;
-    UPixelScalar text_line_two_y;
-    UPixelScalar text_line_three_y;
-
-  public:
-    SliderShape(const DialogLook &_dialog_look,
-                const InfoBoxLook &_infobox_look)
-    :dialog_look(_dialog_look), infobox_look(_infobox_look) {};
-
-    UPixelScalar GetWidth() const {
-      return points[2].x - points[6].x;
-    }
-
-    UPixelScalar GetHeight() const {
-      return points[4].y - points[0].y + 1;
-    }
-
-    UPixelScalar GetHintWidth() const {
-      return points[2].x - points[4].x;
-    }
-
-    UPixelScalar GetOverScrollWidth() const {
-      return 1 * GetHintWidth();
-    }
-
-    const RasterPoint GetPoint(unsigned i) {
-      assert(i < 8);
-      return points[i];
-    }
-
-    /**
-     * the font used to display the turnpoint name
-     */
-    const Font &GetLargeFont();
-
-    /**
-     * the font used to display the info about the turnpoint
-     */
-    const Font &GetSmallFont();
-
-    /**
-     * the y position of line one text for painting
-     */
-    void SetLine1Y(UPixelScalar y) {
-      text_line_one_y = y;
-    }
-    void SetLine2Y(UPixelScalar y) {
-      text_line_two_y = y;
-    }
-    void SetLine3Y(UPixelScalar y) {
-      text_line_three_y = y;
-    }
-    /**
-     * the y position of line one text for painting
-     */
-    UPixelScalar GetLine1Y() {
-      return text_line_one_y;
-    }
-    UPixelScalar GetLine2Y() {
-      return text_line_two_y;
-    }
-    UPixelScalar GetLine3Y() {
-      return text_line_three_y;
-    }
-    /**
-     * returns large rectangle excluding tips of slider shape
-     */
-    const PixelRect &GetInnerRect() {
-      inner_rect.left = points[0].x;
-      inner_rect.right = points[4].x;
-      inner_rect.top = points[0].y;
-      inner_rect.bottom = points[4].y;
-      return inner_rect;
-    }
-
-    /**
-     * resizes the slider to fit horizontally in the width of the rc
-     * @return height to set ItemHeight() of ListControl
-     */
-    void Resize(UPixelScalar map_width);
-
-    /**
-     * draws the outline of the slider shape
-     */
-    void Draw(Canvas &canvas, const PixelRect &rc);
-  };
 
   SliderShape slider_shape;
   TaskNavDataCache task_data_cache;

@@ -755,6 +755,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Widgets/MainMenuButtonWidget.cpp \
 	$(SRC)/Widgets/MapOverlayButton.cpp \
 	$(SRC)/Widgets/TaskNavSliderWidget.cpp \
+	$(SRC)/Widgets/TaskNavSliderShape.cpp \
 	$(SRC)/Widgets/ZoomOutButtonWidget.cpp \
 	$(SRC)/Widgets/ZoomInButtonWidget.cpp \
 	$(SRC)/Widgets/ZoomButton.cpp \
