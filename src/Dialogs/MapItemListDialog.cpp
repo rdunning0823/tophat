@@ -114,7 +114,7 @@ public:
         ? caption_height : 0u;
 
     PixelScalar item_height = dialog_look.list.font->GetHeight()
-      + Layout::Scale(6) + dialog_look.small_font->GetHeight();
+      + Layout::Scale(6) + dialog_look.text_font->GetHeight();
     assert(item_height > 0);
 
     const PixelRect rc_footer = GetFooterRect();
@@ -267,7 +267,7 @@ void
 MapItemListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   UPixelScalar item_height = dialog_look.list.font->GetHeight()
-    + Layout::Scale(6) + dialog_look.small_font->GetHeight();
+    + Layout::Scale(6) + dialog_look.text_font->GetHeight();
   assert(item_height > 0);
 
   CreateList(parent, dialog_look, rc, item_height);
@@ -359,7 +359,7 @@ ShowMapItemListDialog(SingleWindow &parent,
   SplitMapItemList(list, footer_list, list_list);
 
   UPixelScalar item_height = dialog_look.list.font->GetHeight()
-    + Layout::Scale(6) + dialog_look.small_font->GetHeight();
+    + Layout::Scale(6) + dialog_look.text_font->GetHeight();
   assert(item_height > 0);
   UPixelScalar caption_height = dialog_look.caption.font->GetHeight();
   UPixelScalar portrait_spacer_height = !Layout::landscape
