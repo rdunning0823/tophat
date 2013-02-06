@@ -315,14 +315,26 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   canvas.text(rc.left + Layout::FastScale(2),
               line_one_y_offset, buffer.c_str());
 
-  // bearing delta to turnpoint
+  // bearing delta waypoint for ordered when not start
+  // or for non ordered task
   // TODO make this configurable to show delta or true bearing
-  if (tp.bearing_valid) {
+  bool do_bearing = false;
+  Angle bearing;
+  if (tp.bearing_valid && task_data_cache.GetTaskMode() ==
+      TaskManager::MODE_ORDERED && idx > 0) {
+    do_bearing = true;
+    bearing = tp.delta_bearing;
+  } else if (task_data_cache.GetTaskMode() != TaskManager::MODE_ORDERED &&
+      tp.bearing_valid) {
+    do_bearing = true;
+    bearing = tp.delta_bearing;
+  }
 
-    FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE, tp.delta_bearing);
+  if (do_bearing) {
+    FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE, bearing);
     width = canvas.CalcTextWidth(buffer.c_str());
     canvas.Select(small_font);
-    canvas.text(rc.right - Layout::FastScale(2) - width,
+    canvas.text((rc.left + rc.right - width) / 2,
                 line_one_y_offset, buffer.c_str());
   }
 }
