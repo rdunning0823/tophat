@@ -17,5 +17,7 @@
   <Button Name="cmdSelect" Caption="Select" X="0" Y="-70" Width="65" Height="35" OnClick="OnSelectClicked" />
   <Button Name="cmdClose" Caption="Cancel" X="0" Y="-35" Width="65" Height="35" OnClick="OnCloseClicked" />
 
-  <List Name="frmWaypointList" X="65" Y="0" Width="-1" Height="-1" />
+  <List Name="frmWaypointList" X="65" Y="0" Width="-1" Height="-24" />
+  <Label Name="frmSummaryLabels1" X="65" Width="50" Y="-24" Height="24"/>
+  <Label Name="frmSummaryValues1" X="115" Y="-24" Height="24"/>
 </Form>
