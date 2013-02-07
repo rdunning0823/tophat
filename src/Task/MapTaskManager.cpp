@@ -212,6 +212,21 @@ MapTaskManager::InsertInTask(const Waypoint &waypoint)
   return result;
 }
 
+/**
+ * inserts the waypoint into the Ordered Task
+ * It is up to the caller to decide whether to commit the new task or not.
+ * Task manager must be in Ordered Mode when called
+ * @param task.  Pointer to an ordered Mat task
+ * @param waypoint.  The wp to insert into the task before the active tp
+ */
+MapTaskManager::TaskEditResult
+MapTaskManager::InsertInMatProForma(OrderedTask &task,
+                                    const Waypoint &waypoint)
+{
+  assert(task.CheckTask());
+  return InsertInTask(&task, waypoint);
+}
+
 static MapTaskManager::TaskEditResult
 ReplaceInTask(OrderedTask *task, const Waypoint &waypoint)
 {

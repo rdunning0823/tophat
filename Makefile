@@ -195,6 +195,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/dlgSimulatorPrompt.cpp \
 	$(SRC)/Dialogs/dlgStartup.cpp \
 	$(SRC)/Dialogs/dlgStartupAssistant.cpp \
+	$(SRC)/Dialogs/dlgMatItemClick.cpp \
 	\
 	$(SRC)/Dialogs/dlgStatus.cpp \
 	$(SRC)/Dialogs/StatusPanels/StatusPanel.cpp \
