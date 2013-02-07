@@ -30,7 +30,7 @@ static constexpr TaskFactoryConstraints mat_constraints = {
   false,
   false,
   false,
-  true,
+  false,
   2, 13,
 };
 
