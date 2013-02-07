@@ -491,6 +491,9 @@ TaskValidationError(AbstractTaskFactory::TaskValidationErrorType type)
     return _("non-FAI turn points");
   case AbstractTaskFactory::NON_MAT_OZS:
     return _("non-MAT turn points");
+  case AbstractTaskFactory::REPEATED_TASK_POINT:
+    return _("repeated task point");
+
   }
 
   assert(false);
