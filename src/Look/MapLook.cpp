@@ -48,8 +48,8 @@ MapLook::Initialise(const MapSettings &settings)
 
   terrain_warning_icon.Load(IDB_TERRAINWARNING, IDB_TERRAINWARNING_HD);
 
-  compass_brush.Set(Color(207, 207, 207));
-  compass_pen.Set(Layout::ScalePenWidth(1), COLOR_GRAY);
+  compass_brush.Set(COLOR_GRAY);
+  compass_pen.Set(Layout::ScalePenWidth(1), COLOR_BLACK);
 
   traffic_safe_icon.Load(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, false);
   traffic_warning_icon.Load(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, false);
