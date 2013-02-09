@@ -44,6 +44,9 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Look/Fonts.hpp"
 #include "Util/StaticString.hpp"
+#include "Task/TaskNationalities.hpp"
+#include "Task/TaskBehaviour.hpp"
+#include "Dialogs/Message.hpp"
 
 const TCHAR* tips [] = {
     N_("Click the Nav Bar at the top to show the navigation menu."),
@@ -335,9 +338,39 @@ StartupAssistant::Save(bool &changed)
   return true;
 }
 
+/**
+ * if nationality is set to unknown, it prompts user if he wants to use
+ * US settings
+ */
+static void
+CheckContestNationality()
+{
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  TaskBehaviour &task_behaviour = settings_computer.task;
+
+  if (task_behaviour.contest_nationality == ContestNationalities::UNKNOWN) {
+    int result = ShowMessageBox(_(
+        "Do you want Top Hat to use US task rules for flying tasks?"),
+                                 _("Nationality settings"),
+                                 MB_YESNO | MB_ICONQUESTION);
+    if (result == IDYES)
+      task_behaviour.contest_nationality = ContestNationalities::USA;
+    else if (result == IDNO)
+      task_behaviour.contest_nationality = ContestNationalities::ALL;
+    else
+      task_behaviour.contest_nationality = ContestNationalities::UNKNOWN;
+
+    Profile::Set(ProfileKeys::ContestNationality,
+                 (int)task_behaviour.contest_nationality);
+    Profile::Save();
+  }
+}
+
 void
 dlgStartupAssistantShowModal(bool conditional)
 {
+  CheckContestNationality();
+
   StaticString<32> decline_ver;
   decline_ver = Profile::Get(ProfileKeys::StartupTipDeclineVersion, _T(""));
   if ((decline_ver == TopHat_ProductToken) && conditional)
