@@ -48,6 +48,19 @@ enum Controls {
   TASK_TYPE,
 };
 
+/**
+ * returns true if task is an FAI type
+ * @param ftype. task type being checked
+ */
+static bool
+IsFai(TaskFactoryType ftype)
+{
+  return (ftype == TaskFactoryType::FAI_GENERAL) ||
+      (ftype == TaskFactoryType::FAI_GOAL) ||
+      (ftype == TaskFactoryType::FAI_OR) ||
+      (ftype == TaskFactoryType::FAI_TRIANGLE);
+}
+
 void
 TaskPropertiesPanel::RefreshView()
 {
@@ -82,6 +95,7 @@ TaskPropertiesPanel::RefreshView()
                 (!is_usa || p.finish_min_height_ref == HeightReferenceType::AGL));
   LoadValueEnum(FINISH_HEIGHT_REF, p.finish_min_height_ref);
 
+  SetRowVisible(FAI_FINISH_HEIGHT, IsFai(ftype));
   LoadValue(FAI_FINISH_HEIGHT, p.fai_finish);
 
   LoadValueEnum(TASK_TYPE, ftype);
