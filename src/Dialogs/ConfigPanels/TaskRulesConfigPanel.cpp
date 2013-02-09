@@ -89,7 +89,6 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Contest Nationality"),
           _("If a specific nation is selected, then building a task is simplified to show only appropriate options"),
           contest_nationality, (unsigned)task_behaviour.contest_nationality);
-  SetExpertRow(ContestNationality);
 
   AddSpacer();
   SetExpertRow(spacer_1);
