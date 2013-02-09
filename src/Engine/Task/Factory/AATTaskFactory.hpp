@@ -25,6 +25,7 @@ Copyright_License {
 #define AAT_TASK_FACTORY_HPP
 
 #include "AbstractTaskFactory.hpp"
+#include "Task/TaskNationalities.hpp"
 
 /**
  * Factory for construction of legal AAT tasks
@@ -43,6 +44,11 @@ public:
   AATTaskFactory(OrderedTask& _task,
                  const TaskBehaviour &tb);
 
+  AATTaskFactory(OrderedTask &_task, const TaskBehaviour &_behaviour,
+                 const LegalPointConstArray _start_types,
+                 const LegalPointConstArray _intermediate_types,
+                 const LegalPointConstArray _finish_types);
+
   ~AATTaskFactory() {};
 
   /**
@@ -57,4 +63,24 @@ public:
 };
 
 
+/**
+ * Factory for construction of legal AAT tasks for US Rules
+ */
+class AATTaskFactoryUs: public AATTaskFactory
+{
+public:
+/**
+ * Constructor
+ *
+ * @param _task Ordered task to be managed by this factory
+ * @param tb Behaviour (options)
+ */
+  AATTaskFactoryUs(OrderedTask& _task,
+                   const TaskBehaviour &tb);
+
+  ~AATTaskFactoryUs() {};
+
+  virtual gcc_pure
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+};
 #endif
