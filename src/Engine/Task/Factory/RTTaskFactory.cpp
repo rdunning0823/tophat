@@ -55,12 +55,41 @@ static constexpr LegalPointSet rt_finish_types{
   TaskPointFactoryType::FINISH_SECTOR,
 };
 
+/**
+ * US flavors of the valid point types
+ */
+static constexpr LegalPointSet rt_start_types_us{
+  TaskPointFactoryType::START_LINE,
+  TaskPointFactoryType::START_CYLINDER,
+};
+
+static constexpr LegalPointSet rt_im_types_us{
+  TaskPointFactoryType::AST_CYLINDER,
+};
+
+static constexpr LegalPointSet rt_finish_types_us{
+  TaskPointFactoryType::FINISH_LINE,
+  TaskPointFactoryType::FINISH_CYLINDER,
+};
+
 RTTaskFactory::RTTaskFactory(OrderedTask& _task,
                                const TaskBehaviour &tb)
   :AbstractTaskFactory(rt_constraints, _task, tb,
                        rt_start_types, rt_im_types, rt_finish_types)
 {
 }
+
+RTTaskFactory::RTTaskFactory(OrderedTask &_task, const TaskBehaviour &_behaviour,
+                             const LegalPointSet & _start_types,
+                             const LegalPointSet &_intermediate_types,
+                             const LegalPointSet &_finish_types)
+  :AbstractTaskFactory(rt_constraints, _task, _behaviour,
+                       _start_types,
+                       _intermediate_types,
+                       _finish_types)
+{
+}
+
 
 bool 
 RTTaskFactory::Validate()
@@ -114,3 +143,58 @@ RTTaskFactory::GetMutatedPointType(const OrderedTaskPoint &tp) const
   return newtype;
 }
 
+RTTaskFactoryUs::RTTaskFactoryUs(OrderedTask& _task, const TaskBehaviour &tb)
+  :RTTaskFactory(_task, tb,
+                 rt_start_types_us, rt_im_types_us, rt_finish_types_us)
+{
+}
+
+TaskPointFactoryType
+RTTaskFactoryUs::GetMutatedPointType(const OrderedTaskPoint &tp) const
+{
+  const TaskPointFactoryType oldtype = GetType(tp);
+  TaskPointFactoryType newtype = oldtype;
+
+  switch (oldtype) {
+  case TaskPointFactoryType::START_LINE:
+  case TaskPointFactoryType::START_CYLINDER:
+    break;
+
+  case TaskPointFactoryType::START_SECTOR:
+  case TaskPointFactoryType::START_BGA:
+    newtype = TaskPointFactoryType::START_CYLINDER;
+    break;
+
+  case TaskPointFactoryType::AST_CYLINDER:
+    break;
+
+  case TaskPointFactoryType::KEYHOLE_SECTOR:
+  case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
+  case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
+  case TaskPointFactoryType::FAI_SECTOR:
+  case TaskPointFactoryType::AAT_KEYHOLE:
+  case TaskPointFactoryType::SYMMETRIC_QUADRANT:
+    newtype = TaskPointFactoryType::AST_CYLINDER;
+    break;
+
+  case TaskPointFactoryType::FINISH_CYLINDER:
+  case TaskPointFactoryType::FINISH_LINE:
+    break;
+
+  case TaskPointFactoryType::FINISH_SECTOR:
+    newtype = TaskPointFactoryType::FINISH_CYLINDER;
+    break;
+
+  case TaskPointFactoryType::AAT_SEGMENT:
+  case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
+  case TaskPointFactoryType::MAT_CYLINDER:
+  case TaskPointFactoryType::AAT_CYLINDER:
+    newtype = TaskPointFactoryType::AST_CYLINDER;
+    break;
+
+  case TaskPointFactoryType::COUNT:
+    gcc_unreachable();
+  }
+
+  return newtype;
+}

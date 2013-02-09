@@ -42,6 +42,8 @@ CreateTaskFactory(TaskFactoryType type, OrderedTask &task,
 {
   switch (type) {
   case TaskFactoryType::RACING:
+    if (task_behaviour.contest_nationality == ContestNationalities::USA)
+      return new RTTaskFactoryUs(task, task_behaviour);
     return new RTTaskFactory(task, task_behaviour);
 
   case TaskFactoryType::FAI_GENERAL:
