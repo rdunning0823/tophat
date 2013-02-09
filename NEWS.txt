@@ -1,9 +1,15 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 0.1.1 1/22/2013
+TopHat 0.1.1b Beta 2/8/2012 (based on XCSoar 6.4.4)
+* Added support for Mat tasks, and interaction when clicking on a tp to add it 
+to the task.
+* Removed many Info Boxes
+* Made fonts larger in lists
+* Added Goto to Nav menu
+* Fixed bug where fonts overlapped in Nav Slider
 
-Top Hat 0.1.1 is based on XCSoar 6.4.4.  
+TopHat 0.1.1 1/22/2013 (based on XCSoar 6.4.4)
 * It has removed many features / configurations / menus to create a simpler 
   flying experience.
 * Removed gestures
