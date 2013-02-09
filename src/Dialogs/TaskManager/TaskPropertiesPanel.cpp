@@ -184,6 +184,10 @@ TaskPropertiesPanel::OnModified(DataField &df)
 void
 TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool us_rules = tb.contest_nationality == ContestNationalities::USA;
+
   AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
           0, 36000, 60, 180);
 
@@ -192,9 +196,17 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            _T("%.0f %s"), _T("%.0f"),
            fixed_zero, fixed(300), fixed(5), false, fixed_zero);
 
-  AddFloat(_("Start max. height"),
-           _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"),
+  StaticString<25> label;
+  StaticString<100> help;
+  if (us_rules) {
+    label = _("Start max. height (MSL)");
+    help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
+  }
+  else {
+    label = _("Start max. height");
+    help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
+  }
+  AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed_zero, fixed(10000), fixed(25), false, fixed_zero);
 
   static constexpr StaticEnumChoice start_max_height_ref_list[] = {
@@ -209,9 +221,15 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
             "[AGL] Reference is the height above the start point"),
           start_max_height_ref_list);
 
-  AddFloat(_("Finish min. height"),
-           _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"),
+  if (us_rules) {
+    label = _("Finish min. height (MSL)");
+    help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
+  }
+  else {
+    label = _("Finish min. height");
+    help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
+  }
+  AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed_zero, fixed(10000), fixed(25), false, fixed_zero);
 
   static constexpr StaticEnumChoice finish_min_height_ref_list[] = {
