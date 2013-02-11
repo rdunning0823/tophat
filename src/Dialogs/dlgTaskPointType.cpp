@@ -25,7 +25,6 @@ Copyright_License {
 #include "Dialogs/Waypoint.hpp"
 #include "Dialogs/CallBackTable.hpp"
 #include "Dialogs/XML.hpp"
-#include "Dialogs/Message.hpp"
 #include "Form/Form.hpp"
 #include "Form/List.hpp"
 #include "Form/Frame.hpp"
@@ -114,8 +113,6 @@ SetPointType(TaskPointFactoryType type)
       // no change
       return true;
 
-    if (ShowMessageBox(_("Change point type?"), _("Task Point"),
-                    MB_YESNO | MB_ICONQUESTION) == IDYES)
       apply = true;
   }
 
