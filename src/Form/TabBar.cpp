@@ -56,8 +56,13 @@ TabBarControl::TabBarControl(ContainerWindow &_parent, const DialogLook &look,
   PixelRect rc = GetClientRect();
   if (Layout::landscape ^ flip_orientation)
     rc.left += tab_display->GetTabWidth();
-  else
-    rc.top += tab_display->GetTabHeight();
+  else {
+    if (y +_height == _parent.GetHeight())
+      rc.bottom -= tab_display->GetTabHeight();
+    else
+      rc.top += tab_display->GetTabHeight();
+  }
+
 
   pager.Move(rc);
 }
