@@ -294,6 +294,14 @@ AbstractTaskFactory::GetPointDefaultSizes(const TaskPointFactoryType type,
                                           fixed &finish_radius) const
 {
   TaskBehaviour ob = this->behaviour;
+  if (!positive(ob.sector_defaults.start_radius))
+    ob.sector_defaults.start_radius = fixed(1000);
+
+  if (!positive(ob.sector_defaults.turnpoint_radius))
+    ob.sector_defaults.turnpoint_radius = fixed(1000);
+
+  if (!positive(ob.sector_defaults.finish_radius))
+    ob.sector_defaults.finish_radius = fixed(1000);
 
   if (start_radius < fixed_zero)
     start_radius = ob.sector_defaults.start_radius;
