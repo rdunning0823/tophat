@@ -102,7 +102,7 @@ dlgTaskManager::OnTaskViewClick(WndOwnerDrawFrame *Sender,
   if (!fullscreen) {
     const UPixelScalar xoffset = Layout::landscape ? wTabBar->GetTabWidth() : 0;
     const UPixelScalar yoffset = !Layout::landscape ? wTabBar->GetTabHeight() : 0;
-    Sender->Move(xoffset, yoffset,
+    Sender->Move(xoffset, 0,
                  wf->GetClientAreaWindow().GetWidth() - xoffset,
                  wf->GetClientAreaWindow().GetHeight() - yoffset);
     fullscreen = true;
