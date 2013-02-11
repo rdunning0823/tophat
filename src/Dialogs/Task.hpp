@@ -33,6 +33,13 @@ dlgTaskManagerShowModal(SingleWindow &parent);
 bool
 dlgTaskPointShowModal(SingleWindow &parent, OrderedTask** task, const unsigned index);
 
+/**
+ * shows dlg task point with limitations to US task rules
+ * returns true if task is modified
+ */
+bool
+dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task, const unsigned index);
+
 bool
 dlgTaskPointType(SingleWindow &parent, OrderedTask** task, const unsigned index);
 

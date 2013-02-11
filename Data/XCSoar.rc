@@ -305,6 +305,10 @@ IDR_XML_TASKMANAGER_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskManag
 IDR_XML_TASKMANAGERCLOSE XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskManagerClose.xml.gz"
 IDR_XML_TASKPOINT XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPoint.xml.gz"
 IDR_XML_TASKPOINT_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPoint_L.xml.gz"
+
+IDR_XML_TASKPOINT_US XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointUs.xml.gz"
+IDR_XML_TASKPOINT_US_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointUs_L.xml.gz"
+
 IDR_XML_TASKPOINTTYPE XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointType.xml.gz"
 IDR_XML_TASKPOINTTYPE_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointType_L.xml.gz"
 IDR_XML_TASKOPTIONALSTARTS XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskOptionalStarts.xml.gz"
