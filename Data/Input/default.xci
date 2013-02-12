@@ -1026,7 +1026,7 @@ mode=Menu
 type=key
 data=9
 event=ScreenModes next
-label=Show $(NextPageName)
+label=Switch screens
 location=23
 
 # -------------
