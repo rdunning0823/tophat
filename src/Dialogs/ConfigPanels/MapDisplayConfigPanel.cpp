@@ -35,7 +35,6 @@ enum ControlIndex {
   OrientationCircling,
   CirclingZoom,
   MapShiftBias,
-  GliderScreenPosition,
   MaxAutoZoomDistance,
 };
 
@@ -123,12 +122,6 @@ MapDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           this);
   SetExpertRow(MapShiftBias);
 
-  AddInteger(_("Glider position offset"),
-             _("Defines the location of the glider drawn on the screen in percent from the screen edge."),
-             _T("%d %%"), _T("%d"), 10, 50, 5,
-             settings_map.glider_screen_position);
-  SetExpertRow(GliderScreenPosition);
-
   AddFloat(_("Max. auto zoom distance"),
            _("The upper limit for auto zoom distance."),
            _T("%.0f %s"), _T("%.0f"), fixed(20), fixed(250), fixed(10), false,
@@ -153,9 +146,6 @@ MapDisplayConfigPanel::Save(bool &_changed, bool &require_restart)
 
   changed |= SaveValueEnum(MapShiftBias, ProfileKeys::MapShiftBias,
                            settings_map.map_shift_bias);
-
-  changed |= SaveValue(GliderScreenPosition, ProfileKeys::GliderScreenPosition,
-                       settings_map.glider_screen_position);
 
   changed |= SaveValue(CirclingZoom, ProfileKeys::CircleZoom,
                        settings_map.circle_zoom_enabled);

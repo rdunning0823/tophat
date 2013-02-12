@@ -51,7 +51,8 @@ Profile::Load(MapSettings &settings)
 
   Load(settings.airspace);
 
-  Get(ProfileKeys::GliderScreenPosition, settings.glider_screen_position);
+  // always use the default for this
+  //Get(ProfileKeys::GliderScreenPosition, settings.glider_screen_position);
 
   bool orientation_found = false;
 
