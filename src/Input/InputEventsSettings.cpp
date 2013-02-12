@@ -357,7 +357,12 @@ InputEvents::eventOrientation(const TCHAR *misc)
 {
   MapSettings &settings_map = CommonInterface::SetMapSettings();
 
-  if (StringIsEqual(misc, _T("northup"))) {
+  if (StringIsEqual(misc, _T("northtracktoggle"))) {
+    if (settings_map.cruise_orientation == NORTHUP)
+      settings_map.cruise_orientation = TRACKUP;
+    else
+      settings_map.cruise_orientation = NORTHUP;
+  } else if (StringIsEqual(misc, _T("northup"))) {
     settings_map.cruise_orientation = NORTHUP;
     settings_map.circling_orientation = NORTHUP;
   } else if (StringIsEqual(misc, _T("northcircle"))) {

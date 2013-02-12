@@ -541,6 +541,10 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
                     gettext(labels[(i + 1) % n]), Size);
   }
 
+  CondReplaceInString(GetMapSettings().cruise_orientation == NORTHUP,
+                      OutBuffer, _T("$(OrientationNorthTrackToggle)"),
+                      _("Set track up"), _("Set north up"), Size);
+
   CondReplaceInString(GetComputerSettings().task.auto_mc,
                       OutBuffer, _T("$(MacCreadyToggleActionName)"),
                       _("Manual"), _("Auto"), Size);
