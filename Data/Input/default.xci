@@ -1057,6 +1057,14 @@ event=Status all
 label=Status
 location=21
 
+mode=Menu1
+type=key
+data=6
+event=Mode default
+event=Orientation northtracktoggle
+label=$(OrientationNorthTrackToggle)
+location=22
+
 # -------------
 # mode=Menu2
 # -------------
