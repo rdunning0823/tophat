@@ -26,6 +26,7 @@ Copyright_License {
 #include "Dialogs/MapItemListDialog.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Layout.hpp"
+#include "MapWindow/MapItem.hpp"
 #include "MapWindow/MapItemList.hpp"
 #include "MapWindow/MapItemListBuilder.hpp"
 #include "Computer/GlideComputer.hpp"
@@ -33,6 +34,22 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Weather/Features.hpp"
 #include "Interface.hpp"
+#include "Dialogs/Dialogs.h"
+#include "Task/ProtectedTaskManager.hpp"
+#include "Task/TaskManager.hpp"
+#include "Components.hpp"
+
+
+/**
+ * returns true if current ordered task is a Mat
+ */
+static bool
+IsMat()
+{
+  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+  return task_manager->IsMat() &&
+      task_manager->GetMode() == TaskManager::MODE_ORDERED;
+}
 
 bool
 GlueMapWindow::ShowMapItems(const GeoPoint &location,
@@ -47,6 +64,28 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
   const DerivedInfo &calculated = CommonInterface::Calculated();
 
   fixed range = visible_projection.DistancePixelsToMeters(Layout::GetHitRadius());
+
+  bool continue_after_mat = true;
+  if (IsMat()) {
+    MapItemList list;
+    MapItemListBuilder builder(list, location, range);
+    if (waypoints)
+      builder.AddWaypoints(*waypoints);
+
+    if (list.size() > 0) {
+      auto i = list.begin();
+
+      const MapItem &item = **i;
+      if (item.type == MapItem::WAYPOINT &&
+          ((const WaypointMapItem &)item).waypoint.IsTurnpoint()) {
+        continue_after_mat =
+            dlgMatItemClickShowModal(((const WaypointMapItem &)item).waypoint);
+      }
+    }
+  }
+
+  if (!continue_after_mat)
+    return true;
 
   MapItemList list;
   MapItemListBuilder builder(list, location, range);
