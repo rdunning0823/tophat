@@ -56,6 +56,7 @@ const TCHAR* tips [] = {
     N_("To cancel a menu, click anywhere on the screen in the background to hide it."),
     N_("While flying, you should be able to do anything from either the Nav Bar or the primary 'M' menu."),
     N_("After you've entered a task cylinder, the Nav Bar shows a checkmark by the turnpoint name."),
+    N_("If you are flying a MAT task, just create the start and finish.  Task points will be added as you fly over them."),
     N_("Add your glider's polar with the 'Plane' menu option."),
     N_("Enter the pilot's name for the .IGC file with the 'Setup' menu and select 'Setup Logger.'"),
     N_("Set your safety height margin for arrival with the 'Setup' menu and select 'Glide computer, Safety factors.'"),
