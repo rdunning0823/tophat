@@ -31,7 +31,7 @@ static constexpr TaskFactoryConstraints mat_constraints = {
   false,
   false,
   false,
-  2, 13,
+  2, 26,
 };
 
 static constexpr TaskPointFactoryType mat_start_types[] = {
