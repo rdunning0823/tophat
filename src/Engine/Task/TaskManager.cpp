@@ -271,7 +271,8 @@ TaskManager::UpdateCommonStats(const AircraftState &state)
 
 bool
 TaskManager::Update(const AircraftState &state,
-                    const AircraftState &state_last)
+                    const AircraftState &state_last,
+                    const Waypoints &waypoints)
 {
   if (!state.location.IsValid()) {
     /* in case of GPS failure or and during startup (before the first
@@ -292,10 +293,12 @@ TaskManager::Update(const AircraftState &state,
   if (state_last.time > state.time)
     Reset();
 
-  if (task_ordered.TaskSize() > 1)
+  if (task_ordered.TaskSize() > 1) {
+    if (IsMat())
+      ScanInsertMatPoints(state, state_last, waypoints);
     // always update ordered task
     retval |= task_ordered.Update(state, state_last, glide_polar);
-
+  }
   // inform the abort task whether it is running as the task or not
   task_abort.SetActive(active_task == &task_abort);
 
@@ -350,6 +353,53 @@ TaskManager::GetStats() const
 
   return null_stats;
 }
+
+bool
+TaskManager::ScanInsertMatPoints(const AircraftState &state,
+                                 const AircraftState &state_last,
+                                 const Waypoints &waypoints)
+{
+  assert(IsMat());
+
+  //flat boxes 3600m (~2.2 miles/ side) filters out most points
+  Angle angle_ur = Angle::FullCircle() / 8;
+  Angle angle_ll = (Angle::FullCircle() * 5) / 8;
+
+  GeoVector vect_ur(fixed(1800), angle_ur);
+  GeoVector vect_ll(fixed(1800), angle_ll);
+
+  GeoPoint last_ur = vect_ur.EndPoint(state_last.location);
+  GeoPoint last_ll = vect_ll.EndPoint(state_last.location);
+
+  GeoPoint now_ur = vect_ur.EndPoint(state.location);
+  GeoPoint now_ll = vect_ll.EndPoint(state.location);
+
+  const TaskProjection& task_projection = task_ordered.GetTaskProjection();
+  FlatBoundingBox bb_last(task_projection.ProjectInteger(last_ll),
+                          task_projection.ProjectInteger(last_ur));
+  FlatBoundingBox bb_now(task_projection.ProjectInteger(now_ll),
+                         task_projection.ProjectInteger(now_ur));
+
+  const unsigned last_achieved_index = task_ordered.GetLastIntermediateAchieved();
+
+  for (unsigned i = 0; i < task_ordered.GetMatPoints().size(); i++) {
+    OrderedTaskPoint &mat_tp = *task_ordered.GetMatPoints()[i];
+    if (task_ordered.CheckTransitionPointMat(mat_tp, state, state_last,
+                                              bb_now, bb_last)) {
+      if (!task_ordered.ShouldAddToMat(mat_tp.GetWaypoint()))
+        break;
+
+      OrderedTask *new_task = task_ordered.Clone(task_behaviour);
+      new_task->Insert(mat_tp, last_achieved_index + 1);
+      Commit(*new_task, waypoints);
+
+      SetActiveTaskPoint(last_achieved_index + 1);
+      return true;
+    }
+  }
+  return false;
+}
+
 
 bool
 TaskManager::DoGoto(const Waypoint &wp)

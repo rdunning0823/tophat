@@ -467,6 +467,16 @@ public:
    */
   bool ScanStartFinish();
 
+  /**
+   * checks if the aircraft has entered the Mat cylinder
+   * updates transition state of point
+   * @return true if enter transition occurs
+   */
+  bool CheckTransitionPointMat(OrderedTaskPoint &point,
+                               const AircraftState &state,
+                               const AircraftState &state_last,
+                               const FlatBoundingBox &bb_now,
+                               const FlatBoundingBox &bb_last);
 private:
 
   fixed ScanDistanceMin(const GeoPoint &ref, bool full);
@@ -641,11 +651,29 @@ public:
   virtual GeoPoint GetTaskCenter(const GeoPoint &fallback_location) const;
   virtual fixed GetTaskRadius(const GeoPoint &fallback_location) const;
 
+  /**
+   * returns the index of the highest intermediate TP that has been entered.
+   * if none have been entered, returns zero
+   * If start has exited, returns zero
+   * Does not consider whether Finish has been achieved
+   * @return index of last intermediate point achieved or 0 if none
+   */
+  virtual unsigned GetLastIntermediateAchieved() const;
+
+  /**
+   * Should we add this WP to the Mat
+   * after the last achieved Intermediate point?
+   * @param mat_wp the wp to test
+   * @return true if this should be added after the last achieved intermediate tp
+   */
+  bool ShouldAddToMat(const Waypoint &mat_wp) const;
+
 protected:
   /* virtual methods from class AbstractTask */
   virtual bool UpdateSample(const AircraftState &state_now,
                             const GlidePolar &glide_polar,
                             const bool full_update);
+
   virtual bool CheckTransitions(const AircraftState &state_now,
                                 const AircraftState &state_last);
   virtual bool CalcBestMC(const AircraftState &state_now,

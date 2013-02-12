@@ -63,7 +63,7 @@ GlideComputerTask::ProcessBasicTask(const MoreData &basic,
                                     DerivedInfo &calculated,
                                     const DerivedInfo &last_calculated,
                                     const ComputerSettings &settings_computer,
-                                    bool force)
+                                    const Waypoints &waypoints, bool force)
 {
   trace.Update(settings_computer, basic, calculated);
 
@@ -76,7 +76,7 @@ GlideComputerTask::ProcessBasicTask(const MoreData &basic,
     const AircraftState current_as = ToAircraftState(basic, calculated);
     const AircraftState last_as = ToAircraftState(last_basic, last_calculated);
 
-    _task->Update(current_as, last_as);
+    _task->Update(current_as, last_as, waypoints);
 
     const fixed fallback_mc = calculated.last_thermal.IsDefined() &&
       positive(calculated.last_thermal_average_smooth)

@@ -321,6 +321,38 @@ OrderedTask::ScanDistancePlanned()
   return fixed_zero;
 }
 
+unsigned
+OrderedTask::GetLastIntermediateAchieved() const
+{
+  if (TaskSize() < 2)
+    return 0;
+
+  for (unsigned i = 1; i < TaskSize() - 1; i++)
+    if (!task_points[i]->HasEntered())
+      return i - 1;
+  return TaskSize() - 2;
+}
+
+bool
+OrderedTask::ShouldAddToMat(const Waypoint &mat_wp) const
+{
+  unsigned last_achieved_index = GetLastIntermediateAchieved();
+
+  // is this the same point we just achieved? then ignore it
+  if (mat_wp == GetPoint(last_achieved_index).GetWaypoint())
+  {
+    return false;
+  }
+
+  // The TP after the last achieved is already next in the task
+  // and it is not the finish so do nothing
+  if ((last_achieved_index + 1 < TaskSize() -1)
+    && mat_wp == GetPoint(last_achieved_index + 1).GetWaypoint()) {
+    return false;
+  }
+  return true;
+}
+
 // TRANSITIONS
 
 bool 
@@ -377,12 +409,12 @@ OrderedTask::CheckTransitions(const AircraftState &state,
                                            transition_enter,
                                            transition_exit)) {
         task_advance.SetArmed(false);
-        
+
         if (i + 1 < n_task) {
           i++;
           SetActiveTaskPoint(i);
           taskpoint_start->ScanActive(*task_points[active_task_point]);
-          
+
           if (task_events != NULL)
             task_events->ActiveAdvanced(*task_points[i], i);
 
@@ -448,6 +480,24 @@ OrderedTask::CheckTransitionOptionalStart(const AircraftState &state,
   return full_update;
 }
 
+//OrderedTaskPoint.CheckEnterTransition() checks and returns true/false
+// ScoredTaskPoint.EnterTransition() calls OTP.CheckEnterTransition and
+ // then updates the state_entered
+//??? Do we want to update state_entered (and trigger unique message) here
+// or let normal check transition take care of that?
+// or trigger message here about adding it, and let other transition
+bool
+OrderedTask::CheckTransitionPointMat(OrderedTaskPoint &point,
+                                     const AircraftState &state,
+                                     const AircraftState &state_last,
+                                     const FlatBoundingBox &bb_now,
+                                     const FlatBoundingBox &bb_last)
+{
+  const bool nearby = point.BoundingBoxOverlaps(bb_now) ||
+    point.BoundingBoxOverlaps(bb_last);
+
+  return nearby && point.CheckEnterTransitionMat(state, state_last);
+}
 
 bool
 OrderedTask::CheckTransitionPoint(OrderedTaskPoint &point,

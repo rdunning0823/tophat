@@ -251,6 +251,11 @@ public:
   virtual bool IsInSector(const AircraftState &ref) const;
   virtual OZBoundary GetBoundary() const;
 
+  /**
+   * a public wrapper that checks but doesn't update Mat transitions
+   */
+  virtual bool CheckEnterTransitionMat(const AircraftState &ref_now,
+                                       const AircraftState &ref_last) const;
 protected:
   /* virtual methods from class ScoredTaskPoint */
   virtual bool CheckEnterTransition(const AircraftState &ref_now,

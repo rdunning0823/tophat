@@ -100,7 +100,7 @@ GlideComputer::ProcessGPS(bool force)
   task_computer.ProcessBasicTask(basic, LastBasic(),
                                  calculated, LastCalculated(),
                                  GetComputerSettings(),
-                                 force);
+                                 waypoints, force);
   task_computer.ProcessMoreTask(basic, calculated, LastCalculated(),
                                 GetComputerSettings());
 

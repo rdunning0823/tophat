@@ -30,6 +30,7 @@ Copyright_License {
 
 struct NMEAInfo;
 class ProtectedTaskManager;
+class Waypoints;
 
 class GlideComputerTask
 {
@@ -72,7 +73,8 @@ public:
                         DerivedInfo &calculated,
                         const DerivedInfo &last_calculated,
                         const ComputerSettings &settings_computer,
-                        bool force);
+                        const Waypoints &waypoints, bool force);
+
   void ProcessMoreTask(const MoreData &basic, DerivedInfo &calculated,
                        const DerivedInfo &last_calculated,
                        const ComputerSettings &settings_computer);

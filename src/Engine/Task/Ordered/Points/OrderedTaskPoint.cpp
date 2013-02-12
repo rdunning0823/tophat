@@ -120,6 +120,13 @@ OrderedTaskPoint::GetBoundary() const
 }
 
 bool
+OrderedTaskPoint::CheckEnterTransitionMat(const AircraftState &ref_now,
+                                          const AircraftState &ref_last) const
+{
+  return CheckEnterTransition(ref_now, ref_last);
+}
+
+bool
 OrderedTaskPoint::CheckEnterTransition(const AircraftState &ref_now,
                                        const AircraftState &ref_last) const
 {
