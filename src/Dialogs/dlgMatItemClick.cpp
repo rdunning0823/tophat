@@ -51,6 +51,7 @@ Copyright_License {
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/TaskManager.hpp"
+#include "Task/Factory/AbstractTaskFactory.hpp"
 #include "UIGlobals.hpp"
 #include "Units/Units.hpp"
 #include "Waypoint/Waypoint.hpp"
@@ -365,33 +366,54 @@ static OrderedTask*
 CreateClone()
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-  if (!task_manager->GetOrderedTask().CheckTask())
-    return nullptr;
-
   return task_manager->Clone(XCSoarInterface::GetComputerSettings().task);
 }
 
 /**
- * returns true if wp is currently the next tp in the task (not the finish)
+ * creates a clone of the ordered task and inserts wp
+ * after the last achieved intermediate point
+ * @return. modified task.  nullptr if fails
+ */
+static OrderedTask*
+CreateCloneWithWaypoint(const Waypoint &wp)
+{
+  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+  const OrderedTask &task_old = task_manager->GetOrderedTask();
+  if (!task_old.CheckTask())
+    return nullptr;
+
+  const TaskBehaviour &tb = XCSoarInterface::GetComputerSettings().task;
+  OrderedTask *task_new = task_old.Clone(tb);
+
+  OrderedTaskPoint *task_point =
+      (OrderedTaskPoint*)task_manager->GetFactory().CreateIntermediate(wp);
+  if (task_point == nullptr) {
+    delete task_new;
+    return nullptr;
+  }
+  unsigned last_achieved_index = task_new->GetLastIntermediateAchieved();
+  if (task_new->Insert(*task_point, last_achieved_index + 1)) {
+    delete task_point;
+    return task_new;
+  }
+  delete task_point;
+  delete task_new;
+  return nullptr;
+}
+
+/**
+ * wrapper with Lease for ShoudAddToMat()
  * @param wp. the waypoint to be tested
+ * @return. true if the wp should be added after the
+ * last achieved intermediate tp in task
  */
 static bool
-CheckIfAlreadyNext(const Waypoint &wp_new)
+ShouldAddToMat(const Waypoint &wp_new)
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
   const OrderedTask &task = task_manager->GetOrderedTask();
 
-  unsigned i = task.GetActiveTaskPointIndex();
-  if (i == task.TaskSize() - 1)
-    return false;
-
-  if (i == 0)
-    i++;
-  if (i >= task.TaskSize())
-    return false;
-
-  const OrderedTaskPoint &otp_current = task.GetTaskPoint(i);
-  return wp_new == otp_current.GetWaypoint();
+  return task.ShouldAddToMat(wp_new);
 }
 
 /**
@@ -399,10 +421,15 @@ CheckIfAlreadyNext(const Waypoint &wp_new)
  * @param task. a valid ordered task
  */
 static bool
-CommitTask(const OrderedTask &task)
+CommitTask(const OrderedTask &task_new)
 {
   ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
-  return task_manager->Commit(task, way_points);
+  if (task_manager->Commit(task_new, way_points)) {
+    const OrderedTask &task = task_manager->GetOrderedTask();
+    task_manager->SetActiveTaskPoint(task.GetLastIntermediateAchieved() + 1u);
+    return true;
+  }
+  return false;
 }
 
 bool dlgMatItemClickShowModal(const Waypoint &wp)
@@ -411,7 +438,7 @@ bool dlgMatItemClickShowModal(const Waypoint &wp)
     return true; // show "Other" options
 
   // ask to remove it if it's already the next TP
-  if (CheckIfAlreadyNext(wp)) {
+  if (!ShouldAddToMat(wp) && MapTaskManager::GetUnachievedIndexInTask(wp) > 0) {
     StaticString<255> remove_prompt;
     remove_prompt.Format(_T("%s %s %s?"),_("Remove"), wp.name.c_str(),
                          _("from task"));
@@ -432,18 +459,12 @@ bool dlgMatItemClickShowModal(const Waypoint &wp)
     return false;
   }
 
-  OrderedTask *task_new = CreateClone();
-  OrderedTask *task_old = CreateClone();
-  if (task_new == nullptr || task_old == nullptr)
-    return false;
-
-  if (MapTaskManager::InsertInMatProForma(*task_new, wp) !=
-      MapTaskManager::SUCCESS) {
+  OrderedTask *task_new = CreateCloneWithWaypoint(wp);
+  if (task_new == nullptr) {
     ShowMessageBox(_("Could not insert waypoint into task"), _("Error"), MB_OK | MB_ICONERROR);
-    delete task_new;
-    delete task_old;
-    return true;
+    return false;
   }
+  OrderedTask *task_old = CreateClone();
 
   if (!CommitTask(*task_new)) {
     ShowMessageBox(_("Failed to commit new task"), _("Error"), MB_OK | MB_ICONERROR);
