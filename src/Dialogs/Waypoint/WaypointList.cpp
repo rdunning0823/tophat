@@ -80,6 +80,8 @@ static WndProperty *direction_filter;
 static WndProperty *type_filter;
 static WndFrame *summary_labels1;
 static WndFrame *summary_values1;
+static WndFrame *summary_labels2;
+static WndFrame *summary_values2;
 
 
 static OrderedTask *ordered_task;
@@ -358,12 +360,11 @@ WaypointListDialog::OnActivateItem(unsigned index)
 void
 WaypointListDialog::OnCursorMoved(gcc_unused unsigned i)
 {
-  StaticString<100> values1;
   StaticString<100> sunset_buffer;
   StaticString<100> alt_buffer;
-  assert (summary_labels1 != nullptr);
-  assert (summary_values1 != nullptr);
 
+  if (waypoint_list.size() == 0)
+    return;
 
   const MoreData &more_data = CommonInterface::Basic();
   const DerivedInfo &calculated = CommonInterface::Calculated();
@@ -400,9 +401,10 @@ WaypointListDialog::OnCursorMoved(gcc_unused unsigned i)
     sunset_buffer.UnsafeFormat(_T("%02u:%02u"), sunset_hour, sunset_minute);
   }
 
-  summary_labels1->SetCaption(_T("Alt. diff:\nSunset:"));
-  values1.Format(_T("%s\n%s"), alt_buffer.c_str(), sunset_buffer.c_str());
-  summary_values1->SetCaption(values1.c_str());
+  summary_labels1->SetCaption(_T("Alt. diff:"));
+  summary_values1->SetCaption(alt_buffer.c_str());
+  summary_labels2->SetCaption(_T("Sunset:"));
+  summary_values2->SetCaption(sunset_buffer.c_str());
 }
 
 static void
@@ -526,8 +528,12 @@ ShowWaypointListDialog(const GeoPoint &_location,
 
   summary_labels1 = (WndFrame *)dialog->FindByName(_T("frmSummaryLabels1"));
   summary_values1 = (WndFrame *)dialog->FindByName(_T("frmSummaryValues1"));
-  assert(summary_labels1);
-  assert(summary_values1);
+  summary_labels2 = (WndFrame *)dialog->FindByName(_T("frmSummaryLabels2"));
+  summary_values2 = (WndFrame *)dialog->FindByName(_T("frmSummaryValues2"));
+  assert(summary_labels1 != nullptr);
+  assert(summary_values1 != nullptr);
+  assert(summary_labels2 != nullptr);
+  assert(summary_values2 != nullptr);
 
 
   location = _location;
@@ -537,6 +543,7 @@ ShowWaypointListDialog(const GeoPoint &_location,
 
   PrepareData();
   UpdateList();
+  dialog2.OnCursorMoved(0);
 
   const ScopeGPSListener l(CommonInterface::GetLiveBlackboard(), OnGPSUpdate);
 
