@@ -481,6 +481,10 @@ ShowWaypointListDialog(const GeoPoint &_location,
                        OrderedTask *_ordered_task, unsigned _ordered_task_index,
                        bool goto_button)
 {
+  return ShowWaypointListSimpleDialog(_location,
+                                      _ordered_task, _ordered_task_index,
+                                      goto_button);
+
   dialog = LoadDialog(callback_table, UIGlobals::GetMainWindow(),
                       Layout::landscape ?
       _T("IDR_XML_WAYPOINTSELECT_L") : _T("IDR_XML_WAYPOINTSELECT"));
