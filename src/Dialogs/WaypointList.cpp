@@ -528,6 +528,11 @@ ShowWaypointListDialog(SingleWindow &parent, const GeoPoint &_location,
                        OrderedTask *_ordered_task, unsigned _ordered_task_index,
                        bool goto_button)
 {
+
+  return ShowWaypointListDialogSimple(parent, _location,
+                                      _ordered_task, _ordered_task_index,
+                                      goto_button);
+
   dialog = LoadDialog(callback_table, parent, Layout::landscape ?
       _T("IDR_XML_WAYPOINTSELECT_L") : _T("IDR_XML_WAYPOINTSELECT"));
   assert(dialog != NULL);
