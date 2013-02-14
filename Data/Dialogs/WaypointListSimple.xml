@@ -1,0 +1,29 @@
+<Form Caption="Select Waypoint">
+  <Panel Name="frmSearch" X="0" Y="0" Width="240" Height="72">
+	  <Label X="2" Y="1" Width="115" Height="14" Caption="Name" />
+	  <Button Name="cmdFltName" Caption="*" X="3" Y="16" Width="115" Height="16" OnClick="OnFilterNameButton" />
+	
+	  <Edit Name="prpFltType" Caption="Type" X="0" Y="36" Width="120" Height="36" CaptionWidth="-1">
+	    <DataField DataType="enum"/>
+	  </Edit>
+	
+	  <Edit Name="prpFltDistance" Caption="Distance" X="120" Y="0" Height="36" CaptionWidth="-1">
+	    <DataField DataType="enum"/>
+	  </Edit>
+	
+	  <Edit Name="prpFltDirection" Caption="Direction" X="120" Height="36" CaptionWidth="-1">
+	    <DataField DataType="enum"/>
+	  </Edit>
+  </Panel>
+  <Button Name="cmdByName" Caption="Select" X="0" Y="0" Width="80" Height="35" OnClick="OnByNameClicked" />
+  <Button Name="cmdByDistance" Caption="Select" X="80" Y="0" Width="80" Height="35" OnClick="OnByDistanceClicked" />
+  <Button Name="cmdByBearing" Caption="Select" X="160" Y="0" Width="80" Height="35" OnClick="OnByBearingClicked" />
+  <List Name="frmWaypointList" X="0" Y="35" Height="-55" />
+  <Label Name="frmSummaryLabels1" X="0" Width="50" Y="-55" Height="20"/>
+  <Label Name="frmSummaryValues1" X="50" Y="-55" Width="70" Height="20"/>
+  <Label Name="frmSummaryLabels2" X="120" Width="50" Y="-55" Height="20"/>
+  <Label Name="frmSummaryValues2" X="170" Y="-55" Width="70" Height="20"/>
+
+  <Button Name="cmdSelect" Caption="Select" X="0" Y="-35" Width="-120" Height="35" OnClick="OnSelectClicked" />
+  <Button Name="cmdClose" Caption="Cancel" X="-120" Y="-35" Height="35" OnClick="OnCloseClicked" />
+</Form>
