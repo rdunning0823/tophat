@@ -385,6 +385,8 @@ InputEvents::eventOrientation(const TCHAR *misc)
     settings_map.circling_orientation = DisplayOrientation::TARGET_UP;
   }
 
+  Profile::Set(ProfileKeys::OrientationCruise,
+               (unsigned)settings_map.cruise_orientation);
   ActionInterface::SendMapSettings(true);
 }
 
