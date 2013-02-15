@@ -26,7 +26,7 @@ Copyright_License {
 void
 TrafficSettings::SetDefaults()
 {
-  enable_gauge = true;
+  enable_gauge = false;
   auto_close_dialog = false;
   auto_zoom = true;
   north_up = false;
