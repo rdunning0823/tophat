@@ -71,20 +71,27 @@ GetDialogStyle()
 class SetupQuick : public NullWidget, public WndForm
 {
 private:
+  PixelRect rc_prompt;
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
   PixelRect rc_ok, rc_advanced;
 
+  WndFrame *prompt;
   WndFrame *site_files_text, *plane_text, *device_text;
   WndButton *site_files_button, *plane_button, *device_button;
   WndButton *ok, *advanced;
 
+  /**
+   *   do we explain that there is missing data?
+   */
+  bool auto_prompt;
+
 public:
-  SetupQuick()
+  SetupQuick(bool _auto_prompt)
     : WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
               UIGlobals::GetMainWindow().GetClientRect(),
               _("Set up Top Hat"),
-              GetDialogStyle()) {}
+              GetDialogStyle()), auto_prompt(_auto_prompt) {}
 
   void RefreshForm();
 
@@ -117,6 +124,10 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 
   PixelRect rc_left = rc;
   PixelRect rc_right = rc;
+
+  rc_prompt = rc;
+  rc_prompt.bottom = auto_prompt ? rc_prompt.top + height + Layout::Scale(5) : rc.top;
+
   rc_left.left += Layout::Scale(2);
   rc_right.right -= Layout::Scale(2);
   rc_left.right = PixelScalar (fixed(rc.right + rc.left) / fixed(2.5));
@@ -125,8 +136,8 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_site_files_text = rc_plane_text = rc_device_text = rc_right;
   rc_site_files_button = rc_plane_button = rc_device_button = rc_left;
 
-  rc_site_files_text.top = rc_site_files_button.top = height / 2;
-  rc_site_files_text.top = rc_site_files_button.top = height / 2;
+  rc_site_files_text.top = rc_site_files_button.top = height / 2 + rc_prompt.bottom;
+  rc_site_files_text.top = rc_site_files_button.top = height / 2 + rc_prompt.bottom;
   rc_plane_text.top = rc_plane_button.top = rc_site_files_text.top + height;
   rc_device_text.top = rc_device_button.top = rc_plane_text.top + height;
 
@@ -137,13 +148,13 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_device_text.bottom = rc_device_button.bottom =
       rc_device_button.top + height;
 
-  rc_advanced.right = rc_right.right;
-  rc_advanced.left = rc_advanced.right - Layout::Scale(80);
-  rc_advanced.top = rc_device_text.bottom + height / 2;
-  rc_advanced.bottom = rc_advanced.top + height - Layout::Scale(5);
-
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
+
+  rc_advanced.right = rc_right.right;
+  rc_advanced.left = rc_advanced.right - Layout::Scale(80);
+  rc_advanced.bottom = rc_ok.top - 1;
+  rc_advanced.top = rc_advanced.bottom - height;
 }
 
 void
@@ -218,6 +229,10 @@ SetupQuick::RefreshForm()
   if (text.empty())
       text = unconfigured;
   plane_text->SetCaption(text.c_str());
+
+  if (auto_prompt) {
+    prompt->SetCaption(_("Please configure Top Hat using the three buttons below."));
+  }
 }
 
 void
@@ -247,6 +262,13 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              rc_device_text,
                              style_frame);
                              device_text->SetVAlignCenter();
+
+  if (auto_prompt) {
+    prompt = new WndFrame(GetClientAreaWindow(), look,
+                          rc_prompt,
+                          style_frame);
+                          prompt->SetVAlignCenter();
+  }
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   ButtonWindowStyle button_style;
@@ -289,14 +311,16 @@ SetupQuick::Unprepare()
   delete device_button;
   delete ok;
   delete advanced;
+  if (auto_prompt)
+     delete prompt;
 }
 
 void
-ShowDialogSetupQuick()
+ShowDialogSetupQuick(bool auto_prompt)
 {
   // add point to task
   ContainerWindow &w = UIGlobals::GetMainWindow();
-  instance = new SetupQuick();
+  instance = new SetupQuick(auto_prompt);
   instance->Initialise(w, w.GetClientRect());
   instance->Prepare(w, w.GetClientRect());
 
