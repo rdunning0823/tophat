@@ -354,6 +354,18 @@ TaskManager::GetStats() const
   return null_stats;
 }
 
+/**
+ * loads the Mat points vector to the current task if it is a Mat
+ */
+void
+TaskManager::FillMatPoints(const Waypoints &waypoints)
+{
+  if (!IsMat())
+    return;
+  task_ordered.FillMatPoints(waypoints);
+}
+
+
 bool
 TaskManager::ScanInsertMatPoints(const AircraftState &state,
                                  const AircraftState &state_last,

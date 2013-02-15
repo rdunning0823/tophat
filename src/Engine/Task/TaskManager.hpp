@@ -240,6 +240,12 @@ public:
                            const Waypoints &waypoints);
 
   /**
+   * loads the Mat points vector to the current task if it is a Mat
+   * @param waypoints the list of active waypoints
+   */
+  void FillMatPoints(const Waypoints &waypoints);
+
+  /**
    * Accessor for statistics of active task
    *
    * @return Statistics of active task
