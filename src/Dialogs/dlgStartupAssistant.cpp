@@ -49,6 +49,7 @@ Copyright_License {
 #include "Task/TaskBehaviour.hpp"
 #include "Dialogs/Message.hpp"
 
+
 const TCHAR* tips [] = {
     N_("Click the Nav Bar at the top to show the navigation menu."),
     N_("Slide the Nav Bar to the left or right to advance the task turnpoint."),
@@ -370,10 +371,45 @@ CheckContestNationality()
   }
 }
 
+/**
+ * checks to see if a Plane, site files, and device are configured, and if no
+ * displays the Quick Setup screen
+ */
+static bool
+CheckConfigurationBasics()
+{
+  StaticString<255> text;
+
+  const DeviceConfig &config =
+    CommonInterface::SetSystemSettings().devices[0];
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &task_behaviour = settings.task;
+
+  if (config.driver_name.empty())
+    return true;
+
+  text.clear();
+  if (Profile::Get(ProfileKeys::MapFile) != nullptr)
+    text = Profile::Get(ProfileKeys::MapFile);
+
+  if (text.empty() && Profile::Get(ProfileKeys::WaypointFile) != nullptr)
+    text = Profile::Get(ProfileKeys::WaypointFile);
+  if (text.empty())
+    return true;
+
+  text = settings.plane.registration;
+  if (text.empty())
+    return true;
+
+  return false;
+}
+
 void
 dlgStartupAssistantShowModal(bool conditional)
 {
   CheckContestNationality();
+  if (CheckConfigurationBasics())
+    ShowDialogSetupQuick(true);
 
   StaticString<32> decline_ver;
   decline_ver = Profile::Get(ProfileKeys::StartupTipDeclineVersion, _T(""));

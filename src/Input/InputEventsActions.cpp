@@ -535,7 +535,7 @@ InputEvents::eventSetup(const TCHAR *misc)
   else if (StringIsEqual(misc, _T("System")))
     SystemConfiguration();
   else if (StringIsEqual(misc, _T("QuickSetup")))
-    ShowDialogSetupQuick();
+    ShowDialogSetupQuick(false);
   else if (StringIsEqual(misc, _T("Task")))
     dlgTaskManagerShowModal(*CommonInterface::main_window);
   else if (StringIsEqual(misc, _T("Airspace")))
