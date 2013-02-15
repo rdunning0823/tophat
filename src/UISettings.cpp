@@ -32,7 +32,7 @@ UISettings::SetDefaults()
 
   custom_fonts = false;
 
-  enable_thermal_assistant_gauge = true;
+  enable_thermal_assistant_gauge = false;
 
   popup_message_position = PopupMessagePosition::CENTER;
 
