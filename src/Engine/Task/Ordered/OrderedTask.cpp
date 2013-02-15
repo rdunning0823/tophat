@@ -493,8 +493,7 @@ OrderedTask::CheckTransitionPointMat(OrderedTaskPoint &point,
                                      const FlatBoundingBox &bb_now,
                                      const FlatBoundingBox &bb_last)
 {
-  const bool nearby = point.BoundingBoxOverlaps(bb_now) ||
-    point.BoundingBoxOverlaps(bb_last);
+  const bool nearby = point.BoundingBoxOverlaps(bb_now);
 
   return nearby && point.CheckEnterTransitionMat(state, state_last);
 }
