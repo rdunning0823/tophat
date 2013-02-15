@@ -155,7 +155,7 @@ public:
     //assert(task.GetFactoryType() == TaskFactoryType::MAT);
   }
 
-  void RefreshForm();
+  void RefreshFormForAdd();
 
   /* virtual methods from class Timer */
   virtual void OnTimer() gcc_override;
@@ -196,9 +196,32 @@ public:
    */
   virtual void OnAction(int id);
 
+private:
+  /**
+   * Removes the points and displays message with Success/Failure
+   * assumes point is in task and not yet achieved
+   */
+  void RemovePoint();
+
 };
 
 static MatClickPanel *instance;
+
+void
+MatClickPanel::RemovePoint()
+{
+  StaticString<255> remove_prompt;
+
+  if (MapTaskManager::RemoveFromTask(wp) == MapTaskManager::SUCCESS) {
+    remove_prompt.Format(_T("%s %s %s"),_("Removed"), wp.name.c_str(),
+                         _("from task"));
+    ShowMessageBox(remove_prompt.c_str(), _("Success"), MB_OK);
+  } else {
+    remove_prompt.Format(_T("%s %s %s?"),_("Could not remove"), wp.name.c_str(),
+                         _("from task"));
+    ShowMessageBox(remove_prompt.c_str(), _("Error"), MB_OK | MB_ICONERROR);
+  }
+}
 
 UPixelScalar
 MatClickPanel::GetNavSliderHeight()
@@ -262,7 +285,7 @@ MatClickPanel::OnAction(int id)
       RemovePoint();
     SetModalResult(mrOK);
 
-  else if (id == CancelClick)
+  } else if (id == CancelClick)
     SetModalResult(mrCancel);
 
   else if (id == MoreClick) {
@@ -272,7 +295,7 @@ MatClickPanel::OnAction(int id)
 }
 
 void
-MatClickPanel::RefreshForm()
+MatClickPanel::RefreshFormForAdd()
 {
   assert (mat_click_mode == MAT_ADD);
 
@@ -328,6 +351,7 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WndForm::Move(rc_form);
 
   SetRectangles(rc_form);
+  StaticString<20> label_text;
 
   WindowStyle style_frame;
   style_frame.Border();
@@ -337,25 +361,18 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           rc_prompt_text.right - rc_prompt_text.left,
                           rc_prompt_text.bottom - rc_prompt_text.top,
                           style_frame);
-  prompt_text->SetFont(Fonts::infobox_small);
-  StaticString<255> prompt;
-  prompt.Format(_T("%s: %s:"), _("If you add"), wp.name.c_str(),
-                _("Estimated task is"));
-  prompt_text->SetCaption(prompt.c_str());
 
   labels = new WndFrame(GetClientAreaWindow(), look,
                           rc_labels.left, rc_labels.top,
                           rc_labels.right - rc_labels.left,
                           rc_labels.bottom - rc_labels.top,
                           style_frame);
-  labels->SetFont(Fonts::infobox_small);
 
   values = new WndFrame(GetClientAreaWindow(), look,
                           rc_values.left, rc_values.top,
                           rc_values.right - rc_values.left,
                           rc_values.bottom - rc_values.top,
                           style_frame);
-  values->SetFont(Fonts::infobox_small);
 
   StaticString<255> prompt;
 
@@ -502,7 +519,7 @@ ShowDialog(const Waypoint &wp,
 {
   // add point to task
   ContainerWindow &w = UIGlobals::GetMainWindow();
-  instance = new MatClickPanel(wp, MatClickPanel::ADD);
+  instance = new MatClickPanel(wp, mat_click_mode);
   instance->Initialise(w, instance->GetSize(w.GetClientRect()));
   instance->Prepare(w, instance->GetSize(w.GetClientRect()));
 
