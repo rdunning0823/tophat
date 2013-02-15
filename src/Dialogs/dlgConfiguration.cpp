@@ -80,6 +80,7 @@ Copyright_License {
 
 static unsigned current_page;
 static WndForm *dialog = NULL;
+static bool single_page;
 
 static TabMenuControl* tab_menu = NULL;
 
@@ -181,7 +182,7 @@ OnPrevClicked(gcc_unused WndButton &button)
 static void
 OnCloseClicked(gcc_unused WndButton &button)
 {
-  if (tab_menu->IsCurrentPageTheMenu())
+  if (tab_menu->IsCurrentPageTheMenu() || single_page)
     dialog->SetModalResult(mrOK);
   else
     tab_menu->GotoMenuPage();
@@ -190,6 +191,9 @@ OnCloseClicked(gcc_unused WndButton &button)
 static bool
 FormKeyDown(gcc_unused WndForm &Sender, unsigned key_code)
 {
+  if (single_page)
+    return false;
+
   switch (key_code) {
   case VK_LEFT:
 #ifdef GNAV
@@ -244,7 +248,7 @@ static constexpr CallBackTableEntry CallBackTable[] = {
 };
 
 static void
-PrepareConfigurationDialog()
+PrepareConfigurationDialog(int page)
 {
   gcc_unused ScopeBusyIndicator busy;
 
@@ -263,8 +267,17 @@ PrepareConfigurationDialog()
   dialog->FilterAdvanced(expert_mode);
 
   PrepareConfigurationMenu();
-
-  tab_menu->GotoMenuPage();
+  single_page = (page >= 0);
+  if (single_page) {
+    assert((unsigned)page < tab_menu->GetNumPages());
+    WndButton *b = (WndButton*)dialog->FindByName(_T("cmdPrev"));
+    b->SetVisible(false);
+    b = (WndButton*)dialog->FindByName(_T("cmdNext"));
+    b->SetVisible(false);
+    current_page = (unsigned)page;
+    tab_menu->SetCurrentPage(current_page);
+  } else
+    tab_menu->GotoMenuPage();
   /* restore last selected menu item */
   static bool Initialized = false;
   if (!Initialized)
@@ -294,9 +307,9 @@ Save()
   }
 }
 
-void dlgConfigurationShowModal()
+void dlgConfigurationShowModal(int page)
 {
-  PrepareConfigurationDialog();
+  PrepareConfigurationDialog(page);
 
   dialog->ShowModal();
 

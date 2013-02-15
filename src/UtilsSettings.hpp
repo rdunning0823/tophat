@@ -24,7 +24,11 @@ Copyright_License {
 #ifndef XCSOAR_UTILS_SETTINGS_HPP
 #define XCSOAR_UTILS_SETTINGS_HPP
 
+/**
+ * show the system information pages
+ * @param page.  Show only a single page or -1 = all pages.
+ */
 void
-SystemConfiguration();
+SystemConfiguration(int page = -1);
 
 #endif
