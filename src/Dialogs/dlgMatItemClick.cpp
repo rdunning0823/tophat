@@ -61,15 +61,15 @@ Copyright_License {
 #include <math.h>
 #include <assert.h>
 
-enum ControlIndex {
-  SPEED_ACHIEVED = 100,
-  DISTANCE,
-  AAT_TIME,
-  AAT_ESTIMATED,
-  CancelClick,
-  AddPointClick,
-  MoreClick,
-};
+  enum ControlIndexMatAdd {
+    SPEED_ACHIEVED = 100,
+    DISTANCE,
+    AAT_TIME,
+    AAT_ESTIMATED,
+    CancelClick,
+    AddPointClick,
+    MoreClick,
+  };
 
 gcc_const
 static WindowStyle
@@ -81,14 +81,37 @@ GetDialogStyle()
   return style;
 }
 
-enum DelayCounter {
-  DELAY_COUNTER_WAIT = 4,
-};
-
-
 
 class MatClickPanel : public NullWidget, public WndForm, private Timer//, private Notify
 {
+public:
+  enum MatClickMode {
+    MAT_ADD,
+    MAT_DELETE,
+  };
+
+  enum ReturnState {
+    /**
+     * (Either Add or Delete was clicked)
+     */
+    OK,
+
+    /**
+     * Cancel was clicked
+     */
+    CANCEL,
+
+    /**
+     * the "More" button was clicked
+     */
+    SHOW_MORE_ITEMS,
+  };
+
+private:
+  enum DelayCounter {
+    DELAY_COUNTER_WAIT = 4,
+  };
+
   //OrderedTask &task;
   const Waypoint &wp;
 
@@ -102,8 +125,18 @@ class MatClickPanel : public NullWidget, public WndForm, private Timer//, privat
    */
   unsigned delay_counter;
 
+  /**
+   * are we adding or deleting a Mat point
+   */
+  MatClickMode mat_click_mode;
+
   PixelRect rc_prompt_text, rc_ok, rc_cancel, rc_more;
-  PixelRect rc_labels, rc_values;
+  PixelRect rc_labels;
+
+  /**
+   * only available in MAT_ADD mode
+   */
+  PixelRect rc_values;
 
   WndFrame *prompt_text;
   WndFrame *labels, *values;
@@ -111,11 +144,12 @@ class MatClickPanel : public NullWidget, public WndForm, private Timer//, privat
   WndButton *ok, *cancel, *more;
 
 public:
-  MatClickPanel(const Waypoint &_wp)
+  MatClickPanel(const Waypoint &_wp, MatClickMode _mat_click_mode)
     : WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
               UIGlobals::GetMainWindow().GetClientRect(),
-              _T("Add MAT point"), GetDialogStyle()),
-     wp(_wp),show_more_options(false), delay_counter(0)
+              _mat_click_mode == MAT_ADD ? _("Add MAT point") : _("Delete MAT point"),
+              GetDialogStyle()),
+     wp(_wp),show_more_options(false), delay_counter(0), mat_click_mode(_mat_click_mode)
   {
     assert(wp.IsTurnpoint());
     //assert(task.GetFactoryType() == TaskFactoryType::MAT);
@@ -210,8 +244,10 @@ MatClickPanel::SetRectangles(const PixelRect &rc_outer)
 
   rc_labels.top = rc_values.top = rc_prompt_text.bottom + 1;
   rc_labels.bottom = rc_values.bottom = rc_labels.top + Layout::Scale(45);
-  rc_labels.right = (rc.right - rc.left) / 2;
-  rc_values.left = rc_labels.right + 1;
+  if (mat_click_mode == MAT_ADD) {
+    rc_labels.right = (rc.right - rc.left) / 2;
+    rc_values.left = rc_labels.right + 1;
+  }
 
   rc_ok.top = rc_cancel.top = rc_more.top = rc.bottom - GetNavSliderHeight();
   rc_ok.right = rc_more.left = (rc.right - rc.left) / 3;
@@ -221,7 +257,9 @@ MatClickPanel::SetRectangles(const PixelRect &rc_outer)
 void
 MatClickPanel::OnAction(int id)
 {
-  if (id == AddPointClick)
+  if (id == AddPointClick) {
+    if (mat_click_mode == MAT_DELETE)
+      RemovePoint();
     SetModalResult(mrOK);
 
   else if (id == CancelClick)
@@ -236,6 +274,8 @@ MatClickPanel::OnAction(int id)
 void
 MatClickPanel::RefreshForm()
 {
+  assert (mat_click_mode == MAT_ADD);
+
   if (!Timer::IsActive())
     Timer::Schedule(1000);
 
@@ -276,7 +316,8 @@ MatClickPanel::RefreshForm()
 void
 MatClickPanel::OnTimer()
 {
-  RefreshForm();
+  if (mat_click_mode == MAT_ADD)
+    RefreshFormForAdd();
 }
 
 void
@@ -316,13 +357,31 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           style_frame);
   values->SetFont(Fonts::infobox_small);
 
+  StaticString<255> prompt;
+
+  if (mat_click_mode == MAT_ADD) {
+    prompt_text->SetFont(Fonts::infobox_small);
+    labels->SetFont(Fonts::infobox_small);
+    values->SetFont(Fonts::infobox_small);
+
+    prompt.Format(_T("%s: %s:"), _("If you add"), wp.name.c_str(),
+                  _("Estimated task is"));
+    prompt_text->SetCaption(prompt.c_str());
+
+  } else {
+    labels->SetFont(Fonts::infobox);
+
+    prompt.Format(_T("X %s %s?"), _("Remove"), wp.name.c_str());
+    labels->SetCaption(prompt.c_str());
+  }
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 
-  ok = new WndButton(GetClientAreaWindow(), dialog_look, _T("Add point"),
+  label_text = (mat_click_mode == MAT_ADD) ? _("Add point") : _("Delete point");
+  ok = new WndButton(GetClientAreaWindow(), dialog_look, label_text.c_str(),
                            rc_ok,
                            button_style, this, AddPointClick);
 
@@ -335,7 +394,8 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                         button_style, this, CancelClick);
 
 
-  RefreshForm();
+  if (mat_click_mode == MAT_ADD)
+    RefreshFormForAdd();
 }
 
 void
@@ -432,33 +492,43 @@ CommitTask(const OrderedTask &task_new)
   return false;
 }
 
-bool dlgMatItemClickShowModal(const Waypoint &wp)
+/**
+ * show the dialog in either Add or Delete mode
+ * @return.  The return state of the dialog
+ */
+static MatClickPanel::ReturnState
+ShowDialog(const Waypoint &wp,
+           MatClickPanel::MatClickMode mat_click_mode)
 {
-  if (!CheckTask())
-    return true; // show "Other" options
+  // add point to task
+  ContainerWindow &w = UIGlobals::GetMainWindow();
+  instance = new MatClickPanel(wp, MatClickPanel::ADD);
+  instance->Initialise(w, instance->GetSize(w.GetClientRect()));
+  instance->Prepare(w, instance->GetSize(w.GetClientRect()));
 
-  // ask to remove it if it's already the next TP
-  if (!ShouldAddToMat(wp) && MapTaskManager::GetUnachievedIndexInTask(wp) > 0) {
-    StaticString<255> remove_prompt;
-    remove_prompt.Format(_T("%s %s %s?"),_("Remove"), wp.name.c_str(),
-                         _("from task"));
-    if (ShowMessageBox(remove_prompt.c_str(),
-                       _("Remove MAT point"),
-                       MB_OKCANCEL | MB_ICONQUESTION) == IDOK) {
-      if (MapTaskManager::RemoveFromTask(wp) == MapTaskManager::SUCCESS) {
-        remove_prompt.Format(_T("%s %s %s?"),_("Removed"), wp.name.c_str(),
-                             _("from task"));
-        ShowMessageBox(remove_prompt.c_str(), _("Success"), MB_OK);
-      } else {
-        remove_prompt.Format(_T("%s %s %s?"),_("Removed"), wp.name.c_str(),
-                             _("from task"));
-        ShowMessageBox(remove_prompt.c_str(), _("Error"), MB_OK | MB_ICONERROR);
+  MatClickPanel::ReturnState return_state = (instance->ShowModal() == mrOK) ?
+      MatClickPanel::ReturnState::OK : MatClickPanel::ReturnState::CANCEL;
 
-      }
-    }
-    return false;
-  }
+  if (instance->GetShowMoreOptions())
+    return_state = MatClickPanel::ReturnState::SHOW_MORE_ITEMS;
 
+  instance->Hide();
+  instance->Unprepare();
+  delete instance;
+
+  return return_state;
+}
+
+/**
+ * prompts to add the waypoint
+ * Commits the "what if" task before displaying so that
+ * the statistics about the task can be displayed
+ * Commits the original task if the "Add" button is not clicked
+ * @return True if "More items" is clicked
+ */
+static bool
+DoAdd(const Waypoint &wp)
+{
   OrderedTask *task_new = CreateCloneWithWaypoint(wp);
   if (task_new == nullptr) {
     ShowMessageBox(_("Could not insert waypoint into task"), _("Error"), MB_OK | MB_ICONERROR);
@@ -473,23 +543,45 @@ bool dlgMatItemClickShowModal(const Waypoint &wp)
     return false;
   }
 
-  // add point to task
-  ContainerWindow &w = UIGlobals::GetMainWindow();
-  instance = new MatClickPanel(wp);
-  instance->Initialise(w, instance->GetSize(w.GetClientRect()));
-  instance->Prepare(w, instance->GetSize(w.GetClientRect()));
+  MatClickPanel::ReturnState return_state =
+      ShowDialog(wp, MatClickPanel::MatClickMode::MAT_ADD);
 
-  if (instance->ShowModal() != mrOK) {
+  if (return_state != MatClickPanel::ReturnState::OK) {
     if (!CommitTask(*task_old))
       ShowMessageBox(_("Failed to restore task"), _("Error"), MB_OK | MB_ICONERROR);
   }
 
-  bool show_more_options = instance->GetShowMoreOptions();
-  instance->Hide();
-  instance->Unprepare();
-  delete instance;
   delete task_new;
   delete task_old;
 
-  return show_more_options;
+  return return_state == MatClickPanel::ReturnState::SHOW_MORE_ITEMS;
+}
+
+/**
+ * prompt to delete the task point from the Mat
+ * Assumes point is in task and not yet achieved
+ * @return True if "More items" was clicked
+ */
+static bool
+DoDelete(const Waypoint &wp)
+{
+  return ShowDialog(wp, MatClickPanel::MatClickMode::MAT_DELETE) ==
+      MatClickPanel::ReturnState::SHOW_MORE_ITEMS;
+}
+
+/**
+ * show either the Add or the Delete Mat item dialog
+ * @return True if "More items" was clicked
+ */
+bool
+dlgMatItemClickShowModal(const Waypoint &wp)
+{
+  if (!CheckTask())
+    return true; // show "Other" options
+
+  // ask to remove it if it's already the next TP
+  if (!ShouldAddToMat(wp) && MapTaskManager::GetUnachievedIndexInTask(wp) > 0)
+    return DoDelete(wp);
+  else
+    return DoAdd(wp);
 }
