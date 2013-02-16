@@ -332,6 +332,18 @@ TabMenuControl::FindPage(unsigned page) const
   return MenuTabIndex(main_index, sub_index);
 }
 
+int
+TabMenuControl::FindPage(const TCHAR * _name) const
+{
+  StaticString<25> name(_name);
+  for (unsigned i = 0; i < GetNumPages(); i++)
+    if (name.equals(pages[i].menu_caption))
+      return i;
+
+  return -1;
+}
+
+
 unsigned
 TabMenuControl::GotoMenuPage()
 {

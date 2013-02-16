@@ -166,6 +166,14 @@ public:
   MenuTabIndex FindPage(unsigned page) const;
 
   /**
+   * find page index from the display name
+   * @param name. the Display name of the page
+   * @return -1 if not found, else the page index
+   */
+  gcc_pure
+  int FindPage(const TCHAR * name) const;
+
+  /**
    * @return true if currently displaying the menu page
    */
   gcc_pure
