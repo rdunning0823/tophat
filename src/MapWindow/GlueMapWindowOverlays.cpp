@@ -262,33 +262,6 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   bmp->Draw(canvas, rc.right - offset,
             rc.bottom - bmp->GetSize().cy - Layout::Scale(4));
 
-  // draw flarm status
-  if (GetMapSettings().show_flarm_alarm_level) {
-    // Don't show indicator when the gauge is indicating the traffic anyway
-
-    const FlarmStatus &flarm = Basic().flarm.status;
-    if (flarm.available) {
-
-      switch (flarm.alarm_level) {
-      case FlarmTraffic::AlarmType::NONE:
-        bmp = &look.traffic_safe_icon;
-        break;
-      case FlarmTraffic::AlarmType::LOW:
-      case FlarmTraffic::AlarmType::INFO_ALERT:
-        bmp = &look.traffic_warning_icon;
-        break;
-      case FlarmTraffic::AlarmType::IMPORTANT:
-      case FlarmTraffic::AlarmType::URGENT:
-        bmp = &look.traffic_alarm_icon;
-        break;
-      };
-
-      offset += bmp->GetSize().cx + Layout::Scale(6);
-
-      bmp->Draw(canvas, rc.right - offset,
-                rc.bottom - bmp->GetSize().cy - Layout::Scale(2));
-    }
-  }
   // draw "Simulator/Replay & InfoBox name
   StaticString<80> buffer;
   const UIState &ui_state = GetUIState();
