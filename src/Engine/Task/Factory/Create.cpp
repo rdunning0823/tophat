@@ -42,7 +42,7 @@ CreateTaskFactory(TaskFactoryType type, OrderedTask &task,
 {
   switch (type) {
   case TaskFactoryType::RACING:
-    if (task_behaviour.contest_nationality == ContestNationalities::USA)
+    if (task_behaviour.contest_nationality == ContestNationalities::AMERICAN)
       return new RTTaskFactoryUs(task, task_behaviour);
     return new RTTaskFactory(task, task_behaviour);
 
@@ -59,7 +59,7 @@ CreateTaskFactory(TaskFactoryType type, OrderedTask &task,
     return new FAIGoalTaskFactory(task, task_behaviour);
 
   case TaskFactoryType::AAT:
-    if (task_behaviour.contest_nationality == ContestNationalities::USA)
+    if (task_behaviour.contest_nationality == ContestNationalities::AMERICAN)
       return new AATTaskFactoryUs(task, task_behaviour);
     return new AATTaskFactory(task, task_behaviour);
 

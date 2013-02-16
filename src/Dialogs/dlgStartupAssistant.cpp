@@ -344,34 +344,6 @@ StartupAssistant::Save(bool &changed, bool &require_restart)
 }
 
 /**
- * if nationality is set to unknown, it prompts user if he wants to use
- * US settings
- */
-static void
-CheckContestNationality()
-{
-  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
-  TaskBehaviour &task_behaviour = settings_computer.task;
-
-  if (task_behaviour.contest_nationality == ContestNationalities::UNKNOWN) {
-    int result = ShowMessageBox(_(
-        "Do you want Top Hat to use US task rules for flying tasks?"),
-                                 _("Nationality settings"),
-                                 MB_YESNO | MB_ICONQUESTION);
-    if (result == IDYES)
-      task_behaviour.contest_nationality = ContestNationalities::USA;
-    else if (result == IDNO)
-      task_behaviour.contest_nationality = ContestNationalities::ALL;
-    else
-      task_behaviour.contest_nationality = ContestNationalities::UNKNOWN;
-
-    Profile::Set(ProfileKeys::ContestNationality,
-                 (int)task_behaviour.contest_nationality);
-    Profile::Save();
-  }
-}
-
-/**
  * checks to see if a Plane, site files, and device are configured, and if no
  * displays the Quick Setup screen
  */
@@ -401,13 +373,17 @@ CheckConfigurationBasics()
   if (text.empty())
     return true;
 
+  if (task_behaviour.contest_nationality == ContestNationalities::UNKNOWN)
+    return true;
+
+
+
   return false;
 }
 
 void
 dlgStartupAssistantShowModal(bool conditional)
 {
-  CheckContestNationality();
   if (CheckConfigurationBasics())
     ShowDialogSetupQuick(true);
 

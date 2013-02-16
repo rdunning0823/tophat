@@ -29,16 +29,10 @@ enum ContestNationalities {
    * unknown nationality.  Show all options
    */
   UNKNOWN = 0,
-
-  /**
-   * USA.  Show only options for USA
-   */
-  USA,
-
-  /**
-   * show options for all nationalities.
-   */
-  ALL,
+  EUROPEAN,
+  BRITISH,
+  AMERICAN,
+  AUSTRALIAN,
 };
 
 #endif
