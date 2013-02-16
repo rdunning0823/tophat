@@ -80,6 +80,7 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Alternates mode"),
           _("Determines sorting of alternates in the alternates dialog and in abort mode:\n[Simple] The alternates will only be sorted by waypoint type (airport/outlanding field) and arrival height.\n[Task] The sorting will also take the current task direction into account.\n[Home] The sorting will try to find landing options in the current direction to the configured home waypoint."),
           abort_task_mode_list, (unsigned)task_behaviour.abort_task_mode);
+  SetExpertRow(AlternateMode);
 
   AddFloat(_("Polar degradation"), /* xgettext:no-c-format */
            _("A permanent polar degradation. "
