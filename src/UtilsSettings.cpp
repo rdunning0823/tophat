@@ -214,11 +214,11 @@ SettingsLeave(const UISettings &old_ui_settings)
 }
 
 void
-SystemConfiguration(int page)
+SystemConfiguration(const TCHAR *page_name)
 {
   const UISettings old_ui_settings = CommonInterface::GetUISettings();
 
   SettingsEnter();
-  dlgConfigurationShowModal(page);
+  dlgConfigurationShowModal(page_name);
   SettingsLeave(old_ui_settings);
 }

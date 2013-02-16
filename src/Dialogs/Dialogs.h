@@ -58,7 +58,7 @@ void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();
-void dlgConfigurationShowModal(int page = -1);
+void dlgConfigurationShowModal(const TCHAR *page_name = _T(""));
 void dlgConfigFontsShowModal();
 
 /**
