@@ -85,6 +85,7 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Alternates mode"),
           _("Determines sorting of alternates in the alternates dialog and in abort mode."),
           abort_task_mode_list, (unsigned)task_behaviour.abort_task_mode);
+  SetExpertRow(AlternateMode);
 
   AddFloat(_("Polar degradation"), /* xgettext:no-c-format */
            _("A permanent polar degradation. "
