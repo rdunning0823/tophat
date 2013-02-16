@@ -61,6 +61,7 @@ Copyright_License {
     PLANE,
     NATIONALITY,
     SAFETY,
+    PILOT,
     ADVANCED,
     OK,
   };
@@ -81,15 +82,15 @@ private:
   PixelRect rc_prompt;
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
-  PixelRect rc_safety_text, rc_nationality_text;
-  PixelRect rc_safety_button, rc_nationality_button;
+  PixelRect rc_safety_text, rc_nationality_text, rc_pilot_text;
+  PixelRect rc_safety_button, rc_nationality_button, rc_pilot_button;
   PixelRect rc_ok, rc_advanced;
 
   WndFrame *prompt;
   WndFrame *site_files_text, *plane_text, *device_text;
-  WndFrame *safety_text, *nationality_text;
+  WndFrame *safety_text, *nationality_text, *pilot_text;
   WndButton *site_files_button, *plane_button, *device_button;
-  WndButton *safety_button, *nationality_button;
+  WndButton *safety_button, *nationality_button, *pilot_button;
   WndButton *ok, *advanced;
 
   /**
@@ -145,9 +146,9 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_right.left = rc_left.right + Layout::Scale(1);
 
   rc_site_files_text = rc_plane_text = rc_device_text = rc_safety_text
-      = rc_nationality_text = rc_right;
+      = rc_nationality_text = rc_pilot_text = rc_right;
   rc_site_files_button = rc_plane_button = rc_device_button
-      = rc_safety_button = rc_nationality_button = rc_left;
+      = rc_safety_button = rc_nationality_button = rc_pilot_button = rc_left;
 
   rc_site_files_text.top = rc_site_files_button.top = rc_prompt.bottom;
   rc_site_files_text.top = rc_site_files_button.top = rc_prompt.bottom;
@@ -156,6 +157,7 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 
   rc_safety_text.top = rc_safety_button.top = rc_device_text.top + height;
   rc_nationality_text.top = rc_nationality_button.top = rc_safety_text.top + height;
+  rc_pilot_text.top = rc_pilot_button.top = rc_nationality_text.top + height;
 
   rc_site_files_text.bottom = rc_site_files_button.bottom =
       rc_site_files_text.top + height;
@@ -167,6 +169,8 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       rc_safety_button.top + height;
   rc_nationality_text.bottom = rc_nationality_button.bottom =
       rc_nationality_button.top + height;
+  rc_pilot_text.bottom = rc_pilot_button.bottom =
+      rc_pilot_button.top + height;
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
@@ -174,7 +178,7 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_advanced.right = rc_right.right;
   rc_advanced.left = rc_advanced.right - Layout::Scale(80);
   rc_advanced.bottom = rc_ok.top - 1;
-  rc_advanced.top = rc_advanced.bottom - (height * 3) / 4;;
+  rc_advanced.top = rc_advanced.bottom - height;
 }
 
 void
@@ -201,6 +205,10 @@ SetupQuick::OnAction(int id)
 
   case NATIONALITY:
     SystemConfiguration(N_("Contest"));
+    break;
+
+  case PILOT:
+    SystemConfiguration(N_("Logger"));
     break;
 
   case ADVANCED:
@@ -273,8 +281,13 @@ SetupQuick::RefreshForm()
   text = ((unsigned)task_behaviour.contest_nationality > 0)
       ? Units::Store::GetName((unsigned)task_behaviour.contest_nationality - 1)
       : unconfigured;
-
   nationality_text->SetCaption(text.c_str());
+
+  const LoggerSettings &logger = settings_computer.logger;
+  text = logger.pilot_name;
+  if (text.empty())
+    text = unconfigured;
+  pilot_text->SetCaption(text.c_str());
 
   if (auto_prompt) {
     prompt->SetCaption(_("Please configure Top Hat using the buttons below."));
@@ -329,6 +342,13 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
       style_frame);
   nationality_text->SetVAlignCenter();
 
+  pilot_text = new WndFrame(GetClientAreaWindow(), look,
+      rc_pilot_text.left, rc_pilot_text.top,
+      rc_pilot_text.right - rc_pilot_text.left,
+      rc_pilot_text.bottom - rc_pilot_text.top,
+      style_frame);
+  pilot_text->SetVAlignCenter();
+
   if (auto_prompt) {
     prompt = new WndFrame(GetClientAreaWindow(), look,
         rc_prompt.left, rc_prompt.top,
@@ -367,6 +387,10 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                 rc_nationality_button,
                                 button_style, this, NATIONALITY);
 
+  pilot_button = new WndButton(GetClientAreaWindow(), dialog_look,
+                               _T("Pilot"),
+                               rc_pilot_button,
+                               button_style, this, PILOT);
   ok = new WndButton(GetClientAreaWindow(), dialog_look, _("Close"),
                      rc_ok,
                      button_style, this, OK);
@@ -386,11 +410,13 @@ SetupQuick::Unprepare()
   delete device_text;
   delete safety_text;
   delete nationality_text;
+  delete pilot_text;
   delete site_files_button;
   delete plane_button;
   delete device_button;
   delete safety_button;
   delete nationality_button;
+  delete pilot_button;
   delete ok;
   delete advanced;
   if (auto_prompt)

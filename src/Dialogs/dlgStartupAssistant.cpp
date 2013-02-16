@@ -372,7 +372,11 @@ CheckConfigurationBasics()
   if (task_behaviour.contest_nationality == ContestNationalities::UNKNOWN)
     return true;
 
-
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const LoggerSettings &logger = settings_computer.logger;
+  text = logger.pilot_name;
+  if (text.empty())
+    return true;
 
   return false;
 }
