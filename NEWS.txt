@@ -1,7 +1,15 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 0.1.1b Beta 2/8/2012 (based on XCSoar 6.4.4)
+TopHat 0.1.2 Beta 2/16/013
+* Added Startup Assistant with help tips and Quick Setup Screen
+* Changed MAT tasks to add turnpoints automatically
+* Started revamp of task manager
+* Added US Rules option via Nationality setting
+* Simplified menus; e.g. "Switch screens"
+* Simplified Waypoint Select screen
+
+TopHat 0.1.1b Beta 2/8/2013 (based on XCSoar 6.4.4)
 * Added support for Mat tasks, and interaction when clicking on a tp to add it 
 to the task.
 * Removed many Info Boxes
