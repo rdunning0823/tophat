@@ -31,7 +31,6 @@ Copyright_License {
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
 
-
 gcc_const
 static WindowStyle
 GetDialogStyle()
@@ -45,11 +44,13 @@ GetDialogStyle()
 WidgetDialog::WidgetDialog(const TCHAR *caption, const PixelRect &rc,
                            Widget *_widget,
                            DialogFooter::Listener *_listener,
-                           UPixelScalar _footer_height)
+                           UPixelScalar _footer_height,
+                           ButtonPanel::ButtonPanelPosition _button_position)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            rc, caption, GetDialogStyle()),
    dialog_footer(GetClientAreaWindow(), _listener, _footer_height),
-   buttons(GetClientAreaWindow(), UIGlobals::GetDialogLook()),
+   buttons(GetClientAreaWindow(), UIGlobals::GetDialogLook(),
+           _button_position),
    widget(GetClientAreaWindow(), _widget),
    auto_size(false),
    changed(false)
@@ -59,12 +60,14 @@ WidgetDialog::WidgetDialog(const TCHAR *caption, const PixelRect &rc,
 
 WidgetDialog::WidgetDialog(const TCHAR *caption, Widget *_widget,
                            DialogFooter::Listener *_listener,
-                           UPixelScalar _footer_height)
+                           UPixelScalar _footer_height,
+                           ButtonPanel::ButtonPanelPosition _button_position)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            UIGlobals::GetMainWindow().GetClientRect(),
            caption, GetDialogStyle()),
    dialog_footer(GetClientAreaWindow(), _listener, _footer_height),
-   buttons(GetClientAreaWindow(), UIGlobals::GetDialogLook()),
+   buttons(GetClientAreaWindow(), UIGlobals::GetDialogLook(),
+           _button_position),
    widget(GetClientAreaWindow(), _widget),
    auto_size(true),
    changed(false)

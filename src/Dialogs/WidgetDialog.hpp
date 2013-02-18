@@ -96,7 +96,9 @@ public:
 public:
   WidgetDialog(const TCHAR *caption, const PixelRect &rc,
                Widget *widget, DialogFooter::Listener *_listener = NULL,
-               UPixelScalar footer_height = 0);
+               UPixelScalar footer_height = 0,
+               ButtonPanel::ButtonPanelPosition button_position =
+                   ButtonPanel::ButtonPanelPosition::Auto);
 
   /**
    * Create a dialog with an automatic size (by
@@ -104,7 +106,9 @@ public:
    */
   WidgetDialog(const TCHAR *caption, Widget *widget,
                DialogFooter::Listener *_listener = NULL,
-               UPixelScalar footer_height = 0);
+               UPixelScalar footer_height = 0,
+               ButtonPanel::ButtonPanelPosition button_position =
+                                  ButtonPanel::ButtonPanelPosition::Auto);
 
   bool GetChanged() const {
     return changed;
@@ -123,16 +127,22 @@ public:
 
   WndButton *AddButton(const TCHAR *caption,
                        WndButton::ClickNotifyCallback callback) {
-    return buttons.Add(caption, callback);
+    WndButton * but = buttons.Add(caption, callback);
+    OnResize(GetWidth(), GetHeight());
+    return but;
   }
 
   WndButton *AddButton(const TCHAR *caption,
                        ActionListener *listener, int id) {
-    return buttons.Add(caption, listener, id);
+    WndButton * but = buttons.Add(caption, listener, id);
+    OnResize(GetWidth(), GetHeight());
+    return but;
   }
 
   WndButton *AddButton(const TCHAR *caption, int modal_result) {
-    return AddButton(caption, this, modal_result);
+    WndButton * but = AddButton(caption, this, modal_result);
+    OnResize(GetWidth(), GetHeight());
+    return but;
   }
 
   int ShowModal();
