@@ -122,6 +122,37 @@ ShowDetails(bool visible)
 }
 
 static void
+RefreshTaskProperties()
+{
+  WndButton *button_properties = (WndButton*) wf->FindByName(_T("butTaskProperties"));
+  assert (button_properties != nullptr);
+  StaticString<255> text;
+
+  const OrderedTaskBehaviour &otb = ordered_task->GetOrderedTaskBehaviour();
+  const TaskFactoryType ftype = ordered_task->GetFactoryType();
+  text = OrderedTaskFactoryName(ftype);
+
+  if (ordered_task->HasTargets()) {
+    StaticString<50> time_info;
+    FormatSignedTimeHHMM(time_info.buffer(), (int)otb.aat_min_time);
+    text.AppendFormat(_T(".  %s %s"), _("Time"), time_info.c_str());
+  }
+
+  if (!IsFai(ordered_task->GetFactoryType())) {
+    StaticString<25> start_height;
+    StaticString<25> finish_height;
+
+    FormatUserAltitude(fixed(otb.start_max_height), start_height.buffer(), true);
+    FormatUserAltitude(fixed(otb.finish_min_height), finish_height.buffer(), true);
+
+    text.AppendFormat(_T("\n%s %s %s\n%s %s %s"),
+                      _("Start"), _("MSL:"), start_height.c_str(),
+                      _("Finish"), _("MSL:"), finish_height.c_str());
+  }
+  button_properties->SetCaption(text.c_str());
+}
+
+static void
 RefreshView()
 {
   wTaskView->Invalidate();
@@ -129,6 +160,8 @@ RefreshView()
   wTaskPoints->SetLength(ordered_task->TaskSize());
 
   wTaskPoints->SetCursorIndex(active_index);
+
+  RefreshTaskProperties();
 
   ShowDetails(ordered_task->TaskSize() != 0);
   if (ordered_task->TaskSize() == 0)
@@ -185,10 +218,18 @@ RefreshView()
     break;
   }
 
+  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
+  assert (button_type != nullptr);
+  unsigned num_types = ordered_task->GetFactory().GetValidTypes(
+      active_index).size();
+  button_type->SetVisible(num_types > 1u);
+  button_type->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
+
   WndFrame* wfrm = nullptr;
   wfrm = ((WndFrame*)wf->FindByName(_T("lblType")));
-  if (wfrm)
-    wfrm->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
+  assert (wfrm != nullptr);
+  wfrm->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
+  wfrm->SetVisible(!button_type->IsVisible());
 
   bool edit_disabled = (ordered_task->GetFactoryType() ==
       TaskFactoryType::FAI_GENERAL) ||
@@ -196,41 +237,6 @@ RefreshView()
       (active_index != ordered_task->TaskSize() - 1 && active_index != 0));
 
   EnableSizeEdit(!edit_disabled);
-
-  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
-  assert (button_type != nullptr);
-  unsigned num_types = ordered_task->GetFactory().GetValidTypes(
-      active_index).size();
-  button_type->SetVisible(num_types > 1u);
-
-
-  WndButton *button_properties = (WndButton*) wf->FindByName(_T("butTaskProperties"));
-  assert (button_type != nullptr);
-  StaticString<255> text;
-
-  const OrderedTaskBehaviour &otb = ordered_task->GetOrderedTaskBehaviour();
-  const TaskFactoryType ftype = ordered_task->GetFactoryType();
-  text = OrderedTaskFactoryName(ftype);
-
-  if (ordered_task->HasTargets()) {
-    StaticString<50> time_info;
-    FormatSignedTimeHHMM(time_info.buffer(), (int)otb.aat_min_time);
-    text.AppendFormat(_T(".  %s %s"), _("Time"), time_info.c_str());
-  }
-  text.append(_T("\n"));
-
-  if (!IsFai(ordered_task->GetFactoryType())) {
-    StaticString<25> start_height;
-    StaticString<25> finish_height;
-
-    FormatUserAltitude(fixed(otb.start_max_height), start_height.buffer(), true);
-    FormatUserAltitude(fixed(otb.finish_min_height), finish_height.buffer(), true);
-
-    text.AppendFormat(_T("%s %s %s\n%s %s %s"),
-                      _("Start"), _("MSL:"), start_height.c_str(),
-                      _("Finish"), _("MSL:"), finish_height.c_str());
-  }
-  button_properties->SetCaption(text.c_str());
 
   Refreshing = false; // reactivate onChange routines
 }
@@ -506,6 +512,8 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
   WndFrame* wType = (WndFrame*) wf->FindByName(_T("lblType"));
   assert (wType);
   wType->SetFont(*look.caption.font);
+  wType->SetAlignCenter();
+  wType->SetVAlignCenter();
 
   wTaskPoints = (ListControl*)wf->FindByName(_T("List"));
   assert(wTaskPoints != nullptr);
