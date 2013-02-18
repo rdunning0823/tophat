@@ -244,6 +244,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/TaskManager/TaskActionsPanel.cpp \
 	$(SRC)/Dialogs/TaskManager/TaskListPanel.cpp \
 	$(SRC)/Dialogs/TaskManager/TaskCalculatorPanel.cpp \
+	$(SRC)/Dialogs/TaskManager/TaskPropertiesDialogUs.cpp \
 	$(SRC)/Dialogs/dlgTaskOptionalStarts.cpp \
 	$(SRC)/Dialogs/dlgTaskPoint.cpp \
 	$(SRC)/Dialogs/dlgTaskPointUs.cpp \
