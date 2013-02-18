@@ -28,14 +28,27 @@ Copyright_License {
 #include "Form/Button.hpp"
 
 class ButtonPanel {
+
+public:
+  enum ButtonPanelPosition {
+    Auto,
+    Side,
+    Bottom,
+  };
+
   ContainerWindow &parent;
   const DialogLook &look;
   ButtonWindowStyle style;
 
   StaticArray<WndButton *, 8u> buttons;
 
-public:
-  ButtonPanel(ContainerWindow &parent, const DialogLook &look);
+  /**
+   * the position of the panel on  the screen
+   */
+  ButtonPanelPosition position;
+
+  ButtonPanel(ContainerWindow &parent, const DialogLook &look,
+              ButtonPanelPosition position = Auto);
   ~ButtonPanel();
 
   WndButton *Add(const TCHAR *caption,
