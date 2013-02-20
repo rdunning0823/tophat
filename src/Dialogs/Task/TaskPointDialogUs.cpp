@@ -157,9 +157,22 @@ RefreshTaskProperties()
     FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
     FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
 
-    text.AppendFormat(_T("\n%s %s %s\n%s %s %s"),
-                      _("Start"), _("MSL:"), start_height.c_str(),
-                      _("Finish"), _("MSL:"), finish_height.c_str());
+    text.AppendFormat(_T("   -   %s %s %s"),
+                      _("Start"), _("MSL:"), start_height.c_str());
+    const DialogLook &look = UIGlobals::GetDialogLook();
+
+    StaticString<50> text2;
+    text2.Format(_T("%s %s %s"),
+                 _("Finish"), _("MSL:"), finish_height.c_str());
+    PixelSize size = look.caption.font->TextSize(text.c_str());
+    PixelSize size2 = look.caption.font->TextSize(text2.c_str());
+    PixelSize size_space = look.caption.font->TextSize(_T(" "));
+
+    assert(size.cx >= size2.cx);
+    unsigned spaces_needed = (size.cx - size2.cx) / size_space.cx;
+    StaticString<100> spaces (_T("                                                  "));
+    spaces.Truncate(spaces_needed);
+    text.AppendFormat(_T("\n%s%s"),spaces.c_str(), text2.c_str());
   }
   button_properties->SetCaption(text.c_str());
 }

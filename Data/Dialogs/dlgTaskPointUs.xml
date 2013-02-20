@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <Form Caption="Waypoint">
-  <Button Caption="Close" X="0" Y="-37" Width="120" Height="35" OnClick="OnCloseClicked"/>
-  <Button Name="butAdd" Caption="Insert after" X="152" Y="127" Width="73" Height="35" OnClick="OnAddClicked"/>
-  <Button Name="butTaskProperties" Caption="Task Properties" X="131" Y="-52" Width="109" Height="50" OnClick="OnTaskPropertiesClicked"/>
+  <Button Caption="Close" X="0" Y="-37" Width="150" Height="35" OnClick="OnCloseClicked"/>
+  <Button Name="butAdd" Caption="Insert after" X="157" Y="109" Width="73" Height="35" OnClick="OnAddClicked"/>
+  <Button Name="butTaskProperties" X="2" Y="2" Width="236" Height="35" OnClick="OnTaskPropertiesClicked"/>
 
-  <Panel Name="frmDetails" X="0" Y="0" Width="-2" Height="-37">
-    <List Name="List" X="0" Y="91" Width="130" Height="177"/>
-    <Canvas Name="frmTaskView" X="0" Y="0" Width="90" Height="90" Border="1" OnPaint="OnTaskPaint" />
+  <Panel Name="frmDetails" X="0" Y="0" Width="-2">
+    <List Name="List" X="0" Y="109" Width="150" Height="-37"/>
+    <Canvas Name="frmTaskView" X="157" Y="-85" Width="75" Height="75" Border="1" OnPaint="OnTaskPaint" />
 
-    <Panel Name="frmButtons" X="152" Y="92" Width="75" Height="105" Border="0">
-      <Button Name="butRelocate" Caption="Change" X="0" Y="0" Width="73" Height="35" OnClick="OnRelocateClicked"/>
+    <Panel Name="frmButtons" X="157" Y="109" Width="75" Height="105" Border="0">
+      <Button Name="butRelocate" Caption="Change" X="0" Y="35" Width="73" Height="35" OnClick="OnRelocateClicked"/>
       <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
     </Panel>
 
-    <Panel Name="frmType" X="92" Y="2" Height="88" Border="1">
+    <Panel Name="frmType" X="0" Y="38" Width="150" Height="70" Border="1">
       <Label Name="lblType" Caption="Type" X="2" Y="3" Width="145" Height="35"/>
       <Button Name="butType" Caption="Change Type" X="2" Y="3" Width="145" Height="35" OnClick="OnTypeClicked"/>
 
