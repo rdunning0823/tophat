@@ -57,7 +57,7 @@ MapLook::Initialise(const MapSettings &settings,
   traffic_alarm_icon.Load(IDB_TRAFFIC_ALARM, IDB_TRAFFIC_ALARM_HD, false);
 
   static constexpr Color clrSepia(0x78,0x31,0x18);
-  reach_pen.Set(Pen::DASH, Layout::ScalePenWidth(1), clrSepia);
+  reach_pen.Set(Pen::DASH, Layout::ScalePenWidth(2), clrSepia);
   reach_pen_thick.Set(Pen::DASH, Layout::ScalePenWidth(2), clrSepia);
 
   track_line_pen.Set(3, COLOR_GRAY);
