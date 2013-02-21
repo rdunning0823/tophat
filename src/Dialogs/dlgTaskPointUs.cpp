@@ -21,6 +21,7 @@ Copyright_License {
 }
 */
 
+#include "Dialogs/dlgTaskPointUs.hpp"
 #include "Dialogs/Task.hpp"
 #include "Dialogs/Waypoint.hpp"
 #include "Dialogs/CallBackTable.hpp"
@@ -71,6 +72,10 @@ static OrderedTask* ordered_task = nullptr;
 static OrderedTask** ordered_task_pointer = nullptr;
 static bool task_modified = false;
 static unsigned active_index = 0;
+/**
+ * tells calling program if modified, not modified or should be reverted
+ */
+TaskEditorReturn task_editor_return;
 
 // setting to True during refresh so control values don't trigger form save
 static bool Refreshing = false;
@@ -88,10 +93,38 @@ IsFai(TaskFactoryType ftype)
       (ftype == TaskFactoryType::FAI_TRIANGLE);
 }
 
+/**
+ * converts last point to finish if it is not already.
+ * @return true if task is valid
+ */
+static bool
+CheckAndFixTask()
+{
+  if (!task_modified)
+    return true;
+
+  task_modified |= ordered_task->GetFactory().CheckAddFinish();
+
+  return (ordered_task->TaskSize() == 0) || ordered_task->CheckTask();
+}
+
 static void
 OnCloseClicked(gcc_unused WndButton &Sender)
 {
-  wf->SetModalResult(mrOK);
+  if (CheckAndFixTask())
+    wf->SetModalResult(mrOK);
+  else {
+
+    ShowMessageBox(getTaskValidationErrors(
+        ordered_task->GetFactory().GetValidationErrors()),
+      _("Validation Errors"), MB_ICONEXCLAMATION | MB_OK);
+
+    if (ShowMessageBox(_("Task not valid. Changes will be lost.\nContinue?"),
+                        _("Task Manager"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK) {
+      task_editor_return = TaskEditorReturn::TASK_REVERT;
+      wf->SetModalResult(mrOK);
+    }
+  }
 }
 
 /**
@@ -161,7 +194,7 @@ RefreshTaskProperties()
 
     assert(size.cx >= size2.cx);
     unsigned spaces_needed = (size.cx - size2.cx) / size_space.cx;
-    StaticString<100> spaces (_T("                                                  "));
+    StaticString<150> spaces (_T("                                                                                                                                                      "));
     spaces.Truncate(spaces_needed);
     text.AppendFormat(_T("\n%s%s"),spaces.c_str(), text2.c_str());
   }
@@ -519,13 +552,14 @@ OnListPaint(Canvas &canvas, const PixelRect rc, unsigned DrawListIndex)
                       rc.right - left, buffer);
 }
 
-bool
+TaskEditorReturn
 dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
                       const unsigned index)
 {
   ordered_task_pointer = task_pointer;
   ordered_task = *task_pointer;
   task_modified = false;
+  task_editor_return = TaskEditorReturn::TASK_NOT_MODIFIED;
   active_index = index;
 
   wf = LoadDialog(CallBackTable, parent,
@@ -564,5 +598,11 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
   if (task_modified) {
     ordered_task->UpdateGeometry();
   }
-  return task_modified;
+
+  if (task_editor_return == TaskEditorReturn::TASK_REVERT)
+    return task_editor_return;
+  else if (task_modified)
+    return TaskEditorReturn::TASK_MODIFIED;
+
+  return TaskEditorReturn::TASK_NOT_MODIFIED;
 }

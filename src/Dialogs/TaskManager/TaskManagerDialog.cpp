@@ -53,6 +53,7 @@ Copyright_License {
 #include "Task/Factory/AbstractTaskFactory.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
+#include "TaskManagerDialogUs.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
@@ -303,6 +304,13 @@ dlgTaskManager::dlgTaskManagerShowModal(SingleWindow &parent)
 {
   if (protected_task_manager == NULL)
     return;
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
+  if (is_usa) {
+    TaskManagerDialogUsShowModal(parent);
+    return;
+  }
 
   /* invalidate the preview layout */
   TaskViewRect.right = 0;

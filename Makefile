@@ -237,6 +237,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/ConfigPanels/WaypointDisplayConfigPanel.cpp \
 	\
 	$(SRC)/Dialogs/TaskManager/TaskManagerDialog.cpp \
+	$(SRC)/Dialogs/TaskManager/TaskManagerDialogUs.cpp \
 	$(SRC)/Dialogs/TaskManager/TaskClosePanel.cpp \
 	$(SRC)/Dialogs/TaskManager/TaskEditPanel.cpp \
 	$(SRC)/Dialogs/TaskManager/TaskPropertiesPanel.cpp \
