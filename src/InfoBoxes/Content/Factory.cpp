@@ -369,7 +369,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentWindBearing>::Create,
     HeadWindSimplified,
     e_WindSpeed_Est, // Wind V
-    STANDARD,
+    DEPRECATED,
   },
 
   // e_AA_Time
