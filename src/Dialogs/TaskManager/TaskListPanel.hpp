@@ -34,9 +34,13 @@ class TabbedControl;
 class Canvas;
 class OrderedTask;
 class TaskStore;
+class WndForm;
 
 class TaskListPanel : public XMLWidget, private ListControl::Handler {
-  TabBarControl &tab_bar;
+  /**
+   * a pointer to the tab bar if run in a tabbed environment
+   */
+  TabBarControl *tab_bar;
 
   OrderedTask **active_task;
   bool *task_modified;
@@ -52,15 +56,23 @@ class TaskListPanel : public XMLWidget, private ListControl::Handler {
 
   ListControl *wTasks;
   WndButton *more_button;
+  WndButton *cancel_button;
   WndOwnerDrawFrame* wTaskView;
 
+  /**
+   * an instance to a parent form.  This form is closed by the Load function
+   * if it is not nullptr
+   * If the form is nullptr, it's assume the widget is shown in a tabbed window
+   */
+  WndForm *parent_form;
+
 public:
-  TaskListPanel(TabBarControl &_tab_bar,
+  TaskListPanel(TabBarControl *_tab_bar,
                 OrderedTask **_active_task, bool *_task_modified)
     :tab_bar(_tab_bar),
      active_task(_active_task), task_modified(_task_modified),
      more(false),
-     wTaskView(NULL) {}
+     wTaskView(NULL), parent_form(nullptr) {}
 
   void SetTaskView(WndOwnerDrawFrame *_task_view) {
     assert(wTaskView == NULL);
@@ -77,6 +89,11 @@ public:
   void DeleteTask();
   void RenameTask();
 
+  /**
+   * closes the parent form when this is not run in a tabbed environment
+   */
+  void CancelForm();
+
   void OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas);
 
   void OnMoreClicked();
@@ -85,6 +102,14 @@ public:
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc);
   virtual void Hide();
+
+  /**
+   * set the tatic parent form
+   * and indicates the widget is being shown in a form
+   * instead of in a tabbed window
+   * also add a cancel button
+   */
+  void SetParentForm(WndForm *_parent_form);
 
 protected:
   OrderedTask *get_cursor_task();

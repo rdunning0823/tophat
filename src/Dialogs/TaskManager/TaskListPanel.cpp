@@ -209,9 +209,21 @@ TaskListPanel::LoadTask()
   RefreshView();
   *task_modified = true;
 
-  tab_bar.SetCurrentPage(dlgTaskManager::GetTurnpointTab());
-  tab_bar.SetFocus();
+  if (parent_form == nullptr) {
+    assert(tab_bar != nullptr);
+    tab_bar->SetCurrentPage(dlgTaskManager::GetTurnpointTab());
+    tab_bar->SetFocus();
+  } else
+    parent_form->SetModalResult(mrOK);
 }
+
+void
+TaskListPanel::SetParentForm(WndForm *_parent_form)
+{
+  assert(_parent_form != nullptr);
+  parent_form = _parent_form;
+}
+
 
 void
 TaskListPanel::DeleteTask()
@@ -261,6 +273,12 @@ ClearSuffix(TCHAR *p, const TCHAR *suffix)
 
   *q = _T('\0');
   return true;
+}
+
+void
+TaskListPanel::CancelForm()
+{
+  parent_form->SetModalResult(mrCancel);
 }
 
 void
@@ -334,11 +352,22 @@ OnRenameClicked(gcc_unused WndButton &Sender)
   instance->RenameTask();
 }
 
+/**
+ * called when the widget is part of a form instead of a tab window
+ * and the cancel will close the form
+ */
+static void
+OnCancelClicked(gcc_unused WndButton &Sender)
+{
+  instance->CancelForm();
+}
+
 static constexpr CallBackTableEntry task_list_callbacks[] = {
   DeclareCallBackEntry(OnMoreClicked),
   DeclareCallBackEntry(OnLoadClicked),
   DeclareCallBackEntry(OnDeleteClicked),
   DeclareCallBackEntry(OnRenameClicked),
+  DeclareCallBackEntry(OnCancelClicked),
 
   DeclareCallBackEntry(NULL)
 };
@@ -361,6 +390,10 @@ TaskListPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   more_button = (WndButton *)form.FindByName(_T("more"));
   assert(more_button != NULL);
+
+  cancel_button = (WndButton *)form.FindByName(_T("cancel"));
+  assert(more_button != NULL);
+  cancel_button->SetVisible(parent_form != nullptr);
 }
 
 void

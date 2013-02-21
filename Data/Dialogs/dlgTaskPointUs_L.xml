@@ -7,7 +7,7 @@
   <Button Name="butAdd" Caption="Insert after" X="155" Y="115" Width="73" Height="35" OnClick="OnAddClicked"/>
   <Button Name="butTaskProperties" X="2" Y="2" Width="316" Height="35" OnClick="OnTaskPropertiesClicked"/>
 
-  <Panel Name="frmDetails" X="0" Y="0" Width="320" Height="251">
+  <Panel Name="frmDetails" X="0" Y="0" Width="320" Height="-1">
     <List Name="List" X="0" Y="39" Width="150" Height="-37"/>
 
     <Panel Name="frmType" X="152" Y="39" Width="167" Height="70" Border="1">
@@ -52,7 +52,9 @@
       <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
     </Panel>
 
-    <Canvas Name="frmTaskView" X="-79" Y="116" Width="75" Height="75" Border="1" OnPaint="OnTaskPaint" />
+    <Canvas Name="frmTaskView" X="-79" Y="116" Width="73" Height="69" Border="1" OnPaint="OnTaskPaint" />
+    <Button Name="butBrowse" Caption="Browse" X="-79" Y="185" Width="73" Height="35" OnClick="OnBrowseClicked"/>
+    
 
   </Panel>
 

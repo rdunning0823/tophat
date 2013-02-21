@@ -38,6 +38,12 @@ dlgTaskPointShowModal(SingleWindow &parent, OrderedTask** task, const unsigned i
  * dialog with task properties needed for American task rules
  */
 void
+dlgTaskListUsShowModal(OrderedTask** task, bool &task_changed);
+
+/**
+ * dialog with task properties needed for American task rules
+ */
+void
 dlgTaskPropertiesUsShowModal(const DialogLook &look, OrderedTask** task,
                              bool &task_changed);
 /**

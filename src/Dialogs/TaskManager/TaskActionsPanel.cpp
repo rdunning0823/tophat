@@ -41,6 +41,8 @@ Copyright_License {
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 
+#include "LogFile.hpp" //debug
+
 /** XXX this hack is needed because the form callbacks don't get a
     context pointer - please refactor! */
 static TaskActionsPanel *instance;

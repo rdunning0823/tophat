@@ -68,6 +68,7 @@ static WndForm *wf = nullptr;
 static WndFrame* wTaskView = nullptr;
 ListControl *wTaskPoints;
 static OrderedTask* ordered_task = nullptr;
+static OrderedTask** ordered_task_pointer = nullptr;
 static bool task_modified = false;
 static unsigned active_index = 0;
 
@@ -130,6 +131,9 @@ RefreshTaskProperties()
   const OrderedTaskBehaviour &otb = ordered_task->GetOrderedTaskBehaviour();
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   text = OrderedTaskFactoryName(ftype);
+
+  wf->SetCaption(text.c_str());
+
 
   if (ordered_task->HasTargets()) {
     StaticString<50> time_info;
@@ -369,6 +373,17 @@ OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
 }
 
 /**
+ * shows the task browse dialog, and updates the task as needed
+ */
+static void
+OnBrowseClicked(gcc_unused WndButton &Sender)
+{
+  dlgTaskListUsShowModal(ordered_task_pointer, task_modified);
+  ordered_task = *ordered_task_pointer;
+  RefreshView();
+}
+
+/**
  * appends or inserts a task point after the current item
  */
 static void
@@ -452,6 +467,7 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnTypeClicked),
   DeclareCallBackEntry(OnTaskPaint),
   DeclareCallBackEntry(OnOZData),
+  DeclareCallBackEntry(OnBrowseClicked),
   DeclareCallBackEntry(NULL)
 };
 
@@ -507,6 +523,7 @@ bool
 dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
                       const unsigned index)
 {
+  ordered_task_pointer = task_pointer;
   ordered_task = *task_pointer;
   task_modified = false;
   active_index = index;
@@ -535,9 +552,6 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
     + Layout::Scale(6) + look.text_font->GetHeight();
   wTaskPoints->SetItemHeight(line_height);
 
-  TaskFactoryType xfac = ordered_task->GetFactoryType();
-
-  wf->SetCaption(OrderedTaskFactoryName(xfac));
   RefreshView();
   wf->ShowModal();
 
