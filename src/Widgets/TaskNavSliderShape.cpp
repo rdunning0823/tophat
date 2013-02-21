@@ -71,7 +71,7 @@ SliderShape::GetMediumFont()
 }
 
 void
-SliderShape::Draw(Canvas &canvas, const PixelRect &rc)
+SliderShape::Draw(Canvas &canvas, const PixelRect &rc, unsigned width)
 {
   UPixelScalar x_offset = rc.left;
   UPixelScalar y_offset =  0;
@@ -81,7 +81,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect &rc)
     poly[i].y = GetPoint(i).y + y_offset;
   }
 
-  canvas.Select(Pen(2, COLOR_BLACK));
+  canvas.Select(Pen(width, COLOR_BLACK));
   DrawClippedPolygon(canvas, poly, 8, rc);
 }
 

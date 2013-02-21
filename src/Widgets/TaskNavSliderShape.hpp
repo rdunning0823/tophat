@@ -135,7 +135,7 @@ public:
   /**
    * draws the outline of the slider shape
    */
-  void Draw(Canvas &canvas, const PixelRect &rc);
+  void Draw(Canvas &canvas, const PixelRect &rc, unsigned border_width);
 };
 
 #endif

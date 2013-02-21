@@ -52,6 +52,7 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
+#include "Terrain/TerrainSettings.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -187,6 +188,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
+  const MapSettings &settings_map = CommonInterface::GetMapSettings();
+  const TerrainRendererSettings &terrain = settings_map.terrain;
 
   TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
   bool draw_checkmark =
@@ -204,12 +207,13 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   PixelRect rc = rc_outer;
   rc.left += slider_shape.GetHintWidth();
   rc.right -= slider_shape.GetHintWidth();
+  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
 
   if (!tp.IsValid()) {
     canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
     canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
       selected, true, false)));
-    slider_shape.Draw(canvas, rc_outer);
+    slider_shape.Draw(canvas, rc_outer, border_width);
     canvas.Select(small_font);
     buffer = _("Click to navigate");
     width = canvas.CalcTextWidth(buffer.c_str());
@@ -225,7 +229,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
   canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
     selected, true, false)));
-  slider_shape.Draw(canvas, rc_outer);
+  slider_shape.Draw(canvas, rc_outer, border_width);
 #ifdef _WIN32
     TaskNavSliderWidget::PaintBackground(canvas, idx, dialog_look, rc_outer);
 #endif
