@@ -1019,7 +1019,7 @@ mode=Menu
 type=key
 data=9
 event=TerrainTopography topography toggle
-label=$(TopographyToggleActionName) Topo.
+label=$(TopographyToggleActionName) roads, cities, water
 location=22
 
 mode=Menu
