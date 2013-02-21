@@ -44,6 +44,7 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Interface.hpp"
 #include "Dialogs/Dialogs.h"
+#include "Terrain/TerrainSettings.hpp"
 
 
 #ifdef HAVE_NOAA
@@ -440,6 +441,9 @@ ShowMapItemListDialog(SingleWindow &parent,
     /* only one map item without details, show it.
      * non-details items are at start of list) */
     ShowMapItemDialog(*list[list.size() - 1], parent, airspace_warnings);
+  //don't show terrain-only info if terrain is disabled
+  else if (list_list_count == 0 && !settings.terrain.enable)
+    return;
   else {
     /* more than one map item: show a list */
     int i = ShowMapItemListDialog(parent, list, dialog_look, look,
