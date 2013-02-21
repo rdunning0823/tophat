@@ -616,7 +616,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_Time
   {
-    N_("Task time to go"),
+    N_("Task time to go (MacCready)"),
     N_("Fin ETE"),
     N_("Estimated time required to complete task, assuming performance of ideal MacCready cruise/climb cycle."),
     UpdateInfoBoxFinalETE,
@@ -627,7 +627,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_Time
   {
-    N_("Next time to go"),
+    N_("Next time to go (MacCready)"),
     N_("WP ETE"),
     N_("Estimated time required to reach next waypoint, assuming performance of ideal MacCready cruise/climb cycle."),
     UpdateInfoBoxNextETE,
