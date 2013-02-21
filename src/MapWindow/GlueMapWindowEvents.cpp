@@ -45,21 +45,6 @@ using std::min;
 using std::max;
 
 bool
-GlueMapWindow::OnMouseDouble(PixelScalar x, PixelScalar y)
-{
-  map_item_timer.Cancel();
-
-  mouse_down_clock.Update();
-
-  if (IsPanning())
-    return true;
-
-  InputEvents::ShowMenu();
-  ignore_single_click = true;
-  return true;
-}
-
-bool
 GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 {
   /* allow a bigger threshold on touch screens */

@@ -174,7 +174,6 @@ public:
 
 protected:
   // events
-  virtual bool OnMouseDouble(PixelScalar x, PixelScalar y);
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
   virtual bool OnMouseDown(PixelScalar x, PixelScalar y);
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y);
