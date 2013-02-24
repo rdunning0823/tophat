@@ -65,8 +65,6 @@ Copyright_License {
 #include <assert.h>
 #include <windef.h> /* for MAX_PATH */
 
-#include "LogFile.hpp" //debug
-
 #define REPOSITORY_URI "http://download.xcsoar.org/repository"
 
 static WindowStyle
@@ -333,8 +331,6 @@ ManagedFilePickAndDownloadWidget::GetResult()
 void
 ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::Prepare ENTER"));
-
   SetCaption(_("Download files from internet"));
 
   const DialogLook &look = UIGlobals::GetDialogLook();
@@ -384,18 +380,14 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
     Net::DownloadManager::AddListener(*this);
     Net::DownloadManager::Enumerate(*this);
 
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::Prepare about to enqueu repository"));
     Net::DownloadManager::Enqueue(REPOSITORY_URI, _T("repository"));
   }
 #endif
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::Prepare EXIT"));
-
 }
 
 void
 ManagedFilePickAndDownloadWidget::Unprepare()
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::Unprepare ENTER"));
 #ifdef HAVE_DOWNLOAD_MANAGER
   Timer::Cancel();
 
@@ -412,7 +404,6 @@ ManagedFilePickAndDownloadWidget::Unprepare()
 void
 ManagedFilePickAndDownloadWidget::LoadRepositoryFile()
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::LoadRepositoryFile ENTER"));
 #ifdef HAVE_DOWNLOAD_MANAGER
   mutex.Lock();
   repository_modified = false;
@@ -425,33 +416,23 @@ ManagedFilePickAndDownloadWidget::LoadRepositoryFile()
   TCHAR path[MAX_PATH];
   LocalPath(path, _T("repository"));
   FileLineReaderA reader(path);
-  if (reader.error()) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::LoadRepositoryFile reader.error()"));
+  if (reader.error())
     return;
-  }
 
   ParseFileRepository(repository, reader);
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::LoadRepositoryFile EXIT"));
 }
 
 
 void
 ManagedFilePickAndDownloadWidget::RefreshTheItem()
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::RefreshTheItem ENTER"));
-
   bool download_active = false;
-  unsigned debug_count = 0;
   for (auto i = repository.begin(), end = repository.end(); i != end; ++i) {
     const auto &remote_file = *i;
     const AvailableFile &file = remote_file;
     WideToACPConverter item_name2(the_item.name);
 
     if (StringIsEqual(item_name2, file.name.c_str())) {
-
-      if (++debug_count > 1)
-        LogDebug(_T("RefreshTheItem error: debug_count:%u name:%s"), debug_count,
-                 the_item.name.c_str());
 
       DownloadStatus download_status;
       const bool is_downloading = IsDownloading(file, download_status);
@@ -464,29 +445,18 @@ ManagedFilePickAndDownloadWidget::RefreshTheItem()
                    HasFailed(file));
 
       the_file = remote_file;
-
-      LogDebug(_T("RefreshTheItem updated the_item's name to: %s, hasfailed:%i"),
-               the_item.name.c_str(),
-               HasFailed(file));
     }
   }
 
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::RefreshTheItem debug_count:%u EXIT"),
-           debug_count);
-
 #ifdef HAVE_DOWNLOAD_MANAGER
-  if (download_active && !Timer::IsActive()) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::RefreshTheItem scheduling timer"));
+  if (download_active && !Timer::IsActive())
     Timer::Schedule(1000);
-  }
 #endif
 }
 
 void
 ManagedFilePickAndDownloadWidget::RefreshForm()
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::RefreshForm ENTER"));
-
   const DialogLook &look = UIGlobals::GetDialogLook();
   const Font& font = *look.list.font;
   StaticString<512> message(_T(""));
@@ -530,7 +500,6 @@ ManagedFilePickAndDownloadWidget::RefreshForm()
 
     status_message->SetCaption(message.c_str());
   }
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::RefreshForm EXIT: %s"), message.c_str());
 }
 
 #ifdef HAVE_DOWNLOAD_MANAGER
@@ -558,16 +527,12 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
 {
   picker_state = PickerState::VISIBLE;
 
-  LogDebug(_T("PromptAndAdd ENTER file filter: area.empty:%i type:%u"),
-           file_filter.area.empty(), file_filter.type);
 #ifdef HAVE_DOWNLOAD_MANAGER
   assert(Net::DownloadManager::IsAvailable());
 
   std::vector<AvailableFile> list;
   for (auto i = repository.begin(), end = repository.end(); i != end; ++i) {
     const AvailableFile &remote_file = *i;
-    LogDebug(_T("PromptAndAdd remote: area.empty:%i type:%u area same:%u"),
-             remote_file.area.empty(), remote_file.type, StringIsEqual(file_filter.area, remote_file.area));
     if ((file_filter.area.empty() || (remote_file.area == file_filter.area)) &&
         (file_filter.type == AvailableFile::Type::UNKNOWN ||
             (file_filter.type == remote_file.type)))
@@ -575,7 +540,6 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
   }
 
   if (list.empty()) {
-    LogDebug(_T("PromptAndAdd list.empty"));
     picker_state = PickerState::INVALID;
     return;
   }
@@ -586,7 +550,6 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
   add_list = NULL;
   if (i < 0) {
     picker_state = PickerState::CANCELLED;
-    LogDebug(_T("PromptAndAdd list < 0 return"));
     return;
   }
 
@@ -596,13 +559,10 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
   ACPToWideConverter base(remote_file.GetName());
   if (!base.IsValid()) {
     picker_state = PickerState::INVALID;
-    LogDebug(_T("PromptAndAdd !base.IsValid() return"));
     return;
   }
 
   the_item.Set(base, nullptr, false);
-  const TCHAR* t = base;
-  LogDebug(_T("PromptAndAdd set the_item's name to: %s"), t);
   picker_state = PickerState::ALREADY_SHOWN;
   Net::DownloadManager::Enqueue(remote_file.GetURI(), base);
 #endif
@@ -657,7 +617,6 @@ ManagedFilePickAndDownloadWidget::OnDownloadAdded(const TCHAR *path_relative,
                                                   int64_t size,
                                                   int64_t position)
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::OnDownloadAdded :%s ENTER"), path_relative);
   const TCHAR *name = BaseName(path_relative);
   if (name == NULL)
     return;
@@ -674,26 +633,19 @@ ManagedFilePickAndDownloadWidget::OnDownloadAdded(const TCHAR *path_relative,
   mutex.Unlock();
 
   SendNotification();
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::OnDownloadAdded EXIT"));
 }
 
 void
 ManagedFilePickAndDownloadWidget::OnDownloadComplete(const TCHAR *path_relative,
                                                      bool success)
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::OnDownloadComplete :%s ENTER"), path_relative);
-
   const TCHAR *name = BaseName(path_relative);
-  if (name == NULL) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::OnDownloadComplete name == NULL exit"));
+  if (name == NULL)
     return;
-  }
 
   WideToACPConverter name2(name);
-  if (!name2.IsValid()) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::OnDownloadComplete !name2.IsValid() exit"));
+  if (!name2.IsValid())
     return;
-  }
 
   const std::string name3(name2);
 
@@ -719,14 +671,11 @@ ManagedFilePickAndDownloadWidget::OnDownloadComplete(const TCHAR *path_relative,
   mutex.Unlock();
 
   SendNotification();
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::OnDownloadComplete EXIT"));
 }
 
 void
 ManagedFilePickAndDownloadWidget::OnNotification()
 {
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::OnNotification ENTER"));
-
   mutex.Lock();
   bool repository_modified2 = repository_modified;
   repository_modified = false;
@@ -760,25 +709,16 @@ ManagedFilePickAndDownloadWidget::OnNotification()
     ShowMessageBox(_("Failed to download the repository index."),
                    _("Error"), MB_OK);
 
-  if(the_item.failed) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::OnNotification item.failed!!! Closing"));
+  if(the_item.failed)
     Close(false);
-  }
 
   if (!the_item.failed && !the_item.downloading &&
-      picker_state == PickerState::ALREADY_SHOWN) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::OnNotification item.done!!! Closing"));
+      picker_state == PickerState::ALREADY_SHOWN)
     Close(true);
-  }
-
 
   if (picker_state == PickerState::CANCELLED ||
-      picker_state == PickerState::INVALID) {
-    LogDebug(_T("ManagedFilePickAndDownloadWidget::OnNotification picker_state CANCELLED or INVALID. Closing"));
+      picker_state == PickerState::INVALID)
     Close(false);
-  }
-
-  LogDebug(_T("ManagedFilePickAndDownloadWidget::OnNotification EXIT"));
 }
 
 static AvailableFile
