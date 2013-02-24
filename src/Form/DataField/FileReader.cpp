@@ -27,6 +27,7 @@ Copyright_License {
 #include "Util/StringUtil.hpp"
 #include "OS/PathName.hpp"
 #include "OS/FileUtil.hpp"
+#include "Language/Language.hpp"
 
 #if defined(_WIN32_WCE) && !defined(GNAV)
 #include "OS/FlashCardEnumerator.hpp"
@@ -91,7 +92,7 @@ DataFieldFileReader::DataFieldFileReader(DataAccessCallback OnDataAccess)
    // Set selection to zero
    mValue(0),
    loaded(false), postponed_sort(false),
-   postponed_value(_T("")) {}
+   postponed_value(_T("")), enable_file_download(false) {}
 
 int
 DataFieldFileReader::GetAsInteger() const
@@ -363,6 +364,8 @@ DataFieldFileReader::EnsureLoaded()
     return;
 
   loaded = true;
+  if (enable_file_download)
+    AddFile(GetScanInternetLabel(), GetScanInternetLabel());
 
   for (auto i = postponed_patterns.begin(), end = postponed_patterns.end();
        i != end; ++i)
@@ -373,4 +376,16 @@ DataFieldFileReader::EnsureLoaded()
 
   if (!StringIsEmpty(postponed_value))
     Lookup(postponed_value);
+}
+
+const TCHAR*
+DataFieldFileReader::GetScanInternetLabel() const
+{
+  return _("--Click to scan internet--");
+}
+
+void
+DataFieldFileReader::EnableInternetDownload()
+{
+  enable_file_download = true;
 }

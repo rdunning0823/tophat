@@ -85,6 +85,12 @@ private:
    */
   PatternList postponed_patterns;
 
+  /**
+   * display item at top of list to download internet files
+   * the user is responsible for handling this selection
+   */
+  bool enable_file_download;
+
 public:
   /**
    * Constructor of the DataFieldFileReader class
@@ -185,6 +191,19 @@ public:
 
   gcc_pure
   const TCHAR *GetItem(unsigned index) const;
+
+  /**
+   * the label displayed in the list of internet download is enabled
+   */
+  gcc_pure
+  const TCHAR* GetScanInternetLabel() const;
+
+  /**
+   * when enabled, inserts an item in the list
+   * created by GetScanInternetLable()
+   * The user is responsible for handling the action when selected
+   */
+  void EnableInternetDownload();
 
 protected:
   void EnsureLoaded();
