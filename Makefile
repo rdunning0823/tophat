@@ -885,7 +885,7 @@ endif
 include $(topdir)/build/gettext.mk
 include $(topdir)/build/cab.mk
 
-OUTPUTS := $(XCSOAR_BIN) $(VALI_XCS_BIN)
+OUTPUTS := $(XCSOAR_BIN) $(VALI_TOP_BIN)
 OUTPUTS += $(XCSOARSETUP_DLL) $(XCSOARLAUNCH_DLL)
 
 ifeq ($(TARGET),ANDROID)
