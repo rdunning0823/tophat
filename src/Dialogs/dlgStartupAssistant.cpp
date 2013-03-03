@@ -55,6 +55,8 @@ const TCHAR* tips [] = {
     N_("Click the 'M' button to show the Main menu.  Try clicking it again."),
     N_("To cancel a menu, click anywhere on the screen in the background to hide it."),
     N_("After you've entered a task cylinder, the Nav Bar shows a checkmark by the turnpoint name."),
+    N_("You can temporarily suspend your task by clicking on a waypoint and selecting 'Goto.'"),
+    N_("While you are in 'Goto' mode, the Nav Bar and all your Info boxes provide information solely about getting to the waypoint."),
     N_("If you are flying a MAT task, just create the start and finish.  Task points will be added as you fly over them."),
     N_("Create tasks in See You desktop and save them as a .CUP file.  Copy the .CUP file to XCSoarData.  Load using Top Hat's task manager."),
     N_("Click on an item in the map to show its details."),
