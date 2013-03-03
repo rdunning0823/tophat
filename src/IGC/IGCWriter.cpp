@@ -168,7 +168,7 @@ IGCWriter::WriteHeader(const BrokenDateTime &date_time,
   char buffer[100];
 
   // Flight recorder ID number MUST go first..
-  sprintf(buffer, "AXCS%s", logger_id);
+  sprintf(buffer, "ATOP%s", logger_id);
   WriteLine(buffer);
 
   sprintf(buffer, "HFDTE%02u%02u%02u",
@@ -182,7 +182,7 @@ IGCWriter::WriteHeader(const BrokenDateTime &date_time,
   WriteLine("HFGTYGLIDERTYPE:", aircraft_model);
   WriteLine("HFGIDGLIDERID:", aircraft_registration);
   WriteLine("HFCIDCOMPETITIONID:", competition_id);
-  WriteLine("HFFTYFRTYPE:XCSOAR,XCSOAR ", XCSoar_VersionStringOld);
+  WriteLine("HFFTYFRTYPE:TOPHAT,TOPHAT ", TopHat_VersionStringOld);
   WriteLine("HFGPS:", driver_name);
 
   WriteLine("HFDTM100DATUM:WGS-84");

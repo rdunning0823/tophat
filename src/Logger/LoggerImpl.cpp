@@ -246,7 +246,7 @@ LoggerImpl::StartLogger(const NMEAInfo &gps_info,
   for (int i = 1; i < 99; i++) {
     if (!settings.short_name)
       FormatIGCFilenameLong(name.buffer(), today,
-                            "XCS", logger_id, i);
+                            "TOP", logger_id, i);
     else
       FormatIGCFilename(name.buffer(), today,
                         'X', logger_id, i);
