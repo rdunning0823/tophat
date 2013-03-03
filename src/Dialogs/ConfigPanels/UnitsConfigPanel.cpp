@@ -57,7 +57,6 @@ public:
   UnitsConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
-  void UpdateUnitFields(const UnitSetting &units);
   void PresetCheck();
 
   /* methods from Widget */
@@ -68,20 +67,6 @@ private:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df);
 };
-
-void
-UnitsConfigPanel::UpdateUnitFields(const UnitSetting &units)
-{
-  LoadValueEnum(UnitsSpeed, units.speed_unit);
-  LoadValueEnum(UnitsDistance, units.distance_unit);
-  LoadValueEnum(UnitsLift, units.vertical_speed_unit);
-  LoadValueEnum(UnitsAltitude, units.altitude_unit);
-  LoadValueEnum(UnitsTemperature, units.temperature_unit);
-  LoadValueEnum(UnitsTaskSpeed, units.task_speed_unit);
-  LoadValueEnum(UnitsPressure, units.pressure_unit);
-
-  // Ignore the coord.format for the preset selection.
-}
 
 void
 UnitsConfigPanel::PresetCheck()
@@ -102,15 +87,7 @@ UnitsConfigPanel::PresetCheck()
 void
 UnitsConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(UnitsPreset, df)) {
-    int result = df.GetAsInteger();
-    if (result > 0) {
-      // First selection means not to load any preset.
-      const UnitSetting &units = Units::Store::Read(result - 1);
-      UpdateUnitFields(units);
-    }
-  } else
-    PresetCheck();
+  PresetCheck();
 }
 
 void
@@ -134,6 +111,7 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   LoadValueEnum(UnitsPreset, Units::Store::EqualsPresetUnits(config));
   wp->GetDataField()->SetListener(this);
+  wp->SetReadOnly(true);
 
   AddSpacer();
   SetExpertRow(spacer_1);
