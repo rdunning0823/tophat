@@ -84,8 +84,8 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
     rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
   } else {
     rc.left = rc_map.left;
-    rc.right = rc.left + (GetWidth() + 2 * clear_border_width);;
-    rc.bottom = rc_map.bottom;
+    rc.right = rc.left + (GetWidth() + 2 * clear_border_width);
+    rc.bottom = rc_map.bottom - GetHeight() - 2 * clear_border_width;
     rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
   }
 
