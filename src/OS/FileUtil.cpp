@@ -84,8 +84,8 @@ IsDots(const TCHAR* str)
 static bool
 checkFilter(const TCHAR *filename, const TCHAR *filter)
 {
-  // filter = e.g. "*.igc" or "config/*.prf"
-  // todo: make filters like "config/*.prf" work
+  // filter = e.g. "*.igc" or "config/*.top"
+  // todo: make filters like "config/*.top" work
 
   // if invalid or short filter "*" -> return true
   // todo: check for asterisk
@@ -94,7 +94,7 @@ checkFilter(const TCHAR *filename, const TCHAR *filter)
 
   // Copy filter without first char into upfilter
   // *.igc         ->  .igc
-  // config/*.prf  ->  onfig/*.prf
+  // config/*.top  ->  onfig/*.top
   TCHAR upfilter[MAX_PATH];
   _tcscpy(upfilter, filter + 1);
 

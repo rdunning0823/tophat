@@ -38,7 +38,7 @@ Copyright_License {
 #include <string.h>
 #include <windef.h> /* for MAX_PATH */
 
-#define XCSPROFILE "xcsoar-registry.prf"
+#define XCSPROFILE "tophat-registry.top"
 
 namespace Profile {
   static bool SaveFile(const FileTransaction &transaction);
@@ -130,7 +130,7 @@ Profile::SetFiles(const TCHAR* override)
       LocalPath(startProfileFile, override);
 
       if (_tcschr(override, '.') == NULL)
-        _tcscat(startProfileFile, _T(".prf"));
+        _tcscat(startProfileFile, _T(".top"));
     } else
       CopyString(startProfileFile, override, MAX_PATH);
     return;

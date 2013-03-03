@@ -82,9 +82,9 @@ TestWriter()
   Profile::Set(_T("key1"), 4);
   Profile::Set(_T("key2"), _T("value2"));
 
-  Profile::SaveFile(_T("output/TestProfileWriter.prf"));
+  Profile::SaveFile(_T("output/TestProfileWriter.top"));
 
-  FileLineReader reader(_T("output/TestProfileWriter.prf"));
+  FileLineReader reader(_T("output/TestProfileWriter.top"));
   if (reader.error()) {
     skip(3, 0, "read error");
     return;
@@ -112,7 +112,7 @@ static void
 TestReader()
 {
   Profile::Clear();
-  Profile::LoadFile(_T("test/data/TestProfileReader.prf"));
+  Profile::LoadFile(_T("test/data/TestProfileReader.top"));
 
   {
     int value;
