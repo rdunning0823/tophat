@@ -121,7 +121,7 @@ type=key
 data=APP1
 event=Pan off
 label=Pan\nOff
-location=20
+location=25
 
 ###### main entry buttons
 
