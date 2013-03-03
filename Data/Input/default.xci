@@ -992,14 +992,6 @@ location=17
 
 mode=Menu
 type=key
-data=0
-event=Exit system
-event=Mode default
-label=Quit
-location=20
-
-mode=Menu
-type=key
 data=8
 event=TerrainTopography terrain toggle
 label=$(TerrainToggleActionName) terrain
@@ -1133,6 +1125,14 @@ event=Analysis
 event=Mode default
 label=Analysis
 location=22
+
+mode=MenuLast
+type=key
+data=0
+event=Exit system
+event=Mode default
+label=Exit program
+location=24
 
 # ----------------------------------
 # mode=default.TA (ThermalAssistant)
