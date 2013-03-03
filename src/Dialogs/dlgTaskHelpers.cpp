@@ -36,6 +36,8 @@ Copyright_License {
 #include "OS/FileUtil.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Interface.hpp"
+#include "Engine/Task/TaskBehaviour.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -44,9 +46,15 @@ Copyright_License {
 const TCHAR*
 OrderedTaskFactoryName(TaskFactoryType type)
 {
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
   switch(type) {
   case TaskFactoryType::RACING:
-    return _("Racing");
+    if (is_usa)
+      return _("AT");
+    else
+      return _("Racing");
   case TaskFactoryType::FAI_GENERAL:
     return _("FAI badges/records");
   case TaskFactoryType::FAI_TRIANGLE:
@@ -56,7 +64,10 @@ OrderedTaskFactoryName(TaskFactoryType type)
   case TaskFactoryType::FAI_GOAL:
     return _("FAI goal");
   case TaskFactoryType::AAT:
-    return _("AAT");
+    if (is_usa)
+      return _("TAT");
+    else
+      return _("AAT");
   case TaskFactoryType::MAT:
     return _("MAT");
   case TaskFactoryType::MIXED:
@@ -72,9 +83,16 @@ OrderedTaskFactoryName(TaskFactoryType type)
 const TCHAR*
 OrderedTaskFactoryDescription(TaskFactoryType type)
 {
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
+
   switch(type) {
   case TaskFactoryType::RACING:
-    return _("Racing task around turn points.  Can also be used for FAI badge and record tasks.  "
+    if (is_usa)
+      return _("Assigned task. Has 1 mile turn point cylinders.  No minimum time.");
+    else
+      return _("Racing task around turn points.  Can also be used for FAI badge and record tasks.  "
         "Allows all shapes of observation zones.");
   case TaskFactoryType::FAI_GENERAL:
     return _("FAI rules, allows only FAI start, finish and turn point types, for badges and "
@@ -86,11 +104,9 @@ OrderedTaskFactoryDescription(TaskFactoryType type)
   case TaskFactoryType::FAI_GOAL:
     return _("FAI rules, path from start to a goal destination.");
   case TaskFactoryType::AAT:
-    return _("Task through assigned areas, minimum task time applies.  Restricted to cylinder "
-        "and sector observation zones.");
+    return _("Turn area task.  Has cylinders of varying sizes.  Minimum task time applies.");
   case TaskFactoryType::MAT:
-    return _("Task with at least one predefined point.  Pilot can add additional as needed.  Minimum task time applies.  Restricted to 1-mile cylinder "
-        "observation zones.");
+    return _("Modified area task.  Task with start, finish and at least one predefined 1-mile cylinder.  Pilot can add additional points as needed.  Minimum task time applies.");
   case TaskFactoryType::MIXED:
     return _("Racing task with a mix of assigned areas and turn points, minimum task time applies.");
   case TaskFactoryType::TOURING:
