@@ -201,15 +201,7 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
 
   const TaskStats &stats = task->GetStats();
   TCHAR summary_shape[100];
-  bool FAIShape = TaskSummaryShape(task, summary_shape);
-  if (FAIShape || task->GetFactoryType() == TaskFactoryType::FAI_GENERAL) {
-    if (!task->GetFactory().ValidateFAIOZs()) {
-      _tcscat(summary_shape, _T("/ "));
-      _tcscat(summary_shape, getTaskValidationErrors(
-          task->GetFactory().GetValidationErrors()));
-    }
-  }
-
+  TaskSummaryShape(task, summary_shape);
 
   TCHAR linebreak[3];
   if (linebreaks) {
