@@ -130,21 +130,10 @@ public:
 
 #ifdef HAVE_DOWNLOAD_MANAGER
   /**
-   * This mutex protects the attributes "downloads" and
-   * "repository_modified".
+   * This mutex protects the attributes repository_modified
+   * and repository_failed.
    */
   mutable Mutex mutex;
-
-  /**
-   * The list of file names (base names) that are currently being
-   * downloaded.
-   */
-  std::map<std::string, DownloadStatus> downloads;
-
-  /**
-   * Each item in this set is a failed download.
-   */
-  std::set<std::string> failures;
 
   /**
    * Was the repository file modified, and needs to be reloaded by
@@ -206,34 +195,6 @@ public:
   void PromptAndAdd();
 
 protected:
-  gcc_pure
-  bool IsDownloading(const char *name) const;
-
-  gcc_pure
-  bool IsDownloading(const AvailableFile &file) const {
-    return IsDownloading(file.GetName());
-  }
-
-  gcc_pure
-  bool IsDownloading(const char *name, DownloadStatus &status_r) const;
-
-  gcc_pure
-  bool IsDownloading(const AvailableFile &file,
-                     DownloadStatus &status_r) const {
-    return IsDownloading(file.GetName(), status_r);
-  }
-
-  gcc_pure
-  bool HasFailed(const char *name) const;
-
-  gcc_pure
-  bool HasFailed(const AvailableFile &file) const {
-    return HasFailed(file.GetName());
-  }
-
-  gcc_pure
-  int FindItem(const TCHAR *name) const;
-
   void LoadRepositoryFile();
   void RefreshForm();
   void RefreshTheItem();
