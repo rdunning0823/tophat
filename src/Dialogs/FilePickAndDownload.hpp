@@ -123,11 +123,8 @@ public:
 
   UPixelScalar font_height;
 
-#ifdef HAVE_DOWNLOAD_MANAGER
   WndButton *close_button;
   WndFrame *status_message;
-
-#endif
 
   FileRepository repository;
 

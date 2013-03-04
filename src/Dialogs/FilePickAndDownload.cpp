@@ -50,7 +50,9 @@ Copyright_License {
 
 #define REPOSITORY_URI "http://download.xcsoar.org/repository"
 
+#ifdef HAVE_DOWNLOAD_MANAGER
 static ManagedFilePickAndDownloadWidget *instance;
+#endif
 
 static bool
 LocalPath(TCHAR *buffer, const AvailableFile &file)
