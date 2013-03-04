@@ -46,8 +46,13 @@ MainMenuButton::OnPaint(Canvas &canvas)
   };
 
   bool pressed = is_down();
-
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed, true);
+#ifdef ENABLE_OPENGL
+  bool transparent = true;
+#else
+  bool transparent = false;
+#endif
+  //Todo fix the GDI rendering so it draws transparent correctly
+  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
   rc = renderer.GetDrawingRect(rc, pressed);
 
   UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
