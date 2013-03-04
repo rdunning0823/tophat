@@ -155,11 +155,9 @@ ManagedFilePickAndDownloadWidget::LoadRepositoryFile()
   ParseFileRepository(repository, reader);
 }
 
-
 void
 ManagedFilePickAndDownloadWidget::RefreshTheItem()
 {
-  bool download_active = false;
   for (auto i = repository.begin(), end = repository.end(); i != end; ++i) {
     const auto &remote_file = *i;
     const AvailableFile &file = remote_file;
@@ -167,22 +165,21 @@ ManagedFilePickAndDownloadWidget::RefreshTheItem()
 
     if (StringIsEqual(item_name2, file.name.c_str())) {
 
-      DownloadStatus download_status;
-      const bool is_downloading = IsDownloading(file, download_status);
+      DownloadStatus download_status = the_item.download_status;
+
 
       TCHAR path[MAX_PATH];
       LocalPath(path, file);
-      download_active |= is_downloading;
       the_item.Set(BaseName(path),
-                   is_downloading ? &download_status : nullptr,
-                   HasFailed(file));
+                   the_item.downloading ? &download_status : nullptr,
+                   the_item.failed);
 
       the_file = remote_file;
     }
   }
 
 #ifdef HAVE_DOWNLOAD_MANAGER
-  if (download_active && !Timer::IsActive())
+  if (the_item.downloading && !Timer::IsActive())
     Timer::Schedule(1000);
 #endif
 }
@@ -254,44 +251,6 @@ OnPaintAddItem(Canvas &canvas, const PixelRect rc, unsigned i)
 }
 
 #endif
-
-bool
-ManagedFilePickAndDownloadWidget::IsDownloading(const char *name) const
-{
-#ifdef HAVE_DOWNLOAD_MANAGER
-  ScopeLock protect(mutex);
-  return downloads.find(name) != downloads.end();
-#else
-  return false;
-#endif
-}
-
-bool
-ManagedFilePickAndDownloadWidget::IsDownloading(const char *name, DownloadStatus &status_r) const
-{
-#ifdef HAVE_DOWNLOAD_MANAGER
-  ScopeLock protect(mutex);
-  auto i = downloads.find(name);
-  if (i == downloads.end())
-    return false;
-
-  status_r = i->second;
-  return true;
-#else
-  return false;
-#endif
-}
-
-bool
-ManagedFilePickAndDownloadWidget::HasFailed(const char *name) const
-{
-#ifdef HAVE_DOWNLOAD_MANAGER
-  ScopeLock protect(mutex);
-  return failures.find(name) != failures.end();
-#else
-  return false;
-#endif
-}
 
 void
 ManagedFilePickAndDownloadWidget::PromptAndAdd()
@@ -371,11 +330,7 @@ ManagedFilePickAndDownloadWidget::OnAction(int id)
 void
 ManagedFilePickAndDownloadWidget::OnTimer()
 {
-  mutex.Lock();
-  const bool download_active = !downloads.empty();
-  mutex.Unlock();
-
-  if (download_active) {
+  if (the_item.downloading) {
     Net::DownloadManager::Enumerate(*this);
     RefreshTheItem();
     RefreshForm();
@@ -396,12 +351,10 @@ ManagedFilePickAndDownloadWidget::OnDownloadAdded(const TCHAR *path_relative,
   if (!name2.IsValid())
     return;
 
-  const std::string name3(name2);
-
-  mutex.Lock();
-  downloads[name3] = DownloadStatus{size, position};
-  failures.erase(name3);
-  mutex.Unlock();
+  if (the_item.name == name) {
+    the_item.download_status = DownloadStatus{size, position};
+    the_item.downloading = true;
+  }
 
   SendNotification();
 }
@@ -422,16 +375,11 @@ ManagedFilePickAndDownloadWidget::OnDownloadComplete(const TCHAR *path_relative,
 
   mutex.Lock();
 
-  downloads.erase(name3);
-
   if (StringIsEqual(name2, "repository")) {
     repository_failed = !success;
     if (success)
       repository_modified = true;
   } else {
-    if (!success)
-      failures.insert(name3);
-
     if (StringIsEqual(name, the_item.name)) {
       the_item.failed = !success;
       the_item.downloading = false;
@@ -528,7 +476,6 @@ ShowFilePickAndDownload2(AvailableFile &file_filter)
 
   return instance->GetResult();
 }
-
 
 #endif
 
