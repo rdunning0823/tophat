@@ -270,7 +270,7 @@ OnPaintAddItem(Canvas &canvas, const PixelRect rc, unsigned i)
 
   const AvailableFile &file = (*add_list)[i];
 
-  ACPToWideConverter name(file.GetName());
+  ACPToWideConverter name(file.GetDisplayName());
   if (name.IsValid())
     canvas.text(rc.left + Layout::Scale(2), rc.top + Layout::Scale(2), name);
 }
