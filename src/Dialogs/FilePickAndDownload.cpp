@@ -48,8 +48,6 @@ Copyright_License {
 #include <assert.h>
 #include <windef.h> /* for MAX_PATH */
 
-#define REPOSITORY_URI "http://download.xcsoar.org/repository"
-
 #ifdef HAVE_DOWNLOAD_MANAGER
 static ManagedFilePickAndDownloadWidget *instance;
 #endif
@@ -115,7 +113,7 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
     Net::DownloadManager::AddListener(*this);
     Net::DownloadManager::Enumerate(*this);
 
-    Net::DownloadManager::Enqueue(REPOSITORY_URI, _T("repository"));
+    Net::DownloadManager::Enqueue(GetRepositoryUri(file_filter.type), _T("repository"));
   }
 #endif
 }
@@ -154,6 +152,31 @@ ManagedFilePickAndDownloadWidget::LoadRepositoryFile()
     return;
 
   ParseFileRepository(repository, reader);
+}
+
+const char*
+ManagedFilePickAndDownloadWidget::GetRepositoryUri(AvailableFile::Type type)
+{
+#define REPOSITORY_MAP_URI "http://download.xcsoar.org/repository"
+//#define REPOSITORY_URI          "http://downloads.tophatsoaring.org/repository/repository_waypoint_tophat.txt"
+#define REPOSITORY_WAYPOINT_URI "http://raspberryridgesheepfarm.com/tophat/repository/repository_waypoint_tophat.txt"
+#define REPOSITORY_AIRSPACE_URI "http://raspberryridgesheepfarm.com/tophat/repository/repository_airspace_tophat.txt"
+
+
+  switch (type) {
+  case AvailableFile::Type::MAP:
+  case AvailableFile::Type::FLARMNET:
+  case AvailableFile::Type::UNKNOWN:
+    return REPOSITORY_MAP_URI;
+
+  case AvailableFile::Type::AIRSPACE:
+    return REPOSITORY_AIRSPACE_URI;
+
+  case AvailableFile::Type::WAYPOINT:
+    return REPOSITORY_WAYPOINT_URI;
+
+  }
+  return REPOSITORY_MAP_URI;
 }
 
 void

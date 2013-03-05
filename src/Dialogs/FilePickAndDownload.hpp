@@ -222,6 +222,12 @@ public:
    */
   const TCHAR * GetTypeFilterName() const;
 
+  /**
+   * @param type.  type of file
+   * @return. URI of repository for specified type of file
+   */
+  const char* GetRepositoryUri(AvailableFile::Type type);
+
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
