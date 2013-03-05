@@ -271,7 +271,7 @@ ManagedFilePickAndDownloadWidget::OnPaintItem(Canvas &canvas,
 
   const AvailableFile &file = (*add_list)[i];
 
-  ACPToWideConverter name(file.GetName());
+  ACPToWideConverter name(file.GetDisplayName());
   if (name.IsValid())
     canvas.DrawText(rc.left + Layout::Scale(2), rc.top + Layout::Scale(2), name);
 }
