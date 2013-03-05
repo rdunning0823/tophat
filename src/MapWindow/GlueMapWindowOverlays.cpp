@@ -230,6 +230,8 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
     icon.Draw(canvas, rc.right - offset, rc.bottom - icon.GetSize().cy);
   }
 
+  return; // don't show the rest of this stuff.  We know if we're circling etc
+
   // draw flight mode
   const MaskedIcon *bmp;
 
