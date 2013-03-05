@@ -43,6 +43,11 @@ struct AvailableFile {
   };
 
   /**
+   * Display name of the file.
+   */
+  std::string display_name;
+
+  /**
    * Base name of the file.
    */
   std::string name;
@@ -56,7 +61,14 @@ struct AvailableFile {
    * A short symbolic name for the area.  Empty means this file is
    * global.
    */
-  NarrowString<8> area;
+  NarrowString<25> area;
+
+  /**
+   * A short symbolic name for the smaller sub area.  Empty means this file is
+   * not associated with a subarea.
+   */
+  NarrowString<25> subarea;
+
 
   Type type;
 
@@ -70,11 +82,16 @@ struct AvailableFile {
 
   void Clear() {
     name.clear();
+    display_name.clear();
     uri.clear();
     area.clear();
+    subarea.clear();
     type = Type::UNKNOWN;
   }
 
+  const char *GetDisplayName() const {
+    return display_name.c_str();
+  }
   const char *GetName() const {
     return name.c_str();
   }
@@ -85,6 +102,10 @@ struct AvailableFile {
 
   const char *GetArea() const {
     return area;
+  }
+
+  const char *GetSubArea() const {
+    return subarea;
   }
 };
 

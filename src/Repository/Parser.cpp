@@ -81,6 +81,8 @@ ParseFileRepository(FileRepository &repository, NLineReader &reader)
       return false;
 
     if (StringIsEqual(name, "name")) {
+      if (file.display_name.empty())
+        file.display_name = file.GetName();
       if (!Commit(repository, file))
         return false;
 
@@ -89,8 +91,12 @@ ParseFileRepository(FileRepository &repository, NLineReader &reader)
       /* ignore */
     } else if (StringIsEqual(name, "uri")) {
       file.uri.assign(value);
+    } else if (StringIsEqual(name, "displayname")) {
+      file.display_name.assign(value);
     } else if (StringIsEqual(name, "area")) {
       file.area = value;
+    } else if (StringIsEqual(name, "subarea")) {
+      file.subarea = value;
     } else if (StringIsEqual(name, "type")) {
       if (StringIsEqual(value, "airspace"))
         file.type = AvailableFile::Type::AIRSPACE;
