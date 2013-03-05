@@ -80,52 +80,38 @@ private:
 void
 SiteConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(MapFile, df)) {
-    const ComputerSettings &settings_computer = XCSoarInterface::GetComputerSettings();
-    const TaskBehaviour &task_behaviour = settings_computer.task;
+  AvailableFile file_filter;
+  file_filter.Clear();
+  DataFieldFileReader* dff = (DataFieldFileReader*)&df;
+  if (IsDataField(MapFile, df))
+    file_filter.type = AvailableFile::Type::MAP;
+  else if (IsDataField(WaypointFile, df))
+    file_filter.type = AvailableFile::Type::WAYPOINT;
+  else if (IsDataField(AirspaceFile, df))
+    file_filter.type = AvailableFile::Type::AIRSPACE;
+  else
+    return;
 
-    DataFieldFileReader* dff = (DataFieldFileReader*)&df;
-    StaticString<255> label;
-    label.clear();
-    if (dff->GetAsDisplayString() != nullptr)
-      label = dff->GetAsDisplayString();
-    if (label == dff->GetScanInternetLabel()) {
-      AvailableFile file_filter;
-      file_filter.type = AvailableFile::Type::MAP;
-      StaticString<15> nationality;
-      switch (task_behaviour.contest_nationality) {
-      case UNKNOWN:
-      case EUROPEAN:
-        nationality.clear();
-        break;
-      case BRITISH:
-        nationality = _T("br");
-        break;
-      case AUSTRALIAN:
-        nationality = _T("au");
-        break;
-      case AMERICAN:
-        nationality = _T("us");
-        break;
-      }
+  StaticString<255> label;
+  label.clear();
 
-      WideToACPConverter base(nationality.c_str());
-      file_filter.area = base;
-      AvailableFile result = ShowFilePickAndDownload(file_filter);
-      if (result.IsValid()) {
-        ACPToWideConverter base(result.GetName());
-        if (!base.IsValid())
-          return;
-        StaticString<255> temp_name(base);
-        DataFieldFileReader *maps = (DataFieldFileReader*)&df;
-        StaticString<255> buffer;
-        LocalPath(buffer.buffer(), base);
-        maps->AddFile(base, buffer.c_str());
-        if (buffer == dff->GetScanInternetLabel())
-          maps->SetAsInteger(0);
-        else
-          maps->Lookup(buffer.c_str());
-      }
+  if (dff->GetAsDisplayString() != nullptr)
+    label = dff->GetAsDisplayString();
+  if (label == dff->GetScanInternetLabel()) {
+
+    AvailableFile result = ShowFilePickAndDownload(file_filter);
+    if (result.IsValid()) {
+      ACPToWideConverter base(result.GetName());
+      if (!base.IsValid())
+        return;
+      StaticString<255> temp_name(base);
+      StaticString<255> buffer;
+      LocalPath(buffer.buffer(), base);
+      dff->AddFile(base, buffer.c_str());
+      if (buffer == dff->GetScanInternetLabel())
+        dff->SetAsInteger(0);
+      else
+        dff->Lookup(buffer.c_str());
     }
   }
 }
@@ -168,10 +154,13 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   DataFieldFileReader *dff = (DataFieldFileReader *)(wp->GetDataField());
   dff->EnableInternetDownload();
 
-  AddFileReader(_("Waypoints"),
-                _("Primary waypoints file.  Supported file types are Cambridge/WinPilot files (.dat), "
-                    "Zander files (.wpz) or SeeYou files (.cup)."),
-                ProfileKeys::WaypointFile, _T("*.dat\0*.xcw\0*.cup\0*.wpz\0*.wpt\0"));
+  wp = AddFileReader(_("Waypoints"),
+                    _("Primary waypoints file.  Supported file types are Cambridge/WinPilot files (.dat), "
+                        "Zander files (.wpz) or SeeYou files (.cup)."),
+                    ProfileKeys::WaypointFile, _T("*.dat\0*.xcw\0*.cup\0*.wpz\0*.wpt\0"),
+                    true, this);
+  dff = (DataFieldFileReader *)(wp->GetDataField());
+  dff->EnableInternetDownload();
 
   AddFileReader(_("More waypoints"),
                 _("Secondary waypoints file.  This may be used to add waypoints for a competition."),
@@ -185,8 +174,12 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                 ProfileKeys::WatchedWaypointFile, _T("*.dat\0*.xcw\0*.cup\0*.wpz\0*.wpt\0"));
   SetExpertRow(WatchedWaypointFile);
 
-  AddFileReader(_("Airspaces"), _("The file name of the primary airspace file."),
-                ProfileKeys::AirspaceFile, _T("*.txt\0*.air\0*.sua\0"));
+  wp = AddFileReader(_("Airspaces"), _("The file name of the primary airspace file."),
+                     ProfileKeys::AirspaceFile, _T("*.txt\0*.air\0*.sua\0"),
+                     true, this);
+  dff = (DataFieldFileReader *)(wp->GetDataField());
+  dff->EnableInternetDownload();
+
 
   AddFileReader(_("More airspaces"), _("The file name of the secondary airspace file."),
                 ProfileKeys::AdditionalAirspaceFile, _T("*.txt\0*.air\0*.sua\0"));
