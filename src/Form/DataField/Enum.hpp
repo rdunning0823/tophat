@@ -184,6 +184,12 @@ public:
   }
   unsigned getItem(unsigned index) const;
 
+  /**
+   * removes items from end of list if new_length > existing length
+   * @param new_length
+   */
+  void Truncate(unsigned new_length);
+
 protected:
   /**
    * Finds an entry with the specified text.  Returns -1 if not found.

@@ -315,3 +315,10 @@ DataFieldEnum::getItem(unsigned index) const
 {
   return entries[index].GetId();
 }
+
+void
+DataFieldEnum::Truncate(unsigned new_length)
+{
+  assert(new_length <= Count());
+  entries.shrink(new_length);
+}
