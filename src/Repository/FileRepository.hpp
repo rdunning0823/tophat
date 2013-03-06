@@ -36,6 +36,7 @@ Copyright_License {
 struct FileRepository {
   typedef std::list<AvailableFile> FileList;
   typedef FileList::const_iterator const_iterator;
+  typedef FileList::iterator iterator;
 
   FileList files;
 
@@ -50,6 +51,14 @@ struct FileRepository {
 
   gcc_pure
   const_iterator end() const {
+    return files.end();
+  }
+
+  iterator begin1() {
+    return files.begin();
+  }
+
+  iterator end1() {
     return files.end();
   }
 
