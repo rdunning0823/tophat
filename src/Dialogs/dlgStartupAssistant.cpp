@@ -53,6 +53,7 @@ const TCHAR* tips [] = {
     N_("Click the Nav Bar at the top to show the navigation menu."),
     N_("Slide the Nav Bar to the left or right to advance the task turnpoint."),
     N_("Click the 'M' button to show the Main menu.  Try clicking it again."),
+    N_("Need a map, waypoint or airspace file?  Top Hat Setup downloads these from the internet."),
     N_("To cancel a menu, click anywhere on the screen in the background to hide it."),
     N_("After you've entered a task cylinder, the Nav Bar shows a checkmark by the turnpoint name."),
     N_("You can temporarily suspend your task by clicking on a waypoint and selecting 'Goto.'"),
