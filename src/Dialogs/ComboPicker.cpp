@@ -124,6 +124,13 @@ dlgComboPicker(WndProperty *theProperty)
   // lower/higher index of items for int/float
   bool bOpenCombo = true;
 
+  /**
+   * non-static pointer to datafield.
+   * used during closing of picker so that dlgComboPicker can be
+   * recursively called by OnModified()
+   */
+  DataField *non_static_datafield;
+
   // prevents multiple instances
   if (bInComboPicker)
     return 0;
@@ -137,7 +144,8 @@ dlgComboPicker(WndProperty *theProperty)
     assert(theProperty != NULL);
     wComboPopupWndProperty = theProperty;
 
-    ComboPopupDataField = wComboPopupWndProperty->GetDataField();
+    non_static_datafield = ComboPopupDataField =
+        wComboPopupWndProperty->GetDataField();
     assert(ComboPopupDataField != NULL);
 
     ComboListPopup = ComboPopupDataField->CreateComboList();
@@ -169,24 +177,28 @@ dlgComboPicker(WndProperty *theProperty)
         item = &(*ComboListPopup)[idx + 1];
         bOpenCombo = true;
       }
+      const ComboList::Item item_temp(item->DataFieldIndex,
+                                      item->StringValue, item->StringValue);
 
-      ComboPopupDataField->SetFromCombo(item->DataFieldIndex,
-                                        item->StringValue);
+      if (!bOpenCombo) {
+        delete ComboListPopup;
+        bInComboPicker = false; // nothing below this line can use statics!
+      }
+      non_static_datafield->SetFromCombo(item_temp.DataFieldIndex,
+                                         item_temp.StringValue);
     } else {
       // Cancel
       // if we've detached the GUI during the load, then there is nothing to do here
+      delete ComboListPopup;
+      bInComboPicker = false; // nothing below this line can use statics!
       assert(iSavedInitialDataIndex >= 0);
       if (iSavedInitialDataIndex >= 0)
-        // use statics here - saved from first page if multiple were used
-        ComboPopupDataField->SetFromCombo(iSavedInitialDataIndex,
-            sSavedInitialValue);
+        // saved from first page if multiple were used
+        non_static_datafield->SetFromCombo(iSavedInitialDataIndex,
+                                           sSavedInitialValue);
     }
-
-    delete ComboListPopup;
-
-    wComboPopupWndProperty->RefreshDisplay();
+    theProperty->RefreshDisplay();
   } // loop reopen combo if <<More>>  or <<Less>> picked
 
-  bInComboPicker = false;
   return 1;
 }
