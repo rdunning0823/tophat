@@ -257,4 +257,7 @@ const TCHAR VarioMinPeriod[] = _T("VarioMinPeriod");
 const TCHAR VarioMaxPeriod[] = _T("VarioMaxPeriod");
 const TCHAR VarioDeadBandEnabled[] = _T("VarioDeadBandEnabled");
 
+
+const TCHAR FilePickAndDownloadAreaFilter[] = _T("FilePickAndDownloadAreaFilter");
+const TCHAR FilePickAndDownloadSubAreaFilter[] = _T("FilePickAndDownloadSubAreaFilter");
 }

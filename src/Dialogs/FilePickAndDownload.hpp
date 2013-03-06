@@ -287,6 +287,7 @@ public:
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
+  virtual bool Save(bool &changed, bool &require_restart);
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id);
