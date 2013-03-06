@@ -56,6 +56,13 @@ class WndFrame;
 class WidgetDialog;
 class DataFieldEnum;
 
+/**
+ * Displays a list of available files matching the area filter and type filter.
+ * Downloads the file if selected.
+ * @param file_filter.  Uses the area and type to filter the displayed files
+ * @return. an AvailableFile struct of the downloaded file,
+ * or cleared struct if none selected or if an error occurred during download
+ */
 AvailableFile
 ShowFilePickAndDownload(AvailableFile &file_filter);
 
