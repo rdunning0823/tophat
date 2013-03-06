@@ -255,6 +255,9 @@ extern const TCHAR VarioMinPeriod[];
 extern const TCHAR VarioMaxPeriod[];
 extern const TCHAR VarioDeadBandEnabled[];
 
+extern const TCHAR FilePickAndDownloadAreaFilter[];
+extern const TCHAR FilePickAndDownloadSubAreaFilter[];
+
 }
 
 #endif

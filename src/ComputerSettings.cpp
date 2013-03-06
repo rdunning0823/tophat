@@ -87,6 +87,7 @@ ComputerSettings::SetDefaults()
   wind.SetDefaults();
   polar.SetDefaults();
   team_code.SetDefaults();
+  file_pick_and_download.SetDefaults();
   voice.SetDefaults();
   poi.SetDefaults();
   features.SetDefaults();

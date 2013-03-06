@@ -35,6 +35,11 @@ Copyright_License {
 #include "IO/FileLineReader.hpp"
 #include "Util/ConvertString.hpp"
 #include "Repository/Parser.hpp"
+#include "FilePickAndDownloadSettings.hpp"
+#include "ComputerSettings.hpp"
+#include "Interface.hpp"
+#include "Profile/ProfileKeys.hpp"
+#include "Profile/Profile.hpp"
 
 #ifdef ANDROID
 #include "Android/NativeView.hpp"
@@ -74,9 +79,29 @@ ManagedFilePickAndDownloadWidget::GetResult()
 void
 ManagedFilePickAndDownloadWidget::CreateButtons(WidgetDialog &dialog)
 {
-  close_button = dialog.AddButton(_("Cancel"), this, mrCancel);
+  close_button = dialog.AddButton(_("Cancel"), this, mrOK);
   search_button = dialog.AddButton(_("Search"), this, SEARCH_BUTTON);
   parent_widget_dialog = &dialog;
+}
+
+bool
+ManagedFilePickAndDownloadWidget::Save(bool &_changed, bool &_require_restart)
+{
+  FilePickAndDownloadSettings &settings =
+      CommonInterface::SetComputerSettings().file_pick_and_download;
+
+  ACPToWideConverter area(file_filter.area);
+  if (area.IsValid()) {
+    settings.area_filter = area;
+    Profile::Set(ProfileKeys::FilePickAndDownloadAreaFilter, settings.area_filter);
+  }
+
+  ACPToWideConverter subarea(file_filter.subarea);
+  if (subarea.IsValid()) {
+    settings.subarea_filter = subarea;
+    Profile::Set(ProfileKeys::FilePickAndDownloadSubAreaFilter, settings.subarea_filter);
+  }
+  return true;
 }
 
 void
@@ -86,9 +111,9 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
   const DialogLook &look = UIGlobals::GetDialogLook();
   font_height = look.list.font->GetHeight();
 
- UPixelScalar margin = Layout::Scale(2);
- UPixelScalar height = std::max(UPixelScalar(3 * margin + 2 * font_height),
-                                Layout::GetMaximumControlHeight());
+  UPixelScalar margin = Layout::Scale(2);
+  UPixelScalar height = std::max(UPixelScalar(3 * margin + 2 * font_height),
+                                 Layout::GetMaximumControlHeight());
 
   PixelRect rc_status = rc;
   rc_status.left += Layout::Scale(2);
@@ -115,6 +140,15 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
                               _("The state or country where you are flying"),
                               this);
   subarea_filter = (DataFieldEnum*)wp_subarea_filter->GetDataField();
+
+  const FilePickAndDownloadSettings &settings =
+      CommonInterface::GetComputerSettings().file_pick_and_download;
+
+  WideToACPConverter base_area(settings.area_filter);
+  file_filter.area = base_area;
+
+  WideToACPConverter base_subarea(settings.subarea_filter);
+  file_filter.subarea = base_subarea;
 
   mutex.Lock();
   the_item.Set(_T(""), nullptr, false);
@@ -287,7 +321,7 @@ ManagedFilePickAndDownloadWidget::SetFilterVisible(bool visible)
     return;
 
   wp_area_filter->SetVisible(visible);
-  wp_subarea_filter->SetVisible(visible && subarea_filter->Count() > 1);
+  wp_subarea_filter->SetVisible(visible && subarea_filter->Count() > 2);
   search_button->SetVisible(visible);
 
   if (visible)
@@ -399,11 +433,20 @@ ManagedFilePickAndDownloadWidget::BuildAreaFilter(FileRepository &repository)
     StaticString<100> t2(base);
     area_filter->AddChoice(id++, t2.c_str(), t2.c_str());
   }
+
+  ACPToWideConverter base_area(file_filter.area);
+  ACPToWideConverter base_subarea(file_filter.subarea);
+  StaticString<50> subarea_original(base_subarea);
+
   area_filter->Sort(0);
-  area_filter->SetAsInteger(0);
+  area_filter->SetAsString(base_area);
   wp_area_filter->RefreshDisplay();
-  OnModified(*area_filter);
+
+  subarea_filter->SetAsString(subarea_original.c_str());
+  wp_subarea_filter->RefreshDisplay();
+
   SetFilterVisible(true);
+
 }
 
 void
@@ -432,7 +475,12 @@ ManagedFilePickAndDownloadWidget::BuildSubAreaFilter(FileRepository &repository,
       return a < b;
   });
 
-  unsigned id = 0;
+  if (subarea_filter->Count() == 0)
+    subarea_filter->AddChoice(0, _T(""), _T(""));
+  else
+    subarea_filter->replaceEnumText(0, _T(""));
+
+  unsigned id = 1;
   for (auto i = subarea_vector.begin(), end = subarea_vector.end(); i != end; ++i) {
     std::string t1 = (std::string)(*i);
     ACPToWideConverter base(t1.c_str());
@@ -518,14 +566,14 @@ ManagedFilePickAndDownloadWidget::Close(bool success)
   if (!success)
     the_file.Clear();
 
-  parent_widget_dialog->OnAction(mrCancel);
+  parent_widget_dialog->OnAction(mrOK);
 }
 
 void
 ManagedFilePickAndDownloadWidget::OnAction(int id)
 {
   switch (id) {
-  case mrCancel:
+  case mrOK:
     Close(false);
     break;
 
@@ -541,6 +589,7 @@ void
 ManagedFilePickAndDownloadWidget::OnModified(DataField &df)
 {
   if (IsDataField(AREA_FILTER, df)) {
+
     DataFieldEnum *dff = (DataFieldEnum*)&df;
 
     file_filter.area.clear();
@@ -554,7 +603,7 @@ ManagedFilePickAndDownloadWidget::OnModified(DataField &df)
       subarea_filter->Set(0);
       wp_subarea_filter->RefreshDisplay();
     }
-    wp_subarea_filter->SetVisible(subarea_filter->Count() > 1);
+    wp_subarea_filter->SetVisible(subarea_filter->Count() > 2);
     OnModified(*subarea_filter);
 
   } else if (IsDataField(SUBAREA_FILTER, df)) {
