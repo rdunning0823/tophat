@@ -35,7 +35,6 @@ static constexpr TaskFactoryConstraints mat_constraints = {
 };
 
 static constexpr TaskPointFactoryType mat_start_types[] = {
-  TaskPointFactoryType::START_LINE,
   TaskPointFactoryType::START_CYLINDER,
 };
 
@@ -66,10 +65,10 @@ MatTaskFactory::GetMutatedPointType(const OrderedTaskPoint &tp) const
   TaskPointFactoryType newtype = oldtype;
 
   switch (oldtype) {
-  case TaskPointFactoryType::START_LINE:
   case TaskPointFactoryType::START_CYLINDER:
     break;
 
+  case TaskPointFactoryType::START_LINE:
   case TaskPointFactoryType::START_BGA:
   case TaskPointFactoryType::START_SECTOR:
     newtype = TaskPointFactoryType::START_CYLINDER;
