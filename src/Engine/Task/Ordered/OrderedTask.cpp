@@ -480,12 +480,6 @@ OrderedTask::CheckTransitionOptionalStart(const AircraftState &state,
   return full_update;
 }
 
-//OrderedTaskPoint.CheckEnterTransition() checks and returns true/false
-// ScoredTaskPoint.EnterTransition() calls OTP.CheckEnterTransition and
- // then updates the state_entered
-//??? Do we want to update state_entered (and trigger unique message) here
-// or let normal check transition take care of that?
-// or trigger message here about adding it, and let other transition
 bool
 OrderedTask::CheckTransitionPointMat(OrderedTaskPoint &point,
                                      const AircraftState &state,
