@@ -282,7 +282,8 @@ RefreshView()
 
   bool edit_disabled = (ordered_task->GetFactoryType() ==
       TaskFactoryType::FAI_GENERAL) ||
-      ((ordered_task->GetFactoryType() == TaskFactoryType::MAT) &&
+      (((ordered_task->GetFactoryType() == TaskFactoryType::MAT) ||
+        (ordered_task->GetFactoryType() == TaskFactoryType::RACING)) &&
       (active_index != ordered_task->TaskSize() - 1 && active_index != 0));
 
   EnableSizeEdit(!edit_disabled);

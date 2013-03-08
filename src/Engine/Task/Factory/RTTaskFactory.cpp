@@ -62,7 +62,7 @@ static constexpr TaskPointFactoryType rt_start_types_us[] = {
 };
 
 static constexpr TaskPointFactoryType rt_im_types_us[] = {
-  TaskPointFactoryType::AST_CYLINDER,
+  TaskPointFactoryType::MAT_CYLINDER,
 };
 
 static constexpr TaskPointFactoryType rt_finish_types_us[] = {
@@ -165,14 +165,14 @@ RTTaskFactoryUs::GetMutatedPointType(const OrderedTaskPoint &tp) const
     newtype = TaskPointFactoryType::START_CYLINDER;
     break;
 
-  case TaskPointFactoryType::AST_CYLINDER:
+  case TaskPointFactoryType::MAT_CYLINDER:
     break;
 
   case TaskPointFactoryType::KEYHOLE_SECTOR:
   case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
   case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
   case TaskPointFactoryType::FAI_SECTOR:
-  newtype = TaskPointFactoryType::AST_CYLINDER;
+  newtype = TaskPointFactoryType::MAT_CYLINDER;
     break;
 
   case TaskPointFactoryType::FINISH_CYLINDER:
@@ -185,9 +185,9 @@ RTTaskFactoryUs::GetMutatedPointType(const OrderedTaskPoint &tp) const
 
   case TaskPointFactoryType::AAT_SEGMENT:
   case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
-  case TaskPointFactoryType::MAT_CYLINDER:
+  case TaskPointFactoryType::AST_CYLINDER:
   case TaskPointFactoryType::AAT_CYLINDER:
-    newtype = TaskPointFactoryType::AST_CYLINDER;
+    newtype = TaskPointFactoryType::MAT_CYLINDER;
     break;
   }
 
