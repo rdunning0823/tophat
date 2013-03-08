@@ -373,7 +373,7 @@ OrderedTaskPointDescription(TaskPointFactoryType type)
   case TaskPointFactoryType::AAT_CYLINDER:
     return _("A cylinder.  Scored by farthest point reached in area.");
   case TaskPointFactoryType::MAT_CYLINDER:
-    return _("A cylinder.  Scored by farthest point reached in area.  One-mile radius.");
+    return _("A 1 mile cylinder.  Scored by farthest point reached in area.");
   case TaskPointFactoryType::AAT_SEGMENT:
     return _("A sector that can vary in angle and radius.  Scored by farthest point reached "
         "inside area.");
@@ -417,7 +417,7 @@ OrderedTaskPointName(TaskPointFactoryType type)
   case TaskPointFactoryType::AAT_CYLINDER:
     return _("Area cylinder");
   case TaskPointFactoryType::MAT_CYLINDER:
-    return _("MAT Area cylinder.  One mile radius.");
+    return _("Cylinder with 1 mile radius.");
   case TaskPointFactoryType::AAT_SEGMENT:
     return _("Area sector");
   case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
