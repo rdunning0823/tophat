@@ -1,11 +1,36 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 0.1.3 Beta 3/7/2013
+
+* Setup
+ - Added Nationality setting controls task rules units and language
+ - Quick Setup screen checks on startup if critical items are not configured.
+ - Added internet download for site files: airspace, maps, waypoints.
+ - Search internet for site files by Continent and State/Country
+
+* Task
+ - New simplified task manager for US tasks
+ - Changed language of US tasks per US rules
+ - Support (mostly) US task rules option via Nationality setting
+
+* Main map screen
+ - Removed double click
+ - Renamed "Topo" to "Roads, cities, water"
+ - Made glide amoeba line thicker
+ - Made Nav Bar outline thicker (if background map is color)
+ - Removed display of Ballast and flight mode from bottom of screen
+ - Removed display of logger status.  (Logger always is on in Top Hat)
+
+* General
+ - Repositioned "Close" button on dialogs for consistency.  Lower Left!
+ - Increased default height of controls by 30%
+ - Removed annoying "are you sure" prompts when Cancel options were available
+ - Renamed profile file from ".prf" to ".top" so won't interfere with XCSoar
+ 
 TopHat 0.1.2 Beta 2/16/013
 * Added Startup Assistant with help tips and Quick Setup Screen
-* Changed MAT tasks to add turnpoints automatically
-* Started revamp of task manager
-* Added US Rules option via Nationality setting
+* Add MAT tasks that add turnpoints automatically when you fly into their cylinder
 * Simplified menus; e.g. "Switch screens"
 * Simplified Waypoint Select screen
 
