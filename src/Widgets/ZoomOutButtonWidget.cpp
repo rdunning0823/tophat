@@ -88,7 +88,6 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
   }
 
   WindowWidget::Move(rc);
-  GetWindow()->Move(rc);
 }
 
 UPixelScalar
