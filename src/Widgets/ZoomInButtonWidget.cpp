@@ -131,7 +131,7 @@ ZoomInButtonWidget::HeightFromBottomLeft()
   if (Layout::landscape)
     return GetHeight() + Layout::Scale(3);
   else
-    return GetHeight() * 2 + Layout::Scale(3);
+    return GetHeight() * 2 + Layout::Scale(6);
 }
 
 ZoomButton &
