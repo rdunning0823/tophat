@@ -134,6 +134,12 @@ public:
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc) {};
   virtual void Hide() {};
+  virtual bool Save(bool &changed, bool &require_restart);
+
+  /**
+   * prompts pilot to declare to any attached loggers
+   */
+  void Declare();
 
   /**
    * from ActionListener (WndForm)
