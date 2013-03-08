@@ -104,7 +104,10 @@ OrderedTaskFactoryDescription(TaskFactoryType type)
   case TaskFactoryType::FAI_GOAL:
     return _("FAI rules, path from start to a goal destination.");
   case TaskFactoryType::AAT:
-    return _("Turn area task.  Has cylinders of varying sizes.  Minimum task time applies.");
+    if (is_usa)
+      return _("Turn area task.  Has cylinders of varying sizes.  Minimum task time applies.");
+    else
+      return _("Assigned area task.  Has cylinders of varying sizes.  Minimum task time applies.");
   case TaskFactoryType::MAT:
     return _("Modified area task.  Task with start, finish and at least one predefined 1-mile cylinder.  Pilot can add additional points as needed.  Minimum task time applies.");
   case TaskFactoryType::MIXED:
