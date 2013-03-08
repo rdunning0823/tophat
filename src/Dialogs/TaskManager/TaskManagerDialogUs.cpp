@@ -43,7 +43,10 @@ Copyright_License {
 #include "Profile/Profile.hpp"
 #include "Task/Factory/AbstractTaskFactory.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Task/Ordered/OrderedTask.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
+#include "Logger/ExternalLogger.hpp"
+#include "Device/Declaration.hpp"
 #include "Screen/SingleWindow.hpp"
 
 #ifdef ENABLE_OPENGL
@@ -110,6 +113,32 @@ TaskManagerDialogUs::Unprepare()
   delete revert_button;
   delete save_as_button;
   delete task_summary;
+}
+
+void
+TaskManagerDialogUs::Declare()
+{
+  if (!active_task->CheckTask())
+    return;
+
+  if (ExternalLogger::LoggerAttachedCount() == 0)
+    return;
+
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const DerivedInfo &calculated = XCSoarInterface::Calculated();
+
+  if (calculated.flight.flying)
+    return;
+
+  Declaration decl(settings.logger, settings.plane, active_task);
+  ExternalLogger::Declare(decl, way_points.GetHome());
+}
+
+bool
+TaskManagerDialogUs::Save(bool &changed, bool &require_restart)
+{
+  Declare();
+  return true;
 }
 
 void
@@ -397,6 +426,8 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
   instance->Hide();
   instance->Unprepare();
   delete instance;
+
+
 
   delete active_task;
 }
