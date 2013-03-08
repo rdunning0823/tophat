@@ -268,6 +268,7 @@ GlideComputer::CalculateTeammateBearingRange()
 void
 GlideComputer::OnTakeoff()
 {
+  task_computer.ResetFlight(true);
   // reset stats on takeoff
   air_data_computer.ResetFlight(SetCalculated(), GetComputerSettings(), false);
 
