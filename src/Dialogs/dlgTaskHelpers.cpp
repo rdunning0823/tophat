@@ -52,7 +52,7 @@ OrderedTaskFactoryName(TaskFactoryType type)
   switch(type) {
   case TaskFactoryType::RACING:
     if (is_usa)
-      return _("AT");
+      return _("AT - Assigned task");
     else
       return _("Racing");
   case TaskFactoryType::FAI_GENERAL:
@@ -65,11 +65,11 @@ OrderedTaskFactoryName(TaskFactoryType type)
     return _("FAI goal");
   case TaskFactoryType::AAT:
     if (is_usa)
-      return _("TAT");
+      return _("TAT - Turn area task");
     else
       return _("AAT");
   case TaskFactoryType::MAT:
-    return _("MAT");
+    return _("MAT - Modified area task");
   case TaskFactoryType::MIXED:
     return _("Mixed");
   case TaskFactoryType::TOURING:
