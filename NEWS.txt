@@ -10,7 +10,9 @@ TopHat 0.1.3 Beta 3/7/2013
  - Search internet for site files by Continent and State/Country
 
 * Task
- - New simplified task manager for US tasks
+ - New simplified task manager for US tasks - support AT, TAT, MAT
+ - Reset task if land and then takeoff again
+ - Fix bug in Nav Bar so check marks always appear when cylinder entered
  - Changed language of US tasks per US rules
  - Support (mostly) US task rules option via Nationality setting
 
