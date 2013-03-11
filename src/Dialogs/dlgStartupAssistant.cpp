@@ -53,11 +53,13 @@ const TCHAR* tips [] = {
     N_("Click the Nav Bar at the top to show the navigation menu."),
     N_("Slide the Nav Bar to the left or right to advance the task turnpoint."),
     N_("Click the 'M' button to show the Main menu.  Try clicking it again."),
+    N_("Need to show the 'Setup Top Hat' screen?  Click the 'M' button 3x, and click the Gear icon."),
     N_("Need a map, waypoint or airspace file?  Top Hat Setup downloads these from the internet."),
     N_("To cancel a menu, click anywhere on the screen in the background to hide it."),
     N_("After you've entered a task cylinder, the Nav Bar shows a checkmark by the turnpoint name."),
-    N_("You can temporarily suspend your task by clicking on a waypoint and selecting 'Goto.'"),
+    N_("You can suspend your task by clicking on a waypoint and selecting 'Goto.'"),
     N_("While you are in 'Goto' mode, the Nav Bar and all your Info boxes provide information solely about getting to the waypoint."),
+    N_("While in 'Goto' mode, click the Nav Bar and 'Resume' to navigate your task again."),
     N_("If you are flying a MAT task, just create the start and finish.  Task points will be added as you fly over them."),
     N_("Create tasks in See You desktop and save them as a .CUP file.  Copy the .CUP file to XCSoarData.  Load using Top Hat's task manager."),
     N_("Click on an item in the map to show its details."),
@@ -336,53 +338,10 @@ StartupAssistant::Save(bool &changed)
   return true;
 }
 
-/**
- * checks to see if a Plane, site files, and device are configured, and if no
- * displays the Quick Setup screen
- */
-static bool
-CheckConfigurationBasics()
-{
-  StaticString<255> text;
-
-  const DeviceConfig &config =
-    CommonInterface::SetSystemSettings().devices[0];
-  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-  const TaskBehaviour &task_behaviour = settings.task;
-
-  if (config.driver_name.empty())
-    return true;
-
-  text.clear();
-  if (Profile::Get(ProfileKeys::MapFile) != nullptr)
-    text = Profile::Get(ProfileKeys::MapFile);
-
-  if (text.empty() && Profile::Get(ProfileKeys::WaypointFile) != nullptr)
-    text = Profile::Get(ProfileKeys::WaypointFile);
-  if (text.empty())
-    return true;
-
-  text = settings.plane.registration;
-  if (text.empty())
-    return true;
-
-  if (task_behaviour.contest_nationality == ContestNationalities::UNKNOWN)
-    return true;
-
-  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
-  const LoggerSettings &logger = settings_computer.logger;
-  text = logger.pilot_name;
-  if (text.empty())
-    return true;
-
-  return false;
-}
-
 void
 dlgStartupAssistantShowModal(bool conditional)
 {
-  if (CheckConfigurationBasics())
-    ShowDialogSetupQuick(true);
+  ShowDialogSetupQuick(true);
 
   StaticString<32> decline_ver;
   decline_ver = Profile::Get(ProfileKeys::StartupTipDeclineVersion, _T(""));
