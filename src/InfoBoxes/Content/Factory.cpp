@@ -868,7 +868,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentGRAvg>::Create,
     e_GR_Instantaneous, // LD Inst
     e_LD, // LD Vario
-    DEPRECATED,
+    STANDARD,
   },
 
   // e_Experimental
