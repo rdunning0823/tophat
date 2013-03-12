@@ -1,6 +1,12 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 0.1.4 Beta 
+
+* Task
+ - Cleaned up task editor, redundand information
+ 
+ 
 TopHat 0.1.3 Beta 3/7/2013
 
 * Setup
