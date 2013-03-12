@@ -4,11 +4,12 @@
   <Button Caption="Close" X="0" Y="-37" Width="150" Height="35" OnClick="OnCloseClicked"/>
   <Button Name="butAdd" Caption="Insert after" X="157" Y="109" Width="73" Height="35" OnClick="OnAddClicked"/>
   <Button Name="butTaskProperties" X="2" Y="2" Width="236" Height="35" OnClick="OnTaskPropertiesClicked"/>
-
+  <Button Name="butBrowse" Caption="Browse" X="157" Y="38" Width="73" Height="35" OnClick="OnBrowseClicked"/>
+  
   <Panel Name="frmDetails" X="0" Y="0" Width="-2">
     <List Name="List" X="0" Y="109" Width="150" Height="-37"/>
     <Canvas Name="frmTaskView" X="157" Y="-85" Width="75" Height="75" Border="1" OnPaint="OnTaskPaint" />
-    <Button Name="butBrowse" Caption="Browse" X="157" Y="38" Width="73" Height="35" OnClick="OnBrowseClicked"/>
+    
 
     <Panel Name="frmButtons" X="157" Y="109" Width="75" Height="105" Border="0">
       <Button Name="butRelocate" Caption="Change" X="0" Y="35" Width="73" Height="35" OnClick="OnRelocateClicked"/>
