@@ -300,6 +300,7 @@ IDR_XML_INFOBOXALTITUDESETUP XMLDIALOG DISCARDABLE "../output/data/dialogs/Infob
 IDR_XML_TASKEDIT XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskEdit.xml.gz"
 IDR_XML_TASKACTIONS XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskActions.xml.gz"
 IDR_XML_TASKLIST XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskList.xml.gz"
+IDR_XML_TASKLIST_L XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskList_L.xml.gz"
 IDR_XML_TASKMANAGER XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskManager.xml.gz"
 IDR_XML_TASKMANAGER_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskManager_L.xml.gz"
 IDR_XML_TASKMANAGERCLOSE XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskManagerClose.xml.gz"

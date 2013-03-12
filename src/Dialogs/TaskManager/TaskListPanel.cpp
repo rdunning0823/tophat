@@ -376,8 +376,8 @@ void
 TaskListPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   LoadWindow(task_list_callbacks, parent, rc,
-             _T("IDR_XML_TASKLIST"));
-
+             Layout::landscape ? _T("IDR_XML_TASKLIST_L") :
+                                 _T("IDR_XML_TASKLIST"));
   instance = this;
 
   task_store = new TaskStore();
