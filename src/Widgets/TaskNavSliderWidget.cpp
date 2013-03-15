@@ -204,6 +204,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   const Font &small_font = slider_shape.GetSmallFont();
   const Font &medium_font = slider_shape.GetMediumFont();
   UPixelScalar width;
+  UPixelScalar distance_width = 0u;
   PixelRect rc = rc_outer;
   rc.left += slider_shape.GetHintWidth();
   rc.right -= slider_shape.GetHintWidth();
@@ -236,7 +237,6 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
   const unsigned line_one_y_offset = rc.top + slider_shape.GetLine1Y();
   const unsigned line_two_y_offset = rc.top + slider_shape.GetLine2Y();
-  const unsigned line_three_y_offset = rc.top + slider_shape.GetLine3Y();
 
   // Draw turnpoint name
   canvas.Select(name_font);
@@ -271,24 +271,26 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     bitmap_size.cx / 2, 0);
   }
 
+  // Draw distance to turnpoint
+  if (tp.distance_valid) {
+
+    canvas.Select(medium_font);
+    FormatUserDistanceSmart(tp.distance, buffer.buffer(), true);
+    distance_width = canvas.CalcTextWidth(buffer.c_str());
+    canvas.text(rc.right - Layout::FastScale(2) - distance_width,
+                line_one_y_offset, buffer.c_str());
+  }
+
   // Draw arrival altitude
   canvas.Select(small_font);
   if (tp.altitude_difference_valid) {
     FormatRelativeUserAltitude(tp.altitude_difference, buffer.buffer(), true);
     width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.text(rc.left + Layout::FastScale(2),
-                line_three_y_offset, buffer.c_str());
+    width += distance_width;
+    canvas.text(rc.right - canvas.CalcTextWidth(_T("     ")) - width,
+                line_one_y_offset, buffer.c_str());
   }
 
-  // Draw distance to turnpoint
-  if (tp.distance_valid) {
-
-    FormatUserDistanceSmart(tp.distance, buffer.buffer(), true);
-    width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.Select(medium_font);
-    canvas.text(rc.right - Layout::FastScale(2) - width,
-                line_three_y_offset, buffer.c_str());
-  }
 
   // draw title "goto" abort, tp#
   switch (task_data_cache.GetTaskMode()) {
@@ -306,7 +308,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     break;
   case TaskManager::MODE_GOTO:
   case TaskManager::MODE_ABORT:
-    buffer = _("Destination:");
+    buffer = _("Goto:");
     break;
 
   case TaskManager::MODE_NULL:
@@ -334,7 +336,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     bearing = tp.delta_bearing;
   }
 
-  if (do_bearing) {
+  if (false && do_bearing) {
     FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE, bearing);
     width = canvas.CalcTextWidth(buffer.c_str());
     canvas.Select(small_font);

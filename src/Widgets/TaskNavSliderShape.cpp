@@ -90,21 +90,20 @@ SliderShape::Resize(UPixelScalar map_width)
 {
   const UPixelScalar large_font_height = GetLargeFont().GetHeight();
   const UPixelScalar medium_font_height = GetMediumFont().GetHeight();
-  const UPixelScalar small_font_height = GetSmallFont().GetHeight();
 
-  const UPixelScalar total_height = large_font_height + small_font_height
-      + medium_font_height - Layout::Scale(3);
+  const UPixelScalar total_height = large_font_height
+      + medium_font_height - Layout::Scale(2);
   const UPixelScalar arrow_point_bluntness = Layout::Scale(4);
 
   SetLine1Y(0u);
-  SetLine2Y((total_height - large_font_height) / 2);
-  SetLine3Y(total_height - medium_font_height);
+  SetLine2Y(total_height - large_font_height);
+  SetLine3Y(0u);
 
   //top
   points[0].x = Layout::Scale(20);
-  points[0].y = 0;
+  points[0].y = 1;
   points[1].x = Layout::Scale(340);
-  points[1].y = 0;
+  points[1].y = 1;
 
   //right arrow tip
   points[2].x = Layout::Scale(360);
@@ -134,5 +133,4 @@ SliderShape::Resize(UPixelScalar map_width)
 
   for (unsigned i = 1; i <= 4; i++)
     points[i].x += amount_to_grow_x;
-
 }
