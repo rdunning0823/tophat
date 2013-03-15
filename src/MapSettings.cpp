@@ -54,8 +54,8 @@ MapSettings::SetDefaults()
   waypoint.SetDefaults();
   airspace.SetDefaults();
   glider_screen_position = 30; // 30% from bottom
-  circling_orientation = TRACKUP;
-  cruise_orientation = TRACKUP;
+  circling_orientation = TARGETUP;
+  cruise_orientation = TARGETUP;
   circling_scale = fixed_one / 2;
   cruise_scale = fixed_one / 60;
   show_flarm_on_map = true;
