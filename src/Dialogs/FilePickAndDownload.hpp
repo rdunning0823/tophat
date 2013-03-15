@@ -302,6 +302,12 @@ public:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df);
 
+  /**
+   * locks and unlocks the mutex on the repository and downloading status
+   */
+  void LockMutex();
+  void UnlockMutex();
+
 #ifdef HAVE_DOWNLOAD_MANAGER
   /* virtual methods from class Timer */
   virtual void OnTimer() gcc_override;
