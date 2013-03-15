@@ -179,6 +179,13 @@ protected:
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y);
   virtual bool OnMouseWheel(PixelScalar x, PixelScalar y, int delta);
 
+#ifndef ENABLE_OPENGL
+  /**
+   * returns true if handled by the button overlays.
+   */
+  virtual bool ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y);
+#endif
+
 #ifdef HAVE_MULTI_TOUCH
   virtual bool OnMultiTouchDown();
 #endif
@@ -213,6 +220,23 @@ private:
   virtual void DrawThermalEstimate(Canvas &canvas) const;
   virtual void RenderTrail(Canvas &canvas, const RasterPoint aircraft_pos);
 
+#ifndef ENABLE_OPENGL
+  /**
+   * render transparent buttons on the screen with GDI
+   * Duplicates code in Widget that is used with OPENGL
+   * Todo: remove duplicate code
+   *
+   */
+  void DrawMainMenuButtonOverlay(Canvas &canvas) const;
+
+  /**
+   * render transparaent buttons for zoom in / out with GDI
+   * Duplicates code in Widget that is used with OPENGL
+   * Todo: remove duplicate code
+   */
+  void DrawZoomButtonOverlays(Canvas &canvas) const;
+#endif
+
   void SwitchZoomClimb(bool circling);
 
   void SaveDisplayModeScales();
@@ -232,6 +256,29 @@ public:
   void UpdateMapScale();
   void UpdateDisplayMode();
   void SetMapScale(fixed scale);
+
+#ifndef ENABLE_OPENGL
+  /**
+   * resizes the rc_main_menu_button for the current screen layout
+   */
+  virtual void SetMainMenuButtonRect();
+  /**
+   * resizes the rc_zoom_in_button and rc_zoom_out_button for the current
+   * screen layout
+   */
+  virtual void SetZoomButtonsRect();
+#endif
+
+
+#ifndef ENABLE_OPENGL
+  /**
+   * locations of Map overlay buttons
+   * With OPENGL, these are separate widgets
+   */
+  PixelRect rc_main_menu_button;
+  PixelRect rc_zoom_out_button;
+  PixelRect rc_zoom_in_button;
+#endif
 
 protected:
   DisplayMode GetDisplayMode() const {

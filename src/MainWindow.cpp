@@ -214,12 +214,13 @@ MainWindow::InitialiseConfigured()
   map = new GlueMapWindow(*look);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
-  widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   task_nav_slider_widget = new TaskNavSliderWidget();
   widget_overlays.Add(task_nav_slider_widget, rc_current);
+#ifdef ENABLE_OPENGL
+  widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
-
+#endif
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 
@@ -347,7 +348,13 @@ MainWindow::ReinitialiseLayout()
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   widget_overlays.Move(rc_current);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
+#ifdef ENABLE_OPENGL
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#endif
+#ifndef ENABLE_OPENGL
+  map->SetMainMenuButtonRect();
+  map->SetZoomButtonsRect();
+#endif
 
   ReinitialiseLayout_flarm(rc_current, ib_layout);
   ReinitialiseLayoutTA(rc_current, ib_layout);
@@ -577,6 +584,10 @@ MainWindow::OnTimer(WindowTimer &_timer)
     task_nav_slider_widget->RefreshTask();
     map->SetCompassOffset(widget_overlays.HeightFromTop());
     map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#ifndef ENABLE_OPENGL
+    map->SetMainMenuButtonRect();
+    map->SetZoomButtonsRect();
+#endif
 
     battery_timer.Process();
   }
@@ -705,6 +716,10 @@ MainWindow::SetFullScreen(bool _full_screen)
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#ifndef ENABLE_OPENGL
+  map->SetMainMenuButtonRect();
+  map->SetZoomButtonsRect();
+#endif
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   PixelRect rc = GetClientRect();
@@ -774,6 +789,11 @@ MainWindow::ActivateMap()
                                    map != NULL, FullScreen);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#ifndef ENABLE_OPENGL
+  map->SetMainMenuButtonRect();
+  map->SetZoomButtonsRect();
+#endif
+
   return map;
 }
 
