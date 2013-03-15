@@ -451,6 +451,7 @@ TaskNavSliderWidget::Move(const PixelRect &rc_map)
 {
   PixelRect rc = rc_map;
   slider_shape.Resize(rc_map.right - rc_map.left);
+  --rc.top;
   rc.bottom = rc.top + slider_shape.GetHeight();
   GetList().SetOverScrollMax(slider_shape.GetOverScrollWidth());
 
