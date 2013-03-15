@@ -377,6 +377,9 @@ InputEvents::eventOrientation(const TCHAR *misc)
   } else if (StringIsEqual(misc, _T("northtrack"))) {
     settings_map.cruise_orientation = TRACKUP;
     settings_map.circling_orientation = TARGETUP;
+  } else if (StringIsEqual(misc, _T("targetup"))) {
+    settings_map.cruise_orientation = TARGETUP;
+    settings_map.circling_orientation = TARGETUP;
   }
 
   Profile::Set(ProfileKeys::OrientationCruise,
