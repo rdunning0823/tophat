@@ -84,7 +84,7 @@ event=Beep 1
 # mode=default
 # ------------
 
-mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Info1 Info2 Menu Menu1 Menu2 MenuLast Vario1 Vario2 NavOrdered NavGoto
+mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Info1 Info2 Menu Menu1 Menu2 MenuLast Vario1 Vario2 NavOrdered NavGoto Orientation
 type=key
 data=ESCAPE
 event=Mode default
@@ -1052,9 +1052,8 @@ location=21
 mode=Menu1
 type=key
 data=6
-event=Mode default
-event=Orientation northtracktoggle
-label=$(OrientationNorthTrackToggle)
+event=Mode Orientation
+label=Screen orientation
 location=22
 
 # -------------
@@ -1145,6 +1144,31 @@ event=Exit system
 event=Mode default
 label=Exit program
 location=24
+
+# -------------
+# mode=Orientation
+# -------------
+
+mode=Orientation
+type=key
+data=6
+event=Orientation northup
+label=North up
+location=16
+
+mode=Orientation
+type=key
+data=6
+event=Orientation trackup
+label=Track up
+location=17
+
+mode=Orientation
+type=key
+data=6
+event=Orientation targetup
+label=Target up
+location=18
 
 # ----------------------------------
 # mode=default.TA (ThermalAssistant)
