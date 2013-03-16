@@ -25,6 +25,8 @@ Copyright_License {
 #define XCSOAR_TASK_NAV_SLIDER_SHAPE_HPP
 
 #include "Screen/Point.hpp"
+#include "Math/fixed.hpp"
+#include "Engine/Task/TaskManager.hpp"
 
 #include <assert.h>
 
@@ -135,7 +137,26 @@ public:
   /**
    * draws the outline of the slider shape
    */
-  void Draw(Canvas &canvas, const PixelRect &rc, unsigned border_width);
+  void DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned border_width);
+
+  void DrawText(Canvas &canvas, const PixelRect rc_outer,
+                unsigned idx, bool selected, const TCHAR *tp_name,
+                bool has_entered, bool has_exited,
+                TaskManager::TaskMode task_mode, unsigned task_size,
+                bool tp_valid, fixed tp_distance, bool distance_valid,
+                fixed tp_altitude_difference,
+                bool altitude_difference_valid);
+
+#ifdef _WIN32
+  /**
+   * clears background adjacent to slider.
+   * WIN32 does not draw transparent like OpenGL does
+   */
+  void PaintBackground(Canvas &canvas, unsigned idx,
+                       unsigned task_size,
+                       const DialogLook &dialog_look,
+                       const PixelRect rc_outer);
+#endif
 };
 
 #endif
