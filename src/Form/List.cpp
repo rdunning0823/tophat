@@ -328,18 +328,18 @@ ListControl::SetOrigin(int i)
   if ((unsigned)i == origin)
     return;
 
-#ifdef USE_GDIXX
+#ifdef USE_GDI
   int delta = origin - i;
 #endif
 
   origin = i;
 
-#ifdef USE_GDIXX
+#ifdef USE_GDI
   if ((unsigned)abs(delta) < items_visible) {
     PixelRect rc = GetClientRect();
     rc.right = scroll_bar.GetLeft(GetSize());
     Scroll(0, delta * item_height, rc);
-zz
+
     /* repaint the scrollbar synchronously; we could Invalidate its
        area and repaint asynchronously via WM_PAINT, but then the clip
        rect passed to OnPaint() would be the whole client area */
