@@ -769,6 +769,9 @@ XCSOAR_SOURCES := \
 	$(SRC)/Widgets/ZoomInButtonWidget.cpp \
 	$(SRC)/Widgets/ZoomButton.cpp \
 	$(SRC)/Widgets/TaskNavDataCache.cpp \
+	$(SRC)/Widgets/TaskButtonWidget.cpp \
+	$(SRC)/Widgets/TaskPreviousButtonWidget.cpp \
+	$(SRC)/Widgets/TaskNextButtonWidget.cpp \
 	\
 	$(SRC)/Device/Driver.cpp \
 	$(SRC)/Device/Declaration.cpp \
