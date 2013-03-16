@@ -28,6 +28,7 @@ Copyright_License {
 
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
+#include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -53,7 +54,8 @@ void
 HorizontalListControl::EnsureVisible(unsigned i)
 {
   assert(i < length);
-  kinetic_timer.Cancel();
+  if (!IsOldWindowsCE())
+    kinetic_timer.Cancel();
 
   SetPixelOriginAndCenter(i * item_height - over_scroll_max);
 }
@@ -193,6 +195,11 @@ HorizontalListControl::DrawItems(Canvas &canvas, unsigned start, unsigned end) c
 void
 HorizontalListControl::ScrollToItem(unsigned i)
 {
+  if (IsOldWindowsCE()) {
+    SetCursorIndex(i);
+    return;
+  }
+
   if (i == origin)
     return;
 
@@ -223,8 +230,12 @@ HorizontalListControl::OnMouseUp(PixelScalar x, PixelScalar y)
     //EnsureVisible(GetCenteredItem());
     drag_end();
 
-    kinetic.MouseUp(GetPixelOrigin(), (item_height));
-    kinetic_timer.Schedule(30);
+    if (!IsOldWindowsCE()) {
+      kinetic.MouseUp(GetPixelOrigin(), (item_height));
+      kinetic_timer.Schedule(30);
+    } else {
+      SetCursorIndex(GetCenteredItem());
+    }
 
     return true;
   } else
@@ -249,7 +260,8 @@ if (drag_mode == DragMode::CURSOR) {
     cursor_down_index = -1;
     int new_origin = drag_y - x;
     SetPixelOrigin(new_origin);
-    kinetic.MouseMove(GetPixelOrigin());
+    if (!IsOldWindowsCE())
+      kinetic.MouseMove(GetPixelOrigin());
     if (handler != nullptr)
       handler->OnPixelMove();
     return true;
@@ -267,8 +279,8 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
   drag_end();
 
   mouse_down_clock.Update();
-
-  kinetic_timer.Cancel();
+  if (!IsOldWindowsCE())
+    kinetic_timer.Cancel();
 
   // if click in ListBox area
   // -> select appropriate item
@@ -289,8 +301,8 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
 
     Invalidate_item(cursor);
   }
-
-  kinetic.MouseDown(GetPixelOrigin());
+  if (!IsOldWindowsCE())
+    kinetic.MouseDown(GetPixelOrigin());
   SetCapture();
 
   return true;
@@ -299,7 +311,10 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 HorizontalListControl::ScrollAdvance(bool forward)
 {
-  unsigned old_item = GetItemFromPixelOrigin(GetPixelOrigin());
+  if (!IsOldWindowsCE())
+    return false;
+
+    unsigned old_item = GetItemFromPixelOrigin(GetPixelOrigin());
   if ((forward && (old_item >= (GetLength() - 1))) ||
       (!forward && old_item == 0))
     return false;
@@ -335,10 +350,10 @@ HorizontalListControl::OnTimer(WindowTimer &timer)
         if (GetItemFromPixelOrigin(GetPixelOrigin()) ==
               GetItemFromPixelOrigin(kinetic.GetMouseDownX())) {
           kinetic.Reverse();
-       } else { // move to next item!
-        int item_temp = GetItemFromPixelOrigin(GetPixelOrigin());
-        int to_location = item_temp * GetItemHeight() - over_scroll_max;
-        kinetic.MoveTo(to_location);
+        } else { // move to next item!
+          int item_temp = GetItemFromPixelOrigin(GetPixelOrigin());
+          int to_location = item_temp * GetItemHeight() - over_scroll_max;
+          kinetic.MoveTo(to_location);
         }
       }
     } else // continue scrolling
