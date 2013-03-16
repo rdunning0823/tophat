@@ -62,6 +62,9 @@ Copyright_License {
 #include "Widgets/TaskNavSliderWidget.hpp"
 #include "Widgets/ZoomInButtonWidget.hpp"
 #include "Widgets/ZoomOutButtonWidget.hpp"
+#include "Widgets/TaskPreviousButtonWidget.hpp"
+#include "Widgets/TaskNextButtonWidget.hpp"
+#include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
@@ -235,13 +238,17 @@ MainWindow::InitialiseConfigured()
   map = new GlueMapWindow(*look);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
-  task_nav_slider_widget = new TaskNavSliderWidget();
-  widget_overlays.Add(task_nav_slider_widget, rc_current);
+  if (IsOldWindowsCE()) {
+    widget_overlays.Add(new TaskPreviousButtonWidget(), rc_current);
+    widget_overlays.Add(new TaskNextButtonWidget(), rc_current);
+  }
 #ifdef ENABLE_OPENGL
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
 #endif
+  task_nav_slider_widget = new TaskNavSliderWidget();
+  widget_overlays.Add(task_nav_slider_widget, rc_current);
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 
