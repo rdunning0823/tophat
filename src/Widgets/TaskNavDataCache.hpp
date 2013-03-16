@@ -124,6 +124,13 @@ public:
     bool GetHasEntered() {
       return has_entered;
     };
+
+    /**
+     * has the plane exited the sector?
+     */
+    bool GetHasExited() {
+      return has_exited;
+    };
   };
 
 private:
