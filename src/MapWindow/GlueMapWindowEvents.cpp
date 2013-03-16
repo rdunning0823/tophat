@@ -313,13 +313,6 @@ GlueMapWindow::OnPaint(Canvas &canvas)
     DrawCrossHairs(canvas);
 
 
-#ifndef ENABLE_OPENGL
-  if (!IsPanning())
-    DrawMainMenuButtonOverlay(canvas);
-
-  DrawZoomButtonOverlays(canvas);
-#endif
-
   DrawGesture(canvas);
 }
 
@@ -335,6 +328,13 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   DrawMapScale(canvas, GetClientRect(), render_projection);
   if (IsPanning())
     DrawPanInfo(canvas);
+
+#ifndef ENABLE_OPENGL
+  if (!IsPanning())
+    DrawMainMenuButtonOverlay(canvas);
+
+  DrawZoomButtonOverlays(canvas);
+#endif
 
 #ifdef ENABLE_OPENGL
   LeaveDrawThread();
