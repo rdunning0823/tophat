@@ -195,7 +195,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool draw_checkmark =
       (task_data_cache.GetTaskMode() == TaskManager::MODE_ORDERED)
       && (task_data_cache.GetOrderedTaskSize() > 1)
-      && ((idx > 0 && tp.GetHasEntered()) || (idx == 0 && tp.GetHasEntered()));
+      && ((idx > 0 && tp.GetHasEntered()) || (idx == 0 && tp.GetHasExited()));
 
   const bool selected = GetList().GetCursorDownIndex() == (int)idx;
 
