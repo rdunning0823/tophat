@@ -806,10 +806,10 @@ ShowFilePickAndDownload(AvailableFile &file_filter)
 #endif
 
   const TCHAR *message =
-    _("The file manager is not available on this device.");
+    _("Internet download is not available on this device.");
 #ifdef ANDROID
   if (native_view->GetAPILevel() < 9)
-    message = _("The file manager requires Android 2.3.");
+    message = _("Internet download requires Android 2.3.");
 #endif
 
   ShowMessageBox(message, _("File Manager"), MB_OK);
