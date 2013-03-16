@@ -204,7 +204,6 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   const Font &small_font = slider_shape.GetSmallFont();
   const Font &medium_font = slider_shape.GetMediumFont();
   UPixelScalar width;
-  UPixelScalar distance_width = 0u;
   PixelRect rc = rc_outer;
   rc.left += slider_shape.GetHintWidth();
   rc.right -= slider_shape.GetHintWidth();
@@ -262,7 +261,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
   // draw checkmark next to name if oz entered
   if (draw_checkmark) {
-    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
+    const int offsety = line_two_y_offset +
+        (rc.bottom - line_two_y_offset - bitmap_size.cy) / 2;
     canvas.CopyAnd(left_bitmap,
                     rc.top + offsety,
                     bitmap_size.cx / 2,
@@ -271,28 +271,23 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     bitmap_size.cx / 2, 0);
   }
 
+  UPixelScalar distance_width = 0u;
+  UPixelScalar label_width = 0u;
+  UPixelScalar height_width = 0u;
+  StaticString<100> distance_buffer(_T(""));
+  StaticString<100> height_buffer(_T(""));
+
   // Draw distance to turnpoint
   if (tp.distance_valid) {
 
     canvas.Select(medium_font);
-    FormatUserDistanceSmart(tp.distance, buffer.buffer(), true);
-    distance_width = canvas.CalcTextWidth(buffer.c_str());
+    FormatUserDistanceSmart(tp.distance, distance_buffer.buffer(), true);
+    distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
     canvas.text(rc.right - Layout::FastScale(2) - distance_width,
-                line_one_y_offset, buffer.c_str());
+                line_one_y_offset, distance_buffer.c_str());
   }
 
-  // Draw arrival altitude
-  canvas.Select(small_font);
-  if (tp.altitude_difference_valid) {
-    FormatRelativeUserAltitude(tp.altitude_difference, buffer.buffer(), true);
-    width = canvas.CalcTextWidth(buffer.c_str());
-    width += distance_width;
-    canvas.text(rc.right - canvas.CalcTextWidth(_T("     ")) - width,
-                line_one_y_offset, buffer.c_str());
-  }
-
-
-  // draw title "goto" abort, tp#
+  // calculate but don't yet draw label "goto" abort, tp#
   switch (task_data_cache.GetTaskMode()) {
   case TaskManager::MODE_ORDERED:
     if (task_data_cache.GetOrderedTaskSize() == 0)
@@ -303,7 +298,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     else if (idx + 1 == task_data_cache.GetOrderedTaskSize())
         buffer = _("Finish");
     else
-      _stprintf(buffer.buffer(), _T("TP# %u"), idx);
+      _stprintf(buffer.buffer(), _T("TP %u"), idx);
 
     break;
   case TaskManager::MODE_GOTO:
@@ -316,10 +311,27 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
     break;
   }
-  width = canvas.CalcTextWidth(buffer.c_str());
+  label_width = canvas.CalcTextWidth(buffer.c_str());
   canvas.Select(small_font);
-  canvas.text(rc.left + Layout::FastScale(2),
-              line_one_y_offset, buffer.c_str());
+
+  // draw arrival altitude centered between label and distance.
+  // draw label if room
+  canvas.Select(small_font);
+  if (tp.altitude_difference_valid) {
+    FormatRelativeUserAltitude(tp.altitude_difference, height_buffer.buffer(),
+                               true);
+    height_width = canvas.CalcTextWidth(height_buffer.c_str());
+    width = distance_width + height_width;
+    UPixelScalar offset = rc.left;
+    if ((PixelScalar)width < (rc.right - rc.left - label_width -
+        Layout::FastScale(15))) {
+      canvas.text(rc.left + Layout::FastScale(2),
+                  line_one_y_offset, buffer.c_str());
+      offset = rc.left + label_width +
+          (rc.right - rc.left - width - label_width) / 2;
+    }
+    canvas.text(offset, line_one_y_offset, height_buffer.c_str());
+  }
 
   // bearing delta waypoint for ordered when not start
   // or for non ordered task
@@ -432,6 +444,7 @@ void
 TaskNavSliderWidget::Unprepare()
 {
   WindowWidget::Unprepare();
+  DeleteWindow();
 }
 
 void
@@ -451,8 +464,8 @@ TaskNavSliderWidget::Move(const PixelRect &rc_map)
 {
   PixelRect rc = rc_map;
   slider_shape.Resize(rc_map.right - rc_map.left);
-  --rc.top;
   rc.bottom = rc.top + slider_shape.GetHeight();
+  --rc.top;
   GetList().SetOverScrollMax(slider_shape.GetOverScrollWidth());
 
   WindowWidget::Move(rc);
