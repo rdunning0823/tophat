@@ -56,6 +56,7 @@ void
 ZoomOutButtonWidget::Unprepare()
 {
   WindowWidget::Unprepare();
+  DeleteWindow();
 }
 
 void

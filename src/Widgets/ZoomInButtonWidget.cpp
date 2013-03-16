@@ -57,6 +57,7 @@ void
 ZoomInButtonWidget::Unprepare()
 {
   WindowWidget::Unprepare();
+  DeleteWindow();
 }
 
 void
