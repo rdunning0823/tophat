@@ -121,6 +121,7 @@ void
 MainMenuButtonWidget::Unprepare()
 {
   WindowWidget::Unprepare();
+  DeleteWindow();
 }
 
 void
