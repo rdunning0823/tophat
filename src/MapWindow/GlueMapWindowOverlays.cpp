@@ -31,6 +31,10 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Logger/Logger.hpp"
 #include "Task/ProtectedTaskManager.hpp"
+#include "Engine/Task/TaskManager.hpp"
+#include "Task/Ordered/OrderedTask.hpp"
+#include "Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Engine/Task/Points/TaskWaypoint.hpp"
 #include "Screen/TextInBox.hpp"
 #include "Screen/Fonts.hpp"
 #include "Screen/UnitSymbol.hpp"
@@ -46,6 +50,10 @@ Copyright_License {
 #include "Look/GestureLook.hpp"
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
+#include "Util/StaticString.hpp"
+#include "Components.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "GlideSolvers/GlideState.hpp"
 
 #include <stdio.h>
 
@@ -72,7 +80,7 @@ GlueMapWindow::DrawGesture(Canvas &canvas) const
 
 #ifndef ENABLE_OPENGL
 /**
- * DrawTwoLines seems to always use pen widthe = 1,
+ * DrawTwoLines seems to always use pen width = 1,
  * we we'll draw consecutive rectangles to emulate thicker pen
  */
 static void
@@ -152,6 +160,90 @@ GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
 
 }
 #endif
+
+void
+GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
+{
+  TaskWaypoint *tp;
+  TaskManager::TaskMode task_mode = TaskManager::MODE_GOTO;
+  const OrderedTask *ot;
+  const Waypoint *wp;
+  if (true) {
+    ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+    ot = &task_manager->GetOrderedTask();
+    tp = task_manager->GetActiveTaskPoint();
+    task_mode = task_manager->GetMode();
+  }
+  StaticString<255> wp_name(_T(""));
+  unsigned task_size = 1;
+  bool has_entered, has_exited;
+  unsigned idx = 0;
+  bool tp_valid = tp != nullptr;
+
+  if (task_mode == TaskManager::MODE_ORDERED) {
+    task_size = ot->TaskSize();
+    idx = ot->GetActiveIndex();
+    const OrderedTaskPoint *otp = &ot->GetTaskPoint(idx);
+    if (otp != nullptr) {
+      has_entered = otp->HasEntered();
+      has_exited = otp->HasExited();
+      wp_name = otp->GetWaypoint().name.c_str();
+      wp = &otp->GetWaypoint();
+      tp_valid = true;
+    }
+  } else {
+    if (tp != nullptr) {
+      wp_name = tp->GetWaypoint().name.c_str();
+      wp = &tp->GetWaypoint();
+    }
+  }
+  bool distance_valid = false, altitude_difference_valid = false;
+  fixed distance = fixed_zero, altitude_difference = fixed_zero;
+  if (wp != nullptr) {
+    const MoreData &more_data = Basic();
+    // altitude differential
+    if (Basic().location_available && more_data.NavAltitudeAvailable() &&
+        GetComputerSettings().polar.glide_polar_task.IsValid()) {
+      const GlideState glide_state(
+          Basic().location.DistanceBearing(wp->location),
+        wp->elevation + GetComputerSettings().task.safety_height_arrival,
+        more_data.nav_altitude,
+        Calculated().GetWindOrZero());
+
+      const GlideResult &result =
+        MacCready::Solve(GetComputerSettings().task.glide,
+                         GetComputerSettings().polar.glide_polar_task,
+                         glide_state);
+      altitude_difference = result.pure_glide_altitude_difference;
+      altitude_difference_valid = true;
+    }
+
+    // New dist & bearing
+    if (Basic().location_available) {
+      const GeoVector vector = Basic().location.DistanceBearing(wp->location);
+      distance = vector.distance;
+      distance_valid = true;
+    }
+
+  }
+  const TerrainRendererSettings &terrain = GetMapSettings().terrain;
+  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
+  PixelRect outer_rect = slider_shape.GetOuterRect();
+  UPixelScalar x_offset = (GetClientRect().right - GetClientRect().left -
+      (outer_rect.right - outer_rect.left)) / 2;
+  MoveRect(outer_rect, x_offset, 0);
+
+  slider_shape.Draw(canvas, outer_rect,
+                    idx, false,
+                    wp_name.c_str(),
+                    has_entered, has_exited,
+                    task_mode,
+                    task_size,
+                    tp_valid, distance, distance_valid,
+                    altitude_difference,
+                    altitude_difference_valid,
+                    border_width);
+}
 
 void
 GlueMapWindow::DrawCrossHairs(Canvas &canvas) const
@@ -529,7 +621,7 @@ GlueMapWindow::SetZoomButtonsRect()
 
   PixelSize button_size;
   button_size.cx = button_size.cy = Fonts::map_bold.GetHeight()
-      * MapOverlayButton::GetScale();
+      * MapOverlayButton::GetScale() * .8;
 
   rc_zoom_in_button.left = rc_map.left;
   if (Layout::landscape) {
@@ -559,6 +651,11 @@ GlueMapWindow::SetZoomButtonsRect()
 
   assert (rc_map.bottom >= rc_zoom_in_button.top);
   SetGPSStatusOffset(rc_map.bottom - rc_zoom_in_button.top);
-
 }
 #endif
+
+void
+GlueMapWindow::SetTaskNavSliderShape()
+{
+  slider_shape.Resize(GetClientRect().right - GetClientRect().left);
+}

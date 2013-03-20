@@ -27,7 +27,8 @@ Copyright_License {
 #include "Screen/Point.hpp"
 #include "Math/fixed.hpp"
 #include "Engine/Task/TaskManager.hpp"
-
+#include "UIGlobals.hpp"
+#include "Look/Look.hpp"
 #include <assert.h>
 
 struct DialogLook;
@@ -38,6 +39,7 @@ class Canvas;
 class SliderShape {
 private:
   PixelRect inner_rect;
+  PixelRect outer_rect;
 
 protected:
   RasterPoint points[8];
@@ -53,9 +55,9 @@ protected:
   UPixelScalar text_line_three_y;
 
 public:
-  SliderShape(const DialogLook &_dialog_look,
-              const InfoBoxLook &_infobox_look)
-  :dialog_look(_dialog_look), infobox_look(_infobox_look) {};
+  SliderShape()
+  :dialog_look(UIGlobals::GetDialogLook()),
+   infobox_look(UIGlobals::GetLook().info_box) {};
 
   UPixelScalar GetWidth() const {
     return points[2].x - points[6].x;
@@ -129,6 +131,17 @@ public:
   }
 
   /**
+   * returns large rectangle circumscribing the tips of the slider
+   */
+  const PixelRect &GetOuterRect() {
+    outer_rect.left = points[7].x;
+    outer_rect.right = points[2].x;
+    outer_rect.top = points[0].y;
+    outer_rect.bottom = points[4].y;
+    return outer_rect;
+  }
+
+  /**
    * resizes the slider to fit horizontally in the width of the rc
    * @return height to set ItemHeight() of ListControl
    */
@@ -139,13 +152,17 @@ public:
    */
   void DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned border_width);
 
-  void DrawText(Canvas &canvas, const PixelRect rc_outer,
+  /**
+   * Draws the text and the outline of the shape
+   */
+  void Draw(Canvas &canvas, const PixelRect rc_outer,
                 unsigned idx, bool selected, const TCHAR *tp_name,
                 bool has_entered, bool has_exited,
                 TaskManager::TaskMode task_mode, unsigned task_size,
                 bool tp_valid, fixed tp_distance, bool distance_valid,
                 fixed tp_altitude_difference,
-                bool altitude_difference_valid);
+                bool altitude_difference_valid,
+                unsigned border_width);
 
 #ifdef _WIN32
   /**

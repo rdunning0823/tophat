@@ -74,8 +74,7 @@ public:
   TaskButtonWidget(const TCHAR *_caption)
   : dialog_look(UIGlobals::GetDialogLook()),
     infobox_look(UIGlobals::GetLook().info_box),
-    caption(_caption),
-    slider_shape(dialog_look, infobox_look) {};
+    caption(_caption) {};
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();

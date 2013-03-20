@@ -220,14 +220,15 @@ MainWindow::InitialiseConfigured()
   if (IsOldWindowsCE()) {
     widget_overlays.Add(new TaskPreviousButtonWidget(), rc_current);
     widget_overlays.Add(new TaskNextButtonWidget(), rc_current);
+  } else {
+    task_nav_slider_widget = new TaskNavSliderWidget();
+    widget_overlays.Add(task_nav_slider_widget, rc_current);
   }
 #ifdef ENABLE_OPENGL
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
 #endif
-  task_nav_slider_widget = new TaskNavSliderWidget();
-  widget_overlays.Add(task_nav_slider_widget, rc_current);
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 
@@ -362,6 +363,8 @@ MainWindow::ReinitialiseLayout()
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
+  if (IsOldWindowsCE())
+    map->SetTaskNavSliderShape();
 
   ReinitialiseLayout_flarm(rc_current, ib_layout);
   ReinitialiseLayoutTA(rc_current, ib_layout);
@@ -588,13 +591,16 @@ MainWindow::OnTimer(WindowTimer &_timer)
     widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                      widget != NULL,
                                      map != NULL, FullScreen);
-    task_nav_slider_widget->RefreshTask();
     map->SetCompassOffset(widget_overlays.HeightFromTop());
     map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #ifndef ENABLE_OPENGL
     map->SetMainMenuButtonRect();
     map->SetZoomButtonsRect();
 #endif
+    if (IsOldWindowsCE())
+      map->SetTaskNavSliderShape();
+    else
+      task_nav_slider_widget->RefreshTask();
 
     battery_timer.Process();
   }
@@ -727,6 +733,8 @@ MainWindow::SetFullScreen(bool _full_screen)
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
+  if (IsOldWindowsCE())
+    map->SetTaskNavSliderShape();
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   PixelRect rc = GetClientRect();
@@ -800,6 +808,8 @@ MainWindow::ActivateMap()
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
+  if (IsOldWindowsCE())
+    map->SetTaskNavSliderShape();
 
   return map;
 }

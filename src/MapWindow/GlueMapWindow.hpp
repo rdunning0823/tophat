@@ -31,6 +31,7 @@ Copyright_License {
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Screen/Timer.hpp"
 #include "Screen/Features.hpp"
+#include "Widgets/TaskNavSliderShape.hpp"
 
 #include <array>
 
@@ -237,6 +238,12 @@ private:
   void DrawZoomButtonOverlays(Canvas &canvas) const;
 #endif
 
+  /**
+   * draws the task nav with transparencies if IsOldWindowsCE()
+   * this does not support dragging
+   */
+  void DrawTaskNavSliderShape(Canvas &canvas);
+
   void SwitchZoomClimb(bool circling);
 
   void SaveDisplayModeScales();
@@ -260,15 +267,21 @@ public:
 #ifndef ENABLE_OPENGL
   /**
    * resizes the rc_main_menu_button for the current screen layout
+   * when drawing without OPENGL
    */
   virtual void SetMainMenuButtonRect();
   /**
    * resizes the rc_zoom_in_button and rc_zoom_out_button for the current
-   * screen layout
+   * screen layout when drawing without OPENGL
    */
   virtual void SetZoomButtonsRect();
 #endif
-
+  /**
+   * resizes the TaskNavSlider shape for the current screen layout
+   * only when it's IsOldWindowsCE() (b/c these screens seem to have
+   * inadequate dragging)
+   */
+  void SetTaskNavSliderShape();
 
 #ifndef ENABLE_OPENGL
   /**
@@ -279,6 +292,11 @@ public:
   PixelRect rc_zoom_out_button;
   PixelRect rc_zoom_in_button;
 #endif
+  /**
+   * draws the slider shape if the screen does not have good dragging
+   * e.g. IsOldWindowsCE()
+   */
+  SliderShape slider_shape;
 
 protected:
   DisplayMode GetDisplayMode() const {
