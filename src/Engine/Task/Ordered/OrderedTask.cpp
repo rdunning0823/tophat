@@ -1176,10 +1176,23 @@ OrderedTask::GetFinishState() const
 bool
 OrderedTask::HasTargets() const
 {
-  for (const OrderedTaskPoint *tp : task_points)
-    if (tp->HasTarget())
-      return true;
+  switch (GetFactoryType()) {
 
+  case TaskFactoryType::FAI_GENERAL:
+  case TaskFactoryType::FAI_TRIANGLE:
+  case TaskFactoryType::FAI_OR:
+  case TaskFactoryType::FAI_GOAL:
+  case TaskFactoryType::RACING:
+    return false;
+
+  case TaskFactoryType::MIXED:
+  case TaskFactoryType::TOURING:
+    return false;
+
+  case TaskFactoryType::AAT:
+  case TaskFactoryType::MAT:
+    return true;
+  }
   return false;
 }
 
