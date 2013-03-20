@@ -374,9 +374,9 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_AA_Time
   {
-    N_("AAT time"),
-    N_("AAT time"),
-    N_("Assigned Area Task time remaining. Goes red when time remaining has expired."),
+    N_("Task time remaining"),
+    N_("Task T rem"),
+    N_("Task time remaining. Goes red when time remaining has expired."),
     IBFHelper<InfoBoxContentTaskAATime>::Create,
     e_AA_TimeDiff, // AA dTime
     e_Fin_Distance, // Fin Dis
@@ -638,8 +638,8 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_Fin_AA_Distance
   {
-    N_("AAT distance around target"),
-    N_("AAT Dtgt"),
+    N_("Task distance remaining"),
+    N_("Task D Rem"),
     N_("Assigned Area Task distance around target points for remainder of task."),
     IBFHelper<InfoBoxContentTaskAADistance>::Create,
     e_AA_SpeedAvg, // AA Vtgt
@@ -759,9 +759,9 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_AA_TimeDiff
   {
-    N_("AAT delta time"),
-    N_("AAT dT"),
-    N_("Difference between estimated task time and AAT minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
+    N_("Task delta time"),
+    N_("Task dT"),
+    N_("Difference between estimated task time and task minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
     IBFHelper<InfoBoxContentTaskAATimeDelta>::Create,
     e_AA_DistanceMax, // AA Dmax
     e_AA_Time, // AA Time
