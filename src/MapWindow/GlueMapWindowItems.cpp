@@ -90,6 +90,11 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
 
   MapItemList list;
   MapItemListBuilder builder(list, location, range);
+  bool has_targets = false;
+  if (protected_task_manager != nullptr) {
+    ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+    has_targets = task_manager->GetOrderedTask().HasTargets();
+  }
 
   if (settings.item_list.add_location)
       builder.AddLocation(basic, terrain);
@@ -101,7 +106,7 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
   if (basic.location_available)
     builder.AddSelfIfNear(basic.location, basic.attitude.heading);
 
-  if (task)
+  if (task && has_targets)
     builder.AddTaskOZs(*task);
 
   const Airspaces *airspace_database = airspace_renderer.GetAirspaces();
