@@ -272,6 +272,17 @@ HasTouchScreen()
 }
 
 /**
+ * Does this device have a touch screen that is sensitive enough to
+ * support dragging?
+ */
+constexpr
+static inline bool
+HasDraggableScreen()
+{
+  return !IsOldWindowsCE();
+}
+
+/**
  * Does this device have a keyboard device?
  * @return True if a keyboard is assumed for the hardware
  * that XCSoar is running on, False if the hardware has no keyboard

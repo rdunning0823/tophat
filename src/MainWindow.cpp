@@ -217,7 +217,7 @@ MainWindow::InitialiseConfigured()
   map = new GlueMapWindow(*look);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
-  if (IsOldWindowsCE()) {
+  if (!HasDraggableScreen()) {
     widget_overlays.Add(new TaskPreviousButtonWidget(), rc_current);
     widget_overlays.Add(new TaskNextButtonWidget(), rc_current);
   } else {
@@ -363,7 +363,7 @@ MainWindow::ReinitialiseLayout()
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
-  if (IsOldWindowsCE())
+  if (!HasDraggableScreen())
     map->SetTaskNavSliderShape();
 
   ReinitialiseLayout_flarm(rc_current, ib_layout);
@@ -597,7 +597,7 @@ MainWindow::OnTimer(WindowTimer &_timer)
     map->SetMainMenuButtonRect();
     map->SetZoomButtonsRect();
 #endif
-    if (IsOldWindowsCE())
+    if (!HasDraggableScreen())
       map->SetTaskNavSliderShape();
     else
       task_nav_slider_widget->RefreshTask();
@@ -733,7 +733,7 @@ MainWindow::SetFullScreen(bool _full_screen)
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
-  if (IsOldWindowsCE())
+  if (!HasDraggableScreen())
     map->SetTaskNavSliderShape();
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
@@ -808,7 +808,7 @@ MainWindow::ActivateMap()
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
-  if (IsOldWindowsCE())
+  if (!HasDraggableScreen())
     map->SetTaskNavSliderShape();
 
   return map;

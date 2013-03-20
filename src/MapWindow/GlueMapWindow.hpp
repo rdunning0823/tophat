@@ -239,7 +239,7 @@ private:
 #endif
 
   /**
-   * draws the task nav with transparencies if IsOldWindowsCE()
+   * draws the task nav with transparencies if !HasDraggableScreen()
    * this does not support dragging
    */
   void DrawTaskNavSliderShape(Canvas &canvas);
@@ -278,8 +278,7 @@ public:
 #endif
   /**
    * resizes the TaskNavSlider shape for the current screen layout
-   * only when it's IsOldWindowsCE() (b/c these screens seem to have
-   * inadequate dragging)
+   * only when it's !HasDraggableScreen()
    */
   void SetTaskNavSliderShape();
 
@@ -294,7 +293,7 @@ public:
 #endif
   /**
    * draws the slider shape if the screen does not have good dragging
-   * e.g. IsOldWindowsCE()
+   * e.g. !HasDraggableScreen()
    */
   SliderShape slider_shape;
 

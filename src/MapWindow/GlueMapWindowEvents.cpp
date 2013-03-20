@@ -335,7 +335,7 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
     DrawMainMenuButtonOverlay(canvas);
   DrawZoomButtonOverlays(canvas);
 #endif
-  if (IsOldWindowsCE())
+  if (!HasDraggableScreen())
     DrawTaskNavSliderShape(canvas);
 
 #ifdef ENABLE_OPENGL
@@ -417,7 +417,7 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
     InputEvents::HideMenu();
     return true;
   }
-  if (IsPointInRect(slider_shape.GetInnerRect(), p)) {
+  if (!HasDraggableScreen() && IsPointInRect(slider_shape.GetInnerRect(), p)) {
     StaticString<20> menu_ordered(_T("NavOrdered"));
     StaticString<20> menu_goto(_T("NavGoto"));
     TaskManager::TaskMode task_mode;
