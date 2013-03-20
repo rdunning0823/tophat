@@ -238,7 +238,8 @@ RefreshCalculator()
 
   {
     ProtectedTaskManager::Lease lease(*protected_task_manager);
-    bAAT = lease->HasTarget(target_point);
+    bAAT = lease->HasTarget(target_point) &&
+        lease->GetOrderedTask().IsOptimizable();
 
     if (!bAAT) {
       nodisplay = true;

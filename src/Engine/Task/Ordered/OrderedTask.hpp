@@ -716,6 +716,10 @@ protected:
                                     const GlideResult &solution_remaining_leg);
 public:
   virtual bool HasTargets() const;
+  /**
+   * is this type of task optimizable?
+   */
+  virtual bool IsOptimizable() const;
 protected:
   virtual bool IsScored() const;
 public:
