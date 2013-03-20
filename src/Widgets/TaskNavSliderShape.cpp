@@ -42,31 +42,6 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Asset.hpp"
 
-static
-void DrawClippedPolygon(Canvas &canvas, const RasterPoint* points,
-                        unsigned size, const PixelRect rc)
-{
-  RasterPoint points_clipped[8];
-  assert(size <= 8);
-
-  for (unsigned i = 0; i < size; i++) {
-    if (points[i].x < rc.left)
-      points_clipped[i].x = rc.left;
-    else if (points[i].x > rc.right)
-      points_clipped[i].x = rc.right;
-    else
-      points_clipped[i].x = points[i].x;
-
-    if (points[i].y < rc.top)
-      points_clipped[i].y = rc.top;
-    else if (points[i].y > rc.bottom)
-      points_clipped[i].y = rc.bottom;
-    else
-      points_clipped[i].y = points[i].y;
-  }
-  canvas.DrawPolygon(points_clipped, size);
-}
-
 const Font &
 SliderShape::GetLargeFont()
 {
@@ -97,7 +72,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   }
 
   canvas.Select(Pen(width, COLOR_BLACK));
-  DrawClippedPolygon(canvas, poly, 8, rc);
+  canvas.DrawPolygon(poly, 8);
 }
 
 #ifdef _WIN32
