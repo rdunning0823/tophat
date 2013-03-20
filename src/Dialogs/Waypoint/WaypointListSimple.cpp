@@ -157,18 +157,12 @@ PrepareButtons()
   name_sort_frame->SetVAlignCenter();
   distance_sort_frame->SetAlignCenter();
   distance_sort_frame->SetVAlignCenter();
-/*
-  bearing_sort_frame->SetAlignCenter();
-  bearing_sort_frame->SetVAlignCenter();
-*/
 
   name_sort_frame->SetCaptionColor(COLOR_WHITE);
   distance_sort_frame->SetCaptionColor(COLOR_WHITE);
-//  bearing_sort_frame->SetCaptionColor(COLOR_WHITE);
 
   name_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
   distance_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
-//  bearing_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
 }
 
 static void
@@ -204,11 +198,9 @@ UpdateButtons()
     search_button->SetCaption(_T("Search"));
   else
     search_button->SetCaption(_T("SearchChecked"));
-  //bearing_sort_button->SetVisible(sort_direction != SortDirection::BEARING);
 
   name_sort_frame->SetVisible(sort_direction == SortDirection::NAME);
   distance_sort_frame->SetVisible(sort_direction == SortDirection::DISTANCE);
-  //bearing_sort_frame->SetVisible(sort_direction == SortDirection::BEARING);
 }
 
 void
