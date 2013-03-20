@@ -134,6 +134,31 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   else if (ParseHexColor(caption.c_str(), color)) {
     GrowRect(rc, -3, -3);
     canvas.DrawFilledRectangle(rc, color);
+
+    //draw search icon
+  } else if (caption == _("Search") || caption == _("SearchChecked")) {
+    Bitmap bmp(caption == _("Search") ?
+        (Layout::scale == 1 ? IDB_SEARCH : IDB_SEARCH_HD) :
+        (Layout::scale == 1 ? IDB_SEARCH_CHECKED : IDB_SEARCH_CHECKED_HD));
+
+    const PixelSize bitmap_size = bmp.GetSize();
+    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
+    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
+    if (is_down())
+      canvas.CopyNotOr(rc.left + offsetx,
+                       rc.top + offsety,
+                       bitmap_size.cx / 2,
+                       bitmap_size.cy,
+                       bmp,
+                       bitmap_size.cx / 2, 0);
+    else
+      canvas.CopyAnd(rc.left + offsetx,
+                      rc.top + offsety,
+                      bitmap_size.cx / 2,
+                      bitmap_size.cy,
+                      bmp,
+                      bitmap_size.cx / 2, 0);
+
   }
 
   //draw gear for set up icon
@@ -157,6 +182,10 @@ WndSymbolButton::OnPaint(Canvas &canvas)
                       bitmap_size.cy,
                       bmp,
                       bitmap_size.cx / 2, 0);
+
+
+
+
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
     // Draw arrow symbols instead of v and ^

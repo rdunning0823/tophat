@@ -41,6 +41,8 @@ IconLook::Initialise()
 
   hBmpMenuButton.Load(Layout::scale > 1 ? IDB_MENU_BUTTON_HD : IDB_MENU_BUTTON);
   hBmpCheckMark.Load(Layout::scale > 1 ? IDB_CHECK_MARK_HD : IDB_CHECK_MARK);
+  hBmpSearch.Load(Layout::scale > 1 ? IDB_SEARCH_HD : IDB_SEARCH);
+  hBmpSearchChecked.Load(Layout::scale > 1 ? IDB_SEARCH_CHECKED_HD : IDB_SEARCH_CHECKED);
   hBmpZoomOutButton.Load(Layout::scale > 1 ? IDB_ZOOM_OUT_BUTTON_HD : IDB_ZOOM_OUT_BUTTON);
   hBmpZoomInButton.Load(Layout::scale > 1 ? IDB_ZOOM_IN_BUTTON_HD : IDB_ZOOM_IN_BUTTON);
 }
