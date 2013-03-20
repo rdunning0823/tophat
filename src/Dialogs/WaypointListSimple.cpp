@@ -265,14 +265,14 @@ OnPaintListItem(Canvas &canvas, const PixelRect rc, unsigned i)
     assert(i == 0);
 
     const UPixelScalar line_height = rc.bottom - rc.top;
-    const Font &name_font =
-      *UIGlobals::GetDialogLook().list.font;
-    canvas.SetTextColor(COLOR_BLACK);
+    const DialogLook &look = UIGlobals::GetDialogLook();
+    const Font &name_font = *look.list.font;
+    canvas.SetTextColor(look.list.GetTextColor(true, true, false));
     canvas.Select(name_font);
-    canvas.text(rc.left + line_height + Layout::FastScale(2),
+    canvas.text(rc.left + Layout::FastScale(2),
                 rc.top + line_height / 2 - name_font.GetHeight() / 2,
                 dialog_state.IsDefined() || way_points.IsEmpty() ?
-                _("No Match!") : _("Choose a filter or click here"));
+                _("No Match!") : _("Too many points. Use Search or click here"));
     return;
   }
 
@@ -288,36 +288,10 @@ OnPaintListItem(Canvas &canvas, const PixelRect rc, unsigned i)
 }
 
 static void
-OnWaypointListEnter(gcc_unused unsigned i)
-{
-  dialog->SetModalResult(mrOK);
-}
-
-static void
 OnByNameClicked(gcc_unused WndButton &button)
 {
   sort_direction = SortDirection::NAME;
   UpdateList();
-}
-
-static void
-OnByDistanceClicked(gcc_unused WndButton &button)
-{
-  sort_direction = SortDirection::DISTANCE;
-  UpdateList();
-}
-
-static void
-OnByBearingClicked(gcc_unused WndButton &button)
-{
-  sort_direction = SortDirection::BEARING;
-  UpdateList();
-}
-
-static void
-OnPaintButtonsBackground(WndOwnerDrawFrame *Sender, Canvas &canvas)
-{
-  canvas.Clear(COLOR_BLACK);
 }
 
 static void
@@ -348,6 +322,35 @@ OnSearchClicked(gcc_unused WndButton &button)
     name_sort_button->SetFocus();
   else
     distance_sort_button->SetFocus();
+}
+
+static void
+OnWaypointListEnter(gcc_unused unsigned i)
+{
+  if (waypoint_list.size() > 0)
+    dialog->SetModalResult(mrOK);
+  else
+    OnSearchClicked(*search_button);
+}
+
+static void
+OnByDistanceClicked(gcc_unused WndButton &button)
+{
+  sort_direction = SortDirection::DISTANCE;
+  UpdateList();
+}
+
+static void
+OnByBearingClicked(gcc_unused WndButton &button)
+{
+  sort_direction = SortDirection::BEARING;
+  UpdateList();
+}
+
+static void
+OnPaintButtonsBackground(WndOwnerDrawFrame *Sender, Canvas &canvas)
+{
+  canvas.Clear(COLOR_BLACK);
 }
 
 static void
