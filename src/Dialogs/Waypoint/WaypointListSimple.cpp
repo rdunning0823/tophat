@@ -448,6 +448,8 @@ ShowWaypointListSimpleDialog(const GeoPoint &_location,
   assert(name_sort_frame != nullptr);
   assert(distance_sort_frame != nullptr);
 
+  dialog_state.name = _T("");
+
   PrepareButtons();
 
   location = _location;
