@@ -64,8 +64,7 @@ void DrawClippedPolygon(Canvas &canvas, const RasterPoint* points,
     else
       points_clipped[i].y = points[i].y;
   }
-//  canvas.DrawPolygon(points_clipped, size);
-  canvas.DrawPolygon(points, size);
+  canvas.DrawPolygon(points_clipped, size);
 }
 
 const Font &
@@ -165,7 +164,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
                     rc.top + (rc.bottom - rc.top - small_font.GetHeight()) / 2,
                     buffer.c_str());
 #ifdef _WIN32
-    if (!IsOldWindowsCE())
+    if (HasDraggableScreen()) // PC or WM
       PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
 #endif
     return;
@@ -176,7 +175,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
     selected, true, false)));
   DrawOutline(canvas, rc_outer, border_width);
 #ifdef _WIN32
-  if (!IsOldWindowsCE())
+  if (HasDraggableScreen()) // PC or WM
     PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
 #endif
 

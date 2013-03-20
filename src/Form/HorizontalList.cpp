@@ -55,7 +55,7 @@ void
 HorizontalListControl::EnsureVisible(unsigned i)
 {
   assert(i < length);
-  if (!IsOldWindowsCE())
+  if (HasDraggableScreen())
     kinetic_timer.Cancel();
 
   SetPixelOriginAndCenter(i * item_height - over_scroll_max);
@@ -193,7 +193,7 @@ HorizontalListControl::DrawItems(Canvas &canvas, unsigned start, unsigned end) c
 void
 HorizontalListControl::ScrollToItem(unsigned i)
 {
-  if (IsOldWindowsCE()) {
+  if (!HasDraggableScreen()) {
     SetCursorIndex(i);
     return;
   }
@@ -227,7 +227,7 @@ HorizontalListControl::OnMouseUp(PixelScalar x, PixelScalar y)
   if (drag_mode == DragMode::SCROLL || drag_mode == DragMode::CURSOR) {
     drag_end();
 
-    if (!IsOldWindowsCE()) {
+    if (HasDraggableScreen()) {
       kinetic.MouseUp(GetPixelOrigin(), (item_height));
       kinetic_timer.Schedule(30);
     } else {
@@ -257,7 +257,7 @@ HorizontalListControl::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     cursor_down_index = -1;
     int new_origin = drag_y - x;
     SetPixelOrigin(new_origin);
-    if (!IsOldWindowsCE())
+    if (HasDraggableScreen())
       kinetic.MouseMove(GetPixelOrigin());
     if (cursor_handler != nullptr)
       cursor_handler->OnPixelMove();
@@ -276,7 +276,7 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
   drag_end();
 
   mouse_down_clock.Update();
-  if (!IsOldWindowsCE())
+  if (HasDraggableScreen())
     kinetic_timer.Cancel();
 
   // if click in ListBox area
@@ -302,7 +302,7 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
     // If item was not selected before
     // -> select it
   }
-  if (!IsOldWindowsCE())
+  if (HasDraggableScreen())
     kinetic.MouseDown(GetPixelOrigin());
   SetCapture();
 
@@ -312,7 +312,7 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 HorizontalListControl::ScrollAdvance(bool forward)
 {
-  if (!IsOldWindowsCE())
+  if (!HasDraggableScreen())
     return false;
 
     unsigned old_item = GetItemFromPixelOrigin(GetPixelOrigin());
