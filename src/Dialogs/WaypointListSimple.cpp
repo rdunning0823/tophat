@@ -72,10 +72,8 @@ static WndFrame *summary_values2;
 static WndButton *name_sort_button;
 static WndButton *distance_sort_button;
 static WndSymbolButton *search_button;
-//static WndButton *bearing_sort_button;
 static WndFrame *name_sort_frame;
 static WndFrame *distance_sort_frame;
-//static WndFrame *bearing_sort_frame;
 
 static OrderedTask *ordered_task;
 static unsigned ordered_task_index;
@@ -141,18 +139,12 @@ PrepareButtons()
   name_sort_frame->SetVAlignCenter();
   distance_sort_frame->SetAlignCenter();
   distance_sort_frame->SetVAlignCenter();
-/*
-  bearing_sort_frame->SetAlignCenter();
-  bearing_sort_frame->SetVAlignCenter();
-*/
 
   name_sort_frame->SetCaptionColor(COLOR_WHITE);
   distance_sort_frame->SetCaptionColor(COLOR_WHITE);
-//  bearing_sort_frame->SetCaptionColor(COLOR_WHITE);
 
   name_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
   distance_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
-//  bearing_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
 }
 
 static void
@@ -188,11 +180,9 @@ UpdateButtons()
     search_button->SetCaption(_T("Search"));
   else
     search_button->SetCaption(_T("SearchChecked"));
-  //bearing_sort_button->SetVisible(sort_direction != SortDirection::BEARING);
 
   name_sort_frame->SetVisible(sort_direction == SortDirection::NAME);
   distance_sort_frame->SetVisible(sort_direction == SortDirection::DISTANCE);
-  //bearing_sort_frame->SetVisible(sort_direction == SortDirection::BEARING);
 }
 
 static void
@@ -422,18 +412,14 @@ ShowWaypointListDialogSimple(SingleWindow &parent, const GeoPoint &_location,
   name_sort_button = (WndButton*)dialog->FindByName(_T("cmdByName"));
   distance_sort_button = (WndButton*)dialog->FindByName(_T("cmdByDistance"));
   search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));
-  //bearing_sort_button = (WndButton*)dialog->FindByName(_T("cmdByBearing"));
   assert(name_sort_button != nullptr);
   assert(distance_sort_button != nullptr);
   assert(search_button != nullptr);
-  //assert(bearing_sort_button != nullptr);
 
   name_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByName"));
   distance_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByDistance"));
-  //bearing_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByBearing"));
   assert(name_sort_frame != nullptr);
   assert(distance_sort_frame != nullptr);
-  //assert(bearing_sort_frame != nullptr);
 
   PrepareButtons();
 
