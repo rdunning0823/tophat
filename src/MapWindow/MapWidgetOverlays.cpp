@@ -28,15 +28,11 @@ Copyright_License {
 #include "Interface.hpp"
 #include "UISettings.hpp"
 
-
-#include "LogFile.hpp"
-
 #include <assert.h>
 
 
 MapWidgetOverlays::~MapWidgetOverlays()
 {
-  LogDebug(_T("MapWidgetOverlays::~MapWidgetOverlays"));
    for (const auto i : widget_list) {
      Widget *widget = (Widget*)i;
      widget->Leave();
@@ -180,51 +176,3 @@ void MapWidgetOverlays::Hide()
       widget->Hide();
   }
 }
-
-
-
-
-/*
-bool
-MapWidgetOverlays::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
-{
-  bool ret_val = false;
-  for (const auto i : widget_list) {
-    Widget *widget = (Widget*)i;
-    ret_val |= widget->OnMouseMove(x, y, keys);
-  }
-  return ret_val;
-}
-
-bool
-MapWidgetOverlays::OnMouseDown(PixelScalar x, PixelScalar y)
-{
-  bool ret_val = false;
-  for (const auto i : widget_list) {
-    Widget *widget = (Widget*)i;
-    ret_val |= widget->OnMouseDown(x, y);
-  }
-  return ret_val;
-}
-
-bool
-MapWidgetOverlays::OnMouseUp(PixelScalar x, PixelScalar y)
-{
-  bool ret_val = false;
-  for (const auto i : widget_list) {
-    Widget *widget = (Widget*)i;
-    ret_val |= widget->OnMouseUp(x, y);
-  }
-  LogDebug(_T("MapWidgetOverlays::OnMouseUp - return %i"), ret_val);
-  return ret_val;
-}
-
-void
-MapWidgetOverlays::OnPaint(Canvas &canvas)
-{
-  for (const auto i : widget_list) {
-    Widget *widget = (Widget*)i;
-    widget->OnPaint(canvas);
-  }
-}
-*/
