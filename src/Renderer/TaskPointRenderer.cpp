@@ -245,7 +245,11 @@ TaskPointRenderer::Draw(const TaskPoint &tp, Layer layer)
 
     DrawOrdered(otp, layer);
     if (layer == LAYER_SYMBOLS) {
-      DrawIsoline(atp);
+      if (otp.GetNext() != nullptr &&
+          !(otp.GetNext()->GetWaypoint() == otp.GetWaypoint()) &&
+          otp.GetPrevious() != nullptr &&
+          !(otp.GetPrevious()->GetWaypoint() == otp.GetWaypoint()))
+        DrawIsoline(atp);
       DrawBearing(tp);
       DrawTarget(tp);
     }
