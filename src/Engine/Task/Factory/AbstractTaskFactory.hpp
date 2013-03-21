@@ -92,7 +92,6 @@ public:
     EMPTY_TASK,
     NON_FAI_OZS,
     NON_MAT_OZS,
-    REPEATED_TASK_POINT,
   };
 
   /** Vector of errors returned by validation routine */
@@ -568,13 +567,6 @@ public:
    */
   gcc_pure
   bool IsClosed() const;
-
-  /**
-   * Determines whether a task has repeated task points
-   * Allows for case where Start == Finish
-   */
-  gcc_pure
-  bool IsNonRepeated() const;
 
   /**
    * Determines whether task is unique 
