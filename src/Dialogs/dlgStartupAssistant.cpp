@@ -217,7 +217,7 @@ StartupAssistant::SetTip(bool forward)
          ui_settings.last_startup_tip <= ARRAY_SIZE(tips));
 
   StaticString<512> tip;
-  tip.Format(_T("Tip %u:\n\n%s"), ui_settings.last_startup_tip, tips[ui_settings.last_startup_tip - 1]);
+  tip.Format(_T("Tip %u:\n%s"), ui_settings.last_startup_tip, tips[ui_settings.last_startup_tip - 1]);
   tip_text->SetCaption(tip.c_str());
 }
 
@@ -250,7 +250,8 @@ StartupAssistant::SetRectangles(const PixelRect &rc_outer)
   rc.right = rc_outer.right - rc_outer.left - Layout::Scale(2);
   rc.bottom = rc_outer.bottom - rc_outer.top - Layout::Scale(2);
 
-  UPixelScalar button_height = GetNavSliderHeight();
+  UPixelScalar button_height = min(GetNavSliderHeight(),
+                                   UPixelScalar(rc.bottom / 5));
 
   rc_close = rc_tip_text = rc_chkb_decline =
       rc_prev_tip = rc_next_tip = rc;
@@ -293,7 +294,6 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
   SetRectangles(rc_form);
 
   WindowStyle style_frame;
-  style_frame.Border();
   tip_text = new WndFrame(GetClientAreaWindow(), look,
                           rc_tip_text.left, rc_tip_text.top,
                           rc_tip_text.right - rc_tip_text.left,
