@@ -141,28 +141,80 @@ Canvas::DrawKeyhole(PixelScalar x, PixelScalar y,
 
 #endif /* !OPENGL */
 
+static void
+BuildButtonShape(RasterPoint *points, const PixelRect &rc)
+{
+  unsigned scale = 1; //(rc.bottom - rc.top > 30) ? 4 : 1;
+
+  //left to left top
+  points[0].x = rc.left;
+  points[0].y = rc.top + 4 * scale;
+  points[1].x = rc.left + 1 * scale;
+  points[1].y = rc.top + 2 * scale;
+
+  points[2].x = rc.left + 2 * scale;
+  points[2].y = rc.top + 1 * scale;
+  points[3].x = rc.left + 4 * scale;
+  points[3].y = rc.top;
+
+  //top to top right
+  points[4].x = rc.right - 4 * scale;
+  points[4].y = points[3].y;
+  points[5].x = rc.right - 2 * scale;
+  points[5].y = points[2].y;
+
+  points[6].x = rc.right - 1 * scale;
+  points[6].y = points[1].y;
+  points[7].x = rc.right;
+  points[7].y = points[0].y;
+
+  //right to right bottom
+  points[8].x = points[7].x;
+  points[8].y = rc.bottom - 4 * scale;
+  points[9].x = points[6].x;
+  points[9].y = rc.bottom - 2 * scale;
+
+  points[10].x = points[5].x;
+  points[10].y = rc.bottom - 1 * scale;
+  points[11].x = points[4].x;
+  points[11].y = rc.bottom;
+
+  //bottom to bottom left
+  points[12].x = points[3].x;
+  points[12].y = points[11].y;
+  points[13].x = points[2].x;
+  points[13].y = points[10].y;
+
+  points[14].x = points[1].x;
+  points[14].y = points[9].y;
+  points[15].x = points[0].x;
+  points[15].y = points[8].y;
+}
+
 void
 Canvas::DrawButton(PixelRect rc, bool down)
 {
   const Pen old_pen = pen;
+  RasterPoint points[16];
+  rc.right -= 1;
 
   Color gray = COLOR_LIGHT_GRAY;
-  DrawFilledRectangle(rc, gray);
+  PixelRect rc_inner = rc;
+  GrowRect(rc_inner, -1, -1);
+  DrawFilledRectangle(rc_inner, gray);
 
   Pen bright(1, LightColor(gray));
   Pen dark(1, DarkColor(gray));
 
-  Select(down ? dark : bright);
-  DrawTwoLines(rc.left, rc.bottom - 2, rc.left, rc.top,
-            rc.right - 2, rc.top);
-  DrawTwoLines(rc.left + 1, rc.bottom - 3, rc.left + 1, rc.top + 1,
-            rc.right - 3, rc.top + 1);
+  Select(!down ? dark : bright);
 
-  Select(down ? bright : dark);
-  DrawTwoLines(rc.left + 1, rc.bottom - 1, rc.right - 1, rc.bottom - 1,
-            rc.right - 1, rc.top + 1);
-  DrawTwoLines(rc.left + 2, rc.bottom - 2, rc.right - 2, rc.bottom - 2,
-            rc.right - 2, rc.top + 2);
+  SelectHollowBrush();
+  BuildButtonShape(points, rc);
+  DrawPolygon(points, 16);
+
+  GrowRect(rc, -1, -1);
+  BuildButtonShape(points, rc);
+  DrawPolygon(points, 16);
 
   pen = old_pen;
 }
