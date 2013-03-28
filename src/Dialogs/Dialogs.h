@@ -36,7 +36,7 @@ void dlgBasicSettingsShowModal();
 /**
  * show the help screen.
  * @param conditional: if true, does not display if user has opted to not show
- * on startup
+ * on startup.  if false, skips the configuration screen
  */
 void dlgStartupAssistantShowModal(bool conditional);
 
