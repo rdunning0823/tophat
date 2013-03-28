@@ -210,4 +210,31 @@ protected:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
 };
 
+/**
+ *  Base class that sizes the rectangles needed to layout
+ *  two buttons or frames of button size in the middle of the
+ *  box, full width.
+ */
+class TwoButtonLayout {
+protected:
+  /**
+   * upper of the two rects
+   */
+  PixelRect upper_rc;
+
+  /**
+   * lower of the two rects
+   */
+  PixelRect lower_rc;
+
+
+protected:
+  /*
+   * Sizes the rectangles for the layout in the center
+   * of the rc
+   * @param parent_rc The rc of the parent window's usable area
+   */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+};
+
 #endif

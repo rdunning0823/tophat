@@ -35,6 +35,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "UIGlobals.hpp"
 #include "InfoBoxes/Panel/OnlineContest.hpp"
+#include "InfoBoxes/Panel/Home.hpp"
 #include "Util/Macros.hpp"
 
 #include <tchar.h>
@@ -489,6 +490,21 @@ InfoBoxContentFinalGR::Update(InfoBoxData &data)
   } else {
     data.SetInvalid();
   }
+}
+
+static constexpr InfoBoxContentHomeDistance::PanelContent panels[] = {
+    InfoBoxContentHomeDistance::PanelContent (
+    N_("Set Home"),
+    LoadHomePanel),
+};
+
+const InfoBoxContentHomeDistance::DialogContent InfoBoxContentHomeDistance::dlgContent = {
+  ARRAY_SIZE(panels), &panels[0], false,
+};
+
+const InfoBoxContentHomeDistance::DialogContent*
+InfoBoxContentHomeDistance::GetDialogContent() {
+  return &dlgContent;
 }
 
 void
