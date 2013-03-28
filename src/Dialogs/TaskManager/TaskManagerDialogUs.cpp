@@ -49,6 +49,7 @@ Copyright_License {
 #include "Device/Declaration.hpp"
 #include "Screen/SingleWindow.hpp"
 
+
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
 #endif
@@ -399,6 +400,8 @@ TaskManagerDialogUs::CommitTaskChanges()
 void
 TaskManagerDialogUsShowModal(SingleWindow &parent)
 {
+  bool changed, require_restart;
+
   if (protected_task_manager == NULL)
     return;
 
@@ -423,6 +426,7 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
   instance->Initialise(w, w.GetClientRect());
   instance->Prepare(w, w.GetClientRect());
   instance->ShowModal();
+  instance->Save(changed, require_restart);
   instance->Hide();
   instance->Unprepare();
   delete instance;
