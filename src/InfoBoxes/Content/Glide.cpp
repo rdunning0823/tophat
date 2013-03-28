@@ -25,7 +25,10 @@ Copyright_License {
 #include "Engine/Util/Gradient.hpp"
 #include "Computer/GlideRatioCalculator.hpp"
 #include "InfoBoxes/Data.hpp"
+#include "InfoBoxes/Panel/GrAverage.hpp"
 #include "Interface.hpp"
+#include "Util/Macros.hpp"
+#include "Language/Language.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -56,6 +59,21 @@ InfoBoxContentGRCruise::Update(InfoBoxData &data)
 
   // Set Value
   data.SetValueFromGlideRatio(cruise_gr);
+}
+
+static constexpr InfoBoxContentGRAvg::PanelContent panels[] = {
+    InfoBoxContentGRAvg::PanelContent (
+    N_("Set GR averager period"),
+    LoadGrAveragePanel),
+};
+
+const InfoBoxContentGRAvg::DialogContent InfoBoxContentGRAvg::dlgContent = {
+  ARRAY_SIZE(panels), &panels[0], false,
+};
+
+const InfoBoxContentGRAvg::DialogContent*
+InfoBoxContentGRAvg::GetDialogContent() {
+  return &dlgContent;
 }
 
 void

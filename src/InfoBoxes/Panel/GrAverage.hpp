@@ -21,37 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_INFOBOX_CONTENT_GLIDE_HPP
-#define XCSOAR_INFOBOX_CONTENT_GLIDE_HPP
+#ifndef XCSOAR_GR_AVERAGE_PANEL_HPP
+#define XCSOAR_GR_AVERAGE_PANEL_HPP
 
-#include "InfoBoxes/Content/Base.hpp"
+class Widget;
 
-class InfoBoxContentGRInstant : public InfoBoxContent
-{
-public:
-  virtual void Update(InfoBoxData &data);
-};
-
-class InfoBoxContentGRCruise : public InfoBoxContent
-{
-public:
-  virtual void Update(InfoBoxData &data);
-};
-
-class InfoBoxContentGRAvg : public InfoBoxContent
-{
-public:
-  virtual const DialogContent *GetDialogContent();
-
-  static const DialogContent dlgContent;
-
-  virtual void Update(InfoBoxData &data);
-};
-
-class InfoBoxContentLDVario : public InfoBoxContent
-{
-public:
-  virtual void Update(InfoBoxData &data);
-};
+Widget *
+LoadGrAveragePanel(unsigned id);
 
 #endif
