@@ -145,6 +145,10 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   PixelRect close_button_rc = base_rc;
   close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
+  close_button_rc.bottom -= Layout::Scale(2);
+  close_button_rc.left += Layout::Scale(2);
+  close_button_rc.right -= Layout::Scale(2);
+
   close_button = new WndButton(GetClientAreaWindow(), look,
                                _("Close"), close_button_rc,
                                button_style,
