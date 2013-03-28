@@ -57,3 +57,19 @@ public:
 void WaypointList::SortByDistance(const GeoPoint &location) {
   std::sort(begin(), end(), WaypointDistanceCompare(location));
 }
+
+class WaypointNameCompare
+{
+public:
+  WaypointNameCompare() {}
+
+  bool operator()(const WaypointListItem &a,
+                  const WaypointListItem &b) const {
+    return a.waypoint->name < b.waypoint->name;
+  }
+};
+
+void WaypointList::SortByName() {
+  std::sort(begin(), end(), WaypointNameCompare());
+}
+

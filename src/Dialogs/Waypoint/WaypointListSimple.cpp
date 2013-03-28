@@ -169,23 +169,32 @@ static void
 FillList(WaypointList &list, const Waypoints &src,
          GeoPoint location, Angle heading, const WaypointListDialogState &state)
 {
-  if (!state.IsDefined() && src.size() >= 500)
-    return;
-
   WaypointFilter filter;
   state.ToFilter(filter, heading);
   WaypointListBuilder builder(filter, location, list,
                               ordered_task, ordered_task_index);
   builder.Visit(src);
+  enum MaxListSize {
+    MAX_LIST_SIZE = 425,
+  };
 
-  switch (sort_direction) {
-  case SortDirection::NAME:
-    break;
-  case SortDirection::DISTANCE:
+  unsigned size = (unsigned)src.size();
+  if (!state.IsDefined() && size >= MAX_LIST_SIZE) {
     list.SortByDistance(location);
-    break;
-  case SortDirection::BEARING:
-    break;
+    list.erase(list.begin() + MAX_LIST_SIZE, list.end());
+    if (sort_direction == SortDirection::NAME)
+      list.SortByName();
+  } else {
+
+    switch (sort_direction) {
+    case SortDirection::NAME:
+      break;
+    case SortDirection::DISTANCE:
+      list.SortByDistance(location);
+      break;
+    case SortDirection::BEARING:
+      break;
+    }
   }
 }
 
