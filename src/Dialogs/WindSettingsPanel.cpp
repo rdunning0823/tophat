@@ -37,6 +37,26 @@ WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind,
    edit_trail_drift(_edit_trail_drift) {}
 
 void
+WindSettingsPanel::SetVisibility()
+{
+  assert(auto_wind != nullptr);
+
+  DataFieldEnum *auto_wind_enum = (DataFieldEnum *)
+      auto_wind->GetDataField();
+  bool manual_mode = auto_wind_enum->GetAsInteger() == 0;
+
+  RowFormWidget::GetControl(ExternalWind).SetVisible(!manual_mode);
+  this->GetControl(Speed).SetVisible(manual_mode);
+  this->GetControl(Direction).SetVisible(manual_mode);
+}
+
+void
+WindSettingsPanel::OnModified(DataField &df)
+{
+  SetVisibility();
+}
+
+void
 WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   RowFormWidget::Prepare(parent, rc);
@@ -57,9 +77,9 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { 0 }
   };
 
-  AddEnum(_("Auto wind"),
-          _("This allows switching on or off the automatic wind algorithm."),
-          auto_wind_list, settings.GetLegacyAutoWindMode());
+  auto_wind = AddEnum(_("Auto wind"),
+      _("This allows switching on or off the automatic wind algorithm."),
+      auto_wind_list, settings.GetLegacyAutoWindMode(), this);
 
   AddBoolean(_("External wind"),
              _("If enabled, then the wind vector received from external devices overrides "
@@ -99,6 +119,8 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                   manual_wind.bearing.Degrees());
     wp->SetEnabled(!external_wind);
   }
+
+  SetVisibility();
 }
 
 bool
