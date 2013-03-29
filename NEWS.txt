@@ -1,11 +1,30 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 0.1.4 Beta 
+TopHat 0.1.4 Beta 3/30/2013
 
 * Task
- - Cleaned up task editor, redundand information
+ - Made Nav Bar thinner
+ - Cleaned up task editor, redundant information
+ - Cleaned up TAT/AT/MAT language
+ - MAT added add/replace tp option
+ - Auto declare task to logger
+
+* Map
+ - Screen orientation menu
+ - Nuked double click
+ - Dialog button consistency improved
  
+InfoBoxes
+ - Home altitude infobox.  Allows setting home wp
+ - Wind.  Hide properties if not "Manual"
+ - Help text
+ - GR Average.  Lets pilot change averager period.
+
+* Waypoint list
+ - new search button
+ - show only closest waypoint if too many
+
  
 TopHat 0.1.3 Beta 3/7/2013
 
