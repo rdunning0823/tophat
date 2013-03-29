@@ -83,6 +83,8 @@ extern const TCHAR CircleZoom[];
 extern const TCHAR MaxAutoZoomDistance[];
 extern const TCHAR HomeWaypoint[];
 extern const TCHAR HomeLocation[];
+extern const TCHAR HomeElevation[];
+extern const TCHAR HomeElevationAvailable[];
 extern const TCHAR TeamcodeRefWaypoint[];
 extern const TCHAR PilotName[];
 extern const TCHAR AircraftType[];

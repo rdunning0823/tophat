@@ -135,13 +135,25 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
-class InfoBoxContentHomeDistance : public InfoBoxContent
+class InfoBoxContentHome : public InfoBoxContent
 {
 public:
   virtual const DialogContent *GetDialogContent();
 
   static const DialogContent dlgContent;
 
+  virtual void Update(InfoBoxData &data) = 0;
+};
+
+class InfoBoxContentHomeDistance : public InfoBoxContentHome
+{
+public:
+  virtual void Update(InfoBoxData &data);
+};
+
+class InfoBoxContentHomeAltitudeRequired : public InfoBoxContentHome
+{
+public:
   virtual void Update(InfoBoxData &data);
 };
 

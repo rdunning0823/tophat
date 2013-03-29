@@ -37,6 +37,9 @@ Copyright_License {
 #include "InfoBoxes/Panel/OnlineContest.hpp"
 #include "InfoBoxes/Panel/Home.hpp"
 #include "Util/Macros.hpp"
+#include "ComputerSettings.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "GlideSolvers/GlideState.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -492,18 +495,18 @@ InfoBoxContentFinalGR::Update(InfoBoxData &data)
   }
 }
 
-static constexpr InfoBoxContentHomeDistance::PanelContent panels[] = {
-    InfoBoxContentHomeDistance::PanelContent (
+static constexpr InfoBoxContentHome::PanelContent panels[] = {
+    InfoBoxContentHome::PanelContent (
     N_("Set Home"),
     LoadHomePanel),
 };
 
-const InfoBoxContentHomeDistance::DialogContent InfoBoxContentHomeDistance::dlgContent = {
+const InfoBoxContentHome::DialogContent InfoBoxContentHome::dlgContent = {
   ARRAY_SIZE(panels), &panels[0], false,
 };
 
-const InfoBoxContentHomeDistance::DialogContent*
-InfoBoxContentHomeDistance::GetDialogContent() {
+const InfoBoxContentHome::DialogContent*
+InfoBoxContentHome::GetDialogContent() {
   return &dlgContent;
 }
 
@@ -527,6 +530,51 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
   } else
     data.SetCommentInvalid();
 }
+
+void
+InfoBoxContentHomeAltitudeRequired::Update(InfoBoxData &data)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const ComputerSettings &settings = XCSoarInterface::GetComputerSettings();
+  const CommonStats &common_stats = XCSoarInterface::Calculated().common_stats;
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+
+  if (!common_stats.vector_home.IsValid() ||
+      !settings.poi.home_location_available ||
+      !settings.poi.home_elevation_available) {
+    data.SetInvalid();
+    return;
+  }
+
+  // altitude differential
+
+  if (basic.location_available && more_data.NavAltitudeAvailable() &&
+      settings.polar.glide_polar_task.IsValid()) {
+    const GlideState glide_state(
+      basic.location.DistanceBearing(settings.poi.home_location),
+      settings.poi.home_elevation + settings.task.safety_height_arrival,
+      more_data.nav_altitude,
+      calculated.GetWindOrZero());
+
+    const GlideResult &result =
+      MacCready::Solve(settings.task.glide,
+                       settings.polar.glide_polar_task,
+                       glide_state);
+    data.SetValueFromArrival(result.pure_glide_altitude_difference);
+  }
+  else
+    data.SetInvalid();
+
+  // Set Comment (bearing)
+  if (basic.track_available) {
+    const GeoVector vector = basic.location.DistanceBearing(settings.poi.home_location);
+    Angle bd = vector.bearing - basic.track;
+    data.SetCommentFromBearingDifference(bd);
+  } else
+    data.SetCommentInvalid();
+}
+
 
 void
 InfoBoxContentOLC::Update(InfoBoxData &data)

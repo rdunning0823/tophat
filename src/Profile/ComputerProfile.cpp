@@ -105,6 +105,9 @@ Profile::Load(PlacesOfInterestSettings &settings)
   Get(ProfileKeys::HomeWaypoint, settings.home_waypoint);
   settings.home_location_available =
     GetGeoPoint(ProfileKeys::HomeLocation, settings.home_location);
+  Get(ProfileKeys::HomeElevationAvailable, settings.home_elevation_available);
+  if (settings.home_elevation_available)
+    Get(ProfileKeys::HomeElevation, settings.home_elevation);
 }
 
 void

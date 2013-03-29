@@ -181,6 +181,10 @@ struct PlacesOfInterestSettings {
 
   GeoPoint home_location;
 
+  bool home_elevation_available;
+
+  fixed home_elevation;
+
   void SetDefaults() {
     ClearHome();
   }
