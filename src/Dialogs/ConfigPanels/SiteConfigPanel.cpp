@@ -149,14 +149,14 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   wp = AddFileReader(_("Map database"),
                      _("The name of the file (.xcm) containing terrain, topography, and optionally "
-                         "waypoints, their details and airspaces."),
+                         "waypoints, their details and airspaces.  Available at www.xcsoar.org/download/maps"),
                      ProfileKeys::MapFile, _T("*.xcm\0*.lkm\0"), true, this);
   DataFieldFileReader *dff = (DataFieldFileReader *)(wp->GetDataField());
   dff->EnableInternetDownload();
 
   wp = AddFileReader(_("Waypoints"),
                     _("Primary waypoints file.  Supported file types are Cambridge/WinPilot files (.dat), "
-                        "Zander files (.wpz) or SeeYou files (.cup)."),
+                        "Zander files (.wpz) or SeeYou files (.cup).  Available at http://soaringweb.org/TP"),
                     ProfileKeys::WaypointFile, _T("*.dat\0*.xcw\0*.cup\0*.wpz\0*.wpt\0"),
                     true, this);
   dff = (DataFieldFileReader *)(wp->GetDataField());
@@ -174,7 +174,7 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                 ProfileKeys::WatchedWaypointFile, _T("*.dat\0*.xcw\0*.cup\0*.wpz\0*.wpt\0"));
   SetExpertRow(WatchedWaypointFile);
 
-  wp = AddFileReader(_("Airspaces"), _("The file name of the primary airspace file."),
+  wp = AddFileReader(_("Airspaces"), _("The file name of the primary airspace file.  Available at http://soaringweb.org/TP"),
                      ProfileKeys::AirspaceFile, _T("*.txt\0*.air\0*.sua\0"),
                      true, this);
   dff = (DataFieldFileReader *)(wp->GetDataField());
