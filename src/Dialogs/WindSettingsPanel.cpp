@@ -46,8 +46,10 @@ WindSettingsPanel::SetVisibility()
   bool manual_mode = auto_wind_enum->GetAsInteger() == 0;
 
   RowFormWidget::GetControl(ExternalWind).SetVisible(!manual_mode);
-  this->GetControl(Speed).SetVisible(manual_mode);
-  this->GetControl(Direction).SetVisible(manual_mode);
+  if (edit_trail_drift) {
+    this->GetControl(Speed).SetVisible(manual_mode);
+    this->GetControl(Direction).SetVisible(manual_mode);
+  }
 }
 
 void
