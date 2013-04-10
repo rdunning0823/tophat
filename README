@@ -1,17 +1,21 @@
-XCSoar README
+Top Hat README
 =============
 
-XCSoar is a tactical glide computer for the Pocket PC operating
-system.
+Top Hat is a tactical glide computer for the Android and Linux operating
+systems.  Although it runs on all the platforms supported by XCSoar such as 
+Window PC (Top Hat is a GUI that runs on the XCSoar platform), we're focusing 
+our time on a GUI that runs on Android and Linux.
 
-This file is aimed at developers.  Users should read the manual which
-can be found on the XCSoar home page (http://www.xcsoar.org/).
+This file is aimed at developers.  We don't have a developer manual yet.  If you 
+would like to write one that would be appreciated.  Our general approach to development
+is to design before we code.  Designing can mean many things including creation of
+mockup screens, interactive prototypes, and testing concepts directly with pilots. 
 
 
 Getting the source
 ------------------
 
-The XCSoar source code is managed with git (http://git-scm.com/).  It
+The Top Hat source code is managed with git (http://git-scm.com/).  It
 can be downloaded with the following command:
 
  git clone git://git.xcsoar.org/xcsoar/master/xcsoar.git
@@ -128,14 +132,13 @@ Supported targets:
 Submitting patches
 ------------------
 
-Subscribe to the XCSoar developer mailing list:
+Subscribe to the Top Hat forum:
 
- https://lists.sourceforge.net/lists/listinfo/xcsoar-devel
- xcsoar-devel@lists.sourceforge.net
+ http://tophat.freeforums.org
+ 
+Wiki is 
+ http://www.tophatsoaring.org
 
-Use this mailing list to submit patches or "git pull" requests.
-
-- patches should be self-contained
-- patches should be self-documenting (add a good description on what
-  is changed, and why you are changing it)
-- write one patch for one change
+Use the Design forum to review designs with other developers, pilots and designers.
+Use the Development forum to submit patches or "git pull" requests.
+Patches should explain the impact on the user as well as any technical structure.
