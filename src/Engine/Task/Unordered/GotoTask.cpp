@@ -45,6 +45,7 @@ GotoTask::SetTaskBehaviour(const TaskBehaviour &tb)
 GotoTask::~GotoTask() 
 {
   delete tp;
+  tp = nullptr;
 }
 
 TaskWaypoint*
@@ -112,6 +113,7 @@ void
 GotoTask::Reset()
 {
   delete tp;
+  tp = nullptr;
   UnorderedTask::Reset();
 }
 

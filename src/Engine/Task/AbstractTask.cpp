@@ -317,7 +317,7 @@ AbstractTask::CalcLegGradient(const AircraftState &aircraft) const
 {
   // Get next turnpoint
   const TaskWaypoint *tp = GetActiveTaskPoint();
-  if (!tp)
+  if (tp == nullptr)
     return fixed_zero;
 
   // Get the distance to the next turnpoint
