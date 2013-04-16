@@ -415,7 +415,7 @@ GlidePolar::GetBestGlideRatioSpeed(fixed head_wind) const
 fixed
 GlidePolar::GetVTakeoff() const
 {
-  return half(GetVMin());
+  return fixed(0.3) * GetVMin();
 }
 
 fixed
