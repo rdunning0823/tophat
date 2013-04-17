@@ -1,6 +1,11 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 0.1.6 Beta 4/17/2013
+* Fix bugs in task speed achieved, time remaining
+* Fix bugs in second takeoff
+* Reduce landing speed threshold 
+
 TopHat 0.1.5 Beta 4/7/2013
 * fix bug in Advanced wind setup
 
