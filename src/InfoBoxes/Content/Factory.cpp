@@ -264,9 +264,9 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_SpeedTaskAvg
   {
-    N_("Speed task average"),
-    N_("V Task Avg"),
-    N_("Average cross country speed while on current task, not compensated for altitude."),
+    N_("Speed task achieved"),
+    N_("V Task Ach"),
+    N_("Achieved speed while on current task, not compensated for altitude."),
     IBFHelper<InfoBoxContentTaskSpeed>::Create,
     e_CC_SpeedInst, // V Task Inst
     e_Fin_AltReq, // Fin AltR
@@ -754,7 +754,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskSpeedAchieved>::Create,
     e_Fin_Distance, // Fin Dis
     e_CC_SpeedInst, // V Task Inst
-    STANDARD,
+    DEPRECATED,
   },
 
   // e_AA_TimeDiff
