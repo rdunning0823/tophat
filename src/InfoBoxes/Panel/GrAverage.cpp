@@ -55,15 +55,17 @@ GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-
   assert(IsDefined());
 
+#ifdef ENABLE_OPENGL
   Window *window = new Window();
   ContainerWindow *panel = (ContainerWindow *)GetWindow();
-  const PixelRect rc_blank = InitialControlRect(Layout::Scale(40));
-  window->set(panel, rc_blank);
-  Add(window);
 
+  window->set(panel, InitialControlRect(Layout::Scale(40)));
+  Add(window);
+#else
+  AddDummy();
+#endif
 
   static constexpr StaticEnumChoice aver_eff_list[] = {
     { ae15seconds, _T("15 s"), N_("Suggested period for paragliders.") },
