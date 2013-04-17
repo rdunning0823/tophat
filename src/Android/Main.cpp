@@ -121,7 +121,7 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
 
   InitialiseDataPath();
 
-  LogStartUp(_T("Starting XCSoar %s"), XCSoar_ProductToken);
+  LogStartUp(_T("Starting %s based on %s"), TopHat_ProductToken, XCSoar_ProductToken);
 
   OpenGL::Initialise();
   TextUtil::Initialise(env);
