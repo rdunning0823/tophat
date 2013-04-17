@@ -44,12 +44,6 @@ ZoomButton::OnPaint(Canvas &canvas)
 #endif
   renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
   rc = renderer.GetDrawingRect(rc, pressed);
-  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
-  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
-  canvas.DrawTwoLines(rc.left, rc.bottom, rc.right, rc.bottom,
-                      rc.right, rc.top);
-  canvas.DrawTwoLines(rc.left, rc.bottom, rc.left, rc.top,
-                      rc.right, rc.top);
 
   canvas.SelectNullPen();
   if (!IsEnabled())
