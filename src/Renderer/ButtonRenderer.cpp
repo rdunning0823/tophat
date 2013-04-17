@@ -27,6 +27,7 @@ Copyright_License {
 #include "Screen/Pen.hpp"
 #include "Look/ButtonLook.hpp"
 
+#ifdef ENABLE_OPENGL
 static void
 BuildButtonShape(RasterPoint *points, const PixelRect &rc)
 {
@@ -101,6 +102,31 @@ ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
   BuildButtonShape(points, rc);
   canvas.DrawPolygon(points, 16);
 }
+
+#else
+void
+ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
+                           bool pressed, bool transparent)
+{
+  const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+
+  if (!transparent)
+    canvas.DrawFilledRectangle(rc, _look.background_color);
+
+  canvas.Select(pressed ? _look.dark_border_pen : _look.light_border_pen);
+  canvas.DrawTwoLines(rc.left, rc.bottom - 2, rc.left, rc.top, rc.right - 2,
+                      rc.top);
+  canvas.DrawTwoLines(rc.left + 1, rc.bottom - 3, rc.left + 1, rc.top + 1,
+                      rc.right - 3, rc.top + 1);
+
+  canvas.Select(pressed ? _look.light_border_pen : _look.dark_border_pen);
+  canvas.DrawTwoLines(rc.left + 1, rc.bottom - 1, rc.right - 1, rc.bottom - 1,
+                      rc.right - 1, rc.top + 1);
+  canvas.DrawTwoLines(rc.left + 2, rc.bottom - 2, rc.right - 2, rc.bottom - 2,
+                      rc.right - 2, rc.top + 2);
+}
+
+#endif
 
 PixelRect
 ButtonRenderer::GetDrawingRect(PixelRect rc, bool pressed)

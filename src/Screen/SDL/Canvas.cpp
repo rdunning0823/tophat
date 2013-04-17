@@ -141,6 +141,9 @@ Canvas::DrawKeyhole(PixelScalar x, PixelScalar y,
 
 #endif /* !OPENGL */
 
+
+#ifdef ENABLE_OPENGL
+
 static void
 BuildButtonShape(RasterPoint *points, const PixelRect &rc)
 {
@@ -218,6 +221,36 @@ Canvas::DrawButton(PixelRect rc, bool down)
 
   pen = old_pen;
 }
+
+#else
+
+void
+Canvas::DrawButton(PixelRect rc, bool down)
+{
+  const Pen old_pen = pen;
+
+  Color gray = COLOR_LIGHT_GRAY;
+  DrawFilledRectangle(rc, gray);
+
+  Pen bright(1, LightColor(gray));
+  Pen dark(1, DarkColor(gray));
+
+  Select(down ? dark : bright);
+  DrawTwoLines(rc.left, rc.bottom - 2, rc.left, rc.top,
+            rc.right - 2, rc.top);
+  DrawTwoLines(rc.left + 1, rc.bottom - 3, rc.left + 1, rc.top + 1,
+            rc.right - 3, rc.top + 1);
+
+  Select(down ? bright : dark);
+  DrawTwoLines(rc.left + 1, rc.bottom - 1, rc.right - 1, rc.bottom - 1,
+            rc.right - 1, rc.top + 1);
+  DrawTwoLines(rc.left + 2, rc.bottom - 2, rc.right - 2, rc.bottom - 2,
+            rc.right - 2, rc.top + 2);
+
+  pen = old_pen;
+}
+
+#endif /* !OPENGL */
 
 const PixelSize
 Canvas::CalcTextSize(const TCHAR *text, size_t length) const
