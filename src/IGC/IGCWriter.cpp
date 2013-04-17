@@ -182,7 +182,7 @@ IGCWriter::WriteHeader(const BrokenDateTime &date_time,
   WriteLine("HFGTYGLIDERTYPE:", aircraft_model);
   WriteLine("HFGIDGLIDERID:", aircraft_registration);
   WriteLine("HFCIDCOMPETITIONID:", competition_id);
-  WriteLine("HFFTYFRTYPE:XCSOAR,XCSOAR ", XCSoar_VersionStringOld);
+  WriteLine("HFRFWFIRMWAREVERSION:XCSoar/Top Hat ", TopHat_VersionStringOld);
   WriteLine("HFGPS:", driver_name);
 
   WriteLine("HFDTM100DATUM:WGS-84");
