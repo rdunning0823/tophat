@@ -1,6 +1,13 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 0.1.6 Beta
+* Infoboxes:
+ - Glide ratio "cruise" - show cruise distance
+ - Home Altitude Req - show home distance
+ - Home: show "not configured" if no home wp is configured
+* Map - allow really quick taps to clear menu
+
 TopHat 0.1.6 Beta 4/17/2013
 * Fix bugs in task speed achieved, time remaining
 * Fix bugs in second takeoff
