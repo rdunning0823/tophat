@@ -59,6 +59,9 @@ InfoBoxContentGRCruise::Update(InfoBoxData &data)
 
   // Set Value
   data.SetValueFromGlideRatio(cruise_gr);
+
+  data.SetCommentFromDistance(XCSoarInterface::Basic().location.Distance(
+      XCSoarInterface::Calculated().cruise_start_location));
 }
 
 static constexpr InfoBoxContentGRAvg::PanelContent panels[] = {

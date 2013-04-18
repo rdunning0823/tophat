@@ -134,7 +134,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
   {
     N_("GR cruise"),
     N_("GR Cruise"),
-    N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'."),
+    N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'.  Cruise distance shown also."),
     IBFHelper<InfoBoxContentGRCruise>::Create,
     e_Fin_GR_TE, // Final LD
     e_GR_Instantaneous, // LD Inst
