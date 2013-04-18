@@ -121,7 +121,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_GR_Instantaneous
   {
-    N_("GR instantaneous"),
+    N_("Glide ratio instantaneous"),
     N_("GR Inst"),
     N_("Instantaneous glide ratio over ground, given by the ground speed divided by the vertical speed (GPS speed) over the last 20 seconds. Negative values indicate climbing cruise. If the vertical speed is close to zero, the displayed value is '---'."),
     IBFHelper<InfoBoxContentGRInstant>::Create,
@@ -132,7 +132,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_GR_Cruise
   {
-    N_("GR cruise"),
+    N_("Glide ratio cruise"),
     N_("GR Cruise"),
     N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'.  Cruise distance shown also."),
     IBFHelper<InfoBoxContentGRCruise>::Create,
@@ -286,7 +286,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_Fin_GR_TE
   {
-    N_("Final GR (TE Compensated)"),
+    N_("Final glide ratio (TE Compensated)"),
     N_("Fin GR-TE"),
     N_("The required glide ratio over ground to finish the task, given by the distance to go divided by the height required to arrive at the safety arrival height. Negative values indicate a climb is necessary to finish. If the height required is close to zero, the displayed value is '---'. Note that this calculation may be optimistic because it reduces the height required to finish by the excess energy height of the glider if its true airspeed is greater than the MacCready and best L/D speeds."),
     IBFHelper<InfoBoxContentFinalGRTE>::Create,
@@ -495,7 +495,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_WP_GR
   {
-    N_("Next GR (TE Compensated)"),
+    N_("Next glide ratio (TE Compensated)"),
     N_("WP GR-TE"),
     N_("The required glide ratio over ground to reach the next waypoint, given by the distance to next waypoint divided by the height required to arrive at the safety arrival height. Negative values indicate a climb is necessary to reach the waypoint. If the height required is close to zero, the displayed value is '---'.   Note that this calculation may be optimistic because it reduces the height required to reach the waypoint by the excess energy height of the glider if its true airspeed is greater than the MacCready and best L/D speeds."),
     IBFHelper<InfoBoxContentNextGR>::Create,
@@ -807,7 +807,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_Fin_GR
   {
-    N_("Final GR"),
+    N_("Final glide ratio"),
     N_("Fin GR"),
     N_("Geometric gradient to the arrival height above the final waypoint. This is not adjusted for total energy."),
     IBFHelper<InfoBoxContentFinalGR>::Create,
@@ -840,7 +840,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_Alternate_1_GR
   {
-    N_("Alternate 1 GR"),
+    N_("Alternate 1 glide ratio"),
     N_("Altn1 GR"),
     N_("Geometric gradient to the arrival height above the best alternate. This is not adjusted for total energy."),
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
@@ -862,7 +862,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
 
   // e_GR_Avg
   {
-    N_("GR average"),
+    N_("Glide ratio average"),
     N_("GR Avg"),
     N_("The distance made in the configured period of time , divided by the altitude lost since then. Negative values are shown as ^^^ and indicate climbing cruise (height gain). Over 200 of L/D the value is shown as +++ . You can configure the period of averaging in the system setup. Suggested values are 60, 90 or 120. Lower values will be closed to L/D INST, and higher values will be closed to L/D Cruise. Notice that the distance is NOT the straight line between your old and current position, it's exactly the distance you have made even in a zigzag glide. This value is not calculated while circling."),
     IBFHelper<InfoBoxContentGRAvg>::Create,
