@@ -74,6 +74,11 @@ struct InfoBoxData {
   void SetInvalid();
 
   /**
+   * sets value and comment as not configured
+   */
+  void SetNotConfigured();
+
+  /**
    * Sets the InfoBox title to the given Value
    *
    * @param title New value of the InfoBox title

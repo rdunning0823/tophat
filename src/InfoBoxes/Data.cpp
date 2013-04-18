@@ -31,6 +31,15 @@ InfoBoxData::Clear()
 }
 
 void
+InfoBoxData::SetNotConfigured()
+{
+  SetAllColors(0);
+  SetValue(_T("N/A"));
+  SetValueUnit(Unit::UNDEFINED);
+  SetComment(_T("Not configured"));
+}
+
+void
 InfoBoxData::SetInvalid()
 {
   SetAllColors(0);
