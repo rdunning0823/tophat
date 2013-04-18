@@ -540,7 +540,7 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
 
   if (!common_stats.vector_home.IsValid()) {
-    data.SetInvalid();
+    data.SetNotConfigured();
     return;
   }
   // Set Value
@@ -565,7 +565,7 @@ InfoBoxContentHomeAltitudeRequired::Update(InfoBoxData &data)
   if (!common_stats.vector_home.IsValid() ||
       !settings.poi.home_location_available ||
       !settings.poi.home_elevation_available) {
-    data.SetInvalid();
+    data.SetNotConfigured();
     return;
   }
 
