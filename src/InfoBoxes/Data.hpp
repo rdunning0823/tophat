@@ -148,6 +148,11 @@ struct InfoBoxData {
   void SetCommentFromSpeed(fixed value, bool precision=true);
 
   /**
+   * Set the InfoBox comment from the specified distance and unit
+   */
+  void SetCommentFromDistance(fixed new_value);
+
+  /**
    * Set the InfoBox value to the specified altitude in the alternate
    * altitude unit.
    */

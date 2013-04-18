@@ -566,13 +566,10 @@ InfoBoxContentHomeAltitudeRequired::Update(InfoBoxData &data)
   else
     data.SetInvalid();
 
-  // Set Comment (bearing)
-  if (basic.track_available) {
-    const GeoVector vector = basic.location.DistanceBearing(settings.poi.home_location);
-    Angle bd = vector.bearing - basic.track;
-    data.SetCommentFromBearingDifference(bd);
-  } else
-    data.SetCommentInvalid();
+  if (common_stats.vector_home.IsValid())
+    data.SetCommentFromDistance(common_stats.vector_home.distance);
+  else
+     data.SetCommentInvalid();
 }
 
 

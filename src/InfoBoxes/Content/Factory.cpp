@@ -1170,7 +1170,7 @@ const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
   {
     N_("Home altitude required"),
     N_("Home Alt Req"),
-    N_("Altitude required to reach the home waypoint (including safety height).  User can change the home waypoint by clicking."),
+    N_("Altitude required to reach the home waypoint (including safety height).  User can change the home waypoint by clicking.  Distance shown in comment."),
     IBFHelper<InfoBoxContentHomeAltitudeRequired>::Create,
     HomeAltitudeRequired,
     HomeAltitudeRequired,
