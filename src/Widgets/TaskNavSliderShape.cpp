@@ -200,7 +200,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
   if (distance_valid) {
 
     canvas.Select(medium_font);
-    FormatUserDistanceSmart(tp_distance, distance_buffer.buffer(), true);
+    FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
     canvas.DrawText(rc.right - Layout::FastScale(2) - distance_width,
                     line_one_y_offset, distance_buffer.c_str());
