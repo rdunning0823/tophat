@@ -141,7 +141,7 @@ namespace InfoBoxFactory
     HeadWindSimplified,
     CruiseEfficiency,
     WIND_ARROW,
-    HomeAltitudeRequired, /* Altitude required to reach home waypoint (if defined) */
+    HomeAltitudeDiff, /* Altitude required to reach home waypoint (if defined) */
 
     e_NUM_TYPES /* Last item */
   };
