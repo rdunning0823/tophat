@@ -33,6 +33,8 @@ Copyright_License {
 #include "Android/NativeInputListener.hpp"
 #include "Android/TextUtil.hpp"
 #include "Android/LogCat.hpp"
+#include "Android/Nook.hpp"
+#include "Asset.hpp"
 #include "Language/Language.hpp"
 #include "LocalPath.hpp"
 #include "LogFile.hpp"
@@ -155,6 +157,10 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
 
   ScreenInitialized();
   AllowLanguage();
+
+  if (IsNookSimpleTouch())
+    Nook::EnterFastMode();
+
   return Startup();
 }
 
@@ -182,6 +188,9 @@ gcc_visibility_default
 JNIEXPORT void JNICALL
 Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
 {
+  if (IsNookSimpleTouch())
+    Nook::ExitFastMode();
+
   InitThreadDebug();
 
   delete CommonInterface::main_window;

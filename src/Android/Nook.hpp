@@ -30,6 +30,19 @@ namespace Nook {
    * initialize USB mode in Nook (must be rooted with USB Kernel)
    */
   void InitUsb();
+
+  /**
+   * Enter FastMode to eliminate full refresh of screen
+   * requires Nook kernel rooted to support FastMode
+   */
+  void EnterFastMode();
+
+  /**
+   * Exit FastMode to restore full (slow) refresh of screen
+   * requires Nook kernel rooted to support FastMode
+   */
+  void ExitFastMode();
+
 }
 
 #endif
