@@ -46,7 +46,7 @@ OpenLog()
   const bool append = initialised;
   if (!initialised) {
     initialised = true;
-    LocalPath(path, _T("xcsoar-startup.log"));
+    LocalPath(path, _T("tophat-startup.log"));
   }
 
   return TextWriter(path, append);
@@ -56,7 +56,7 @@ static void
 LogString(const char *p)
 {
 #ifdef ANDROID
-  __android_log_print(ANDROID_LOG_INFO, "XCSoar", "%s", p);
+  __android_log_print(ANDROID_LOG_INFO, "TopHat", "%s", p);
 #elif defined(HAVE_POSIX) && !defined(NDEBUG)
   fprintf(stderr, "%s\n", p);
 #endif

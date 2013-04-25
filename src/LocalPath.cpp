@@ -405,7 +405,7 @@ FindDataPath()
     if (stat(ANDROID_SAMSUNG_EXTERNAL_SD, &st) == 0 &&
         (st.st_mode & S_IFDIR) != 0 &&
         fgrep("/proc/mounts", ANDROID_SAMSUNG_EXTERNAL_SD " ", "tmpfs ")) {
-      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+      __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                           "Enable Samsung hack, " XCSDATADIR " in "
                           ANDROID_SAMSUNG_EXTERNAL_SD);
       return strdup(ANDROID_SAMSUNG_EXTERNAL_SD "/" XCSDATADIR);
@@ -415,7 +415,7 @@ FindDataPath()
     char buffer[MAX_PATH];
     if (Environment::getExternalStoragePublicDirectory(buffer, sizeof(buffer),
                                                        "XCSoarData") != NULL) {
-      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+      __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                           "Environment.getExternalStoragePublicDirectory()='%s'",
                           buffer);
       return strdup(buffer);
@@ -425,7 +425,7 @@ FindDataPath()
        getExternalStoragePublicDirectory() needs API level 8 */
     if (Environment::getExternalStorageDirectory(buffer,
                                                  sizeof(buffer) - 32) != NULL) {
-      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+      __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                           "Environment.getExternalStorageDirectory()='%s'",
                           buffer);
 
@@ -434,7 +434,7 @@ FindDataPath()
     }
 
     /* hard-coded path for Android */
-    __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+    __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                         "Fallback " XCSDATADIR " in " ANDROID_SDCARD);
 #endif
     return _tcsdup(_T(ANDROID_SDCARD "/" XCSDATADIR));

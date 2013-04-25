@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
-<Form Caption="XCSoar">
-  <SymbolButton Name="cmdNext" Caption="&gt;" Y="-105" Width="70" Height="35" OnClick="OnNext" />
+<Form Caption="Top Hat">
+  <SymbolButton Name="cmdNext" Caption="&gt;" Y="-70" Width="70" Height="35" OnClick="OnNext" />
 
   <CloseButton Y="-35" Width="70" Height="35"/>
 

@@ -45,7 +45,7 @@ import java.util.Map;
  * Code to support the growing suite of non-GPS sensors on Android platforms.
  */
 public class NonGPSSensors implements SensorEventListener, Runnable {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   // Constant array saying whether we want to support certain sensors.
   // If modifying this array, make certain that the largest ID value inside

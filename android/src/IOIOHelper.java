@@ -37,7 +37,7 @@ import ioio.lib.api.exception.IncompatibilityException;
  * C++ code.
  */
 final class IOIOHelper extends Thread implements IOIOConnectionHolder {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private boolean shutdownFlag;
 
