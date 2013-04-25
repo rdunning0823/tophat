@@ -12,6 +12,7 @@ TopHat 1.0.2 Beta June 14, 2013
 TopHat 1.0.1 Beta June 12, 2013
 First release of Top Hat based on XCSoar 6.6 features:
 * Many more device drivers including i2c and LNAV
+
 * map
   - optional distinct map zoom on each page (#1603)
   - add label selection "Task waypoints & airfields"
