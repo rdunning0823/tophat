@@ -30,7 +30,7 @@
  * White	GND
  */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.util.Log;
 import ioio.lib.api.IOIO;
@@ -54,7 +54,7 @@ final class Nunchuck extends Thread {
     void onNunchuckError();
   };
 
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private static final byte WII_NUN_ADDR = 0x52;
   private static final byte REG_DATA     = 0x00; /*  */

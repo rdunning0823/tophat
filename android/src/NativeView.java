@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -297,10 +297,10 @@ class NativeView extends SurfaceView
    */
   private boolean loadResourceTexture(String name, int[] result) {
     /* find the resource */
-    int resourceId = resources.getIdentifier(name, "drawable", "org.xcsoar");
+    int resourceId = resources.getIdentifier(name, "drawable", "org.tophat");
     if (resourceId == 0) {
       resourceId = resources.getIdentifier(name, "drawable",
-                                           "org.xcsoar.testing");
+                                           "org.tophat.testing");
       if (resourceId == 0)
         return false;
     }

@@ -125,7 +125,7 @@ LiveTrack24::StartTracking(SessionID session, const TCHAR *username,
   NarrowString<2048> url;
   url.Format("http://%s/track.php?leolive=2&sid=%u&pid=%u&"
              "client=%s&v=%s&user=%s&pass=%s&vtype=%u&vname=%s",
-             GetServer(), session, 1, "XCSoar", version,
+             GetServer(), session, 1, "TopHat", version,
              (const char *)username2, (const char *)password, vtype, vname);
 
   return SendRequest(url);

@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.app.Service;
 import android.app.Notification;

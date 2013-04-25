@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.util.Log;
 import ioio.lib.api.IOIO;
@@ -42,7 +42,7 @@ final class Voltage extends Thread {
     void onVoltageError();
   };
 
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private AnalogInput h_volt;
   private AnalogInput h_temp;

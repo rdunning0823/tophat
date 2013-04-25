@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.xcsoar"
+          package="org.tophat"
           android:installLocation="auto"
           android:versionCode="82"
           android:versionName="6.6">

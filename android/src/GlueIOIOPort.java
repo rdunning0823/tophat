@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.util.Log;
 import ioio.lib.api.IOIO;
@@ -36,7 +36,7 @@ import ioio.lib.api.exception.ConnectionLostException;
  *
  */
 final class GlueIOIOPort extends IOIOPort implements IOIOConnectionListener {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private IOIOConnectionHolder holder;
   private boolean connected;

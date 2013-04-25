@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.util.Log;
 import ioio.lib.api.IOIO;
@@ -43,7 +43,7 @@ final class BMP085 extends Thread {
     void onBMP085Error();
   };
 
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   static final byte BMP085_DEVICE_ID = 0x77;
   static final byte BMP085_CHIP_ID = 0x55;

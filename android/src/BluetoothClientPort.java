@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.io.IOException;
 import android.util.Log;
@@ -32,7 +32,7 @@ import android.bluetooth.BluetoothSocket;
  * connection.
  */
 class BluetoothClientPort extends ProxyAndroidPort implements Runnable {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private BluetoothSocket socket;
 

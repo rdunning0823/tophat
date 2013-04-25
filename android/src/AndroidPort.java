@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 /**
  * The Java interface of the C++ AndroidPort class.

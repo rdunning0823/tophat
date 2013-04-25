@@ -23,6 +23,7 @@
 #ifndef XCSOAR_ALTITUDE_REFERENCE_HPP
 #define XCSOAR_ALTITUDE_REFERENCE_HPP
 
+
 #include <stdint.h>
 
 /**

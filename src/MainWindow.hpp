@@ -74,7 +74,7 @@ class MainWindow : public SingleWindow {
     RESTORE_PAGE,
   };
 
-  static constexpr const TCHAR *title = _T("XCSoar");
+  static constexpr const TCHAR *title = _T("TopHat");
 
   Look *look;
 

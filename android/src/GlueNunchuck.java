@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;

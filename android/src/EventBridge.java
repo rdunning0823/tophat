@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 class EventBridge {
   public static native void onKeyDown(int keyCode);

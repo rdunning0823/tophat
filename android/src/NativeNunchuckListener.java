@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 /**
  * A #Nunchuck.Listener implementation that passes method calls to

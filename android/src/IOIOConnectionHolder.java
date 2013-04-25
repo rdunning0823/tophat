@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 /**
  * An object that manages the connection to a IOIO board.

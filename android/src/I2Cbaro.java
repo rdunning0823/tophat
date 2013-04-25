@@ -21,7 +21,7 @@
   }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.util.Log;
 import ioio.lib.api.IOIO;
@@ -48,7 +48,7 @@ final class I2Cbaro extends Thread {
     void onI2CbaroError();
   };
 
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private int type = 0;
   private int sample_rate;

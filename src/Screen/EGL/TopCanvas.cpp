@@ -48,7 +48,7 @@ TopCanvas::Create(PixelSize new_size,
                            &swa);
 
   XMapWindow(x_display, x_window);
-  XStoreName(x_display, x_window, "XCSoar");
+  XStoreName(x_display, x_window, "TopHat");
 
   const EGLNativeDisplayType native_display = x_display;
   const EGLNativeWindowType native_window = x_window;

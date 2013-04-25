@@ -131,7 +131,7 @@ Uninstall_Init(HWND hwndparent, LPCTSTR pszinstalldir)
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
                    TEXT("\\Software\\Microsoft\\Today\\Items"),
                    0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) {
-    RegDeleteKey(hKey, TEXT("XCSoar"));
+    RegDeleteKey(hKey, TEXT("TopHat"));
     RegCloseKey(hKey);
   }
 
