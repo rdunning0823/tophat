@@ -1,7 +1,10 @@
 VERSION = $(strip $(shell cat $(topdir)/VERSION.txt))
+TOPHAT_VERSION = $(strip $(shell cat $(topdir)/VERSION_TOPHAT.txt))
 FULL_VERSION = $(VERSION)
+BUILD_DATE = $(strip $(shell date +"%b_%d_%Y"))
 
 CPPFLAGS += -DXCSOAR_VERSION=\"$(VERSION)\"
+CPPFLAGS += -DTOPHAT_VERSION=\"$(TOPHAT_VERSION)\"
 
 GIT_COMMIT_ID := $(shell git rev-parse --short --verify HEAD 2>$(NUL))
 RELEASE_COMMIT_ID := $(shell git rev-parse --short --verify "v$(VERSION)" 2>$(NUL))

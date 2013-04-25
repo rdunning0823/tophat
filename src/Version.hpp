@@ -36,5 +36,7 @@ extern const TCHAR XCSoar_VersionString[];
 extern const TCHAR XCSoar_VersionStringOld[];
 /** XCSoar v5.2.5F-PC */
 extern const TCHAR XCSoar_ProductToken[];
+/** TopHat version */
+extern const TCHAR TopHat_ProductToken[];
 
 #endif
