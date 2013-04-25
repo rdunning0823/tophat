@@ -53,6 +53,14 @@ public:
 
   gcc_pure
   virtual const InfoBoxPanel *GetDialogContent();
+
+  /**
+   * Tells consumer of content whether to display it
+   * in a legacy tab format or not.
+   */
+  virtual bool ShowInTabLayout() const {
+    return true;
+  }
 };
 
 #endif
