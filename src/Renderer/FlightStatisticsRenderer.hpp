@@ -70,8 +70,15 @@ public:
                   const TraceComputer *trace_computer) const;
 
   static void CaptionTask(TCHAR *sTmp, const DerivedInfo &derived);
-  static void CaptionOLC(TCHAR *sTmp, const ContestSettings &settings,
-                         const DerivedInfo &derived);
+
+  /**
+   * @param buffer buffer for result
+   * @param settings
+   * @derived
+   * @long_line if true formats output to use fewer lines of text
+   */
+  static void CaptionOLC(TCHAR *buffer, const ContestSettings &settings,
+                         const DerivedInfo &derived, bool long_line);
 };
 
 #endif

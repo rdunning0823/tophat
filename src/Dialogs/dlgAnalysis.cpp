@@ -364,7 +364,7 @@ Update()
     wf->SetCaption(sTmp);
     SetCalcCaption(_T(""));
     FlightStatisticsRenderer::CaptionOLC(sTmp, settings_computer.contest,
-                                         calculated);
+                                         calculated, false);
     wInfo->SetCaption(sTmp);
     break;
 
