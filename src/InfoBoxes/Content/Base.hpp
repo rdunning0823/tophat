@@ -63,4 +63,14 @@ public:
   }
 };
 
+class InfoBoxContentNonTabbed : public InfoBoxContent {
+  /**
+   * Tells consumer of content to show in full screen format instead of tabbed
+   */
+  virtual bool ShowInTabLayout() const {
+    return false;
+  }
+
+};
+
 #endif
