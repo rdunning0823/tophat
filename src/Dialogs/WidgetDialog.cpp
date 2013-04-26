@@ -51,19 +51,25 @@ WidgetDialog::WidgetDialog(const DialogLook &look)
 void
 WidgetDialog::Create(SingleWindow &parent,
                      const TCHAR *caption, const PixelRect &rc,
-                     Widget *_widget)
+                     Widget *_widget,
+                     DialogFooter::Listener *_listener,
+                     UPixelScalar _footer_height)
 {
   auto_size = false;
+  dialog_footer.Create(parent, _listener, _footer_height);
   WndForm::Create(parent, rc, caption, GetDialogStyle());
   widget.Set(_widget);
-  widget.Move(buttons.UpdateLayout());
+  widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 }
 
 void
 WidgetDialog::CreateFull(SingleWindow &parent, const TCHAR *caption,
-                         Widget *widget)
+                         Widget *widget,
+                         DialogFooter::Listener *_listener,
+                         UPixelScalar _footer_height)
 {
-  Create(parent, caption, parent.GetClientRect(), widget);
+  Create(parent, caption, parent.GetClientRect(), widget, _listener,
+         _footer_height);
 }
 
 void
@@ -71,9 +77,22 @@ WidgetDialog::CreateAuto(SingleWindow &parent, const TCHAR *caption,
                          Widget *_widget)
 {
   auto_size = true;
+  dialog_footer.Create(parent, nullptr, 0);
   WndForm::Create(parent, caption, GetDialogStyle());
   widget.Set(_widget);
-  widget.Move(buttons.UpdateLayout());
+  widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
+}
+
+void
+WidgetDialog::DialogFooter::Create(ContainerWindow &parent,
+                                   Listener *_listener,
+                                   UPixelScalar _height)
+{
+  listener = _listener;
+  height = _height;
+  WindowStyle style;
+  PixelRect rc(0, parent.GetHeight() - height, parent.GetWidth(), parent.GetHeight());
+  PaintWindow::Create(parent, rc, style);
 }
 
 void
@@ -91,7 +110,7 @@ WidgetDialog::FinishPreliminary(Widget *_widget)
   assert(_widget != nullptr);
 
   widget.Set(_widget);
-  widget.Move(buttons.UpdateLayout());
+  widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 
   AutoSize();
 }
@@ -119,6 +138,7 @@ WidgetDialog::AutoSize()
     max_size.cy + Layout::GetMaximumControlHeight();
 
   if (/* need full dialog height even for minimum widget height? */
+      /*landscape */
       min_height_with_buttons >= parent_size.cy ||
       /* try to avoid putting buttons left on portrait screens; try to
          comply with maximum widget height only on landscape
@@ -136,6 +156,8 @@ WidgetDialog::AutoSize()
       rc.right -= remaining_size.cx - max_size.cx;
 
     Resize(rc.GetSize());
+    rc.bottom -= dialog_footer.GetHeight();
+    rc.bottom -= GetTitleHeight();
     widget.Move(buttons.LeftLayout());
 
     MoveToCenter();
@@ -143,6 +165,7 @@ WidgetDialog::AutoSize()
   }
 
   /* see if buttons fit at the bottom */
+  /* portrait */
 
   PixelRect rc = parent_rc;
   if (max_size.cx < parent_size.cx)
@@ -155,6 +178,8 @@ WidgetDialog::AutoSize()
     rc.bottom -= remaining_size.cy - max_size.cy;
 
   Resize(rc.GetSize());
+  rc.bottom -= dialog_footer.GetHeight();
+  rc.bottom -= GetTitleHeight();
   widget.Move(buttons.BottomLayout());
 
   MoveToCenter();
@@ -166,7 +191,7 @@ WidgetDialog::ShowModal()
   if (auto_size)
     AutoSize();
   else
-    widget.Move(buttons.UpdateLayout());
+    widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 
   widget.Show();
   return WndForm::ShowModal();
@@ -191,6 +216,28 @@ WidgetDialog::OnDestroy()
   WndForm::OnDestroy();
 }
 
+PixelRect
+WidgetDialog::GetNonFooterRect()
+{
+  PixelRect rc;
+  rc.left = 0;
+  rc.right = GetWidth();
+  rc.top = 0;
+  rc.bottom = GetHeight() - dialog_footer.GetHeight() - WndForm::GetTitleHeight();
+  return rc;
+}
+
+PixelRect
+WidgetDialog::GetFooterRect()
+{
+  PixelRect rc;
+  rc.left = 0;
+  rc.right = GetWidth();
+  rc.top = GetHeight() - dialog_footer.GetHeight() - WndForm::GetTitleHeight();
+  rc.bottom = GetHeight() - WndForm::GetTitleHeight();
+  return rc;
+}
+
 void
 WidgetDialog::OnResize(PixelSize new_size)
 {
@@ -199,7 +246,9 @@ WidgetDialog::OnResize(PixelSize new_size)
   if (auto_size)
     return;
 
-  widget.Move(buttons.UpdateLayout());
+  widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
+  if (dialog_footer.IsDefined())
+    dialog_footer.Move(1, new_size.cy - dialog_footer.GetHeight());
 }
 
 bool

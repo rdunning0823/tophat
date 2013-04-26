@@ -29,11 +29,64 @@ Copyright_License {
 #include "Form/ButtonPanel.hpp"
 #include "Widget/ManagedWidget.hpp"
 
+#include "Look/MapLook.hpp"
 #include <tchar.h>
 
 class Widget;
 
+
+
 class WidgetDialog : public WndForm {
+public:
+  /**
+   * A class that displays a footer rectangle below the widget and buttons
+   * of the dialog.
+   * The height of the rectangle is set when the WidgetDialog is constructed
+   * OnPaintFooter is implemented by listener class
+   */
+  class DialogFooter: public PaintWindow
+  {
+  public:
+    /**
+     * A class that listens to the OnPaintFooter() method of the DialogFooter class
+     */
+    struct Listener {
+      virtual void OnPaintFooter(Canvas &canvas) = 0;
+    };
+
+  protected:
+    /**
+     * handles OnPaintFooter()
+     */
+    Listener *listener;
+
+    /**
+     * height of footer
+     */
+    UPixelScalar height;
+
+  public:
+    void Create(ContainerWindow &parent,
+                Listener *listener,
+                UPixelScalar height);
+
+    /**
+     * returns height
+     */
+    virtual UPixelScalar GetHeight() {
+      return height;
+    }
+
+    virtual void OnPaint(Canvas &canvas) {
+      PaintWindow::OnPaint(canvas);
+
+      if (listener != nullptr)
+        listener->OnPaintFooter(canvas);
+    }
+  };
+
+  DialogFooter dialog_footer;
+
   ButtonPanel buttons;
 
   ManagedWidget widget;
@@ -46,12 +99,16 @@ public:
   WidgetDialog(const DialogLook &look);
 
   void Create(SingleWindow &parent, const TCHAR *caption,
-              const PixelRect &rc, Widget *widget);
+              const PixelRect &rc, Widget *widget,
+              DialogFooter::Listener *_listener = nullptr,
+              UPixelScalar footer_height = 0);
 
   /**
    * Create a full-screen dialog.
    */
-  void CreateFull(SingleWindow &parent, const TCHAR *caption, Widget *widget);
+  void CreateFull(SingleWindow &parent, const TCHAR *caption, Widget *widget,
+                  DialogFooter::Listener *_listener = nullptr,
+                  UPixelScalar footer_height = 0);
 
   /**
    * Create a dialog with an automatic size (by
@@ -95,6 +152,18 @@ public:
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
+
+  /**
+   * returns rectangle used by footer area
+   * (above buttons and widget)
+   */
+  PixelRect GetFooterRect();
+
+  /**
+   * returns rectangle not used by footer area
+   * (for the buttons and widget)
+   */
+  PixelRect GetNonFooterRect();
 
 private:
   void AutoSize();
