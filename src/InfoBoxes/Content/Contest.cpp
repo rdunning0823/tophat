@@ -23,44 +23,14 @@ Copyright_License {
 
 #include "Contest.hpp"
 #include "InfoBoxes/Data.hpp"
-#include "InfoBoxes/Panel/Panel.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
 #include "UIGlobals.hpp"
-#include "Dialogs/dlgAnalysis.hpp"
 #include "Language/Language.hpp"
-#include "Widget/CallbackWidget.hpp"
+#include "InfoBoxes/Panel/OnlineContest.hpp"
+#include "InfoBoxes/Panel/Panel.hpp"
 
 #include <tchar.h>
-
-static void
-ShowAnalysis8()
-{
-  dlgAnalysisShowModal(UIGlobals::GetMainWindow(),
-                       UIGlobals::GetLook(),
-                       CommonInterface::Full(), *glide_computer,
-                       protected_task_manager,
-                       &airspace_database,
-                       terrain, 8);
-}
-
-static Widget *
-LoadAnalysis8Panel(unsigned id)
-{
-  return new CallbackWidget(ShowAnalysis8);
-}
-
-static constexpr
-InfoBoxPanel analysis8_infobox_panels[] = {
-  { N_("Analysis"), LoadAnalysis8Panel },
-  { nullptr, nullptr }
-};
-
-const InfoBoxPanel *
-InfoBoxContentOLC::GetDialogContent()
-{
-  return analysis8_infobox_panels;
-}
 
 void
 InfoBoxContentOLC::Update(InfoBoxData &data)
@@ -84,3 +54,18 @@ InfoBoxContentOLC::Update(InfoBoxData &data)
 
   data.UnsafeFormatComment(_T("%.1f pts"), (double)result_olc.score);
 }
+
+/*
+ * Subpart callback function pointers
+ */
+
+static constexpr InfoBoxPanel panels_olc[] = {
+  { N_("OLC"), LoadOnlineContestPanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentOLC::GetDialogContent() {
+  return panels_olc;
+}
+

@@ -35,6 +35,7 @@ Copyright_License {
 #include "Formatter/TimeFormatter.hpp"
 #include "Language/Language.hpp"
 #include "Widget/CallbackWidget.hpp"
+#include "UIGlobals.hpp"
 
 #include <tchar.h>
 #include <stdio.h>

@@ -511,6 +511,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/Panel/AltitudeSetup.cpp \
 	$(SRC)/InfoBoxes/Panel/InfoBoxDescription.cpp \
 	$(SRC)/InfoBoxes/Panel/MacCreadyEdit.cpp \
+	$(SRC)/InfoBoxes/Panel/OnlineContest.cpp \
 	$(SRC)/InfoBoxes/Panel/WindEdit.cpp \
 	$(SRC)/InfoBoxes/Panel/ATCReference.cpp \
 	$(SRC)/Pan.cpp \
