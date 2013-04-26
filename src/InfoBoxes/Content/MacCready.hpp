@@ -26,13 +26,12 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
-class InfoBoxContentMacCready : public InfoBoxContent
+class InfoBoxContentMacCready : public InfoBoxContentNonTabbed
 {
 public:
   virtual const InfoBoxPanel *GetDialogContent() override;
 
   virtual void Update(InfoBoxData &data) override;
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
 };
 
 #endif

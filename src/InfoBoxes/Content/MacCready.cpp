@@ -25,7 +25,6 @@ Copyright_License {
 #include "InfoBoxes/Data.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
 #include "InfoBoxes/Panel/MacCreadyEdit.hpp"
-#include "InfoBoxes/Panel/MacCreadySetup.hpp"
 #include "Interface.hpp"
 #include "ActionInterface.hpp"
 #include "Units/Units.hpp"
@@ -55,7 +54,6 @@ SetVSpeed(InfoBoxData &data, fixed value)
 
 static constexpr InfoBoxPanel panels[] = {
   { N_("Edit"), LoadMacCreadyEditPanel },
-  { N_("Setup"), LoadMacCreadySetupPanel },
   { nullptr, nullptr }
 };
 
@@ -80,32 +78,4 @@ InfoBoxContentMacCready::Update(InfoBoxData &data)
 
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
   data.SetCommentFromSpeed(common_stats.V_block, false);
-}
-
-bool
-InfoBoxContentMacCready::HandleKey(const InfoBoxKeyCodes keycode)
-{
-  const fixed step = Units::ToSysVSpeed(GetUserVerticalSpeedStep());
-  TaskBehaviour &task_behaviour = CommonInterface::SetComputerSettings().task;
-
-  switch (keycode) {
-  case ibkUp:
-    ActionInterface::OffsetManualMacCready(step);
-    return true;
-
-  case ibkDown:
-    ActionInterface::OffsetManualMacCready(-step);
-    return true;
-
-  case ibkLeft:
-    task_behaviour.auto_mc = false;
-    Profile::Set(ProfileKeys::AutoMc, false);
-    return true;
-
-  case ibkRight:
-    task_behaviour.auto_mc = true;
-    Profile::Set(ProfileKeys::AutoMc, true);
-    return true;
-  }
-  return false;
 }
