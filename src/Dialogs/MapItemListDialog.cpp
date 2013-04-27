@@ -29,6 +29,7 @@ Copyright_License {
 #include "Dialogs/Task/TaskDialogs.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Dialogs/Traffic/TrafficDialogs.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/Look.hpp"
 #include "UIGlobals.hpp"
@@ -117,29 +118,42 @@ public:
     const FinalGlideBarLook &final_glide_look = look.final_glide_bar;
 
     /* footer_caption is painted at the top of the footer */
-    UPixelScalar caption_height = dialog_look.caption.font->GetHeight();
+    PixelScalar caption_height = dialog_look.caption.font->GetHeight();
 
-    UPixelScalar item_height = dialog_look.list.font->GetHeight()
+    // in portrait, draw a spacer above the caption to separate it from the buttons
+    const PixelScalar portrait_spacer_height = !Layout::landscape
+        ? caption_height : 0u;
+
+    PixelScalar item_height = dialog_look.list.font->GetHeight()
       + Layout::Scale(6) + dialog_look.small_font->GetHeight();
     assert(item_height > 0);
 
     const PixelRect rc_footer = GetFooterRect();
 
     // paint the caption at the top of the footer.
-    PixelRect rc_caption {0, 0, rc_footer.right - rc_footer.left,
-      caption_height};
+    PixelRect rc_caption;
+    rc_caption.left = 0;
+    rc_caption.top = portrait_spacer_height;
+    rc_caption.right = rc_footer.right - rc_footer.left;
+    rc_caption.bottom = caption_height + portrait_spacer_height;
 
-    Brush brush(COLOR_XCSOAR_DARK);
-    canvas.Select(brush);
+    if (!Layout::landscape) {
+      canvas.Select(look.dialog.background_brush);
+      canvas.SetBackgroundTransparent();
+      canvas.Rectangle(0, 0, rc_caption.right, portrait_spacer_height);
+    }
+
+    canvas.Select(Brush(COLOR_XCSOAR_DARK));
     canvas.SetBackgroundTransparent();
     canvas.SetTextColor(COLOR_WHITE);
     canvas.Select(*dialog_look.caption.font);
-    canvas.Rectangle(0, 0, rc_caption.right, rc_caption.bottom);
+    canvas.Rectangle(rc_caption.left, rc_caption.top, rc_caption.right, rc_caption.bottom);
     canvas.DrawText(rc_caption.left + Layout::FastScale(2),
                     rc_caption.top, _("Terrain:"));
 
+    // paint the main footer information
     PixelRect footer_rect_inner = rc_footer;
-    footer_rect_inner.top = caption_height;
+    footer_rect_inner.top = caption_height + portrait_spacer_height;
 
     canvas.SelectWhiteBrush();
     canvas.Rectangle(footer_rect_inner.left, footer_rect_inner.top,
@@ -393,15 +407,17 @@ ShowMapItemListDialog(const MapItemList &list,
     + Layout::Scale(6) + dialog_look.small_font->GetHeight();
   assert(item_height > 0);
   UPixelScalar caption_height = dialog_look.caption.font->GetHeight();
+  UPixelScalar portrait_spacer_height = !Layout::landscape
+      ? caption_height : 0u;
 
   MapItemListWidget widget(list_list, dialog_look, look,
                            traffic_look, final_glide_look,
                            settings);
-
   MapItemListDialog dialog(dialog_look, settings, footer_list);
 
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Nearby items:"), &widget,
-                    item_height * footer_list.size() + caption_height);
+                    item_height * footer_list.size() + caption_height
+                    + portrait_spacer_height);
 
   widget.CreateButtons(dialog);
 
