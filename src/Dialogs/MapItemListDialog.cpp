@@ -30,6 +30,8 @@ Copyright_License {
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Dialogs/Traffic/TrafficDialogs.hpp"
 #include "Look/DialogLook.hpp"
+#include "Look/Look.hpp"
+#include "UIGlobals.hpp"
 #include "Language/Language.hpp"
 #include "MapSettings.hpp"
 #include "MapWindow/Items/MapItem.hpp"
@@ -43,6 +45,7 @@ Copyright_License {
 #include "Airspace/ProtectedAirspaceWarningManager.hpp"
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
+
 
 #ifdef HAVE_NOAA
 #include "Dialogs/Weather/WeatherDialogs.hpp"
@@ -75,8 +78,91 @@ HasDetails(const MapItem &item)
   return false;
 }
 
-class MapItemListWidget final
-  : public ListWidget, private ActionListener {
+/**
+ * A class based on the WidgetDialog that draws map list items
+ * about the plane in the footer, and map list items that exist
+ * on the map as separate entities as items in a list.
+ */
+class MapItemListDialog : public WidgetDialog, public WidgetDialog::DialogFooter::Listener
+{
+protected:
+  const MapItemList &footer_list;
+  const Look &look;
+  const MapSettings &settings;
+
+public:
+  MapItemListDialog(const DialogLook &dialog_look,
+                    const MapSettings &_settings,
+                    const MapItemList &_footer_list)
+    :WidgetDialog(dialog_look),
+     footer_list(_footer_list),
+     look(UIGlobals::GetLook()),
+     settings(_settings)
+     {}
+
+  virtual void CreateFull(SingleWindow &parent, const TCHAR *caption,
+                          Widget *widget,
+                          UPixelScalar footer_height)
+  {
+    WidgetDialog::CreateFull(parent, caption, widget, this, footer_height);
+  }
+  /**
+    * Inherited from WidgetDialogActionListener
+   * paints the footer of the Dialog
+   */
+  virtual void OnPaintFooter(Canvas &canvas)
+  {
+    const DialogLook &dialog_look = look.dialog;
+    const TrafficLook &traffic_look = look.traffic;
+    const FinalGlideBarLook &final_glide_look = look.final_glide_bar;
+
+    /* footer_caption is painted at the top of the footer */
+    UPixelScalar caption_height = dialog_look.caption.font->GetHeight();
+
+    UPixelScalar item_height = dialog_look.list.font->GetHeight()
+      + Layout::Scale(6) + dialog_look.small_font->GetHeight();
+    assert(item_height > 0);
+
+    const PixelRect rc_footer = GetFooterRect();
+
+    // paint the caption at the top of the footer.
+    PixelRect rc_caption {0, 0, rc_footer.right - rc_footer.left,
+      caption_height};
+
+    Brush brush(COLOR_XCSOAR_DARK);
+    canvas.Select(brush);
+    canvas.SetBackgroundTransparent();
+    canvas.SetTextColor(COLOR_WHITE);
+    canvas.Select(*dialog_look.caption.font);
+    canvas.Rectangle(0, 0, rc_caption.right, rc_caption.bottom);
+    canvas.DrawText(rc_caption.left + Layout::FastScale(2),
+                    rc_caption.top, _("Terrain:"));
+
+    PixelRect footer_rect_inner = rc_footer;
+    footer_rect_inner.top = caption_height;
+
+    canvas.SelectWhiteBrush();
+    canvas.Rectangle(footer_rect_inner.left, footer_rect_inner.top,
+                     footer_rect_inner.right, footer_rect_inner.bottom);
+
+    // paint items in footer
+    canvas.SetTextColor(COLOR_BLACK);
+    for (unsigned i = 0; i < footer_list.size(); i++) {
+      MapItem& item = *footer_list[i];
+      PixelRect rc = footer_rect_inner;
+      rc.left += Layout::Scale(1);
+      rc.top += i * item_height;
+      rc.bottom = rc.top + item_height;
+      MapItemListRenderer::Draw(canvas, rc, item,
+                                dialog_look, look.map, traffic_look,
+                                final_glide_look, settings,
+                                CommonInterface::GetComputerSettings().utc_offset,
+                                &CommonInterface::Basic().flarm.traffic);
+    }
+  }
+};
+
+class MapItemListWidget final : public ListWidget, private ActionListener {
   enum Buttons {
     SETTINGS,
     GOTO,
@@ -115,6 +201,11 @@ public:
 protected:
   void UpdateButtons() {
     const unsigned current = GetCursorIndex();
+    if (list.size() == 0) {
+      details_button->SetEnabled(false);
+      goto_button->SetEnabled(false);
+      return;
+    }
     details_button->SetEnabled(HasDetails(*list[current]));
     goto_button->SetEnabled(CanGotoItem(current));
     ack_button->SetEnabled(CanAckItem(current));
@@ -268,6 +359,28 @@ MapItemListWidget::OnAction(int id)
   }
 }
 
+/**
+ * Populates footer_list with items the belong in the footer
+ * Populates list_list with items that belong in the lists
+ *
+ * @param footer_list. the list of all the Map Items
+ * @param footer_list. an empty list
+ * @param list_list. an empty list
+ */
+static void
+SplitMapItemList(const MapItemList &full_list,
+                 MapItemList& footer_list,
+                 MapItemList& list_list)
+{
+  for (unsigned i = 0; i < full_list.size(); i++) {
+    MapItem &item = *full_list[i];
+    if (!HasDetails(item))
+      footer_list.append(&item);
+    else
+      list_list.append(&item);
+  }
+}
+
 static int
 ShowMapItemListDialog(const MapItemList &list,
                       const DialogLook &dialog_look, const MapLook &look,
@@ -275,19 +388,34 @@ ShowMapItemListDialog(const MapItemList &list,
                       const FinalGlideBarLook &final_glide_look,
                       const MapSettings &settings)
 {
-  MapItemListWidget widget(list, dialog_look, look,
+  MapItemList list_list;
+  MapItemList footer_list;
+  list_list.clear();
+  footer_list.clear();
+  SplitMapItemList(list, footer_list, list_list);
+
+  UPixelScalar item_height = dialog_look.list.font->GetHeight()
+    + Layout::Scale(6) + dialog_look.small_font->GetHeight();
+  assert(item_height > 0);
+  UPixelScalar caption_height = dialog_look.caption.font->GetHeight();
+
+  MapItemListWidget widget(list_list, dialog_look, look,
                            traffic_look, final_glide_look,
                            settings);
-  WidgetDialog dialog(dialog_look);
-  dialog.CreateFull(UIGlobals::GetMainWindow(),
-                    _("Map elements at this location"), &widget);
+
+  MapItemListDialog dialog(dialog_look, settings, footer_list);
+
+  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Nearby items:"), &widget,
+                    item_height * footer_list.size() + caption_height);
+
   widget.CreateButtons(dialog);
 
   int result = dialog.ShowModal() == mrOK
-    ? (int)widget.GetCursorIndex()
+    ? (int)widget.GetCursorIndex() + footer_list.size()
     : -1;
   dialog.StealWidget();
-
+  list_list.clear();
+  footer_list.clear();
   return result;
 }
 

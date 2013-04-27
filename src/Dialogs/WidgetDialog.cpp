@@ -56,8 +56,8 @@ WidgetDialog::Create(SingleWindow &parent,
                      UPixelScalar _footer_height)
 {
   auto_size = false;
-  dialog_footer.Create(parent, _listener, _footer_height);
   WndForm::Create(parent, rc, caption, GetDialogStyle());
+  dialog_footer.Create(GetClientAreaWindow(), _listener, _footer_height);
   widget.Set(_widget);
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 }
@@ -77,8 +77,8 @@ WidgetDialog::CreateAuto(SingleWindow &parent, const TCHAR *caption,
                          Widget *_widget)
 {
   auto_size = true;
-  dialog_footer.Create(parent, nullptr, 0);
   WndForm::Create(parent, caption, GetDialogStyle());
+  dialog_footer.Create(GetClientAreaWindow(), nullptr, 0);
   widget.Set(_widget);
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 }
@@ -247,6 +247,7 @@ WidgetDialog::OnResize(PixelSize new_size)
     return;
 
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
+
   if (dialog_footer.IsDefined())
     dialog_footer.Move(1, new_size.cy - dialog_footer.GetHeight());
 }
