@@ -164,7 +164,6 @@ public:
 
 class MapItemListWidget final : public ListWidget, private ActionListener {
   enum Buttons {
-    SETTINGS,
     GOTO,
     ACK,
   };
@@ -177,7 +176,7 @@ class MapItemListWidget final : public ListWidget, private ActionListener {
   const FinalGlideBarLook &final_glide_look;
   const MapSettings &settings;
 
-  WndButton *settings_button, *details_button, *cancel_button, *goto_button;
+  WndButton *details_button, *cancel_button, *goto_button;
   WndButton *ack_button;
 
 public:
@@ -263,7 +262,6 @@ public:
 void
 MapItemListWidget::CreateButtons(WidgetDialog &dialog)
 {
-  settings_button = dialog.AddButton(_("Settings"), *this, SETTINGS);
   goto_button = dialog.AddButton(_("Goto"), *this, GOTO);
   ack_button = dialog.AddButton(_("Ack Day"), *this, ACK);
   details_button = dialog.AddButton(_("Details"), mrOK);
@@ -346,9 +344,6 @@ void
 MapItemListWidget::OnAction(int id)
 {
   switch (id) {
-  case SETTINGS:
-    ShowMapItemListSettingsDialog();
-    break;
   case GOTO:
     OnGotoClicked();
     break;
