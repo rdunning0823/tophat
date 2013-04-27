@@ -201,32 +201,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
 
   // Format title row
-
   TCHAR altitude_buffer[32];
   StaticString<256> buffer;
   buffer.clear();
-
-  if (elevation_available) {
-    RoughAltitude relative_arrival_altitude =
-      item.reach.direct - item.elevation;
-
-    FormatRelativeUserAltitude(fixed((short)relative_arrival_altitude),
-                               altitude_buffer, ARRAY_SIZE(altitude_buffer));
-
-    buffer.AppendFormat(_T("%s %s, "), altitude_buffer, _("AGL"));
-  }
-
-  FormatUserAltitude(fixed(item.reach.direct),
-                     altitude_buffer, ARRAY_SIZE(altitude_buffer));
-
-  buffer.AppendFormat(_T("%s %s"), altitude_buffer, _("MSL"));
-
-  // Draw title row
-
-  canvas.Select(name_font);
-  canvas.DrawClippedText(left, rc.top + text_padding, rc, buffer);
-
-  // Format comment row
 
   if (reach_relevant) {
     buffer.Format(_T("%s: "), _("around terrain"));
@@ -253,7 +230,29 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     buffer.clear();
   }
 
-  buffer += _("Arrival altitude incl. safety height");
+  buffer += _("Arrival altitude");
+
+  // Draw title row
+  canvas.Select(name_font);
+  canvas.DrawClippedText(left, rc.top + text_padding, rc, buffer);
+
+  // Format comment row
+
+  buffer.clear();
+  if (elevation_available) {
+    RoughAltitude relative_arrival_altitude =
+      item.reach.direct - item.elevation;
+
+    FormatRelativeUserAltitude(fixed((short)relative_arrival_altitude),
+                               altitude_buffer, ARRAY_SIZE(altitude_buffer));
+
+    buffer.AppendFormat(_T("%s %s, "), altitude_buffer, _("AGL"));
+  }
+
+  FormatUserAltitude(fixed(item.reach.direct),
+                     altitude_buffer, ARRAY_SIZE(altitude_buffer));
+
+  buffer.AppendFormat(_T("%s %s"), altitude_buffer, _("MSL"));
 
   // Draw comment row
 
