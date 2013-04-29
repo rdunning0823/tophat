@@ -17,6 +17,7 @@ First release of Top Hat based on XCSoar 6.6 features:
 Version 6.6.1 - not yet released
 * devices
   - indicate duplicate devices in list
+  - allow using more than one TCP/UDP device
 
 6.6
 * map
