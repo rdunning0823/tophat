@@ -108,6 +108,7 @@ DeviceDescriptor::DeviceDescriptor(unsigned _index)
    voltage(nullptr),
 #endif
 #endif
+   n_failures(0u),
    ticker(false), borrowed(false)
 {
   config.Clear();
@@ -120,6 +121,8 @@ DeviceDescriptor::DeviceDescriptor(unsigned _index)
 void
 DeviceDescriptor::SetConfig(const DeviceConfig &_config)
 {
+  ResetFailureCounter();
+
   config = _config;
 
   if (config.UsesDriver()) {
@@ -386,10 +389,14 @@ DeviceDescriptor::DoOpen(OperationEnvironment &env)
   }
 
   if (!port->WaitConnected(env) || !OpenOnPort(*port, env)) {
+    if (!env.IsCancelled())
+      ++n_failures;
+
     delete port;
     return false;
   }
 
+  ResetFailureCounter();
   return true;
 }
 
