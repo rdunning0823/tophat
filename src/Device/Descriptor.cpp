@@ -190,7 +190,7 @@ DeviceDescriptor::CancelAsync()
 }
 
 bool
-DeviceDescriptor::Open(Port &_port, OperationEnvironment &env)
+DeviceDescriptor::OpenOnPort(Port &_port, OperationEnvironment &env)
 {
   assert(port == NULL);
   assert(device == NULL);
@@ -385,7 +385,7 @@ DeviceDescriptor::DoOpen(OperationEnvironment &env)
     return false;
   }
 
-  if (!port->WaitConnected(env) || !Open(*port, env)) {
+  if (!port->WaitConnected(env) || !OpenOnPort(*port, env)) {
     delete port;
     return false;
   }
