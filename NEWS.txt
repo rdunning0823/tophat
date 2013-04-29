@@ -5,6 +5,7 @@ TopHat 1.0.3 Beta June 16, 2013
 * fixed bug where MC popup crashed if no task was defined
 * fix spurious errors after IOIO baud rate change (#2733, #2754)
 
+
 TopHat 1.0.2 Beta June 14, 2013
 * fixed logo version number
 * disallow "Page types" for Thermal Asst & Flarm.
@@ -13,6 +14,11 @@ TopHat 1.0.1 Beta June 12, 2013
 First release of Top Hat based on XCSoar 6.6 features:
 * Many more device drivers including i2c and LNAV
 
+Version 6.6.1 - not yet released
+* devices
+  - indicate duplicate devices in list
+
+6.6
 * map
   - optional distinct map zoom on each page (#1603)
   - add label selection "Task waypoints & airfields"
