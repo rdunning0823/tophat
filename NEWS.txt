@@ -15,6 +15,8 @@ First release of Top Hat based on XCSoar 6.6 features:
 * Many more device drivers including i2c and LNAV
 
 Version 6.6.1 - not yet released
+* cross section
+  - fix airspace display after display rotation (#2825)
 * user interface
   - fix malformed name in airspace warning dialog (#2813)
 * devices
