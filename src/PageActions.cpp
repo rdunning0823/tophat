@@ -246,6 +246,8 @@ PageActions::LoadLayout(const PageLayout &layout)
 void
 PageActions::OpenLayout(const PageLayout &layout)
 {
+  LeavePage();
+
   PagesState &state = CommonInterface::SetUIState().pages;
   state.special_page = layout;
 
