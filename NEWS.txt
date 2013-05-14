@@ -1,6 +1,10 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 0.1.7 Beta
+* Task
+ - Mat: remove "auto add" turnpoint feature when fly over it
+ 
 TopHat 0.1.6 Beta
 * Infoboxes:
  - Glide ratio "cruise" - show cruise distance

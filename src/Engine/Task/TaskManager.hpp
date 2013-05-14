@@ -224,22 +224,6 @@ public:
   bool UpdateAutoMC(const AircraftState& state_now, const fixed fallback_mc);
 
   /**
-   * Scans all the MAT points to see if any have been entered.
-   * If point is entered and not next unachieved point,
-   * Inserts the point into the active ordered task, and calls Commit().
-   * Assumes the protected task manager already holds an Exclusive Lease
-   * on the Task Manager.
-   * Should be called before CheckTransitions for a MAT task.
-   * @param state
-   * @param state_last
-   * @param waypoints
-   * @return true if point is inserted into task
-   */
-  bool ScanInsertMatPoints(const AircraftState &state,
-                           const AircraftState &state_last,
-                           const Waypoints &waypoints);
-
-  /**
    * loads the Mat points vector to the current task if it is a Mat
    * @param waypoints the list of active waypoints
    */
