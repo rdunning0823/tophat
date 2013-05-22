@@ -988,9 +988,8 @@ location=18
 mode=Menu
 type=key
 data=6
-event=DeclutterLabels show
-event=DeclutterLabels toggle
-label=Labels\n$(MapLabelsToggleActionName)
+event=Mode Labels
+label=Map labels
 location=16
 
 mode=Menu
@@ -1174,6 +1173,42 @@ event=Orientation targetup
 event=Mode default
 label=Target up
 location=18
+
+# -------------
+# mode=Labels
+# -------------
+
+mode=Labels
+type=key
+data=6
+event=DeclutterLabels all
+event=Mode default
+label=All
+location=16
+
+mode=Labels
+type=key
+data=6
+event=DeclutterLabels task+landables
+event=Mode default
+label=Task & Landables
+location=17
+
+mode=Labels
+type=key
+data=6
+event=DeclutterLabels task
+event=Mode default
+label=Task
+location=18
+
+mode=Labels
+type=key
+data=6
+event=DeclutterLabels none
+event=Mode default
+label=None
+location=19
 
 # ----------------------------------
 # mode=default.TA (ThermalAssistant)
