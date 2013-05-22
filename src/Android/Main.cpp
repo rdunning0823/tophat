@@ -58,8 +58,7 @@ Copyright_License {
 #include "IO/Async/GlobalIOThread.hpp"
 #include "Thread/Debug.hpp"
 
-#ifdef IOIOLIB
-#include "Android/IOIOHelper.hpp"
+#include "IOIOHelper.hpp"
 #include "NativeBMP085Listener.hpp"
 #include "BMP085Device.hpp"
 #include "NativeI2CbaroListener.hpp"
@@ -68,7 +67,6 @@ Copyright_License {
 #include "NunchuckDevice.hpp"
 #include "NativeVoltageListener.hpp"
 #include "VoltageDevice.hpp"
-#endif
 
 #ifndef NDEBUG
 #include "Screen/OpenGL/Texture.hpp"
@@ -86,9 +84,7 @@ EventQueue *event_queue;
 Vibrator *vibrator;
 bool os_haptic_feedback_enabled;
 
-#ifdef IOIOLIB
 IOIOHelper *ioio_helper;
-#endif
 
 extern "C" {
   /* workaround for
@@ -120,7 +116,6 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   NativeInputListener::Initialise(env);
   PortBridge::Initialise(env);
   BluetoothHelper::Initialise(env);
-#ifdef IOIOLIB
   IOIOHelper::Initialise(env);
   NativeBMP085Listener::Initialise(env);
   BMP085Device::Initialise(env);
@@ -130,7 +125,6 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   NunchuckDevice::Initialise(env);
   NativeVoltageListener::Initialise(env);
   VoltageDevice::Initialise(env);
-#endif
 
   context = new Context(env, _context);
 
@@ -151,9 +145,7 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   Vibrator::Initialise(env);
   vibrator = Vibrator::Create(env, *context);
 
-#ifdef IOIOLIB
   ioio_helper = new IOIOHelper(env);
-#endif
 
   ScreenInitialized();
   AllowLanguage();
@@ -200,10 +192,8 @@ Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
   DisallowLanguage();
   Fonts::Deinitialize();
 
-#ifdef IOIOLIB
   delete ioio_helper;
   ioio_helper = NULL;
-#endif
 
   delete vibrator;
   vibrator = NULL;
@@ -220,7 +210,6 @@ Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
 
   delete context;
 
-#ifdef IOIOLIB
   BMP085Device::Deinitialise(env);
   NativeBMP085Listener::Deinitialise(env);
   I2CbaroDevice::Deinitialise(env);
@@ -230,7 +219,6 @@ Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
   VoltageDevice::Deinitialise(env);
   NativeVoltageListener::Deinitialise(env);
   IOIOHelper::Deinitialise(env);
-#endif
   BluetoothHelper::Deinitialise(env);
   NativeInputListener::Deinitialise(env);
   InternalSensors::Deinitialise(env);

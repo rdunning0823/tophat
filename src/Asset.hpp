@@ -197,7 +197,7 @@ constexpr
 static inline bool
 HasIOIOLib()
 {
-#ifdef IOIOLIB
+#ifdef ANDROID
   return true;
 #else
   return false;

@@ -50,9 +50,7 @@
 #include "Asset.hpp"
 #include "Android/Nook.hpp"
 #include "Android/Product.hpp"
-#ifdef IOIOLIB
 #include "Device/Port/AndroidIOIOUartPort.hpp"
-#endif
 #endif
 
 enum ControlIndex {
@@ -283,7 +281,7 @@ FillNookSimpleTouchTypes(DataFieldEnum &df, const DeviceConfig &config)
 static void
 FillAndroidIOIOPorts(DataFieldEnum &df, const DeviceConfig &config)
 {
-#if defined(ANDROID) && defined(IOIOLIB)
+#if defined(ANDROID)
   df.EnableItemHelp(true);
 
   TCHAR tempID[4];

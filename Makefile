@@ -847,6 +847,7 @@ XCSOAR_SOURCES += \
 	$(SRC)/Java/URL.cpp \
 	$(SRC)/Device/Port/AndroidPort.cpp \
 	$(SRC)/Device/Port/AndroidBluetoothPort.cpp \
+	$(SRC)/Device/Port/AndroidIOIOUartPort.cpp \
 	$(SRC)/Android/Environment.cpp \
 	$(SRC)/Android/Product.cpp \
 	$(SRC)/Android/InternalSensors.cpp \
@@ -862,10 +863,6 @@ XCSOAR_SOURCES += \
 	$(SRC)/Android/Context.cpp \
 	$(SRC)/Android/LogCat.cpp \
 	$(SRC)/Android/Nook.cpp \
-	$(SRC)/Android/Main.cpp
-ifneq ($(IOIOLIB_DIR),)
-XCSOAR_SOURCES += \
-	$(SRC)/Device/Port/AndroidIOIOUartPort.cpp \
 	$(SRC)/Android/NativeBMP085Listener.cpp \
 	$(SRC)/Android/BMP085Device.cpp \
 	$(SRC)/Android/NativeI2CbaroListener.cpp \
@@ -874,8 +871,8 @@ XCSOAR_SOURCES += \
 	$(SRC)/Android/NunchuckDevice.cpp \
 	$(SRC)/Android/NativeVoltageListener.cpp \
 	$(SRC)/Android/VoltageDevice.cpp \
-	$(SRC)/Android/IOIOHelper.cpp
-endif
+	$(SRC)/Android/IOIOHelper.cpp \
+	$(SRC)/Android/Main.cpp
 
 ifeq ($(DEBUG),y)
 XCSOAR_SOURCES += \
