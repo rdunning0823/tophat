@@ -26,12 +26,17 @@ Copyright_License {
 #include "TaskManager/TaskCalculatorPanel.hpp"
 #include "Look/DialogLook.hpp"
 #include "Language/Language.hpp"
+#include "Screen/SingleWindow.hpp"
 
 void
 ShowTaskStatusDialog()
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
-  WidgetDialog dialog(_("Task Status"), new TaskCalculatorPanel(look));
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  ButtonPanel::ButtonPanelPosition position = ButtonPanel::ButtonPanelPosition::Bottom;
+
+  WidgetDialog dialog(_("Task Status"),
+                      rc, new TaskCalculatorPanel(look), nullptr, 0, position);
   dialog.AddButton(_("OK"), mrOK);
   dialog.ShowModal();
 }
