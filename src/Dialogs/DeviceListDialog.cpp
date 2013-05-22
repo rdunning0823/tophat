@@ -46,6 +46,7 @@ Copyright_License {
 #include "Form/List.hpp"
 #include "Form/ListWidget.hpp"
 #include "Screen/Layout.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "Language/Language.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Simulator.hpp"
@@ -216,6 +217,7 @@ DeviceListWidget::CreateButtons(WidgetDialog &dialog)
 {
   reconnect_button = dialog.AddButton(_("Reconnect"), this, RECONNECT);
   flight_button = dialog.AddButton(_("Flight download"), this, FLIGHT);
+  dialog.AddButton(_("Close"), mrOK);
   edit_button = dialog.AddButton(_("Edit"), this, EDIT);
   manage_button = dialog.AddButton(_("Manage"), this, MANAGE);
   monitor_button = dialog.AddButton(_("Monitor"), this, MONITOR);
@@ -500,9 +502,12 @@ ShowDeviceList(SingleWindow &parent, const DialogLook &look,
 {
   DeviceListWidget widget(look, terminal_look);
 
-  WidgetDialog dialog(_("Devices"), &widget);
+  ButtonPanel::ButtonPanelPosition position = ButtonPanel::ButtonPanelPosition::Bottom;
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  WidgetDialog dialog(_("Devices"),
+                      rc, &widget, nullptr, 0, position);
+
   widget.CreateButtons(dialog);
-  dialog.AddButton(_("Close"), mrOK);
 
   dialog.ShowModal();
   dialog.StealWidget();
