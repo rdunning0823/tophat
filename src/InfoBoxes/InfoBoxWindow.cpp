@@ -371,7 +371,7 @@ InfoBoxWindow::ShowDialog(const int id,
   }
 
   if (widget == NULL)
-    CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id));
+    CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id), true);
   else
     CommonInterface::main_window->SetWidget(widget, true);
 
