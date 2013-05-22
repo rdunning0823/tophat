@@ -994,6 +994,7 @@ mode=Menu
 type=key
 data=8
 event=TerrainTopography terrain toggle
+event=Mode default
 label=$(TerrainToggleActionName) terrain
 location=21
 
@@ -1001,6 +1002,7 @@ mode=Menu
 type=key
 data=9
 event=TerrainTopography topography toggle
+event=Mode default
 label=$(TopographyToggleActionName) roads, cities, water
 location=22
 
@@ -1149,6 +1151,7 @@ mode=Orientation
 type=key
 data=6
 event=Orientation northup
+event=Mode default
 label=North up
 location=16
 
@@ -1156,6 +1159,7 @@ mode=Orientation
 type=key
 data=6
 event=Orientation trackup
+event=Mode default
 label=Track up
 location=17
 
@@ -1163,6 +1167,7 @@ mode=Orientation
 type=key
 data=6
 event=Orientation targetup
+event=Mode default
 label=Target up
 location=18
 
