@@ -4,12 +4,11 @@
   <SymbolButton Name="cmdShrink" Caption="-" X="0" Y="0" Width="35" Height="35" OnClick="OnShrinkClicked" />
   <SymbolButton Name="cmdMagnify" Caption="+" X="-35" Y="0" Width="35" Height="35" OnClick="OnMagnifyClicked" />
 
-  <SymbolButton Name="cmdPrev" Caption="&lt;" Y="-35" Width="40" Height="35" OnClick="OnPrevClicked" />
-  <SymbolButton Name="cmdNext" Caption="&gt;" X="40" Y="-35" Width="40" Height="35" OnClick="OnNextClicked" />
+  <SymbolButton Name="cmdPrev" Caption="&lt;" X="-80" Y="-70" Width="40" Height="35" OnClick="OnPrevClicked" />
+  <SymbolButton Name="cmdNext" Caption="&gt;" X="-40" Y="-70" Width="40" Height="35" OnClick="OnNextClicked" />
   
-  <Button Name="cmdGoto" Caption="GoTo" X="80" Y="-35" Width="-80" Height="35" OnClick="OnGotoClicked" />
-
-  <Button Name="cmdClose" Caption="Close" X="-80" Y="-35" Height="35" OnClick="OnCloseClicked" />
+  <Button Name="cmdGoto" Caption="GoTo" X="0" Y="-70" Width="120" Height="35" OnClick="OnGotoClicked" />
+  <Button Name="cmdClose" Caption="Close" X="0" Y="-35" Height="35" OnClick="OnCloseClicked" />
 
   <Widget Name="info" Y="0" Height="-35"/>
 
