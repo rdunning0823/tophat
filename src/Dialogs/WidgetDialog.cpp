@@ -216,7 +216,9 @@ DefaultWidgetDialog(const TCHAR *caption, const PixelRect &rc, Widget &widget)
 bool
 DefaultWidgetDialog(const TCHAR *caption, Widget &widget)
 {
-  WidgetDialog dialog(caption, &widget);
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+
+  WidgetDialog dialog(caption, rc, &widget);
   dialog.AddButton(_("OK"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
 
