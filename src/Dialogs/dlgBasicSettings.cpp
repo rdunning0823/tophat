@@ -30,6 +30,7 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "UIGlobals.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
@@ -260,11 +261,11 @@ void
 dlgBasicSettingsShowModal()
 {
   instance = new FlightSetupPanel();
-
-  WidgetDialog dialog(_("Bugs & ballast"), instance);
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  WidgetDialog dialog(_("Bugs & ballast"), rc, instance);
   dialog.SetTimerNotify(OnTimerNotify);
-  instance->SetDumpButton(dialog.AddButton(_("Dump"), instance, DUMP));
   dialog.AddButton(_("OK"), mrOK);
+  instance->SetDumpButton(dialog.AddButton(_("Dump"), instance, DUMP));
 
   dialog.ShowModal();
 }

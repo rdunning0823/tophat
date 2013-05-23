@@ -25,11 +25,15 @@ Copyright_License {
 #include "Dialogs/WidgetDialog.hpp"
 #include "Dialogs/WindSettingsPanel.hpp"
 #include "Language/Language.hpp"
+#include "Screen/SingleWindow.hpp"
+#include "UIGlobals.hpp"
 
 void
 ShowWindSettingsDialog()
 {
-  WidgetDialog dialog(_("Wind Settings"), new WindSettingsPanel(true, true));
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+
+  WidgetDialog dialog(_("Wind Settings"), rc, new WindSettingsPanel(true, true));
   dialog.AddButton(_("OK"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();

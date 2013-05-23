@@ -31,6 +31,7 @@ Copyright_License {
 #include "Atmosphere/Temperature.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "UIGlobals.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
@@ -185,8 +186,8 @@ void
 dlgQNHShowModal()
 {
   instance = new QNHPanel();
-
-  WidgetDialog dialog(_("QNH"), instance);
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  WidgetDialog dialog(_("QNH"), rc, instance);
   dialog.SetTimerNotify(OnTimerNotify);
   dialog.AddButton(_("OK"), mrOK);
 
