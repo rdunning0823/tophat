@@ -766,7 +766,6 @@ DoAdd(const Waypoint &wp)
   MatClickPanel::ReturnState return_state = ShowDialog(wp, result);
 
   switch (return_state) {
-  case MatClickPanel::ReturnState::SHOW_MORE_ITEMS:
   case MatClickPanel::ReturnState::OK:
     break;
 
@@ -776,6 +775,7 @@ DoAdd(const Waypoint &wp)
       break;
     }
   case MatClickPanel::ReturnState::CANCEL:
+  case MatClickPanel::ReturnState::SHOW_MORE_ITEMS:
     if (!CommitTask(*task_old))
       ShowMessageBox(_("Failed to restore task"), _("Error"), MB_OK | MB_ICONERROR);
     break;
