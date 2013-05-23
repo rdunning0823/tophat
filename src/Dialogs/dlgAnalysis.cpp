@@ -289,7 +289,7 @@ Update()
     wf->SetCaption(sTmp);
     BarographCaption(sTmp, glide_computer->GetFlightStats(), false);
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Settings"));
+    SetCalcCaption(_("Bugs & ballast"));
     break;
 
   case AnalysisPage::CLIMB:
@@ -325,7 +325,7 @@ Update()
     wf->SetCaption(sTmp);
     GlidePolarCaption(sTmp, settings_computer.polar.glide_polar_task);
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Settings"));
+    SetCalcCaption(_("Bugs & ballast"));
    break;
 
   case AnalysisPage::TEMPTRACE:
@@ -334,7 +334,7 @@ Update()
     wf->SetCaption(sTmp);
     TemperatureChartCaption(sTmp, glide_computer->GetCuSonde());
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Settings"));
+    SetCalcCaption(_("Bugs & ballast"));
     break;
 
   case AnalysisPage::TASK_SPEED:
@@ -518,9 +518,7 @@ OnCalcClicked(gcc_unused WndButton &Sender)
     dlgBasicSettingsShowModal();
 
   if (page == AnalysisPage::CLIMB) {
-    wf->Hide();
-    dlgTaskManagerShowModal(*(SingleWindow *)wf->GetRootOwner());
-    wf->Show();
+    ShowTaskStatusDialog();
   }
 
   if (page == AnalysisPage::WIND)
@@ -533,9 +531,7 @@ OnCalcClicked(gcc_unused WndButton &Sender)
     dlgBasicSettingsShowModal();
 
   if ((page == AnalysisPage::TASK) || (page == AnalysisPage::TASK_SPEED)) {
-    wf->Hide();
-    dlgTaskManagerShowModal(*(SingleWindow *)wf->GetRootOwner());
-    wf->Show();
+    ShowTaskStatusDialog();
   }
 
   if (page == AnalysisPage::AIRSPACE)
