@@ -112,16 +112,16 @@ ButtonPanel::VerticalRange(PixelRect rc, unsigned start, unsigned end)
   const UPixelScalar row_height = std::min(total_height, max_height) / n;
 
   PixelRect button_rc = {
-    rc.left, rc.top, PixelScalar(rc.left + width),
-    PixelScalar(rc.top + row_height),
+    rc.left, (PixelScalar)(rc.bottom - row_height), PixelScalar(rc.left + width),
+    PixelScalar(rc.bottom),
   };
   rc.left += width;
 
   for (unsigned i = start; i < end; ++i) {
     buttons[i]->Move(button_rc);
 
-    button_rc.top = button_rc.bottom;
-    button_rc.bottom += row_height;
+    button_rc.bottom = button_rc.top;
+    button_rc.top -= row_height;
   }
 
   return rc;
