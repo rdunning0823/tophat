@@ -36,7 +36,13 @@ enum class TaskPointFactoryType : uint8_t {
   KEYHOLE_SECTOR,
   BGAFIXEDCOURSE_SECTOR,
   BGAENHANCEDOPTION_SECTOR,
+  /**
+   * AST_CYLINDER is not used for US AT (Racing) task - see note below
+   */
   AST_CYLINDER,
+  /** MAT_CYLINDER is used for US AT (Racing) tasks also
+   * because it is scored to the furthest point reached
+   */
   MAT_CYLINDER,
   AAT_CYLINDER,
   AAT_SEGMENT,
