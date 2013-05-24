@@ -87,6 +87,13 @@ namespace InputEvents
   bool IsDefault();
 
   /**
+   * Is the current mode this mode?
+   * @param mode.  The mode to check against
+   * @return. true if the current mode is the same.
+   */
+  bool IsMode(const TCHAR *mode);
+
+  /**
    * Process an event chain.
    */
   void ProcessEvent(unsigned event_id);

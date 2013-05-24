@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2012 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,30 +21,20 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_ICON_LOOK_HPP
-#define XCSOAR_ICON_LOOK_HPP
-
-#include "Screen/Bitmap.hpp"
+#ifndef XCSOAR_MAP_OVERLAY_BUTTON_SIZE_HPP
+#define XCSOAR_MAP_OVERLAY_BUTTON_SIZE_HPP
 
 /**
- * This class manages the icons of various XCSoar dialogs.
+ * a shared properties of all the map overlay buttons
  */
-struct IconLook {
-  // task dialog
-  Bitmap hBmpTabTask;
-  Bitmap hBmpTabWrench;
-  Bitmap hBmpTabSettings;
-  Bitmap hBmpTabCalculator;
 
-  // status dialog
-  Bitmap hBmpTabFlight;
-  Bitmap hBmpTabSystem;
-  Bitmap hBmpTabRules;
-  Bitmap hBmpTabTimes;
+namespace MapOverlayButton {
 
-  Bitmap hBmpMenuButton;
+  /**
+   * size from 2 (tiny) to 6 (huge) of map overlay buttons
+   */
+  unsigned GetScale();
 
-  void Initialise();
-};
+}
 
 #endif

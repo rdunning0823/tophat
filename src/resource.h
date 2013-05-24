@@ -146,3 +146,5 @@
 #define IDB_WEATHER_STATION_HD         5368
 #define IDB_THERMAL_HOTSPOT             369
 #define IDB_THERMAL_HOTSPOT_HD         5369
+#define IDB_MENU_BUTTON                 500
+#define IDB_MENU_BUTTON_HD             5500

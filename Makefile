@@ -787,6 +787,9 @@ XCSOAR_SOURCES := \
 	$(SRC)/Startup.cpp \
 	$(SRC)/Components.cpp \
 	\
+	$(SRC)/Widgets/MainMenuButtonWidget.cpp \
+	$(SRC)/Widgets/MapOverlayButton.cpp \
+	\
 	$(SRC)/Device/Driver.cpp \
 	$(SRC)/Device/Declaration.cpp \
 	$(SRC)/Device/Register.cpp \
