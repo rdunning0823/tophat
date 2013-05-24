@@ -45,8 +45,7 @@ ButtonPanel::UpdateLayout(const PixelRect rc)
   if (buttons.empty())
     return rc;
 
-  const bool landscape = rc.right - rc.left > rc.bottom - rc.top;
-  return landscape
+  return Layout::landscape
     ? LeftLayout(rc)
     : BottomLayout(rc);
 }
