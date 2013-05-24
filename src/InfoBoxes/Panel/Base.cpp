@@ -160,7 +160,16 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              frame_rc, style_frame);
   header_text->SetVAlignCenter();
   header_text->SetFont(Fonts::infobox_small);
+  SetCaption();
 
+  content_rc = base_rc;
+  content_rc.top += GetHeaderHeight();
+  content_rc.bottom -= GetFooterHeight();
+}
+
+void
+BaseAccessPanel::SetCaption()
+{
   InfoBoxSettings &settings = CommonInterface::SetUISettings().info_boxes;
   const unsigned panel_index = CommonInterface::GetUIState().panel_index;
   const InfoBoxSettings::Panel &panel = settings.panels[panel_index];
@@ -169,12 +178,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   StaticString<32> buffer;
   buffer = gettext(InfoBoxFactory::GetName(old_type));
   header_text->SetText(buffer);
-
-  content_rc = base_rc;
-  content_rc.top += GetHeaderHeight();
-  content_rc.bottom -= GetFooterHeight();
 }
-
 
 void
 NumberButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &parent_rc)

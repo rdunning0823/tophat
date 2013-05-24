@@ -68,6 +68,11 @@ protected:
    */
   virtual void OnPaint(Canvas &canvas);
 
+  /**
+   * Caption for InfoBox dialog
+   */
+  virtual void SetCaption();
+
 public:
   BaseAccessPanel(unsigned _id);
 
