@@ -29,6 +29,7 @@
 #include "Stats/CommonStats.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
 #include "TaskBehaviour.hpp"
+#include "Time/PeriodClock.hpp"
 
 class AbstractTaskFactory;
 class TaskEvents;
@@ -71,6 +72,11 @@ class TaskManager:
   TaskStats null_stats;
 
   CommonStats common_stats;
+
+  /**
+   * time stamp of when the ordered task last was committed
+   */
+  unsigned task_time_stamp;
 
 public:
   /**
@@ -469,6 +475,12 @@ public:
   void TakeoffAutotask(const GeoPoint &ref, const fixed terrain_alt);
 
   void UpdateCommonStatsTask();
+  /**
+   * returns time stamp when ordered task was last committed
+   */
+  unsigned GetTaskTimeStamp() const {
+    return task_time_stamp;
+  }
 
 private:
   TaskType SetMode(const TaskType mode);
