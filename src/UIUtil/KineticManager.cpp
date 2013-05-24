@@ -28,16 +28,12 @@
  */
 
 #include "KineticManager.hpp"
-#include "LogFile.hpp"
-#include <tchar.h>
 
 void
 KineticManager::Reverse()
 {
   MoveTo(mouse_down_x);
   mode = REVERSED;
-  LogDebug(_T("KineticManager::Reverse v:%.2f, last:%i end:%i dt:%i"),
-           (float)v, last, end, clock.Elapsed());
 }
 
 void
@@ -51,9 +47,6 @@ KineticManager::MoveTo(int x)
   clock.Update();
   v = (distance * fixed(2)) / fixed(stopping_time);
   end = x;
-
-  LogDebug(_T("KineticManager::MoteTo x:%i v:%.2f, last:%i end:%i dt:%i"),
-           x, (float)v, last, end, clock.Elapsed());
 }
 
 bool
@@ -71,7 +64,6 @@ KineticManager::IsMoveTo()
 void
 KineticManager::MouseDown(int x)
 {
-  LogDebug(_T("KineticManager::MouseDown x:%i"), x);
   steady = false;
   mode = NORMAL;
   mouse_down_x = last = x;
@@ -128,17 +120,6 @@ KineticManager::MouseUp(int x, unsigned max_distance_mouse_dn)
     v = (distance_final * fixed(2)) / fixed(stopping_time);
   }
   end = last + (int)distance_final;
-
-  LogDebug(_T("KineticManager::MouseUp x:%i max_dist_ms_dn:%u last:%i, ms_dn_x:%i dist_basic:%.0f, dist_nomax:%i, dist_final%.0f, v%.2f end:%i"),
-           x,
-           max_distance_mouse_dn,
-           last,
-           mouse_down_x,
-           (float)distance_basic,
-           dist_no_max,
-           (float)distance_final,
-           (float)v,
-           end);
 }
 
 int
@@ -150,8 +131,6 @@ KineticManager::GetPosition()
   if (t >= stopping_time) {
     // Stop the kinetic movement and return the precalculated end position
     steady = true;
-    LogDebug(_T("KineticManager::GetPosition exiting. v:%.2f, returning end:%i, steady:%i dt:%i"),
-             (float)v, end, steady, t);
     return end;
   }
 
@@ -159,8 +138,6 @@ KineticManager::GetPosition()
   int x = last + (int)(v * t - v * t * t / (2 * stopping_time));
   if (x == end)
     steady = true;
-    LogDebug(_T("KineticManager::GetPosition x:%i, v:%.2f, end:%i, dt:%i"),
-             x, (float)v, end, t);
   return x;
 }
 
