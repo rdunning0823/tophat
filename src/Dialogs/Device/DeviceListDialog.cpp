@@ -564,8 +564,8 @@ ShowDeviceList(SingleWindow &parent, const DialogLook &look,
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Devices"), &widget);
-  dialog.AddButton(_("Close"), mrOK);
   widget.CreateButtons(dialog);
+  dialog.AddButton(_("Close"), mrOK);
 
   dialog.ShowModal();
   dialog.StealWidget();
