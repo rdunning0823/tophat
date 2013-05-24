@@ -56,6 +56,8 @@ Copyright_License {
 #include "DrawThread.hpp"
 #include "UIReceiveBlackboard.hpp"
 #include "Event/Idle.hpp"
+#include "MapWindow/MapWidgetOverlays.hpp"
+#include "Pan.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
@@ -231,6 +233,11 @@ MainWindow::InitialiseConfigured()
   ReinitialiseLayout_flarm(rc, ib_layout);
 
   map = new GlueMapWindow(*look);
+
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+  widget_overlays.Initialise(*this, rc_current);
+  widget_overlays.Prepare(*this, rc_current);
+
   map->SetComputerSettings(CommonInterface::GetComputerSettings());
   map->SetMapSettings(CommonInterface::GetMapSettings());
   map->SetUIState(CommonInterface::GetUIState());
@@ -350,6 +357,11 @@ MainWindow::ReinitialiseLayout()
     map->Move(GetMapRectAbove(main_rect, bottom_rect));
     map->FullRedraw();
   }
+
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                   widget != NULL,
+                                   map != NULL, FullScreen);
+  widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
 
   if (widget != NULL)
     widget->Move(GetMainRect(rc));
@@ -641,6 +653,10 @@ MainWindow::OnTimer(WindowTimer &_timer)
         (GaugeThermalAssistant *)thermal_assistant.Get();
       widget->Raise();
     }
+
+    widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                     widget != NULL,
+                                     map != NULL, FullScreen);
   }
 
   battery_timer.Process();
@@ -729,6 +745,7 @@ MainWindow::SetFullScreen(bool _full_screen)
   if (map != NULL)
     map->FastMove(GetMainRect());
 
+  widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
   // the repaint will be triggered by the DrawThread
 
   UpdateVarioGaugeVisibility();
@@ -801,7 +818,9 @@ MainWindow::ActivateMap()
     }
 #endif
   }
-
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                   widget != NULL,
+                                   map != NULL, FullScreen);
   return map;
 }
 
@@ -887,6 +906,7 @@ MainWindow::SetWidget(Widget *_widget)
   /* hide the map (might be hidden already) */
   if (map != NULL) {
     map->FastHide();
+    widget_overlays.Hide();
 
 #ifndef ENABLE_OPENGL
     if (!draw_suspended) {

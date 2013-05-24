@@ -31,6 +31,7 @@ Copyright_License {
 #include "BatteryTimer.hpp"
 #include "Widget/ManagedWidget.hpp"
 #include "UIUtil/GestureManager.hpp"
+#include "MapWindow/MapWidgetOverlays.hpp"
 
 #include <stdint.h>
 #include <assert.h>
@@ -124,6 +125,11 @@ private:
   bool restore_page_pending;
 
   bool airspace_warning_pending;
+
+  /**
+   * collection of widgets displayed over the map
+   */
+  MapWidgetOverlays widget_overlays;
 
 public:
   MainWindow(const StatusMessageList &status_messages);
