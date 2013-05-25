@@ -18,6 +18,7 @@ FORM_SOURCES = \
 	$(FORM_SRC_DIR)/Frame.cpp \
 	$(FORM_SRC_DIR)/Draw.cpp \
 	$(FORM_SRC_DIR)/List.cpp \
+	$(FORM_SRC_DIR)/HorizontalList.cpp \
 	$(FORM_SRC_DIR)/ScrollBar.cpp \
 	$(FORM_SRC_DIR)/Edit.cpp \
 	$(FORM_SRC_DIR)/DigitEntry.cpp \
