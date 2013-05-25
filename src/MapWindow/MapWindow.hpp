@@ -150,6 +150,11 @@ protected:
 
   bool compass_visible;
 
+  /**
+   * distance from the top of the map where the compass is displayed
+   */
+  unsigned compass_offset_y;
+
 #ifndef ENABLE_OPENGL
   /**
    * Tracks whether the buffer canvas contains valid data.  We use
@@ -184,6 +189,14 @@ public:
    */
   bool IsNearSelf() const {
     return follow_mode == FOLLOW_SELF;
+  }
+
+  /**
+   * @param y. The distance from the top of the map where the compass
+   * will display
+   */
+  void SetCompassOffset(unsigned y) {
+    compass_offset_y = y;
   }
 
   bool IsPanning() const {

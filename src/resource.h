@@ -148,3 +148,5 @@
 #define IDB_THERMAL_HOTSPOT_HD         5369
 #define IDB_MENU_BUTTON                 500
 #define IDB_MENU_BUTTON_HD             5500
+#define IDB_CHECK_MARK                  503
+#define IDB_CHECK_MARK_HD              5503

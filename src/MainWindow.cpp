@@ -56,9 +56,10 @@ Copyright_License {
 #include "DrawThread.hpp"
 #include "UIReceiveBlackboard.hpp"
 #include "Event/Idle.hpp"
-#include "MapWindow/MapWidgetOverlays.hpp"
 #include "Pan.hpp"
+#include "MapWindow/MapWidgetOverlays.hpp"
 #include "Widgets/MainMenuButtonWidget.hpp"
+#include "Widgets/TaskNavSliderWidget.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
@@ -237,6 +238,8 @@ MainWindow::InitialiseConfigured()
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
+  task_nav_slider_widget = new TaskNavSliderWidget();
+  widget_overlays.Add(task_nav_slider_widget, rc_current);
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 
@@ -364,6 +367,8 @@ MainWindow::ReinitialiseLayout()
                                    widget != NULL,
                                    map != NULL, FullScreen);
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
+  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
+      task_nav_slider_widget->GetHeight() : 0);
 
   if (widget != NULL)
     widget->Move(GetMainRect(rc));
@@ -655,11 +660,13 @@ MainWindow::OnTimer(WindowTimer &_timer)
         (GaugeThermalAssistant *)thermal_assistant.Get();
       widget->Raise();
     }
-
-    widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
-                                     widget != NULL,
-                                     map != NULL, FullScreen);
   }
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                   widget != NULL,
+                                   map != NULL, FullScreen);
+  task_nav_slider_widget->RefreshTask();
+  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
+      task_nav_slider_widget->GetHeight() : 0);
 
   battery_timer.Process();
 
@@ -748,6 +755,8 @@ MainWindow::SetFullScreen(bool _full_screen)
     map->FastMove(GetMainRect());
 
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
+  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
+      task_nav_slider_widget->GetHeight() : 0);
   // the repaint will be triggered by the DrawThread
 
   UpdateVarioGaugeVisibility();
@@ -823,6 +832,8 @@ MainWindow::ActivateMap()
   widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
+  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
+      task_nav_slider_widget->GetHeight() : 0);
   return map;
 }
 

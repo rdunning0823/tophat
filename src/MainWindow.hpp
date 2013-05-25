@@ -46,6 +46,7 @@ class StatusMessageList;
 class RasterTerrain;
 class TopographyStore;
 class MapWindowProjection;
+class TaskNavSliderWidget;
 
 /**
  * The XCSoar main window.
@@ -130,6 +131,11 @@ private:
    * collection of widgets displayed over the map
    */
   MapWidgetOverlays widget_overlays;
+
+ /**
+  * used to access the widget to update the task
+  */
+  TaskNavSliderWidget *task_nav_slider_widget;
 
 public:
   MainWindow(const StatusMessageList &status_messages);
