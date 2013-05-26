@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_MENU_BAR_HPP
 #define XCSOAR_MENU_BAR_HPP
 
-#include "Screen/ButtonWindow.hpp"
+#include "Form/SymbolButton.hpp"
 
 #include <tchar.h>
 
@@ -41,10 +41,17 @@ public:
   };
 
 protected:
-  class Button : public ButtonWindow {
+  class Button : public WndSymbolButton {
     unsigned event;
 
   public:
+    Button(ContainerWindow &parent, const DialogLook &look,
+           const TCHAR *Caption,
+           const PixelRect &rc, const ButtonWindowStyle style)
+    :WndSymbolButton(parent, look,
+                     Caption,
+                     rc, style, NULL) {};
+
     void SetEvent(unsigned _event) {
       event = _event;
     }
@@ -58,7 +65,7 @@ protected:
 #endif
   };
 
-  Button buttons[MAX_BUTTONS];
+  Button *buttons[MAX_BUTTONS];
 
 public:
   MenuBar(ContainerWindow &parent);
@@ -70,7 +77,7 @@ public:
   void HideButton(unsigned i);
 
   bool IsButtonEnabled(unsigned i) const {
-    return buttons[i].IsEnabled();
+    return buttons[i]->IsEnabled();
   }
 
   /**

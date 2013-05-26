@@ -25,8 +25,7 @@ Copyright_License {
 #include "Screen/ContainerWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "Input/InputEvents.hpp"
-
-#include "LogFile.hpp" //debug
+#include "UIGlobals.hpp"
 
 #include <assert.h>
 
@@ -188,10 +187,11 @@ MenuBar::MenuBar(ContainerWindow &parent)
   style.Hide();
   style.Border();
   style.multiline();
+  const DialogLook &look = UIGlobals::GetDialogLook();
 
   for (unsigned i = 0; i < MAX_BUTTONS; ++i) {
     PixelRect button_rc = GetButtonPosition(i, rc);
-    buttons[i].Create(parent, _T(""), button_rc, style);
+    buttons[i] = new Button(parent, look, _T(""), button_rc, style);
   }
 }
 
@@ -199,7 +199,7 @@ void
 MenuBar::SetFont(const Font &font)
 {
   for (unsigned i = 0; i < MAX_BUTTONS; i++)
-    buttons[i].SetFont(font);
+    buttons[i]->SetFont(font);
 }
 
 void
@@ -208,7 +208,7 @@ MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
 {
   assert(i < MAX_BUTTONS);
 
-  Button &button = buttons[i];
+  Button &button = *buttons[i];
 
   button.SetText(text);
   button.SetEnabled(enabled && event > 0);
@@ -221,12 +221,12 @@ MenuBar::HideButton(unsigned i)
 {
   assert(i < MAX_BUTTONS);
 
-  buttons[i].Hide();
+  buttons[i]->Hide();
 }
 
 void
 MenuBar::OnResize(const PixelRect &rc)
 {
   for (unsigned i = 0; i < MAX_BUTTONS; ++i)
-    buttons[i].Move(GetButtonPosition(i, rc));
+    buttons[i]->Move(GetButtonPosition(i, rc));
 }
