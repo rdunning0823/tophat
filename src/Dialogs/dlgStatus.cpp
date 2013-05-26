@@ -25,6 +25,7 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
 #include "Form/TabBar.hpp"
+#include "Widget/ActionWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "StatusPanels/FlightStatusPanel.hpp"
@@ -62,37 +63,24 @@ dlgStatusShowModal(int start_page)
 
   const PixelRect rc = form.GetClientAreaWindow().GetClientRect();
 
-  PixelRect close_rc, tab_rc;
-
-  close_rc.left = 0;
-  close_rc.top = 0;
+  PixelRect tab_rc;
 
   if (Layout::landscape) {
     const unsigned tab_width = Layout::Scale(80);
 
-    close_rc.right = tab_width;
-    close_rc.bottom = Layout::Scale(28);
-
     tab_rc.left = 0;
-    tab_rc.top = close_rc.bottom;
+    tab_rc.top = 0;
     tab_rc.right = tab_width;
     tab_rc.bottom = rc.bottom;
   } else {
-    close_rc.right = Layout::Scale(55);
-    close_rc.bottom = Layout::Scale(76);
-
-    tab_rc.left = close_rc.right;
+    tab_rc.left = Layout::Scale(55);
     tab_rc.top = 0;
     tab_rc.right = rc.right;
-    tab_rc.bottom = close_rc.bottom;
+    tab_rc.bottom = Layout::Scale(76);
   }
 
   ButtonWindowStyle button_style;
   button_style.TabStop();
-
-  WndButton close_button(form.GetClientAreaWindow(), look,
-                         _("Close"), close_rc, button_style,
-                         form, mrOK);
 
   ButtonWindowStyle tab_style;
   tab_style.ControlParent();
@@ -135,6 +123,10 @@ dlgStatusShowModal(int start_page)
 
   Widget *times_panel = new TimesStatusPanel(look);
   tab_bar.AddTab(times_panel, _("Times"), TimesIcon);
+
+  Widget *wClose = new ActionWidget(form, mrOK);
+  tab_bar.AddTab(wClose, _("Close"));
+
 
   /* restore previous page */
 
