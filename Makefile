@@ -789,8 +789,8 @@ XCSOAR_SOURCES := \
 	\
 	$(SRC)/Widgets/MainMenuButtonWidget.cpp \
 	$(SRC)/Widgets/MapOverlayButton.cpp \
-	$(SRC)/Widgets/TaskNavDataCache.cpp \
 	$(SRC)/Widgets/TaskNavSliderWidget.cpp \
+	$(SRC)/Widgets/TaskNavDataCache.cpp \
 	\
 	$(SRC)/Device/Driver.cpp \
 	$(SRC)/Device/Declaration.cpp \

@@ -383,7 +383,6 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
 
   MapWindow::OnPaintBuffer(canvas);
 
-  DrawMapScale(canvas, GetClientRect(), render_projection);
   if (IsPanning())
     DrawPanInfo(canvas);
 
