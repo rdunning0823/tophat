@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Internal.hpp"
 #include "TaskMapWindow.hpp"
-#include "TaskCalculatorPanel.hpp"
 #include "TaskEditPanel.hpp"
 #include "TaskPropertiesPanel.hpp"
 #include "TaskMiscPanel.hpp"
@@ -159,10 +158,6 @@ TaskManagerDialog::Create(SingleWindow &parent)
 
   TaskClosePanel *wClose = new TaskClosePanel(*this, &modified);
 
-  TaskCalculatorPanel *wCalculator =
-    new TaskCalculatorPanel(UIGlobals::GetDialogLook(), &modified);
-  wCalculator->SetTargetButton(target_button);
-
   const MapLook &look = UIGlobals::GetMapLook();
   Widget *wEdit = CreateTaskEditPanel(*this, look.task, look.airspace,
                                       &task, &modified);
@@ -173,21 +168,18 @@ TaskManagerDialog::Create(SingleWindow &parent)
     CommonInterface::GetUISettings().dialog.tab_style
     == DialogSettings::TabStyle::Icon;
   const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *CalcIcon = enable_icons ? &icons.hBmpTabCalculator : NULL;
   const Bitmap *TurnPointIcon = enable_icons ? &icons.hBmpTabTask : NULL;
   const Bitmap *BrowseIcon = enable_icons ? &icons.hBmpTabWrench : NULL;
   const Bitmap *PropertiesIcon = enable_icons ? &icons.hBmpTabSettings : NULL;
 
-  tab_bar->AddTab(wCalculator, _("Calculator"), CalcIcon);
-
   if (layout.vertical) {
     tab_bar->AddTab(wEdit, _("Turn Points"), TurnPointIcon);
-    TurnpointTab = 1;
+    TurnpointTab = 0;
 
     tab_bar->AddTab(list_tab, _("Manage"), BrowseIcon);
 
     tab_bar->AddTab(wProps, _("Rules"), PropertiesIcon);
-    PropertiesTab = 3;
+    PropertiesTab = 2;
 
     tab_bar->AddTab(wClose, _("Close"));
 
@@ -196,14 +188,14 @@ TaskManagerDialog::Create(SingleWindow &parent)
     tab_bar->AddTab(wClose, _("Close"));
 
     tab_bar->AddTab(wEdit, _("Turn Points"), TurnPointIcon);
-    TurnpointTab = 2;
+    TurnpointTab = 1;
 
     tab_bar->AddTab(list_tab, _("Manage"), BrowseIcon);
 
     tab_bar->AddTab(wProps, _("Rules"), PropertiesIcon);
-    PropertiesTab = 4;
+    PropertiesTab = 3;
 
-    tab_bar->SetCurrentPage(0);
+    tab_bar->SetCurrentPage(1);
   }
 
   UpdateCaption();
