@@ -124,5 +124,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
                       bitmap_size.cy,
                       bmp,
                       bitmap_size.cx / 2, 0);
+  } else {
+    WndButton::OnPaint(canvas);
   }
 }
