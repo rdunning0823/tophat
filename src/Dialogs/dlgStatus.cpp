@@ -29,9 +29,9 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "StatusPanels/FlightStatusPanel.hpp"
-#include "StatusPanels/TaskStatusPanel.hpp"
 #include "StatusPanels/RulesStatusPanel.hpp"
 #include "StatusPanels/SystemStatusPanel.hpp"
+#include "Task/Manager/TaskCalculatorPanel.hpp"
 #include "StatusPanels/TimesStatusPanel.hpp"
 #include "Screen/Layout.hpp"
 #include "Components.hpp"
@@ -115,7 +115,8 @@ dlgStatusShowModal(int start_page)
   Widget *system_panel = new SystemStatusPanel(look);
   tab_bar.AddTab(system_panel, _("System"), SystemIcon);
 
-  Widget *task_panel = new TaskStatusPanel(look);
+  static bool modified = false;
+  Widget *task_panel = new TaskCalculatorPanel(look, &modified);
   tab_bar.AddTab(task_panel, _("Task"), TaskIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
