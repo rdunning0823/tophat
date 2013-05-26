@@ -104,6 +104,8 @@ private:
   void NewClicked();
   void EditClicked();
   void DeleteClicked();
+  bool IsAnyActive();
+  void LoadFirstIfNoneActive();
 
 public:
   /* virtual methods from class Widget */
@@ -136,6 +138,30 @@ GetRowHeight(const DialogLook &look)
     + look.small_font->GetHeight();
 }
 
+/**
+ * is any plane in the list active?
+ * @return true if one of the planes in the list is active
+ */
+bool
+PlaneListWidget::IsAnyActive()
+{
+  for (unsigned i = 0; i < list.size(); i++)
+    if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path))
+      return true;
+
+  return false;
+}
+
+/**
+ * if no planes in the list are active, it loads the first in the list
+ */
+void
+PlaneListWidget::LoadFirstIfNoneActive()
+{
+  if (!IsAnyActive() && list.size() > 0)
+    Load(0);
+}
+
 void
 PlaneListWidget::UpdateList()
 {
@@ -157,6 +183,8 @@ PlaneListWidget::UpdateList()
   load_button->SetEnabled(!empty);
   edit_button->SetEnabled(!empty);
   delete_button->SetEnabled(!empty);
+
+  LoadFirstIfNoneActive();
 }
 
 void
