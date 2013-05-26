@@ -169,7 +169,7 @@ PaintTask(Canvas &canvas, const WindowProjection &projection,
                         ozv, false, TaskPointRenderer::NONE,
                         location_available, location);
   TaskRenderer dv(tpv, projection.GetScreenBounds());
-  dv.Draw(task);
+    dv.Draw(task, task);
 
   // highlight a task point
   if (highlight_index >= 0 && highlight_index < (int) task.TaskSize()) {

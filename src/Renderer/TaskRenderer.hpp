@@ -37,11 +37,23 @@ class TaskRenderer
 {
   TaskPointRenderer &tpv;
   GeoBounds screen_bounds;
+  /**
+   * if true, drawing the ordered task shows only OZ outlines
+   */
+  bool show_only_ordered_outlines;
 
 public:
   TaskRenderer(TaskPointRenderer &_tpv, GeoBounds _screen_bounds);
 
-  void Draw(const TaskInterface &task);
+  /**
+   * Draws Goto or Abort or Ordered task.
+   * ALso draws the outlines of the Ordered OZ's while in Goto or Abort mode.
+   * @param active_task.  The active task
+   * @param ordered_task.  The ordered task.  May not be active
+   * or have zero turnpoints
+   */
+  void Draw(const TaskInterface &active_task,
+            const OrderedTask &ordered_task);
   void Draw(const AbortTask &task);
   void Draw(const OrderedTask &task);
   void Draw(const GotoTask &task);

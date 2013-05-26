@@ -151,6 +151,7 @@ TargetMapWindow::DrawTask(Canvas &canvas)
 
   ProtectedTaskManager::Lease task_manager(*task);
   const AbstractTask *task = task_manager->GetActiveTask();
+  const OrderedTask &ordered_task = task_manager->GetOrderedTask();
   if (task && task->CheckTask()) {
     OZRenderer ozv(task_look, airspace_renderer.GetLook(),
                    GetMapSettings().airspace);
@@ -162,7 +163,7 @@ TargetMapWindow::DrawTask(Canvas &canvas)
                           ozv, false, TaskPointRenderer::ALL,
                           Basic().location_available, Basic().location);
     TaskRenderer dv(tpv, projection.GetScreenBounds());
-    dv.Draw(*task);
+    dv.Draw(*task, ordered_task);
   }
 }
 
