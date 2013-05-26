@@ -41,24 +41,36 @@ public:
 
 extern const InfoBoxPanel wind_infobox_panels[];
 
-void
-UpdateInfoBoxWindSpeed(InfoBoxData &data);
-
-void
-UpdateInfoBoxWindBearing(InfoBoxData &data);
-
-void
-UpdateInfoBoxHeadWind(InfoBoxData &data);
-
-void
-UpdateInfoBoxHeadWindSimplified(InfoBoxData &data);
-
-class InfoBoxContentWindArrow: public InfoBoxContent
+class InfoBoxContentWind: public InfoBoxContentNonTabbed
 {
 public:
+  virtual const InfoBoxPanel *GetDialogContent() override;
+};
+
+class InfoBoxContentWindSpeed: public InfoBoxContentWind
+{
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxContentWindBearing: public InfoBoxContentWind
+{
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxContentHeadWind: public InfoBoxContentWind
+{
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxContentHeadWindSimplified: public InfoBoxContentWind
+{
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxContentWindArrow: public InfoBoxContentWind
+{
   virtual void Update(InfoBoxData &data) override;
   virtual void OnCustomPaint(Canvas &canvas, const PixelRect &rc) override;
-  virtual const InfoBoxPanel *GetDialogContent() override;
 };
 
 #endif

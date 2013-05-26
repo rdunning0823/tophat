@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Weather.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
-#include "InfoBoxes/Panel/WindEdit.hpp"
+#include "InfoBoxes/Panel/WindSetupInfoBox.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "Interface.hpp"
 #include "Dialogs/dlgInfoBoxAccess.hpp"
@@ -107,18 +107,18 @@ InfoBoxContentTemperatureForecast::HandleKey(const InfoBoxKeyCodes keycode)
 constexpr
 #endif
 const InfoBoxPanel wind_infobox_panels[] = {
-  { N_("Edit"), LoadWindEditPanel },
+  { N_("Setup"), LoadWindSetupInfoBoxPanel },
   { nullptr, nullptr }
 };
 
 const InfoBoxPanel *
-InfoBoxContentWindArrow::GetDialogContent()
+InfoBoxContentWind::GetDialogContent()
 {
   return wind_infobox_panels;
 }
 
 void
-UpdateInfoBoxWindSpeed(InfoBoxData &data)
+InfoBoxContentWindSpeed::Update(InfoBoxData &data)
 {
   const DerivedInfo &info = CommonInterface::Calculated();
   if (!info.wind_available) {
@@ -138,7 +138,7 @@ UpdateInfoBoxWindSpeed(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxWindBearing(InfoBoxData &data)
+InfoBoxContentWindBearing::Update(InfoBoxData &data)
 {
   const DerivedInfo &info = CommonInterface::Calculated();
   if (!info.wind_available) {
@@ -154,7 +154,7 @@ UpdateInfoBoxWindBearing(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxHeadWind(InfoBoxData &data)
+InfoBoxContentHeadWind::Update(InfoBoxData &data)
 {
   const DerivedInfo &info = CommonInterface::Calculated();
   if (!info.head_wind_available) {
@@ -171,7 +171,7 @@ UpdateInfoBoxHeadWind(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxHeadWindSimplified(InfoBoxData &data)
+InfoBoxContentHeadWindSimplified::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   if (!basic.ground_speed_available || !basic.airspeed_available) {

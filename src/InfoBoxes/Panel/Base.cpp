@@ -55,12 +55,17 @@ GetDialogStyle()
   return style;
 }
 
+BaseAccessPanel::BaseAccessPanel(unsigned _id, Widget *_widget)
+  :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
+           UIGlobals::GetMainWindow().GetClientRect(),
+           _T(""), GetDialogStyle()),
+   id(_id), managed_widget(GetClientAreaWindow(), _widget) {}
+
 BaseAccessPanel::BaseAccessPanel(unsigned _id)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            UIGlobals::GetMainWindow().GetClientRect(),
            _T(""), GetDialogStyle()),
-
-    id(_id) {}
+   id(_id), managed_widget(GetClientAreaWindow()) {}
 
 gcc_pure PixelScalar
 BaseAccessPanel::GetHeaderHeight() {
@@ -106,6 +111,8 @@ BaseAccessPanel::OnAction(int action_id)
 void
 BaseAccessPanel::Show(const PixelRect &rc)
 {
+  if (managed_widget.IsDefined())
+    managed_widget.Show();
   WndForm::ShowModeless();
 }
 
@@ -116,12 +123,12 @@ BaseAccessPanel::Unprepare()
   delete setup_button;
   delete close_button;
   NullWidget::Unprepare();
+  managed_widget.Clear();
 }
 
 void
 BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-
   NullWidget::Prepare(parent, rc);
   WndForm::Move(rc);
 
@@ -135,6 +142,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
+
 
   PixelRect close_button_rc = base_rc;
   close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
@@ -165,6 +173,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   content_rc = base_rc;
   content_rc.top += GetHeaderHeight();
   content_rc.bottom -= GetFooterHeight();
+  managed_widget.Move(content_rc);
 }
 
 void
