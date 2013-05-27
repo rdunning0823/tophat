@@ -257,9 +257,9 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   buffer.clear();
 
   if (Basic().gps.replay)
-    buffer += _T(" REPLAY");
+    buffer += _T("REPLAY");
   else if (Basic().gps.simulator) {
-    buffer += _(" Simulator");
+    buffer += _("Simulator");
   }
 
   if (weather != NULL && weather->GetParameter() > 0) {
@@ -292,9 +292,8 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
       _T(" %d L"),
       (int)computer_settings.polar.glide_polar_task.GetBallastLitres());
 
-    offset += canvas.CalcTextWidth(buffer) + Layout::Scale(2);
-    canvas.DrawText(rc.right - offset, rc.bottom - canvas.CalcTextSize(buffer).cy, buffer);
- }
+    canvas.DrawText(rc.right - offset, rc.bottom - 2 * canvas.CalcTextSize(buffer).cy, buffer);
+  }
 }
 
 void
