@@ -59,7 +59,6 @@ Copyright_License {
 #include "Panels/GaugesConfigPanel.hpp"
 #include "Panels/VarioConfigPanel.hpp"
 #include "Panels/TaskRulesConfigPanel.hpp"
-#include "Panels/TaskDefaultsConfigPanel.hpp"
 #include "Panels/InfoBoxesConfigPanel.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
@@ -90,7 +89,7 @@ const TCHAR *main_menu_captions[] = {
   N_("Map Display"),
   N_("Glide Computer"),
   N_("Gauges"),
-  N_("Task Defaults"),
+  N_("Contest"),
   N_("Look"),
   N_("Setup"),
 };
@@ -111,8 +110,7 @@ static constexpr TabMenuControl::PageItem pages[] = {
 #ifdef HAVE_PCM_PLAYER
   {N_("Audio Vario"), 3, CreateAudioVarioConfigPanel },
 #endif
-  {N_("Task Rules"), 4, CreateTaskRulesConfigPanel },
-  {N_("Turnpoint Types"), 4, CreateTaskDefaultsConfigPanel },
+  {N_("Contest"), 4, CreateTaskRulesConfigPanel },
   {N_("Language, Input"), 5, CreateInterfaceConfigPanel },
   {N_("Screen Layout"), 5, CreateLayoutConfigPanel },
   {N_("Pages"), 5, CreatePagesConfigPanel },
