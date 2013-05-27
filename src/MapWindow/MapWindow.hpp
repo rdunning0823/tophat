@@ -155,6 +155,11 @@ protected:
    */
   unsigned compass_offset_y;
 
+  /**
+   * distance from the bottom of the map where the GPSStatus is displayed
+   */
+  unsigned gps_status_offset_y;
+
 #ifndef ENABLE_OPENGL
   /**
    * Tracks whether the buffer canvas contains valid data.  We use
@@ -197,6 +202,14 @@ public:
    */
   void SetCompassOffset(unsigned y) {
     compass_offset_y = y;
+  }
+
+  /**
+   * @param y. The distance from the bottom of the map where the
+   * GPSStatus will display
+   */
+  void SetGPSStatusOffset(unsigned y) {
+    gps_status_offset_y = y;
   }
 
   bool IsPanning() const {

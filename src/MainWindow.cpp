@@ -372,6 +372,7 @@ MainWindow::ReinitialiseLayout()
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   widget_overlays.Move(rc_current);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 
   ReinitialiseLayout_flarm(rc_current, ib_layout);
   ReinitialiseLayoutTA(rc_current, ib_layout);
@@ -676,9 +677,8 @@ MainWindow::OnTimer(WindowTimer &_timer)
                                    widget != NULL,
                                    map != NULL, FullScreen);
   task_nav_slider_widget->RefreshTask();
-  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
-      task_nav_slider_widget->GetHeight() : 0);
-
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
   battery_timer.Process();
 
   return true;
@@ -766,6 +766,8 @@ MainWindow::SetFullScreen(bool _full_screen)
     map->FastMove(GetMainRect());
 
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   PixelRect rc = GetClientRect();
@@ -851,6 +853,7 @@ MainWindow::ActivateMap()
                                    widget != NULL,
                                    map != NULL, FullScreen);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
   return map;
 }
 

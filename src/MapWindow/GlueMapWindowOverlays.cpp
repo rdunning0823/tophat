@@ -154,7 +154,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
 }
 
 void
-GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
+GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc_unadjusted,
                              const NMEAInfo &info) const
 {
   const TCHAR *txt;
@@ -170,12 +170,16 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
     // early exit
     return;
 
+  PixelRect rc = rc_unadjusted;
+  rc.top -= gps_status_offset_y;
+  rc.bottom -= gps_status_offset_y;
+
   PixelScalar x = rc.left + Layout::FastScale(2);
-  PixelScalar y = rc.bottom - Layout::FastScale(35);
+  PixelScalar y = rc.bottom - Layout::FastScale(2) - icon->GetSize().cy;
   icon->Draw(canvas, x, y);
 
   x += icon->GetSize().cx + Layout::FastScale(4);
-  y = rc.bottom - Layout::FastScale(34);
+  y += Layout::Scale(1);
 
   TextInBoxMode mode;
   mode.shape = LabelShape::ROUNDED_BLACK;
