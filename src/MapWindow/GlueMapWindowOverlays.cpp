@@ -47,6 +47,7 @@ Copyright_License {
 #include "Util/Clamp.hpp"
 #include "Look/GestureLook.hpp"
 #include "Input/InputEvents.hpp"
+#include "Task/Points/TaskWaypoint.hpp"
 
 #include <stdio.h>
 
@@ -299,9 +300,26 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 void
 GlueMapWindow::DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const
 {
+  StaticString<64> description;
+
+  ProtectedTaskManager::Lease task_manager(*task);
+  if (task_manager->GetMode() == TaskType::ORDERED)
+    description = _("Task");
+  else {
+    const TaskWaypoint* wp = task_manager->GetActiveTaskPoint();
+    if (wp != nullptr) {
+      description = wp->GetWaypoint().name.c_str();
+      if (description == _T("(takeoff)"))
+        description = _T("TakeOff");
+    } else
+      description = _T("");
+  }
+
+
   final_glide_bar_renderer.Draw(canvas, rc, Calculated(),
                                 GetComputerSettings().task.glide,
-                                GetMapSettings().final_glide_bar_mc0_enabled);
+                                GetMapSettings().final_glide_bar_mc0_enabled,
+                                description.c_str());
 }
 
 void

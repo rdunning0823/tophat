@@ -34,12 +34,14 @@ Copyright_License {
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
 #endif
+#include "Util/StaticString.hpp"
 
 void
 FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,
                             const DerivedInfo &calculated,
                             const GlideSettings &glide_settings,
-                            const bool final_glide_bar_mc0_enabled) const
+                            const bool final_glide_bar_mc0_enabled,
+                            const TCHAR* description) const
 {
 #ifdef ENABLE_OPENGL
   const GLEnable blend(GL_BLEND);
@@ -241,13 +243,22 @@ FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,
   canvas.SetBackgroundColor(COLOR_WHITE);
 
   TextInBoxMode style;
-  style.shape = LabelShape::ROUNDED_BLACK;
+  style.shape = LabelShape::FILLED;
   style.move_in_view = true;
+
+  StaticString<120> buffer;
+
+  buffer = description;
+  if (buffer.length() > 5)
+    buffer.Truncate(5);
+  buffer += _T(": ");
+  buffer += Value;
 
   if (text_size.cx < Layout::Scale(18)) {
     style.align = TextInBoxMode::Alignment::RIGHT;
-    TextInBox(canvas, Value, Layout::Scale(18), y0, style, rc);
+    TextInBox(canvas, buffer.c_str(), Layout::Scale(18), y0, style, rc);
   } else
-    TextInBox(canvas, Value, 0, y0, style, rc);
+    TextInBox(canvas, buffer.c_str(), 0, y0, style, rc);
+
 
 }
