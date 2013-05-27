@@ -38,7 +38,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   const bool pressed = IsDown();
 
   PixelRect rc = canvas.GetRect();
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed);
+  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
   // If button has text on it
   const tstring caption = GetText();
   if (caption.empty())
