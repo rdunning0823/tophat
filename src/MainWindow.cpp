@@ -226,13 +226,9 @@ MainWindow::InitialiseConfigured()
 
   ReinitialiseLayout_vario(ib_layout);
 
-  ReinitialiseLayoutTA(rc, ib_layout);
-
   WindowStyle hidden_border;
   hidden_border.Hide();
   hidden_border.Border();
-
-  ReinitialiseLayout_flarm(rc, ib_layout);
 
   map = new GlueMapWindow(*look);
 
@@ -243,6 +239,10 @@ MainWindow::InitialiseConfigured()
 
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
+
+  ReinitialiseLayoutTA(rc_current, ib_layout);
+
+  ReinitialiseLayout_flarm(rc_current, ib_layout);
 
   map->SetComputerSettings(CommonInterface::GetComputerSettings());
   map->SetMapSettings(CommonInterface::GetMapSettings());
@@ -299,8 +299,9 @@ MainWindow::ReinitialiseLayoutTA(PixelRect rc,
 {
   UPixelScalar sz = std::min(layout.control_height,
                              layout.control_width) * 2;
+  rc.top += widget_overlays.HeightFromTop();
+  rc.bottom = rc.top + sz;
   rc.right = rc.left + sz;
-  rc.top = rc.bottom - sz;
   thermal_assistant.Move(rc);
 }
 
@@ -343,10 +344,6 @@ MainWindow::ReinitialiseLayout()
 
   ReinitialiseLayout_vario(ib_layout);
 
-  ReinitialiseLayout_flarm(rc, ib_layout);
-
-  ReinitialiseLayoutTA(rc, ib_layout);
-
   if (map != NULL) {
     if (FullScreen)
       InfoBoxManager::Hide();
@@ -367,9 +364,13 @@ MainWindow::ReinitialiseLayout()
   widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
-  widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
-  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
-      task_nav_slider_widget->GetHeight() : 0);
+
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+  widget_overlays.Move(rc_current);
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
+
+  ReinitialiseLayout_flarm(rc_current, ib_layout);
+  ReinitialiseLayoutTA(rc_current, ib_layout);
 
   if (widget != NULL)
     widget->Move(GetMainRect(rc));
@@ -412,12 +413,14 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
   case TrafficSettings::GaugeLocation::TopLeft:
     rc.right = rc.left + ib_layout.control_width * 2;
     ++rc.left;
+    rc.top += widget_overlays.HeightFromTop();
     rc.bottom = rc.top + ib_layout.control_height * 2;
     ++rc.top;
     break;
 
   case TrafficSettings::GaugeLocation::TopRight:
     rc.left = rc.right - ib_layout.control_width * 2 + 1;
+    rc.top += widget_overlays.HeightFromTop();
     rc.bottom = rc.top + ib_layout.control_height * 2;
     ++rc.top;
     break;
@@ -425,12 +428,14 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
   case TrafficSettings::GaugeLocation::BottomLeft:
     rc.right = rc.left + ib_layout.control_width * 2;
     ++rc.left;
+    rc.bottom -= widget_overlays.HeightFromBottomLeft();
     rc.top = rc.bottom - ib_layout.control_height * 2 + 1;
     break;
 
   case TrafficSettings::GaugeLocation::CentreTop:
     rc.left = (rc.left + rc.right) / 2 - ib_layout.control_width;
     rc.right = rc.left + ib_layout.control_width * 2 - 1;
+    rc.top += widget_overlays.HeightFromTop();
     rc.bottom = rc.top + ib_layout.control_height * 2;
     ++rc.top;
     break;
@@ -438,15 +443,16 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
   case TrafficSettings::GaugeLocation::CentreBottom:
     rc.left = (rc.left + rc.right) / 2 - ib_layout.control_width;
     rc.right = rc.left + ib_layout.control_width * 2 - 1;
+    rc.bottom -= widget_overlays.HeightFromBottomMax();
     rc.top = rc.bottom - ib_layout.control_height * 2 + 1;
     break;
 
   default:    // aka flBottomRight
     rc.left = rc.right - ib_layout.control_width * 2 + 1;
+    rc.bottom -= widget_overlays.HeightFromBottomRight();
     rc.top = rc.bottom - ib_layout.control_height * 2 + 1;
     break;
   }
-
   traffic_gauge.Move(rc);
 }
 
@@ -756,8 +762,15 @@ MainWindow::SetFullScreen(bool _full_screen)
     map->FastMove(GetMainRect());
 
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
-  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
-      task_nav_slider_widget->GetHeight() : 0);
+
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+  PixelRect rc = GetClientRect();
+  const InfoBoxLayout::Layout ib_layout =
+    InfoBoxLayout::Calculate(rc, ui_settings.info_boxes.geometry);
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+
+  ReinitialiseLayout_flarm(rc_current, ib_layout);
+  ReinitialiseLayoutTA(rc_current, ib_layout);
   // the repaint will be triggered by the DrawThread
 
   UpdateVarioGaugeVisibility();
@@ -833,8 +846,7 @@ MainWindow::ActivateMap()
   widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
-  map->SetCompassOffset(task_nav_slider_widget->IsVisible() ?
-      task_nav_slider_widget->GetHeight() : 0);
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
   return map;
 }
 
