@@ -275,7 +275,7 @@ void dlgConfigFontsShowModal()
 
   if (changed) {
     Profile::Save();
-    ShowMessageBox(_("Changes to configuration saved.  Restart XCSoar to apply changes."),
+    ShowMessageBox(_("Changes to configuration saved.  Restart Top Hat to apply changes."),
                    _T(""), MB_OK);
   }
 }
