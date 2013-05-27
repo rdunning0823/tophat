@@ -53,7 +53,6 @@ enum ControlIndex {
   Bugs,
   QNH,
   Altitude,
-  Temperature,
 };
 
 enum Actions {
@@ -321,29 +320,11 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddReadOnly(_("Altitude"), NULL, _T("%.0f %s"),
               UnitGroup::ALTITUDE, fixed(0));
-
-  wp = AddFloat(_("Max. temp."),
-                _("Set to forecast ground temperature.  Used by convection estimator (temperature trace page of Analysis dialog)"),
-                _T("%.0f %s"), _T("%.0f"),
-                Units::ToUserTemperature(CelsiusToKelvin(fixed(-50))),
-                Units::ToUserTemperature(CelsiusToKelvin(fixed(60))),
-                fixed(1), false,
-                Units::ToUserTemperature(settings.forecast_temperature));
-  {
-    DataFieldFloat &df = *(DataFieldFloat *)wp->GetDataField();
-    df.SetUnits(Units::GetTemperatureName());
-    wp->RefreshDisplay();
-  }
 }
 
 bool
 FlightSetupPanel::Save(bool &changed)
 {
-  ComputerSettings &settings = CommonInterface::SetComputerSettings();
-
-  changed |= SaveValue(Temperature, UnitGroup::TEMPERATURE,
-                       settings.forecast_temperature);
-
   return true;
 }
 
@@ -360,7 +341,7 @@ dlgBasicSettingsShowModal()
   FlightSetupPanel *instance = new FlightSetupPanel();
 
   const Plane &plane = CommonInterface::GetComputerSettings().plane;
-  StaticString<128> caption(_("Flight Setup"));
+  StaticString<128> caption(_("Bugs, ballast & QNH"));
   caption.append(_T(" - "));
   caption.append(plane.polar_name);
 
