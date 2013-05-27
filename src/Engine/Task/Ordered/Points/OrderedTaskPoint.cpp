@@ -153,30 +153,36 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
   if (waypoint == NULL)
     waypoint = &GetWaypoint();
 
+  OrderedTaskPoint* tp_temp;
+
   switch (GetType()) {
   case TaskPointType::START:
-    return new StartPoint(GetObservationZone().Clone(waypoint->location),
-                          *waypoint, task_behaviour,
-                          ordered_task_behaviour.start_constraints);
+    tp_temp = new StartPoint(GetObservationZone().Clone(waypoint->location),
+                             *waypoint, task_behaviour,
+                             ordered_task_behaviour.start_constraints);
+    break;
 
   case TaskPointType::AST: {
     const ASTPoint &src = *(const ASTPoint *)this;
-    ASTPoint *dest =
-      new ASTPoint(GetObservationZone().Clone(waypoint->location),
-                   *waypoint, task_behaviour, IsBoundaryScored());
+    ASTPoint *dest = new
+        ASTPoint(GetObservationZone().Clone(waypoint->location),
+                 *waypoint, task_behaviour, IsBoundaryScored());
     dest->SetScoreExit(src.GetScoreExit());
-    return dest;
+    tp_temp = (OrderedTaskPoint*)dest;
+    break;
   }
 
   case TaskPointType::AAT:
-    return new AATPoint(GetObservationZone().Clone(waypoint->location),
-                        *waypoint, task_behaviour);
+    tp_temp = new AATPoint(GetObservationZone().Clone(waypoint->location),
+                            *waypoint, task_behaviour);
+    break;
 
   case TaskPointType::FINISH:
-    return new FinishPoint(GetObservationZone().Clone(waypoint->location),
-                           *waypoint, task_behaviour,
-                           ordered_task_behaviour.finish_constraints,
-                           IsBoundaryScored());
+    tp_temp = new FinishPoint(GetObservationZone().Clone(waypoint->location),
+                              *waypoint, task_behaviour,
+                              ordered_task_behaviour.finish_constraints,
+                              IsBoundaryScored());
+    break;
 
   case TaskPointType::UNORDERED:
     /* an OrderedTaskPoint must never be UNORDERED */
@@ -185,7 +191,11 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
     break;
   }
 
-  return NULL;
+  assert(tp_temp != nullptr);
+  tp_temp->SetStateEntered(GetEnteredState());
+  tp_temp->SetHasExited(HasExited());
+
+  return tp_temp;
 }
 
 void
