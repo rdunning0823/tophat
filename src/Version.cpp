@@ -74,5 +74,6 @@ const TCHAR XCSoar_Version[] = _T(VERSION);
 const TCHAR XCSoar_VersionLong[] = _T(VERSION VERSION_SUFFIX);
 const TCHAR XCSoar_VersionString[] = _T(VERSION VERSION_SUFFIX "-" TARGET);
 const TCHAR XCSoar_VersionStringOld[] = _T(TARGET " " VERSION VERSION_SUFFIX " " __DATE__);
+const TCHAR XCSoar_ProductTokenShort[] = _T("based on XCSoar " VERSION VERSION_SUFFIX);
 const TCHAR XCSoar_ProductToken[] = _T("based on XCSoar v" VERSION VERSION_SUFFIX "-" TARGET GIT_SUFFIX);
 const TCHAR TopHat_ProductToken[] = _T("Top Hat " TOPHAT_VERSION " (" __DATE__ ")");

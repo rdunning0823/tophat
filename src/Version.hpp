@@ -34,8 +34,10 @@ extern const TCHAR XCSoar_VersionLong[];
 extern const TCHAR XCSoar_VersionString[];
 /** PC 5.2.5F 7. Oct 09 */
 extern const TCHAR XCSoar_VersionStringOld[];
-/** XCSoar v5.2.5F-PC */
+/** based on XCSoar v5.2.5F-PC git: aaaaabb*/
 extern const TCHAR XCSoar_ProductToken[];
+/** based on XCSoar 5.2.5F */
+extern const TCHAR XCSoar_ProductTokenShort[];
 /** TopHat version */
 extern const TCHAR TopHat_ProductToken[];
 
