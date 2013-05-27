@@ -75,7 +75,7 @@ PageLayout::MakeTitle(const InfoBoxSettings &info_box_settings,
     }
   } else {
     if (concise)
-      _tcscpy(buffer, _("Info Hide"));
+      _tcscpy(buffer, _("Full screen"));
     else
       _tcscpy(buffer, _("Map (Full screen)"));
   }
