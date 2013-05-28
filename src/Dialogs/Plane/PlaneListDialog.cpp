@@ -277,13 +277,8 @@ PlaneListWidget::LoadWithDialog(unsigned i)
     title = _("Error");
     text.Format(_("Activating plane profile \"%s\" failed!"),
                 list[i].name.c_str());
-  } else {
-    title = _(" ");
-    text.Format(_("Plane profile \"%s\" activated."),
-                list[i].name.c_str());
+    ShowMessageBox(text, title, MB_OK);
   }
-
-  ShowMessageBox(text, title, MB_OK);
 
   return result;
 }
@@ -291,8 +286,7 @@ PlaneListWidget::LoadWithDialog(unsigned i)
 inline void
 PlaneListWidget::LoadClicked()
 {
-  if (LoadWithDialog(GetList().GetCursorIndex()))
-    form->SetModalResult(mrOK);
+  LoadWithDialog(GetList().GetCursorIndex());
 }
 
 inline void
