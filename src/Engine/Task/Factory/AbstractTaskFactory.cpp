@@ -577,6 +577,9 @@ void
 AbstractTaskFactory::UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to)
 {
   to.finish_constraints.fai_finish = constraints.fai_finish;
+  to.start_constraints.max_speed = fixed(0);
+  to.start_constraints.max_height_ref = AltitudeReference::MSL;
+  to.finish_constraints.min_height_ref = AltitudeReference::MSL;
 }
 
 bool 

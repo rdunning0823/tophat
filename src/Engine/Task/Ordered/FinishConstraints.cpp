@@ -27,7 +27,7 @@ void
 FinishConstraints::SetDefaults()
 {
   min_height = 0;
-  min_height_ref = AltitudeReference::AGL;
+  min_height_ref = AltitudeReference::MSL;
   fai_finish = false;
 }
 

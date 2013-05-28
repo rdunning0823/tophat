@@ -30,6 +30,7 @@ Copyright_License {
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
 #include "Task/TypeStrings.hpp"
+#include "Task/TaskNationalities.hpp"
 #include "Units/Units.hpp"
 #include "Language/Language.hpp"
 #include "Components.hpp"
@@ -74,10 +75,13 @@ TaskPropertiesPanel::RefreshView()
 {
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   const OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
 
   const bool aat_types = ftype == TaskFactoryType::AAT ||
     ftype == TaskFactoryType::MAT;
   bool fai_start_finish = p.finish_constraints.fai_finish;
+  bool is_usa = tb.contest_nationality == ContestNationalities::USA;
 
   SetRowVisible(MIN_TIME, aat_types);
   LoadValueTime(MIN_TIME, (int)p.aat_min_time);
@@ -85,7 +89,8 @@ TaskPropertiesPanel::RefreshView()
   LoadValue(START_OPEN_TIME, p.start_constraints.open_time_span.GetStart());
   LoadValue(START_CLOSE_TIME, p.start_constraints.open_time_span.GetEnd());
 
-  SetRowVisible(START_MAX_SPEED, !fai_start_finish);
+  SetRowVisible(START_MAX_SPEED, !fai_start_finish &&
+                (!is_usa || positive(p.start_constraints.max_speed)));
   LoadValue(START_MAX_SPEED, p.start_constraints.max_speed,
             UnitGroup::HORIZONTAL_SPEED);
 
@@ -93,14 +98,18 @@ TaskPropertiesPanel::RefreshView()
   LoadValue(START_MAX_HEIGHT, fixed(p.start_constraints.max_height),
             UnitGroup::ALTITUDE);
 
-  SetRowVisible(START_HEIGHT_REF, !fai_start_finish);
+  SetRowVisible(START_HEIGHT_REF, !fai_start_finish  &&
+                (!is_usa || p.start_constraints.max_height_ref ==
+                    AltitudeReference::AGL));
   LoadValueEnum(START_HEIGHT_REF, p.start_constraints.max_height_ref);
 
   SetRowVisible(FINISH_MIN_HEIGHT, !fai_start_finish);
   LoadValue(FINISH_MIN_HEIGHT, fixed(p.finish_constraints.min_height),
             UnitGroup::ALTITUDE);
 
-  SetRowVisible(FINISH_HEIGHT_REF, !fai_start_finish);
+  SetRowVisible(FINISH_HEIGHT_REF, !fai_start_finish &&
+                (!is_usa || p.finish_constraints.min_height_ref ==
+                    AltitudeReference::AGL));
   LoadValueEnum(FINISH_HEIGHT_REF, p.finish_constraints.min_height_ref);
 
   SetRowVisible(FAI_FINISH_HEIGHT, IsFai(ftype));
