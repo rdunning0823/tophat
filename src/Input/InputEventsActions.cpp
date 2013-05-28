@@ -453,6 +453,8 @@ InputEvents::eventSetup(const TCHAR *misc)
 {
   if (StringIsEqual(misc, _T("Basic")))
     dlgBasicSettingsShowModal();
+  else if (StringIsEqual(misc, _T("QNH")))
+    dlgQNHShowModal();
   else if (StringIsEqual(misc, _T("Wind")))
     ShowWindSettingsDialog();
   else if (StringIsEqual(misc, _T("System")))
