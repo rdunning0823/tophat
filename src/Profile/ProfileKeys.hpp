@@ -163,6 +163,7 @@ extern const char FinishRadius[];
 extern const char TaskType[];
 extern const char AATMinTime[];
 extern const char AATTimeMargin[];
+extern const char ContestNationality[];
 
 extern const char EnableNavBaroAltitude[];
 

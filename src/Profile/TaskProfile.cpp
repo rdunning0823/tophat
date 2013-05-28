@@ -95,6 +95,8 @@ Profile::Load(TaskBehaviour &settings)
   if (Get(ProfileKeys::RiskGamma, Temp))
     settings.risk_gamma = fixed(Temp) / 10;
 
+  GetEnum(ProfileKeys::ContestNationality, settings.contest_nationality);
+
   if (Get(ProfileKeys::SafetyMacCready, Temp))
     settings.safety_mc = fixed(Temp) / 10;
 

@@ -23,6 +23,7 @@
 #ifndef TASK_BEHAVIOUR_HPP
 #define TASK_BEHAVIOUR_HPP
 
+#include "Task/TaskNationalities.hpp"
 #include "Ordered/OrderedTaskBehaviour.hpp"
 #include "Task/Factory/TaskPointFactoryType.hpp"
 #include "Engine/Route/Config.hpp"
@@ -115,7 +116,9 @@ struct TaskBehaviour {
   /** Compensation factor for risk at low altitude */
   fixed risk_gamma;
 
-  /** Safety MacCready value (m/s) used by abort task */
+  /** Options available for task building and behaviour */
+  ContestNationalities contest_nationality;
+
   fixed safety_mc;
 
   /** Minimum height above terrain for arrival height at landable waypoint (m) */

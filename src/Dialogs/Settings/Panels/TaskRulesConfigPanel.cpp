@@ -34,6 +34,7 @@ enum ControlIndex {
   StartMaxSpeedMargin,
   StartMaxHeightMargin,
   AATTimeMargin,
+  ContestNationality,
   spacer_1,
   Contests,
   PREDICT_CONTEST,
@@ -75,6 +76,21 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
             "seeks to complete the task at the minimum time plus this margin time."),
           0, 30 * 60, 60, (unsigned)task_behaviour.optimise_targets_margin);
   SetExpertRow(AATTimeMargin);
+
+  const StaticEnumChoice contest_nationality[] = {
+    { UNKNOWN, _("Unknown nationality"),
+      _("Unknown nationality.  All task building options available.") },
+    { USA, _T("USA"),
+      _("Show only task options for US tasks.  Display 2-minute start information in Navigation bar.") },
+    { ALL, _("All nationalities"),
+      _("Show all task building options.") },
+    { 0 }
+  };
+
+  AddEnum(_("Contest Nationality"),
+          _("If a specific nation is selected, then building a task is simplified to show only appropriate options"),
+          contest_nationality, (unsigned)task_behaviour.contest_nationality);
+  SetExpertRow(ContestNationality);
 
   AddSpacer();
 
@@ -130,6 +146,9 @@ TaskRulesConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(StartMaxHeightMargin, UnitGroup::ALTITUDE, ProfileKeys::StartMaxHeightMargin,
                        task_behaviour.start_margins.max_height_margin);
+
+  changed |= SaveValueEnum(ContestNationality, ProfileKeys::ContestNationality,
+                       task_behaviour.contest_nationality);
 
   changed |= SaveValueEnum(Contests, ProfileKeys::OLCRules,
                            contest_settings.contest);
