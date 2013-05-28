@@ -84,7 +84,7 @@ TaskActionsPanel::OnNewTaskClicked()
     (*active_task)->Clear();
     (*active_task)->SetFactory(CommonInterface::GetComputerSettings().task.task_type_default);
     *task_modified = true;
-    dialog.SwitchToPropertiesPanel();
+    dialog.SwitchToEditTab();
   }
 }
 
