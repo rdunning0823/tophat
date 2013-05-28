@@ -40,6 +40,8 @@ Copyright_License {
 #include "Components.hpp"
 #include "LocalPath.hpp"
 #include "OS/FileUtil.hpp"
+#include "Formatter/UserUnits.hpp"
+#include "Formatter/TimeFormatter.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -99,6 +101,34 @@ TaskSummaryShape(OrderedTask* task, TCHAR* text)
 void
 OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
 {
+  StaticString<120> gate_info;
+  gate_info.clear();
+  const OrderedTaskBehaviour &otb = task->GetOrderedTaskBehaviour();
+
+  if (!otb.finish_constraints.fai_finish) {
+    StaticString<25> start_height;
+    StaticString<25> finish_height;
+
+    FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
+    FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
+
+    gate_info.Format(_T("\nStart Height: %s %s. Finish Height: %s %s. "),
+                     start_height.c_str(),
+                     (otb.start_constraints.max_height_ref == AltitudeReference::AGL)
+                     ? _("AGL") : _("MSL"),
+                         finish_height.c_str(),
+                         (otb.finish_constraints.min_height_ref == AltitudeReference::AGL)
+                         ? _("AGL") : _("MSL"));
+  }
+
+  if (task->HasTargets()) {
+    StaticString<50> time_info;
+    FormatSignedTimeHHMM(time_info.buffer(), (int)otb.aat_min_time);
+    gate_info.append(_("Min Time: "));
+    gate_info.append(time_info.c_str());
+  }
+
+
   const TaskStats &stats = task->GetStats();
   TCHAR summary_shape[100];
   bool FAIShape = TaskSummaryShape(task, summary_shape);
@@ -126,7 +156,7 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
              OrderedTaskFactoryName(task->GetFactoryType()));
   } else {
     if (task->HasTargets())
-      _stprintf(text, _T("%s%s%.0f %s%s%s %.0f %s%s%s %.0f %s (%s)"),
+      _stprintf(text, _T("%s%s%.0f %s%s%s %.0f %s%s%s %.0f %s (%s) %s"),
                 summary_shape,
                 linebreak,
                 (double)Units::ToUserDistance(stats.distance_nominal),
@@ -139,15 +169,17 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
                 _("min."),
                 (double)Units::ToUserDistance(stats.distance_min),
                 Units::GetDistanceName(),
-                OrderedTaskFactoryName(task->GetFactoryType()));
+                OrderedTaskFactoryName(task->GetFactoryType()),
+                gate_info.c_str());
     else
-      _stprintf(text, _T("%s%s%s %.0f %s (%s)"),
+      _stprintf(text, _T("%s%s%s %.0f %s (%s) %s"),
                 summary_shape,
                 linebreak,
                 _("dist."),
                 (double)Units::ToUserDistance(stats.distance_nominal),
                 Units::GetDistanceName(),
-                OrderedTaskFactoryName(task->GetFactoryType()));
+                OrderedTaskFactoryName(task->GetFactoryType()),
+                gate_info.c_str());
   }
 }
 
