@@ -184,6 +184,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/dlgConfiguration.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigFonts.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigInfoboxes.cpp \
+	$(SRC)/Dialogs/Settings/dlgQNH.cpp \
 	$(SRC)/Dialogs/Settings/FontEdit.cpp \
 	$(SRC)/Dialogs/Traffic/TrafficList.cpp \
 	$(SRC)/Dialogs/Traffic/FlarmTrafficDetails.cpp \

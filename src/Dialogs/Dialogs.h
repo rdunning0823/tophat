@@ -27,6 +27,7 @@ Copyright_License {
 class SingleWindow;
 
 void dlgBasicSettingsShowModal();
+void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();
