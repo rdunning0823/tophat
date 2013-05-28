@@ -25,34 +25,14 @@ Copyright_License {
 #define XCSOAR_ZOOM_OUT_BUTTON_WIDGET_HPP
 
 #include "Widgets/MapOverlayWidget.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Widgets/ZoomButton.hpp"
 #include "Form/ActionListener.hpp"
 #include "Projection/MapWindowProjection.hpp"
 #include "Look/DialogLook.hpp"
 
 struct IconLook;
-struct MapLook;
 class ContainerWindow;
 struct PixelRect;
-
-/**
- * a class that is a button that draws the Map Scale information
- */
-class ZoomOutButton : public WndSymbolButton {
-public:
-
-  ZoomOutButton(ContainerWindow &parent, const DialogLook &dialog_look,
-               const PixelRect &rc,
-               ButtonWindowStyle style,
-               ActionListener &listener, int id)
-  :WndSymbolButton(parent, dialog_look, _T("v"), rc, style, listener, id) {};
-
-  /**
-   * The OnPaint event is called when the button needs to be drawn
-   * (derived from PaintWindow)
-   */
-  virtual void OnPaint(Canvas &canvas);
-};
 
 /**
  * a class that is a widget that draws the a zoom in button
@@ -94,9 +74,10 @@ public:
    */
   UPixelScalar GetHeight() const;
 
-  ZoomOutButton& CreateButton(ContainerWindow &parent,
-                               const DialogLook &dialog_look,
-                               const PixelRect &rc_map);
+  ZoomButton& CreateButton(ContainerWindow &parent,
+                           const DialogLook &dialog_look,
+                           const IconLook &icon_look,
+                           const PixelRect &rc_map);
 
   /**
    * Shows or hides the widgets based on these parameters

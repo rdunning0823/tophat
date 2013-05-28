@@ -150,3 +150,7 @@
 #define IDB_MENU_BUTTON_HD             5500
 #define IDB_CHECK_MARK                  503
 #define IDB_CHECK_MARK_HD              5503
+#define IDB_ZOOM_OUT_BUTTON             501
+#define IDB_ZOOM_OUT_BUTTON_HD         5501
+#define IDB_ZOOM_IN_BUTTON              502
+#define IDB_ZOOM_IN_BUTTON_HD          5502
