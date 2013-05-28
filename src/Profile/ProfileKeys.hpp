@@ -195,6 +195,8 @@ extern const char EnableFlightLogger[];
 extern const char EnableNMEALogger[];
 extern const char MapFile[];
 extern const char BallastSecsToEmpty[];
+extern const char StartupTipId[];
+extern const char StartupTipDeclineVersion[];
 extern const char AccelerometerZero[];
 extern const char UseCustomFonts[];
 extern const char FontInfoWindowFont[];

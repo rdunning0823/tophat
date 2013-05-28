@@ -50,6 +50,9 @@ struct UISettings {
 
   bool custom_fonts;
 
+  /** last startup tip display. 1 is first tip, 0 means never shown */
+  unsigned last_startup_tip;
+
   /** Show ThermalAssistant if circling */
   bool enable_thermal_assistant_gauge;
 

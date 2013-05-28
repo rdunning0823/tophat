@@ -169,6 +169,8 @@ AfterStartup()
   CommonInterface::main_window->Fullscreen();
   InfoBoxManager::SetDirty();
 
+  dlgStartupAssistantShowModal(true);
+
   ForceCalculation();
 
   CommonInterface::status_messages.Startup(false);
