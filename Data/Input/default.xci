@@ -1123,9 +1123,17 @@ location=19
 mode=MenuLast
 type=key
 data=0
+event=StartupTips
 event=Mode default
 label=Help
 location=20
+
+mode=MenuLast
+type=key
+data=0
+event=Mode default
+label=Help
+location=21
 
 mode=MenuLast
 type=key

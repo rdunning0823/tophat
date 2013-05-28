@@ -133,6 +133,7 @@ namespace InputEvents
   void eventCalculator(const TCHAR *misc);
   void eventChangeInfoBoxType(const TCHAR *misc);
   void eventChecklist(const TCHAR *misc);
+  void eventStartupTips(gcc_unused const TCHAR *misc);
   void eventClearAirspaceWarnings(const TCHAR *misc);
   void eventClearStatusMessages(const TCHAR *misc);
   void eventLogger(const TCHAR *misc);

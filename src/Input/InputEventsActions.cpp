@@ -210,6 +210,14 @@ InputEvents::eventChecklist(gcc_unused const TCHAR *misc)
   dlgChecklistShowModal();
 }
 
+// Startup Tips
+// Displays the Startup Assistant dialog
+void
+InputEvents::eventStartupTips(gcc_unused const TCHAR *misc)
+{
+  dlgStartupAssistantShowModal(false);
+}
+
 // Status
 // Displays one of the three status dialogs:
 //    system: display the system status

@@ -41,6 +41,13 @@ void dlgConfigFontsShowModal();
 bool
 dlgStartupShowModal();
 
+/**
+ * show the help screen.
+ * @param conditional: if true, does not display if user has opted to not show
+ * on startup
+ */
+void dlgStartupAssistantShowModal(bool conditional);
+
 void ShowWindSettingsDialog();
 
 void dlgStatusShowModal(int page);
