@@ -487,19 +487,18 @@ ShowMapItemListDialog(const MapItemList &list,
                       const MapSettings &settings,
                       ProtectedAirspaceWarningManager *airspace_warnings)
 {
-  switch (list.size()) {
-  case 0:
-    /* no map items in the list */
-    return;
+  unsigned list_list_count = 0;
+  for (auto i = list.begin(); i != list.end(); i++) {
+    if (HasDetails(**i))
+        list_list_count++;
+  }
 
-  case 1:
-    /* only one map item, show it */
-    ShowMapItemDialog(*list[0], airspace_warnings);
-    break;
-
-  default:
+  if (list_list_count == 1)
+    /* only one map item without details, show it.
+     * non-details items are at start of list) */
+    ShowMapItemDialog(*list[list.size() - 1], airspace_warnings);
+  else {
     /* more than one map item: show a list */
-
     int i = ShowMapItemListDialog(list, dialog_look, look,
                                   traffic_look, final_glide_look, settings);
     assert(i >= -1 && i < (int)list.size());
