@@ -40,11 +40,17 @@ class ObservationZonePoint;
  * @param linebreaks True if each summary item should be separated with a line break
  */
 void OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks);
-
 void
 OrderedTaskPointLabel(TaskPointType type, const TCHAR *name,
                       unsigned index, TCHAR *buffer);
 
+/**
+ * label for task points with actionable labels
+ * when clicked on the Map List popup
+ */
+void
+OrderedTaskPointLabelMapAction(TaskPointType type, const TCHAR *name,
+                               unsigned index, TCHAR* buffer);
 void OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* radius);
 
 bool

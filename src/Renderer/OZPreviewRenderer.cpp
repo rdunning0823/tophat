@@ -38,7 +38,8 @@ OZPreviewRenderer::Draw(Canvas &canvas, const ObservationZonePoint &oz,
                         const RasterPoint pt, unsigned radius,
                         const TaskLook &look,
                         const AirspaceRendererSettings &airspace_settings,
-                        const AirspaceLook &airspace_look)
+                        const AirspaceLook &airspace_look,
+                        bool has_target)
 {
   fixed scale;
   GeoPoint center;
@@ -73,4 +74,8 @@ OZPreviewRenderer::Draw(Canvas &canvas, const ObservationZonePoint &oz,
   ozv.Draw(canvas, OZRenderer::LAYER_SHADE, projection, oz, 1);
   ozv.Draw(canvas, OZRenderer::LAYER_INACTIVE, projection, oz, 1);
   ozv.Draw(canvas, OZRenderer::LAYER_ACTIVE, projection, oz, 1);
+  if (has_target) {
+    RasterPoint p_center = projection.GeoToScreen(oz.GetReference());
+    look.target_icon.Draw(canvas, p_center.x, p_center.y);
+  }
 }
