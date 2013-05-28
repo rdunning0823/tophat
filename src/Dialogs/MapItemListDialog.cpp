@@ -219,6 +219,11 @@ protected:
       goto_button->SetEnabled(false);
       return;
     }
+    if (CanDragItem(current))
+      details_button->SetCaption(_("Drag Target"));
+    else
+      details_button->SetCaption(_("Details"));
+
     details_button->SetEnabled(HasDetails(*list[current]));
     goto_button->SetEnabled(CanGotoItem(current));
     ack_button->SetEnabled(CanAckItem(current));
@@ -244,6 +249,12 @@ public:
 
   virtual bool CanActivateItem(unsigned index) const override {
     return HasDetails(*list[index]);
+  }
+
+  bool CanDragItem(unsigned index) const {
+    assert(index < list.size());
+    return protected_task_manager != NULL &&
+      list[index]->type == MapItem::TASK_OZ;
   }
 
   bool CanGotoItem(unsigned index) const {
