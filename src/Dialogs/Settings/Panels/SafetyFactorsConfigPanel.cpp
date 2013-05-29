@@ -40,8 +40,6 @@ enum ControlIndex {
   TerrainHeight,
   AlternateMode,
   PolarDegradation,
-  AutoBugs,
-  SafetyMC,
   RiskFactor,
 };
 
@@ -97,20 +95,6 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            (fixed(1) - settings_computer.polar.degradation_factor) * 100);
   SetExpertRow(PolarDegradation);
 
-  AddBoolean(_("Auto bugs"), /* xgettext:no-c-format */
-           _("If enabled, adds 1% to the bugs setting after each full hour while flying."),
-             settings_computer.polar.auto_bugs);
-  SetExpertRow(AutoBugs);
-
-  AddFloat(_("Safety MC"),
-           _("The MacCready setting used, when safety MC is enabled for reach calculations, in task abort mode and for determining arrival altitude at airfields."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed(0), Units::ToUserVSpeed(fixed(10)), GetUserVerticalSpeedStep(),
-           false, UnitGroup::VERTICAL_SPEED, task_behaviour.safety_mc);
-  SetExpertRow(SafetyMC);
-  DataFieldFloat &safety_mc = (DataFieldFloat &)GetDataField(SafetyMC);
-  safety_mc.SetFormat(GetUserVerticalSpeedFormat(false, false));
-
   AddFloat(_("STF risk factor"),
            _("The STF risk factor reduces the MacCready setting used to calculate speed to fly as the glider gets low, in order to compensate for risk. Set to 0.0 for no compensation, 1.0 scales MC linearly with current height (with reference to height of the maximum climb). If considered, 0.3 is recommended."),
            _T("%.1f %s"), _T("%.1f"),
@@ -145,17 +129,6 @@ SafetyFactorsConfigPanel::Save(bool &_changed)
                  settings_computer.polar.degradation_factor);
     if (protected_task_manager != NULL)
       protected_task_manager->SetGlidePolar(settings_computer.polar.glide_polar_task);
-    changed = true;
-  }
-
-  if (SaveValue(AutoBugs, settings_computer.polar.auto_bugs)) {
-    Profile::Set(ProfileKeys::AutoBugs, settings_computer.polar.auto_bugs);
-    changed = true;
-  }
-
-  if (SaveValue(SafetyMC, UnitGroup::VERTICAL_SPEED, task_behaviour.safety_mc)) {
-    Profile::Set(ProfileKeys::SafetyMacCready,
-                 iround(task_behaviour.safety_mc * 10));
     changed = true;
   }
 

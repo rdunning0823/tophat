@@ -33,5 +33,8 @@ Profile::Load(RoutePlannerConfig &settings)
   Get(ProfileKeys::RoutePlannerAllowClimb, settings.allow_climb);
   Get(ProfileKeys::RoutePlannerUseCeiling, settings.use_ceiling);
   GetEnum(ProfileKeys::TurningReach, settings.reach_calc_mode);
-  GetEnum(ProfileKeys::ReachPolarMode, settings.reach_polar_mode);
+  /** Hard code to Task MC.
+   *  Leave architecture in place, but remove option from UI
+   */
+  settings.reach_polar_mode = RoutePlannerConfig::Polar::TASK;
 }
