@@ -165,13 +165,12 @@ static constexpr MetaData meta_data[] = {
 
   // e_HeightAGL
   {
-    N_("Height AGL"),
-    N_("H AGL"),
-    N_("This is the navigation altitude minus the terrain elevation obtained from the terrain file. The value is coloured red when the glider is below the terrain safety clearance height."),
-    UpdateInfoBoxAltitudeAGL,
-    altitude_infobox_panels,
-    e_H_Terrain, // Terr Elev
-    e_HeightGPS, // Alt GPS
+    N_("Altitude AGL"),
+    N_("Alt AGL"),
+    N_("This is the navigation altitude minus the terrain height obtained from the terrain file. The value is coloured red when the glider is below the terrain safety clearance height."),
+    IBFHelper<InfoBoxContentAltitudeAGL>::Create,
+    e_H_Terrain, // H GND
+    e_HeightGPS, // H GPS
   },
 
   // e_Thermal_30s
