@@ -294,10 +294,15 @@ InfoBoxManager::ShowInfoBoxPicker(const int id)
 
   ComboList list;
   for (unsigned j = InfoBoxFactory::MIN_TYPE_VAL; j < InfoBoxFactory::NUM_TYPES; j++) {
-    const TCHAR *desc = InfoBoxFactory::GetDescription((InfoBoxFactory::Type)j);
-    list.Append(j, gettext(InfoBoxFactory::GetName((InfoBoxFactory::Type)j)),
-                gettext(InfoBoxFactory::GetName((InfoBoxFactory::Type)j)),
-                desc != NULL ? gettext(desc) : NULL);
+
+    if (InfoBoxFactory::GetCategory((InfoBoxFactory::Type) j)
+      == InfoBoxFactory::Category::STANDARD) {
+
+      const TCHAR * desc = InfoBoxFactory::GetDescription((InfoBoxFactory::Type) j);
+      list.Append(j, gettext(InfoBoxFactory::GetName((InfoBoxFactory::Type) j)),
+                  gettext(InfoBoxFactory::GetName((InfoBoxFactory::Type) j)),
+                  desc != nullptr ? gettext(desc) : nullptr);
+    }
   }
 
   list.Sort();

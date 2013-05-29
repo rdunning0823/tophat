@@ -34,6 +34,20 @@ class InfoBoxContent;
 namespace InfoBoxFactory
 {
   /**
+   * category for each InfoBox
+   */
+  enum Category {
+    /**
+     * valid type
+     */
+    STANDARD,
+
+    /**
+     * deprecated type
+     */
+    DEPRECATED,
+  };
+  /**
    * Returns the human-readable name of the info box type.
    */
   gcc_const
@@ -63,6 +77,10 @@ namespace InfoBoxFactory
   gcc_const
   Type
   GetPrevious(Type type);
+
+  gcc_const
+  Category
+  GetCategory(Type type);
 
   InfoBoxContent* Create(Type infobox_type);
 };
