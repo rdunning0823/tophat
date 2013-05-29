@@ -103,8 +103,52 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   StaticString<64> buffer;
 
-  if (!waypoint.comment.empty())
-    AddMultiLine(waypoint.comment.c_str());
+  if (basic.location_available) {
+    const GeoVector vector = basic.location.DistanceBearing(waypoint.location);
+
+    TCHAR distance_buffer[32];
+    FormatUserDistanceSmart(vector.distance, distance_buffer,
+                            ARRAY_SIZE(distance_buffer));
+
+    FormatBearing(buffer.buffer(), buffer.MAX_SIZE,
+                  vector.bearing, distance_buffer);
+    AddReadOnly(_("Bearing and Distance"), NULL, buffer);
+  }
+
+  if (basic.location_available && basic.NavAltitudeAvailable() &&
+      settings.polar.glide_polar_task.IsValid()) {
+    const GlideState glide_state(basic.location.DistanceBearing(waypoint.location),
+                                 waypoint.elevation + settings.task.safety_height_arrival,
+                                 basic.nav_altitude,
+                                 calculated.GetWindOrZero());
+
+    AddGlideResult(_("Alt. diff. MC current"),
+                   MacCready::Solve(settings.task.glide,
+                                    settings.polar.glide_polar_task,
+                                    glide_state));
+
+    GlidePolar gp0 = settings.polar.glide_polar_task;
+    gp0.SetMC(fixed(0));
+    AddGlideResult(_("Alt. diff. MC 0"),
+                   MacCready::Solve(settings.task.glide,
+                                    gp0, glide_state));
+  }
+
+  FormatUserAltitude(waypoint.elevation,
+                     buffer.buffer(), buffer.MAX_SIZE);
+  AddReadOnly(_("Elevation"), NULL, buffer);
+
+  if (basic.time_available && basic.date_available) {
+    const SunEphemeris::Result sun =
+      SunEphemeris::CalcSunTimes(waypoint.location, basic.date_time_utc,
+                                 settings.utc_offset);
+
+    const BrokenTime sunset = BreakHourOfDay(sun.time_of_sunset);
+
+    buffer.UnsafeFormat(_T("%02u:%02u"),
+                        sunset.hour, sunset.minute);
+    AddReadOnly(_("Sunset"), nullptr, buffer);
+  }
 
   if (waypoint.radio_frequency.IsDefined() &&
       waypoint.radio_frequency.Format(buffer.buffer(),
@@ -124,70 +168,11 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
     TCHAR length_buffer[16];
     FormatSmallUserDistance(length_buffer,
-                                   fixed(waypoint.runway.GetLength()));
+                            fixed(waypoint.runway.GetLength()));
     buffer += length_buffer;
   }
-
   if (!buffer.empty())
-    AddReadOnly(_("Runway"), nullptr, buffer);
-
-  if (FormatGeoPoint(waypoint.location,
-                     buffer.buffer(), buffer.MAX_SIZE) != nullptr)
-    AddReadOnly(_("Location"), nullptr, buffer);
-
-  FormatUserAltitude(waypoint.elevation,
-                            buffer.buffer(), buffer.MAX_SIZE);
-  AddReadOnly(_("Elevation"), nullptr, buffer);
-
-  if (basic.time_available && basic.date_available) {
-    const SunEphemeris::Result sun =
-      SunEphemeris::CalcSunTimes(waypoint.location, basic.date_time_utc,
-                                 settings.utc_offset);
-
-    const BrokenTime sunrise = BreakHourOfDay(sun.time_of_sunrise);
-    const BrokenTime sunset = BreakHourOfDay(sun.time_of_sunset);
-
-    buffer.UnsafeFormat(_T("%02u:%02u - %02u:%02u"),
-                        sunrise.hour, sunrise.minute,
-                        sunset.hour, sunset.minute);
-    AddReadOnly(_("Daylight time"), nullptr, buffer);
-  }
-
-  if (basic.location_available) {
-    const GeoVector vector = basic.location.DistanceBearing(waypoint.location);
-
-    TCHAR distance_buffer[32];
-    FormatUserDistanceSmart(vector.distance, distance_buffer,
-                                   ARRAY_SIZE(distance_buffer));
-
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE,
-                  vector.bearing, distance_buffer);
-    AddReadOnly(_("Bearing and Distance"), nullptr, buffer);
-  }
-
-  if (basic.location_available && basic.NavAltitudeAvailable() &&
-      settings.polar.glide_polar_task.IsValid()) {
-    const GlideState glide_state(basic.location.DistanceBearing(waypoint.location),
-                                 waypoint.elevation + settings.task.safety_height_arrival,
-                                 basic.nav_altitude,
-                                 calculated.GetWindOrZero());
-
-    GlidePolar gp0 = settings.polar.glide_polar_task;
-    gp0.SetMC(fixed(0));
-    AddGlideResult(_("Alt. diff. MC 0"),
-                   MacCready::Solve(settings.task.glide,
-                                    gp0, glide_state));
-
-    AddGlideResult(_("Alt. diff. MC safety"),
-                   MacCready::Solve(settings.task.glide,
-                                    calculated.glide_polar_safety,
-                                    glide_state));
-
-    AddGlideResult(_("Alt. diff. MC current"),
-                   MacCready::Solve(settings.task.glide,
-                                    settings.polar.glide_polar_task,
-                                    glide_state));
-  }
+    AddReadOnly(_("Runway"), NULL, buffer);
 
   if (basic.location_available && basic.NavAltitudeAvailable()) {
     const TaskBehaviour &task_behaviour =
@@ -200,9 +185,11 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       const fixed distance = basic.location.Distance(waypoint.location);
       const fixed gr = distance / delta_h;
       if (GradientValid(gr)) {
-        buffer.UnsafeFormat(_T("%.1f"), (double)gr);
+        buffer.UnsafeFormat(_T("%.0f"), (double)gr);
         AddReadOnly(_("Required glide ratio"), nullptr, buffer);
       }
     }
   }
+
+  AddReadOnly(_(" "), NULL, waypoint.comment.c_str());
 }
