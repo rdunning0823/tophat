@@ -95,6 +95,7 @@ struct MetaData {
   void (*update)(InfoBoxData &data);
   const InfoBoxPanel *panels;
   Type next, previous;
+  Category category;
 
   /**
    * Implicit instances shall not exist.  This declaration ensures at
@@ -107,29 +108,32 @@ struct MetaData {
                      const TCHAR *_caption,
                      const TCHAR *_description,
                      InfoBoxContent *(*_create)(),
-                     Type _next, Type _previous)
+                     Type _next, Type _previous,
+                     Category _category)
     :name(_name), caption(_caption), description(_description),
      create(_create), update(nullptr), panels(nullptr),
-     next(_next), previous(_previous) {}
+     next(_next), previous(_previous), category(_category) {}
 
   constexpr MetaData(const TCHAR *_name,
                      const TCHAR *_caption,
                      const TCHAR *_description,
                      void (*_update)(InfoBoxData &data),
-                     Type _next, Type _previous)
+                     Type _next, Type _previous,
+                     Category _category)
     :name(_name), caption(_caption), description(_description),
      create(nullptr), update(_update), panels(nullptr),
-     next(_next), previous(_previous) {}
+     next(_next), previous(_previous), category(_category) {}
 
   constexpr MetaData(const TCHAR *_name,
                      const TCHAR *_caption,
                      const TCHAR *_description,
                      void (*_update)(InfoBoxData &data),
                      const InfoBoxPanel _panels[],
-                     Type _next, Type _previous)
+                     Type _next, Type _previous,
+                     Category _category)
     :name(_name), caption(_caption), description(_description),
      create(nullptr), update(_update), panels(_panels),
-     next(_next), previous(_previous) {}
+     next(_next), previous(_previous), category(_category) {}
 };
 
 // Groups:
@@ -161,6 +165,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentAltitudeGPS>::Create,
     e_HeightAGL, // H AGL
     e_FlightLevel, // Flight Level
+    Category::STANDARD,
   },
 
   // e_HeightAGL
@@ -171,6 +176,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentAltitudeAGL>::Create,
     e_H_Terrain, // H GND
     e_HeightGPS, // H GPS
+    Category::STANDARD,
   },
 
   // e_Thermal_30s
@@ -181,6 +187,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermal30s,
     e_TL_Avg, // TL Avg
     e_VerticalSpeed_Netto, // Netto
+    Category::STANDARD,
   },
 
   // e_Bearing
@@ -192,6 +199,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_Speed_GPS, // V GND
     e_Horizon,
+    Category::DEPRECATED,
   },
 
   // e_GR_Instantaneous
@@ -202,6 +210,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxGRInstant,
     e_GR_Cruise, // GR Cruise
     e_GR_Avg, // GR Avg
+    Category::STANDARD,
   },
 
   // e_GR_Cruise
@@ -212,6 +221,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxGRCruise,
     e_Fin_GR_TE, // Final GR
     e_GR_Instantaneous, // GR Inst
+    Category::STANDARD,
   },
 
   // e_Speed_GPS
@@ -222,6 +232,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentSpeedGround>::Create,
     e_Track_GPS, // Track
     e_Bearing, // Bearing
+    Category::STANDARD,
   },
 
   // e_TL_Avg
@@ -232,6 +243,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalLastAvg,
     e_TL_Gain, // TL Gain
     e_Thermal_30s, // TC 30s
+    Category::STANDARD,
   },
 
   // e_TL_Gain
@@ -242,6 +254,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalLastGain,
     e_TL_Time, // TL Time
     e_TL_Avg, // TL Avg
+    Category::STANDARD,
   },
 
   // e_TL_Time
@@ -252,6 +265,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalLastTime,
     e_Thermal_Avg, // TC Avg
     e_TL_Gain, // TL Gain
+    Category::STANDARD,
   },
 
   // e_MacCready
@@ -262,6 +276,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentMacCready>::Create,
     e_WP_Speed_MC, // V MC
     NextLegEqThermal,
+    Category::STANDARD,
   },
 
   // e_WP_Distance
@@ -273,6 +288,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_WP_AltDiff, // WP AltD
     e_TaskProgress, // Progress
+    Category::DEPRECATED,
   },
 
   // e_WP_AltDiff
@@ -284,6 +300,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_WP_MC0AltDiff, // WP MC0 AltD
     e_WP_Distance, // WP Dist
+    Category::DEPRECATED,
   },
 
   // e_WP_AltReq
@@ -295,6 +312,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_Fin_AltDiff, // Fin AltD
     e_WP_AltDiff, // WP AltD
+    Category::DEPRECATED,
   },
 
   // e_WP_Name
@@ -305,6 +323,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentNextWaypoint>::Create,
     e_TimeSinceTakeoff, // Time flt
     e_TaskMaxHeightTime, // Start height
+    Category::DEPRECATED,
   },
 
   // e_Fin_AltDiff
@@ -315,6 +334,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalAltitudeDiff,
     e_Fin_AltReq, // Fin AltR
     e_WP_AltReq, // WP AltR
+    Category::DEPRECATED,
   },
 
   // e_Fin_AltReq
@@ -325,6 +345,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalAltitudeRequire,
     e_SpeedTaskAvg, // V Task Av
     e_Fin_AltDiff, // Fin AltD
+    Category::DEPRECATED,
   },
 
   // e_SpeedTaskAvg
@@ -335,6 +356,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskSpeed,
     e_CC_SpeedInst, // V Task Inst
     e_Fin_AltReq, // Fin AltR
+    Category::STANDARD,
   },
 
   // e_Fin_Distance
@@ -345,6 +367,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalDistance,
     e_AA_Time, // AA Time
     e_CC_Speed, // V Task Ach
+    Category::STANDARD,
   },
 
   // e_Fin_GR_TE
@@ -355,6 +378,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalGR,
     e_Fin_GR, // Final GR
     e_GR_Cruise, // GR Cruise
+    Category::DEPRECATED,
   },
 
   // e_H_Terrain
@@ -365,6 +389,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTerrainHeight,
     e_H_Baro, // H Baro
     e_HeightAGL, // H AGL
+    Category::STANDARD,
   },
 
   // e_Thermal_Avg
@@ -375,6 +400,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalAvg,
     e_Thermal_Gain, // TC Gain
     e_TL_Time, // TL Time
+    Category::STANDARD,
   },
 
   // e_Thermal_Gain
@@ -385,6 +411,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalGain,
     e_Climb_Avg, // TC All
     e_Thermal_Avg, // TC Avg
+    Category::STANDARD,
   },
 
   // e_Track_GPS
@@ -395,6 +422,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentTrack>::Create,
     e_AirSpeed_Ext, // V IAS
     e_Speed_GPS, // V GND
+    Category::STANDARD,
   },
 
   // e_VerticalSpeed_GPS
@@ -405,6 +433,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxVario,
     e_VerticalSpeed_Netto, // Netto
     e_Climb_Avg, // TC All
+    Category::DEPRECATED,
   },
 
   // e_WindSpeed_Est
@@ -415,6 +444,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentWindSpeed>::Create,
     e_WindBearing_Est, // Wind B
     e_Home_Temperature, // Max Temp
+    Category::STANDARD,
   },
 
   // e_WindBearing_Est
@@ -425,6 +455,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentWindBearing>::Create,
     HeadWindSimplified,
     e_WindSpeed_Est, // Wind V
+    Category::STANDARD,
   },
 
   // e_AA_Time
@@ -435,6 +466,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAATime,
     e_AA_TimeDiff, // AA dTime
     e_Fin_Distance, // Fin Dis
+    Category::STANDARD,
   },
 
   // e_AA_DistanceMax
@@ -445,6 +477,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAADistanceMax,
     e_AA_DistanceMin, // AA Dmin
     e_AA_TimeDiff, // AA dTime
+    Category::DEPRECATED,
   },
 
   // e_AA_DistanceMin
@@ -455,6 +488,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAADistanceMin,
     e_AA_SpeedMax, // AA Vmax
     e_AA_DistanceMax, // AA Dmax
+    Category::DEPRECATED,
   },
 
   // e_AA_SpeedMax
@@ -465,6 +499,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAASpeedMax,
     e_AA_SpeedMin, // AA Vmin
     e_AA_DistanceMin, // AA Dmin
+    Category::DEPRECATED,
   },
 
   // e_AA_SpeedMin
@@ -475,6 +510,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAASpeedMin,
     e_Fin_AA_Distance, // AA Dtgt
     e_AA_SpeedMax, // AA Vmax
+    Category::DEPRECATED,
   },
 
   // e_AirSpeed_Ext
@@ -485,6 +521,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxSpeedIndicated,
     e_Load_G, // G load
     e_Track_GPS, // Track
+    Category::DEPRECATED,
   },
 
   // e_H_Baro
@@ -496,6 +533,7 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
     e_H_QFE, // H T/O
     e_H_Terrain, // Terr Elev
+    Category::STANDARD,
   },
 
   // e_WP_Speed_MC
@@ -506,6 +544,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxSpeedMacCready,
     e_Climb_Perc, // % Climb
     e_MacCready, // MC
+    Category::DEPRECATED,
   },
 
   // e_Climb_Perc
@@ -516,6 +555,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalRatio,
     e_Act_Speed, // V Opt
     e_WP_Speed_MC, // V MC
+    Category::STANDARD,
   },
 
   // e_TimeSinceTakeoff
@@ -526,6 +566,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTimeFlight,
     e_TimeLocal, // Time local
     e_WP_Name, // Next
+    Category::STANDARD,
   },
 
   // e_Load_G
@@ -536,6 +577,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxGLoad,
     e_WP_BearingDiff, // Bearing D
     e_AirSpeed_Ext, // Track
+    Category::DEPRECATED,
   },
 
   // e_WP_GR
@@ -547,6 +589,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_LD, // LD Vario
     e_Fin_GR, // Final GR
+    Category::DEPRECATED,
   },
 
   // e_TimeLocal
@@ -557,6 +600,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTimeLocal,
     e_TimeUTC, // Time UTC
     e_TimeSinceTakeoff, // Time flt
+    Category::STANDARD,
   },
 
   // e_TimeUTC
@@ -567,6 +611,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTimeUTC,
     e_Fin_Time, // Fin ETE
     e_TimeLocal, // Time local
+    Category::DEPRECATED,
   },
 
   // e_Fin_Time
@@ -577,6 +622,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalETE,
     e_Fin_ETE_VMG,
     e_TimeUTC, // Time UTC
+    Category::DEPRECATED,
   },
 
   // e_WP_Time
@@ -587,7 +633,8 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxNextETE,
     next_waypoint_infobox_panels,
     e_WP_ETE_VMG,
-    e_Fin_ETE_VMG
+    e_Fin_ETE_VMG,
+    Category::STANDARD,
   },
 
   // e_Act_Speed
@@ -597,7 +644,8 @@ static constexpr MetaData meta_data[] = {
     N_("The instantaneous MacCready speed-to-fly, making use of netto vario calculations to determine dolphin cruise speed in the glider's current bearing. In cruise flight mode, this speed-to-fly is calculated for maintaining altitude. In final glide mode, this speed-to-fly is calculated for descent. In climb mode, this switches to the speed for minimum sink at the current load factor (if an accelerometer is connected). When Block mode speed to fly is selected, this InfoBox displays the MacCready speed."),
     UpdateInfoBoxSpeedDolphin,
     NextLegEqThermal,
-    e_Climb_Perc // % Climb
+    e_Climb_Perc, // % Climb
+    Category::STANDARD,
   },
 
   // e_VerticalSpeed_Netto
@@ -608,6 +656,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxVarioNetto,
     e_Vario_spark, // Vario trace
     e_VerticalSpeed_GPS, // Vario
+    Category::STANDARD,
   },
 
   // e_Fin_TimeLocal
@@ -618,6 +667,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalETA,
     e_WP_TimeLocal, // WP ETA
     e_WP_ETE_VMG,
+    Category::STANDARD,
   },
 
   // e_WP_TimeLocal
@@ -629,6 +679,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_RH_Trend, // RH Trend
     e_Fin_TimeLocal, // Fin ETA
+    Category::STANDARD,
   },
 
   // e_WP_BearingDiff
@@ -639,6 +690,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxBearingDiff,
     e_Speed, // V TAS
     e_Load_G, // G load
+    Category::DEPRECATED,
   },
 
   // e_Temperature
@@ -649,6 +701,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTemperature,
     e_HumidityRel, // RelHum
     e_HeadWind,
+    Category::STANDARD,
   },
 
   // e_HumidityRel
@@ -659,6 +712,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxHumidity,
     e_Home_Temperature, // MaxTemp
     e_Temperature, // OAT
+    Category::DEPRECATED,
   },
 
   // e_Home_Temperature
@@ -669,6 +723,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentTemperatureForecast>::Create,
     e_WindSpeed_Est, // Wind V
     e_HumidityRel, // RelHum
+    Category::DEPRECATED,
   },
 
   // e_Fin_AA_Distance
@@ -679,6 +734,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAADistance,
     e_AA_SpeedAvg, // AA Vtgt
     e_AA_SpeedMin, // AA Vmin
+    Category::STANDARD,
   },
 
   // e_AA_SpeedAvg
@@ -689,6 +745,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAASpeed,
     e_Home_Distance, // Home Dis
     e_Fin_AA_Distance, // AA Dtgt
+    Category::DEPRECATED,
   },
 
   // e_LD
@@ -698,7 +755,8 @@ static constexpr MetaData meta_data[] = {
     N_("Instantaneous lift/drag ratio, given by the indicated airspeed divided by the total energy vertical speed, when connected to an intelligent variometer. Negative values indicate climbing cruise. If the total energy vario speed is close to zero, the displayed value is '---'."),
     UpdateInfoBoxLDVario,
     e_GR_Avg, // GR Avg
-    e_WP_GR, // Next GR
+    e_GR_Avg, // GR Avg
+    Category::DEPRECATED,
   },
 
   // e_Speed
@@ -709,6 +767,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxSpeed,
     e_Horizon,
     e_WP_BearingDiff, // Bearing Diff
+    Category::DEPRECATED,
   },
 
   // e_Team_Code
@@ -719,6 +778,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentTeamCode>::Create,
     e_Team_Bearing, // Team Bearing
     e_Team_Range, // Team Range
+    Category::DEPRECATED,
   },
 
   // e_Team_Bearing
@@ -729,6 +789,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTeamBearing,
     e_Team_BearingDiff, // Team Bearing Diff
     e_Team_Code, // Team Code
+    Category::DEPRECATED,
   },
 
   // e_Team_BearingDiff
@@ -739,6 +800,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTeamBearingDiff,
     e_Team_Range, // Team Range
     e_Team_Bearing, // Team Bearing
+    Category::DEPRECATED,
   },
 
   // e_Team_Range
@@ -749,6 +811,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTeamDistance,
     e_Team_Code, // Team Code
     e_Team_BearingDiff, // Team Bearing Diff
+    Category::DEPRECATED,
   },
 
   // e_CC_SpeedInst
@@ -759,6 +822,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskSpeedInstant,
     e_CC_Speed, // V Task Ach
     e_SpeedTaskAvg, // V Task Av
+    Category::DEPRECATED,
   },
 
   // e_Home_Distance
@@ -769,6 +833,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxHomeDistance,
     e_OC_Distance, // OLC
     e_AA_SpeedAvg, // AA Vtgt
+    Category::STANDARD,
   },
 
   // e_CC_Speed
@@ -779,6 +844,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskSpeedAchieved,
     e_Fin_Distance, // Fin Dis
     e_CC_SpeedInst, // V Task Inst
+    Category::STANDARD,
   },
 
   // e_AA_TimeDiff
@@ -789,6 +855,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskAATimeDelta,
     e_AA_DistanceMax, // AA Dmax
     e_AA_Time, // AA Time
+    Category::STANDARD,
   },
 
   // e_Climb_Avg
@@ -799,6 +866,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxThermalAllAvg,
     e_VerticalSpeed_GPS, // Vario
     e_Thermal_Gain, // TC Gain
+    Category::STANDARD,
   },
 
   // e_RH_Trend
@@ -809,6 +877,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxVarioDistance,
     e_TaskMaxHeightTime, // Start height
     e_WP_TimeLocal, // WP ETA
+    Category::DEPRECATED,
   },
 
   // e_Battery
@@ -823,16 +892,18 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxBattery,
     e_CPU_Load, // CPU
     e_CPU_Load, // CPU
+    Category::STANDARD,
   },
 
   // e_Fin_GR
   {
     N_("Final GR"),
     N_("Fin GR"),
-    N_("The required glide ratio over ground to finish the task, given by the distance to go divided by the height required to arrive at the safety arrival height."),
+    N_("Geometric gradient to the arrival height above the final waypoint. This is not adjusted for total energy."),
     UpdateInfoBoxFinalGR,
     e_WP_GR, // Next GR
     e_Fin_GR_TE, // Fin GR
+    Category::DEPRECATED,
   },
 
   // e_Alternate_1_Name
@@ -843,6 +914,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelperInt<InfoBoxContentAlternateName, 0>::Create,
     e_Alternate_2_Name, // Altern2 name
     e_Alternate_1_GR, // Altern1 GR
+    Category::STANDARD,
   },
 
   // e_Alternate_2_Name
@@ -853,6 +925,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelperInt<InfoBoxContentAlternateName, 1>::Create,
     e_Alternate_1_GR, // Altern1 GR
     e_Alternate_1_Name, // Altern1 name
+    Category::STANDARD,
   },
 
   // e_Alternate_1_GR
@@ -863,6 +936,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
     e_Alternate_1_Name, // Altern1 name
     e_Alternate_2_Name, // Altern2 name
+    Category::STANDARD,
   },
 
   // e_H_QFE
@@ -874,6 +948,7 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
     e_FlightLevel, // Flight Level
     e_H_Baro, // Alt Baro
+    Category::DEPRECATED,
   },
 
   // e_GR_Avg
@@ -884,6 +959,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxGRAvg,
     e_GR_Instantaneous, // GR Inst
     e_LD, // LD Vario
+    Category::DEPRECATED,
   },
 
   // e_Experimental
@@ -894,6 +970,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxExperimental1,
     e_Experimental2, // Exp2
     e_Experimental2, // Exp2
+    Category::DEPRECATED,
   },
 
   // e_OC_Distance
@@ -904,6 +981,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentOLC>::Create,
     e_TaskProgress, // Progress
     e_Home_Distance, // Home Dis
+    Category::STANDARD,
   },
 
   // e_Experimental2
@@ -914,6 +992,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxExperimental2,
     e_Experimental1, // Exp1
     e_Experimental1, // Exp1
+    Category::DEPRECATED,
   },
 
   // e_CPU_Load
@@ -924,6 +1003,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxCPULoad,
     e_Battery, // Battery
     e_Battery, // Battery
+    Category::DEPRECATED,
   },
 
   // e_WP_H
@@ -935,6 +1015,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_WP_AltReq, // WP AltR
     e_WP_AltDiff, // WP AltD
+    Category::DEPRECATED,
   },
 
   // e_Free_RAM
@@ -945,6 +1026,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFreeRAM,
     e_CPU_Load, // CPU Load
     e_CPU_Load, // CPU Load
+    Category::DEPRECATED,
   },
 
   // e_FlightLevel
@@ -956,6 +1038,7 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
     e_Barogram, // Barogram
     e_H_QFE, // H T/O
+    Category::DEPRECATED,
   },
 
   // e_Barogram
@@ -966,6 +1049,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentBarogram>::Create,
     e_HeightGPS, // H GPS
     e_FlightLevel, // Flight level
+    Category::DEPRECATED,
   },
 
   // e_Vario_spark
@@ -976,6 +1060,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentVarioSpark>::Create,
     e_NettoVario_spark, // Netto trace
     e_VerticalSpeed_Netto, // Netto
+    Category::DEPRECATED,
   },
 
   // e_NettoVario_spark
@@ -986,6 +1071,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentNettoVarioSpark>::Create,
     e_CirclingAverage_spark, // TC trace
     e_Vario_spark, // Vario trace
+    Category::DEPRECATED,
   },
   
   // e_CirclingAverage_spark
@@ -996,6 +1082,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentCirclingAverageSpark>::Create,
     e_ThermalBand, // Climb band
     e_NettoVario_spark, // Netto trace
+    Category::DEPRECATED,
   },
 
   // e_ThermalBand
@@ -1006,6 +1093,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentThermalBand>::Create,
     e_Thermal_30s, // TC 30s
     e_CirclingAverage_spark, // TC trace
+    Category::DEPRECATED,
   },
 
   // e_TaskProgress
@@ -1016,6 +1104,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentTaskProgress>::Create,
     e_WP_Distance, // WP Dist
     e_OC_Distance, // OLC
+    Category::DEPRECATED,
   },
 
   // e_TaskMaxHeightTime
@@ -1026,6 +1115,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskTimeUnderMaxHeight,
     e_WP_Name, // Next WP
     e_RH_Trend, // RH Trend
+    Category::STANDARD,
   },
 
   // e_Fin_ETE_VMG
@@ -1036,6 +1126,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFinalETEVMG,
     e_WP_Time, // WP ETE
     e_Fin_Time,
+    Category::STANDARD,
   },
 
   // e_WP_ETE_VMG
@@ -1047,6 +1138,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_Fin_TimeLocal, // Fin ETA
     e_WP_Time,
+    Category::STANDARD,
   },
 
   // e_Horizon
@@ -1057,6 +1149,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentHorizon>::Create,
     e_Bearing,
     e_Speed,
+    Category::DEPRECATED,
   },
 
   // e_NearestAirspaceHorizontal
@@ -1067,6 +1160,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxNearestAirspaceHorizontal,
     e_NearestAirspaceVertical,
     TerrainCollision,
+    Category::DEPRECATED,
   },
 
   // e_NearestAirspaceVertical
@@ -1077,6 +1171,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxNearestAirspaceVertical,
     TerrainCollision,
     e_NearestAirspaceHorizontal,
+    Category::DEPRECATED,
   },
 
   // e_WP_MC0AltDiff
@@ -1088,6 +1183,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_WP_H, // WP AltA
     e_WP_AltDiff, // WP AltD
+    Category::DEPRECATED,
   },
 
   // e_HeadWind
@@ -1098,6 +1194,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentHeadWind>::Create,
     e_Temperature, // OAT
     HeadWindSimplified,
+    Category::STANDARD,
   },
 
   // TerrainCollision
@@ -1108,6 +1205,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTerrainCollision,
     e_NearestAirspaceHorizontal,
     e_NearestAirspaceVertical,
+    Category::DEPRECATED,
   },
 
   {
@@ -1118,6 +1216,7 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
     NavAltitude,
     NavAltitude,
+    Category::DEPRECATED,
   },
 
   // NextLegEqThermal
@@ -1128,6 +1227,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxNextLegEqThermal,
     e_MacCready, // MC
     e_Act_Speed, // V Opt
+    Category::DEPRECATED,
   },
 
   // HeadWindSimplified
@@ -1138,6 +1238,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentHeadWindSimplified>::Create,
     e_HeadWind, // OAT
     e_WindBearing_Est,
+    Category::DEPRECATED,
   },
 
   {
@@ -1149,6 +1250,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxCruiseEfficiency,
     CruiseEfficiency,
     CruiseEfficiency,
+    Category::DEPRECATED,
   },
 
   {
@@ -1158,6 +1260,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentWindArrow>::Create,
     WIND_ARROW,
     WIND_ARROW,
+    Category::DEPRECATED,
   },
 
   {
@@ -1167,6 +1270,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentThermalAssistant>::Create,
     THERMAL_ASSISTANT,
     THERMAL_ASSISTANT,
+    Category::STANDARD,
   },
 
 
@@ -1177,6 +1281,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxStartOpen,
     START_OPEN_ARRIVAL_TIME,
     START_OPEN_ARRIVAL_TIME,
+    Category::STANDARD,
   },
 
   {
@@ -1186,6 +1291,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxStartOpenArrival,
     START_OPEN_TIME,
     START_OPEN_TIME,
+    Category::STANDARD,
   },
 
   {
@@ -1196,6 +1302,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     ATC_RADIAL,
     ATC_RADIAL,
+    Category::STANDARD,
   },
 
   {
@@ -1206,6 +1313,7 @@ static constexpr MetaData meta_data[] = {
     atc_infobox_panels,
     NEXT_RADIAL,
     NEXT_RADIAL,
+    Category::STANDARD,
   },
 };
 
@@ -1253,6 +1361,14 @@ InfoBoxFactory::GetPrevious(Type type)
   assert(type < NUM_TYPES);
 
   return meta_data[type].previous;
+}
+
+InfoBoxFactory::Category
+InfoBoxFactory::GetCategory(Type type)
+{
+  assert(type < NUM_TYPES);
+
+  return meta_data[type].category;
 }
 
 InfoBoxContent*
