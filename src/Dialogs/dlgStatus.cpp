@@ -105,7 +105,6 @@ dlgStatusShowModal(int start_page)
   const IconLook &icons = UIGlobals::GetIconLook();
   const Bitmap *FlightIcon = enable_icons ? &icons.hBmpTabFlight : NULL;
   const Bitmap *SystemIcon = enable_icons ? &icons.hBmpTabSystem : NULL;
-  const Bitmap *TaskIcon = enable_icons ? &icons.hBmpTabTask : NULL;
   const Bitmap *RulesIcon = enable_icons ? &icons.hBmpTabRules : NULL;
   const Bitmap *TimesIcon = enable_icons ? &icons.hBmpTabTimes : NULL;
 
@@ -114,10 +113,6 @@ dlgStatusShowModal(int start_page)
 
   Widget *system_panel = new SystemStatusPanel(look);
   tab_bar.AddTab(system_panel, _("System"), SystemIcon);
-
-  static bool modified = false;
-  Widget *task_panel = new TaskCalculatorPanel(look, &modified);
-  tab_bar.AddTab(task_panel, _("Task"), TaskIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
 
