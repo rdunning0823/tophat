@@ -4,7 +4,7 @@ SUMMARY OF NEW FEATURES AND CHANGES
 
 TopHat 0.1.1 1/22/2013
 
-Top Hat 0.1.1 is based on XCSoar 6.4.4.  
+* Simplified InfoBox selection by removing redundant items
 * It has removed many features / configurations / menus to create a simpler 
   flying experience.
 * Removed gestures
@@ -12,8 +12,9 @@ Top Hat 0.1.1 is based on XCSoar 6.4.4.
 * Added "one stop shopping" for all navigation needs with a clickable/slidable 
   task bar at top of screen that shows destination information
 * Add menu button and zoom buttons to the main screen
-* Upgraded from XCSoar 6.4.4 to 6.6
 
+
+* Upgraded from XCSoar 6.4.4 to 6.6
 Version 6.6 - 2013/04/23
 * map
   - optional distinct map zoom on each page (#1603)
