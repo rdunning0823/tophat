@@ -48,6 +48,11 @@ dlgStartupShowModal();
  */
 void dlgStartupAssistantShowModal(bool conditional);
 
+/**
+ * shows dialog with task status info
+ */
+void ShowTaskStatusDialog();
+
 void ShowWindSettingsDialog();
 
 void dlgStatusShowModal(int page);
