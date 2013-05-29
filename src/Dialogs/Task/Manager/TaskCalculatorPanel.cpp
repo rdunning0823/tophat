@@ -56,43 +56,19 @@ static TaskCalculatorPanel *instance;
 void
 TaskCalculatorPanel::Refresh()
 {
-
-  const auto &calculated = CommonInterface::Calculated();
-  const TaskStats &task_stats = calculated.ordered_task_stats;
-  const CommonStats &common_stats = calculated.common_stats;
+  const CommonStats &common_stats = XCSoarInterface::Calculated().common_stats;
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+  StaticString<32> time;
 
   SetRowVisible(AAT_TIME, common_stats.ordered_has_targets);
-  if (common_stats.ordered_has_targets) {
-    StaticString<5> sign;
-    StaticString<32> both;
-    if (!positive(common_stats.aat_time_remaining))
-      sign = _T("-");
-    else
-      sign = _T("");
-
-    unsigned seconds = abs((int)common_stats.aat_time_remaining % 60);
-    unsigned minutes = ((int)common_stats.aat_time_remaining - seconds)
-        / 60;
-    both.Format(_T("%s%u min %u sec"), sign.c_str(), minutes, seconds);
-    SetText(AAT_TIME, both.c_str());
-  }
+  FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
+  SetText(AAT_TIME, time.c_str());
 
   SetRowVisible(AAT_ESTIMATED, common_stats.ordered_has_targets);
   if (common_stats.ordered_has_targets) {
-    StaticString<5> sign;
-    StaticString<32> both;
-    if (!positive(common_stats.aat_time_remaining
-        + task_stats.GetEstimatedTotalTime()))
-      sign = _T("-");
-    else
-      sign = _T("");
-
-    unsigned seconds = abs((int)(task_stats.GetEstimatedTotalTime()) % 60);
-    unsigned minutes = ((int)(task_stats.GetEstimatedTotalTime()) - seconds)
-        / 60;
-    both.Format(_T("%s%u min"), sign.c_str(), minutes);
-    SetText(AAT_ESTIMATED, both.c_str());
-
+    FormatTimespanSmart(time.buffer(), (int)(common_stats.aat_time_remaining
+                        + task_stats.GetEstimatedTotalTime()), 2);
+    SetText(AAT_ESTIMATED, time.c_str());
   }
   fixed rPlanned = task_stats.total.solution_remaining.IsDefined()
     ? task_stats.total.solution_remaining.vector.distance
