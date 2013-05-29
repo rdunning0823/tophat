@@ -24,6 +24,7 @@ Copyright_License {
 #include "Profile/InfoBoxConfig.hpp"
 #include "Profile/Profile.hpp"
 #include "InfoBoxes/InfoBoxSettings.hpp"
+#include "Asset.hpp"
 
 using namespace InfoBoxFactory;
 
@@ -71,7 +72,7 @@ Profile::Load(InfoBoxSettings &settings)
 
   GetEnum(ProfileKeys::InfoBoxGeometry, settings.geometry);
   Get(ProfileKeys::AppInverseInfoBox, settings.inverse);
-  Get(ProfileKeys::AppInfoBoxColors, settings.use_colors);
+  settings.use_colors = !IsGrayScaleScreen();
 
   GetV60InfoBoxManagerConfig(settings);
   char profileKey[32];
