@@ -42,7 +42,6 @@ enum ControlIndex {
   TRAIL_TYPE,
   TRAIL_WIDTH,
   ENABLE_DETOUR_COST_MARKERS,
-  WIND_ARROW_STYLE,
   SHOW_FAI_TRIANGLE_AREAS,
 };
 
@@ -117,13 +116,6 @@ static constexpr StaticEnumChoice trail_type_list[] = {
   { 0 }
 };
 
-static const StaticEnumChoice  wind_arrow_list[] = {
-  { (unsigned)WindArrowStyle::NO_ARROW, N_("Off"), N_("No wind arrow is drawn.") },
-  { (unsigned)WindArrowStyle::ARROW_HEAD, N_("Arrow head"), N_("Draws an arrow head only.") },
-  { (unsigned)WindArrowStyle::FULL_ARROW, N_("Full arrow"), N_("Draws an arrow head with a dashed arrow line.") },
-  { 0 }
-};
-
 void
 SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
@@ -165,10 +157,6 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings_map.detour_cost_markers_enabled);
   SetExpertRow(ENABLE_DETOUR_COST_MARKERS);
 
-  AddEnum(_("Wind arrow"), _("Determines the way the wind arrow is drawn on the map."),
-          wind_arrow_list, (unsigned)settings_map.wind_arrow_style);
-  SetExpertRow(WIND_ARROW_STYLE);
-
   AddBoolean(_("FAI triangle areas"),
              _("Show FAI triangle areas on the map."),
              settings_map.show_fai_triangle_areas);
@@ -201,8 +189,6 @@ SymbolsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(ENABLE_DETOUR_COST_MARKERS, ProfileKeys::DetourCostMarker,
                        settings_map.detour_cost_markers_enabled);
-
-  changed |= SaveValueEnum(WIND_ARROW_STYLE, ProfileKeys::WindArrowStyle, settings_map.wind_arrow_style);
 
   changed |= SaveValue(SHOW_FAI_TRIANGLE_AREAS,
                        ProfileKeys::ShowFAITriangleAreas,
