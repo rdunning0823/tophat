@@ -120,7 +120,8 @@ dlgStatusShowModal(int start_page)
   tab_bar.AddTab(task_panel, _("Task"), TaskIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
-  tab_bar.AddTab(rules_panel, _("Rules"), RulesIcon);
+
+  tab_bar.AddTab(rules_panel, _T("Task Start"), RulesIcon);
 
   Widget *times_panel = new TimesStatusPanel(look);
   tab_bar.AddTab(times_panel, _("Times"), TimesIcon);
