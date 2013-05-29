@@ -64,7 +64,6 @@ Profile::Load(TrafficSettings &settings)
   Get(ProfileKeys::AutoCloseFlarmDialog, settings.auto_close_dialog);
   Get(ProfileKeys::FlarmAutoZoom, settings.auto_zoom);
   Get(ProfileKeys::FlarmNorthUp, settings.north_up);
-  GetEnum(ProfileKeys::FlarmLocation, settings.gauge_location);
 }
 
 void
