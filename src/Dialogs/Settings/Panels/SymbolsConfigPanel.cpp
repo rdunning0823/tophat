@@ -35,6 +35,7 @@ Copyright_License {
 #include "MapSettings.hpp"
 
 enum ControlIndex {
+  REACH_DISPLAY,
   ENABLE_FLARM_MAP,
   TRAIL_LENGTH,
   TRAIL_DRIFT,
@@ -118,6 +119,21 @@ void
 SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
+
+  static constexpr StaticEnumChoice turning_reach_list[] = {
+    { (unsigned)RoutePlannerConfig::ReachMode::OFF, N_("Off"),
+      N_("Reachable terrain outline not displayed.") },
+    { (unsigned)RoutePlannerConfig::ReachMode::STRAIGHT, N_("On"),
+      N_("An outline is displayed over the contours of the terrain indicating how far the glider can reach in each direction.") },
+    { 0 }
+  };
+
+  AddEnum(_("Glidable terrain outline"),
+          _("Whether an outline is displayed on the terrain showing how far the glider can reach."),
+          turning_reach_list, (unsigned)route_planner.reach_calc_mode,
+          this);
 
   AddBoolean(_("FLARM traffic"), _("This enables the display of FLARM traffic on the map window."),
              settings_map.show_flarm_on_map);
@@ -153,6 +169,11 @@ SymbolsConfigPanel::Save(bool &_changed)
   bool changed = false;
 
   MapSettings &settings_map = CommonInterface::SetMapSettings();
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
+
+  changed |= SaveValueEnum(REACH_DISPLAY, ProfileKeys::TurningReach,
+                           route_planner.reach_calc_mode);
 
   changed |= SaveValue(ENABLE_FLARM_MAP, ProfileKeys::EnableFLARMMap,
                        settings_map.show_flarm_on_map);
