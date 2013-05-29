@@ -42,7 +42,6 @@ enum ControlIndex {
   TRAIL_TYPE,
   TRAIL_WIDTH,
   ENABLE_DETOUR_COST_MARKERS,
-  AIRCRAFT_SYMBOL,
   WIND_ARROW_STYLE,
   SHOW_FAI_TRIANGLE_AREAS,
 };
@@ -118,21 +117,7 @@ static constexpr StaticEnumChoice trail_type_list[] = {
   { 0 }
 };
 
-static constexpr StaticEnumChoice  aircraft_symbol_list[] = {
-  { (unsigned)AircraftSymbol::SIMPLE, N_("Simple"),
-    N_("Simplified line graphics, black with white contours.") },
-  { (unsigned)AircraftSymbol::SIMPLE_LARGE, N_("Simple (large)"),
-    N_("Enlarged simple graphics.") },
-  { (unsigned)AircraftSymbol::DETAILED, N_("Detailed"),
-    N_("Detailed rendered aircraft graphics.") },
-  { (unsigned)AircraftSymbol::HANGGLIDER, N_("HangGlider"),
-    N_("Simplified hang glider as line graphics, white with black contours.") },
-  { (unsigned)AircraftSymbol::PARAGLIDER, N_("ParaGlider"),
-    N_("Simplified para glider as line graphics, white with black contours.") },
-  { 0 }
-};
-
-static constexpr StaticEnumChoice wind_arrow_list[] = {
+static const StaticEnumChoice  wind_arrow_list[] = {
   { (unsigned)WindArrowStyle::NO_ARROW, N_("Off"), N_("No wind arrow is drawn.") },
   { (unsigned)WindArrowStyle::ARROW_HEAD, N_("Arrow head"), N_("Draws an arrow head only.") },
   { (unsigned)WindArrowStyle::FULL_ARROW, N_("Full arrow"), N_("Draws an arrow head with a dashed arrow line.") },
@@ -180,10 +165,6 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings_map.detour_cost_markers_enabled);
   SetExpertRow(ENABLE_DETOUR_COST_MARKERS);
 
-  AddEnum(_("Aircraft symbol"), NULL, aircraft_symbol_list,
-          (unsigned)settings_map.aircraft_symbol);
-  SetExpertRow(AIRCRAFT_SYMBOL);
-
   AddEnum(_("Wind arrow"), _("Determines the way the wind arrow is drawn on the map."),
           wind_arrow_list, (unsigned)settings_map.wind_arrow_style);
   SetExpertRow(WIND_ARROW_STYLE);
@@ -220,8 +201,6 @@ SymbolsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(ENABLE_DETOUR_COST_MARKERS, ProfileKeys::DetourCostMarker,
                        settings_map.detour_cost_markers_enabled);
-
-  changed |= SaveValueEnum(AIRCRAFT_SYMBOL, ProfileKeys::AircraftSymbol, settings_map.aircraft_symbol);
 
   changed |= SaveValueEnum(WIND_ARROW_STYLE, ProfileKeys::WindArrowStyle, settings_map.wind_arrow_style);
 
