@@ -115,7 +115,8 @@ Profile::Load(UISettings &settings)
 
   Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);
 
-  GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
+  // hard code to default value
+//  GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
 
   GetEnum(ProfileKeys::HapticFeedback, settings.haptic_feedback);
 
