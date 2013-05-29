@@ -33,10 +33,6 @@ Copyright_License {
 #include "UIGlobals.hpp"
 
 enum ControlIndex {
-  RoutePlannerMode,
-  RoutePlannerAllowClimb,
-  RoutePlannerUseCeiling,
-  empty_spacer,
   TurningReach,
   FinalGlideTerrain,
 };
@@ -48,7 +44,6 @@ public:
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 public:
-  void ShowRouteControls(bool show);
   void ShowReachControls(bool show);
 
   /* methods from Widget */
@@ -61,13 +56,6 @@ private:
 };
 
 void
-RouteConfigPanel::ShowRouteControls(bool show)
-{
-  SetRowVisible(RoutePlannerAllowClimb, show);
-  SetRowVisible(RoutePlannerUseCeiling, show);
-}
-
-void
 RouteConfigPanel::ShowReachControls(bool show)
 {
   SetRowVisible(FinalGlideTerrain, show);
@@ -76,13 +64,8 @@ RouteConfigPanel::ShowReachControls(bool show)
 void
 RouteConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(RoutePlannerMode, df)) {
-    const DataFieldEnum &dfe = (const DataFieldEnum &)df;
-    RoutePlannerConfig::Mode mode =
-      (RoutePlannerConfig::Mode)dfe.GetValue();
-    ShowRouteControls(mode != RoutePlannerConfig::Mode::NONE);
-  } else if (IsDataField(TurningReach, df)) {
-    const DataFieldEnum &dfe = (const DataFieldEnum &)df;
+if (IsDataField(TurningReach, df)) {
+  const DataFieldEnum &dfe = (const DataFieldEnum &)df;
     RoutePlannerConfig::ReachMode mode =
       (RoutePlannerConfig::ReachMode)dfe.GetValue();
     ShowReachControls(mode != RoutePlannerConfig::ReachMode::OFF);
@@ -97,34 +80,6 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  static constexpr StaticEnumChoice route_mode_list[] = {
-    { (unsigned)RoutePlannerConfig::Mode::NONE, N_("None"),
-      N_("Neither airspace nor terrain is used for route planning.") },
-    { (unsigned)RoutePlannerConfig::Mode::TERRAIN, N_("Terrain"),
-      N_("Routes will avoid terrain.") },
-    { (unsigned)RoutePlannerConfig::Mode::AIRSPACE, N_("Airspace"),
-      N_("Routes will avoid airspace.") },
-    { (unsigned)RoutePlannerConfig::Mode::BOTH, N_("Both"),
-      N_("Routes will avoid airspace and terrain.") },
-    { 0 }
-  };
-
-  AddEnum(_("Route mode"), NULL, route_mode_list,
-          (unsigned)route_planner.mode, this);
-
-  AddBoolean(_("Route climb"),
-             _("When enabled and MC is positive, route planning allows climbs between the aircraft "
-                 "location and destination."),
-             route_planner.allow_climb);
-  SetExpertRow(RoutePlannerAllowClimb);
-
-  AddBoolean(_("Route ceiling"),
-             _("When enabled, route planning climbs are limited to ceiling defined by greater of "
-                 "current aircraft altitude plus 500 m and the thermal ceiling.  If disabled, "
-                 "climbs are unlimited."),
-             route_planner.use_ceiling);
-  SetExpertRow(RoutePlannerUseCeiling);
-
   static constexpr StaticEnumChoice turning_reach_list[] = {
     { (unsigned)RoutePlannerConfig::ReachMode::OFF, N_("Off"),
       N_("Reach calculations disabled.") },
@@ -134,8 +89,6 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
       N_("The reach is calculated allowing turns around terrain obstacles.") },
     { 0 }
   };
-
-  AddSpacer(); // Spacer
 
   AddEnum(_("Reach mode"),
           _("How calculations are performed of the reach of the glider with respect to terrain."),
@@ -155,7 +108,6 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Reach display"), NULL, final_glide_terrain_list,
           (unsigned)settings_computer.features.final_glide_terrain);
 
-  ShowRouteControls(route_planner.mode != RoutePlannerConfig::Mode::NONE);
   ShowReachControls(route_planner.reach_calc_mode != RoutePlannerConfig::ReachMode::OFF);
 }
 
@@ -166,17 +118,8 @@ RouteConfigPanel::Save(bool &_changed)
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
   RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
 
-  changed |= SaveValueEnum(RoutePlannerMode, ProfileKeys::RoutePlannerMode,
-                           route_planner.mode);
-
   changed |= SaveValueEnum(FinalGlideTerrain, ProfileKeys::FinalGlideTerrain,
                            settings_computer.features.final_glide_terrain);
-
-  changed |= SaveValue(RoutePlannerAllowClimb, ProfileKeys::RoutePlannerAllowClimb,
-                       route_planner.allow_climb);
-
-  changed |= SaveValue(RoutePlannerUseCeiling, ProfileKeys::RoutePlannerUseCeiling,
-                       route_planner.use_ceiling);
 
   changed |= SaveValueEnum(TurningReach, ProfileKeys::TurningReach,
                            route_planner.reach_calc_mode);
