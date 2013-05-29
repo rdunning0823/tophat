@@ -67,15 +67,6 @@ Profile::Load(LoggerSettings &settings)
   Get(ProfileKeys::LoggerTimeStepCruise, settings.time_step_cruise);
   Get(ProfileKeys::LoggerTimeStepCircling, settings.time_step_circling);
 
-  if (!GetEnum(ProfileKeys::AutoLogger, settings.auto_logger)) {
-    // Legacy
-    bool disable_auto_logger;
-    if (Get(ProfileKeys::DisableAutoLogger, disable_auto_logger))
-      settings.auto_logger =
-          disable_auto_logger ? LoggerSettings::AutoLogger::OFF :
-                                LoggerSettings::AutoLogger::ON;
-  }
-
   Get(ProfileKeys::LoggerID, settings.logger_id.buffer(),
       settings.logger_id.MAX_SIZE);
   Get(ProfileKeys::PilotName, settings.pilot_name.buffer(),
