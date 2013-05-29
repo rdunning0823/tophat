@@ -213,6 +213,8 @@ protected:
 
 private:
   void DrawGesture(Canvas &canvas) const;
+  void DrawMapScale(Canvas &canvas, const PixelRect &rc,
+                    const MapWindowProjection &projection) const;
   void DrawFlightMode(Canvas &canvas, const PixelRect &rc) const;
   void DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
                      const NMEAInfo &info) const;
