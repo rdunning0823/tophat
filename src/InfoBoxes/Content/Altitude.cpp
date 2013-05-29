@@ -150,7 +150,7 @@ InfoBoxContentAltitudeGPS::HandleKey(const InfoBoxKeyCodes keycode)
 }
 
 void
-UpdateInfoBoxAltitudeAGL(InfoBoxData &data)
+InfoBoxContentAltitudeAGL::Update(InfoBoxData &data)
 {
   const DerivedInfo &calculated = CommonInterface::Calculated();
 

@@ -44,8 +44,11 @@ public:
   virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
 };
 
-void
-UpdateInfoBoxAltitudeAGL(InfoBoxData &data);
+class InfoBoxContentAltitudeAGL : public InfoBoxContentAltitude
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
 
 void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data);
