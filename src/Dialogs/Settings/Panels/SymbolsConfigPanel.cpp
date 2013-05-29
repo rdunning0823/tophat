@@ -41,7 +41,6 @@ enum ControlIndex {
   TRAIL_DRIFT,
   TRAIL_TYPE,
   TRAIL_WIDTH,
-  ENABLE_DETOUR_COST_MARKERS,
   SHOW_FAI_TRIANGLE_AREAS,
 };
 
@@ -150,18 +149,6 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings_map.trail.scaling_enabled);
   SetExpertRow(TRAIL_WIDTH);
 
-  AddBoolean(_("Detour cost markers"),
-             _("If the aircraft heading deviates from the current waypoint, markers are displayed "
-                 "at points ahead of the aircraft. The value of each marker is the extra distance "
-                 "required to reach that point as a percentage of straight-line distance to the waypoint."),
-             settings_map.detour_cost_markers_enabled);
-  SetExpertRow(ENABLE_DETOUR_COST_MARKERS);
-
-  AddBoolean(_("FAI triangle areas"),
-             _("Show FAI triangle areas on the map."),
-             settings_map.show_fai_triangle_areas);
-  SetExpertRow(SHOW_FAI_TRIANGLE_AREAS);
-
   ShowTrailControls(settings_map.trail.length != TrailSettings::Length::OFF);
 }
 
@@ -186,13 +173,6 @@ SymbolsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(TRAIL_WIDTH, ProfileKeys::SnailWidthScale,
                        settings_map.trail.scaling_enabled);
-
-  changed |= SaveValue(ENABLE_DETOUR_COST_MARKERS, ProfileKeys::DetourCostMarker,
-                       settings_map.detour_cost_markers_enabled);
-
-  changed |= SaveValue(SHOW_FAI_TRIANGLE_AREAS,
-                       ProfileKeys::ShowFAITriangleAreas,
-                       settings_map.show_fai_triangle_areas);
 
   _changed |= changed;
 
