@@ -44,7 +44,6 @@ enum ControlIndex {
   DialogStyle,
   AppInverseInfoBox,
   AppInfoBoxColors,
-  AppInfoBoxBorder
 };
 
 static constexpr StaticEnumChoice display_orientation_list[] = {
@@ -145,18 +144,6 @@ static constexpr StaticEnumChoice dialog_style_list[] = {
   { 0 }
 };
 
-static constexpr StaticEnumChoice infobox_border_list[] = {
-  { unsigned(InfoBoxSettings::BorderStyle::BOX),
-    N_("Box"), N_("Draws boxes around each InfoBox.") },
-  { unsigned(InfoBoxSettings::BorderStyle::TAB),
-    N_("Tab"), N_("Draws a tab at the top of the InfoBox across the title.") },
-  { unsigned(InfoBoxSettings::BorderStyle::SHADED),
-    N_("Shaded"), nullptr /* TODO: help text */ },
-  { unsigned(InfoBoxSettings::BorderStyle::GLASS),
-    N_("Glass"), nullptr /* TODO: help text */ },
-  { 0 }
-};
-
 class LayoutConfigPanel final : public RowFormWidget {
 public:
   LayoutConfigPanel()
@@ -210,10 +197,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                  "InfoBox will be blue when the glider is above final glide."),
              ui_settings.info_boxes.use_colors);
   SetExpertRow(AppInfoBoxColors);
-
-  AddEnum(_("InfoBox border"), nullptr, infobox_border_list,
-          unsigned(ui_settings.info_boxes.border_style));
-  SetExpertRow(AppInfoBoxBorder);
 }
 
 bool
@@ -250,12 +233,8 @@ LayoutConfigPanel::Save(bool &_changed)
   changed |= SaveValueEnum(DialogStyle, ProfileKeys::AppDialogStyle,
                            ui_settings.dialog.dialog_style);
 
-  changed |= SaveValueEnum(AppInfoBoxBorder, ProfileKeys::AppInfoBoxBorder,
-                           ui_settings.info_boxes.border_style);
-
-  if (SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox,
-                ui_settings.info_boxes.inverse))
-    require_restart = changed = true;
+  changed |= require_restart |=
+    SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
 
   if (SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors,
                 ui_settings.info_boxes.use_colors))
