@@ -42,6 +42,7 @@ enum ControlIndex {
   TRAIL_TYPE,
   TRAIL_WIDTH,
   WIND_ARROW_LOCATION,
+  AIRCRAFT_SYMBOL,
 };
 
 class SymbolsConfigPanel final
@@ -118,6 +119,20 @@ static constexpr StaticEnumChoice trail_type_list[] = {
   { 0 }
 };
 
+static constexpr StaticEnumChoice  aircraft_symbol_list[] = {
+  { (unsigned)AircraftSymbol::SIMPLE, N_("Simple"),
+    N_("Simplified line graphics, black with white contours.") },
+  { (unsigned)AircraftSymbol::SIMPLE_LARGE, N_("Simple (large)"),
+    N_("Enlarged simple graphics.") },
+  { (unsigned)AircraftSymbol::DETAILED, N_("Detailed"),
+    N_("Detailed rendered aircraft graphics.") },
+  { (unsigned)AircraftSymbol::HANGGLIDER, N_("HangGlider"),
+    N_("Simplified hang glider as line graphics, white with black contours.") },
+  { (unsigned)AircraftSymbol::PARAGLIDER, N_("ParaGlider"),
+    N_("Simplified para glider as line graphics, white with black contours.") },
+  { 0 }
+};
+
 void
 SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
@@ -175,6 +190,10 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddEnum(_("Wind arrow location"), _("Determines where the wind arrow is shown."),
           wind_arrow_list, (unsigned)settings_map.wind_arrow_location);
+
+  AddEnum(_("Aircraft symbol"), NULL, aircraft_symbol_list,
+          (unsigned)settings_map.aircraft_symbol);
+  SetExpertRow(AIRCRAFT_SYMBOL);
 }
 
 bool
@@ -203,6 +222,8 @@ SymbolsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(WIND_ARROW_LOCATION, ProfileKeys::WindArrowLocation,
                            settings_map.wind_arrow_location);
+
+  changed |= SaveValueEnum(AIRCRAFT_SYMBOL, ProfileKeys::AircraftSymbol, settings_map.aircraft_symbol);
 
   _changed |= changed;
 
