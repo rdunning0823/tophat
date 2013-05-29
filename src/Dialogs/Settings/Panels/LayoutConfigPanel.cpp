@@ -38,7 +38,6 @@ Copyright_License {
 enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
-  TabDialogStyle,
   AppStatusMessageAlignment,
   AppInverseInfoBox,
   AppInfoBoxColors,
@@ -100,13 +99,6 @@ static constexpr StaticEnumChoice info_box_geometry_list[] = {
   { 0 }
 };
 
-static constexpr StaticEnumChoice tabdialog_style_list[] = {
-  { (unsigned)DialogSettings::TabStyle::Text, N_("Text"),
-    N_("Show text on tabbed dialogs.") },
-  { (unsigned)DialogSettings::TabStyle::Icon, N_("Icons"),
-    N_("Show icons on tabbed dialogs.")},
-  { 0 }
-};
 
 static constexpr StaticEnumChoice popup_msg_position_list[] = {
   { (unsigned)UISettings::PopupMessagePosition::CENTER, N_("Center"),
@@ -142,9 +134,6 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("InfoBox geometry"),
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
-
-  AddEnum(_("Tab dialog style"), NULL,
-          tabdialog_style_list, (unsigned)ui_settings.dialog.tab_style);
 
   AddEnum(_("Message display"), NULL,
           popup_msg_position_list,
@@ -195,9 +184,6 @@ LayoutConfigPanel::Save(bool &_changed)
   if (SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors,
                 ui_settings.info_boxes.use_colors))
     require_restart = changed = true;
-
-  DialogSettings &dialog_settings = CommonInterface::SetUISettings().dialog;
-  changed |= SaveValueEnum(TabDialogStyle, ProfileKeys::AppDialogTabStyle, dialog_settings.tab_style);
 
   if (orientation_changed) {
     assert(Display::RotateSupported());

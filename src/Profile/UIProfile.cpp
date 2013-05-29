@@ -69,7 +69,8 @@ Profile::Load(TrafficSettings &settings)
 void
 Profile::Load(DialogSettings &settings)
 {
-  GetEnum(ProfileKeys::AppDialogTabStyle, settings.tab_style);
+  // use default tab style
+//  GetEnum(ProfileKeys::AppDialogTabStyle, settings.tab_style);
   Get(ProfileKeys::UserLevel, settings.expert);
 }
 
