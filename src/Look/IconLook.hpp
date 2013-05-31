@@ -42,6 +42,13 @@ struct IconLook {
   Bitmap hBmpTabRules;
   Bitmap hBmpTabTimes;
 
+  Bitmap hBmpMenuButton;
+  Bitmap hBmpCheckMark;
+  Bitmap hBmpSearch;
+  Bitmap hBmpSearchChecked;
+  Bitmap hBmpZoomOutButton;
+  Bitmap hBmpZoomInButton;
+
   void Initialise();
 };
 

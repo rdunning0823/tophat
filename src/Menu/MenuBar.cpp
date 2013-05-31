@@ -25,13 +25,80 @@ Copyright_License {
 #include "Screen/ContainerWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "Input/InputEvents.hpp"
+#include "UIGlobals.hpp"
+
+#include "LogFile.hpp" //debug
 
 #include <assert.h>
+
+/**
+ * creates button positions 15 to MAX_BUTTONS -1
+ * 16-20 are always on the left side of the screen
+ * 21-25 are always on the right side of the screen
+ * 26 is the "Cancel" position, and is bottom left
+ * for portrait, Bottom right for Landscape
+ * 27 is "More/Less" and located next to the Cancel button
+ */
+gcc_pure
+static PixelRect
+GetButtonPositionFixed(unsigned i, PixelRect rc)
+{
+  if (i < 16 || i > 31)
+    i = 0;
+  else
+    i -= 15;
+
+  UPixelScalar hwidth = rc.right - rc.left;
+  UPixelScalar hheight = rc.bottom - rc.top;
+  const bool portrait = hheight > hwidth;
+
+  if (portrait)
+    hwidth /= 3;
+  else
+    hwidth /= 4;
+
+  hheight /= 6;
+
+  if (i == 0) {
+    rc.left = rc.right;
+    rc.top = rc.bottom;
+  } else {
+
+    // Cancel button
+    if (i == 11) {
+      if (!portrait)
+        rc.left = rc.right - hwidth;
+      rc.top = 5 * hheight;
+
+      // More/less button
+    } else if (i == 12) {
+      if (!portrait)
+        rc.left = rc.right - hwidth * 2;
+      else
+        rc.left += hwidth;
+      rc.top = 5 * hheight;
+
+    } else {
+      rc.top += ((i - 1) % 5) * hheight;
+      if (i > 5)
+        rc.left = rc.right - hwidth;
+    }
+  }
+
+  rc.right = rc.left + hwidth;
+  rc.bottom = rc.top + hheight;
+
+  return rc;
+}
+
 
 gcc_pure
 static PixelRect
 GetButtonPosition(unsigned i, PixelRect rc)
 {
+  if (i > 15)
+    return GetButtonPositionFixed(i, rc);
+
   UPixelScalar hwidth = rc.right - rc.left;
   UPixelScalar hheight = rc.bottom - rc.top;
 
@@ -52,10 +119,9 @@ GetButtonPosition(unsigned i, PixelRect rc)
       hwidth /= 3;
 
       rc.left = rc.right - hwidth;
-      PixelScalar k = rc.bottom - rc.top - Layout::Scale(46);
 
       if (IsAltair()) {
-        k = rc.bottom - rc.top;
+        PixelScalar k = rc.bottom - rc.top;
         // JMW need upside down button order for rotated Altair
         rc.top = rc.bottom - (i - 5) * k / 5 - hheight - Layout::Scale(20);
       } else {
@@ -123,10 +189,12 @@ MenuBar::MenuBar(ContainerWindow &parent)
   style.Hide();
   style.Border();
   style.multiline();
+  const DialogLook &look = UIGlobals::GetDialogLook();
 
   for (unsigned i = 0; i < MAX_BUTTONS; ++i) {
     PixelRect button_rc = GetButtonPosition(i, rc);
-    buttons[i].set(parent, _T(""), button_rc, style);
+    buttons[i] = new Button(parent, look, _T(""), button_rc, style);
+//    buttons[i].set(parent, _T(""), button_rc, style);
   }
 }
 
@@ -134,7 +202,7 @@ void
 MenuBar::SetFont(const Font &font)
 {
   for (unsigned i = 0; i < MAX_BUTTONS; i++)
-    buttons[i].SetFont(font);
+    buttons[i]->SetFont(font);
 }
 
 void
@@ -143,7 +211,7 @@ MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
 {
   assert(i < MAX_BUTTONS);
 
-  Button &button = buttons[i];
+  Button &button = *buttons[i];
 
   button.set_text(text);
   button.SetEnabled(enabled && event > 0);
@@ -156,12 +224,12 @@ MenuBar::HideButton(unsigned i)
 {
   assert(i < MAX_BUTTONS);
 
-  buttons[i].Hide();
+  buttons[i]->Hide();
 }
 
 void
 MenuBar::OnResize(const PixelRect &rc)
 {
   for (unsigned i = 0; i < MAX_BUTTONS; ++i)
-    buttons[i].Move(GetButtonPosition(i, rc));
+    buttons[i]->Move(GetButtonPosition(i, rc));
 }

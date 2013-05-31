@@ -18,16 +18,20 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
+
 #include "OLCFAI.hpp"
 
-OLCFAI::OLCFAI(const Trace &_trace):
-  OLCTriangle(_trace, true)
-{}
-
-fixed
-OLCFAI::CalcScore() const
+OLCFAI::OLCFAI(const Trace &_trace, bool predict)
+  :OLCTriangle(_trace, true, predict)
 {
+}
+
+ContestResult
+OLCFAI::CalculateResult(const ContestTraceVector &solution) const
+{
+  ContestResult result = OLCTriangle::CalculateResult(solution);
   // 0.3 points per km
-  return ApplyHandicap(CalcDistance()*fixed(0.0003));
+  result.score = ApplyHandicap(result.distance * fixed(0.0003));
+  return result;
 }

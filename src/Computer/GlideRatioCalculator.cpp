@@ -29,7 +29,7 @@ Copyright_License {
 #include <assert.h>
 
 /** over this, show INVALID_GR */
-static const int MAXEFFICIENCYSHOW = 200;
+static const fixed MAXEFFICIENCYSHOW = fixed(200);
 
 void
 GlideRatioCalculator::Initialize(const ComputerSettings &settings)
@@ -102,18 +102,18 @@ GlideRatioCalculator::Add(unsigned distance, int altitude)
 /*
  * returns 0 if invalid, 999 if too high
  */
-int
+fixed
 GlideRatioCalculator::Calculate() const
 {
-  int altdiff, eff;
+  int altdiff;
   short bcold;
 
   if (start >= size)
-    return 0;
+    return fixed_zero;
 
   if (!valid) {
     if (start == 0)
-      return 0; // unavailable
+      return fixed_zero; // unavailable
 
     bcold = 0;
   } else {
@@ -127,7 +127,7 @@ GlideRatioCalculator::Calculate() const
   if (altdiff == 0)
     return INVALID_GR; // infinitum
 
-  eff = (int)totaldistance / altdiff;
+  fixed eff = (fixed) totaldistance / (fixed) altdiff;
   if (eff > MAXEFFICIENCYSHOW)
     eff = INVALID_GR;
 
@@ -139,35 +139,35 @@ GlideRatioCalculator::Calculate() const
 // limit to reasonable values
 gcc_const
 static fixed
-LimitLD(fixed ld)
+LimitGR(fixed gr)
 {
-  if (fabs(ld) > fixed(INVALID_GR))
-    return fixed(INVALID_GR);
+  if (fabs(gr) > INVALID_GR)
+    return INVALID_GR;
 
-  if (ld >= fixed_zero && ld < fixed_one)
+  if (gr >= fixed_zero && gr < fixed_one)
     return fixed_one;
 
-  if (ld < fixed_zero && ld > fixed_minus_one)
+  if (gr < fixed_zero && gr > fixed_minus_one)
     return fixed_minus_one;
 
-  return ld;
+  return gr;
 }
 
 fixed
-UpdateLD(fixed ld, fixed leg_distance, fixed height_above_leg,
+UpdateGR(fixed gr, fixed leg_distance, fixed height_above_leg,
          fixed filter_factor)
 {
   if (!positive(leg_distance))
-    return ld;
+    return gr;
 
   fixed glideangle = height_above_leg / leg_distance;
-  if (ld != fixed(INVALID_GR))
-    glideangle = LowPassFilter(fixed_one / ld, glideangle, filter_factor);
+  if (gr != INVALID_GR)
+    glideangle = LowPassFilter(fixed_one / gr, glideangle, filter_factor);
 
   if (fabs(glideangle) > fixed_one / INVALID_GR)
-    ld = LimitLD(fixed_one / glideangle);
+    gr = LimitGR(fixed_one / glideangle);
   else
-    ld = fixed(INVALID_GR);
+    gr = INVALID_GR;
 
-  return ld;
+  return gr;
 }

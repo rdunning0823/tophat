@@ -23,9 +23,10 @@
 #include "Task/MapTaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Components.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Protection.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Engine/Task/Factory/AbstractTaskFactory.hpp"
+#include "Interface.hpp"
 
 static const TaskBehaviour&
 GetTaskBehaviour()
@@ -42,11 +43,8 @@ AppendToTask(OrderedTask *task, const Waypoint &waypoint)
   int i = task->TaskSize() - 1;
   // skip all finish points
   while (i >= 0) {
-    const OrderedTaskPoint *tp = task->get_tp(i);
-    if (tp == NULL)
-      break;
-
-    if (tp->successor_allowed()) {
+    const OrderedTaskPoint &tp = task->GetPoint(i);
+    if (tp.IsSuccessorAllowed()) {
       ++i;
       break;
     }
@@ -111,7 +109,7 @@ MapTaskManager::AppendToTask(const Waypoint &waypoint)
     OrderedTask *task = task_manager->Clone(GetTaskBehaviour());
     result = AppendToTask(task, waypoint);
     if (result == SUCCESS)
-      task_manager->Commit(*task);
+      task_manager->Commit(*task, way_points);
     delete task;
   } else { // ordered task invalid
     switch (task_manager->GetMode()) {
@@ -131,7 +129,7 @@ MapTaskManager::AppendToTask(const Waypoint &waypoint)
       const Waypoint &OldGotoWp = OldGotoTWP->GetWaypoint();
       result = MutateFromGoto(task, waypoint, OldGotoWp);
       if (result == MUTATED_FROM_GOTO)
-        task_manager->Commit(*task);
+        task_manager->Commit(*task, way_points);
 
       delete task;
       break;
@@ -153,8 +151,8 @@ InsertInTask(OrderedTask *task, const Waypoint &waypoint)
     if (i >= (int)task->TaskSize())
       return MapTaskManager::UNMODIFIED;
 
-    const OrderedTaskPoint *task_point = task->get_tp(i);
-    if (task_point == NULL || task_point->predecessor_allowed())
+    const OrderedTaskPoint &task_point = task->GetPoint(i);
+    if (task_point.IsPredecessorAllowed())
       break;
 
     ++i;
@@ -186,7 +184,7 @@ MapTaskManager::InsertInTask(const Waypoint &waypoint)
 
     result = InsertInTask(task, waypoint);
     if (result == SUCCESS)
-      task_manager->Commit(*task);
+      task_manager->Commit(*task, way_points);
     delete task;
   } else { // ordered task invalid
     switch (task_manager->GetMode()) {
@@ -205,13 +203,28 @@ MapTaskManager::InsertInTask(const Waypoint &waypoint)
       const Waypoint &OldGotoWp = OldGotoTWP->GetWaypoint();
       result = MutateFromGoto(task, OldGotoWp, waypoint);
       if (result == MUTATED_FROM_GOTO)
-        task_manager->Commit(*task);
+        task_manager->Commit(*task, way_points);
       delete task;
       break;
     }
     }
   }
   return result;
+}
+
+/**
+ * inserts the waypoint into the Ordered Task
+ * It is up to the caller to decide whether to commit the new task or not.
+ * Task manager must be in Ordered Mode when called
+ * @param task.  Pointer to an ordered Mat task
+ * @param waypoint.  The wp to insert into the task before the active tp
+ */
+MapTaskManager::TaskEditResult
+MapTaskManager::InsertInMatProForma(OrderedTask &task,
+                                    const Waypoint &waypoint)
+{
+  assert(task.CheckTask());
+  return InsertInTask(&task, waypoint);
 }
 
 static MapTaskManager::TaskEditResult
@@ -241,10 +254,44 @@ MapTaskManager::ReplaceInTask(const Waypoint &waypoint)
 
   TaskEditResult result = ReplaceInTask(task, waypoint);
   if (result == SUCCESS)
-    task_manager->Commit(*task);
+    task_manager->Commit(*task, way_points);
 
   delete task;
   return result;
+}
+
+static int
+GetUnachievedIndexInTask(const OrderedTask &task,
+                         const Waypoint &waypoint)
+{
+  if (task.TaskSize() < 2)
+    return -1;
+
+  unsigned last_achieved_index = task.GetLastIntermediateAchieved();
+
+  int TPindex = -1;
+  for (unsigned i = task.TaskSize() - 2; i > last_achieved_index; i--) {
+    const OrderedTaskPoint &tp = task.GetPoint(i);
+
+    if (tp.GetWaypoint() == waypoint) {
+      TPindex = i;
+      break;
+    }
+  }
+  return TPindex;
+}
+
+int
+MapTaskManager::GetUnachievedIndexInTask(const Waypoint &waypoint)
+{
+  assert(protected_task_manager != NULL);
+  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+
+  if (task_manager->GetMode() == TaskManager::MODE_ORDERED) {
+    const OrderedTask &task = task_manager->GetOrderedTask();
+    return GetUnachievedIndexInTask(task, waypoint);
+  }
+  return -1;
 }
 
 static int
@@ -313,7 +360,7 @@ MapTaskManager::RemoveFromTask(const Waypoint &wp)
 
   TaskEditResult result = RemoveFromTask(task, wp);
   if (result == SUCCESS)
-    task_manager->Commit(*task);
+    task_manager->Commit(*task, way_points);
 
   delete task;
   return result;

@@ -27,12 +27,10 @@ Copyright_License {
 #include "Device/device.hpp"
 #include "Util/CharUtil.hpp"
 #include "Geo/Geoid.hpp"
-#include "Math/Earth.hpp"
 #include "NMEA/Info.hpp"
 #include "NMEA/Checksum.hpp"
 #include "NMEA/InputLine.hpp"
 #include "Util/StringUtil.hpp"
-#include "Compatibility/string.h" /* for _ttoi() */
 #include "Units/System.hpp"
 #include "OS/Clock.hpp"
 #include "Driver/FLARM/StaticParser.hpp"
@@ -142,11 +140,28 @@ NAVWarn(char c)
 }
 
 /**
+ * Parses non-negative floating-point angle value in degrees.
+ */
+static bool
+ReadBearing(NMEAInputLine &line, Angle &value_r)
+{
+  fixed value;
+  if (!line.ReadChecked(value))
+    return false;
+
+  if (negative(value) || value > fixed(360))
+    return false;
+
+  value_r = Angle::Degrees(value).AsBearing();
+  return true;
+}
+
+/**
  * Parses an angle in the form "DDDMM.SSS".  Minutes are 0..59, and
  * seconds are 0..999.
  */
 static bool
-ReadPositiveAngle(NMEAInputLine &line, Angle &a)
+ReadGeoAngle(NMEAInputLine &line, Angle &a)
 {
   char buffer[32], *endptr;
   line.Read(buffer, sizeof(buffer));
@@ -161,7 +176,7 @@ ReadPositiveAngle(NMEAInputLine &line, Angle &a)
 
   dot[-2] = 0;
   long y = strtol(buffer, &endptr, 10);
-  if (y < 0 || endptr == buffer || *endptr != 0)
+  if (y < 0 || y > 180 || endptr == buffer || *endptr != 0)
     return false;
 
   a = Angle::Degrees(fixed(y) + fixed(x) / 60);
@@ -180,11 +195,14 @@ static bool
 ReadLatitude(NMEAInputLine &line, Angle &value_r)
 {
   Angle value;
-  if (!ReadPositiveAngle(line, value))
+  if (!ReadGeoAngle(line, value))
     return false;
 
-  if (line.ReadFirstChar() == 'S')
+  char ch = line.ReadOneChar();
+  if (ch == 'S')
     value.Flip();
+  else if (ch != 'N')
+    return false;
 
   value_r = value;
   return true;
@@ -194,11 +212,14 @@ static bool
 ReadLongitude(NMEAInputLine &line, Angle &value_r)
 {
   Angle value;
-  if (!ReadPositiveAngle(line, value))
+  if (!ReadGeoAngle(line, value))
     return false;
 
-  if (line.ReadFirstChar() == 'W')
+  char ch = line.ReadOneChar();
+  if (ch == 'W')
     value.Flip();
+  else if (ch != 'E')
+    return false;
 
   value_r = value;
   return true;
@@ -292,6 +313,12 @@ NMEAParser::TimeAdvanceTolerance(fixed time) const
 bool
 NMEAParser::TimeHasAdvanced(fixed this_time, NMEAInfo &info)
 {
+  return TimeHasAdvanced(this_time, last_time, info);
+}
+
+bool
+NMEAParser::TimeHasAdvanced(fixed this_time, fixed &last_time, NMEAInfo &info)
+{
   if (this_time < last_time) {
     last_time = this_time;
     start_day = -1; // reset search for the first day
@@ -384,8 +411,8 @@ NMEAParser::GLL(NMEAInputLine &line, NMEAInfo &info)
   return true;
 }
 
-static bool
-ReadDate(NMEAInputLine &line, BrokenDate &date)
+bool
+NMEAParser::ReadDate(NMEAInputLine &line, BrokenDate &date)
 {
   char buffer[9];
   line.Read(buffer, 9);
@@ -429,7 +456,9 @@ NMEAParser::RMC(NMEAInputLine &line, NMEAInfo &info)
    * 13) Checksum
    */
 
-  fixed this_time = line.Read(fixed_zero);
+  fixed this_time;
+  if (!line.ReadChecked(this_time))
+    return false;
 
   bool gps_valid = !NAVWarn(line.ReadFirstChar());
 
@@ -439,8 +468,8 @@ NMEAParser::RMC(NMEAInputLine &line, NMEAInfo &info)
   fixed speed;
   bool ground_speed_available = line.ReadChecked(speed);
 
-  fixed track;
-  bool track_available = line.ReadChecked(track);
+  Angle track;
+  bool track_available = ReadBearing(line, track);
 
   // JMW get date info first so TimeModify is accurate
   if (ReadDate(line, info.date_time_utc))
@@ -467,7 +496,7 @@ NMEAParser::RMC(NMEAInputLine &line, NMEAInfo &info)
 
   if (track_available && info.MovementDetected()) {
     // JMW don't update bearing unless we're moving
-    info.track = Angle::Degrees(track).AsBearing();
+    info.track = track;
     info.track_available.Update(info.clock);
   }
 
@@ -515,10 +544,15 @@ NMEAParser::GGA(NMEAInputLine &line, NMEAInfo &info)
    * 14) Differential reference station ID, 0000-1023
    * 15) Checksum
    */
+
   GPSState &gps = info.gps;
 
-  fixed this_time = TimeModify(line.Read(fixed_zero), info.date_time_utc,
-                               info.date_available);
+  fixed this_time;
+  if (!line.ReadChecked(this_time))
+    return false;
+
+  this_time = TimeModify(this_time, info.date_time_utc,
+                         info.date_available);
   this_time = TimeAdvanceTolerance(this_time);
 
   GeoPoint location;

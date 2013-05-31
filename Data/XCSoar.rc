@@ -68,6 +68,18 @@ IDB_RULES               BITMAP  DISCARDABLE     "../output/data/icons/rules.bmp"
 IDB_RULES_HD            BITMAP  DISCARDABLE     "../output/data/icons/rules_160.bmp"
 IDB_CLOCK               BITMAP  DISCARDABLE     "../output/data/icons/clock.bmp"
 IDB_CLOCK_HD            BITMAP  DISCARDABLE     "../output/data/icons/clock_160.bmp"
+IDB_MENU_BUTTON         BITMAP  DISCARDABLE     "../output/data/icons/menu_button.bmp"
+IDB_MENU_BUTTON_HD      BITMAP  DISCARDABLE     "../output/data/icons/menu_button_160.bmp"
+IDB_CHECK_MARK          BITMAP  DISCARDABLE     "../output/data/icons/checkmark.bmp"
+IDB_CHECK_MARK_HD       BITMAP  DISCARDABLE     "../output/data/icons/checkmark_160.bmp"
+IDB_SEARCH          	BITMAP  DISCARDABLE     "../output/data/icons/search.bmp"
+IDB_SEARCH_HD       	BITMAP  DISCARDABLE     "../output/data/icons/search_160.bmp"
+IDB_SEARCH_CHECKED    	BITMAP  DISCARDABLE     "../output/data/icons/search_checked.bmp"
+IDB_SEARCH_CHECKED_HD 	BITMAP  DISCARDABLE     "../output/data/icons/search_checked_160.bmp"
+IDB_ZOOM_OUT_BUTTON     BITMAP  DISCARDABLE     "../output/data/icons/zoom_out_button.bmp"
+IDB_ZOOM_OUT_BUTTON_HD  BITMAP  DISCARDABLE     "../output/data/icons/zoom_out_button_160.bmp"
+IDB_ZOOM_IN_BUTTON      BITMAP  DISCARDABLE     "../output/data/icons/zoom_in_button.bmp"
+IDB_ZOOM_IN_BUTTON_HD   BITMAP  DISCARDABLE     "../output/data/icons/zoom_in_button_160.bmp"
 
 #ifdef EYE_CANDY
 #ifdef TESTING
@@ -193,6 +205,8 @@ IDB_TITLE_HD          BITMAP  DISCARDABLE     "../output/data/graphics/title_red
 IDB_TITLE             BITMAP  DISCARDABLE     "../output/data/graphics/title_110.bmp"
 IDB_TITLE_HD          BITMAP  DISCARDABLE     "../output/data/graphics/title_320.bmp"
 #endif
+IDB_WEATHER_STATION     BITMAP  DISCARDABLE     "../output/data/icons/map_weather_station.bmp"
+IDB_WEATHER_STATION_HD  BITMAP  DISCARDABLE     "../output/data/icons/map_weather_station_160.bmp"
 // --- Audio ---
 
 IDR_FAIL                WAVE    DISCARDABLE     "sound/fail.wav"
@@ -239,8 +253,6 @@ IDR_XML_FONTEDIT XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgFontEdit.xml.g
 IDR_XML_HELP XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgHelp.xml.gz"
 IDR_XML_HELP_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgHelp_L.xml.gz"
 IDR_XML_LOGGERREPLAY XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgLoggerReplay.xml.gz"
-IDR_XML_MAPITEMLIST_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgMapItemList_L.xml.gz"
-IDR_XML_MAPITEMLIST XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgMapItemList.xml.gz"
 IDR_XML_NOAA_DETAILS_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgNOAADetails_L.xml.gz"
 IDR_XML_NOAA_DETAILS XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgNOAADetails.xml.gz"
 IDR_XML_NOAA_LIST_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgNOAAList_L.xml.gz"
@@ -275,6 +287,8 @@ IDR_XML_WAYPOINTEDIT XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgWaypointEd
 IDR_XML_WAYPOINTEDIT_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgWaypointEdit_L.xml.gz"
 IDR_XML_WAYPOINTSELECT XMLDIALOG DISCARDABLE "../output/data/dialogs/WaypointList.xml.gz"
 IDR_XML_WAYPOINTSELECT_L XMLDIALOG DISCARDABLE "../output/data/dialogs/WaypointList_L.xml.gz"
+IDR_XML_WAYPOINTSELECTSIMPLE XMLDIALOG DISCARDABLE "../output/data/dialogs/WaypointListSimple.xml.gz"
+IDR_XML_WAYPOINTSELECTSIMPLE_L XMLDIALOG DISCARDABLE "../output/data/dialogs/WaypointListSimple_L.xml.gz"
 IDR_XML_WEATHER XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgWeather.xml.gz"
 
 // configuration menu
@@ -282,27 +296,24 @@ IDR_XML_POLARCONFIGPANEL XMLDIALOG DISCARDABLE "../output/data/dialogs/Configura
 IDR_XML_POLARCONFIGPANEL_L XMLDIALOG DISCARDABLE "../output/data/dialogs/Configuration/PolarConfigPanel_L.xml.gz"
 
 // infobox access
-IDR_XML_INFOBOXMACCREADYEDIT XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxMacCreadyEdit.xml.gz"
-IDR_XML_INFOBOXMACCREADYSETUP XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxMacCreadySetup.xml.gz"
 IDR_XML_INFOBOXALTITUDEINFO XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxAltitudeInfo.xml.gz"
 IDR_XML_INFOBOXALTITUDESIMULATOR XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxAltitudeSimulator.xml.gz"
 IDR_XML_INFOBOXALTITUDESETUP XMLDIALOG DISCARDABLE "../output/data/dialogs/Infobox/pnlInfoBoxAltitudeSetup.xml.gz"
 
 // new task editor
 IDR_XML_TASKEDIT XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskEdit.xml.gz"
-IDR_XML_TASKEDIT_L XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskEdit_L.xml.gz"
+IDR_XML_TASKACTIONS XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskActions.xml.gz"
 IDR_XML_TASKLIST XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskList.xml.gz"
 IDR_XML_TASKLIST_L XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskList_L.xml.gz"
 IDR_XML_TASKMANAGER XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskManager.xml.gz"
 IDR_XML_TASKMANAGER_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskManager_L.xml.gz"
 IDR_XML_TASKMANAGERCLOSE XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskManagerClose.xml.gz"
-IDR_XML_TASKMANAGERCLOSE_L XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskManagerClose_L.xml.gz"
-IDR_XML_TASKCALCULATOR XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskCalculator.xml.gz"
-IDR_XML_TASKCALCULATOR_L XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskCalculator_L.xml.gz"
-IDR_XML_TASKPROPERTIES XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskProperties.xml.gz"
-IDR_XML_TASKPROPERTIES_L XMLDIALOG DISCARDABLE "../output/data/dialogs/pnlTaskProperties_L.xml.gz"
 IDR_XML_TASKPOINT XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPoint.xml.gz"
 IDR_XML_TASKPOINT_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPoint_L.xml.gz"
+
+IDR_XML_TASKPOINT_US XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointUs.xml.gz"
+IDR_XML_TASKPOINT_US_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointUs_L.xml.gz"
+
 IDR_XML_TASKPOINTTYPE XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointType.xml.gz"
 IDR_XML_TASKPOINTTYPE_L XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskPointType_L.xml.gz"
 IDR_XML_TASKOPTIONALSTARTS XMLDIALOG DISCARDABLE "../output/data/dialogs/dlgTaskOptionalStarts.xml.gz"

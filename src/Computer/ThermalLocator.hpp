@@ -25,9 +25,9 @@ Copyright_License {
 #define THERMALLOCATOR_H
 
 #include "Math/fixed.hpp"
-#include "Navigation/GeoPoint.hpp"
-#include "Navigation/Flat/FlatPoint.hpp"
-#include "Navigation/SpeedVector.hpp"
+#include "Geo/GeoPoint.hpp"
+#include "Geo/SpeedVector.hpp"
+#include "Geo/Flat/FlatPoint.hpp"
 
 class TaskProjection;
 struct ThermalLocatorInfo;

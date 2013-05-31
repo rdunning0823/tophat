@@ -26,9 +26,8 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Units/Units.hpp"
 #include "LocalPath.hpp"
-#include "LocalTime.hpp"
-#include "OS/PathName.hpp"
 #include "OS/FileUtil.hpp"
+#include "Util/ConvertString.hpp"
 #include "Operation/Operation.hpp"
 #include "zzip/zzip.h"
 
@@ -43,7 +42,7 @@ struct WeatherDescriptor {
   const TCHAR *help;
 };
 
-static gcc_constexpr_data WeatherDescriptor WeatherDescriptors[RasterWeather::MAX_WEATHER_MAP] = {
+static constexpr WeatherDescriptor WeatherDescriptors[RasterWeather::MAX_WEATHER_MAP] = {
   {
     NULL,
     N_("Terrain"),
@@ -171,8 +170,9 @@ void
 RasterWeather::NarrowWeatherFilename(char *filename, const TCHAR *name,
                                      unsigned time_index)
 {
+  const WideToACPConverter narrow_name(name);
   sprintf(filename, "%s.curr.%04dlst.d2.jp2",
-          (const char *)NarrowPathName(name), IndexToTime(time_index));
+          (const char *)narrow_name, IndexToTime(time_index));
 }
 
 void
@@ -225,7 +225,8 @@ RasterWeather::ScanAll(const GeoPoint &location,
   TCHAR fname[MAX_PATH];
   LocalPath(fname, _T("xcsoar-rasp.dat"));
 
-  ZZIP_DIR *dir = zzip_dir_open(NarrowPathName(fname), NULL);
+  const WideToACPConverter narrow_path(fname);
+  ZZIP_DIR *dir = zzip_dir_open(narrow_path, NULL);
   if (dir == NULL)
     return;
 
@@ -240,7 +241,7 @@ RasterWeather::ScanAll(const GeoPoint &location,
 }
 
 void
-RasterWeather::Reload(int day_time, OperationEnvironment &operation)
+RasterWeather::Reload(int day_time_local, OperationEnvironment &operation)
 {
   static unsigned last_weather_time;
   bool found = false;
@@ -253,7 +254,7 @@ RasterWeather::Reload(int day_time, OperationEnvironment &operation)
   Poco::ScopedRWLock protect(lock, true);
   if (_weather_time == 0) {
     // "Now" time, so find time in half hours
-    unsigned half_hours = (TimeLocal(day_time) / 1800) % 48;
+    unsigned half_hours = (day_time_local / 1800) % 48;
     _weather_time = max(_weather_time, half_hours);
     now = true;
   }

@@ -28,12 +28,63 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/ButtonPanel.hpp"
 #include "Form/ManagedWidget.hpp"
-
+#include "Look/MapLook.hpp"
 #include <tchar.h>
 
 class Widget;
 
+
+
 class WidgetDialog : public WndForm {
+public:
+  /**
+   * A class that displays a footer rectangle below the widget and buttons
+   * of the dialog.
+   * The height of the rectangle is set when the WidgetDialog is constructed
+   * OnPaintFooter is implemented by listener class
+   */
+  class DialogFooter: public PaintWindow
+  {
+  public:
+    /**
+     * A class that listens to the OnPaintFooter() method of the DialogFooter class
+     */
+    struct Listener {
+      virtual void OnPaintFooter(Canvas &canvas) = 0;
+    };
+
+    DialogFooter(ContainerWindow &parent,
+                 Listener *_listener,
+                 UPixelScalar _height);
+
+    /**
+     * returns height
+     */
+    virtual UPixelScalar GetHeight() {
+      return height;
+    }
+
+    virtual void OnPaint(Canvas &canvas) {
+      PaintWindow::OnPaint(canvas);
+
+      if (listener != NULL)
+        listener->OnPaintFooter(canvas);
+    }
+
+  protected:
+    /**
+     * handles OnPaintFooter()
+     */
+    Listener *listener;
+
+    /**
+     * height of footer
+     */
+    UPixelScalar height;
+  };
+
+  DialogFooter dialog_footer;
+
   ButtonPanel buttons;
 
   ManagedWidget widget;
@@ -43,13 +94,21 @@ class WidgetDialog : public WndForm {
   bool changed;
 
 public:
-  WidgetDialog(const TCHAR *caption, const PixelRect &rc, Widget *widget);
+  WidgetDialog(const TCHAR *caption, const PixelRect &rc,
+               Widget *widget, DialogFooter::Listener *_listener = NULL,
+               UPixelScalar footer_height = 0,
+               ButtonPanel::ButtonPanelPosition button_position =
+                   ButtonPanel::ButtonPanelPosition::Auto);
 
   /**
    * Create a dialog with an automatic size (by
    * Widget::GetMinimumSize() and Widget::GetMaximumSize()).
    */
-  WidgetDialog(const TCHAR *caption, Widget *widget);
+  WidgetDialog(const TCHAR *caption, Widget *widget,
+               DialogFooter::Listener *_listener = NULL,
+               UPixelScalar footer_height = 0,
+               ButtonPanel::ButtonPanelPosition button_position =
+                                  ButtonPanel::ButtonPanelPosition::Auto);
 
   bool GetChanged() const {
     return changed;
@@ -68,21 +127,33 @@ public:
 
   WndButton *AddButton(const TCHAR *caption,
                        WndButton::ClickNotifyCallback callback) {
-    return buttons.Add(caption, callback);
+    WndButton * but = buttons.Add(caption, callback);
+    OnResize(GetWidth(), GetHeight());
+    return but;
   }
 
   WndButton *AddButton(const TCHAR *caption,
                        ActionListener *listener, int id) {
-    return buttons.Add(caption, listener, id);
+    WndButton * but = buttons.Add(caption, listener, id);
+    OnResize(GetWidth(), GetHeight());
+    return but;
   }
 
   WndButton *AddButton(const TCHAR *caption, int modal_result) {
-    return AddButton(caption, this, modal_result);
+    WndButton * but = AddButton(caption, this, modal_result);
+    OnResize(GetWidth(), GetHeight());
+    return but;
   }
 
   int ShowModal();
 
   virtual void OnAction(int id);
+
+  /**
+   * returns rectangle used by footer area
+   * (above buttons and widget)
+   */
+  PixelRect GetFooterRect();
 
 private:
   void AutoSize();

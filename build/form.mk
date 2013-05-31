@@ -17,9 +17,11 @@ FORM_SOURCES = \
 	$(FORM_SRC_DIR)/Frame.cpp \
 	$(FORM_SRC_DIR)/Draw.cpp \
 	$(FORM_SRC_DIR)/List.cpp \
+	$(FORM_SRC_DIR)/HorizontalList.cpp \
 	$(FORM_SRC_DIR)/ScrollBar.cpp \
 	$(FORM_SRC_DIR)/Edit.cpp \
 	$(FORM_SRC_DIR)/Widget.cpp \
+	$(FORM_SRC_DIR)/ActionWidget.cpp \
 	$(FORM_SRC_DIR)/WindowWidget.cpp \
 	$(FORM_SRC_DIR)/ListWidget.cpp \
 	$(FORM_SRC_DIR)/PanelWidget.cpp \
@@ -33,13 +35,15 @@ FORM_SOURCES = \
 	$(FORM_SRC_DIR)/TabBar.cpp \
 	$(FORM_SRC_DIR)/TabDisplay.cpp \
 	$(FORM_SRC_DIR)/TabMenu.cpp \
+	$(FORM_SRC_DIR)/TabMenuDisplay.cpp \
 	$(FORM_SRC_DIR)/Keyboard.cpp \
 	$(FORM_SRC_DIR)/UnitUtil.cpp \
 	$(FORM_SRC_DIR)/ProfileUtil.cpp \
 	$(FORM_SRC_DIR)/GridView.cpp \
 	$(FORM_SRC_DIR)/CustomButton.cpp \
+	$(FORM_SRC_DIR)/HLine.cpp \
 	$(FORM_SRC_DIR)/Util.cpp
 
-FORM_CPPFLAGS = $(SCREEN_CPPFLAGS)
+FORM_CPPFLAGS_INTERNAL = $(SCREEN_CPPFLAGS)
 
 $(eval $(call link-library,form,FORM))

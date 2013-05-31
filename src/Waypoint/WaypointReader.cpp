@@ -29,12 +29,13 @@ Copyright_License {
 #include "WaypointReaderFS.hpp"
 #include "WaypointReaderOzi.hpp"
 #include "WaypointReaderCompeGPS.hpp"
+#include "WaypointFileType.hpp"
 
 #include "Terrain/RasterTerrain.hpp"
 #include "Waypoint/Waypoints.hpp"
 #include "OS/FileUtil.hpp"
-#include "OS/PathName.hpp"
 #include "IO/ZipSource.hpp"
+#include "IO/TextFile.hpp"
 
 bool
 WaypointReader::Parse(Waypoints &way_points, OperationEnvironment &operation)
@@ -42,7 +43,13 @@ WaypointReader::Parse(Waypoints &way_points, OperationEnvironment &operation)
   if (reader == NULL)
     return false;
 
-  return reader->Parse(way_points, operation);
+  TLineReader *line_reader = OpenTextFile(path, ConvertLineReader::AUTO);
+  if (line_reader == nullptr)
+    return false;
+
+  reader->Parse(way_points, *line_reader, operation);
+  delete line_reader;
+  return true;
 }
 
 void
@@ -62,6 +69,8 @@ WaypointReader::Open(const TCHAR* filename, int the_filenum)
   if (StringIsEmpty(filename))
     return;
 
+  _tcscpy(path, filename);
+
   // Test if file exists
   bool compressed = false;
   if (!File::Exists(filename)) {
@@ -73,36 +82,32 @@ WaypointReader::Open(const TCHAR* filename, int the_filenum)
       return;
   }
 
-  // If WinPilot waypoint file -> save type and return true
-  if (MatchesExtension(filename, _T(".dat")) ||
-      MatchesExtension(filename, _T(".xcw")))
-    reader = new WaypointReaderWinPilot(filename, the_filenum, compressed);
+  switch (DetermineWaypointFileType(filename)) {
+  case WaypointFileType::WINPILOT:
+    reader = new WaypointReaderWinPilot(the_filenum, compressed);
+    break;
 
-  // If SeeYou waypoint file -> save type and return true
-  else if (MatchesExtension(filename, _T(".cup")))
-    reader = new WaypointReaderSeeYou(filename, the_filenum, compressed);
+  case WaypointFileType::SEEYOU:
+    reader = new WaypointReaderSeeYou(the_filenum, compressed);
+    break;
 
-  // If Zander waypoint file -> save type and return true
-  else if (MatchesExtension(filename, _T(".wpz")))
-    reader = new WaypointReaderZander(filename, the_filenum, compressed);
+  case WaypointFileType::ZANDER:
+    reader = new WaypointReaderZander(the_filenum, compressed);
+    break;
 
-  // If FS waypoint file -> save type and return true
-  else if (MatchesExtension(filename, _T(".wpt"))) {
-    reader = new WaypointReaderFS(filename, the_filenum, compressed);
-    if (reader->VerifyFormat())
-      return;
+  case WaypointFileType::FS:
+    reader = new WaypointReaderFS(the_filenum, compressed);
+    break;
 
-    delete reader;
-    reader = new WaypointReaderOzi(filename, the_filenum, compressed);
-    if (reader->VerifyFormat())
-      return;
+  case WaypointFileType::OZI_EXPLORER:
+    reader = new WaypointReaderOzi(the_filenum, compressed);
+    break;
 
-    delete reader;
-    reader = new WaypointReaderCompeGPS(filename, the_filenum, compressed);
-    if (reader->VerifyFormat())
-      return;
+  case WaypointFileType::COMPE_GPS:
+    reader = new WaypointReaderCompeGPS(the_filenum, compressed);
+    break;
 
-    delete reader;
-    reader = NULL;
+  default:
+    break;
   }
 }

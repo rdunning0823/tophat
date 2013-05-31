@@ -22,7 +22,7 @@
 
 #include "RoutePolars.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
-#include "Navigation/TaskProjection.hpp"
+#include "Geo/Flat/TaskProjection.hpp"
 #include "Terrain/RasterMap.hpp"
 
 #define MC_CEILING_PENALTY_FACTOR 5.0
@@ -32,16 +32,16 @@ RoutePolars::MSLIntercept(const int index, const AGeoPoint& p,
                            const TaskProjection& proj) const
 {
   const unsigned safe_index = ((unsigned)index) % ROUTEPOLAR_POINTS;
-  const FlatGeoPoint fp = proj.project(p);
+  const FlatGeoPoint fp = proj.ProjectInteger(p);
   const fixed d = p.altitude * polar_glide.GetPoint(safe_index).inv_gradient;
-  const fixed scale = proj.get_approx_scale();
+  const fixed scale = proj.GetApproximateScale();
   const int steps = int(d / scale) + 1;
   int dx, dy;
   RoutePolar::IndexToDXDY(safe_index, dx, dy);
   dx = (dx * steps) >> 7;
   dy = (dy * steps) >> 7;
-  const FlatGeoPoint dp(fp.Longitude + dx, fp.Latitude + dy);
-  return proj.unproject(dp);
+  const FlatGeoPoint dp(fp.longitude + dx, fp.latitude + dy);
+  return proj.Unproject(dp);
 }
 
 void
@@ -115,8 +115,8 @@ RoutePolars::CheckClearance(const RouteLink &e, const RasterMap* map,
 
   GeoPoint int_x;
   short int_h;
-  GeoPoint start = proj.unproject(e.first);
-  GeoPoint dest = proj.unproject(e.second);
+  GeoPoint start = proj.Unproject(e.first);
+  GeoPoint dest = proj.Unproject(e.second);
 
   assert(map);
 
@@ -126,7 +126,7 @@ RoutePolars::CheckClearance(const RouteLink &e, const RasterMap* map,
                               int_x, int_h))
     return true;
 
-  inp = RoutePoint(proj.project(int_x), RoughAltitude(int_h));
+  inp = RoutePoint(proj.ProjectInteger(int_x), RoughAltitude(int_h));
   return false;
 }
 
@@ -162,17 +162,17 @@ RoutePolars::NeighbourLink(const RoutePoint &start, const RoutePoint &end,
   // a = asin(sina/256)
   // cosa = 256*cos(a)
 
-  static gcc_constexpr_data int sina[] =
+  static constexpr int sina[] =
     {256, 128, 85, 64, 51, 43, 37, 32, 28, 26, 23, 21, 20, 18 };
-  static gcc_constexpr_data int cosa[] =
+  static constexpr int cosa[] =
     {256, 222, 241, 248, 251, 252, 253, 254, 254, 255, 255, 255, 255, 255 };
 
   const int index = std::min((int)8,
-                             std::max(abs(d.Longitude), abs(d.Latitude)) - 1);
+                             std::max(abs(d.longitude), abs(d.latitude)) - 1);
 
   FlatGeoPoint dr(
-      (d.Longitude * cosa[index] - d.Latitude * sina[index] * sign) >> 8,
-      (d.Longitude * sina[index] * sign + d.Latitude * cosa[index]) >> 8);
+      (d.longitude * cosa[index] - d.latitude * sina[index] * sign) >> 8,
+      (d.longitude * sina[index] * sign + d.latitude * cosa[index]) >> 8);
   RoutePoint pd(start + dr, start.altitude);
   pd.RoundLocation();
   return GenerateIntermediate(start, pd, proj);
@@ -221,8 +221,9 @@ RoutePolars::Intersection(const AGeoPoint& origin, const AGeoPoint& destination,
   if (!map || !map->isMapLoaded())
     return false;
 
-  RouteLink e(RoutePoint(proj.project(destination), destination.altitude),
-              RoutePoint(proj.project(origin), origin.altitude), proj);
+  RouteLink e(RoutePoint(proj.ProjectInteger(destination),
+                         destination.altitude),
+              RoutePoint(proj.ProjectInteger(origin), origin.altitude), proj);
   if (!positive(e.d))
     return false;
 
@@ -252,5 +253,5 @@ RoutePolars::ReachIntercept(const int index, const AGeoPoint& origin,
   const GeoPoint dest = MSLIntercept(index, m_origin, proj);
   const GeoPoint p = valid ?
     map->Intersection(m_origin, (short)altitude, (short)altitude, dest) : dest;
-  return proj.project(p);
+  return proj.ProjectInteger(p);
 }

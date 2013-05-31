@@ -28,6 +28,7 @@ Copyright_License {
 #include "Task/ObservationZones/BGAFixedCourseZone.hpp"
 #include "Task/ObservationZones/BGAEnhancedOptionZone.hpp"
 #include "Task/ObservationZones/CylinderZone.hpp"
+#include "Task/ObservationZones/MatCylinderZone.hpp"
 #include "Task/ObservationZones/AnnularSectorZone.hpp"
 #include "Projection/WindowProjection.hpp"
 #include "MapSettings.hpp"
@@ -122,6 +123,17 @@ OZRenderer::Draw(Canvas &canvas, Layer layer, const Projection &projection,
     break;
   }
 
+  case ObservationZonePoint::MAT_CYLINDER: {
+    const MatCylinderZone &oz = (const MatCylinderZone &)_oz;
+
+    if (layer != LAYER_INACTIVE) {
+      RasterPoint p_center = projection.GeoToScreen(oz.GetReference());
+      canvas.DrawCircle(p_center.x, p_center.y,
+                    projection.GeoToScreenDistance(oz.GetRadius()));
+    }
+
+    break;
+  }
   case ObservationZonePoint::CYLINDER: {
     const CylinderZone &oz = (const CylinderZone &)_oz;
 

@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "ChartProjection.hpp"
 #include "Engine/Task/TaskManager.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 
 void
 ChartProjection::Set(const PixelRect &rc, const TaskManager &task_manager,
@@ -41,7 +41,7 @@ ChartProjection::Set(const PixelRect &rc,
                      const TaskProjection &task_projection,
                      fixed radius_factor)
 {
-  const GeoPoint center = task_projection.get_center();
+  const GeoPoint center = task_projection.GetCenter();
   const fixed radius = max(fixed(10000),
                            task_projection.ApproxRadius() * radius_factor);
   Set(rc, center, radius);
@@ -61,8 +61,8 @@ ChartProjection::Set(const PixelRect &rc, const OrderedTaskPoint &point,
                      const GeoPoint &fallback_loc)
 {
   TaskProjection task_projection;
-  task_projection.reset(fallback_loc);
-  point.scan_projection(task_projection);
+  task_projection.Reset(fallback_loc);
+  point.ScanProjection(task_projection);
 
   Set(rc, task_projection, fixed(1.3));
 }

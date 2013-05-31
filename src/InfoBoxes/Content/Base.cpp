@@ -43,6 +43,12 @@ InfoBoxContent::HandleQuickAccess(const TCHAR *misc)
   return false;
 }
 
+unsigned
+InfoBoxContent::GetQuickAccess()
+{
+  return 0;
+}
+
 const InfoBoxContent::DialogContent *
 InfoBoxContent::GetDialogContent()
 {

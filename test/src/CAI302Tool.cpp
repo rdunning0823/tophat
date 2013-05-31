@@ -23,11 +23,13 @@ Copyright_License {
 
 #include "Device/Driver/CAI302/Internal.hpp"
 #include "Profile/DeviceConfig.hpp"
+#include "Device/Port/Port.hpp"
 #include "Device/Port/ConfiguredPort.hpp"
 #include "DebugPort.hpp"
 #include "OS/Args.hpp"
 #include "Operation/ConsoleOperationEnvironment.hpp"
 #include "Util/Macros.hpp"
+#include "IO/Async/GlobalIOThread.hpp"
 
 #include <stdio.h>
 
@@ -133,6 +135,8 @@ RunCommand(CAI302Device &device, const char *command,
     return device.StartLogging(env);
   else if (strcmp(command, "stoplogger") == 0)
     return device.StopLogging(env);
+  else if (strcmp(command, "clearlog") == 0)
+    return device.ClearLog(env);
   else if (strcmp(command, "pilots") == 0)
     return ListPilots(device, env);
   else if (strcmp(command, "navpoints") == 0)
@@ -161,7 +165,9 @@ int main(int argc, char **argv)
   const char *command = args.ExpectNext();
   args.ExpectEnd();
 
-  Port *port = OpenPort(config, *(Port::Handler *)NULL);
+  InitialiseIOThread();
+
+  Port *port = OpenPort(config, *(DataHandler *)NULL);
   if (port == NULL) {
     fprintf(stderr, "Failed to open port\n");
     return EXIT_FAILURE;
@@ -176,5 +182,6 @@ int main(int argc, char **argv)
   }
 
   delete port;
+  DeinitialiseIOThread();
   return EXIT_SUCCESS;
 }

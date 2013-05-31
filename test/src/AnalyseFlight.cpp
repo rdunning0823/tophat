@@ -20,57 +20,65 @@
 }
 */
 
-#include "Engine/Math/Earth.hpp"
 #include "Engine/Trace/Trace.hpp"
 #include "Contest/ContestManager.hpp"
-#include "Engine/Navigation/Aircraft.hpp"
 #include "OS/Args.hpp"
 #include "DebugReplay.hpp"
-#include "NMEA/Aircraft.hpp"
-#include "XML/Node.hpp"
 #include "Util/Macros.hpp"
 #include "IO/TextWriter.hpp"
 #include "Formatter/TimeFormatter.hpp"
+#include "JSON/Writer.hpp"
+#include "JSON/GeoWriter.hpp"
 
 struct Result {
-  BrokenDateTime takeoff_time, landing_time;
+  BrokenDateTime takeoff_time, release_time, landing_time;
+  GeoPoint takeoff_location, release_location, landing_location;
 
   Result() {
     takeoff_time.Clear();
     landing_time.Clear();
+    release_time.Clear();
+
+    takeoff_location.SetInvalid();
+    landing_location.SetInvalid();
+    release_location.SetInvalid();
   }
 };
 
-static Trace full_trace(60, Trace::null_time, 256);
+static Trace full_trace(0, Trace::null_time, 256);
 static Trace sprint_trace(0, 9000, 64);
 
-static BrokenDateTime
-BreakTime(const NMEAInfo &basic, fixed time)
+static void
+Update(const MoreData &basic, const FlyingState &state,
+       Result &result)
 {
-  assert(basic.time_available);
-  assert(basic.date_available);
+  if (!basic.time_available || !basic.date_available)
+    return;
 
-  BrokenDateTime broken = basic.date_time_utc;
-  (BrokenTime &)broken = BrokenTime::FromSecondOfDayChecked((unsigned)time);
+  if (state.flying && !result.takeoff_time.Plausible()) {
+    result.takeoff_time = basic.GetDateTimeAt(state.takeoff_time);
+    result.takeoff_location = state.takeoff_location;
+  }
 
-  // XXX: what if "time" refers to yesterday/tomorrow? (midnight rollover)
+  if (!state.flying && result.takeoff_time.Plausible() &&
+      !result.landing_time.Plausible()) {
+    result.landing_time = basic.date_time_utc;
 
-  return broken;
+    if (basic.location_available)
+      result.landing_location = basic.location;
+  }
+
+  if (!negative(state.release_time) && !result.release_time.Plausible()) {
+    result.release_time = basic.GetDateTimeAt(state.release_time);
+    result.release_location = state.release_location;
+  }
 }
 
 static void
 Update(const MoreData &basic, const DerivedInfo &calculated,
        Result &result)
 {
-  if (!basic.time_available || !basic.date_available)
-    return;
-
-  if (calculated.flight.flying && !result.takeoff_time.Plausible())
-    result.takeoff_time = BreakTime(basic, calculated.flight.takeoff_time);
-
-  if (!calculated.flight.flying && result.takeoff_time.Plausible() &&
-      !result.landing_time.Plausible())
-    result.landing_time = basic.date_time_utc;
+  Update(basic, calculated.flight, result);
 }
 
 static void
@@ -80,20 +88,38 @@ Finish(const MoreData &basic, const DerivedInfo &calculated,
   if (!basic.time_available || !basic.date_available)
     return;
 
-  if (result.takeoff_time.Plausible() && !result.landing_time.Plausible())
+  if (result.takeoff_time.Plausible() && !result.landing_time.Plausible()) {
     result.landing_time = basic.date_time_utc;
+
+    if (basic.location_available)
+      result.landing_location = basic.location;
+  }
 }
 
 static int
 Run(DebugReplay &replay, ContestManager &contest, Result &result)
 {
-  for (int i = 1; replay.Next(); i++) {
-    Update(replay.Basic(), replay.Calculated(), result);
+  bool released = false;
 
-    const AircraftState state =
-      ToAircraftState(replay.Basic(), replay.Calculated());
-    full_trace.push_back(state);
-    sprint_trace.push_back(state);
+  for (int i = 1; replay.Next(); i++) {
+    const MoreData &basic = replay.Basic();
+
+    Update(basic, replay.Calculated(), result);
+
+    if (!basic.time_available || !basic.location_available ||
+        !basic.NavAltitudeAvailable())
+      continue;
+
+    if (!released && !negative(replay.Calculated().flight.release_time)) {
+      released = true;
+
+      full_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+      sprint_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+    }
+
+    const TracePoint point(basic);
+    full_trace.push_back(point);
+    sprint_trace.push_back(point);
   }
 
   contest.SolveExhaustive();
@@ -104,97 +130,150 @@ Run(DebugReplay &replay, ContestManager &contest, Result &result)
 }
 
 static void
-Add(XMLNode &root, const Result &result,
-    const MoreData &basic, const DerivedInfo &calculated)
+WriteEventAttributes(TextWriter &writer,
+                     const BrokenDateTime &time, const GeoPoint &location)
 {
-  StaticString<64> buffer;
+  JSON::ObjectWriter object(writer);
 
-  XMLNode &times = root.AddChild(_T("times"));
+  if (time.Plausible()) {
+    NarrowString<64> buffer;
+    FormatISO8601(buffer.buffer(), time);
+    object.WriteElement("time", JSON::WriteString, buffer);
+  }
+
+  if (location.IsValid())
+    JSON::WriteGeoPointAttributes(object, location);
+}
+
+static void
+WriteEvent(JSON::ObjectWriter &object, const char *name,
+           const BrokenDateTime &time, const GeoPoint &location)
+{
+  if (time.Plausible() || location.IsValid())
+    object.WriteElement(name, WriteEventAttributes, time, location);
+}
+
+static void
+WriteTimes(TextWriter &writer, const Result &result)
+{
+  JSON::ObjectWriter object(writer);
+  NarrowString<64> buffer;
 
   if (result.takeoff_time.Plausible()) {
     FormatISO8601(buffer.buffer(), result.takeoff_time);
-    times.AddAttribute(_T("takeoff"), buffer.c_str());
+    object.WriteElement("takeoff", JSON::WriteString, buffer);
   }
 
   if (result.landing_time.Plausible()) {
     FormatISO8601(buffer.buffer(), result.landing_time);
-    times.AddAttribute(_T("landing"), buffer.c_str());
+    object.WriteElement("landing", JSON::WriteString, buffer);
   }
 }
 
 static void
-Add(XMLNode &parent, const TracePoint &point, const TracePoint *previous)
+WriteLocations(TextWriter &writer, const Result &result)
 {
-  XMLNode &node = parent.AddChild(_T("point"));
+  JSON::ObjectWriter object(writer);
 
-  StaticString<64> buffer;
+  if (result.takeoff_location.IsValid())
+    object.WriteElement("takeoff", JSON::WriteGeoPoint,
+                        result.takeoff_location);
 
-  buffer.UnsafeFormat(_T("%u"), point.GetTime());
-  node.AddAttribute(_T("time"), buffer.c_str());
+  if (result.landing_location.IsValid())
+    object.WriteElement("landing", JSON::WriteGeoPoint,
+                        result.landing_location);
+}
 
-  buffer.UnsafeFormat(_T("%f"),
-                      (double)point.get_location().longitude.Degrees());
-  node.AddAttribute(_T("longitude"), buffer.c_str());
+static void
+WriteEvents(TextWriter &writer, const Result &result)
+{
+  JSON::ObjectWriter object(writer);
 
-  buffer.UnsafeFormat(_T("%f"),
-                      (double)point.get_location().latitude.Degrees());
-  node.AddAttribute(_T("latitude"), buffer.c_str());
+  WriteEvent(object, "takeoff", result.takeoff_time, result.takeoff_location);
+  WriteEvent(object, "release", result.release_time, result.release_location);
+  WriteEvent(object, "landing", result.landing_time, result.landing_location);
+}
+
+static void
+WriteResult(JSON::ObjectWriter &root, const Result &result)
+{
+  root.WriteElement("events", WriteEvents, result);
+
+  /* the following code is obsolete and is only here for compatibility
+     with old SkyLines code: */
+  root.WriteElement("times", WriteTimes, result);
+  root.WriteElement("locations", WriteLocations, result);
+}
+
+static void
+WritePoint(TextWriter &writer, const ContestTracePoint &point,
+           const ContestTracePoint *previous)
+{
+  JSON::ObjectWriter object(writer);
+
+  object.WriteElement("time", JSON::WriteLong, (long)point.GetTime());
+  JSON::WriteGeoPointAttributes(object, point.GetLocation());
 
   if (previous != NULL) {
-    fixed distance = point.distance(previous->get_location());
-    buffer.UnsafeFormat(_T("%u"), uround(distance));
-    node.AddAttribute(_T("distance"), buffer.c_str());
+    fixed distance = point.DistanceTo(previous->GetLocation());
+    object.WriteElement("distance", JSON::WriteUnsigned, uround(distance));
 
     unsigned duration =
       std::max((int)point.GetTime() - (int)previous->GetTime(), 0);
-    buffer.UnsafeFormat(_T("%u"), duration);
-    node.AddAttribute(_T("duration"), buffer.c_str());
+    object.WriteElement("duration", JSON::WriteUnsigned, duration);
 
     if (duration > 0) {
       fixed speed = distance / duration;
-      buffer.UnsafeFormat(_T("%1.2f"), (double)speed);
-      node.AddAttribute(_T("speed"), buffer.c_str());
+      object.WriteElement("speed", JSON::WriteFixed, speed);
     }
   }
 }
 
 static void
-Add(XMLNode &parent, const TCHAR *name,
-    const ContestResult &result, const ContestTraceVector &trace)
+WriteTrace(TextWriter &writer, const ContestTraceVector &trace)
 {
-  XMLNode &node = parent.AddChild(_T("trace"));
-  node.AddAttribute(_T("name"), name);
+  JSON::ArrayWriter array(writer);
 
-  StaticString<64> buffer;
-
-  buffer.UnsafeFormat(_T("%1.2f"), (double)result.score);
-  node.AddAttribute(_T("score"), buffer.c_str());
-
-  buffer.UnsafeFormat(_T("%1.2f"), (double)result.distance);
-  node.AddAttribute(_T("distance"), buffer.c_str());
-
-  buffer.UnsafeFormat(_T("%u"), uround(result.time));
-  node.AddAttribute(_T("duration"), buffer.c_str());
-
-  buffer.UnsafeFormat(_T("%1.2f"), (double)result.speed);
-  node.AddAttribute(_T("speed"), buffer.c_str());
-
-  const TracePoint *previous = NULL;
+  const ContestTracePoint *previous = NULL;
   for (auto i = trace.begin(), end = trace.end(); i != end; ++i) {
-    Add(node, *i, previous);
+    array.WriteElement(WritePoint, *i, previous);
     previous = &*i;
   }
 }
 
 static void
-AddOLCPlus(XMLNode &parent, const ContestStatistics &stats)
+WriteContest(TextWriter &writer,
+             const ContestResult &result, const ContestTraceVector &trace)
 {
-  XMLNode &node = parent.AddChild(_T("contest"));
-  node.AddAttribute(_T("name"), _T("olc_plus"));
+  JSON::ObjectWriter object(writer);
 
-  Add(node, _T("classic"), stats.result[0], stats.solution[0]);
-  Add(node, _T("triangle"), stats.result[1], stats.solution[1]);
-  Add(node, _T("plus"), stats.result[2], stats.solution[2]);
+  object.WriteElement("score", JSON::WriteFixed, result.score);
+  object.WriteElement("distance", JSON::WriteFixed, result.distance);
+  object.WriteElement("duration", JSON::WriteUnsigned, (unsigned)result.time);
+  object.WriteElement("speed", JSON::WriteFixed, result.GetSpeed());
+
+  object.WriteElement("turnpoints", WriteTrace, trace);
+}
+
+static void
+WriteOLCPlus(TextWriter &writer, const ContestStatistics &stats)
+{
+  JSON::ObjectWriter object(writer);
+
+  object.WriteElement("classic", WriteContest,
+                      stats.result[0], stats.solution[0]);
+  object.WriteElement("triangle", WriteContest,
+                      stats.result[1], stats.solution[1]);
+  object.WriteElement("plus", WriteContest,
+                      stats.result[2], stats.solution[2]);
+}
+
+static void
+WriteContests(TextWriter &writer, const ContestStatistics &olc_plus)
+{
+  JSON::ObjectWriter object(writer);
+
+  object.WriteElement("olc_plus", WriteOLCPlus, olc_plus);
 }
 
 int main(int argc, char **argv)
@@ -209,13 +288,14 @@ int main(int argc, char **argv)
   ContestManager olc_plus(OLC_Plus, full_trace, sprint_trace);
   Result result;
   Run(*replay, olc_plus, result);
-
-  XMLNode root = XMLNode::CreateRoot(_T("analysis"));
-  Add(root, result, replay->Basic(), replay->Calculated());
   delete replay;
 
-  AddOLCPlus(root, olc_plus.GetStats());
-
   TextWriter writer("/dev/stdout", true);
-  root.Serialise(writer, true);
+
+  {
+    JSON::ObjectWriter root(writer);
+
+    WriteResult(root, result);
+    root.WriteElement("contests", WriteContests, olc_plus.GetStats());
+  }
 }

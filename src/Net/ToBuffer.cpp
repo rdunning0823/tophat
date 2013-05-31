@@ -28,27 +28,35 @@ Copyright_License {
 
 #include <stdint.h>
 
-#ifdef HAVE_NET
-
 int
-Net::DownloadToBuffer(Session &session, const TCHAR *url,
+Net::DownloadToBuffer(Session &session, const char *url,
                       void *_buffer, size_t max_length,
                       OperationEnvironment &env)
 {
   Request request(session, url, 10000);
-  if (!request.Created())
+  if (!request.Send(10000))
     return -1;
+
+  int64_t total = request.GetLength();
+  if (total >= 0)
+    env.SetProgressRange(total);
+  total = 0;
 
   uint8_t *buffer = (uint8_t *)_buffer, *p = buffer, *end = buffer + max_length;
   while (p != end) {
     if (env.IsCancelled())
       return -1;
 
-    size_t nbytes = request.Read(p, end - p, 5000);
+    ssize_t nbytes = request.Read(p, end - p, 5000);
+    if (nbytes < 0)
+      return -1;
     if (nbytes == 0)
       break;
 
     p += nbytes;
+
+    total += nbytes;
+    env.SetProgressPosition(total);
   }
 
   return p - buffer;
@@ -59,5 +67,3 @@ Net::DownloadToBufferJob::Run(OperationEnvironment &env)
 {
   length = DownloadToBuffer(session, url, buffer, max_length, env);
 }
-
-#endif

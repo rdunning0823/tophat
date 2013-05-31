@@ -23,8 +23,10 @@ Copyright_License {
 
 #include "Dialogs/Airspace.hpp"
 #include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/Internal.hpp"
-#include "Dialogs/Dialogs.h"
+#include "Dialogs/XML.hpp"
+#include "Form/Form.hpp"
+#include "Form/List.hpp"
+#include "Form/Button.hpp"
 #include "Profile/Profile.hpp"
 #include "Profile/AirspaceConfig.hpp"
 #include "Profile/ProfileKeys.hpp"
@@ -40,6 +42,8 @@ Copyright_License {
 #include "Engine/Airspace/AirspaceWarningManager.hpp"
 #include "Components.hpp"
 #include "Computer/GlideComputer.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
 
 #include <assert.h>
 
@@ -58,7 +62,7 @@ OnAirspacePaintListItem(Canvas &canvas, const PixelRect rc, unsigned i)
     CommonInterface::GetComputerSettings().airspace;
   const AirspaceRendererSettings &renderer =
     CommonInterface::GetMapSettings().airspace;
-  const AirspaceLook &look = CommonInterface::main_window.GetLook().map.airspace;
+  const AirspaceLook &look = CommonInterface::main_window->GetLook().map.airspace;
 
   PixelScalar w0 = rc.right - rc.left - Layout::FastScale(4);
 
@@ -107,7 +111,7 @@ OnAirspaceListEnter(unsigned index)
 
   if (color_mode) {
     AirspaceLook &look =
-      CommonInterface::main_window.SetLook().map.airspace;
+      CommonInterface::main_window->SetLook().map.airspace;
 
     if (!ShowAirspaceClassRendererSettingsDialog((AirspaceClass)index))
       return;
@@ -141,7 +145,7 @@ OnLookupClicked(gcc_unused WndButton &Sender)
   ShowAirspaceListDialog(airspace_database, GetAirspaceWarnings());
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnLookupClicked),
   DeclareCallBackEntry(NULL)

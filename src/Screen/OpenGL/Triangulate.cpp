@@ -279,6 +279,48 @@ PolygonToTriangles(const ShapePoint *points, unsigned num_points,
   return _PolygonToTriangles(points, num_points, triangles, min_distance);
 }
 
+/**
+ * Count the occurrences of each value.
+ */
+static void
+AddValueCounts(unsigned *counts, unsigned max_value,
+               const GLushort *values, const GLushort *values_end)
+{
+  for (const GLushort *i = values; i != values_end; ++i) {
+    const unsigned value = *i;
+    assert(value < max_value);
+    counts[value]++;
+  }
+}
+
+gcc_pure
+static GLushort *
+FindOne(const unsigned *counts, unsigned max_value,
+        GLushort *values, const GLushort *values_end)
+{
+  for (GLushort *i = values; i != values_end; ++i) {
+    const unsigned value = *i;
+    assert(value < max_value);
+    if (counts[value] == 1)
+      return i;
+  }
+
+  return nullptr;
+}
+
+gcc_pure
+static GLushort *
+FindSharedEdge(const unsigned idx1, const unsigned idx2,
+               GLushort *values, const GLushort *values_end)
+{
+  for (GLushort *v = values; v < values_end; v += 3)
+    if ((idx1 == v[0] || idx1 == v[1] || idx1 == v[2]) &&
+        (idx2 == v[0] || idx2 == v[1] || idx2 == v[2]))
+      return v;
+
+  return nullptr;
+}
+
 unsigned
 TriangleToStrip(GLushort *triangles, unsigned index_count,
                 unsigned vertex_count, unsigned polygon_count)
@@ -290,21 +332,19 @@ TriangleToStrip(GLushort *triangles, unsigned index_count,
     return 0;
 
   // count the number of occurrences for each vertex
-  GLushort *vcount = new GLushort[vertex_count]();
+  unsigned *vcount = new unsigned[vertex_count]();
   GLushort *t = triangles;
-  GLushort *v;
   const GLushort * const t_end = triangles + index_count;
-  for (v = t; v < t_end; v++)
-    vcount[*v]++;
+
+  AddValueCounts(vcount, vertex_count, t, t_end);
 
   const unsigned triangle_buffer_size = index_count + 2 * (polygon_count - 1);
   GLushort *triangle_strip = new GLushort[triangle_buffer_size];
   GLushort *strip = triangle_strip;
 
   // search a start point with only one reference
-  for (v = t; v < t_end; v++)
-    if (vcount[*v] == 1)
-      break;
+  GLushort *v = FindOne(vcount, vertex_count, t, t_end);
+  assert(v >= t && v < t_end);
 
   strip[0] = *v;
   v = t + (v - t) / 3 * 3;
@@ -314,7 +354,14 @@ TriangleToStrip(GLushort *triangles, unsigned index_count,
   unsigned strip_size = 0;
   unsigned triangles_left = index_count / 3;
   while (triangles_left > 1) {
-    bool found_something = false;
+    assert(v >= t && v < t_end);
+    assert((v - t) % 3 == 0);
+    assert(v[0] < vertex_count);
+    assert(v[1] < vertex_count);
+    assert(v[2] < vertex_count);
+    assert(vcount[v[0]] > 0);
+    assert(vcount[v[1]] > 0);
+    assert(vcount[v[2]] > 0);
 
     vcount[v[0]]--;
     vcount[v[1]]--;
@@ -338,24 +385,24 @@ TriangleToStrip(GLushort *triangles, unsigned index_count,
     assert(strip + 4 <= triangle_strip + triangle_buffer_size);
 
     // search for a shared edge
+    assert(strip[1] < vertex_count);
+    assert(strip[2] < vertex_count);
     if (vcount[strip[1]] > 0 && vcount[strip[2]] > 0) {
-      for (v = t; v < t_end; v += 3) {
-        if ((strip[1] == v[0] || strip[1] == v[1] || strip[1] == v[2]) &&
-            (strip[2] == v[0] || strip[2] == v[1] || strip[2] == v[2])) {
-          // add triangle to strip
-          strip[3] = v[0] != strip[1] && v[0] != strip[2] ? v[0] :
-                     v[1] != strip[1] && v[1] != strip[2] ? v[1] : v[2];
-          strip++;
-          strip_size++;
-          found_something = true;
-          break;
-        }
+      v = FindSharedEdge(strip[1], strip[2], t, t_end);
+      if (v != nullptr) {
+        // add triangle to strip
+        assert(v >= t && v < t_end);
+
+        strip[3] = v[0] != strip[1] && v[0] != strip[2] ? v[0] :
+          v[1] != strip[1] && v[1] != strip[2] ? v[1] : v[2];
+        strip++;
+        strip_size++;
+        continue;
       }
     }
-    if (found_something)
-      continue;
 
     // search for a single shared vertex
+    bool found_something = false;
     if (vcount[strip[1]] + vcount[strip[2]] > 0) {
       for (v = t; v < t_end; v++) {
         if (strip[2] == *v) {
@@ -364,9 +411,7 @@ TriangleToStrip(GLushort *triangles, unsigned index_count,
         }
         if (strip_size == 0 && strip[1] == *v) {
           // swap the last two indices
-          GLushort tmp = strip[1];
-          strip[1] = strip[2];
-          strip[2] = tmp;
+          std::swap(strip[1], strip[2]);
           found_something = true;
           break;
         }
@@ -375,11 +420,8 @@ TriangleToStrip(GLushort *triangles, unsigned index_count,
 
     if (!found_something) {
       // search for a vertex that has only one reference left
-      for (v = t; v < t_end; v++)
-        if (vcount[*v] == 1)
-          break;
-
-      assert(v != t_end);
+      v = FindOne(vcount, vertex_count, t, t_end);
+      assert(v >= t && v < t_end);
 
       // add two redundant points
       assert(strip + 5 <= triangle_strip + triangle_buffer_size);
@@ -400,8 +442,7 @@ TriangleToStrip(GLushort *triangles, unsigned index_count,
   strip += 3;
 
   // copy strip over triangles
-  for (t = triangles, v = triangle_strip; v < strip; v++, t++)
-    *t = *v;
+  std::copy(triangle_strip, strip, triangles);
 
   //LogDebug(_T("triangle_to_strip: indices=%u strip indices=%u (%u%%)"),
   //         index_count, strip - triangle_strip,

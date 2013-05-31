@@ -24,44 +24,52 @@ Copyright_License {
 #ifndef REPLAY_HPP
 #define REPLAY_HPP
 
-#include "Replay/IgcReplayGlue.hpp"
-#include "Replay/NmeaReplayGlue.hpp"
-#include "Replay/DemoReplayGlue.hpp"
+#include "Math/fixed.hpp"
 
 #include <tchar.h>
 #include <windef.h> /* for MAX_PATH */
-#include <stdio.h>
 
+class Logger;
 class ProtectedTaskManager;
+class AbstractReplay;
 
 class Replay
 {
-  enum ReplayMode {
-    MODE_NULL,
-    MODE_IGC,
-    MODE_NMEA,
-    MODE_DEMO
-  };
+  fixed time_scale;
 
-  ReplayMode mode;
-  IgcReplayGlue igc_replay;
-  NmeaReplayGlue nmea_replay;
-  DemoReplayGlue demo_replay;
+  AbstractReplay *replay;
+
+  Logger *logger;
+  ProtectedTaskManager &task_manager;
+
+  TCHAR path[MAX_PATH];
 
 public:
-  Replay(Logger *_logger, ProtectedTaskManager& task_manager):
-    mode(MODE_NULL),
-    igc_replay(_logger),
-    demo_replay(task_manager) {}
+  Replay(Logger *_logger, ProtectedTaskManager &_task_manager)
+    :time_scale(fixed_one), replay(NULL),
+     logger(_logger), task_manager(_task_manager) {
+    path[0] = _T('\0');
+  }
+
+  ~Replay() {
+    Stop();
+  }
 
   bool Update();
   void Stop();
-  void Start();
-  const TCHAR* GetFilename();
-  void SetFilename(const TCHAR *name);
+  bool Start(const TCHAR *_path);
 
-  fixed GetTimeScale();
-  void SetTimeScale(const fixed time_scale);
+  const TCHAR *GetFilename() const {
+    return path;
+  }
+
+  fixed GetTimeScale() const {
+    return time_scale;
+  }
+
+  void SetTimeScale(const fixed _time_scale) {
+    time_scale = _time_scale;
+  }
 };
 
 #endif

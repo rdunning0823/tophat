@@ -25,9 +25,6 @@ Copyright_License {
 #include "Dialogs/TextEntry.hpp"
 #include "Dialogs/Message.hpp"
 #include "Language/Language.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/TaskPoints/AATPoint.hpp"
-#include "Task/TaskPoints/ASTPoint.hpp"
 #include "Units/Units.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/ObservationZones/CylinderZone.hpp"
@@ -37,6 +34,10 @@ Copyright_License {
 #include "Components.hpp"
 #include "LocalPath.hpp"
 #include "OS/FileUtil.hpp"
+#include "Formatter/TimeFormatter.hpp"
+#include "Formatter/UserUnits.hpp"
+#include "Interface.hpp"
+#include "Engine/Task/TaskBehaviour.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -45,9 +46,15 @@ Copyright_License {
 const TCHAR*
 OrderedTaskFactoryName(TaskFactoryType type)
 {
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
   switch(type) {
   case TaskFactoryType::RACING:
-    return _("Racing");
+    if (is_usa)
+      return _("AT - Assigned task");
+    else
+      return _("Racing");
   case TaskFactoryType::FAI_GENERAL:
     return _("FAI badges/records");
   case TaskFactoryType::FAI_TRIANGLE:
@@ -57,7 +64,12 @@ OrderedTaskFactoryName(TaskFactoryType type)
   case TaskFactoryType::FAI_GOAL:
     return _("FAI goal");
   case TaskFactoryType::AAT:
-    return _("AAT");
+    if (is_usa)
+      return _("TAT - Turn area task");
+    else
+      return _("AAT");
+  case TaskFactoryType::MAT:
+    return _("MAT - Modified area task");
   case TaskFactoryType::MIXED:
     return _("Mixed");
   case TaskFactoryType::TOURING:
@@ -71,9 +83,16 @@ OrderedTaskFactoryName(TaskFactoryType type)
 const TCHAR*
 OrderedTaskFactoryDescription(TaskFactoryType type)
 {
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
+
   switch(type) {
   case TaskFactoryType::RACING:
-    return _("Racing task around turn points.  Can also be used for FAI badge and record tasks.  "
+    if (is_usa)
+      return _("Assigned task. Has 1 mile turn point cylinders.  No minimum time.");
+    else
+      return _("Racing task around turn points.  Can also be used for FAI badge and record tasks.  "
         "Allows all shapes of observation zones.");
   case TaskFactoryType::FAI_GENERAL:
     return _("FAI rules, allows only FAI start, finish and turn point types, for badges and "
@@ -85,8 +104,12 @@ OrderedTaskFactoryDescription(TaskFactoryType type)
   case TaskFactoryType::FAI_GOAL:
     return _("FAI rules, path from start to a goal destination.");
   case TaskFactoryType::AAT:
-    return _("Task through assigned areas, minimum task time applies.  Restricted to cylinder "
-        "and sector observation zones.");
+    if (is_usa)
+      return _("Turn area task.  Has cylinders of varying sizes.  Minimum task time applies.");
+    else
+      return _("Assigned area task.  Has cylinders of varying sizes.  Minimum task time applies.");
+  case TaskFactoryType::MAT:
+    return _("Modified area task.  Task with start, finish and at least one predefined 1-mile cylinder.  Pilot can add additional points as needed.  Minimum task time applies.");
   case TaskFactoryType::MIXED:
     return _("Racing task with a mix of assigned areas and turn points, minimum task time applies.");
   case TaskFactoryType::TOURING:
@@ -139,7 +162,7 @@ TaskSummaryShape(OrderedTask* task, TCHAR* text)
       FAIShape = true;
     }
     else
-      _tcscpy(text, _("non-FAI triangle"));
+      _tcscpy(text, _("triangle"));
     break;
 
   default:
@@ -151,17 +174,37 @@ TaskSummaryShape(OrderedTask* task, TCHAR* text)
 void
 OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
 {
-  const TaskStats &stats = task->GetStats();
-  TCHAR summary_shape[100];
-  bool FAIShape = TaskSummaryShape(task, summary_shape);
-  if (FAIShape || task->get_factory_type() == TaskFactoryType::FAI_GENERAL) {
-    if (!task->GetFactory().ValidateFAIOZs()) {
-      _tcscat(summary_shape, _T("/ "));
-      _tcscat(summary_shape, getTaskValidationErrors(
-          task->GetFactory().GetValidationErrors()));
-    }
+
+  StaticString<120> gate_info;
+  gate_info.clear();
+  const OrderedTaskBehaviour &otb = task->GetOrderedTaskBehaviour();
+
+  if (!otb.fai_finish) {
+    StaticString<25> start_height;
+    StaticString<25> finish_height;
+
+    FormatUserAltitude(fixed(otb.start_max_height), start_height.buffer(), true);
+    FormatUserAltitude(fixed(otb.finish_min_height), finish_height.buffer(), true);
+
+    gate_info.Format(_T("\nStart Height: %s %s. Finish Height: %s %s. "),
+                     start_height.c_str(),
+                     (otb.start_max_height_ref == HeightReferenceType::AGL)
+                       ? _("AGL") : _("MSL"),
+                     finish_height.c_str(),
+                     (otb.finish_min_height_ref == HeightReferenceType::AGL)
+                       ? _("AGL") : _("MSL"));
   }
 
+  if (task->HasTargets()) {
+    StaticString<50> time_info;
+    FormatSignedTimeHHMM(time_info.buffer(), (int)otb.aat_min_time);
+    gate_info.append(_("Min Time: "));
+    gate_info.append(time_info.c_str());
+  }
+
+  const TaskStats &stats = task->GetStats();
+  TCHAR summary_shape[100];
+  TaskSummaryShape(task, summary_shape);
 
   TCHAR linebreak[3];
   if (linebreaks) {
@@ -175,10 +218,11 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
 
   if (!task->TaskSize()) {
     _stprintf(text, _("Task is empty (%s)"),
-             OrderedTaskFactoryName(task->get_factory_type()));
+             OrderedTaskFactoryName(task->GetFactoryType()));
   } else {
     if (task->HasTargets())
-      _stprintf(text, _T("%s%s%.0f %s%s%s %.0f %s%s%s %.0f %s (%s)"),
+      _stprintf(text, _T("%s. %s%s%.0f %s%s%s %.0f %s%s%s %.0f %s %s"),
+                OrderedTaskFactoryName(task->GetFactoryType()),
                 summary_shape,
                 linebreak,
                 (double)Units::ToUserDistance(stats.distance_nominal),
@@ -191,15 +235,16 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
                 _("min."),
                 (double)Units::ToUserDistance(stats.distance_min),
                 Units::GetDistanceName(),
-                OrderedTaskFactoryName(task->get_factory_type()));
+                gate_info.c_str());
     else
-      _stprintf(text, _T("%s%s%s %.0f %s (%s)"),
+      _stprintf(text, _T("%s. %s%s%s %.0f %s %s"),
+                OrderedTaskFactoryName(task->GetFactoryType()),
                 summary_shape,
                 linebreak,
                 _("dist."),
                 (double)Units::ToUserDistance(stats.distance_nominal),
                 Units::GetDistanceName(),
-                OrderedTaskFactoryName(task->get_factory_type()));
+                gate_info.c_str());
   }
 }
 
@@ -213,11 +258,11 @@ OrderedTaskPointLabel(TaskPoint::Type type, const TCHAR *name,
     break;
 
   case TaskPoint::AST:
-    _stprintf(buffer, _T("T%d: %s"), index, name);
+    _stprintf(buffer, _T("%d: %s"), index, name);
     break;
 
   case TaskPoint::AAT:
-    _stprintf(buffer, _T("A%d: %s"), index, name);
+    _stprintf(buffer, _T("%d: %s"), index, name);
     break;
 
   case TaskPoint::FINISH:
@@ -229,6 +274,31 @@ OrderedTaskPointLabel(TaskPoint::Type type, const TCHAR *name,
   }
 }
 
+void
+OrderedTaskPointLabelMapAction(TaskPoint::Type type, const TCHAR *name,
+                               unsigned index, TCHAR* buffer)
+{
+  switch (type) {
+  case TaskPoint::START:
+    _stprintf(buffer, _T("Zoom to start: %s"), name);
+    break;
+
+  case TaskPoint::AST:
+    _stprintf(buffer, _T("Zoom to T%d: %s"), index, name);
+    break;
+
+  case TaskPoint::AAT:
+    _stprintf(buffer, _T("Drag target %d: %s"), index, name);
+    break;
+
+  case TaskPoint::FINISH:
+    _stprintf(buffer, _T("Zoom to finish:  %s"), name);
+    break;
+
+  default:
+    break;
+  }
+}
 void
 OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 {
@@ -245,13 +315,14 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
     return;
 
   case ObservationZonePoint::LINE:
-    _stprintf(buffer,_T("%s  - %s: %.1f%s"), _("Line"), _("Gate Width"),
+    _stprintf(buffer,_T("%s: %.1f%s"), _("Gate Width"),
               (double)Units::ToUserDistance(((const LineSectorZone &)ozp).GetLength()),
               Units::GetDistanceName());
     return;
 
   case ObservationZonePoint::CYLINDER:
-    _stprintf(buffer,_T("%s  - %s: %.1f%s"), _("Cylinder"), _("Radius"),
+  case ObservationZonePoint::MAT_CYLINDER:
+    _stprintf(buffer,_T("%.1f%s"),
               (double)Units::ToUserDistance(((const CylinderZone &)ozp).GetRadius()),
               Units::GetDistanceName());
     return;
@@ -277,44 +348,46 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 }
 
 const TCHAR*
-OrderedTaskPointDescription(AbstractTaskFactory::LegalPointType type)
+OrderedTaskPointDescription(TaskPointFactoryType type)
 {
   switch (type) {
-  case AbstractTaskFactory::START_SECTOR:
+  case TaskPointFactoryType::START_SECTOR:
     return _("A 90 degree sector with 1km radius. Cross corner edge from inside area to start.");
-  case AbstractTaskFactory::START_LINE:
+  case TaskPointFactoryType::START_LINE:
     return _("A straight line start gate.  Cross start gate from inside area to start.");
-  case AbstractTaskFactory::START_CYLINDER:
+  case TaskPointFactoryType::START_CYLINDER:
     return _("A cylinder.  Exit area to start.");
-  case AbstractTaskFactory::START_BGA:
+  case TaskPointFactoryType::START_BGA:
     return _("A 180 degree sector with 5km radius.  Exit area in any direction to start.");
-  case AbstractTaskFactory::FAI_SECTOR:
+  case TaskPointFactoryType::FAI_SECTOR:
     return _("A 90 degree sector with 'infinite' length sides.  Cross any edge, scored from "
         "corner point.");
-  case AbstractTaskFactory::AST_CYLINDER:
+  case TaskPointFactoryType::AST_CYLINDER:
     return _("A cylinder.  Any point within area scored from center.");
-  case AbstractTaskFactory::KEYHOLE_SECTOR:
+  case TaskPointFactoryType::KEYHOLE_SECTOR:
     return _("(German rules) Any point within 1/2 km of center or 10km of a 90 degree sector.  "
         "Scored from center.");
-  case AbstractTaskFactory::BGAFIXEDCOURSE_SECTOR:
+  case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
     return _("(British rules) Any point within 1/2 km of center or 20km of a 90 degree sector.  "
         "Scored from center.");
-  case AbstractTaskFactory::BGAENHANCEDOPTION_SECTOR:
+  case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
     return _("(British rules) Any point within 1/2 km of center or 10km of a 180 degree sector.  "
         "Scored from center.");
-  case AbstractTaskFactory::AAT_CYLINDER:
+  case TaskPointFactoryType::AAT_CYLINDER:
     return _("A cylinder.  Scored by farthest point reached in area.");
-  case AbstractTaskFactory::AAT_SEGMENT:
+  case TaskPointFactoryType::MAT_CYLINDER:
+    return _("A 1 mile cylinder.  Scored by farthest point reached in area.");
+  case TaskPointFactoryType::AAT_SEGMENT:
     return _("A sector that can vary in angle and radius.  Scored by farthest point reached "
         "inside area.");
-  case AbstractTaskFactory::AAT_ANNULAR_SECTOR:
+  case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
     return _("A sector that can vary in angle, inner and outer radius.  Scored by farthest point "
         "reached inside area.");
-  case AbstractTaskFactory::FINISH_SECTOR:
+  case TaskPointFactoryType::FINISH_SECTOR:
     return _("A 90 degree sector with 1km radius.  Cross edge to finish.");
-  case AbstractTaskFactory::FINISH_LINE:
+  case TaskPointFactoryType::FINISH_LINE:
     return _("Cross finish gate line into area to finish.");
-  case AbstractTaskFactory::FINISH_CYLINDER:
+  case TaskPointFactoryType::FINISH_CYLINDER:
     return _("Enter cylinder to finish.");
   }
 
@@ -323,38 +396,40 @@ OrderedTaskPointDescription(AbstractTaskFactory::LegalPointType type)
 }
 
 const TCHAR*
-OrderedTaskPointName(AbstractTaskFactory::LegalPointType type)
+OrderedTaskPointName(TaskPointFactoryType type)
 {
   switch (type) {
-  case AbstractTaskFactory::START_SECTOR:
+  case TaskPointFactoryType::START_SECTOR:
     return _("FAI start quadrant");
-  case AbstractTaskFactory::START_LINE:
+  case TaskPointFactoryType::START_LINE:
     return _("Start line");
-  case AbstractTaskFactory::START_CYLINDER:
+  case TaskPointFactoryType::START_CYLINDER:
     return _("Start cylinder");
-  case AbstractTaskFactory::START_BGA:
+  case TaskPointFactoryType::START_BGA:
     return _("BGA start sector");
-  case AbstractTaskFactory::FAI_SECTOR:
+  case TaskPointFactoryType::FAI_SECTOR:
     return _("FAI quadrant");
-  case AbstractTaskFactory::KEYHOLE_SECTOR:
+  case TaskPointFactoryType::KEYHOLE_SECTOR:
     return _("Keyhole sector (DAeC)");
-  case AbstractTaskFactory::BGAFIXEDCOURSE_SECTOR:
+  case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
     return _("BGA Fixed Course sector");
-  case AbstractTaskFactory::BGAENHANCEDOPTION_SECTOR:
+  case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
     return _("BGA Enhanced Option Fixed Course sector");
-  case AbstractTaskFactory::AST_CYLINDER:
+  case TaskPointFactoryType::AST_CYLINDER:
     return _("Turn point cylinder");
-  case AbstractTaskFactory::AAT_CYLINDER:
+  case TaskPointFactoryType::AAT_CYLINDER:
     return _("Area cylinder");
-  case AbstractTaskFactory::AAT_SEGMENT:
+  case TaskPointFactoryType::MAT_CYLINDER:
+    return _("Cylinder with 1 mile radius.");
+  case TaskPointFactoryType::AAT_SEGMENT:
     return _("Area sector");
-  case AbstractTaskFactory::AAT_ANNULAR_SECTOR:
+  case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
     return _("Area sector with inner radius");
-  case AbstractTaskFactory::FINISH_SECTOR:
+  case TaskPointFactoryType::FINISH_SECTOR:
     return _("FAI finish quadrant");
-  case AbstractTaskFactory::FINISH_LINE:
+  case TaskPointFactoryType::FINISH_LINE:
     return _("Finish line");
-  case AbstractTaskFactory::FINISH_CYLINDER:
+  case TaskPointFactoryType::FINISH_CYLINDER:
     return _("Finish cylinder");
   }
 
@@ -425,6 +500,8 @@ TaskValidationError(AbstractTaskFactory::TaskValidationErrorType type)
     return _("Empty task.\n");
   case AbstractTaskFactory::NON_FAI_OZS:
     return _("non-FAI turn points");
+  case AbstractTaskFactory::NON_MAT_OZS:
+    return _("non-MAT turn points");
   }
 
   assert(false);

@@ -59,7 +59,7 @@ Layout::Initialize(unsigned width, unsigned height)
 
   pen_width_scale = std::max(1024u, x_dpi * 1024u / 80u);
 
-  minimum_control_height = Scale(22);
+  minimum_control_height = Scale(30);
 
   if (HasTouchScreen()) {
     /* larger rows for touch screens */

@@ -22,12 +22,12 @@ Copyright_License {
 */
 
 #include "NOAAStore.hpp"
-#include "NOAADownloader.hpp"
-#include "METARParser.hpp"
 #include "ParsedMETAR.hpp"
 #include "Util/Macros.hpp"
 
 #ifdef _UNICODE
+#include "Util/ConvertString.hpp"
+
 #include <windows.h>
 #endif
 
@@ -44,54 +44,6 @@ NOAAStore::Item::GetCodeT() const
 }
 
 #endif
-
-bool
-NOAAStore::Item::GetMETAR(METAR &_metar) const
-{
-  if (!metar_available)
-    return false;
-
-  _metar = metar;
-  return true;
-}
-
-bool
-NOAAStore::Item::GetParsedMETAR(ParsedMETAR &_parsed_metar) const
-{
-  if (!parsed_metar_available)
-    return false;
-
-  _parsed_metar = parsed_metar;
-  return true;
-}
-
-bool
-NOAAStore::Item::GetTAF(TAF &_taf) const
-{
-  if (!taf_available)
-    return false;
-
-  _taf = taf;
-  return true;
-}
-
-bool
-NOAAStore::Item::Update(JobRunner &runner)
-{
-  bool metar_downloaded = NOAADownloader::DownloadMETAR(code, metar, runner);
-  if (metar_downloaded) {
-    metar_available = true;
-
-    if (METARParser::Parse(metar, parsed_metar))
-      parsed_metar_available = true;
-  }
-
-  bool taf_downloaded = NOAADownloader::DownloadTAF(code, taf, runner);
-  if (taf_downloaded)
-    taf_available = true;
-
-  return metar_downloaded && taf_downloaded;
-}
 
 bool
 NOAAStore::IsValidCode(const char *code)
@@ -149,21 +101,8 @@ NOAAStore::AddStation(const TCHAR *code)
 {
   assert(IsValidCode(code));
 
-  size_t len = _tcslen(code);
-  char code2[len * 4 + 1];
-  ::WideCharToMultiByte(CP_UTF8, 0, code, len, code2, sizeof(code2), NULL, NULL);
-  code2[4] = 0;
-
+  WideToUTF8Converter code2(code);
+  assert(code2.IsValid());
   return AddStation(code2);
 }
 #endif
-
-bool
-NOAAStore::Update(JobRunner &runner)
-{
-  bool result = true;
-  for (auto i = begin(), e = end(); i != e; ++i)
-    result = i->Update(runner) && result;
-
-  return result;
-}

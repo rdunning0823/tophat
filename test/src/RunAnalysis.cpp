@@ -106,7 +106,12 @@ dlgAirspaceWarningsShowModal(SingleWindow &parent,
 }
 
 void dlgTaskManagerShowModal(SingleWindow &parent) {}
-void ConditionMonitorsUpdate(const GlideComputer &cmp) {}
+
+void
+ConditionMonitorsUpdate(const NMEAInfo &basic, const DerivedInfo &calculated,
+                        const ComputerSettings &settings)
+{
+}
 
 bool InputEvents::processGlideComputer(unsigned) { return false; }
 
@@ -119,8 +124,6 @@ InputEvents::processNmea(unsigned key)
 {
   return true;
 }
-
-int GetUTCOffset() { return 0; }
 
 /* done with fake symbols. */
 

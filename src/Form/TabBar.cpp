@@ -29,20 +29,22 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Asset.hpp"
 
+#ifdef HAVE_CLIPPING
+#include "Look/DialogLook.hpp"
+#endif
+
 #include <assert.h>
 #include <winuser.h>
 
 TabBarControl::TabBarControl(ContainerWindow &_parent, const DialogLook &look,
                              PixelScalar x, PixelScalar y,
                              UPixelScalar _width, UPixelScalar _height,
-                             const WindowStyle style, bool _flipOrientation,
-                             bool _clientOverlapTabs)
+                             const WindowStyle style, bool _flipOrientation)
   :tab_display(NULL),
    tab_line_height((Layout::landscape ^ _flipOrientation)
                  ? (Layout::Scale(TabLineHeightInitUnscaled) * 0.75)
                  : Layout::Scale(TabLineHeightInitUnscaled)),
    flip_orientation(_flipOrientation),
-   client_overlap_tabs(_clientOverlapTabs),
    page_flipped_callback(NULL)
 {
   set(_parent, 0, 0, _parent.GetWidth(), _parent.GetHeight(), style),
@@ -52,12 +54,15 @@ TabBarControl::TabBarControl(ContainerWindow &_parent, const DialogLook &look,
                                  flip_orientation);
 
   PixelRect rc = GetClientRect();
-  if (!_clientOverlapTabs) {
-    if (Layout::landscape ^ flip_orientation)
-      rc.left += tab_display->GetTabWidth();
+  if (Layout::landscape ^ flip_orientation)
+    rc.left += tab_display->GetTabWidth();
+  else {
+    if (y +_height == _parent.GetHeight())
+      rc.bottom -= tab_display->GetTabHeight();
     else
       rc.top += tab_display->GetTabHeight();
   }
+
 
   pager.Move(rc);
 }
@@ -69,25 +74,6 @@ TabBarControl::~TabBarControl()
   reset();
 }
 
-void
-TabBarControl::SetClientOverlapTabs(bool value)
-{
-  if (client_overlap_tabs == value)
-    return;
-
-  client_overlap_tabs = value;
-
-  PixelRect rc = GetClientRect();
-  if (!client_overlap_tabs) {
-    if (Layout::landscape ^ flip_orientation)
-      rc.left += tab_display->GetTabWidth();
-    else
-      rc.top += tab_display->GetTabHeight();
-  }
-
-  pager.Move(rc);
-}
-
 const TCHAR*
 TabBarControl::GetButtonCaption(unsigned i) const
 {
@@ -95,11 +81,10 @@ TabBarControl::GetButtonCaption(unsigned i) const
 }
 
 unsigned
-TabBarControl::AddTab(Widget *widget, const TCHAR *caption,
-                      bool button_only, const Bitmap *bmp)
+TabBarControl::AddTab(Widget *widget, const TCHAR *caption, const Bitmap *bmp)
 {
   pager.Add(widget);
-  tab_display->Add(caption, button_only, bmp);
+  tab_display->Add(caption, bmp);
   return GetTabCount() - 1;
 }
 
@@ -200,3 +185,18 @@ TabBarControl::OnDestroy()
 
   ContainerWindow::OnDestroy();
 }
+
+#ifdef HAVE_CLIPPING
+
+void
+TabBarControl::OnPaint(Canvas &canvas)
+{
+  /* erase the remaining background area, just in case the TabDisplay
+     does not cover the whole height or width; this is necessary only
+     on GDI */
+
+  if (tab_display != NULL)
+    canvas.Clear(tab_display->GetLook().background_color);
+}
+
+#endif

@@ -28,7 +28,7 @@ Copyright_License {
 #include "Projection/WindowProjection.hpp"
 #include "Renderer/AirspaceRendererSettings.hpp"
 #include "MapCanvas.hpp"
-#include "Navigation/SearchPointVector.hpp"
+#include "Geo/SearchPointVector.hpp"
 
 MapDrawHelper::MapDrawHelper(Canvas &_canvas, Canvas &_buffer, Canvas &_stencil,
                              const WindowProjection &_proj,
@@ -66,7 +66,7 @@ MapDrawHelper::DrawSearchPointVector(const SearchPointVector &points)
   /* copy all SearchPointVector elements to geo_points */
   geo_points.GrowDiscard(size * 3);
   for (unsigned i = 0; i < size; ++i)
-    geo_points[i] = points[i].get_location();
+    geo_points[i] = points[i].GetLocation();
 
   /* clip them */
   size = clip.ClipPolygon(geo_points.begin(), geo_points.begin(), size);

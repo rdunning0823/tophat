@@ -23,15 +23,17 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/Internal.hpp"
+#include "Dialogs/XML.hpp"
+#include "Dialogs/Message.hpp"
 #include "UIGlobals.hpp"
 #include "Form/TabMenu.hpp"
+#include "Form/CheckBox.hpp"
+#include "Form/Button.hpp"
+#include "Form/DataField/FileReader.hpp"
 #include "Screen/Busy.hpp"
 #include "Screen/Key.h"
-#include "Form/CheckBox.hpp"
 #include "Screen/Layout.hpp"
 #include "Profile/Profile.hpp"
-#include "Form/DataField/FileReader.hpp"
 #include "LogFile.hpp"
 #include "Util/Macros.hpp"
 #include "ConfigPanels/ConfigPanel.hpp"
@@ -57,28 +59,37 @@ Copyright_License {
 #include "ConfigPanels/GaugesConfigPanel.hpp"
 #include "ConfigPanels/VarioConfigPanel.hpp"
 #include "ConfigPanels/TaskRulesConfigPanel.hpp"
-#include "ConfigPanels/TaskDefaultsConfigPanel.hpp"
 #include "ConfigPanels/InfoBoxesConfigPanel.hpp"
-#include "ConfigPanels/ExperimentalConfigPanel.hpp"
 #include "Interface.hpp"
+#include "Language/Language.hpp"
+#include "Audio/Features.hpp"
+
+#ifdef HAVE_PCM_PLAYER
+#include "ConfigPanels/AudioVarioConfigPanel.hpp"
+#endif
 
 #ifdef HAVE_TRACKING
 #include "ConfigPanels/TrackingConfigPanel.hpp"
 #endif
 
+#ifdef HAVE_MODEL_TYPE
+#include "ConfigPanels/ExperimentalConfigPanel.hpp"
+#endif
+
 #include <assert.h>
 
 static unsigned current_page;
-static WndForm *wf = NULL;
+static WndForm *dialog = NULL;
+static bool single_page;
 
-static TabMenuControl* wTabMenu = NULL;
+static TabMenuControl* tab_menu = NULL;
 
 const TCHAR *main_menu_captions[] = {
   N_("Site Files"),
   N_("Map Display"),
   N_("Glide Computer"),
   N_("Gauges"),
-  N_("Task Defaults"),
+  N_("Contest"),
   N_("Look"),
   N_("Setup"),
 };
@@ -93,19 +104,16 @@ static const TabMenuControl::PageItem pages[] = {
   {N_("Safety Factors"), 2, CreateSafetyFactorsConfigPanel },
   {N_("Glide Computer"), 2, CreateGlideComputerConfigPanel },
   {N_("Wind"), 2, CreateWindConfigPanel },
-  {N_("Route"), 2, CreateRouteConfigPanel },
   {N_("FLARM, Other"), 3, CreateGaugesConfigPanel },
-  {N_("Vario"), 3, CreateVarioConfigPanel },
-  {N_("Task Rules"), 4, CreateTaskRulesConfigPanel },
-  {N_("Turnpoint Types"), 4, CreateTaskDefaultsConfigPanel },
+#ifdef HAVE_PCM_PLAYER
+  {N_("Audio Vario"), 3, CreateAudioVarioConfigPanel },
+#endif
+  {N_("Contest"), 4, CreateTaskRulesConfigPanel },
   {N_("Language, Input"), 5, CreateInterfaceConfigPanel },
   {N_("Screen Layout"), 5, CreateLayoutConfigPanel },
   {N_("InfoBox Pages"), 5, CreatePagesConfigPanel },
   {N_("InfoBox Modes"), 5, CreateInfoBoxesConfigPanel },
-  {N_("Devices"), 6, CreateDevicesConfigPanel },
-  {N_("Polar"), 6, CreatePolarConfigPanel },
   {N_("Logger"), 6, CreateLoggerConfigPanel },
-  {N_("Logger Info"), 6, CreateLoggerInfoConfigPanel },
   {N_("Units"), 6, CreateUnitsConfigPanel },
   // Important: all pages after Units in this list must not have data fields that are
   // unit-dependent because they will be saved after their units may have changed.
@@ -122,28 +130,28 @@ static const TabMenuControl::PageItem pages[] = {
 WndForm &
 ConfigPanel::GetForm()
 {
-  assert(wf != NULL);
+  assert(dialog != NULL);
 
-  return *wf;
+  return *dialog;
 }
 
 WndButton *
 ConfigPanel::GetExtraButton(unsigned number)
 {
-  assert(number>=1 && number<=2);
+  assert(number >= 1 && number <= 2);
 
-  WndButton *ExtraButton = NULL;
+  WndButton *extra_button = NULL;
 
   switch (number) {
   case 1:
-    ExtraButton = (WndButton *)wf->FindByName(_T("cmdExtra1"));
+    extra_button = (WndButton *)dialog->FindByName(_T("cmdExtra1"));
     break;
   case 2:
-    ExtraButton = (WndButton *)wf->FindByName(_T("cmdExtra2"));
+    extra_button = (WndButton *)dialog->FindByName(_T("cmdExtra2"));
     break;
   }
 
-  return ExtraButton;
+  return extra_button;
 }
 
 static void
@@ -151,21 +159,21 @@ OnUserLevel(CheckBoxControl &control)
 {
   const bool expert = control.GetState();
   CommonInterface::SetUISettings().dialog.expert = expert;
-  Profile::Set(szProfileUserLevel, expert);
-  wf->FilterAdvanced(expert);
-  wTabMenu->UpdateLayout();
+  Profile::Set(ProfileKeys::UserLevel, expert);
+  dialog->FilterAdvanced(expert);
+  tab_menu->UpdateLayout();
 }
 
 static void
 OnNextClicked(gcc_unused WndButton &button)
 {
-  wTabMenu->NextPage();
+  tab_menu->NextPage();
 }
 
 static void
 OnPrevClicked(gcc_unused WndButton &button)
 {
-  wTabMenu->PreviousPage();
+  tab_menu->PreviousPage();
 }
 
 /**
@@ -174,26 +182,29 @@ OnPrevClicked(gcc_unused WndButton &button)
 static void
 OnCloseClicked(gcc_unused WndButton &button)
 {
-  if (wTabMenu->IsCurrentPageTheMenu())
-    wf->SetModalResult(mrOK);
+  if (tab_menu->IsCurrentPageTheMenu() || single_page)
+    dialog->SetModalResult(mrOK);
   else
-    wTabMenu->GotoMenuPage();
+    tab_menu->GotoMenuPage();
 }
 
 static bool
 FormKeyDown(gcc_unused WndForm &Sender, unsigned key_code)
 {
+  if (single_page)
+    return false;
+
   switch (key_code) {
   case VK_LEFT:
 #ifdef GNAV
   case '6':
 #endif
-    if (wTabMenu->IsCurrentPageTheMenu()) {
-      wTabMenu->FocusMenuPage();
-      wTabMenu->HighlightPreviousMenuItem();
+    if (tab_menu->IsCurrentPageTheMenu()) {
+      tab_menu->FocusMenuPage();
+      tab_menu->HighlightPreviousMenuItem();
     } else {
-      wTabMenu->PreviousPage();
-      ((WndButton *)wf->FindByName(_T("cmdPrev")))->SetFocus();
+      tab_menu->PreviousPage();
+      ((WndButton *)dialog->FindByName(_T("cmdPrev")))->SetFocus();
     }
     return true;
 
@@ -201,12 +212,12 @@ FormKeyDown(gcc_unused WndForm &Sender, unsigned key_code)
 #ifdef GNAV
   case '7':
 #endif
-    if (wTabMenu->IsCurrentPageTheMenu()) {
-      wTabMenu->FocusMenuPage();
-      wTabMenu->HighlightNextMenuItem();
+    if (tab_menu->IsCurrentPageTheMenu()) {
+      tab_menu->FocusMenuPage();
+      tab_menu->HighlightNextMenuItem();
     } else {
-      wTabMenu->NextPage();
-      ((WndButton *)wf->FindByName(_T("cmdNext")))->SetFocus();
+      tab_menu->NextPage();
+      ((WndButton *)dialog->FindByName(_T("cmdNext")))->SetFocus();
     }
     return true;
 
@@ -218,17 +229,17 @@ FormKeyDown(gcc_unused WndForm &Sender, unsigned key_code)
 static void
 PrepareConfigurationMenu()
 {
-  assert (wf != NULL);
+  assert (dialog != NULL);
 
-  wTabMenu = (TabMenuControl*)wf->FindByName(_T("TabMenu"));
-  assert(wTabMenu != NULL);
-  wTabMenu->InitMenu(pages,
+  tab_menu = (TabMenuControl*)dialog->FindByName(_T("TabMenu"));
+  assert(tab_menu != NULL);
+  tab_menu->InitMenu(pages,
                      ARRAY_SIZE(pages),
                      main_menu_captions,
                      ARRAY_SIZE(main_menu_captions));
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnNextClicked),
   DeclareCallBackEntry(OnPrevClicked),
   DeclareCallBackEntry(OnUserLevel),
@@ -237,65 +248,77 @@ static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
 };
 
 static void
-PrepareConfigurationDialog()
+PrepareConfigurationDialog(const TCHAR *page_name)
 {
   gcc_unused ScopeBusyIndicator busy;
 
-  wf = LoadDialog(CallBackTable, UIGlobals::GetMainWindow(),
+  dialog = LoadDialog(CallBackTable, UIGlobals::GetMainWindow(),
                   Layout::landscape ? _T("IDR_XML_CONFIGURATION_L") :
                                       _T("IDR_XML_CONFIGURATION"));
-  if (wf == NULL)
+  if (dialog == NULL)
     return;
 
-  wf->SetKeyDownNotify(FormKeyDown);
+  dialog->SetKeyDownNotify(FormKeyDown);
 
+  CommonInterface::SetUISettings().dialog.expert = false;
   bool expert_mode = CommonInterface::GetUISettings().dialog.expert;
-  CheckBox *cb = (CheckBox *)wf->FindByName(_T("Expert"));
+  CheckBox *cb = (CheckBox *)dialog->FindByName(_T("Expert"));
   cb->SetState(expert_mode);
-  wf->FilterAdvanced(expert_mode);
+  dialog->FilterAdvanced(expert_mode);
 
   PrepareConfigurationMenu();
-
-  wTabMenu->GotoMenuPage();
+  int page = tab_menu->FindPage(page_name);
+  single_page = (page >= 0);
+  cb->SetVisible(!single_page);
+  if (single_page) {
+    assert((unsigned)page < tab_menu->GetNumPages());
+    WndButton *b = (WndButton*)dialog->FindByName(_T("cmdPrev"));
+    b->SetVisible(false);
+    b = (WndButton*)dialog->FindByName(_T("cmdNext"));
+    b->SetVisible(false);
+    current_page = (unsigned)page;
+    tab_menu->SetCurrentPage(current_page);
+  } else
+    tab_menu->GotoMenuPage();
   /* restore last selected menu item */
   static bool Initialized = false;
   if (!Initialized)
     Initialized = true;
   else
-    wTabMenu->SetLastContentPage(current_page);
+    tab_menu->SetLastContentPage(current_page);
 }
 
 static void
 Save()
 {
   /* save page number for next time this dialog is opened */
-  current_page = wTabMenu->GetLastContentPage();
+  current_page = tab_menu->GetLastContentPage();
 
   // TODO enhancement: implement a cancel button that skips all this
   // below after exit.
   bool changed = false;
   bool requirerestart = false;
-  wTabMenu->Save(changed, requirerestart);
+  tab_menu->Save(changed, requirerestart);
 
   if (changed) {
     Profile::Save();
     LogDebug(_T("Configuration: Changes saved"));
     if (requirerestart)
-      ShowMessageBox(_("Changes to configuration saved.  Restart XCSoar to apply changes."),
+      ShowMessageBox(_("Changes to configuration saved.  Restart Top Hat to apply changes."),
                   _T(""), MB_OK);
   }
 }
 
-void dlgConfigurationShowModal()
+void dlgConfigurationShowModal(const TCHAR *page_name)
 {
-  PrepareConfigurationDialog();
+  PrepareConfigurationDialog(page_name);
 
-  wf->ShowModal();
+  dialog->ShowModal();
 
-  if (wf->IsDefined()) {
+  if (dialog->IsDefined()) {
     /* hide the dialog, to avoid redraws inside Save() on a dialog
        that has already been deregistered from the SingleWindow */
-    wf->Hide();
+    dialog->Hide();
 
     Save();
   }
@@ -303,8 +326,8 @@ void dlgConfigurationShowModal()
   /* destroy the TabMenuControl first, to have a well-defined
      destruction order; this is necessary because some config panels
      refer to buttons belonging to the dialog */
-  wTabMenu->reset();
+  tab_menu->reset();
 
-  delete wf;
-  wf = NULL;
+  delete dialog;
+  dialog = NULL;
 }

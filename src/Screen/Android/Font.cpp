@@ -38,7 +38,7 @@ Font::Set(const LOGFONT &log)
 }
 
 /*
- * create a new instance of org.xcsoar.TextUtil and store it with a global
+ * create a new instance of org.tophat.TextUtil and store it with a global
  * reference in text_util_object member.
  */
 bool
@@ -52,7 +52,6 @@ Font::Set(const TCHAR *facename, UPixelScalar height, bool bold, bool italic)
     return false;
 
   this->height = text_util_object->get_height();
-  style = text_util_object->get_style();
   ascent_height = text_util_object->get_ascent_height();
   capital_height = text_util_object->get_capital_height();
   line_spacing = text_util_object->GetLineSpacing();

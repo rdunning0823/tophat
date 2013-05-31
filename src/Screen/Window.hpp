@@ -60,7 +60,7 @@ protected:
   int text_style;
 
 public:
-  gcc_constexpr_ctor
+  constexpr
   WindowStyle()
     :visible(true), enabled(true),
      tab_stop(false), control_parent(false),
@@ -79,7 +79,7 @@ protected:
 #endif
 
 public:
-  gcc_constexpr_ctor
+  constexpr
   WindowStyle()
     :style(WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS),
      ex_style(0), double_clicks(false), custom_painting(false)
@@ -434,6 +434,10 @@ public:
 #endif
   }
 
+  void FastMove(const PixelRect rc) {
+    FastMove(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
+  }
+
   /**
    * Move the Window to the specified position within the parent
    * ContainerWindow and make it visible.
@@ -631,6 +635,13 @@ public:
    */
   virtual void ClearFocus();
 
+  /**
+   * Send keyboard focus to this window's parent.  This should usually
+   * only be called when this window owns the keyboard focus, and
+   * doesn't want it anymore.
+   */
+  void FocusParent();
+
 #else /* USE_GDI */
 
   void SetFocus() {
@@ -638,6 +649,13 @@ public:
     AssertThread();
 
     ::SetFocus(hWnd);
+  }
+
+  void FocusParent() {
+    AssertNoneLocked();
+    AssertThread();
+
+    ::SetFocus(::GetParent(hWnd));
   }
 
 #endif /* USE_GDI */
@@ -793,11 +811,6 @@ public:
   void Setup(Canvas &canvas);
 
   virtual void Invalidate();
-
-  /**
-   * Ensures that the window is updated on the physical screen.
-   */
-  virtual void Expose();
 #else /* USE_GDI */
   HDC BeginPaint(PAINTSTRUCT *ps) {
     AssertThread();

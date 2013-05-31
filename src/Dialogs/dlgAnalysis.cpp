@@ -24,14 +24,16 @@ Copyright_License {
 #include "Dialogs/dlgAnalysis.hpp"
 #include "Dialogs/CallBackTable.hpp"
 #include "Dialogs/Dialogs.h"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/AirspaceWarningDialog.hpp"
 #include "Dialogs/Task.hpp"
+#include "Dialogs/XML.hpp"
+#include "Form/Form.hpp"
+#include "Form/Frame.hpp"
+#include "Form/Button.hpp"
 #include "CrossSection/CrossSectionWindow.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "ComputerSettings.hpp"
 #include "Math/FastMath.h"
-#include "Math/Earth.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
 #include "Look/Look.hpp"
@@ -48,6 +50,8 @@ Copyright_License {
 #include "Renderer/WindChartRenderer.hpp"
 #include "Renderer/CuRenderer.hpp"
 #include "GestureManager.hpp"
+#include "Blackboard/FullBlackboard.hpp"
+#include "Language/Language.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
@@ -103,9 +107,6 @@ protected:
 class ChartControl: public PaintWindow
 {
   const ChartLook &chart_look;
-  const AirspaceLook &airspace_look;
-  const AircraftLook &aircraft_look;
-  const TaskLook &task_look;
   const ThermalBandLook &thermal_band_look;
 
 public:
@@ -114,9 +115,6 @@ public:
                UPixelScalar Width, UPixelScalar Height,
                const WindowStyle style,
                const ChartLook &chart_look,
-               const AirspaceLook &airspace_look,
-               const AircraftLook &aircraft_look,
-               const TaskLook &task_look,
                const ThermalBandLook &thermal_band_look);
 
 protected:
@@ -132,13 +130,8 @@ ChartControl::ChartControl(ContainerWindow &parent,
                            UPixelScalar Width, UPixelScalar Height,
                            const WindowStyle style,
                            const ChartLook &_chart_look,
-                           const AirspaceLook &_airspace_look,
-                           const AircraftLook &_aircraft_look,
-                           const TaskLook &_task_look,
                            const ThermalBandLook &_thermal_band_look)
-  :chart_look(_chart_look), airspace_look(_airspace_look),
-   aircraft_look(_aircraft_look),
-   task_look(_task_look),
+  :chart_look(_chart_look),
    thermal_band_look(_thermal_band_look)
 {
   set(parent, X, Y, Width, Height, style);
@@ -229,8 +222,7 @@ ChartControl::OnPaint(Canvas &canvas)
       const TraceComputer *trace_computer = glide_computer != NULL
         ? &glide_computer->GetTraceComputer()
         : NULL;
-      const FlightStatisticsRenderer fs(glide_computer->GetFlightStats(),
-                                        chart_look, look->map);
+      const FlightStatisticsRenderer fs(chart_look, look->map);
       fs.RenderTask(canvas, rcgfx, basic, calculated,
                     settings_computer, settings_map,
                     *protected_task_manager,
@@ -239,8 +231,7 @@ ChartControl::OnPaint(Canvas &canvas)
     break;
   case AnalysisPage::OLC:
     if (glide_computer != NULL) {
-      const FlightStatisticsRenderer fs(glide_computer->GetFlightStats(),
-                                        chart_look, look->map);
+      const FlightStatisticsRenderer fs(chart_look, look->map);
       fs.RenderOLC(canvas, rcgfx, basic, calculated,
                    settings_computer, settings_map,
                    calculated.contest_stats,
@@ -296,9 +287,9 @@ Update()
     _stprintf(sTmp, _T("%s: %s"), _("Analysis"),
               _("Barograph"));
     wf->SetCaption(sTmp);
-    BarographCaption(sTmp, glide_computer->GetFlightStats());
+    BarographCaption(sTmp, glide_computer->GetFlightStats(), false);
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Settings"));
+    SetCalcCaption(_("Bugs & ballast"));
     break;
 
   case AnalysisPage::CLIMB:
@@ -334,7 +325,7 @@ Update()
     wf->SetCaption(sTmp);
     GlidePolarCaption(sTmp, settings_computer.polar.glide_polar_task);
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Settings"));
+    SetCalcCaption(_("Bugs & ballast"));
    break;
 
   case AnalysisPage::TEMPTRACE:
@@ -343,7 +334,7 @@ Update()
     wf->SetCaption(sTmp);
     TemperatureChartCaption(sTmp, glide_computer->GetCuSonde());
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Settings"));
+    SetCalcCaption(_("Bugs & ballast"));
     break;
 
   case AnalysisPage::TASK_SPEED:
@@ -368,7 +359,8 @@ Update()
               ContestToString(settings_computer.task.contest));
     wf->SetCaption(sTmp);
     SetCalcCaption(_T(""));
-    FlightStatisticsRenderer::CaptionOLC(sTmp, settings_computer.task, calculated);
+    FlightStatisticsRenderer::CaptionOLC(sTmp, settings_computer.task,
+                                         calculated, false);
     wInfo->SetCaption(sTmp);
     break;
 
@@ -526,9 +518,7 @@ OnCalcClicked(gcc_unused WndButton &Sender)
     dlgBasicSettingsShowModal();
 
   if (page == AnalysisPage::CLIMB) {
-    wf->Hide();
-    dlgTaskManagerShowModal(*(SingleWindow *)wf->GetRootOwner());
-    wf->Show();
+    ShowTaskStatusDialog();
   }
 
   if (page == AnalysisPage::WIND)
@@ -541,9 +531,7 @@ OnCalcClicked(gcc_unused WndButton &Sender)
     dlgBasicSettingsShowModal();
 
   if ((page == AnalysisPage::TASK) || (page == AnalysisPage::TASK_SPEED)) {
-    wf->Hide();
-    dlgTaskManagerShowModal(*(SingleWindow *)wf->GetRootOwner());
-    wf->Show();
+    ShowTaskStatusDialog();
   }
 
   if (page == AnalysisPage::AIRSPACE)
@@ -575,8 +563,7 @@ OnCreateChartControl(ContainerWindow &parent,
                      const WindowStyle style)
 {
   return new ChartControl(parent, left, top, width, height, style,
-                          look->chart, look->map.airspace, look->map.aircraft,
-                          look->map.task,
+                          look->chart,
                           look->thermal_band);
 }
 
@@ -586,7 +573,7 @@ OnTimer(WndForm &Sender)
   Update();
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCreateCrossSectionControl),
   DeclareCallBackEntry(OnCreateChartControl),
   DeclareCallBackEntry(OnNextClicked),

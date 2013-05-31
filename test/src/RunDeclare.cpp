@@ -28,12 +28,13 @@ Copyright_License {
 #include "Device/device.hpp"
 #include "Logger/Settings.hpp"
 #include "Plane/Plane.hpp"
-#include "Engine/Navigation/GeoPoint.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Operation/ConsoleOperationEnvironment.hpp"
 #include "Profile/DeviceConfig.hpp"
+#include "Device/Port/Port.hpp"
 #include "Device/Port/ConfiguredPort.hpp"
 #include "DebugPort.hpp"
+#include "IO/Async/GlobalIOThread.hpp"
 
 #define MORE_USAGE
 #include "OS/Args.hpp"
@@ -61,6 +62,25 @@ bool
 NMEAParser::ReadGeoPoint(NMEAInputLine &line, GeoPoint &value_r)
 {
   return false;
+}
+
+bool
+NMEAParser::ReadDate(NMEAInputLine &line, BrokenDate &date)
+{
+  return false;
+}
+
+bool
+NMEAParser::TimeHasAdvanced(fixed this_time, fixed &last_time, NMEAInfo &info)
+{
+  return false;
+}
+
+fixed
+NMEAParser::TimeModify(fixed fix_time, BrokenDateTime &date_time,
+                       bool date_available)
+{
+  return fixed_zero;
 }
 
 static Waypoint
@@ -96,7 +116,9 @@ int main(int argc, char **argv)
   const DeviceConfig config = ParsePortArgs(args);
   args.ExpectEnd();
 
-  Port *port = OpenPort(config, *(Port::Handler *)NULL);
+  InitialiseIOThread();
+
+  Port *port = OpenPort(config, *(DataHandler *)NULL);
   if (port == NULL) {
     fprintf(stderr, "Failed to open COM port\n");
     return EXIT_FAILURE;
@@ -168,6 +190,7 @@ int main(int argc, char **argv)
   delete through_device;
   delete device;
   delete port;
+  DeinitialiseIOThread();
 
   return EXIT_SUCCESS;
 }

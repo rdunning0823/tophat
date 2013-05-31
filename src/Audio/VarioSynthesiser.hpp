@@ -50,10 +50,40 @@ class VarioSynthesiser : public ToneSynthesiser {
    */
   size_t audible_remaining, silence_remaining;
 
+  bool dead_band_enabled;
+
+  /**
+   * The tone frequency for #min_vario.
+   */
+  unsigned min_frequency;
+
+  /**
+   * The tone frequency for stationary altitude.
+   */
+  unsigned zero_frequency;
+
+  /**
+   * The tone frequency for #max_vario.
+   */
+  unsigned max_frequency;
+
+  /**
+   * The minimum silence+audible period for #max_vario.
+   */
+  unsigned min_period_ms;
+
+  /**
+   * The maximum silence+audible period for #min_vario.
+   */
+  unsigned max_period_ms;
+
 public:
   VarioSynthesiser()
     :audible_count(0), silence_count(1),
-     audible_remaining(0), silence_remaining(0) {}
+     audible_remaining(0), silence_remaining(0),
+     dead_band_enabled(false),
+     min_frequency(200), zero_frequency(500), max_frequency(1500),
+     min_period_ms(150), max_period_ms(600) {}
 
   /**
    * Update the vario value.  This calculates a new tone frequency and
@@ -68,8 +98,41 @@ public:
    */
   void SetSilence();
 
+  /**
+   * Enable/disable the dead band silence
+   */
+  void SetDeadBand(bool enabled) {
+    dead_band_enabled = enabled;
+  }
+
+  /**
+   * Set the base frequencies for minimum, zero and maximum lift
+   */
+  void SetFrequencies(unsigned min, unsigned zero, unsigned max) {
+    min_frequency = min;
+    zero_frequency = zero;
+    max_frequency = max;
+  }
+
+  /**
+   * Set the time periods for minimum and maximum lift
+   */
+  void SetPeriods(unsigned min, unsigned max) {
+    min_period_ms = min;
+    max_period_ms = max;
+  }
+
   /* methods from class PCMSynthesiser */
   virtual void Synthesise(int16_t *buffer, size_t n);
+
+private:
+  /**
+   * Convert a vario value to a tone frequency.
+   *
+   * @param ivario the current vario value [cm/s]
+   */
+  gcc_const
+  unsigned VarioToFrequency(int ivario);
 };
 
 #endif

@@ -35,13 +35,14 @@ enum ControlIndex {
   OrientationCircling,
   CirclingZoom,
   MapShiftBias,
-  GliderScreenPosition,
   MaxAutoZoomDistance,
 };
 
 static const StaticEnumChoice orientation_list[] = {
   { TRACKUP, N_("Track up"),
     N_("The moving map display will be rotated so the glider's track is oriented up.") },
+  { HEADINGUP, N_("Heading up"),
+    N_("The moving map display will be rotated so the glider's heading is oriented up.") },
   { NORTHUP, N_("North up"),
     N_("The moving map display will always be orientated north to south and the glider icon will be rotated to show its course.") },
   { TARGETUP, N_("Target up"),
@@ -121,12 +122,6 @@ MapDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           this);
   SetExpertRow(MapShiftBias);
 
-  AddInteger(_("Glider position offset"),
-             _("Defines the location of the glider drawn on the screen in percent from the screen edge."),
-             _T("%d %%"), _T("%d"), 10, 50, 5,
-             settings_map.glider_screen_position);
-  SetExpertRow(GliderScreenPosition);
-
   AddFloat(_("Max. auto zoom distance"),
            _("The upper limit for auto zoom distance."),
            _T("%.0f %s"), _T("%.0f"), fixed(20), fixed(250), fixed(10), false,
@@ -143,23 +138,20 @@ MapDisplayConfigPanel::Save(bool &_changed, bool &require_restart)
 
   MapSettings &settings_map = CommonInterface::SetMapSettings();
 
-  changed |= SaveValueEnum(OrientationCruise, szProfileOrientationCruise,
+  changed |= SaveValueEnum(OrientationCruise, ProfileKeys::OrientationCruise,
                            settings_map.cruise_orientation);
 
-  changed |= SaveValueEnum(OrientationCircling, szProfileOrientationCircling,
+  changed |= SaveValueEnum(OrientationCircling, ProfileKeys::OrientationCircling,
                            settings_map.circling_orientation);
 
-  changed |= SaveValueEnum(MapShiftBias, szProfileMapShiftBias,
+  changed |= SaveValueEnum(MapShiftBias, ProfileKeys::MapShiftBias,
                            settings_map.map_shift_bias);
 
-  changed |= SaveValue(GliderScreenPosition, szProfileGliderScreenPosition,
-                       settings_map.glider_screen_position);
-
-  changed |= SaveValue(CirclingZoom, szProfileCircleZoom,
+  changed |= SaveValue(CirclingZoom, ProfileKeys::CircleZoom,
                        settings_map.circle_zoom_enabled);
 
   changed |= SaveValue(MaxAutoZoomDistance, UnitGroup::DISTANCE,
-                       szProfileMaxAutoZoomDistance,
+                       ProfileKeys::MaxAutoZoomDistance,
                        settings_map.max_auto_zoom_distance);
 
   _changed |= changed;

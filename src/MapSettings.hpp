@@ -27,11 +27,14 @@ Copyright_License {
 // changed only in config or by user interface
 // not expected to be used by other threads
 
-#include "Navigation/GeoPoint.hpp"
 #include "Airspace/AirspaceClass.hpp"
 #include "Renderer/AirspaceRendererSettings.hpp"
 #include "Renderer/WaypointRendererSettings.hpp"
 #include "Terrain/TerrainSettings.hpp"
+#include "Util/TypeTraits.hpp"
+#include "Math/fixed.hpp"
+
+#include <stdint.h>
 
 enum AircraftSymbol {
   acSimple = 0,
@@ -44,7 +47,8 @@ enum AircraftSymbol {
 enum DisplayOrientation {
   TRACKUP = 0,
   NORTHUP,
-  TARGETUP
+  TARGETUP,
+  HEADINGUP,
 };
 
 enum MapShiftBias {
@@ -53,23 +57,10 @@ enum MapShiftBias {
   MAP_SHIFT_BIAS_TARGET
 };
 
-enum TrailLength {
-  TRAIL_OFF,
-  TRAIL_LONG,
-  TRAIL_SHORT,
-  TRAIL_FULL,
-};
-
-enum SnailType {
-  stStandardVario,
-  stSeeYouVario,
-  stAltitude,
-};
-
-enum DisplayTrackBearing {
-  dtbOff,
-  dtbOn,
-  dtbAuto
+enum class DisplayGroundTrack: uint8_t {
+  OFF,
+  ON,
+  AUTO,
 };
 
 struct MapItemListSettings {
@@ -83,10 +74,44 @@ struct MapItemListSettings {
   void SetDefaults();
 };
 
+static_assert(is_trivial<MapItemListSettings>::value, "type is not trivial");
+
+struct TrailSettings {
+  /** Snailtrail wind drifting in circling mode */
+  bool wind_drift_enabled;
+  bool scaling_enabled;
+
+  /** 0: standard, 1: seeyou colors */
+  enum class Type: uint8_t {
+    VARIO_1,
+    VARIO_2,
+    ALTITUDE,
+    VARIO_1_DOTS,
+    VARIO_2_DOTS,
+  } type;
+
+  enum class Length: uint8_t {
+    OFF,
+    LONG,
+    SHORT,
+    FULL,
+  } length;
+
+  void SetDefaults();
+};
+
+static_assert(is_trivial<TrailSettings>::value, "type is not trivial");
+
 // user interface options
 
 // where using these from Calculations or MapWindow thread, should
 // protect
+
+enum class WindArrowStyle: uint8_t {
+  ARROW_HEAD,
+  FULL_ARROW,
+  NO_ARROW,
+};
 
 struct MapSettings {
   /** Map zooms in on circling */
@@ -100,24 +125,16 @@ struct MapSettings {
 
   AircraftSymbol aircraft_symbol;
 
-  /** Snailtrail wind drifting in circling mode */
-  bool trail_drift_enabled;
   /** Indicate extra distance reqd. if deviating from target heading */
   bool detour_cost_markers_enabled;
   /** Render track bearing on map */
-  DisplayTrackBearing display_track_bearing;
+  DisplayGroundTrack display_ground_track;
 
   /** Automatic zoom when closing in on waypoint */
   bool auto_zoom_enabled;
-  bool snail_scaling_enabled;
-  /** 0: standard, 1: seeyou colors */
-  SnailType snail_type;
-  int wind_arrow_style;
+  WindArrowStyle wind_arrow_style;
 
   WaypointRendererSettings waypoint;
-
-  TrailLength trail_length;
-
   AirspaceRendererSettings airspace;
 
   int glider_screen_position;
@@ -135,12 +152,28 @@ struct MapSettings {
 
   bool show_flarm_on_map;
 
+  /**
+   * This is an inverted copy of TrafficSettings::enable_gauge.  The
+   * map should not render the FLARM alarm level if the gauge already
+   * shows it, to declutter the map.  The copy is needed because
+   * MapWindowBlackboard only knows MapSettings, but not
+   * TrafficSettings, and DrawThread is not allowed to access
+   * InterfaceBlackboard.
+   */
+  bool show_flarm_alarm_level;
+
   /** Display climb band on map */
   bool show_thermal_profile;
 
+  /** Show FinalGlideBar mc0 arrow */
+  bool final_glide_bar_mc0_enabled;
+
+  TrailSettings trail;
   MapItemListSettings item_list;
 
   void SetDefaults();
 };
+
+static_assert(is_trivial<MapSettings>::value, "type is not trivial");
 
 #endif

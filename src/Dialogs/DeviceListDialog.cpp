@@ -25,6 +25,8 @@ Copyright_License {
 #include "Dialogs/Vega/VegaDialogs.hpp"
 #include "Dialogs/ManageCAI302Dialog.hpp"
 #include "Dialogs/ManageFlarmDialog.hpp"
+#include "Dialogs/LX/ManageV7Dialog.hpp"
+#include "Dialogs/LX/ManageNanoDialog.hpp"
 #include "Dialogs/PortMonitor.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Dialogs/Message.hpp"
@@ -36,6 +38,7 @@ Copyright_License {
 #include "Device/List.hpp"
 #include "Device/Descriptor.hpp"
 #include "Device/Register.hpp"
+#include "Device/Driver/LX/Internal.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Blackboard/BlackboardListener.hpp"
 #include "Components.hpp"
@@ -43,6 +46,7 @@ Copyright_License {
 #include "Form/List.hpp"
 #include "Form/ListWidget.hpp"
 #include "Screen/Layout.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "Language/Language.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Simulator.hpp"
@@ -213,6 +217,7 @@ DeviceListWidget::CreateButtons(WidgetDialog &dialog)
 {
   reconnect_button = dialog.AddButton(_("Reconnect"), this, RECONNECT);
   flight_button = dialog.AddButton(_("Flight download"), this, FLIGHT);
+  dialog.AddButton(_("Close"), mrOK);
   edit_button = dialog.AddButton(_("Edit"), this, EDIT);
   manage_button = dialog.AddButton(_("Manage"), this, MANAGE);
   monitor_button = dialog.AddButton(_("Monitor"), this, MONITOR);
@@ -426,6 +431,18 @@ DeviceListWidget::ManageCurrent()
     device_blackboard->mutex.Unlock();
 
     ManageFlarmDialog(*device, version);
+  } else if (descriptor.IsDriver(_T("LX"))) {
+    device_blackboard->mutex.Lock();
+    const NMEAInfo &basic = device_blackboard->RealState(current);
+    const DeviceInfo info = basic.device;
+    const DeviceInfo secondary_info = basic.secondary_device;
+    device_blackboard->mutex.Unlock();
+
+    LXDevice &lx_device = *(LXDevice *)device;
+    if (lx_device.IsV7())
+      ManageV7Dialog(lx_device, info, secondary_info);
+    else if (lx_device.IsNano())
+      ManageNanoDialog(lx_device, info);
   } else if (descriptor.IsDriver(_T("Vega")))
     dlgConfigurationVarioShowModal(*device);
 
@@ -485,8 +502,11 @@ ShowDeviceList(SingleWindow &parent, const DialogLook &look,
 {
   DeviceListWidget widget(look, terminal_look);
 
-  WidgetDialog dialog(_("Devices"), &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  ButtonPanel::ButtonPanelPosition position = ButtonPanel::ButtonPanelPosition::Bottom;
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  WidgetDialog dialog(_("Devices"),
+                      rc, &widget, nullptr, 0, position);
+
   widget.CreateButtons(dialog);
 
   dialog.ShowModal();

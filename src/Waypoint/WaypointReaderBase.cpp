@@ -26,19 +26,17 @@ Copyright_License {
 #include "Terrain/RasterTerrain.hpp"
 #include "Waypoint/Waypoint.hpp"
 #include "Waypoint/Waypoints.hpp"
-#include "IO/FileLineReader.hpp"
-#include "IO/ZipLineReader.hpp"
 #include "Operation/Operation.hpp"
+#include "IO/LineReader.hpp"
 
 #include <assert.h>
 
-WaypointReaderBase::WaypointReaderBase(const TCHAR* file_name, const int _file_num,
+WaypointReaderBase::WaypointReaderBase(const int _file_num,
                            bool _compressed):
   file_num(_file_num),
   terrain(NULL),
   compressed(_compressed)
 {
-  _tcscpy(file, file_name);
 }
 
 static bool is_closing_quote_char(TCHAR const *s) {
@@ -178,56 +176,5 @@ WaypointReaderBase::Parse(Waypoints &way_points, TLineReader &reader,
 
     if ((i & 0x3f) == 0)
       operation.SetProgressPosition(reader.tell() * 100 / filesize);
-  }
-}
-
-bool
-WaypointReaderBase::Parse(Waypoints &way_points,
-                          OperationEnvironment &operation)
-{
-  // If no file loaded yet -> return false
-  if (file[0] == 0)
-    return false;
-
-  if (!compressed) {
-    // Try to open waypoint file
-    FileLineReader reader(file, ConvertLineReader::AUTO);
-    if (reader.error())
-      return false;
-
-    Parse(way_points, reader, operation);
-  } else {
-    // convert path to ascii
-    ZipLineReader reader(file, ConvertLineReader::AUTO);
-    if (reader.error())
-      return false;
-
-    Parse(way_points, reader, operation);
-  }
-
-  return true;
-}
-
-bool
-WaypointReaderBase::VerifyFormat() const
-{
-  // If no file loaded yet -> return false
-  if (file[0] == 0)
-    return false;
-
-  if (!compressed) {
-    // Try to open waypoint file
-    FileLineReader reader(file);
-    if (reader.error())
-      return false;
-
-    return VerifyFormat(reader);
-  } else {
-    // convert path to ascii
-    ZipLineReader reader(file);
-    if (reader.error())
-      return false;
-
-    return VerifyFormat(reader);
   }
 }

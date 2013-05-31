@@ -21,17 +21,17 @@
  */
 
 #include "LineSectorZone.hpp"
-#include "Navigation/Geometry/GeoVector.hpp"
+#include "Boundary.hpp"
 
 GeoPoint LineSectorZone::GetBoundaryParametric(fixed t) const
 { 
   return GetSectorStart().Interpolate(GetSectorEnd(), t);
 }
 
-ObservationZone::Boundary
+OZBoundary
 LineSectorZone::GetBoundary() const
 {
-  Boundary boundary;
+  OZBoundary boundary;
   boundary.push_front(GetSectorEnd());
   boundary.push_front(GetSectorStart());
   boundary.push_front(GetReference());

@@ -22,9 +22,13 @@ Copyright_License {
 */
 
 #include "Dialogs/Dialogs.h"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
+#include "Form/Form.hpp"
+#include "Form/Button.hpp"
 #include "Form/Tabbed.hpp"
+#include "Form/Draw.hpp"
+#include "Screen/EditWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Font.hpp"
@@ -33,6 +37,7 @@ Copyright_License {
 #include "ResourceLoader.hpp"
 #include "Version.hpp"
 #include "Inflate.hpp"
+#include "Util/ConvertString.hpp"
 #include "resource.h"
 
 #include <assert.h>
@@ -143,12 +148,10 @@ OnLogoPaint(gcc_unused WndOwnerDrawFrame *Sender, Canvas &canvas)
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
 
-  canvas.text(x, y, _T("version: "));
-  canvas.text(x + Layout::FastScale(80), y, XCSoar_VersionString);
+  canvas.text(x, y, TopHat_ProductToken);
   y += Layout::FastScale(22);
 
-  canvas.text(x, y, _T("date: "));
-  canvas.text(x + Layout::FastScale(80), y, _T(__DATE__));
+  canvas.text(x, y, XCSoar_ProductTokenShort);
 #ifdef GIT_COMMIT_ID
   y += Layout::FastScale(22);
 
@@ -161,7 +164,7 @@ OnLogoPaint(gcc_unused WndOwnerDrawFrame *Sender, Canvas &canvas)
   y += Layout::FastScale(22);
 
   canvas.SetTextColor(COLOR_XCSOAR);
-  canvas.text(x, y, _T("http://www.xcsoar.org"));
+  canvas.text(x, y, _T("http://tophatsoaring.org"));
 }
 
 static void
@@ -172,27 +175,14 @@ LoadTextFromResource(const TCHAR* name, const TCHAR* control)
 
   char *buffer = InflateToString(data.first, data.second);
 
-#ifdef _UNICODE
-  int length = strlen(buffer);
-  TCHAR *buffer2 = new TCHAR[length + 1];
-  length = MultiByteToWideChar(CP_UTF8, 0, buffer, length,
-                               buffer2, length);
-  buffer2[length] = _T('\0');
-  delete[] buffer;
-#else
-  const char *buffer2 = buffer;
-#endif
+  UTF8ToWideConverter text(buffer);
+  if (text.IsValid())
+    ((EditWindow *)wf->FindByName(control))->SetText(text);
 
-  ((EditWindow *)wf->FindByName(control))->SetText(buffer2);
-
-#ifdef _UNICODE
-  delete[] buffer2;
-#else
   delete[] buffer;
-#endif
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnClose),
   DeclareCallBackEntry(OnNext),
   DeclareCallBackEntry(OnPrev),

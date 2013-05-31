@@ -22,16 +22,22 @@ Copyright_License {
 */
 
 #include "Dialogs/Task.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/Waypoint.hpp"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
+#include "Form/Form.hpp"
+#include "Form/List.hpp"
+#include "Form/Frame.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 #include "LocalPath.hpp"
-
 #include "Task/Factory/AbstractTaskFactory.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Engine/Task/Factory/TaskFactoryConstraints.hpp"
 #include "Dialogs/dlgTaskHelpers.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -51,14 +57,14 @@ static void OnCloseClicked(gcc_unused WndButton &Sender)
   wf->SetModalResult(mrOK);
 }
 
-static AbstractTaskFactory::LegalPointType
+static TaskPointFactoryType
 get_point_type() 
 {
   return ordered_task->GetFactory().GetType(*point);
 }
 
 
-static AbstractTaskFactory::LegalPointType
+static TaskPointFactoryType
 get_cursor_type() 
 {
   return point_types[wPointTypes->GetCursorIndex()];
@@ -95,7 +101,7 @@ OnPointPaintListItem(Canvas &canvas, const PixelRect rc,
 }
 
 static bool
-SetPointType(AbstractTaskFactory::LegalPointType type)
+SetPointType(TaskPointFactoryType type)
 {
   bool apply = false;
 
@@ -107,8 +113,6 @@ SetPointType(AbstractTaskFactory::LegalPointType type)
       // no change
       return true;
 
-    if (ShowMessageBox(_("Change point type?"), _("Task Point"),
-                    MB_YESNO | MB_ICONQUESTION) == IDYES)
       apply = true;
   }
 
@@ -125,15 +129,15 @@ SetPointType(AbstractTaskFactory::LegalPointType type)
       delete point;
     } else {
       if (factory.IsValidFinishType(type) &&
-          ordered_task->get_ordered_task_behaviour().is_closed)
-        way_point = &(ordered_task->get_tp(0)->GetWaypoint());
-      else
+          ordered_task->GetFactoryConstraints().is_closed)
+        way_point = &ordered_task->GetPoint(0).GetWaypoint();
+      else {
+        const GeoPoint &location = ordered_task->TaskSize() > 0
+          ? ordered_task->GetPoint(ordered_task->TaskSize() - 1).GetLocation()
+          : CommonInterface::Basic().location;
         way_point =
-          ShowWaypointListDialog(wf->GetMainWindow(),
-                              ordered_task->TaskSize() > 0 ?
-                              ordered_task->get_tp(ordered_task->
-                                  TaskSize() - 1)->GetLocation() :
-                              XCSoarInterface::Basic().location);
+          ShowWaypointListDialog(wf->GetMainWindow(), location);
+      }
       if (!way_point)
         return false;
 
@@ -181,7 +185,7 @@ OnPointCursorCallback(gcc_unused unsigned i)
   RefreshView();
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnSelectClicked),
   DeclareCallBackEntry(NULL)
@@ -200,11 +204,8 @@ dlgTaskPointType(SingleWindow &parent, OrderedTask** task, const unsigned index)
   task_modified = false;
   active_index = index;
 
-  point = ordered_task->get_tp(active_index);
-  if (point)
-    way_point = &point->GetWaypoint();
-  else
-    way_point = NULL;
+  point = &ordered_task->GetPoint(active_index);
+  way_point = &point->GetWaypoint();
 
   if (Layout::landscape)
     wf = LoadDialog(CallBackTable, parent, _T("IDR_XML_TASKPOINTTYPE_L"));

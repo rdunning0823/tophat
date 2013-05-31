@@ -26,16 +26,29 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Pen.hpp"
 #include "Look/ButtonLook.hpp"
+#include "Screen/Util.hpp"
 
-#include <winuser.h>
+#ifdef ENABLE_OPENGL
 
 void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
-                           bool pressed)
+                           bool pressed, bool transparent)
 {
   const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
 
-  canvas.DrawFilledRectangle(rc, _look.background_color);
+  DrawButtonFancy(canvas, rc, _look.dark_border_pen, _look.light_border_pen,
+                  _look.background_color, focused, pressed, transparent);
+}
+
+#else
+void
+ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
+                           bool pressed, bool transparent)
+{
+  const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+
+  if (!transparent)
+    canvas.DrawFilledRectangle(rc, _look.background_color);
 
   canvas.Select(pressed ? _look.dark_border_pen : _look.light_border_pen);
   canvas.DrawTwoLines(rc.left, rc.bottom - 2, rc.left, rc.top, rc.right - 2,
@@ -50,12 +63,14 @@ ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
                       rc.right - 2, rc.top + 2);
 }
 
+#endif
+
 PixelRect
 ButtonRenderer::GetDrawingRect(PixelRect rc, bool pressed)
 {
-  InflateRect(&rc, -2, -2);
+  GrowRect(rc, -2, -2);
   if (pressed)
-    OffsetRect(&rc, 1, 1);
+    MoveRect(rc, 1, 1);
 
   return rc;
 }

@@ -23,17 +23,17 @@ Copyright_License {
 
 #include "Vector.hpp"
 #include "Point.hpp"
-#include "Navigation/TaskProjection.hpp"
+#include "Geo/Flat/TaskProjection.hpp"
 
 TaskProjection
 TracePointVector::GetBounds(const GeoPoint &fallback_location) const
 {
   TaskProjection task_projection;
 
-  task_projection.reset(fallback_location);
-  for (auto it = begin(); it != end(); ++it)
-    task_projection.scan_location(it->get_location());
+  task_projection.Reset(fallback_location);
+  for (const auto &i : *this)
+    task_projection.Scan(i.GetLocation());
 
-  task_projection.update_fast();
+  task_projection.Update();
   return task_projection;
 }

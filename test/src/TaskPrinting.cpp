@@ -19,21 +19,20 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
 */
+
 #include "Printing.hpp"
-#include <fstream>
-
 #include "Engine/Task/TaskManager.hpp"
-#include "Task/Tasks/AbortTask.hpp"
-#include "Task/Tasks/GotoTask.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/Tasks/AbstractTask.hpp"
-#include "Task/Tasks/BaseTask/TaskPoint.hpp"
-#include "Task/Tasks/BaseTask/SampledTaskPoint.hpp"
-#include "Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Task/Points/TaskPoint.hpp"
+#include "Task/Points/SampledTaskPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/Points/AATPoint.hpp"
+#include "Engine/Task/Ordered/AATIsolineSegment.hpp"
+#include "Engine/Task/Unordered/GotoTask.hpp"
+#include "Engine/Task/Unordered/AbortTask.hpp"
+#include "Geo/Math.hpp"
 
-
-#include "Task/TaskPoints/AATPoint.hpp"
-#include "Task/TaskPoints/AATIsolineSegment.hpp"
+#include <fstream>
 
 void 
 PrintHelper::aatpoint_print(std::ostream& f, 
@@ -45,29 +44,29 @@ PrintHelper::aatpoint_print(std::ostream& f,
   switch(item) {
   case 0:
     orderedtaskpoint_print(f, tp, state, item);
-    f << "#   Target " << tp.m_target_location.longitude << ","
-      << tp.m_target_location.latitude << "\n";
+    f << "#   Target " << tp.target_location.longitude << ","
+      << tp.target_location.latitude << "\n";
     break;
 
   case 1:
 
-    if (tp.valid() && (tp.getActiveState() != OrderedTaskPoint::BEFORE_ACTIVE)) {
-      assert(tp.get_previous());
-      assert(tp.get_next());
+    if (tp.valid() && (tp.GetActiveState() != OrderedTaskPoint::BEFORE_ACTIVE)) {
+      assert(tp.GetPrevious());
+      assert(tp.GetNext());
       // note in general this will only change if 
       // prev max or target changes
 
       AATIsolineSegment seg(tp, projection);
-      fixed tdist = tp.get_previous()->GetLocationRemaining().Distance(
+      fixed tdist = tp.GetPrevious()->GetLocationRemaining().Distance(
         tp.GetLocationMin());
-      fixed rdist = tp.get_previous()->GetLocationRemaining().Distance(
-        tp.get_location_target());
+      fixed rdist = tp.GetPrevious()->GetLocationRemaining().Distance(
+        tp.GetTargetLocation());
 
       bool filter_backtrack = true;
       if (seg.IsValid()) {
         for (double t = 0.0; t<=1.0; t+= 1.0/20) {
           GeoPoint ga = seg.Parametric(fixed(t));
-          fixed dthis = tp.get_previous()->GetLocationRemaining().Distance(ga);
+          fixed dthis = tp.GetPrevious()->GetLocationRemaining().Distance(ga);
           if (!filter_backtrack 
               || (dthis>=tdist)
               || (dthis>=rdist)) {
@@ -140,7 +139,7 @@ PrintHelper::sampledtaskpoint_print_samples(std::ostream& f,
   f << "#   Search points\n";
   if (tp.HasEntered()) {
     for (unsigned i=0; i<n; i++) {
-      const GeoPoint loc = tp.GetSearchPoints()[i].get_location();
+      const GeoPoint loc = tp.GetSearchPoints()[i].GetLocation();
       f << "     " << loc.longitude << " " << loc.latitude << "\n";
     }
   }
@@ -309,11 +308,6 @@ void PrintHelper::taskmanager_print(TaskManager& task, const AircraftState &stat
   }
 }
 
-#include "Math/Earth.hpp"
-#include "Navigation/TaskProjection.hpp"
-
-
-
 /*
 std::ostream& operator<< (std::ostream& o, 
                           const TaskProjection& tp)
@@ -362,7 +356,7 @@ std::ostream& operator<< (std::ostream& f,
   return f;
 }
 
-#include "Task/TaskStats/TaskStats.hpp"
+#include "Task/Stats/TaskStats.hpp"
 
 std::ostream& operator<< (std::ostream& f, 
                           const DistanceStat& ds)
@@ -393,7 +387,7 @@ std::ostream& operator<< (std::ostream& f,
 }
 
 
-#include "Task/TaskStats/CommonStats.hpp"
+#include "Task/Stats/CommonStats.hpp"
 
 std::ostream& operator<< (std::ostream& f, 
                           const ElementStat& es)

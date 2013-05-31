@@ -22,10 +22,6 @@ Copyright_License {
 */
 
 #include "NOAAGlue.hpp"
-#include "Net/Features.hpp"
-
-#ifdef HAVE_NET
-
 #include "NOAAStore.hpp"
 #include "Profile/Profile.hpp"
 
@@ -55,7 +51,7 @@ NOAAStore::LoadFromString(const TCHAR *string)
 bool
 NOAAStore::LoadFromProfile()
 {
-  const TCHAR *stations = Profile::Get(szProfileWeatherStations);
+  const TCHAR *stations = Profile::Get(ProfileKeys::WeatherStations);
   if (stations == NULL)
     return false;
 
@@ -74,20 +70,5 @@ NOAAStore::SaveToProfile()
 
   *p = _T('\0');
 
-  Profile::Set(szProfileWeatherStations, buffer);
+  Profile::Set(ProfileKeys::WeatherStations, buffer);
 }
-
-#else
-
-bool
-NOAAStore::LoadFromProfile()
-{
-  return false;
-}
-
-void
-NOAAStore::SaveToProfile()
-{
-}
-
-#endif

@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,7 +31,7 @@ import android.util.Log;
  * A wrapper for an OutputStream which allows writing with a timeout.
  */
 class OutputThread extends Thread {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   static final int BUFFER_SIZE = 256;
 

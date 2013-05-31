@@ -21,27 +21,50 @@
  */
 
 #include "FAITaskFactory.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
+#include "TaskFactoryConstraints.hpp"
+#include "Task/Ordered/OrderedTaskBehaviour.hpp"
 #include "Util/Macros.hpp"
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType fai_start_types[] = {
-  AbstractTaskFactory::START_SECTOR,
-  AbstractTaskFactory::START_LINE,
+static constexpr TaskFactoryConstraints fai_constraints = {
+  true,
+  true,
+  false,
+  false,
+  false,
+  2, 13,
 };
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType fai_im_types[] = {
-  AbstractTaskFactory::FAI_SECTOR,
-  AbstractTaskFactory::AST_CYLINDER,
+static constexpr TaskPointFactoryType fai_start_types[] = {
+  TaskPointFactoryType::START_SECTOR,
+  TaskPointFactoryType::START_LINE,
 };
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType fai_finish_types[] = {
-  AbstractTaskFactory::FINISH_SECTOR,
-  AbstractTaskFactory::FINISH_LINE,
+static constexpr TaskPointFactoryType fai_im_types[] = {
+  TaskPointFactoryType::FAI_SECTOR,
+  TaskPointFactoryType::AST_CYLINDER,
 };
+
+static constexpr TaskPointFactoryType fai_finish_types[] = {
+  TaskPointFactoryType::FINISH_SECTOR,
+  TaskPointFactoryType::FINISH_LINE,
+};
+
+FAITaskFactory::FAITaskFactory(const TaskFactoryConstraints &_constraints,
+                               OrderedTask& _task,
+                               const TaskBehaviour &tb)
+  :AbstractTaskFactory(_constraints, _task, tb,
+                       LegalPointConstArray(fai_start_types,
+                                            ARRAY_SIZE(fai_start_types)),
+                       LegalPointConstArray(fai_im_types,
+                                            ARRAY_SIZE(fai_im_types)),
+                       LegalPointConstArray(fai_finish_types,
+                                            ARRAY_SIZE(fai_finish_types)))
+{
+}
 
 FAITaskFactory::FAITaskFactory(OrderedTask& _task,
                                const TaskBehaviour &tb)
-  :AbstractTaskFactory(_task, tb,
+  :AbstractTaskFactory(fai_constraints, _task, tb,
                        LegalPointConstArray(fai_start_types,
                                             ARRAY_SIZE(fai_start_types)),
                        LegalPointConstArray(fai_im_types,
@@ -66,66 +89,61 @@ FAITaskFactory::Validate()
 void 
 FAITaskFactory::UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to)
 {
-  to.task_scored = true;
-  to.fai_finish = true;  
-  to.homogeneous_tps = false;
-  to.is_closed = false;
-  to.min_points = 2;
-  to.max_points = 13;
+  AbstractTaskFactory::UpdateOrderedTaskBehaviour(to);
 
   to.start_max_speed = fixed_zero;
   to.start_max_height = 0;
   to.start_max_height_ref = HeightReferenceType::AGL;
   to.finish_min_height = 0;
-  to.start_requires_arm = false;
 }
 
-AbstractTaskFactory::LegalPointType
+TaskPointFactoryType
 FAITaskFactory::GetMutatedPointType(const OrderedTaskPoint &tp) const
 {
-  const LegalPointType oldtype = GetType(tp);
-  LegalPointType newtype = oldtype;
+  const TaskPointFactoryType oldtype = GetType(tp);
+  TaskPointFactoryType newtype = oldtype;
 
   switch (oldtype) {
-
-  case START_SECTOR:
-  case START_LINE:
+  case TaskPointFactoryType::START_SECTOR:
+  case TaskPointFactoryType::START_LINE:
     break;
 
-  case START_CYLINDER:
-  case START_BGA:
-    newtype = START_SECTOR;
+  case TaskPointFactoryType::START_CYLINDER:
+  case TaskPointFactoryType::START_BGA:
+    newtype = TaskPointFactoryType::START_SECTOR;
     break;
 
-  case KEYHOLE_SECTOR:
-  case BGAFIXEDCOURSE_SECTOR:
-  case BGAENHANCEDOPTION_SECTOR:
-  case AAT_ANNULAR_SECTOR:
-  case AAT_SEGMENT:
-    newtype = FAI_SECTOR;
+  case TaskPointFactoryType::KEYHOLE_SECTOR:
+  case TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR:
+  case TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR:
+  case TaskPointFactoryType::AAT_ANNULAR_SECTOR:
+  case TaskPointFactoryType::AAT_SEGMENT:
+    newtype = TaskPointFactoryType::FAI_SECTOR;
     break;
 
-  case FINISH_SECTOR:
-  case FINISH_LINE:
+  case TaskPointFactoryType::FINISH_SECTOR:
+  case TaskPointFactoryType::FINISH_LINE:
     break;
 
-  case FINISH_CYLINDER:
-    newtype = FINISH_SECTOR;
+  case TaskPointFactoryType::FINISH_CYLINDER:
+    newtype = TaskPointFactoryType::FINISH_SECTOR;
     break;
 
-  case FAI_SECTOR:
-  case AST_CYLINDER:
+  case TaskPointFactoryType::FAI_SECTOR:
+  case TaskPointFactoryType::AST_CYLINDER:
     break;
 
-  case AAT_CYLINDER:
-    newtype = AST_CYLINDER;
+  case TaskPointFactoryType::AAT_CYLINDER:
+  case TaskPointFactoryType::MAT_CYLINDER:
+    newtype = TaskPointFactoryType::AST_CYLINDER;
     break;
   }
+
   return newtype;
 }
 
 void
-FAITaskFactory::GetPointDefaultSizes(const LegalPointType type,
+FAITaskFactory::GetPointDefaultSizes(const TaskPointFactoryType type,
                                           fixed &start_radius,
                                           fixed &turnpoint_radius,
                                           fixed &finish_radius) const

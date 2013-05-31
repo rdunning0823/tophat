@@ -53,6 +53,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "MapSettings.hpp"
 #include "Math/FastMath.h"
 #include "Dialogs/Dialogs.h"
+#include "Dialogs/Vega/VoiceSettingsDialog.hpp"
 #include "Dialogs/Airspace.hpp"
 #include "Dialogs/Task.hpp"
 #include "Dialogs/Traffic.hpp"
@@ -62,6 +63,8 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Dialogs/Planes.hpp"
 #include "Dialogs/Message.hpp"
 #include "Dialogs/dlgAnalysis.hpp"
+#include "Dialogs/FileManager.hpp"
+#include "Dialogs/ReplayDialog.hpp"
 #include "Message.hpp"
 #include "Markers/ProtectedMarkers.hpp"
 #include "InfoBoxes/InfoBoxLayout.hpp"
@@ -88,7 +91,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "FLARM/FlarmDetails.hpp"
 #include "FLARM/Glue.hpp"
 #include "Compiler.h"
-#include "Net/Features.hpp"
+#include "Weather/Features.hpp"
 #include "MapWindow/GlueMapWindow.hpp"
 #include "Simulator.hpp"
 
@@ -101,7 +104,7 @@ static void
 trigger_redraw()
 {
   if (!XCSoarInterface::Basic().location_available)
-    TriggerGPSUpdate();
+    ForceCalculation();
   TriggerMapUpdate();
 }
 
@@ -121,7 +124,7 @@ InputEvents::eventMarkLocation(const TCHAR *misc)
   } else {
     protected_marks->MarkLocation(basic.location, basic.date_time_utc);
 
-    if (CommonInterface::GetComputerSettings().sound.sound_modes_enabled)
+    if (CommonInterface::GetUISettings().sound.sound_modes_enabled)
       PlayResource(_T("IDR_WAV_CLEAR"));
   }
 
@@ -163,10 +166,10 @@ InputEvents::eventScreenModes(const TCHAR *misc)
                         PageSettings::InfoBoxConfig(true, 0));
     OpenLayout(pl);
   } else if (StringIsEqual(misc, _T("togglefull"))) {
-    XCSoarInterface::main_window.SetFullScreen(
-        !XCSoarInterface::main_window.GetFullScreen());
+    CommonInterface::main_window->SetFullScreen(
+        !CommonInterface::main_window->GetFullScreen());
   } else if (StringIsEqual(misc, _T("show"))) {
-    if (XCSoarInterface::main_window.GetFullScreen())
+    if (CommonInterface::main_window->GetFullScreen())
       Message::AddMessage(_("Screen Mode Full"));
     else if (ui_state.auxiliary_enabled)
         Message::AddMessage(_("Auxiliary InfoBoxes"));
@@ -174,8 +177,18 @@ InputEvents::eventScreenModes(const TCHAR *misc)
         Message::AddMessage(_("Default InfoBoxes"));
   } else if (StringIsEqual(misc, _T("previous")))
     Pages::Prev();
-  else
+  else {
+    StaticString<128> buffer;
+    const PageSettings::PageLayout *pl =
+      &CommonInterface::SetUISettings().pages.pages[Pages::NextIndex()];
+    const InfoBoxSettings &info_box_settings =
+      CommonInterface::GetUISettings().info_boxes;
+    assert(pl != NULL);
+    pl->MakeTitle(info_box_settings, buffer.buffer(), true);
+
     Pages::Next();
+    Message::AddMessage(_("Screen switch:"), buffer.c_str());
+  }
 
 
   trigger_redraw();
@@ -187,16 +200,16 @@ void
 InputEvents::eventClearStatusMessages(gcc_unused const TCHAR *misc)
 {
   // TODO enhancement: allow selection of specific messages (here we are acknowledging all)
-  XCSoarInterface::main_window.popup.Acknowledge(0);
+  CommonInterface::main_window->popup.Acknowledge();
 }
 
 void
 InputEvents::eventFLARMRadar(gcc_unused const TCHAR *misc)
 {
   if (StringIsEqual(misc, _T("ForceToggle"))) {
-    CommonInterface::main_window.ToggleForceFLARMRadar();
+    CommonInterface::main_window->ToggleForceFLARMRadar();
   } else
-    CommonInterface::main_window.ToggleSuppressFLARMRadar();
+    CommonInterface::main_window->ToggleSuppressFLARMRadar();
 }
 
 // Mode
@@ -208,7 +221,7 @@ InputEvents::eventMode(const TCHAR *misc)
 {
   assert(misc != NULL);
 
-  XCSoarInterface::main_window.SetDefaultFocus();
+  CommonInterface::main_window->SetDefaultFocus();
 
   InputEvents::setMode(misc);
 }
@@ -227,6 +240,14 @@ void
 InputEvents::eventChecklist(gcc_unused const TCHAR *misc)
 {
   dlgChecklistShowModal();
+}
+
+// Startup Tips
+// Displays the Startup Assistant dialog
+void
+InputEvents::eventStartupTips(gcc_unused const TCHAR *misc)
+{
+  dlgStartupAssistantShowModal(false);
 }
 
 // FLARM Traffic
@@ -248,7 +269,7 @@ InputEvents::eventFlarmDetails(gcc_unused const TCHAR *misc)
 
   StaticString<4> callsign;
   callsign.clear();
-  if (!TextEntryDialog(CommonInterface::main_window, callsign,
+  if (!TextEntryDialog(*CommonInterface::main_window, callsign,
                        _("Competition ID")) ||
       callsign.empty())
     return;
@@ -257,8 +278,8 @@ InputEvents::eventFlarmDetails(gcc_unused const TCHAR *misc)
   unsigned count = FlarmDetails::FindIdsByCallSign(callsign, ids, 30);
 
   if (count > 0) {
-    FlarmId id = dlgFlarmDetailsListShowModal(
-        XCSoarInterface::main_window, _("Show details:"), ids, count);
+    FlarmId id = dlgFlarmDetailsListShowModal(*CommonInterface::main_window,
+                                              _("Show details:"), ids, count);
 
     if (id.IsDefined())
       dlgFlarmTrafficDetailsShowModal(id);
@@ -281,7 +302,7 @@ InputEvents::eventStatus(const TCHAR *misc)
   if (StringIsEqual(misc, _T("system"))) {
     dlgStatusShowModal(1);
   } else if (StringIsEqual(misc, _T("task"))) {
-    dlgStatusShowModal(2);
+    ShowTaskStatusDialog();
   } else if (StringIsEqual(misc, _T("aircraft"))) {
     dlgStatusShowModal(0);
   } else {
@@ -296,8 +317,8 @@ InputEvents::eventStatus(const TCHAR *misc)
 void
 InputEvents::eventAnalysis(gcc_unused const TCHAR *misc)
 {
-  dlgAnalysisShowModal(XCSoarInterface::main_window,
-                       CommonInterface::main_window.GetLook(),
+  dlgAnalysisShowModal(*CommonInterface::main_window,
+                       CommonInterface::main_window->GetLook(),
                        CommonInterface::Full(),
                        *glide_computer,
                        protected_task_manager,
@@ -328,10 +349,10 @@ InputEvents::eventWaypointDetails(const TCHAR *misc)
       return;
     }
   } else if (StringIsEqual(misc, _T("select"))) {
-    wp = ShowWaypointListDialog(XCSoarInterface::main_window, basic.location);
+    wp = ShowWaypointListDialog(*CommonInterface::main_window, basic.location);
   }
   if (wp)
-    dlgWaypointDetailsShowModal(XCSoarInterface::main_window, *wp);
+    dlgWaypointDetailsShowModal(*CommonInterface::main_window, *wp);
 }
 
 // StatusMessage
@@ -437,7 +458,7 @@ InputEvents::eventRepeatStatusMessage(gcc_unused const TCHAR *misc)
 {
   // new interface
   // TODO enhancement: display only by type specified in misc field
-  XCSoarInterface::main_window.popup.Repeat(0);
+  CommonInterface::main_window->popup.Repeat();
 }
 
 // NearestWaypointDetails
@@ -454,7 +475,7 @@ InputEvents::eventNearestWaypointDetails(const TCHAR *misc)
   else if (StringIsEqual(misc, _T("pan")))
     // big range..
     PopupNearestWaypointDetails(way_points,
-                                CommonInterface::main_window.GetProjection().GetGeoLocation(),
+                                CommonInterface::main_window->GetProjection().GetGeoLocation(),
                                 1.0e5);
 }
 
@@ -466,12 +487,12 @@ void
 InputEvents::eventNearestMapItems(const TCHAR *misc)
 {
   if (StringIsEqual(misc, _T("aircraft")))
-    CommonInterface::main_window.GetMap()->ShowMapItems(
+    CommonInterface::main_window->GetMap()->ShowMapItems(
         CommonInterface::Basic().location);
 
   else if (StringIsEqual(misc, _T("pan")))
-    CommonInterface::main_window.GetMap()->ShowMapItems(
-        CommonInterface::main_window.GetProjection().GetGeoLocation());
+    CommonInterface::main_window->GetMap()->ShowMapItems(
+        CommonInterface::main_window->GetProjection().GetGeoLocation());
 }
 
 // Null
@@ -507,19 +528,23 @@ InputEvents::eventSetup(const TCHAR *misc)
 {
   if (StringIsEqual(misc, _T("Basic")))
     dlgBasicSettingsShowModal();
+  else if (StringIsEqual(misc, _T("QNH")))
+    dlgQNHShowModal();
   else if (StringIsEqual(misc, _T("Wind")))
     ShowWindSettingsDialog();
   else if (StringIsEqual(misc, _T("System")))
     SystemConfiguration();
+  else if (StringIsEqual(misc, _T("QuickSetup")))
+    ShowDialogSetupQuick(false);
   else if (StringIsEqual(misc, _T("Task")))
-    dlgTaskManagerShowModal(XCSoarInterface::main_window);
+    dlgTaskManagerShowModal(*CommonInterface::main_window);
   else if (StringIsEqual(misc, _T("Airspace")))
     dlgAirspaceShowModal(false);
   else if (StringIsEqual(misc, _T("Weather")))
     dlgWeatherShowModal();
   else if (StringIsEqual(misc, _T("Replay"))) {
     if (!CommonInterface::MovementDetected())
-      dlgLoggerReplayShowModal();
+      ShowReplayDialog();
   } else if (StringIsEqual(misc, _T("Switches")))
     dlgSwitchesShowModal();
   else if (StringIsEqual(misc, _T("Voice")))
@@ -529,9 +554,9 @@ InputEvents::eventSetup(const TCHAR *misc)
   else if (StringIsEqual(misc, _T("Target")))
     dlgTargetShowModal();
   else if (StringIsEqual(misc, _T("Plane")))
-    dlgPlanesShowModal(XCSoarInterface::main_window);
+    dlgPlanesShowModal(*CommonInterface::main_window);
   else if (StringIsEqual(misc, _T("Alternates")))
-    dlgAlternatesListShowModal(XCSoarInterface::main_window);
+    dlgAlternatesListShowModal(*CommonInterface::main_window);
 
   trigger_redraw();
 }
@@ -539,7 +564,7 @@ InputEvents::eventSetup(const TCHAR *misc)
 void
 InputEvents::eventCredits(gcc_unused const TCHAR *misc)
 {
-  dlgCreditsShowModal(XCSoarInterface::main_window);
+  dlgCreditsShowModal(*CommonInterface::main_window);
 }
 
 // Run
@@ -592,7 +617,7 @@ InputEvents::eventUserDisplayModeForce(const TCHAR *misc)
     Message::AddMessage(_("Map labels on"));
 
   /* trigger mode update by GlueMapWindow */
-  CommonInterface::main_window.FullRedraw();
+  CommonInterface::main_window->FullRedraw();
 }
 
 void
@@ -668,14 +693,20 @@ eventSounds			- Include Task and Modes sounds along with Vario
 void
 InputEvents::eventWeather(const TCHAR *misc)
 {
-#ifdef HAVE_NET
+#ifdef HAVE_NOAA
   if (StringIsEqual(misc, _T("list")))
-    dlgNOAAListShowModal(XCSoarInterface::main_window);
+    dlgNOAAListShowModal(*CommonInterface::main_window);
 #endif
 }
 
 void
 InputEvents::eventQuickMenu(gcc_unused const TCHAR *misc)
 {
- dlgQuickMenuShowModal(XCSoarInterface::main_window);
+ dlgQuickMenuShowModal(*CommonInterface::main_window);
+}
+
+void
+InputEvents::eventFileManager(const TCHAR *misc)
+{
+  ShowFileManager();
 }

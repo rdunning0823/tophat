@@ -49,25 +49,26 @@ struct BrokenDate {
   uint8_t day;
 
   /**
-   * Day of the week (0-6, 0: sunday)
+   * Day of the week (0-6, 0: sunday).  -1 means the value has not
+   * been determined.
    */
-  unsigned char day_of_week;
+  int8_t day_of_week;
 
   /**
    * Non-initializing default constructor.
    */
   BrokenDate() = default;
 
-  gcc_constexpr_ctor
+  constexpr
   BrokenDate(unsigned _year, unsigned _month, unsigned _day)
     :year(_year), month(_month), day(_day), day_of_week(-1) {}
 
-  gcc_constexpr_method
+  constexpr
   bool operator==(const BrokenDate other) const {
     return year == other.year && month == other.month && day == other.day;
   }
 
-  gcc_constexpr_method
+  constexpr
   bool operator>(const BrokenDate other) const {
     return year > other.year ||
       (year == other.year && (month > other.month ||
@@ -82,14 +83,24 @@ struct BrokenDate {
   }
 
   /**
+   * Returns an instance that fails the Plausible() check.
+   */
+  constexpr
+  static BrokenDate Invalid() {
+    return BrokenDate(0, 0, 0);
+  }
+
+  /**
    * Does this object contain plausible values?
    */
-  gcc_constexpr_method
+  constexpr
   bool Plausible() const {
     return year >= 1800 && year <= 2500 &&
       month >= 1 && month <= 12 &&
       day >= 1 && day <= 31;
   }
+
+  void IncrementDay();
 };
 
 /**
@@ -116,17 +127,17 @@ struct BrokenTime {
    */
   BrokenTime() = default;
 
-  gcc_constexpr_ctor
+  constexpr
   BrokenTime(unsigned _hour, unsigned _minute, unsigned _second=0)
     :hour(_hour), minute(_minute), second(_second) {}
 
-  gcc_constexpr_method
+  constexpr
   bool operator==(const BrokenTime other) const {
     return hour == other.hour && minute == other.minute &&
       second == other.second;
   }
 
-  gcc_constexpr_method
+  constexpr
   bool operator>(const BrokenTime other) const {
     return hour > other.hour ||
       (hour == other.hour && (minute > other.minute ||
@@ -134,9 +145,17 @@ struct BrokenTime {
   }
 
   /**
+   * Returns an instance that fails the Plausible() check.
+   */
+  constexpr
+  static BrokenTime Invalid() {
+    return BrokenTime(24, 60, 60);
+  }
+
+  /**
    * Does this object contain plausible values?
    */
-  gcc_constexpr_method
+  constexpr
   bool Plausible() const {
     return hour < 24 && minute < 60 && second < 60;
   }
@@ -144,7 +163,7 @@ struct BrokenTime {
   /**
    * Returns the number of seconds which have passed on this day.
    */
-  gcc_constexpr_method
+  constexpr
   unsigned GetSecondOfDay() const {
     return hour * 3600u + minute * 60u + second;
   }
@@ -164,6 +183,32 @@ struct BrokenTime {
    */
   gcc_const
   static BrokenTime FromSecondOfDayChecked(unsigned second_of_day);
+
+  /**
+   * Returns a BrokenTime that has the specified number of seconds
+   * added to it.  It properly wraps around midnight.
+   *
+   * @param seconds the number of seconds to add
+   */
+  gcc_pure
+  BrokenTime operator+(unsigned seconds) const;
+
+  /**
+   * Returns a BrokenTime that has the specified number of seconds
+   * added to it.  It properly wraps around midnight.
+   *
+   * @param seconds the number of seconds to add; may be negative
+   */
+  gcc_pure
+  BrokenTime operator+(int seconds) const;
+
+  BrokenTime operator-(int seconds) const {
+    return *this + (-seconds);
+  }
+
+  BrokenTime operator-(unsigned seconds) const {
+    return *this - int(seconds);
+  }
 };
 
 /**
@@ -175,25 +220,37 @@ struct BrokenDateTime : public BrokenDate, public BrokenTime {
    */
   BrokenDateTime() = default;
 
-  gcc_constexpr_ctor
+  constexpr
   BrokenDateTime(unsigned _year, unsigned _month, unsigned _day,
                  unsigned _hour, unsigned _minute, unsigned _second=0)
     :BrokenDate(_year, _month, _day), BrokenTime(_hour, _minute, _second) {}
 
-  gcc_constexpr_ctor
+  constexpr
   BrokenDateTime(unsigned _year, unsigned _month, unsigned _day)
     :BrokenDate(_year, _month, _day), BrokenTime(0, 0) {}
 
-  gcc_constexpr_method
+  constexpr
+  BrokenDateTime(const BrokenDate &date, const BrokenTime &time)
+    :BrokenDate(date), BrokenTime(time) {}
+
+  constexpr
   bool operator==(const BrokenDateTime other) const {
     return (const BrokenDate &)*this == (const BrokenDate &)other &&
       (const BrokenTime &)*this == (const BrokenTime &)other;
   }
 
   /**
+   * Returns an instance that fails the Plausible() check.
+   */
+  constexpr
+  static BrokenDateTime Invalid() {
+    return BrokenDateTime(BrokenDate::Invalid(), BrokenTime::Invalid());
+  }
+
+  /**
    * Does this object contain plausible values?
    */
-  gcc_constexpr_method
+  constexpr
   bool Plausible() const {
     return BrokenDate::Plausible() && BrokenTime::Plausible();
   }

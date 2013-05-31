@@ -27,30 +27,31 @@ Copyright_License {
 #include "LocalPath.hpp"
 #include "Util/EscapeBackslash.hpp"
 #include "Util/StringUtil.hpp"
+#include "Util/NumberParser.hpp"
 #include "IO/ConfiguredFile.hpp"
 
 #include <stdio.h>
+#include <memory>
 
-static gcc_constexpr_data StatusMessageSTRUCT StatusMessageDefaults[] = {
+static constexpr StatusMessage default_status_messages[] = {
 #include "Status_defaults.cpp"
   { NULL }
 };
 
 StatusMessageList::StatusMessageList()
-  :olddelay(2000)
+  :old_delay(2000)
 {
   // DEFAULT - 0 is loaded as default, and assumed to exist
-  StatusMessageSTRUCT &first = StatusMessageData.append();
+  StatusMessage &first = list.append();
   first.key = _T("DEFAULT");
-  first.doStatus = true;
-  first.doSound = true;
+  first.visible = true;
   first.sound = _T("IDR_WAV_DRIP");
   first.delay_ms = 2500; // 2.5 s
 
   // Load up other defaults - allow overwrite in config file
-  const StatusMessageSTRUCT *src = &StatusMessageDefaults[0];
+  const StatusMessage *src = &default_status_messages[0];
   while (src->key != NULL)
-    StatusMessageData.append(*src++);
+    list.append(*src++);
 }
 
 void
@@ -58,11 +59,9 @@ StatusMessageList::LoadFile()
 {
   LogStartUp(_T("Loading status file"));
 
-  TLineReader *reader = OpenConfiguredTextFile(szProfileStatusFile);
-  if (reader != NULL) {
+  std::unique_ptr<TLineReader> reader(OpenConfiguredTextFile(ProfileKeys::StatusFile));
+  if (reader)
     LoadFile(*reader);
-    delete reader;
-  }
 }
 
 static bool
@@ -83,14 +82,9 @@ parse_assignment(TCHAR *buffer, const TCHAR *&key, const TCHAR *&value)
 void
 StatusMessageList::LoadFile(TLineReader &reader)
 {
-  int ms; // Found ms for delay
-  const TCHAR **location; // Where to put the data
-  bool some_data; // Did we find some in the last loop...
-
   // Init first entry
-  StatusMessageSTRUCT current;
-  _init_Status(current);
-  some_data = false;
+  StatusMessage current;
+  current.Clear();
 
   /* Read from the file */
   TCHAR *buffer;
@@ -99,48 +93,34 @@ StatusMessageList::LoadFile(TLineReader &reader)
     // Check valid line? If not valid, assume next record (primative, but works ok!)
     if (*buffer == _T('#') || !parse_assignment(buffer, key, value)) {
       // Global counter (only if the last entry had some data)
-      if (some_data) {
-        StatusMessageData.append(current);
-        some_data = false;
-        _init_Status(current);
+      if (!current.IsEmpty()) {
+        list.append(current);
+        current.Clear();
 
-        if (StatusMessageData.full())
+        if (list.full())
           break;
       }
     } else {
-      location = NULL;
-
       if (_tcscmp(key, _T("key")) == 0) {
-        some_data = true; // Success, we have a real entry
-        location = &current.key;
+        if (current.key == NULL)
+          current.key = UnescapeBackslash(value);
       } else if (_tcscmp(key, _T("sound")) == 0) {
-        current.doSound = true;
-        location = &current.sound;
+        if (current.sound == NULL)
+          current.sound = UnescapeBackslash(value);
       } else if (_tcscmp(key, _T("delay")) == 0) {
         TCHAR *endptr;
-        ms = _tcstol(value, &endptr, 10);
+        unsigned ms = ParseUnsigned(value, &endptr);
         if (endptr > value)
           current.delay_ms = ms;
       } else if (_tcscmp(key, _T("hide")) == 0) {
         if (_tcscmp(value, _T("yes")) == 0)
-          current.doStatus = false;
-      }
-
-      // Do we have somewhere to put this &&
-      // is it currently empty ? (prevent lost at startup)
-      if (location && (_tcscmp(*location, _T("")) == 0)) {
-        // TODO code: this picks up memory lost from no entry, but not duplicates - fix.
-        if (*location) {
-          // JMW fix memory leak
-          free((void*)const_cast<TCHAR *>(*location));
-        }
-        *location = UnescapeBackslash(value);
+          current.visible = false;
       }
     }
   }
 
-  if (some_data)
-    StatusMessageData.append(current);
+  if (!current.IsEmpty())
+    list.append(current);
 }
 
 void
@@ -148,30 +128,19 @@ StatusMessageList::Startup(bool first)
 {
   if (first) {
     // NOTE: Must show errors AFTER all windows ready
-    olddelay = StatusMessageData[0].delay_ms;
-    StatusMessageData[0].delay_ms = 20000; // 20 seconds
+    old_delay = list[0].delay_ms;
+    list[0].delay_ms = 20000; // 20 seconds
   } else {
-    StatusMessageData[0].delay_ms = olddelay;
+    list[0].delay_ms = old_delay;
   }
 }
 
-const StatusMessageSTRUCT *
+const StatusMessage *
 StatusMessageList::Find(const TCHAR *key) const
 {
-  for (int i = StatusMessageData.size() - 1; i > 0; i--)
-    if (_tcscmp(key, StatusMessageData[i].key) == 0)
-      return &StatusMessageData[i];
+  for (int i = list.size() - 1; i > 0; i--)
+    if (_tcscmp(key, list[i].key) == 0)
+      return &list[i];
 
   return NULL;
-}
-
-// Create a blank entry (not actually used)
-void
-StatusMessageList::_init_Status(StatusMessageSTRUCT &m)
-{
-  m.key = _T("");
-  m.doStatus = true;
-  m.doSound = false;
-  m.sound = _T("");
-  m.delay_ms = 2500;  // 2.5 s
 }

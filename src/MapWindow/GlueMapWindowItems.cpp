@@ -26,52 +26,111 @@ Copyright_License {
 #include "Dialogs/MapItemListDialog.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Layout.hpp"
+#include "MapWindow/MapItem.hpp"
 #include "MapWindow/MapItemList.hpp"
 #include "MapWindow/MapItemListBuilder.hpp"
 #include "Computer/GlideComputer.hpp"
 #include "Dialogs/Message.hpp"
 #include "Language/Language.hpp"
+#include "Weather/Features.hpp"
+#include "Interface.hpp"
+#include "Dialogs/Dialogs.h"
+#include "Task/ProtectedTaskManager.hpp"
+#include "Task/TaskManager.hpp"
+#include "Components.hpp"
+
+
+/**
+ * returns true if current ordered task is a Mat
+ */
+static bool
+IsMat()
+{
+  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+  return task_manager->IsMat() &&
+      task_manager->GetMode() == TaskManager::MODE_ORDERED;
+}
 
 bool
 GlueMapWindow::ShowMapItems(const GeoPoint &location,
                             bool show_empty_message) const
 {
+  /* not using MapWindowBlackboard here because this method is called
+     by the main thread */
+  const ComputerSettings &computer_settings =
+    CommonInterface::GetComputerSettings();
+  const MapSettings &settings = CommonInterface::GetMapSettings();
+  const MoreData &basic = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+
   fixed range = visible_projection.DistancePixelsToMeters(Layout::GetHitRadius());
+
+  bool continue_after_mat = true;
+  if (IsMat()) {
+    MapItemList list;
+    MapItemListBuilder builder(list, location, range);
+    if (waypoints)
+      builder.AddWaypoints(*waypoints);
+
+    if (list.size() > 0) {
+      auto i = list.begin();
+
+      const MapItem &item = **i;
+      if (item.type == MapItem::WAYPOINT &&
+          ((const WaypointMapItem &)item).waypoint.IsTurnpoint()) {
+        continue_after_mat =
+            dlgMatItemClickShowModal(((const WaypointMapItem &)item).waypoint);
+      }
+    }
+  }
+
+  if (!continue_after_mat)
+    return true;
 
   MapItemList list;
   MapItemListBuilder builder(list, location, range);
+  bool has_targets = false;
+  if (protected_task_manager != nullptr) {
+    ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+    has_targets = task_manager->GetOrderedTask().HasTargets();
+  }
 
-  if (GetMapSettings().item_list.add_location)
-      builder.AddLocation(Basic(), terrain);
+  if (settings.item_list.add_location)
+      builder.AddLocation(basic, terrain);
 
-  if (GetMapSettings().item_list.add_arrival_altitude && route_planner)
+  if (settings.item_list.add_arrival_altitude && route_planner)
     builder.AddArrivalAltitudes(*route_planner, terrain,
-                                GetComputerSettings().task.safety_height_arrival);
+                                computer_settings.task.safety_height_arrival);
 
-  if (Basic().location_available)
-    builder.AddSelfIfNear(Basic().location, Calculated().heading);
+  if (basic.location_available)
+    builder.AddSelfIfNear(basic.location, calculated.heading);
 
-  if (task)
+  if (task && has_targets)
     builder.AddTaskOZs(*task);
 
   const Airspaces *airspace_database = airspace_renderer.GetAirspaces();
   if (airspace_database)
     builder.AddVisibleAirspace(*airspace_database,
                                airspace_renderer.GetWarningManager(),
-                               GetComputerSettings().airspace,
-                               GetMapSettings().airspace, Basic(),
-                               Calculated());
+                               computer_settings.airspace,
+                               settings.airspace, basic,
+                               calculated);
 
-  if (marks && render_projection.GetMapScale() <= fixed_int_constant(30000))
+  if (marks && visible_projection.GetMapScale() <= fixed_int_constant(30000))
     builder.AddMarkers(*marks);
 
-  if (render_projection.GetMapScale() <= fixed_int_constant(4000))
-    builder.AddThermals(Calculated().thermal_locator, Basic(), Calculated());
+  if (visible_projection.GetMapScale() <= fixed_int_constant(4000))
+    builder.AddThermals(calculated.thermal_locator, basic, calculated);
 
   if (waypoints)
     builder.AddWaypoints(*waypoints);
 
-  builder.AddTraffic(Basic().flarm.traffic, GetComputerSettings().team_code);
+#ifdef HAVE_NOAA
+  if (noaa_store)
+    builder.AddWeatherStations(*noaa_store);
+#endif
+
+  builder.AddTraffic(basic.flarm.traffic, computer_settings.team_code);
 
   // Sort the list of map items
   list.Sort();
@@ -87,7 +146,7 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
 
   ShowMapItemListDialog(UIGlobals::GetMainWindow(), list,
                         UIGlobals::GetDialogLook(), look, traffic_look,
-                        final_glide_bar_renderer.GetLook(), GetMapSettings(),
+                        final_glide_bar_renderer.GetLook(), settings,
                         glide_computer != NULL
                         ? &glide_computer->GetAirspaceWarnings() : NULL);
   return true;

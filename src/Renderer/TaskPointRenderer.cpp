@@ -25,12 +25,12 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Projection/WindowProjection.hpp"
-#include "Task/Tasks/BaseTask/UnorderedTaskPoint.hpp"
-#include "Task/TaskPoints/AATIsolineSegment.hpp"
-#include "Task/TaskPoints/StartPoint.hpp"
-#include "Task/TaskPoints/ASTPoint.hpp"
-#include "Task/TaskPoints/AATPoint.hpp"
-#include "Task/TaskPoints/FinishPoint.hpp"
+#include "Engine/Task/Unordered/UnorderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/Points/StartPoint.hpp"
+#include "Engine/Task/Ordered/Points/FinishPoint.hpp"
+#include "Engine/Task/Ordered/Points/ASTPoint.hpp"
+#include "Engine/Task/Ordered/Points/AATPoint.hpp"
+#include "Engine/Task/Ordered/AATIsolineSegment.hpp"
 #include "Look/TaskLook.hpp"
 #include "Math/Screen.hpp"
 #include "OZRenderer.hpp"
@@ -65,7 +65,7 @@ TaskPointRenderer::DrawOrdered(const OrderedTaskPoint &tp, Layer layer)
 {
   switch (layer) {
   case LAYER_OZ_SHADE:
-    if (tp.boundingbox_overlaps(bb_screen))
+    if (tp.BoundingBoxOverlaps(bb_screen))
       // draw shaded part of observation zone
       DrawOZBackground(canvas, tp);
 
@@ -80,7 +80,7 @@ TaskPointRenderer::DrawOrdered(const OrderedTaskPoint &tp, Layer layer)
     break;
 
   case LAYER_OZ_OUTLINE:
-    if (tp.boundingbox_overlaps(bb_screen))
+    if (tp.BoundingBoxOverlaps(bb_screen))
       DrawOZForeground(tp);
 
     break;
@@ -188,7 +188,7 @@ TaskPointRenderer::DrawIsoline(const AATPoint &tp)
 void
 TaskPointRenderer::DrawOZBackground(Canvas &canvas, const OrderedTaskPoint &tp)
 {
-  ozv.Draw(canvas, OZRenderer::LAYER_SHADE, m_proj, *tp.GetOZPoint(),
+  ozv.Draw(canvas, OZRenderer::LAYER_SHADE, m_proj, tp.GetObservationZone(),
            index - active_index);
 }
 
@@ -199,9 +199,9 @@ TaskPointRenderer::DrawOZForeground(const OrderedTaskPoint &tp)
   if (mode_optional_start)
     offset = -1; // render optional starts as deactivated
 
-  ozv.Draw(canvas, OZRenderer::LAYER_INACTIVE, m_proj, *tp.GetOZPoint(),
+  ozv.Draw(canvas, OZRenderer::LAYER_INACTIVE, m_proj, tp.GetObservationZone(),
            offset);
-  ozv.Draw(canvas, OZRenderer::LAYER_ACTIVE, m_proj, *tp.GetOZPoint(),
+  ozv.Draw(canvas, OZRenderer::LAYER_ACTIVE, m_proj, tp.GetObservationZone(),
            offset);
 }
 
@@ -248,7 +248,11 @@ TaskPointRenderer::Draw(const TaskPoint &tp, Layer layer)
 
     DrawOrdered(otp, layer);
     if (layer == LAYER_SYMBOLS) {
-      DrawIsoline(atp);
+      if (otp.GetNext() != nullptr &&
+          !(otp.GetNext()->GetWaypoint() == otp.GetWaypoint()) &&
+          otp.GetPrevious() != nullptr &&
+          !(otp.GetPrevious()->GetWaypoint() == otp.GetWaypoint()))
+        DrawIsoline(atp);
       DrawBearing(tp);
       DrawTarget(tp);
     }

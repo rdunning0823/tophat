@@ -22,15 +22,20 @@ Copyright_License {
 */
 
 #include "Dialogs/Task.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/Waypoint.hpp"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
+#include "Form/Form.hpp"
+#include "Form/List.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 #include "LocalPath.hpp"
 #include "Task/Factory/AbstractTaskFactory.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Dialogs/dlgTaskHelpers.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -50,7 +55,7 @@ OnCloseClicked(gcc_unused WndButton &Sender)
 static void
 RefreshView()
 {
-  wOptionalStartPoints->SetLength(ordered_task->optional_start_points_size()
+  wOptionalStartPoints->SetLength(ordered_task->GetOptionalStartPointCount()
       + (RealStartExists ? 2 : 1));
 
   wOptionalStartPoints->Invalidate();
@@ -60,10 +65,10 @@ static void
 OnOptionalStartPaintListItem(Canvas &canvas, const PixelRect rc,
                              unsigned DrawListIndex)
 {
-  assert(DrawListIndex <= ordered_task->optional_start_points_size()
+  assert(DrawListIndex <= ordered_task->GetOptionalStartPointCount()
       +  (RealStartExists ? 2 : 1));
   assert(wOptionalStartPoints->GetLength() ==
-      ordered_task->optional_start_points_size() + (RealStartExists ? 2 : 1));
+         ordered_task->GetOptionalStartPointCount() + (RealStartExists ? 2 : 1));
 
   const unsigned index_optional_starts = DrawListIndex - (RealStartExists ? 1 : 0);
 
@@ -76,11 +81,11 @@ OnOptionalStartPaintListItem(Canvas &canvas, const PixelRect rc,
 
     const OrderedTaskPoint *tp;
     if (DrawListIndex == 0 && RealStartExists) {
-      tp = ordered_task->get_tp(0);
+      tp = &ordered_task->GetPoint(0);
       canvas.text(pt.x, pt.y, _T("*"));
       pt.x += canvas.CalcTextWidth(_T("*"));
     } else
-      tp = ordered_task->get_optional_start(index_optional_starts);
+      tp = &ordered_task->GetOptionalStartPoint(index_optional_starts);
 
     assert(tp != NULL);
 
@@ -92,37 +97,39 @@ OnOptionalStartPaintListItem(Canvas &canvas, const PixelRect rc,
 static void
 OnOptionalStartListEnter(unsigned ItemIndex)
 {
-  assert(ItemIndex <= ordered_task->optional_start_points_size()
+  assert(ItemIndex <= ordered_task->GetOptionalStartPointCount()
       +  (RealStartExists ? 2 : 1));
   assert(wOptionalStartPoints->GetLength() ==
-      ordered_task->optional_start_points_size() + (RealStartExists ? 2 : 1));
+         ordered_task->GetOptionalStartPointCount() + (RealStartExists ? 2 : 1));
 
   if (ItemIndex == 0 && RealStartExists)
     return;
 
   const unsigned index_optional_starts = ItemIndex - (RealStartExists ? 1 : 0);
 
-  if (index_optional_starts < ordered_task->optional_start_points_size()) {
+  if (index_optional_starts < ordered_task->GetOptionalStartPointCount()) {
+    const GeoPoint &location = ordered_task->TaskSize() > 0
+      ? ordered_task->GetPoint(0).GetLocation()
+      : XCSoarInterface::Basic().location;
     const Waypoint* way_point = ShowWaypointListDialog(wf->GetMainWindow(),
-        ordered_task->TaskSize() > 0 ? ordered_task->get_tp(0)->GetLocation()
-            : XCSoarInterface::Basic().location);
+                                                       location);
     if (!way_point)
       return;
 
     if (ordered_task->RelocateOptionalStart(index_optional_starts, *way_point))
       task_modified = true;
 
-  } else if (!ordered_task->is_max_size()) {
+  } else if (!ordered_task->IsFull()) {
 
-    AbstractTaskFactory &factory = ordered_task->GetFactory();
+    const GeoPoint &location = ordered_task->TaskSize() > 0
+      ? ordered_task->GetPoint(0).GetLocation()
+      : XCSoarInterface::Basic().location;
     const Waypoint* way_point =
-        ShowWaypointListDialog(wf->GetMainWindow(),
-                          ordered_task->TaskSize() > 0 ?
-                          ordered_task->get_tp(0)->GetLocation() :
-                          XCSoarInterface::Basic().location);
+      ShowWaypointListDialog(wf->GetMainWindow(), location);
     if (!way_point)
       return;
 
+    AbstractTaskFactory &factory = ordered_task->GetFactory();
     if (factory.AppendOptionalStart(*way_point)) {
       task_modified = true;
     }
@@ -148,7 +155,7 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
   }
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnRemoveClicked),
   DeclareCallBackEntry(OnRelocateClicked),

@@ -27,6 +27,8 @@ Copyright_License {
 #include "Math/fixed.hpp"
 #include "Util/TypeTraits.hpp"
 
+#include <array>
+
 /** Derived vario data */
 struct VarioInfo
 {
@@ -37,23 +39,26 @@ struct VarioInfo
   /** Average vertical speed of the airmass based on 30s */
   fixed netto_average;
 
-  /** Instant glide ratio */
-  fixed ld;
-  /** Glide ratio while in Cruise mode */
-  fixed cruise_ld;
+  /** Instant glide ratio over ground */
+  fixed gr;
+  /** Glide ratio over ground while in Cruise mode */
+  fixed cruise_gr;
 
   /**
-   * Average glide ratio.  Zero means the value is not available.
+   * Average glide ratio over ground.  Zero means the value is not available.
    */
-  int average_ld;
+  fixed average_gr;
 
+  /** Instant lift/drag ratio */
   fixed ld_vario;
+
+  typedef std::array<fixed, 36> LiftDatabase;
 
   /**
    * The lift of each ten degrees while circling.
    * Index 1 equals 5 to 15 degrees.
    */
-  fixed lift_database[36];
+  LiftDatabase lift_database;
 
   void ClearLiftDatabase();
 

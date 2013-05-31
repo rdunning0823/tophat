@@ -73,7 +73,7 @@ GaugesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Final glide bar MC0"),
              _("If set to ON the final glide bar will show a second arrow indicating the required height "
                  "to reach the final waypoint at MC zero."),
-             ui_settings.final_glide_bar_mc0_enabled);
+             ui_settings.map.final_glide_bar_mc0_enabled);
   SetExpertRow(EnableFinalGlideBarMC0);
 }
 
@@ -84,20 +84,20 @@ GaugesConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   UISettings &ui_settings = CommonInterface::SetUISettings();
 
-  changed |= SaveValue(EnableFLARMGauge, szProfileEnableFLARMGauge,
+  changed |= SaveValue(EnableFLARMGauge, ProfileKeys::EnableFLARMGauge,
                        ui_settings.traffic.enable_gauge);
 
-  changed |= SaveValue(AutoCloseFlarmDialog, szProfileAutoCloseFlarmDialog,
+  changed |= SaveValue(AutoCloseFlarmDialog, ProfileKeys::AutoCloseFlarmDialog,
                        ui_settings.traffic.auto_close_dialog);
 
-  changed |= SaveValue(EnableTAGauge, szProfileEnableTAGauge,
+  changed |= SaveValue(EnableTAGauge, ProfileKeys::EnableTAGauge,
                        ui_settings.enable_thermal_assistant_gauge);
 
-  changed |= SaveValue(EnableThermalProfile, szProfileEnableThermalProfile,
+  changed |= SaveValue(EnableThermalProfile, ProfileKeys::EnableThermalProfile,
                        XCSoarInterface::SetMapSettings().show_thermal_profile);
 
-  changed |= SaveValue(EnableFinalGlideBarMC0, szProfileEnableFinalGlideBarMC0,
-                       ui_settings.final_glide_bar_mc0_enabled);
+  changed |= SaveValue(EnableFinalGlideBarMC0, ProfileKeys::EnableFinalGlideBarMC0,
+                       ui_settings.map.final_glide_bar_mc0_enabled);
 
   _changed |= changed;
   _require_restart |= require_restart;

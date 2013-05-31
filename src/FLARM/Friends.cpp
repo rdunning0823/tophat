@@ -31,6 +31,7 @@ Copyright_License {
 
 namespace FlarmFriends
 {
+  bool loaded = false;
   std::map<FlarmId, Color> friends;
 
   void LoadColor(const TCHAR *key, Color color);
@@ -86,24 +87,29 @@ FlarmFriends::Load()
   LoadColor(_T("FriendsBlue"), Color::BLUE);
   LoadColor(_T("FriendsYellow"), Color::YELLOW);
   LoadColor(_T("FriendsMagenta"), Color::MAGENTA);
+
+  loaded = true;
 }
 
 void
 FlarmFriends::Save()
 {
+  if (!loaded)
+    return;
+
   TCHAR id[16];
   tstring ids[4];
 
-  for (auto it = friends.begin(), it_end = friends.end(); it != it_end; ++it) {
-    assert(it->first.IsDefined());
-    assert((int)it->second < (int)Color::COUNT);
+  for (const auto &i : friends) {
+    assert(i.first.IsDefined());
+    assert((int)i.second < (int)Color::COUNT);
 
-    if (it->second == Color::NONE)
+    if (i.second == Color::NONE)
       continue;
 
-    unsigned color_index = (int)it->second - 1;
+    unsigned color_index = (int)i.second - 1;
 
-    it->first.Format(id);
+    i.first.Format(id);
     ids[color_index] += id;
     ids[color_index] += ',';
   }

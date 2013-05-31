@@ -30,6 +30,7 @@ Copyright_License {
 #include "IO/KeyValueFileReader.hpp"
 #include "IO/FileLineReader.hpp"
 #include "IO/TextWriter.hpp"
+#include "IO/FileTransaction.hpp"
 #include "OS/FileUtil.hpp"
 #include "OS/PathName.hpp"
 #include "Compatibility/path.h"
@@ -37,7 +38,11 @@ Copyright_License {
 #include <string.h>
 #include <windef.h> /* for MAX_PATH */
 
-#define XCSPROFILE "xcsoar-registry.prf"
+#define XCSPROFILE "tophat-registry.top"
+
+namespace Profile {
+  static bool SaveFile(const FileTransaction &transaction);
+}
 
 static TCHAR startProfileFile[MAX_PATH];
 
@@ -85,24 +90,33 @@ Profile::Save()
   SaveFile(startProfileFile);
 }
 
+bool
+Profile::SaveFile(const FileTransaction &transaction)
+{
+  TextWriter writer(transaction.GetTemporaryPath());
+  // ... on error -> return
+  if (!writer.IsOpen())
+    return false;
+
+  KeyValueFileWriter kvwriter(writer);
+  Export(kvwriter);
+
+  return writer.Flush();
+}
+
 void
 Profile::SaveFile(const TCHAR *szFile)
 {
   if (StringIsEmpty(szFile))
     return;
 
-  // Try to open the file for writing
-  TextWriter writer(szFile);
-  // ... on error -> return
-  if (writer.error())
-    return;
-
-  KeyValueFileWriter kvwriter(writer);
-
   LogStartUp(_T("Saving profile to %s"), szFile);
-  Export(kvwriter);
-}
 
+  // Try to open the file for writing
+  FileTransaction transaction(szFile);
+  if (SaveFile(transaction))
+    transaction.Commit();
+}
 
 void
 Profile::SetFiles(const TCHAR* override)
@@ -116,7 +130,7 @@ Profile::SetFiles(const TCHAR* override)
       LocalPath(startProfileFile, override);
 
       if (_tcschr(override, '.') == NULL)
-        _tcscat(startProfileFile, _T(".prf"));
+        _tcscat(startProfileFile, _T(".top"));
     } else
       CopyString(startProfileFile, override, MAX_PATH);
     return;

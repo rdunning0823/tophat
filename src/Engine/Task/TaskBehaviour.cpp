@@ -25,11 +25,11 @@
 void
 SectorDefaults::SetDefaults()
 {
-  start_type = AbstractTaskFactory::START_CYLINDER;
+  start_type = TaskPointFactoryType::START_CYLINDER;
   start_radius = fixed(1000);
-  turnpoint_type = AbstractTaskFactory::AST_CYLINDER;
+  turnpoint_type = TaskPointFactoryType::AST_CYLINDER;
   turnpoint_radius = fixed(500);
-  finish_type = AbstractTaskFactory::FINISH_CYLINDER;
+  finish_type = TaskPointFactoryType::FINISH_CYLINDER;
   finish_radius = fixed(1000);
 }
 
@@ -58,6 +58,7 @@ TaskBehaviour::SetDefaults()
   goto_nonlandable = true;
   risk_gamma = fixed_zero;
   enable_olc = true;
+  predict_contest = false;
   contest = OLC_Plus;
   contest_handicap = 100;
   safety_mc = fixed_half;
@@ -79,6 +80,5 @@ TaskBehaviour::DisableAll()
   calc_cruise_efficiency = false;
   calc_glide_required = false;
   enable_olc = false;
-  ordered_defaults.AllOff();
   route_planner.mode = RoutePlannerConfig::Mode::NONE;
 }

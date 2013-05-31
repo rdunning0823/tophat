@@ -26,32 +26,17 @@ Copyright_License {
 
 #include "Replay/NmeaReplay.hpp"
 #include "PeriodClock.hpp"
-#include "Device/Port/NullPort.hpp"
-
-class Device;
-class NMEAParser;
 
 class NmeaReplayGlue:
   public NmeaReplay
 {
-  NullPort port;
-  NMEAParser *parser;
-  Device *device;
-
   PeriodClock clock;
 
 public:
-  NmeaReplayGlue();
-  virtual ~NmeaReplayGlue();
-
-  virtual void Start();
-  virtual void Stop();
+  NmeaReplayGlue(NLineReader *reader);
 
 protected:
   virtual bool UpdateTime();
-  virtual void ResetTime();
-  virtual void OnBadFile();
-  virtual void OnSentence(const char *line);
 };
 
 #endif

@@ -25,8 +25,11 @@ Copyright_License {
 #define XCSOAR_WIND_SETTINGS_PANEL_HPP
 
 #include "Form/RowFormWidget.hpp"
+#include "Form/DataField/Listener.hpp"
 
-class WindSettingsPanel : public RowFormWidget {
+class WndProperty;
+
+class WindSettingsPanel : public RowFormWidget, DataFieldListener {
   enum ControlIndex {
     AutoWind,
     ExternalWind,
@@ -35,18 +38,28 @@ class WindSettingsPanel : public RowFormWidget {
     Direction,
   };
 
-  const bool edit_manual_wind;
+  const bool edit_manual_wind, edit_trail_drift;
 
   bool external_wind;
+
+  WndProperty *auto_wind;
 
 public:
   /**
    * @param manual_wind edit the manual wind setting
    */
-  WindSettingsPanel(bool edit_manual_wind);
+  WindSettingsPanel(bool edit_manual_wind, bool edit_trail_drift);
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed, bool &require_restart);
+
+  /** DataFieldListener */
+  virtual void OnModified(DataField &df);
+
+  /**
+   * Shows/Hides controls based on Auto Wind value
+   */
+  void SetVisibility();
 };
 
 #endif

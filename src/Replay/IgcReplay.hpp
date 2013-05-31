@@ -27,12 +27,8 @@ Copyright_License {
 #include "Math/fixed.hpp"
 #include "AbstractReplay.hpp"
 #include "Replay/CatmullRomInterpolator.hpp"
-#include "IO/FileLineReader.hpp"
 
-#include <tchar.h>
-#include <windef.h> /* for MAX_PATH */
-#include <stdio.h>
-
+class NLineReader;
 struct GeoPoint;
 class Angle;
 struct IGCFix;
@@ -41,39 +37,23 @@ class IgcReplay: public AbstractReplay
 {
   CatmullRomInterpolator cli;
 
-  TCHAR file_name[MAX_PATH];
-  FileLineReaderA *reader;
+  NLineReader *reader;
 
 protected:
   fixed t_simulation;
 
 public:
-  IgcReplay();
+  IgcReplay(NLineReader *reader);
+  virtual ~IgcReplay();
 
-  bool Update();
-  void Stop();
-  void Start();
-  const TCHAR* GetFilename();
-  void SetFilename(const TCHAR *name);
+  virtual bool Update(NMEAInfo &data, fixed time_scale) gcc_override;
 
 protected:
-  virtual bool UpdateTime();
-  virtual void ResetTime();
-
-  virtual void OnReset() = 0;
-  virtual void OnStop() = 0;
-  virtual void OnBadFile() = 0;
-  virtual void OnAdvance(const GeoPoint &loc,
-                         const fixed speed, const Angle bearing,
-                         const fixed alt, const fixed baroalt, const fixed t) = 0;
+  virtual bool UpdateTime(fixed time_scale);
 
   bool ScanBuffer(const char *buffer, IGCFix &fix);
 
   bool ReadPoint(IGCFix &fix);
-
-private:
-  bool OpenFile();
-  void CloseFile();
 };
 
 #endif

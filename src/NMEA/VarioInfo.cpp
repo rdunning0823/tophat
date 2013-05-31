@@ -24,22 +24,20 @@ Copyright_License {
 #include "VarioInfo.hpp"
 #include "Computer/GlideRatioCalculator.hpp"
 
-#include <algorithm>
-
 void
 VarioInfo::ClearLiftDatabase()
 {
-  std::fill(lift_database, lift_database + 36, fixed_zero);
+  lift_database.fill(fixed_zero);
 }
 
 void
 VarioInfo::Clear()
 {
   sink_rate = fixed_zero;
-  cruise_ld = fixed(INVALID_GR);
-  average_ld = 0;
-  ld = fixed(INVALID_GR);
-  ld_vario = fixed(INVALID_GR);
+  cruise_gr = INVALID_GR;
+  average_gr = fixed_zero;
+  gr = INVALID_GR;
+  ld_vario = INVALID_GR;
 
   ClearLiftDatabase();
 }

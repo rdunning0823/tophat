@@ -27,19 +27,39 @@ Copyright_License {
 #include <tchar.h>
 
 class SingleWindow;
+class Waypoint;
 
 void dlgAlternatesListShowModal(SingleWindow &parent);
 
 void dlgBasicSettingsShowModal();
+
+/**
+ * show the help screen.
+ * @param conditional: if true, does not display if user has opted to not show
+ * on startup.  if false, skips the configuration screen
+ */
+void dlgStartupAssistantShowModal(bool conditional);
+
+/**
+ * Allows setting up of the critical items for Top Hat
+ * @param auto_prompt.  do we explain that there is missing data?
+ */
+void ShowDialogSetupQuick(bool auto_prompt);
+
+/**
+ * displays a popup describing the "what if" task stats if the
+ * wp is appended before the finish of the current MAT task
+ * Allows user to either append it or cancel
+ * @param wp. the waypoint to be added.
+ * return true if the "More options" button was clicked
+ */
+bool dlgMatItemClickShowModal(const Waypoint &wp);
+void dlgQNHShowModal();
 void dlgBrightnessShowModal();
-void dlgHelpShowModal(SingleWindow &parent, const TCHAR* Caption,
-    const TCHAR* HelpText);
 
 void dlgChecklistShowModal();
-void dlgConfigurationShowModal();
+void dlgConfigurationShowModal(const TCHAR *page_name = _T(""));
 void dlgConfigFontsShowModal();
-
-void dlgLoggerReplayShowModal();
 
 /**
  * @return true on success, false if the user has pressed the "Quit"
@@ -48,16 +68,16 @@ void dlgLoggerReplayShowModal();
 bool
 dlgStartupShowModal();
 
+/**
+ * shows dialog with task status info
+ */
+void ShowTaskStatusDialog();
+
 void ShowWindSettingsDialog();
 
 void dlgStatusShowModal(int page);
 
 void dlgSwitchesShowModal();
-
-void
-dlgInfoBoxAccessShowModeless(const int id);
-
-void dlgVoiceShowModal();
 
 void dlgCreditsShowModal(SingleWindow &parent);
 

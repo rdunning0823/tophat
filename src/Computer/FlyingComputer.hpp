@@ -24,11 +24,12 @@ Copyright_License {
 #ifndef XCSOAR_FLYING_COMPUTER_HPP
 #define XCSOAR_FLYING_COMPUTER_HPP
 
+#include "StateClock.hpp"
 #include "Math/fixed.hpp"
+#include "Geo/GeoPoint.hpp"
 
 struct NMEAInfo;
 struct DerivedInfo;
-struct GeoPoint;
 struct AircraftState;
 struct FlyingState;
 
@@ -36,8 +37,15 @@ struct FlyingState;
  * Detect takeoff and landing.
  */
 class FlyingComputer {
-  unsigned short time_on_ground;
-  unsigned short time_in_flight;
+  /**
+   * Tracks the duration the aircraft has been stationary.
+   */
+  StateClock<60, 5> stationary_clock;
+
+  /**
+   * Tracks the duration the aircraft has been moving.
+   */
+  StateClock<30, 5> moving_clock;
 
   /**
    * If the aircraft is currenly assumed to be moving, then this
@@ -46,6 +54,19 @@ class FlyingComputer {
    * amount of time.
    */
   fixed moving_since;
+
+  /**
+   * If the aircraft is currently assumed to be moving, then this
+   * denotes the location when moving started initially.  This
+   * attribute is only valid if #moving_since is non-negative.
+   */
+  GeoPoint moving_at;
+
+  fixed sinking_since;
+
+  GeoPoint sinking_location;
+
+  fixed sinking_altitude;
 
 public:
   void Reset();
@@ -56,10 +77,13 @@ public:
                FlyingState &flying);
 
   void Compute(fixed takeoff_speed,
-               const AircraftState &state,
+               const AircraftState &state, fixed dt,
                FlyingState &flying);
 
 protected:
+  void CheckRelease(FlyingState &state, fixed time, const GeoPoint &location,
+                    fixed altitude);
+
   void Check(FlyingState &state, fixed time, const GeoPoint &location);
 
   /**
@@ -67,7 +91,8 @@ protected:
    *
    * @param time Time the aircraft is moving
    */
-  void Moving(FlyingState &state, fixed time, const GeoPoint &location);
+  void Moving(FlyingState &state, fixed time, fixed dt,
+              const GeoPoint &location);
 
   /**
    * Update flying state when stationary 
@@ -75,7 +100,8 @@ protected:
    * @param time Time the aircraft is stationary
    * @param on_ground Whether the aircraft is known to be on the ground
    */
-  void Stationary(FlyingState &state, fixed time, const GeoPoint &location);
+  void Stationary(FlyingState &state, fixed time, fixed dt,
+                  const GeoPoint &location);
 };
 
 #endif

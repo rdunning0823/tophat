@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "DebugPort.hpp"
+#include "Device/Port/Port.hpp"
 #include "Device/Port/ConfiguredPort.hpp"
 #include "Device/Driver.hpp"
 #include "Device/Register.hpp"
@@ -32,6 +33,7 @@ Copyright_License {
 #include "Profile/DeviceConfig.hpp"
 #include "Util/StringUtil.hpp"
 #include "Operation/ConsoleOperationEnvironment.hpp"
+#include "IO/Async/GlobalIOThread.hpp"
 
 #include <stdio.h>
 
@@ -391,7 +393,9 @@ main(int argc, char **argv)
   const DeviceConfig config = ParsePortArgs(args);
   args.ExpectEnd();
 
-  Port *port = OpenPort(config, *(Port::Handler *)NULL);
+  InitialiseIOThread();
+
+  Port *port = OpenPort(config, *(DataHandler *)NULL);
   if (port == NULL) {
     fprintf(stderr, "Failed to open COM port\n");
     return EXIT_FAILURE;
@@ -402,6 +406,7 @@ main(int argc, char **argv)
   RunUI(flarm, env);
 
   delete port;
+  DeinitialiseIOThread();
 
   return EXIT_SUCCESS;
 }

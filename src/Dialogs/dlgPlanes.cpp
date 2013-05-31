@@ -23,7 +23,11 @@ Copyright_License {
 
 #include "Dialogs/Planes.hpp"
 #include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/Internal.hpp"
+#include "Dialogs/XML.hpp"
+#include "Dialogs/Message.hpp"
+#include "Form/Form.hpp"
+#include "Form/List.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 #include "Plane/Plane.hpp"
 #include "Plane/PlaneGlue.hpp"
@@ -37,10 +41,15 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
+#include "LogFile.hpp"
 
 #include <vector>
 #include <assert.h>
 #include <windef.h> /* for MAX_PATH */
+
+static bool Load(unsigned i);
 
 static WndForm *dialog = NULL;
 static ListControl *plane_list = NULL;
@@ -75,6 +84,30 @@ GetRowHeight(const DialogLook &look)
     + look.small_font->GetHeight();
 }
 
+/**
+ * is any plane in the list active?
+ * @return true if one of the planes in the list is active
+ */
+static bool
+IsAnyActive()
+{
+  for (unsigned i = 0; i < list.size(); i++)
+    if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path))
+      return true;
+
+  return false;
+}
+
+/**
+ * if no planes in the list are active, it loads the first in the list
+ */
+static void
+LoadFirstIfNoneActive()
+{
+  if (!IsAnyActive() && list.size() > 0)
+    Load(0);
+}
+
 static void
 UpdateList()
 {
@@ -102,6 +135,8 @@ UpdateList()
   b = (WndButton*)dialog->FindByName(_T("DeleteButton"));
   assert(b != NULL);
   b->SetEnabled(len > 0);
+
+  LoadFirstIfNoneActive();
 }
 
 static void
@@ -113,17 +148,18 @@ OnPlaneListPaint(Canvas &canvas, const PixelRect rc, unsigned i)
   const Font &name_font = *look.list.font;
   const Font &details_font = *look.small_font;
 
-  canvas.SetTextColor(COLOR_BLACK);
   canvas.Select(name_font);
+
+  canvas.text_clipped(rc.left + Layout::FastScale(2),
+                      rc.top + Layout::FastScale(2), rc, list[i].name);
 
   if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path)) {
     StaticString<256> buffer;
-    buffer.Format(_T("%s - %s"), list[i].name.c_str(), _("Active"));
-    canvas.text_clipped(rc.left + Layout::FastScale(2),
+    buffer.Format(_T("** %s **"), _("Active"));
+    canvas.text_clipped(rc.right - Layout::FastScale(2) -
+                        canvas.CalcTextSize(buffer).cx,
                         rc.top + Layout::FastScale(2), rc, buffer);
   } else
-    canvas.text_clipped(rc.left + Layout::FastScale(2),
-                        rc.top + Layout::FastScale(2), rc, list[i].name);
 
   canvas.Select(details_font);
 
@@ -154,30 +190,33 @@ Load(unsigned i)
 static bool
 LoadWithDialog(unsigned i)
 {
-  const TCHAR *title;
-  StaticString<256> text;
+  assert(i < list.size());
 
-  bool result = Load(i);
-  if (!result) {
-    title = _("Error");
-    text.Format(_("Loading of plane profile \"%s\" failed!"),
-                list[i].name.c_str());
-  } else {
-    title = _("Load");
-    text.Format(_("Plane profile \"%s\" activated."),
-                list[i].name.c_str());
+  StaticString<256> tmp;
+  tmp.Format(_("Do you want to activate plane profile \"%s\"?"),
+             list[i].name.c_str());
+
+  if (ShowMessageBox(tmp, _(" "), MB_YESNO) == IDYES) {
+
+    const TCHAR *title;
+    StaticString<256> text;
+
+    bool result = Load(i);
+    if (!result) {
+      title = _("Error");
+      text.Format(_("Activating plane profile \"%s\" failed!"),
+                  list[i].name.c_str());
+      ShowMessageBox(text, title, MB_OK);
+    }
+    return result;
   }
-
-  ShowMessageBox(text, title, MB_OK);
-
-  return result;
+  return false;
 }
 
 static void
 LoadClicked(gcc_unused WndButton &button)
 {
-  if (LoadWithDialog(plane_list->GetCursorIndex()))
-    dialog->SetModalResult(mrOK);
+  LoadWithDialog(plane_list->GetCursorIndex());
 }
 
 static void
@@ -292,18 +331,10 @@ DeleteClicked(gcc_unused WndButton &button)
 static void
 ListItemSelected(unsigned i)
 {
-  assert(i < list.size());
-
-  StaticString<256> tmp;
-  tmp.Format(_("Do you want to load plane profile \"%s\"?"),
-             list[i].name.c_str());
-
-  if (ShowMessageBox(tmp, _("Load"), MB_YESNO) == IDYES)
-    if (LoadWithDialog(i))
-      dialog->SetModalResult(mrOK);
+  LoadWithDialog(i);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
    DeclareCallBackEntry(LoadClicked),
    DeclareCallBackEntry(CloseClicked),
    DeclareCallBackEntry(NewClicked),

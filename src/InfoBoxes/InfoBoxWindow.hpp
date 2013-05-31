@@ -31,19 +31,6 @@ Copyright_License {
 #include "PeriodClock.hpp"
 #include "Data.hpp"
 
-enum BorderKind_t {
-  bkNone,
-  bkTop,
-  bkRight,
-  bkBottom,
-  bkLeft
-};
-
-#define BORDERTOP    (1<<bkTop)
-#define BORDERRIGHT  (1<<bkRight)
-#define BORDERBOTTOM (1<<bkBottom)
-#define BORDERLEFT   (1<<bkLeft)
-
 struct InfoBoxSettings;
 struct InfoBoxLook;
 struct UnitsLook;
@@ -51,21 +38,20 @@ struct UnitsLook;
 class InfoBoxWindow : public PaintWindow
 {
   /** timeout of infobox focus [ms] */
-  static gcc_constexpr_data unsigned FOCUS_TIMEOUT_MAX = 20 * 1000;
+  static constexpr unsigned FOCUS_TIMEOUT_MAX = 20 * 1000;
 
 private:
   InfoBoxContent *content;
-  ContainerWindow &parent;
 
   const InfoBoxSettings &settings;
   const InfoBoxLook &look;
   const UnitsLook &units_look;
 
-  int border_kind;
+  const unsigned border_kind;
+
+  const unsigned id;
 
   InfoBoxData data;
-
-  int id;
 
   /**
    * draw the selector event if the InfoBox window is not the system focus
@@ -81,6 +67,16 @@ private:
   PixelRect value_and_comment_rect;
 
   PeriodClock click_clock;
+
+  /**
+   * Used during double click event
+   */
+  bool ignore_single_click;
+
+  /**
+   * a timer that allows detection of double clicks and single clicks
+   */
+  WindowTimer single_click_timer;
 
   /**
    * Paints the InfoBox title to the given canvas
@@ -107,12 +103,6 @@ public:
                  UPixelScalar width, UPixelScalar height);
 
   /**
-   * Sets the InfoBox ID to the given Value
-   * @param id New value of the InfoBox ID
-   */
-  void SetID(const int id);
-  int GetID() { return id; };
-  /**
    * Sets the InfoBox title to the given Value
    * @param Value New value of the InfoBox title
    */
@@ -131,9 +121,10 @@ public:
    * @param Height Height of the InfoBox
    */
   InfoBoxWindow(ContainerWindow &parent, PixelScalar x, PixelScalar y,
-                UPixelScalar width, UPixelScalar height, int border_flags,
+                UPixelScalar width, UPixelScalar height, unsigned border_flags,
                 const InfoBoxSettings &settings, const InfoBoxLook &_look,
                 const UnitsLook &units_look,
+                unsigned id,
                 WindowStyle style=WindowStyle());
 
   ~InfoBoxWindow();
@@ -146,6 +137,20 @@ public:
   void UpdateContent();
 
 protected:
+  /**
+   * shows dialog and also sets and clears force_draw_selector
+   */
+  void ShowDialog();
+
+  /**
+   * shows dialog
+   * @param id id of box whose content to show
+   * @param dlgContent Content to be displayed
+   */
+  void ShowDialog(const int id,
+                  const InfoBoxContent::DialogContent *dlgContent);
+
+
   bool HandleKey(InfoBoxContent::InfoBoxKeyCodes keycode);
 
 public:
@@ -156,6 +161,12 @@ public:
    * @return True on success, Fales otherwise
    */
   bool HandleQuickAccess(const TCHAR *value);
+
+  /**
+   * This is a generic handler for the InfoBox. It returns an unsigned value
+   * @return a value determined by the content or 0 if no content exists
+   */
+  virtual gcc_pure unsigned GetQuickAccess();
 
   const InfoBoxContent::DialogContent *GetDialogContent();
 

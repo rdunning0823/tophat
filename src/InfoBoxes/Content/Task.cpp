@@ -28,13 +28,18 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Dialogs/Waypoint.hpp"
 #include "Dialogs/dlgAnalysis.hpp"
-#include "LocalTime.hpp"
 #include "Engine/Util/Gradient.hpp"
 #include "Units/Units.hpp"
 #include "Formatter/Units.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Language/Language.hpp"
 #include "UIGlobals.hpp"
+#include "InfoBoxes/Panel/OnlineContest.hpp"
+#include "InfoBoxes/Panel/Home.hpp"
+#include "Util/Macros.hpp"
+#include "ComputerSettings.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "GlideSolvers/GlideState.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -203,16 +208,15 @@ InfoBoxContentNextETA::Update(InfoBoxData &data)
 {
   // use proper non-terminal next task stats
 
-  const NMEAInfo &basic = CommonInterface::Basic();
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (!task_stats.task_valid || !task_stats.current_leg.IsAchievable()) {
     data.SetInvalid();
     return;
   }
 
-  int dd = (int)(task_stats.current_leg.solution_remaining.time_elapsed) +
-    DetectCurrentTime(basic);
-  const BrokenTime t = BrokenTime::FromSecondOfDayChecked(abs(dd));
+  const BrokenTime &now_local = CommonInterface::Calculated().date_time_local;
+  const BrokenTime t = now_local +
+    unsigned(task_stats.current_leg.solution_remaining.time_elapsed);
 
   // Set Value
   data.UnsafeFormatValue(_T("%02u:%02u"), t.hour, t.minute);
@@ -242,7 +246,7 @@ InfoBoxContentNextAltitudeDiff::Update(InfoBoxData &data)
   // pilots want this to be assuming terminal flight to this wp
 
   const TaskStats &task_stats = XCSoarInterface::Calculated().task_stats;
-  const GlideResult &next_solution = XCSoarInterface::Calculated().common_stats.next_solution;
+  const GlideResult &next_solution = task_stats.current_leg.solution_remaining;
 
   SetValueFromAltDiff(data, task_stats, next_solution);
 }
@@ -253,7 +257,7 @@ InfoBoxContentNextMC0AltitudeDiff::Update(InfoBoxData &data)
   const TaskStats &task_stats = XCSoarInterface::Calculated().task_stats;
 
   SetValueFromAltDiff(data, task_stats,
-                      CommonInterface::Calculated().common_stats.next_solution_mc0);
+                      task_stats.current_leg.solution_mc0);
 }
 
 void
@@ -262,7 +266,7 @@ InfoBoxContentNextAltitudeRequire::Update(InfoBoxData &data)
   // pilots want this to be assuming terminal flight to this wp
 
   const TaskStats &task_stats = XCSoarInterface::Calculated().task_stats;
-  const GlideResult &next_solution = XCSoarInterface::Calculated().common_stats.next_solution;
+  const GlideResult &next_solution = task_stats.current_leg.solution_remaining;
   if (!task_stats.task_valid || !next_solution.IsAchievable()) {
     data.SetInvalid();
     return;
@@ -278,8 +282,9 @@ InfoBoxContentNextAltitudeArrival::Update(InfoBoxData &data)
 
   const MoreData &basic = CommonInterface::Basic();
   const TaskStats &task_stats = XCSoarInterface::Calculated().task_stats;
-  const GlideResult next_solution = XCSoarInterface::Calculated().common_stats.next_solution;
-  if (!task_stats.task_valid || !next_solution.IsAchievable()) {
+  const GlideResult next_solution = task_stats.current_leg.solution_remaining;
+  if (!basic.NavAltitudeAvailable() ||
+      !task_stats.task_valid || !next_solution.IsAchievable()) {
     data.SetInvalid();
     return;
   }
@@ -289,7 +294,7 @@ InfoBoxContentNextAltitudeArrival::Update(InfoBoxData &data)
 
 
 void
-InfoBoxContentNextLD::Update(InfoBoxData &data)
+InfoBoxContentNextGR::Update(InfoBoxData &data)
 {
   // pilots want this to be assuming terminal flight to this wp, and this
   // is what current_leg gradient does.
@@ -362,9 +367,9 @@ InfoBoxContentFinalETA::Update(InfoBoxData &data)
     return;
   }
 
-  int dd = (int)task_stats.total.solution_remaining.time_elapsed +
-    DetectCurrentTime(XCSoarInterface::Basic());
-  const BrokenTime t = BrokenTime::FromSecondOfDayChecked(abs(dd));
+  const BrokenTime &now_local = CommonInterface::Calculated().date_time_local;
+  const BrokenTime t = now_local +
+    unsigned(task_stats.total.solution_remaining.time_elapsed);
 
   // Set Value
   data.UnsafeFormatValue(_T("%02u:%02u"), t.hour, t.minute);
@@ -447,7 +452,7 @@ InfoBoxContentTaskSpeedInstant::Update(InfoBoxData &data)
 }
 
 void
-InfoBoxContentFinalLD::Update(InfoBoxData &data)
+InfoBoxContentFinalGRTE::Update(InfoBoxData &data)
 {
   const TaskStats &task_stats = XCSoarInterface::Calculated().task_stats;
   if (!task_stats.task_valid) {
@@ -490,6 +495,21 @@ InfoBoxContentFinalGR::Update(InfoBoxData &data)
   }
 }
 
+static constexpr InfoBoxContentHome::PanelContent panels[] = {
+    InfoBoxContentHome::PanelContent (
+    N_("Set Home"),
+    LoadHomePanel),
+};
+
+const InfoBoxContentHome::DialogContent InfoBoxContentHome::dlgContent = {
+  ARRAY_SIZE(panels), &panels[0], false,
+};
+
+const InfoBoxContentHome::DialogContent*
+InfoBoxContentHome::GetDialogContent() {
+  return &dlgContent;
+}
+
 void
 InfoBoxContentHomeDistance::Update(InfoBoxData &data)
 {
@@ -497,7 +517,7 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
   const CommonStats &common_stats = XCSoarInterface::Calculated().common_stats;
 
   if (!common_stats.vector_home.IsValid()) {
-    data.SetInvalid();
+    data.SetNotConfigured();
     return;
   }
 
@@ -510,6 +530,48 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
   } else
     data.SetCommentInvalid();
 }
+
+void
+InfoBoxContentHomeAltitudeDiff::Update(InfoBoxData &data)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const ComputerSettings &settings = XCSoarInterface::GetComputerSettings();
+  const CommonStats &common_stats = XCSoarInterface::Calculated().common_stats;
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+
+  if (!common_stats.vector_home.IsValid() ||
+      !settings.poi.home_location_available ||
+      !settings.poi.home_elevation_available) {
+    data.SetNotConfigured();
+    return;
+  }
+
+  // altitude differential
+
+  if (basic.location_available && more_data.NavAltitudeAvailable() &&
+      settings.polar.glide_polar_task.IsValid()) {
+    const GlideState glide_state(
+      basic.location.DistanceBearing(settings.poi.home_location),
+      settings.poi.home_elevation + settings.task.safety_height_arrival,
+      more_data.nav_altitude,
+      calculated.GetWindOrZero());
+
+    const GlideResult &result =
+      MacCready::Solve(settings.task.glide,
+                       settings.polar.glide_polar_task,
+                       glide_state);
+    data.SetValueFromArrival(result.pure_glide_altitude_difference);
+  }
+  else
+    data.SetInvalid();
+
+  if (common_stats.vector_home.IsValid())
+    data.SetCommentFromDistance(common_stats.vector_home.distance);
+  else
+     data.SetCommentInvalid();
+}
+
 
 void
 InfoBoxContentOLC::Update(InfoBoxData &data)
@@ -534,23 +596,19 @@ InfoBoxContentOLC::Update(InfoBoxData &data)
   data.UnsafeFormatComment(_T("%.1f pts"), (double)result_olc.score);
 }
 
-bool
-InfoBoxContentOLC::HandleKey(const InfoBoxKeyCodes keycode)
-{
-  switch (keycode) {
-  case ibkEnter:
-    dlgAnalysisShowModal(UIGlobals::GetMainWindow(), UIGlobals::GetLook(),
-                         CommonInterface::Full(), *glide_computer,
-                         protected_task_manager,
-                         &airspace_database,
-                         terrain, 8);
-    return true;
+static constexpr InfoBoxContentOLC::PanelContent panels_olc[] = {
+  InfoBoxContentOLC::PanelContent (
+    N_("OLC"),
+    LoadOnlineContestPanel),
+};
 
-  default:
-    break;
-  }
+const InfoBoxContentOLC::DialogContent InfoBoxContentOLC::dlgContent = {
+  ARRAY_SIZE(panels_olc), &panels_olc[0], false,
+};
 
-  return false;
+const InfoBoxContentOLC::DialogContent*
+InfoBoxContentOLC::GetDialogContent() {
+  return &dlgContent;
 }
 
 void
@@ -804,4 +862,17 @@ InfoBoxContentFinalETEVMG::Update(InfoBoxData &data)
 
   data.SetValue(value);
   data.SetComment(comment);
+}
+
+void
+InfoBoxContentCruiseEfficiency::Update(InfoBoxData &data)
+{
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+  if (!task_stats.task_valid || !task_stats.task_started) {
+    data.SetInvalid();
+    return;
+  }
+
+  data.UnsafeFormatValue(_T("%d"), (int) (task_stats.cruise_efficiency * 100));
+  data.SetCommentFromVerticalSpeed(task_stats.effective_mc, false);
 }

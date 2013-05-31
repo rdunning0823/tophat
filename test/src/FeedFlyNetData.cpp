@@ -24,6 +24,8 @@ Copyright_License {
 #include "Util/StaticString.hpp"
 #include "Math/fixed.hpp"
 #include "PeriodClock.hpp"
+#include "OS/SocketDescriptor.hpp"
+#include "OS/SocketAddress.hpp"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -32,51 +34,37 @@ Copyright_License {
 #include <errno.h>
 #include <stdlib.h>
 
-#ifdef HAVE_POSIX
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#else
-#include <winsock2.h>
-#endif
-
 int main(int argc, char **argv)
 {
   // Determine on which TCP port to connect to the server
-  int tcp_port;
+  const char *tcp_port;
   if (argc < 2) {
     fprintf(stderr, "This program opens a TCP connection to a server which is assumed ");
     fprintf(stderr, "to be at 127.0.0.1, and sends artificial FlyNet vario data.\n\n");
     fprintf(stderr, "Usage: %s PORT\n", argv[0]);
     fprintf(stderr, "Defaulting to port 4353\n");
-    tcp_port = 4353;
+    tcp_port = "4353";
   } else {
-    tcp_port = atoi(argv[1]);
+    tcp_port = argv[1];
   }
 
   // Convert IP address to binary form
-  struct sockaddr_in server_addr;
-  if ((server_addr.sin_addr.s_addr = inet_addr("127.0.0.1")) == INADDR_NONE) {
-    perror("IP");
+  SocketAddress server_address;
+  if (!server_address.Lookup("127.0.0.1", tcp_port, AF_INET)) {
+    fprintf(stderr, "Failed to look up address\n");
     exit(EXIT_FAILURE);
   }
 
   // Create socket for the outgoing connection
-  int sock;
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+  SocketDescriptor sock;
+  if (!sock.CreateTCP()) {
     perror("Socket");
     exit(EXIT_FAILURE);
   }
 
   // Connect to the specified server
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(tcp_port);
-  memset(&(server_addr.sin_zero), 0, 8);
-
-  if (connect(sock, (struct sockaddr *)&server_addr,
-              sizeof(struct sockaddr)) == -1)
+  if (!sock.Connect(server_address))
   {
-    close(sock);
     perror("Connect");
     exit(EXIT_FAILURE);
   }
@@ -106,7 +94,7 @@ int main(int argc, char **argv)
       sentence.AppendFormat("%08X", uround(pressure));
       sentence += "\n";
 
-      send(sock, sentence.c_str(), sentence.length(), 0);
+      sock.Write(sentence.c_str(), sentence.length());
     }
 
     if (battery_clock.CheckUpdate(11000)) {
@@ -119,7 +107,7 @@ int main(int argc, char **argv)
         sentence += "*";
 
       sentence += "\n";
-      send(sock, sentence.c_str(), sentence.length(), 0);
+      sock.Write(sentence.c_str(), sentence.length());
 
       if (battery_level == 0)
         battery_level = 11;
@@ -127,8 +115,6 @@ int main(int argc, char **argv)
         battery_level--;
     }
   }
-
-  close(sock);
 
   return EXIT_SUCCESS;
 }

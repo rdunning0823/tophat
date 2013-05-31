@@ -37,9 +37,11 @@ Copyright_License {
 #include "LimitParameters.hpp"
 #include "DisplayParameters.hpp"
 #include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/Message.hpp"
+#include "Dialogs/XML.hpp"
 #include "Form/Tabbed.hpp"
+#include "Form/Form.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
 #include "Device/device.hpp"
@@ -278,7 +280,7 @@ OnCreatePager(ContainerWindow &parent,
   return tabbed;
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnNextClicked),
   DeclareCallBackEntry(OnPrevClicked),
   DeclareCallBackEntry(OnDemoClicked),

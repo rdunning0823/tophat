@@ -30,15 +30,19 @@
  */
 
 #include "Dialogs/Traffic.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/TextEntry.hpp"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
+#include "Dialogs/Message.hpp"
+#include "Form/Form.hpp"
+#include "Form/Util.hpp"
+#include "Form/Button.hpp"
 #include "FLARM/FlarmNet.hpp"
 #include "FLARM/Traffic.hpp"
 #include "FLARM/FlarmDetails.hpp"
 #include "FLARM/Friends.hpp"
 #include "Screen/Layout.hpp"
-#include "Engine/Math/Earth.hpp"
+#include "Geo/Math.hpp"
 #include "LocalPath.hpp"
 #include "UIGlobals.hpp"
 #include "Components.hpp"
@@ -47,6 +51,7 @@
 #include "Util/StringUtil.hpp"
 #include "Util/Macros.hpp"
 #include "Language/Language.hpp"
+#include "Interface.hpp"
 #include "Compiler.h"
 
 #include <math.h>
@@ -285,7 +290,7 @@ OnFriendClearClicked(gcc_unused WndButton &Sender)
   wf->SetModalResult(mrOK);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnTeamClicked),
   DeclareCallBackEntry(OnCallsignClicked),

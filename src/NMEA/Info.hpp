@@ -30,10 +30,11 @@ Copyright_License {
 #include "NMEA/Acceleration.hpp"
 #include "NMEA/Attitude.hpp"
 #include "DateTime.hpp"
-#include "Navigation/GeoPoint.hpp"
+#include "Geo/GeoPoint.hpp"
 #include "Atmosphere/Pressure.hpp"
+#include "DeviceInfo.hpp"
 #include "FLARM/Data.hpp"
-#include "Engine/Navigation/SpeedVector.hpp"
+#include "Geo/SpeedVector.hpp"
 
 /**
  * State of external switch devices (esp Vega)
@@ -275,7 +276,9 @@ struct NMEAInfo {
   /** GPS date and time (UTC) */
   BrokenDateTime date_time_utc;
 
-  /** Is the BrokenDate part of DateTime available? */
+  /**
+   * Is the BrokenDate part of #date_time_utc available?
+   */
   bool date_available;
 
   //###########
@@ -391,6 +394,14 @@ struct NMEAInfo {
   fixed stall_ratio;
   Validity stall_ratio_available;
 
+  DeviceInfo device;
+
+  /**
+   * Information about the "secondary" device, e.g. the GPS connected
+   * "behind" the LXNAV V7.
+   */
+  DeviceInfo secondary_device;
+
   FlarmData flarm;
 
   void UpdateClock();
@@ -404,6 +415,16 @@ struct NMEAInfo {
   bool HasTimeRetreatedSince(const NMEAInfo &last) const {
     return !last.time_available || (time_available && time < last.time);
   }
+
+  /**
+   * Returns a #BrokenDate referring to the given time stamp (all
+   * UTC).  This object's #date_time_utc and #time attributes are used
+   * to calculate the date.
+   *
+   * @param other_time the time stamp (see attribute #time)
+   */
+  gcc_pure
+  BrokenDateTime GetDateTimeAt(fixed other_time) const;
 
   bool MovementDetected() const {
     return ground_speed_available && ground_speed > fixed_two;

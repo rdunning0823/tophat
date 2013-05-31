@@ -38,45 +38,14 @@ static const int min_vario = -500, max_vario = 500;
  */
 static const int min_dead = -30, max_dead = 10;
 
-/**
- * The tone frequency for #min_vario.
- */
-static const unsigned min_frequency = 50;
-
-/**
- * The tone frequency for stationary altitude.
- */
-static const unsigned zero_frequency = 400;
-
-/**
- * The tone frequency for #max_vario.
- */
-static const unsigned max_frequency = 2000;
-
-/**
- * The minimum silence+audible period for #max_vario.
- */
-static const unsigned min_period_ms = 150;
-
-/**
- * The maximum silence+audible period for #min_vario.
- */
-static const unsigned max_period_ms = 800;
-
 static int
 Clamp(int value, int min, int max)
 {
   return std::max(std::min(value, max), min);
 }
 
-/**
- * Convert a vario value to a tone frequency.
- *
- * @param ivario the current vario value [cm/s]
- */
-gcc_const
-static unsigned
-VarioToFrequency(int ivario)
+unsigned
+VarioSynthesiser::VarioToFrequency(int ivario)
 {
   return ivario > 0
     ? (zero_frequency + (unsigned)ivario * (max_frequency - zero_frequency)
@@ -84,12 +53,19 @@ VarioToFrequency(int ivario)
     : (zero_frequency - (unsigned)(ivario * (int)(zero_frequency - min_frequency) / min_vario));
 }
 
+gcc_const
+static bool
+InDeadBand(int ivario)
+{
+  return ivario >= min_dead && ivario <= max_dead;
+}
+
 void
 VarioSynthesiser::SetVario(unsigned sample_rate, fixed vario)
 {
   const int ivario = Clamp((int)(vario * 100), min_vario, max_vario);
 
-  if (ivario >= min_dead && ivario <= max_dead) {
+  if (dead_band_enabled && InDeadBand(ivario)) {
     /* inside the "dead band" */
     SetSilence();
     return;

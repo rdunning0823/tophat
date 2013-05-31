@@ -34,36 +34,28 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Audio/VarioGlue.hpp"
 
-static void
-trigger_redraw()
-{
-  if (!XCSoarInterface::Basic().location_available)
-    TriggerGPSUpdate();
-  TriggerMapUpdate();
-}
-
 void
 InputEvents::eventSounds(const TCHAR *misc)
 {
-  SoundSettings &settings = CommonInterface::SetComputerSettings().sound;
+  SoundSettings &settings = CommonInterface::SetUISettings().sound;
  // bool OldEnableSoundVario = EnableSoundVario;
 
   if (StringIsEqual(misc, _T("toggle")))
-    settings.sound_vario_enabled = !settings.sound_vario_enabled;
+    settings.vario.enabled = !settings.vario.enabled;
   else if (StringIsEqual(misc, _T("on")))
-    settings.sound_vario_enabled = true;
+    settings.vario.enabled = true;
   else if (StringIsEqual(misc, _T("off")))
-    settings.sound_vario_enabled = false;
+    settings.vario.enabled = false;
   else if (StringIsEqual(misc, _T("show"))) {
-    if (settings.sound_vario_enabled)
+    if (settings.vario.enabled)
       Message::AddMessage(_("Vario sounds on"));
     else
       Message::AddMessage(_("Vario sounds off"));
     return;
   }
 
-  AudioVarioGlue::Configure(settings);
-  Profile::Set(szProfileSoundAudioVario, settings.sound_vario_enabled);
+  AudioVarioGlue::Configure(settings.vario);
+  Profile::Set(ProfileKeys::SoundAudioVario, settings.vario.enabled);
 }
 
 void
@@ -72,32 +64,32 @@ InputEvents::eventSnailTrail(const TCHAR *misc)
   MapSettings &settings_map = CommonInterface::SetMapSettings();
 
   if (StringIsEqual(misc, _T("toggle"))) {
-    unsigned trail_length = (int)settings_map.trail_length;
+    unsigned trail_length = (int)settings_map.trail.length;
     trail_length = (trail_length + 1u) % 4u;
-    settings_map.trail_length = (TrailLength)trail_length;
+    settings_map.trail.length = (TrailSettings::Length)trail_length;
   } else if (StringIsEqual(misc, _T("off")))
-    settings_map.trail_length = TRAIL_OFF;
+    settings_map.trail.length = TrailSettings::Length::OFF;
   else if (StringIsEqual(misc, _T("long")))
-    settings_map.trail_length = TRAIL_LONG;
+    settings_map.trail.length = TrailSettings::Length::LONG;
   else if (StringIsEqual(misc, _T("short")))
-    settings_map.trail_length = TRAIL_SHORT;
+    settings_map.trail.length = TrailSettings::Length::SHORT;
   else if (StringIsEqual(misc, _T("full")))
-    settings_map.trail_length = TRAIL_FULL;
+    settings_map.trail.length = TrailSettings::Length::FULL;
   else if (StringIsEqual(misc, _T("show"))) {
-    switch (settings_map.trail_length) {
-    case TRAIL_OFF:
+    switch (settings_map.trail.length) {
+    case TrailSettings::Length::OFF:
       Message::AddMessage(_("Snail trail off"));
       break;
 
-    case TRAIL_LONG:
+    case TrailSettings::Length::LONG:
       Message::AddMessage(_("Long snail trail"));
       break;
 
-    case TRAIL_SHORT:
+    case TrailSettings::Length::SHORT:
       Message::AddMessage(_("Short snail trail"));
       break;
 
-    case TRAIL_FULL:
+    case TrailSettings::Length::FULL:
       Message::AddMessage(_("Full snail trail"));
       break;
     }
@@ -148,7 +140,7 @@ InputEvents::eventTerrainTopography(const TCHAR *misc)
 void
 InputEvents::eventAudioDeadband(const TCHAR *misc)
 {
-  SoundSettings &settings = CommonInterface::SetComputerSettings().sound;
+  SoundSettings &settings = CommonInterface::SetUISettings().sound;
 
   if (StringIsEqual(misc, _T("+"))) {
     if (settings.sound_deadband >= 40)
@@ -163,7 +155,7 @@ InputEvents::eventAudioDeadband(const TCHAR *misc)
     --settings.sound_deadband;
   }
 
-  Profile::Set(szProfileSoundDeadband, settings.sound_deadband);
+  Profile::Set(ProfileKeys::SoundDeadband, settings.sound_deadband);
 
   // TODO feature: send to vario if available
 }
@@ -260,9 +252,8 @@ InputEvents::eventProfileLoad(const TCHAR *misc)
   if (!StringIsEmpty(misc)) {
     Profile::LoadFile(misc);
 
+    MapFileChanged = true;
     WaypointFileChanged = true;
-    TerrainFileChanged = true;
-    TopographyFileChanged = true;
     AirspaceFileChanged = true;
     AirfieldFileChanged = true;
     PolarFileChanged = true;
@@ -315,7 +306,7 @@ InputEvents::eventDeclutterLabels(const TCHAR *misc)
                                      N_("Task & Landables"),
                                      N_("Task"),
                                      N_("None")};
-  static gcc_constexpr_data unsigned int n = ARRAY_SIZE(msg);
+  static constexpr unsigned int n = ARRAY_SIZE(msg);
   static const TCHAR *const actions[n] = {_T("all"),
                                           _T("task+landables"),
                                           _T("task"),
@@ -323,9 +314,10 @@ InputEvents::eventDeclutterLabels(const TCHAR *misc)
 
   WaypointRendererSettings::LabelSelection &wls =
     XCSoarInterface::SetMapSettings().waypoint.label_selection;
-  if (StringIsEqual(misc, _T("toggle")))
+  if (StringIsEqual(misc, _T("toggle"))) {
     wls = WaypointRendererSettings::LabelSelection(((unsigned)wls + 1) %  n);
-  else if (StringIsEqual(misc, _T("show"))) {
+    Profile::Set(ProfileKeys::WaypointLabelSelection, (int)wls);
+  } else if (StringIsEqual(misc, _T("show"))) {
     TCHAR tbuf[64];
     _stprintf(tbuf, _T("%s: %s"), _("Waypoint labels"),
               gettext(msg[(unsigned)wls]));
@@ -357,7 +349,7 @@ InputEvents::eventAirspaceDisplayMode(const TCHAR *misc)
   else if (StringIsEqual(misc, _T("off")))
     settings.altitude_mode = AirspaceDisplayMode::ALLOFF;
 
-  trigger_redraw();
+  TriggerMapUpdate();
 }
 
 void
@@ -365,7 +357,12 @@ InputEvents::eventOrientation(const TCHAR *misc)
 {
   MapSettings &settings_map = CommonInterface::SetMapSettings();
 
-  if (StringIsEqual(misc, _T("northup"))) {
+  if (StringIsEqual(misc, _T("northtracktoggle"))) {
+    if (settings_map.cruise_orientation == NORTHUP)
+      settings_map.cruise_orientation = TRACKUP;
+    else
+      settings_map.cruise_orientation = NORTHUP;
+  } else if (StringIsEqual(misc, _T("northup"))) {
     settings_map.cruise_orientation = NORTHUP;
     settings_map.circling_orientation = NORTHUP;
   } else if (StringIsEqual(misc, _T("northcircle"))) {
@@ -380,8 +377,13 @@ InputEvents::eventOrientation(const TCHAR *misc)
   } else if (StringIsEqual(misc, _T("northtrack"))) {
     settings_map.cruise_orientation = TRACKUP;
     settings_map.circling_orientation = TARGETUP;
+  } else if (StringIsEqual(misc, _T("targetup"))) {
+    settings_map.cruise_orientation = TARGETUP;
+    settings_map.circling_orientation = TARGETUP;
   }
 
+  Profile::Set(ProfileKeys::OrientationCruise,
+               settings_map.cruise_orientation);
   ActionInterface::SendMapSettings(true);
 }
 
@@ -452,9 +454,9 @@ InputEvents::sub_TerrainTopography(int vswitch)
   }
 
   /* save new values to profile */
-  Profile::Set(szProfileDrawTopography,
+  Profile::Set(ProfileKeys::DrawTopography,
                settings_map.topography_enabled);
-  Profile::Set(szProfileDrawTerrain,
+  Profile::Set(ProfileKeys::DrawTerrain,
                settings_map.terrain.enable);
 
   XCSoarInterface::SendMapSettings(true);

@@ -28,7 +28,7 @@ Copyright_License {
 #include <assert.h>
 
 Net::Request::Request(Session &_session, const TCHAR *url,
-                      unsigned long timeout)
+                      unsigned timeout_ms)
   :session(_session), handle(curl_easy_init())
 {
   // XXX implement timeout
@@ -88,17 +88,49 @@ Net::Request::WriteCallback(void *ptr, size_t size, size_t nmemb,
 }
 
 bool
-Net::Request::Created() const
+Net::Request::Send(unsigned _timeout_ms)
 {
-  return handle != NULL;
+  if (handle == NULL)
+    return false;
+
+  const int timeout_ms = _timeout_ms == INFINITE ? -1 : _timeout_ms;
+
+  CURLMcode mcode = CURLM_CALL_MULTI_PERFORM;
+  while (buffer.IsEmpty()) {
+    CURLcode code = session.InfoRead(handle);
+    if (code != CURLE_AGAIN)
+      return code == CURLE_OK;
+
+    if (mcode != CURLM_CALL_MULTI_PERFORM &&
+        !session.Select(timeout_ms))
+      return false;
+
+    mcode = session.Perform();
+    if (mcode != CURLM_OK && mcode != CURLM_CALL_MULTI_PERFORM)
+      return false;
+  }
+
+  return true;
 }
 
-size_t
-Net::Request::Read(void *_buffer, size_t buffer_size, unsigned long timeout)
+int64_t
+Net::Request::GetLength() const
 {
   assert(handle != NULL);
 
-  const int timeout_ms = timeout == INFINITE ? -1 : timeout;
+  double value;
+  return curl_easy_getinfo(handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD,
+                           &value) == CURLE_OK
+    ? (int64_t)value
+    : -1;
+}
+
+ssize_t
+Net::Request::Read(void *_buffer, size_t buffer_size, unsigned _timeout_ms)
+{
+  assert(handle != NULL);
+
+  const int timeout_ms = _timeout_ms == INFINITE ? -1 : _timeout_ms;
 
   Buffer::Range range;
   CURLMcode mcode = CURLM_CALL_MULTI_PERFORM;
@@ -109,15 +141,15 @@ Net::Request::Read(void *_buffer, size_t buffer_size, unsigned long timeout)
 
     CURLcode code = session.InfoRead(handle);
     if (code != CURLE_AGAIN)
-      return 0;
+      return code == CURLE_OK ? 0 : -1;
 
     if (mcode != CURLM_CALL_MULTI_PERFORM &&
         !session.Select(timeout_ms))
-      return 0;
+      return -1;
 
     mcode = session.Perform();
     if (mcode != CURLM_OK && mcode != CURLM_CALL_MULTI_PERFORM)
-      return 0;
+      return -1;
   }
 
   --buffer_size;

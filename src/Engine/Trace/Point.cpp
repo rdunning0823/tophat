@@ -22,13 +22,27 @@ Copyright_License {
 */
 
 #include "Point.hpp"
+#include "NMEA/MoreData.hpp"
 #include "Navigation/Aircraft.hpp"
+
+TracePoint::TracePoint(const MoreData &basic)
+  :SearchPoint(basic.location),
+   time((unsigned)basic.time),
+   altitude(basic.nav_altitude),
+   vario(basic.netto_vario),
+   engine_noise_level(basic.engine_noise_level_available
+                      ? basic.engine_noise_level
+                      : 0u),
+   drift_factor(sigmoid(basic.nav_altitude / 100) * 256)
+{
+}
 
 TracePoint::TracePoint(const AircraftState &state):
   SearchPoint(state.location),
   time((unsigned)state.time),
-  drift_factor(sigmoid(state.altitude_agl / 100) * 256),
   altitude(state.altitude),
-  vario(state.netto_vario)
+  vario(state.netto_vario),
+  engine_noise_level(0),
+  drift_factor(sigmoid(state.altitude_agl / 100) * 256)
 {
 }

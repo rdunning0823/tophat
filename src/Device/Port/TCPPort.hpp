@@ -24,15 +24,21 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_TCP_PORT_HPP
 #define XCSOAR_DEVICE_TCP_PORT_HPP
 
-#include "Thread/StoppableThread.hpp"
-#include "Port.hpp"
+#include "SocketPort.hpp"
+#include "Thread/Trigger.hpp"
 
 /**
  * A TCP listener port class.
  */
-class TCPPort : public Port, protected StoppableThread
+class TCPPort : public SocketPort
 {
-  int listener_fd, connection_fd;
+  SocketDescriptor listener;
+
+#ifndef HAVE_POSIX
+  SocketThread thread;
+#endif
+
+  Trigger closed_trigger;
 
 public:
   /**
@@ -41,7 +47,12 @@ public:
    * @param handler the callback object for input received on the
    * port
    */
-  TCPPort(Handler &handler):Port(handler) {}
+  TCPPort(DataHandler &handler)
+    :SocketPort(handler)
+#ifndef HAVE_POSIX
+    , thread(listener, *this)
+#endif
+  {}
 
   /**
    * Closes the serial port (Destructor)
@@ -54,21 +65,12 @@ public:
    */
   bool Open(unsigned port);
 
-  /* virtual methods from class Port */
+  /* overrided virtual methods from SocketPort */
   virtual bool IsValid() const;
-  virtual bool Drain();
-  virtual void Flush();
-  virtual bool SetBaudrate(unsigned baud_rate);
-  virtual unsigned GetBaudrate() const;
-  virtual bool StopRxThread();
-  virtual bool StartRxThread();
-  virtual int Read(void *buffer, size_t length);
-  virtual WaitResult WaitRead(unsigned timeout_ms);
-  virtual size_t Write(const void *data, size_t length);
 
 protected:
-  /* virtual methods from class Thread */
-  virtual void Run();
+  /* virtual methods from class FileEventHandler */
+  virtual bool OnFileEvent(int fd, unsigned mask);
 };
 
 #endif

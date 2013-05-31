@@ -32,7 +32,7 @@ Copyright_License {
 #include <assert.h>
 
 Net::Request::Request(Session &_session, const TCHAR *url,
-                      unsigned long timeout)
+                      unsigned timeout_ms)
   :env(Java::GetEnv())
 {
   Java::String j_url(env, url);
@@ -51,7 +51,7 @@ Net::Request::Request(Session &_session, const TCHAR *url,
     return;
   }
 
-  Java::URLConnection::setConnectTimeout(env, connection, (jint)timeout);
+  Java::URLConnection::setConnectTimeout(env, connection, (jint)timeout_ms);
 
   input_stream = Java::URLConnection::getInputStream(env, connection);
   if (Java::DiscardException(env)) {
@@ -76,22 +76,34 @@ Net::Request::~Request()
 }
 
 bool
-Net::Request::Created() const
+Net::Request::Send(unsigned _timeout_ms)
 {
   return input_stream != NULL;
 }
 
-size_t
-Net::Request::Read(void *buffer, size_t buffer_size, unsigned long timeout)
+int64_t
+Net::Request::GetLength() const
 {
   assert(connection != NULL);
   assert(input_stream != NULL);
 
-  Java::URLConnection::setReadTimeout(env, connection, (jint)timeout);
+  return Java::URLConnection::getContentLength(env, connection);
+}
+
+ssize_t
+Net::Request::Read(void *buffer, size_t buffer_size, unsigned timeout_ms)
+{
+  assert(connection != NULL);
+  assert(input_stream != NULL);
+
+  Java::URLConnection::setReadTimeout(env, connection, (jint)timeout_ms);
 
   Java::LocalRef<jbyteArray> array(env,
                                    (jbyteArray)env->NewByteArray(buffer_size));
   jint nbytes = Java::InputStream::read(env, input_stream, array.Get());
+  if (Java::DiscardException(env))
+    return -1;
+
   if (nbytes <= 0)
     return 0;
 

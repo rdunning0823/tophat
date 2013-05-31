@@ -128,6 +128,15 @@ Window::ClearFocus()
 }
 
 void
+Window::FocusParent()
+{
+  AssertThread();
+  assert(parent != NULL);
+
+  parent->SetFocus();
+}
+
+void
 Window::SetCapture()
 {
   AssertNoneLocked();
@@ -169,16 +178,6 @@ Window::Invalidate()
 {
   if (visible && parent != NULL)
     parent->Invalidate();
-}
-
-void
-Window::Expose()
-{
-  if (!visible)
-    return;
-
-  if (parent != NULL)
-    parent->Expose();
 }
 
 void

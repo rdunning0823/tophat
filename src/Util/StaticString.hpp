@@ -32,9 +32,11 @@
 
 #include "Util/StringUtil.hpp"
 
+#include <algorithm>
+
 #include <assert.h>
 #include <stddef.h>
-#include <algorithm>
+#include <tchar.h>
 
 /**
  * A string with a maximum size known at compile time.
@@ -85,6 +87,26 @@ public:
     data[new_length] = SENTINEL;
   }
 
+  void SetASCII(const char *src, const char *src_end) {
+    T *end = ::CopyASCII(data, MAX_SIZE - 1, src, src_end);
+    *end = SENTINEL;
+  }
+
+  void SetASCII(const char *src) {
+    SetASCII(src, src + StringLength(src));
+  }
+
+#ifdef _UNICODE
+  void SetASCII(const TCHAR *src, const TCHAR *src_end) {
+    T *end = ::CopyASCII(data, MAX_SIZE - 1, src, src_end);
+    *end = SENTINEL;
+  }
+
+  void SetASCII(const TCHAR *src) {
+    SetASCII(src, src + StringLength(src));
+  }
+#endif
+
   /**
    * Eliminate all non-ASCII characters.
    */
@@ -93,7 +115,7 @@ public:
   }
 
   bool equals(const T *other) const {
-    assert(other != NULL);
+    assert(other != nullptr);
 
     return StringIsEqual(data, other);
   }
@@ -105,7 +127,7 @@ public:
 
   gcc_pure
   bool Contains(const T *needle) const {
-    return StringFind(data, needle) != NULL;
+    return StringFind(data, needle) != nullptr;
   }
 
   /**
@@ -152,27 +174,27 @@ public:
   }
 
   void set(const T *new_value) {
-    assert(new_value != NULL);
+    assert(new_value != nullptr);
 
     CopyString(data, new_value, MAX_SIZE);
   }
 
   void set(const T *new_value, size_type length) {
-    assert(new_value != NULL);
+    assert(new_value != nullptr);
 
     size_type max_length = (MAX_SIZE < length + 1) ? MAX_SIZE : length + 1;
     CopyString(data, new_value, max_length);
   }
 
   void append(const T *new_value) {
-    assert(new_value != NULL);
+    assert(new_value != nullptr);
 
     size_type len = length();
     CopyString(data + len, new_value, MAX_SIZE - len);
   }
 
   void append(const T *new_value, size_type _length) {
-    assert(new_value != NULL);
+    assert(new_value != nullptr);
 
     size_type len = length();
     size_type max_length = (MAX_SIZE - len < _length + 1) ?
@@ -240,7 +262,7 @@ public:
    * Don't use - not thread safe.
    */
   T *next_token(const T *delim) {
-    return StringToken(NULL, delim);
+    return StringToken(nullptr, delim);
   }
 
   /**

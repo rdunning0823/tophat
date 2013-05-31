@@ -23,20 +23,24 @@ Copyright_License {
 
 #include "TraceComputer.hpp"
 #include "ComputerSettings.hpp"
-#include "Engine/Navigation/Aircraft.hpp"
+#include "NMEA/MoreData.hpp"
+#include "NMEA/Derived.hpp"
 #include "Asset.hpp"
 
-static gcc_constexpr_data unsigned full_trace_size =
+static constexpr unsigned full_trace_size =
   HasLittleMemory() ? 512 : 1024;
 
-static gcc_constexpr_data unsigned contest_trace_size =
+static constexpr unsigned contest_trace_size =
   HasLittleMemory() ? 256 : 512;
 
-static gcc_constexpr_data unsigned sprint_trace_size =
+static constexpr unsigned sprint_trace_size =
   IsAncientHardware() ? 96 : 128;
 
+static constexpr unsigned full_trace_no_thin_time =
+  HasLittleMemory() ? 60 : 120;
+
 TraceComputer::TraceComputer()
- :full(60, Trace::null_time, full_trace_size),
+ :full(full_trace_no_thin_time, Trace::null_time, full_trace_size),
   contest(0, Trace::null_time, contest_trace_size),
   sprint(0, 9000, sprint_trace_size)
 {
@@ -50,7 +54,6 @@ TraceComputer::Reset()
   mutex.Unlock();
 
   sprint.clear();
-  last_time = fixed_zero;
 }
 
 void
@@ -73,24 +76,26 @@ TraceComputer::LockedCopyTo(TracePointVector &v, unsigned min_time,
 
 void
 TraceComputer::Update(const ComputerSettings &settings_computer,
-                      const AircraftState &state)
+                      const MoreData &basic, const DerivedInfo &calculated)
 {
   /* time warps are handled by the Trace class */
 
-  last_time = state.time;
-
-  if (!state.flying)
+  if (!basic.time_available || !basic.location_available ||
+      !basic.NavAltitudeAvailable() ||
+      !calculated.flight.flying)
     return;
 
   // either olc or basic trace requires trace_full
   if (settings_computer.task.enable_olc ||
       settings_computer.task.enable_trace) {
-    mutex.Lock();
-    full.push_back(state);
-    mutex.Unlock();
-  }
+    const TracePoint point(basic);
 
-  // only olc requires trace_sprint
-  if (settings_computer.task.enable_olc)
-    sprint.push_back(state);
+    mutex.Lock();
+    full.push_back(point);
+    mutex.Unlock();
+
+    // only olc requires trace_sprint
+    if (settings_computer.task.enable_olc)
+      sprint.push_back(point);
+  }
 }

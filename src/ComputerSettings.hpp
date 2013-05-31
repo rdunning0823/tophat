@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_COMPUTER_SETTINGS_HPP
 #define XCSOAR_COMPUTER_SETTINGS_HPP
 
-#include "Engine/Navigation/GeoPoint.hpp"
+#include "Geo/GeoPoint.hpp"
 #include "Engine/GlideSolvers/GlidePolar.hpp"
 #include "Atmosphere/Pressure.hpp"
 #include "Engine/Route/Config.hpp"
@@ -32,11 +32,12 @@ Copyright_License {
 #include "Util/TypeTraits.hpp"
 #include "Task/TaskBehaviour.hpp"
 #include "Tracking/TrackingSettings.hpp"
-#include "Engine/Navigation/SpeedVector.hpp"
+#include "Geo/SpeedVector.hpp"
 #include "NMEA/Validity.hpp"
 #include "Logger/Settings.hpp"
 #include "Airspace/AirspaceComputerSettings.hpp"
 #include "TeamCodeSettings.hpp"
+#include "FilePickAndDownloadSettings.hpp"
 #include "Plane/Plane.hpp"
 
 #include <stdint.h>
@@ -155,17 +156,6 @@ struct PolarSettings {
   }
 };
 
-struct SoundSettings {
-  // sound stuff not used?
-  bool sound_vario_enabled;
-  bool sound_task_enabled;
-  bool sound_modes_enabled;
-  uint8_t sound_volume;
-  uint8_t sound_deadband;
-
-  void SetDefaults();
-};
-
 struct VoiceSettings {
   // vegavoice stuff
   bool voice_climb_rate_enabled;
@@ -190,6 +180,10 @@ struct PlacesOfInterestSettings {
   bool home_location_available;
 
   GeoPoint home_location;
+
+  bool home_elevation_available;
+
+  fixed home_elevation;
 
   void SetDefaults() {
     ClearHome();
@@ -234,9 +228,12 @@ struct ComputerSettings {
 
   PolarSettings polar;
 
-  SoundSettings sound;
-
   TeamCodeSettings team_code;
+
+  /**
+   * settings for defaults for the FilePickAndDownload dialog
+   */
+  FilePickAndDownloadSettings file_pick_and_download;
 
   VoiceSettings voice;
 

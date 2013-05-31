@@ -22,7 +22,7 @@
 
 #include "TaskAutoPilot.hpp"
 #include "TaskAccessor.hpp"
-#include "Task/TaskStats/ElementStat.hpp"
+#include "Task/Stats/ElementStat.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
 
 void
@@ -219,7 +219,6 @@ TaskAutoPilot::UpdateState(const TaskAccessor& task, AircraftState& state,
     else
       state.true_airspeed = glide_polar.GetVBestLD();
 
-    state.indicated_airspeed = state.true_airspeed;
     state.vario = -glide_polar.SinkRate(state.true_airspeed) * parms.sink_factor;
     UpdateCruiseBearing(task, state, timestep);
     break;
@@ -287,7 +286,7 @@ TaskAutoPilot::DoAdvance(TaskAccessor& task)
 }
 
 bool
-TaskAutoPilot::HasFinished(TaskAccessor& task)
+TaskAutoPilot::HasFinished(const TaskAccessor &task) const
 {
   if (task.IsFinished())
     return true;
@@ -324,7 +323,7 @@ TaskAutoPilot::AdvanceIfRequired(TaskAccessor& task)
 }
 
 void
-TaskAutoPilot::GetAWP(TaskAccessor& task)
+TaskAutoPilot::GetAWP(const TaskAccessor &task)
 {
   w[0] = task.GetRandomOZPoint(awp, parms.target_noise);
 }

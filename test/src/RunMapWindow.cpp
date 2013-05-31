@@ -47,9 +47,20 @@ Copyright_License {
 #include "Operation/Operation.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/TrafficLook.hpp"
+#include "Thread/Debug.hpp"
 
 void
 DeviceBlackboard::SetStartupLocation(const GeoPoint &loc, const fixed alt) {}
+
+#ifndef NDEBUG
+
+bool
+InDrawThread()
+{
+  return InMainThread();
+}
+
+#endif
 
 static Waypoints way_points;
 
@@ -150,7 +161,7 @@ protected:
   virtual bool OnCommand(unsigned id, unsigned code) {
     switch (id) {
     case ID_CLOSE:
-      close();
+      Close();
       return true;
     }
 
@@ -181,13 +192,11 @@ LoadFiles(ComputerSettings &settings)
   WaypointGlue::LoadWaypoints(way_points, terrain, operation);
   WaypointGlue::SetHome(way_points, terrain, settings, NULL, false);
 
-  TLineReader *reader = OpenConfiguredTextFile(szProfileAirspaceFile,
-                                               ConvertLineReader::AUTO);
-  if (reader != NULL) {
+  std::unique_ptr<TLineReader> reader(OpenConfiguredTextFile(ProfileKeys::AirspaceFile,
+                                                             ConvertLineReader::AUTO));
+  if (reader) {
     AirspaceParser parser(airspace_database);
     parser.Parse(*reader, operation);
-    delete reader;
-
     airspace_database.Optimise();
   }
 }

@@ -37,7 +37,7 @@ Copyright_License {
 #define COLOR_XCSOAR Color(0xd0, 0x17, 0x17)
 #define COLOR_XCSOAR_DARK Color(0x5d, 0x0a, 0x0a)
 #else
-#define COLOR_XCSOAR_LIGHT Color(0xaa, 0xc9, 0xe4)
+#define COLOR_XCSOAR_LIGHT Color(0x50, 0x6a, 0xe4)
 #define COLOR_XCSOAR Color(0x3f, 0x76, 0xa8)
 #define COLOR_XCSOAR_DARK Color(0x00, 0x31, 0x5e)
 #endif
@@ -56,7 +56,7 @@ Copyright_License {
 #define COLOR_ORANGE Color(0xff, 0xa2, 0x00)
 #define COLOR_BROWN Color(0xb7, 0x64, 0x1e)
 
-static inline gcc_constexpr_function uint8_t
+static inline constexpr uint8_t
 LightColor(uint8_t c)
 {
   return ((c ^ 0xff) >> 1) ^ 0xff;
@@ -66,14 +66,14 @@ LightColor(uint8_t c)
  * Returns a lighter version of the specified color, adequate for
  * SRCAND filtering.
  */
-static inline gcc_constexpr_function Color
+static inline constexpr Color
 LightColor(Color c)
 {
   return Color(LightColor(c.Red()), LightColor(c.Green()),
                LightColor(c.Blue()));
 }
 
-static inline gcc_constexpr_function uint8_t
+static inline constexpr uint8_t
 DarkColor(uint8_t c)
 {
   return (c >> 1);
@@ -82,7 +82,7 @@ DarkColor(uint8_t c)
 /**
  * Returns a darker version of the specified color.
  */
-static inline gcc_constexpr_function Color
+static inline constexpr Color
 DarkColor(Color c)
 {
   return Color(DarkColor(c.Red()), DarkColor(c.Green()),

@@ -48,9 +48,6 @@ class ContestManager
 
   ContestStatistics stats;
 
-  const Trace &trace_full;
-  const Trace &trace_sprint;
-
   OLCSprint olc_sprint;
   OLCFAI olc_fai;
   OLCClassic olc_classic;
@@ -64,20 +61,27 @@ class ContestManager
   NetCoupe olc_netcoupe;
 
 public:
-  /** 
+  /**
    * Base constructor.
-   * 
+   *
    * @param _contest Contests that shall be used
-   * @param _handicap Contest handicap factor
    * @param trace_full Trace object reference
    * containing full flight history for scanning
    * @param trace_sprint Trace object reference
    * containing 2.5 hour flight history for scanning
+   * @param predict_triangle assume the the pilot will close the
+   * triangle?
    */
   ContestManager(const Contests _contest,
-                 const Trace &trace_full, const Trace &trace_sprint);
+                 const Trace &trace_full, const Trace &trace_sprint,
+                 bool predict_triangle=false);
 
   void SetIncremental(bool incremental);
+
+  /**
+   * @see ContestDijkstra::SetPredicted()
+   */
+  void SetPredicted(const TracePoint &predicted);
 
   void SetContest(Contests _contest) {
     contest = _contest;
@@ -99,7 +103,7 @@ public:
     return UpdateIdle(true);
   }
 
-  /** 
+  /**
    * Reset the task (as if never flown)
    */
   void Reset();
@@ -107,10 +111,6 @@ public:
   const ContestStatistics &GetStats() const {
     return stats;
   }
-
-private:
-  static bool RunContest(AbstractContest &_contest, ContestResult &result,
-                         ContestTraceVector &solution, bool exhaustive);
 };
 
 #endif

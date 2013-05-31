@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Screen/OpenGL/Features.hpp"
 #include "Screen/OpenGL/Point.hpp"
+#include "FBO.hpp"
 #include "Asset.hpp"
 
 #include <assert.h>
@@ -91,7 +92,7 @@ public:
   /**
    * Returns the standard pixel format of the platform.
    */
-  gcc_constexpr_function
+  constexpr
   static GLenum GetType() {
     return have_gles()
       ? GL_UNSIGNED_SHORT_5_6_5
@@ -161,6 +162,11 @@ protected:
 public:
   void Bind() {
     glBindTexture(GL_TEXTURE_2D, id);
+  }
+
+  void AttachFramebuffer(GLenum attachment) {
+    FBO::FramebufferTexture2D(FBO::FRAMEBUFFER, attachment,
+                              GL_TEXTURE_2D, id, 0);
   }
 
   void Draw(PixelScalar dest_x, PixelScalar dest_y,

@@ -29,16 +29,19 @@ Copyright_License {
  */
 
 #include "DebugPort.hpp"
+#include "Device/Port/Port.hpp"
 #include "Device/Port/ConfiguredPort.hpp"
 #include "Profile/DeviceConfig.hpp"
 #include "OS/Args.hpp"
 #include "OS/Sleep.h"
 #include "Operation/ConsoleOperationEnvironment.hpp"
+#include "IO/Async/GlobalIOThread.hpp"
+#include "IO/DataHandler.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-class MyHandler : public Port::Handler {
+class MyHandler : public DataHandler {
 public:
   virtual void DataReceived(const void *data, size_t length) {
     fwrite(data, 1, length, stdout);
@@ -51,6 +54,8 @@ main(int argc, char **argv)
   Args args(argc, argv, "PORT BAUD");
   const DeviceConfig config = ParsePortArgs(args);
   args.ExpectEnd();
+
+  InitialiseIOThread();
 
   MyHandler handler;
   Port *port = OpenPort(config, handler);
@@ -92,5 +97,6 @@ main(int argc, char **argv)
   }
 
   delete port;
+  DeinitialiseIOThread();
   return EXIT_SUCCESS;
 }

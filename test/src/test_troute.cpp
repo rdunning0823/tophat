@@ -30,9 +30,8 @@
 #include "Compatibility/path.h"
 #include "GlideSolvers/GlideSettings.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
-#include "Navigation/TaskProjection.hpp"
-#include "Navigation/SpeedVector.hpp"
-#include "Navigation/Geometry/GeoVector.hpp"
+#include "Geo/SpeedVector.hpp"
+#include "Geo/GeoVector.hpp"
 #include "Operation/Operation.hpp"
 
 static void

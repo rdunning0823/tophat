@@ -43,8 +43,8 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Look/TaskLook.hpp"
 #include "Look/AirspaceLook.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Language/Language.hpp"
 #include "Renderer/OZPreviewRenderer.hpp"
 #include "Util/Macros.hpp"
@@ -83,12 +83,14 @@ TaskEditPanel::RefreshView()
 {
   UpdateButtons();
 
-  if (!ordered_task->is_max_size())
+  if (!ordered_task->IsFull())
     wTaskPoints->SetLength(ordered_task->TaskSize()+1);
   else
     wTaskPoints->SetLength(ordered_task->TaskSize());
 
-  wTaskView->Invalidate();
+  if (wTaskView != NULL)
+    wTaskView->Invalidate();
+
   wTaskPoints->Invalidate();
 
   if (wSummary) {
@@ -133,12 +135,11 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   TCHAR buffer[120];
 
   const Font &name_font = *wf.GetLook().list.font;
-  const Font &small_font = *wf.GetLook().small_font;
+  const Font &text_font = *wf.GetLook().text_font;
 
   // Draw "Add turnpoint" label
   if (DrawListIndex == ordered_task->TaskSize()) {
     canvas.Select(name_font);
-    canvas.SetTextColor(COLOR_BLACK);
     _stprintf(buffer, _T("  (%s)"), _("Add Turnpoint"));
     canvas.text(rc.left + line_height + Layout::FastScale(2),
                 rc.top + line_height / 2 - name_font.GetHeight() / 2, buffer);
@@ -146,7 +147,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   }
 
   const OrderedTaskPoint &tp = ordered_task->GetTaskPoint(DrawListIndex);
-  GeoVector leg = tp.leg_vector_nominal();
+  GeoVector leg = tp.GetNominalLegVector();
   bool show_leg_info = leg.distance > fixed(0.01);
 
   // Draw icon
@@ -159,7 +160,8 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
                                             - Layout::FastScale(4)),
                                 Layout::FastScale(10));
 
-  OZPreviewRenderer::Draw(canvas, *tp.GetOZPoint(), pt, radius, task_look,
+  OZPreviewRenderer::Draw(canvas, tp.GetObservationZone(),
+                          pt, radius, task_look,
                           CommonInterface::GetMapSettings().airspace,
                           airspace_look);
 
@@ -167,8 +169,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
 
   // Use small font for details
-  canvas.Select(small_font);
-  canvas.SetTextColor(COLOR_BLACK);
+  canvas.Select(text_font);
 
   UPixelScalar leg_info_width = 0;
   if (show_leg_info) {
@@ -177,7 +178,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer);
     canvas.text(rc.right - Layout::FastScale(2) - width,
                 rc.top + Layout::FastScale(2) +
-                (name_font.GetHeight() - small_font.GetHeight()) / 2, buffer);
+                (name_font.GetHeight() - text_font.GetHeight()) / 2, buffer);
 
     // Draw leg bearing
     FormatBearing(buffer, ARRAY_SIZE(buffer), leg.bearing);
@@ -192,7 +193,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
 
   // Draw details line
   PixelScalar left = rc.left + line_height + Layout::FastScale(2);
-  OrderedTaskPointRadiusLabel(*tp.GetOZPoint(), buffer);
+  OrderedTaskPointRadiusLabel(tp.GetObservationZone(), buffer);
   if (!StringIsEmpty(buffer))
     canvas.text_clipped(left, top2, rc.right - leg_info_width - left, buffer);
 
@@ -230,16 +231,15 @@ TaskEditPanel::EditTaskPoint(unsigned ItemIndex)
       *task_modified = true;
       RefreshView();
     }
-  } else if (!ordered_task->is_max_size()) {
+  } else if (!ordered_task->IsFull()) {
 
     OrderedTaskPoint* point = NULL;
     AbstractTaskFactory &factory = ordered_task->GetFactory();
     const Waypoint* way_point =
       ShowWaypointListDialog(wf.GetMainWindow(),
-                        ordered_task->TaskSize() > 0 ?
-                          ordered_task->get_tp(ordered_task->
-                              TaskSize() - 1)->GetLocation() :
-                          XCSoarInterface::Basic().location,
+                             ordered_task->TaskSize() > 0
+                             ? ordered_task->GetPoint(ordered_task->TaskSize() - 1).GetLocation()
+                             : XCSoarInterface::Basic().location,
                         ordered_task, ItemIndex);
     if (!way_point)
       return;
@@ -372,9 +372,7 @@ OnKeyDown(gcc_unused WndForm &Sender, unsigned key_code)
   return instance->OnKeyDown(key_code);
 }
 
-static gcc_constexpr_data CallBackTableEntry task_edit_callbacks[] = {
-  DeclareCallBackEntry(dlgTaskManager::OnTaskPaint),
-
+static constexpr CallBackTableEntry task_edit_callbacks[] = {
   DeclareCallBackEntry(OnMakeFinish),
   DeclareCallBackEntry(OnMoveUpClicked),
   DeclareCallBackEntry(OnMoveDownClicked),
@@ -389,24 +387,18 @@ TaskEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   ordered_task = *ordered_task_pointer;;
 
-  LoadWindow(task_edit_callbacks, parent,
-             Layout::landscape
-             ? _T("IDR_XML_TASKEDIT_L") : _T("IDR_XML_TASKEDIT"));
+  LoadWindow(task_edit_callbacks, parent, rc, _T("IDR_XML_TASKEDIT"));
 
   instance = this;
 
   wTaskPoints = (ListControl*)form.FindByName(_T("frmTaskPoints"));
   assert(wTaskPoints != NULL);
 
-  wTaskView = (WndOwnerDrawFrame*)form.FindByName(_T("frmTaskView"));
-  assert(wTaskView != NULL);
-  wTaskView->SetOnMouseDownNotify(dlgTaskManager::OnTaskViewClick);
-
   wSummary = (WndFrame *)form.FindByName(_T("frmSummary"));
   assert(wSummary);
 
   UPixelScalar line_height = wf.GetLook().list.font->GetHeight()
-    + Layout::Scale(6) + wf.GetLook().small_font->GetHeight();
+    + Layout::Scale(6) + wf.GetLook().text_font->GetHeight();
   wTaskPoints->SetItemHeight(line_height);
   wTaskPoints->SetHandler(this);
 }
@@ -414,17 +406,21 @@ TaskEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 void
 TaskEditPanel::ReClick()
 {
-  dlgTaskManager::OnTaskViewClick(wTaskView, 0, 0);
+  if (wTaskView != NULL)
+    dlgTaskManager::OnTaskViewClick(wTaskView, 0, 0);
 }
 
 void
 TaskEditPanel::Show(const PixelRect &rc)
 {
+  if (wTaskView != NULL)
+    wTaskView->Show();
+
   if (ordered_task != *ordered_task_pointer) {
     ordered_task = *ordered_task_pointer;
     wTaskPoints->SetCursorIndex(0);
   }
-  dlgTaskManager::TaskViewRestore(wTaskView);
+
   RefreshView();
 
   wf.SetKeyDownNotify(::OnKeyDown);
@@ -435,6 +431,9 @@ TaskEditPanel::Show(const PixelRect &rc)
 void
 TaskEditPanel::Hide()
 {
+  if (wTaskView != NULL)
+    dlgTaskManager::ResetTaskView(wTaskView);
+
   wf.SetKeyDownNotify(NULL);
 
   XMLWidget::Hide();

@@ -30,14 +30,13 @@ Copyright_License {
 #include "Util/ListHead.hpp"
 #include "Util/CastIterator.hpp"
 #include "Util/Serial.hpp"
-#include "Navigation/TaskProjection.hpp"
+#include "Geo/Flat/TaskProjection.hpp"
 #include "Compiler.h"
 
 #include <set>
 #include <assert.h>
 #include <stdio.h>
 
-struct AircraftState;
 class TracePointVector;
 class TracePointerVector;
 
@@ -115,7 +114,7 @@ class Trace : private NonCopyable
       :point(p),
        elim_time(TimeMetric(p_last, p, p_next)),
        elim_distance(DistanceMetric(p_last, p, p_next)),
-       delta_distance(p.flat_distance(p_last))
+       delta_distance(p.FlatDistanceTo(p_last))
     {
       assert(elim_distance != null_delta);
     }
@@ -146,7 +145,7 @@ class Trace : private NonCopyable
     void Update(const TracePoint &p_last, const TracePoint &p_next) {
       elim_time = TimeMetric(p_last, point, p_next);
       elim_distance = DistanceMetric(p_last, point, p_next);
-      delta_distance = point.flat_distance(p_last);
+      delta_distance = point.FlatDistanceTo(p_last);
     }
 
     /**
@@ -163,8 +162,8 @@ class Trace : private NonCopyable
     static unsigned DistanceMetric(const TracePoint &last,
                                    const TracePoint &node,
                                    const TracePoint &next) {
-      const int d_this = last.flat_distance(node) + node.flat_distance(next);
-      const int d_rem = last.flat_distance(next);
+      const int d_this = last.FlatDistanceTo(node) + node.FlatDistanceTo(next);
+      const int d_rem = last.FlatDistanceTo(next);
       return abs(d_this - d_rem);
     }
 
@@ -296,9 +295,9 @@ public:
    * Add trace to internal store.  Call optimise() periodically
    * to balance tree for faster queries
    *
-   * @param state Aircraft state to log point for
+   * @param a new point; its "flat" (projected) location is ignored
    */
-  void push_back(const AircraftState &state);
+  void push_back(const TracePoint &point);
 
   /**
    * Clear the trace store
@@ -339,6 +338,10 @@ public:
   /**
    * Returns a #Serial that gets incremented when data gets appended
    * to the #Trace.
+   *
+   * It also gets incremented on any other change, which makes this
+   * method useful for checking whether the object is unmodified since
+   * the last call.
    */
   const Serial &GetAppendSerial() const {
     return append_serial;
@@ -395,6 +398,18 @@ public:
 
 private:
   /**
+   * Enforce the maximum duration, i.e. remove points that are too
+   * old.  This will be called before a new point is added, therefore
+   * the time stamp of the new point is passed to this method.
+   *
+   * This method is a no-op if no time window was configured.
+   *
+   * @param latest_time the latest time stamp which is/will be stored
+   * in this trace
+   */
+  void EnforceTimeWindow(unsigned latest_time);
+
+  /**
    * Helper function for Thin().
    */
   void Thin2();
@@ -416,9 +431,6 @@ private:
 
     return *static_cast<TraceDelta *>(chronological_list.GetPrevious());
   }
-
-  gcc_pure
-  unsigned GetMinTime() const;
 
   gcc_pure
   unsigned CalcAverageDeltaDistance(const unsigned no_thin) const;
@@ -499,7 +511,7 @@ public:
           return *this;
 
         const TraceDelta &td = (const TraceDelta &)*iterator;
-        if (td.point.FlatSquareDistance(previous) >= sq_resolution)
+        if (td.point.FlatSquareDistanceTo(previous) >= sq_resolution)
           return *this;
       }
     }
@@ -587,9 +599,13 @@ public:
     return chronological_list.rend();
   }
 
+  const TaskProjection &GetProjection() const {
+    return task_projection;
+  }
+
   gcc_pure
   unsigned ProjectRange(const GeoPoint &location, fixed distance) const {
-    return task_projection.project_range(location, distance);
+    return task_projection.ProjectRangeInteger(location, distance);
   }
 };
 

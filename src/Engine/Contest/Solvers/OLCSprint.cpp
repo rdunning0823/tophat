@@ -18,7 +18,8 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
+
 #include "OLCSprint.hpp"
 #include "Trace/Trace.hpp"
 
@@ -37,11 +38,11 @@
   - if this is up to date, no need to process anything earlier than
     last 2.5 hours, since save_solution will catch the very best
 
-  - only need to pass in last 2.5 hours worth of data, therefore 
+  - only need to pass in last 2.5 hours worth of data, therefore
     use min_time and have this class request data directly from Trace
 
   - so, calculate acceptable n_points size so we get a solution
-    on slow platforms within a close-to-one fraction of the 
+    on slow platforms within a close-to-one fraction of the
     resulting time step for new points
     e.g. if n_points is 150 (one per minute), we expect a solution
     in approx worst case within 60 cycles.
@@ -51,17 +52,11 @@
     potentially implement as circular buffer (emulate as dequeue)
 */
 
-OLCSprint::OLCSprint(const Trace &_trace):
-  ContestDijkstra(_trace, false, 4, 0) {}
-
-void
-OLCSprint::Reset()
-{
-  ContestDijkstra::Reset();
-}
+OLCSprint::OLCSprint(const Trace &_trace)
+  :ContestDijkstra(_trace, false, 4, 0) {}
 
 unsigned
-OLCSprint::find_start() const
+OLCSprint::FindStart() const
 {
   assert(num_stages <= MAX_STAGES);
   assert(n_points >= 2);
@@ -90,56 +85,55 @@ OLCSprint::AddStartEdges()
 
   const int max_altitude = GetMaximumStartAltitude(GetPoint(n_points - 1));
 
-  const ScanTaskPoint start(0, find_start());
+  const ScanTaskPoint start(0, FindStart());
 
   if (GetPoint(start).GetIntegerAltitude() <= max_altitude)
     LinkStart(start);
 }
 
-void 
+void
 OLCSprint::AddEdges(const ScanTaskPoint origin)
 {
   const ScanTaskPoint destination(origin.GetStageNumber() + 1, n_points - 1);
-  if (!IsFinal(destination)) {
+  if (IsFinal(destination)) {
+    /* For final, only add last valid point */
+    const unsigned d = GetStageWeight(origin.GetStageNumber()) *
+      CalcEdgeDistance(origin, destination);
+    Link(destination, origin, d);
+  } else
     ContestDijkstra::AddEdges(origin);
-    return;
-  }
-  /*
-    For final, only add last valid point
-   */
-  const unsigned d = GetStageWeight(origin.GetStageNumber()) *
-    CalcEdgeDistance(origin, destination);
-  Link(destination, origin, d);
 }
 
-fixed
-OLCSprint::CalcScore() const
+ContestResult
+OLCSprint::CalculateResult() const
 {
-  return ApplyHandicap(CalcDistance()/fixed(2500), true);
+  ContestResult result = ContestDijkstra::CalculateResult();
+  result.score = ApplyShiftedHandicap(result.distance / fixed(2500));
+  return result;
 }
 
 void
-OLCSprint::UpdateTrace(bool force) {
+OLCSprint::UpdateTrace(bool force)
+{
+  /* since this is online, all solutions must have start to end of
+     trace satisfy the finish altitude requirements.  otherwise there
+     is no point even retrieving the full trace or starting a
+     search. */
 
-  // since this is online, all solutions must have start to end of trace
-  // satisfy the finish altitude requirements.  otherwise there is no point
-  // even retrieving the full trace or starting a search.
-
-  // assuming a bounded ceiling and very long flight, this would be expected to reduce
-  // the number of trace acquisitions and solution starts by 50%.  In practice the number
-  // will be lower than this but the fewer wasted cpu cycles the better.
+  /* assuming a bounded ceiling and very long flight, this would be
+     expected to reduce the number of trace acquisitions and solution
+     starts by 50%.  In practice the number will be lower than this
+     but the fewer wasted cpu cycles the better. */
 
   if (trace_master.size() < 2) {
     ClearTrace();
     return;
   }
 
-  const TracePoint e[2] = {
-    trace_master.front(),
-    trace_master.back(),
-  };
+  const TracePoint &first = trace_master.front();
+  const TracePoint &last = trace_master.back();
 
-  if (!IsFinishAltitudeValid(e[0], e[1])) {
+  if (!IsFinishAltitudeValid(first, last)) {
     ClearTrace();
     return;
   }

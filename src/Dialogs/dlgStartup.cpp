@@ -83,7 +83,7 @@ SelectProfile(const TCHAR *path)
   File::Touch(path);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnLogoPaint),
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnQuitClicked),
@@ -108,7 +108,7 @@ dlgStartupShowModal()
   DataFieldFileReader* dfe = (DataFieldFileReader*)wp->GetDataField();
   assert(dfe != NULL);
 
-  dfe->ScanDirectoryTop(_T("*.prf"));
+  dfe->ScanDirectoryTop(_T("*.top"));
 
   if (dfe->GetNumFiles() <= 1) {
     SelectProfile(dfe->GetPathFile());

@@ -28,10 +28,12 @@ Copyright_License {
 #include "Pages.hpp"
 #include "Profile/Profile.hpp"
 #include "Profile/ProfileKeys.hpp"
-#include "MainWindow.hpp"
+#include "UIGlobals.hpp"
 #include "MapWindow/GlueMapWindow.hpp"
 #include "Units/Units.hpp"
+#include "UIState.hpp"
 #include "Asset.hpp"
+#include "Pan.hpp"
 
 // eventAutoZoom - Turn on|off|toggle AutoZoom
 // misc:
@@ -129,10 +131,10 @@ InputEvents::eventPan(const TCHAR *misc)
     TogglePan();
 
   else if (StringIsEqual(misc, _T("on")))
-    SetPan(true);
+    EnterPan();
 
   else if (StringIsEqual(misc, _T("off")))
-    SetPan(false);
+    LeavePan();
 
   else if (StringIsEqual(misc, _T("up")))
     if (IsHP31X())
@@ -158,51 +160,9 @@ InputEvents::eventPan(const TCHAR *misc)
 }
 
 void
-InputEvents::SetPan(bool enable)
-{
-  GlueMapWindow *map_window = CommonInterface::main_window.ActivateMap();
-  if (map_window == NULL)
-    return;
-
-  if (enable == map_window->IsPanning())
-    return;
-
-  map_window->SetPan(enable);
-
-  if (enable) {
-    setMode(MODE_PAN);
-    XCSoarInterface::main_window.SetFullScreen(true);
-  } else {
-    setMode(MODE_DEFAULT);
-    Pages::Update();
-  }
-}
-
-void
-InputEvents::TogglePan()
-{
-  const GlueMapWindow *map_window = CommonInterface::main_window.ActivateMap();
-  if (map_window == NULL)
-    return;
-
-  SetPan(!map_window->IsPanning());
-}
-
-void
-InputEvents::LeavePan()
-{
-  const GlueMapWindow *map_window =
-    CommonInterface::main_window.GetMapIfActive();
-  if (map_window == NULL)
-    return;
-
-  SetPan(false);
-}
-
-void
 InputEvents::sub_PanCursor(int dx, int dy)
 {
-  GlueMapWindow *map_window = CommonInterface::main_window.GetMapIfActive();
+  GlueMapWindow *map_window = UIGlobals::GetMapIfActive();
   if (map_window == NULL || !map_window->IsPanning())
     return;
 
@@ -227,11 +187,11 @@ InputEvents::sub_AutoZoom(int vswitch)
   else
     settings_map.auto_zoom_enabled = (vswitch != 0); // 0 off, 1 on
 
-  Profile::Set(szProfileAutoZoom, settings_map.auto_zoom_enabled);
+  Profile::Set(ProfileKeys::AutoZoom, settings_map.auto_zoom_enabled);
 
   if (settings_map.auto_zoom_enabled &&
-      CommonInterface::main_window.GetMap() != NULL)
-    CommonInterface::main_window.GetMap()->SetPan(false);
+      UIGlobals::GetMap() != NULL)
+    UIGlobals::GetMap()->SetPan(false);
 
   ActionInterface::SendMapSettings(true);
 }
@@ -240,17 +200,16 @@ void
 InputEvents::sub_SetZoom(fixed value)
 {
   MapSettings &settings_map = CommonInterface::SetMapSettings();
-  GlueMapWindow *map_window = CommonInterface::main_window.ActivateMap();
+  GlueMapWindow *map_window = UIGlobals::ActivateMap();
   if (map_window == NULL)
     return;
 
-  DisplayMode displayMode = XCSoarInterface::main_window.GetDisplayMode();
+  const DisplayMode displayMode = CommonInterface::GetUIState().display_mode;
   if (settings_map.auto_zoom_enabled &&
       !(displayMode == DisplayMode::CIRCLING && settings_map.circle_zoom_enabled) &&
-      !CommonInterface::IsPanning()) {
+      !IsPanning()) {
     settings_map.auto_zoom_enabled = false;  // disable autozoom if user manually changes zoom
-    Profile::Set(szProfileAutoZoom, false);
-    Message::AddMessage(_("Auto. zoom off"));
+    Profile::Set(ProfileKeys::AutoZoom, false);
   }
 
   fixed vmin = CommonInterface::GetComputerSettings().polar.glide_polar_task.GetVMin();
@@ -268,7 +227,7 @@ InputEvents::sub_SetZoom(fixed value)
 void
 InputEvents::sub_ScaleZoom(int vswitch)
 {
-  const GlueMapWindow *map_window = CommonInterface::main_window.ActivateMap();
+  const GlueMapWindow *map_window = UIGlobals::ActivateMap();
   if (map_window == NULL)
     return;
 
@@ -301,5 +260,5 @@ void
 InputEvents::eventMap(const TCHAR *misc)
 {
   if (StringIsEqual(misc, _T("show")))
-    CommonInterface::main_window.ActivateMap();
+    UIGlobals::ActivateMap();
 }

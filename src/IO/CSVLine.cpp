@@ -57,6 +57,13 @@ CSVLine::ReadFirstChar()
   return Skip() > 0 ? ch : '\0';
 }
 
+char
+CSVLine::ReadOneChar()
+{
+  char ch = *data;
+  return Skip() == 1 ? ch : '\0';
+}
+
 void
 CSVLine::Read(char *dest, size_t size)
 {
@@ -177,6 +184,29 @@ CSVLine::ReadChecked(long &value_r)
 {
   char *endptr;
   long value = strtol(data, &endptr, 10);
+  assert(endptr >= data && endptr <= end);
+
+  bool success = endptr > data;
+  if (endptr >= end) {
+    data = end;
+  } else if (*endptr == ',') {
+    data = endptr + 1;
+  } else {
+    data = endptr;
+    Skip();
+    return false;
+  }
+
+  if (success)
+    value_r = value;
+  return success;
+}
+
+bool
+CSVLine::ReadHexChecked(long &value_r)
+{
+  char *endptr;
+  long value = strtol(data, &endptr, 16);
   assert(endptr >= data && endptr <= end);
 
   bool success = endptr > data;

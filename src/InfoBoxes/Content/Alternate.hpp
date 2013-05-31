@@ -26,28 +26,46 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
-class InfoBoxContentAlternateName : public InfoBoxContent
+class InfoBoxContentAlternate : public InfoBoxContent
+{
+protected:
+  unsigned index;
+  static const DialogContent dlgContent;
+
+public:
+  InfoBoxContentAlternate(const unsigned _index):
+    index(_index) {}
+
+  virtual const DialogContent *GetDialogContent();
+
+  /**
+   * sets the index of the Alternate for this IB and invalidates the IB data
+   */
+  virtual bool HandleQuickAccess(const TCHAR *misc);
+
+  /**
+   * @param misc
+   * returns the index of this IB if misc is set to "index"
+   */
+  virtual unsigned GetQuickAccess() {
+    return index;
+  }
+};
+
+class InfoBoxContentAlternateName : public InfoBoxContentAlternate
 {
 public:
   InfoBoxContentAlternateName(const unsigned _index):
-    InfoBoxContent(), index(_index) {}
+    InfoBoxContentAlternate(_index) {}
   virtual void Update(InfoBoxData &data);
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode);
-
-private:
-  unsigned index;
 };
 
-class InfoBoxContentAlternateGR : public InfoBoxContent
+class InfoBoxContentAlternateGR : public InfoBoxContentAlternate
 {
 public:
   InfoBoxContentAlternateGR(const unsigned _index):
-    InfoBoxContent(), index(_index) {}
+    InfoBoxContentAlternate(_index) {}
   virtual void Update(InfoBoxData &data);
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode);
-
-private:
-  unsigned index;
 };
 
 #endif

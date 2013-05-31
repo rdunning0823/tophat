@@ -23,6 +23,8 @@ Copyright_License {
 
 #include "HexColor.hpp"
 #include "Screen/Color.hpp"
+#include "Util/NumberParser.hpp"
+#include "Compiler.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +55,7 @@ ParseHexColor(const TCHAR *buffer, Color &color)
   buffer++;
 
   TCHAR *endptr;
-  unsigned long value = _tcstoul(buffer, &endptr, 16);
+  unsigned value = ParseUnsigned(buffer, &endptr, 16);
   if (endptr != buffer + 6)
     return false;
 

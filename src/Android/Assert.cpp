@@ -36,7 +36,7 @@ gcc_noreturn
 void
 __assert2(const char *file, int line, const char *func, const char *failedexpr)
 {
-  __android_log_print(ANDROID_LOG_FATAL, "XCSoar",
+  __android_log_print(ANDROID_LOG_FATAL, "TopHat",
                       "assertion \"%s\" failed: file \"%s\", line %d, function \"%s\"",
                       failedexpr, file, line, func);
 

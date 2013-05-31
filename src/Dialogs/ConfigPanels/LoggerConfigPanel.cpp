@@ -31,12 +31,12 @@ Copyright_License {
 #include "Logger/NMEALogger.hpp"
 
 enum ControlIndex {
+  PilotName,
   LoggerTimeStepCruise,
   LoggerTimeStepCircling,
-  LoggerShortName,
-  DisableAutoLogger,
   EnableNMEALogger,
   EnableFlightLogger,
+  LoggerID,
 };
 
 class LoggerConfigPanel : public RowFormWidget {
@@ -63,6 +63,7 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const LoggerSettings &logger = settings_computer.logger;
 
   RowFormWidget::Prepare(parent, rc);
+  AddText(_("Pilot name"), NULL, logger.pilot_name);
 
   AddTime(_("Time step cruise"),
           _("This is the time interval between logged points when not circling."),
@@ -74,19 +75,6 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           1, 30, 1, logger.time_step_circling);
   SetExpertRow(LoggerTimeStepCircling);
 
-  AddBoolean(_("Short file name"),
-             _("This determines whether the logger uses the short IGC file name or the "
-                 "long IGC file name. Example short name (81HXABC1.IGC), long name "
-                 "(2008-01-18-XXX-ABC-01.IGC)."),
-             logger.short_name);
-  SetExpertRow(LoggerShortName);
-
-  AddEnum(_("Auto. logger"),
-          _("Enables the automatic starting and stopping of logger on takeoff and landing "
-            "respectively. Disable when flying paragliders."),
-          auto_logger_list, (unsigned)logger.auto_logger);
-  SetExpertRow(DisableAutoLogger);
-
   AddBoolean(_("NMEA logger"),
              _("Enable the NMEA logger on startup? If this option is disabled, "
                  "the NMEA logger can still be started manually."),
@@ -96,6 +84,10 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Log book"), _("Logs each start and landing."),
              logger.enable_flight_logger);
   SetExpertRow(EnableFlightLogger);
+
+  AddText(_("Logger ID"), NULL, logger.logger_id);
+  SetExpertRow(LoggerID);
+
 }
 
 bool
@@ -104,26 +96,22 @@ LoggerConfigPanel::Save(bool &changed, bool &require_restart)
   ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
   LoggerSettings &logger = settings_computer.logger;
 
-  changed |= SaveValue(LoggerTimeStepCruise, szProfileLoggerTimeStepCruise,
+  changed |= SaveValue(PilotName, ProfileKeys::PilotName,
+                       logger.pilot_name.buffer(), logger.pilot_name.MAX_SIZE);
+
+  changed |= SaveValue(LoggerTimeStepCruise, ProfileKeys::LoggerTimeStepCruise,
                        logger.time_step_cruise);
 
-  changed |= SaveValue(LoggerTimeStepCircling, szProfileLoggerTimeStepCircling,
+  changed |= SaveValue(LoggerTimeStepCircling, ProfileKeys::LoggerTimeStepCircling,
                        logger.time_step_circling);
 
-  changed |= SaveValue(LoggerShortName, szProfileLoggerShort,
-                       logger.short_name);
-
-  /* GUI label is "Enable Auto Logger" */
-  changed |= SaveValueEnum(DisableAutoLogger, szProfileAutoLogger,
-                           logger.auto_logger);
-
-  changed |= SaveValue(EnableNMEALogger, szProfileEnableNMEALogger,
+  changed |= SaveValue(EnableNMEALogger, ProfileKeys::EnableNMEALogger,
                        logger.enable_nmea_logger);
 
   if (logger.enable_nmea_logger)
     NMEALogger::enabled = true;
 
-  if (SaveValue(EnableFlightLogger, szProfileEnableFlightLogger,
+  if (SaveValue(EnableFlightLogger, ProfileKeys::EnableFlightLogger,
                 logger.enable_flight_logger)) {
     changed = true;
 
@@ -132,6 +120,9 @@ LoggerConfigPanel::Save(bool &changed, bool &require_restart)
        setting */
     require_restart = true;
   }
+
+  changed |= SaveValue(LoggerID, ProfileKeys::LoggerID,
+                       logger.logger_id.buffer(), logger.logger_id.MAX_SIZE);
 
   return true;
 }

@@ -38,11 +38,14 @@ public:
  * @param tb Behaviour (options)
  */  
   RTTaskFactory(OrderedTask& _task,
-                 const TaskBehaviour &tb);
+                const TaskBehaviour &tb);
+
+  RTTaskFactory(OrderedTask &_task, const TaskBehaviour &_behaviour,
+                const LegalPointConstArray _start_types,
+                const LegalPointConstArray _intermediate_types,
+                const LegalPointConstArray _finish_types);
 
   ~RTTaskFactory() {};
-
-  void UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to); 
 
 /** 
  * Check whether task is complete and valid according to factory rules
@@ -58,7 +61,35 @@ public:
    * similar to type of tp
    */
   virtual gcc_pure
-  LegalPointType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+};
+
+/**
+ * a RT task factory that supports US rules
+ */
+class RTTaskFactoryUs:
+  public RTTaskFactory
+{
+public:
+/**
+ * Constructor
+ *
+ * @param _task Ordered task to be managed by this factory
+ * @param tb Behaviour (options)
+ */
+  RTTaskFactoryUs(OrderedTask& _task,
+                  const TaskBehaviour &tb);
+
+  ~RTTaskFactoryUs() {};
+
+  /**
+   * swaps AAT OZs for AST_CYLINDERs
+   * @param tp
+   * @return: point type compatible with current factory, most
+   * similar to type of tp
+   */
+  virtual gcc_pure
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
 };
 
 #endif

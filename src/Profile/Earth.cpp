@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "Profile/Profile.hpp"
-#include "Engine/Navigation/GeoPoint.hpp"
+#include "Geo/GeoPoint.hpp"
 
 #include <stdio.h>
 
@@ -50,12 +50,12 @@ Profile::GetGeoPoint(const TCHAR *key, GeoPoint &value)
   return true;
 }
 
-bool
+void
 Profile::SetGeoPoint(const TCHAR *key, const GeoPoint &value)
 {
   StaticString<128> buffer;
   buffer.Format(_T("%f %f"),
                 (double)value.longitude.Degrees(),
                 (double)value.latitude.Degrees());
-  return Set(key, buffer);
+  Set(key, buffer);
 }

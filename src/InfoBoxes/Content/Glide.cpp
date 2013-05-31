@@ -22,57 +22,80 @@ Copyright_License {
 */
 
 #include "InfoBoxes/Content/Glide.hpp"
+#include "Engine/Util/Gradient.hpp"
+#include "Computer/GlideRatioCalculator.hpp"
 #include "InfoBoxes/Data.hpp"
+#include "InfoBoxes/Panel/GrAverage.hpp"
 #include "Interface.hpp"
+#include "Util/Macros.hpp"
+#include "Language/Language.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
 
 void
-InfoBoxContentLDInstant::Update(InfoBoxData &data)
+InfoBoxContentGRInstant::Update(InfoBoxData &data)
 {
-  const fixed ld = XCSoarInterface::Calculated().ld;
+  const fixed gr = XCSoarInterface::Calculated().gr;
 
-  if (ld == fixed(999)) {
+  if (!::GradientValid(gr)) {
     data.SetInvalid();
     return;
   }
 
   // Set Value
-  data.SetValueFromGlideRatio(ld);
+  data.SetValueFromGlideRatio(gr);
 }
 
 void
-InfoBoxContentLDCruise::Update(InfoBoxData &data)
+InfoBoxContentGRCruise::Update(InfoBoxData &data)
 {
-  const fixed cruise_ld = XCSoarInterface::Calculated().cruise_ld;
+  const fixed cruise_gr = XCSoarInterface::Calculated().cruise_gr;
 
-  if (cruise_ld == fixed(999)) {
+  if (!::GradientValid(cruise_gr)) {
     data.SetInvalid();
     return;
   }
 
   // Set Value
-  data.SetValueFromGlideRatio(cruise_ld);
+  data.SetValueFromGlideRatio(cruise_gr);
+
+  data.SetCommentFromDistance(XCSoarInterface::Basic().location.Distance(
+      XCSoarInterface::Calculated().cruise_start_location));
+}
+
+static constexpr InfoBoxContentGRAvg::PanelContent panels[] = {
+    InfoBoxContentGRAvg::PanelContent (
+    N_("Set GR averager period"),
+    LoadGrAveragePanel),
+};
+
+const InfoBoxContentGRAvg::DialogContent InfoBoxContentGRAvg::dlgContent = {
+  ARRAY_SIZE(panels), &panels[0], false,
+};
+
+const InfoBoxContentGRAvg::DialogContent*
+InfoBoxContentGRAvg::GetDialogContent() {
+  return &dlgContent;
 }
 
 void
-InfoBoxContentLDAvg::Update(InfoBoxData &data)
+InfoBoxContentGRAvg::Update(InfoBoxData &data)
 {
-  const int average_ld = XCSoarInterface::Calculated().average_ld;
+  const fixed average_gr = XCSoarInterface::Calculated().average_gr;
 
-  if (average_ld == 0) {
+  if (average_gr == fixed_zero) {
     data.SetInvalid();
     return;
   }
 
   // Set Value
-  if (average_ld < 0)
+  if (average_gr < fixed_zero)
     data.SetValue(_T("^^^"));
-  else if (average_ld >= 999)
+  else if (!::GradientValid(average_gr))
     data.SetValue(_T("+++"));
   else
-    data.SetValueFromGlideRatio(fixed(average_ld));
+    data.SetValueFromGlideRatio(average_gr);
 }
 
 void
@@ -80,7 +103,7 @@ InfoBoxContentLDVario::Update(InfoBoxData &data)
 {
   const fixed ld_vario = XCSoarInterface::Calculated().ld_vario;
 
-  if (ld_vario == fixed(999) ||
+  if (!::GradientValid(ld_vario) ||
       !XCSoarInterface::Basic().total_energy_vario_available ||
       !XCSoarInterface::Basic().airspeed_available) {
     data.SetInvalid();

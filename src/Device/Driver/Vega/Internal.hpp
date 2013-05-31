@@ -25,17 +25,21 @@ Copyright_License {
 #define XCSOAR_VEGA_INTERNAL_HPP
 
 #include "Device/Driver.hpp"
+#include "Device/SettingsMap.hpp"
 #include "Atmosphere/Pressure.hpp"
 #include "Thread/Mutex.hpp"
-
-#include <map>
-#include <string>
 
 class NMEAInputLine;
 
 class VegaDevice : public AbstractDevice {
 private:
   Port &port;
+
+  /**
+   * The most recent MacCready setting, written by PutMacCready(),
+   * read by VarioWriteSettings().
+   */
+  fixed mc;
 
   /**
    * The most recent QNH value, written by SetQNH(), read by
@@ -45,19 +49,13 @@ private:
 
   bool detected;
 
-  /**
-   * This #Mutex protects the #settings map.
-   */
-  mutable Mutex settings_mutex;
-
-  /**
-   * Settings that were received in PDVSC sentences.
-   */
-  std::map<std::string, int> settings;
+  DeviceSettingsMap<int> settings;
 
 public:
   VegaDevice(Port &_port)
-    :port(_port), qnh(AtmosphericPressure::Standard()), detected(false) {}
+    :port(_port),
+     mc(fixed_zero), qnh(AtmosphericPressure::Standard()),
+     detected(false) {}
 
   /**
    * Write an integer setting to the Vega.
@@ -93,6 +91,7 @@ protected:
 public:
   virtual void LinkTimeout();
   virtual bool ParseNMEA(const char *line, struct NMEAInfo &info);
+  virtual bool PutMacCready(fixed mc, OperationEnvironment &env);
   virtual bool PutQNH(const AtmosphericPressure& pres,
                       OperationEnvironment &env);
   virtual void OnSysTicker(const DerivedInfo &calculated);

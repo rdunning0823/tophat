@@ -26,15 +26,17 @@
 #include "Trace/Trace.hpp"
 
 void
-PrintHelper::contestmanager_print(const ContestManager& man)  
+PrintHelper::contestmanager_print(const ContestManager &man,
+                                  const Trace &trace_full,
+                                  const Trace &trace_sprint)
 {
   {
     std::ofstream fs("results/res-olc-trace.txt");
     TracePointVector v;
-    man.trace_full.GetPoints(v);
+    trace_full.GetPoints(v);
 
     for (auto it = v.begin(); it != v.end(); ++it)
-      fs << it->get_location().longitude << " " << it->get_location().latitude
+      fs << it->GetLocation().longitude << " " << it->GetLocation().latitude
          << " " << it->GetAltitude() << " " << it->GetTime()
          << "\n";
   }
@@ -43,10 +45,10 @@ PrintHelper::contestmanager_print(const ContestManager& man)
     std::ofstream fs("results/res-olc-trace_sprint.txt");
 
     TracePointVector v;
-    man.trace_sprint.GetPoints(v);
+    trace_sprint.GetPoints(v);
 
     for (auto it = v.begin(); it != v.end(); ++it)
-      fs << it->get_location().longitude << " " << it->get_location().latitude
+      fs << it->GetLocation().longitude << " " << it->GetLocation().latitude
          << " " << it->GetAltitude() << " " << it->GetTime()
          << "\n";
   }
@@ -60,10 +62,10 @@ PrintHelper::contestmanager_print(const ContestManager& man)
 
   if (positive(man.stats.result[0].time)) {
 
-    for (const TracePoint* it = man.stats.solution[0].begin();
+    for (auto it = man.stats.solution[0].begin();
          it != man.stats.solution[0].end(); ++it) {
-      fs << it->get_location().longitude << " " << it->get_location().latitude
-         << " " << it->GetAltitude() << " " << it->GetTime()
+      fs << it->GetLocation().longitude << " " << it->GetLocation().latitude
+         << " " << it->GetTime()
          << "\n";
     }
   }
@@ -74,6 +76,6 @@ PrintHelper::print(const ContestResult& score)
 {
   std::cout << "#   score " << score.score << "\n";
   std::cout << "#   distance " << score.distance/fixed(1000) << " (km)\n";
-  std::cout << "#   speed " << score.speed*fixed(3.6) << " (kph)\n";
+  std::cout << "#   speed " << score.GetSpeed() * fixed(3.6) << " (kph)\n";
   std::cout << "#   time " << score.time << " (sec)\n";
 }

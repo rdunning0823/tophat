@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Compiler.h"
 #include "Util/tstring.hpp"
+#include "Util/NumberParser.hpp"
 
 #ifdef _UNICODE
 #include "OS/PathName.hpp"
@@ -146,8 +147,12 @@ public:
     assert(!IsEmpty());
 
     const char *p = args.front();
-    args.pop_front();
+    Skip();
     return p;
+  }
+
+  void Skip() {
+    args.pop_front();
   }
 
   const char *PeekNext() const {
@@ -159,6 +164,30 @@ public:
       UsageError();
 
     return GetNext();
+  }
+
+  int ExpectNextInt() {
+    const char *p = ExpectNext();
+    assert(p != NULL);
+
+    char *endptr;
+    int result = ParseInt(p, &endptr);
+    if (p == endptr)
+      UsageError();
+
+    return result;
+  }
+
+  double ExpectNextDouble() {
+    const char *p = ExpectNext();
+    assert(p != NULL);
+
+    char *endptr;
+    double result = ParseDouble(p, &endptr);
+    if (p == endptr)
+      UsageError();
+
+    return result;
   }
 
   tstring ExpectNextT() {

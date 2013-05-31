@@ -31,7 +31,7 @@ struct DialogLook;
 class Bitmap;
 class ContainerWindow;
 class TabDisplay;
-class OneTabButton;
+class TabButton;
 
 /** TabBarControl displays tabs that show/hide the windows
  * associated with each tab.  For example a "Panel" control.
@@ -48,10 +48,6 @@ class TabBarControl : public ContainerWindow {
   TabDisplay * tab_display;
   const UPixelScalar tab_line_height;
   bool flip_orientation;
-  /** if false (default) Client rectangle is adjacent to tabs
-   *  if true, Client rectangle overlaps tabs (for advanced drawing)
-   */
-  bool client_overlap_tabs;
 
   PageFlippedCallback page_flipped_callback;
 
@@ -68,8 +64,7 @@ public:
                 PixelScalar x, PixelScalar y,
                 UPixelScalar width, UPixelScalar height,
                 const WindowStyle style = WindowStyle(),
-                bool _flipOrientation = false,
-                bool _clientOverlapTabs = false);
+                bool _flipOrientation = false);
 
   ~TabBarControl();
 
@@ -81,12 +76,10 @@ public:
   }
 
 private:
-#define TabLineHeightInitUnscaled (unsigned)5
+  static constexpr unsigned TabLineHeightInitUnscaled = 5;
 
 public:
-  unsigned AddTab(Widget *widget, const TCHAR *caption,
-                  bool button_only=false,
-                  const Bitmap *bmp=NULL);
+  unsigned AddTab(Widget *widget, const TCHAR *caption, const Bitmap *bmp = NULL);
 
 public:
   gcc_pure
@@ -127,11 +120,13 @@ public:
     return tab_line_height;
   }
 
-  void SetClientOverlapTabs(bool value);
-
 protected:
   virtual void OnCreate();
   virtual void OnDestroy();
+
+#ifdef HAVE_CLIPPING
+  virtual void OnPaint(Canvas &canvas) gcc_override;
+#endif
 };
 
 #endif

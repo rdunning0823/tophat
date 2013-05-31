@@ -24,31 +24,25 @@ Copyright_License {
 #ifndef DEMO_REPLAY_GLUE_HPP
 #define DEMO_REPLAY_GLUE_HPP
 
+#include "AbstractReplay.hpp"
 #include "Replay/DemoReplay.hpp"
 #include "PeriodClock.hpp"
 
 class ProtectedTaskManager;
 
-class DemoReplayGlue:
-  public DemoReplay
+class DemoReplayGlue
+  : public AbstractReplay, private DemoReplay
 {
   PeriodClock clock;
   ProtectedTaskManager* task_manager;
 
 public:
-  DemoReplayGlue(ProtectedTaskManager &_task_manager)
-    :task_manager(&_task_manager) {}
+  DemoReplayGlue(ProtectedTaskManager &_task_manager);
 
-  virtual void Start();
-  virtual bool Update();
+  virtual bool Update(NMEAInfo &data, fixed time_scale) gcc_override;
 
 protected:
-  virtual bool UpdateTime();
-  virtual void ResetTime();
-  virtual void OnAdvance(const GeoPoint &loc, const fixed speed,
-                         const Angle bearing, const fixed alt,
-                         const fixed baroalt, const fixed t);
-  virtual void OnStop();
+  bool UpdateTime();
 };
 
 #endif

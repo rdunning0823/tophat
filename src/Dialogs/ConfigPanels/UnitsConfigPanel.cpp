@@ -57,7 +57,6 @@ public:
   UnitsConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
-  void UpdateUnitFields(const UnitSetting &units);
   void PresetCheck();
 
   /* methods from Widget */
@@ -68,20 +67,6 @@ private:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df);
 };
-
-void
-UnitsConfigPanel::UpdateUnitFields(const UnitSetting &units)
-{
-  LoadValueEnum(UnitsSpeed, units.speed_unit);
-  LoadValueEnum(UnitsDistance, units.distance_unit);
-  LoadValueEnum(UnitsLift, units.vertical_speed_unit);
-  LoadValueEnum(UnitsAltitude, units.altitude_unit);
-  LoadValueEnum(UnitsTemperature, units.temperature_unit);
-  LoadValueEnum(UnitsTaskSpeed, units.task_speed_unit);
-  LoadValueEnum(UnitsPressure, units.pressure_unit);
-
-  // Ignore the coord.format for the preset selection.
-}
 
 void
 UnitsConfigPanel::PresetCheck()
@@ -102,15 +87,7 @@ UnitsConfigPanel::PresetCheck()
 void
 UnitsConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(UnitsPreset, df)) {
-    int result = df.GetAsInteger();
-    if (result > 0) {
-      // First selection means not to load any preset.
-      const UnitSetting &units = Units::Store::Read(result - 1);
-      UpdateUnitFields(units);
-    }
-  } else
-    PresetCheck();
+  PresetCheck();
 }
 
 void
@@ -134,6 +111,7 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   LoadValueEnum(UnitsPreset, Units::Store::EqualsPresetUnits(config));
   wp->GetDataField()->SetListener(this);
+  wp->SetReadOnly(true);
 
   AddSpacer();
   SetExpertRow(spacer_1);
@@ -244,22 +222,22 @@ UnitsConfigPanel::Save(bool &_changed, bool &_require_restart)
   /* the Units settings affect how other form values are read and translated
    * so changes to Units settings should be processed after all other form settings
    */
-  changed |= SaveValueEnum(UnitsSpeed, szProfileSpeedUnitsValue, config.speed_unit);
+  changed |= SaveValueEnum(UnitsSpeed, ProfileKeys::SpeedUnitsValue, config.speed_unit);
   config.wind_speed_unit = config.speed_unit; // Mapping the wind speed to the speed unit
 
-  changed |= SaveValueEnum(UnitsDistance, szProfileDistanceUnitsValue, config.distance_unit);
+  changed |= SaveValueEnum(UnitsDistance, ProfileKeys::DistanceUnitsValue, config.distance_unit);
 
-  changed |= SaveValueEnum(UnitsLift, szProfileLiftUnitsValue, config.vertical_speed_unit);
+  changed |= SaveValueEnum(UnitsLift, ProfileKeys::LiftUnitsValue, config.vertical_speed_unit);
 
-  changed |= SaveValueEnum(UnitsAltitude, szProfileAltitudeUnitsValue, config.altitude_unit);
+  changed |= SaveValueEnum(UnitsAltitude, ProfileKeys::AltitudeUnitsValue, config.altitude_unit);
 
-  changed |= SaveValueEnum(UnitsTemperature, szProfileTemperatureUnitsValue, config.temperature_unit);
+  changed |= SaveValueEnum(UnitsTemperature, ProfileKeys::TemperatureUnitsValue, config.temperature_unit);
 
-  changed |= SaveValueEnum(UnitsTaskSpeed, szProfileTaskSpeedUnitsValue, config.task_speed_unit);
+  changed |= SaveValueEnum(UnitsTaskSpeed, ProfileKeys::TaskSpeedUnitsValue, config.task_speed_unit);
 
-  changed |= SaveValueEnum(UnitsPressure, szProfilePressureUnitsValue, config.pressure_unit);
+  changed |= SaveValueEnum(UnitsPressure, ProfileKeys::PressureUnitsValue, config.pressure_unit);
 
-  changed |= SaveValueEnum(UnitsLatLon, szProfileLatLonUnits, coordinate_format);
+  changed |= SaveValueEnum(UnitsLatLon, ProfileKeys::LatLonUnits, coordinate_format);
 
   _changed |= changed;
   _require_restart |= require_restart;

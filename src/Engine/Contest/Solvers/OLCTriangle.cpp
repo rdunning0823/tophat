@@ -18,9 +18,11 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
+
 #include "OLCTriangle.hpp"
-#include "Navigation/Flat/FlatRay.hpp"
+#include "Cast.hpp"
+#include "Trace/Trace.hpp"
 
 /*
  @todo potential to use 3d convex hull to speed search
@@ -41,17 +43,28 @@
   4: end
 */
 
+/**
+ * Maximum allowed distance between start end finish.  According to
+ * FAI-OLC 2012 rules, this is 1 km.
+ *
+ * TODO: due to trace thinning, our TracePoints are sometimes not
+ * close enough for this check to succeed.  To work around this for
+ * now, we allow up to 5 km until this library has been implemented
+ * properly.
+ */
+static constexpr fixed max_distance(5000);
+
 OLCTriangle::OLCTriangle(const Trace &_trace,
-                         const bool _is_fai):
-  ContestDijkstra(_trace, false, 3, 1000),
-  is_closed(false),
-  is_complete(false),
-  first_tp(0),
-  is_fai(_is_fai)
-{}
+                         const bool _is_fai, bool _predict)
+  :ContestDijkstra(_trace, false, 3, 1000),
+   is_fai(_is_fai), predict(_predict),
+   is_closed(false),
+   is_complete(false),
+   first_tp(0)
+{
+}
 
-
-void 
+void
 OLCTriangle::Reset()
 {
   ContestDijkstra::Reset();
@@ -61,23 +74,21 @@ OLCTriangle::Reset()
   best_d = 0;
 }
 
-
-fixed
-OLCTriangle::CalcLegDistance(const unsigned index) const
-{  
+gcc_pure
+static fixed
+CalcLegDistance(const ContestTraceVector &solution, const unsigned index)
+{
   // leg 0: 1-2
   // leg 1: 2-3
   // leg 2: 3-1
 
-  const GeoPoint &p_start = GetPoint(solution[index]).get_location();
-  const GeoPoint &p_dest =
-    GetPoint(solution[index < 2 ? index + 1 : 0]).get_location();
+  const GeoPoint &p_start = solution[index].GetLocation();
+  const GeoPoint &p_dest = solution[index < 2 ? index + 1 : 0].GetLocation();
 
   return p_start.Distance(p_dest);
 }
 
-
-bool 
+bool
 OLCTriangle::IsPathClosed() const
 {
 
@@ -86,7 +97,7 @@ OLCTriangle::IsPathClosed() const
   // note this may fail if resolution of sampled trace is too low
   assert(n_points > 0);
 
-  const GeoPoint end_location = GetPoint(n_points - 1).get_location();
+  const GeoPoint end_location = GetPoint(n_points - 1).GetLocation();
 
   fixed d_min(-1);
 
@@ -94,14 +105,13 @@ OLCTriangle::IsPathClosed() const
 
   for (unsigned start_index = 0; start_index <= first_tp; ++start_index) {
     const fixed d_this =
-      GetPoint(start_index).get_location().Distance(end_location);
+      GetPoint(start_index).GetLocation().Distance(end_location);
 
-    if (!positive(d_min) || (d_this < d_min)) {
+    if (!positive(d_min) || d_this < d_min)
       d_min = d_this;
-    } 
-    if (d_this<= fixed_int_constant(1000)) {
+
+    if (d_this <= max_distance)
       return true;
-    }
   }
 
   return false;
@@ -114,7 +124,7 @@ class TriangleSecondLeg {
 
 public:
   TriangleSecondLeg(bool _fai, const SearchPoint &_a, const SearchPoint &_b)
-    :is_fai(_fai), a(_a), b(_b), df_1(a.flat_distance(b)) {}
+    :is_fai(_fai), a(_a), b(_b), df_1(a.FlatDistanceTo(b)) {}
 
   struct Result {
     unsigned leg_distance, total_distance;
@@ -133,8 +143,8 @@ TriangleSecondLeg::Calculate(const SearchPoint &c, unsigned best) const
   // this is a heuristic to remove invalid triangles
   // we do as much of this in flat projection for speed
 
-  const unsigned df_2 = b.flat_distance(c);
-  const unsigned df_3 = c.flat_distance(a);
+  const unsigned df_2 = b.FlatDistanceTo(c);
+  const unsigned df_3 = c.FlatDistanceTo(a);
   const unsigned df_total = df_1+df_2+df_3;
 
   // require some distance!
@@ -150,50 +160,45 @@ TriangleSecondLeg::Calculate(const SearchPoint &c, unsigned best) const
   const unsigned shortest = min(df_1, min(df_2, df_3));
 
   // require all legs to have distance
-  if (!shortest) {
+  if (!shortest)
     return Result(0, 0);
-  }
 
-  if (is_fai && (shortest*4<df_total)) { // fails min < 25% worst-case rule!
+  if (is_fai && (shortest*4<df_total))
+    // fails min < 25% worst-case rule!
     return Result(0, 0);
-  }
 
-  const unsigned d = df_3+df_2;
+  const unsigned d = df_3 + df_2;
 
   // without FAI rules, allow any triangle
-  if (!is_fai) {
+  if (!is_fai)
     return Result(d, df_total);
-  }
 
-  if (shortest*25>=df_total*7) { 
+  if (shortest * 25 >= df_total * 7)
     // passes min > 28% rule,
     // this automatically means we pass max > 45% worst-case
     return Result(d, df_total);
-  }
 
   const unsigned longest = max(df_1, max(df_2, df_3));
-  if (longest*20>df_total*9) { // fails max > 45% worst-case rule!
+  if (longest * 20 > df_total * 9) // fails max > 45% worst-case rule!
     return Result(0, 0);
-  }
 
   // passed basic tests, now detailed ones
 
   // find accurate min leg distance
   fixed leg(0);
-  if (df_1 == shortest) {
-    leg = a.get_location().Distance(b.get_location());
-  } else if (df_2 == shortest) {
-    leg = b.get_location().Distance(c.get_location());
-  } else if (df_3 == shortest) {
-    leg = c.get_location().Distance(a.get_location());
-  }
+  if (df_1 == shortest)
+    leg = a.GetLocation().Distance(b.GetLocation());
+  else if (df_2 == shortest)
+    leg = b.GetLocation().Distance(c.GetLocation());
+  else if (df_3 == shortest)
+    leg = c.GetLocation().Distance(a.GetLocation());
 
   // estimate total distance by scaling.
   // this is a slight approximation, but saves having to do
   // three accurate distance calculations.
 
-  const fixed d_total((df_total*leg)/shortest);
-  if (d_total>=fixed(500000)) {
+  const fixed d_total(df_total* leg / shortest);
+  if (d_total >= fixed(500000)) {
     // long distance, ok that it failed 28% rule
     return Result(d, df_total);
   }
@@ -208,94 +213,121 @@ OLCTriangle::AddStartEdges()
   // use last point as single start,
   // this is out of order but required
 
-  ScanTaskPoint destination(0, n_points-1);
+  ScanTaskPoint destination(0, n_points - 1);
   LinkStart(destination);
 }
 
+void
+OLCTriangle::AddTurn1Edges(const ScanTaskPoint origin)
+{
+  // add points up to finish
 
-void 
+  const ScanTaskPoint begin(origin.GetStageNumber() + 1, 0);
+  const ScanTaskPoint end(origin.GetStageNumber() + 1, origin.GetPointIndex());
+
+  for (ScanTaskPoint i = begin; i != end; i.IncrementPointIndex()) {
+    const unsigned d = CalcEdgeDistance(origin, i);
+
+    if (!is_fai || 4 * d >= best_d)
+      /* no reason to add candidate if worse than 25% rule for FAI
+         tasks */
+      Link(i, origin, GetStageWeight(origin.GetStageNumber()) * d);
+  }
+}
+
+void
+OLCTriangle::AddTurn2Edges(const ScanTaskPoint origin)
+{
+  ScanTaskPoint previous = dijkstra.GetPredecessor(origin);
+
+  // give first leg points to penultimate node
+  TriangleSecondLeg sl(is_fai, GetPoint(previous), GetPoint(origin));
+
+  const ScanTaskPoint begin(origin.GetStageNumber() + 1,
+                            origin.GetPointIndex() + 1);
+  const ScanTaskPoint end(origin.GetStageNumber() + 1, n_points - 1);
+
+  for (ScanTaskPoint i = begin; i != end; i.IncrementPointIndex()) {
+    TriangleSecondLeg::Result result = sl.Calculate(GetPoint(i), best_d);
+    const unsigned d = result.leg_distance;
+    if (d > 0) {
+      best_d = result.total_distance;
+
+      Link(i, origin, GetStageWeight(origin.GetStageNumber()) * d);
+
+      // we have an improved solution
+      is_complete = true;
+
+      // need to scan again whether path is closed
+      is_closed = false;
+      first_tp = origin.GetPointIndex();
+    }
+  }
+}
+
+void
+OLCTriangle::AddFinishEdges(const ScanTaskPoint origin)
+{
+  assert(IsFinal(origin.GetStageNumber() + 1));
+
+  if (predict) {
+    // dummy just to close the triangle
+    Link(ScanTaskPoint(origin.GetStageNumber() + 1, n_points - 1), origin, 0);
+  } else {
+    const ScanTaskPoint start = FindStart(origin);
+    const TracePoint &start_point = GetPoint(start);
+    const TracePoint &origin_point = GetPoint(origin);
+
+    const unsigned max_range =
+      trace_master.ProjectRange(origin_point.GetLocation(), max_distance);
+
+    /* check all remaining points, see which ones match the
+       conditions */
+    const ScanTaskPoint begin(origin.GetStageNumber() + 1, 0);
+    const ScanTaskPoint end(origin.GetStageNumber() + 1,
+                            origin.GetPointIndex());
+    for (ScanTaskPoint i = begin; i != end; i.IncrementPointIndex())
+      if (CalcEdgeDistance(start, i) <= max_range &&
+          start_point.GetLocation().Distance(GetPoint(i).GetLocation()) < max_distance)
+        Link(i, origin, CalcEdgeDistance(origin, i));
+  }
+}
+
+void
 OLCTriangle::AddEdges(const ScanTaskPoint origin)
 {
   assert(origin.GetPointIndex() < n_points);
 
   switch (origin.GetStageNumber()) {
   case 0:
-    // add points up to finish
-    for (ScanTaskPoint destination(origin.GetStageNumber() + 1, 0),
-           end(origin.GetStageNumber() + 1, origin.GetPointIndex());
-         destination != end; destination.IncrementPointIndex()) {
-      const unsigned d = CalcEdgeDistance(origin, destination);
-
-      if (!is_fai || (4*d >= best_d)) { // no reason to add candidate if worse
-                                        // than 25% rule for FAI tasks
-        Link(destination, origin, GetStageWeight(origin.GetStageNumber()) * d);
-      }
-
-    }
+    AddTurn1Edges(origin);
     break;
-  case 1: {
-    ScanTaskPoint previous = dijkstra.GetPredecessor(origin);
 
-    // give first leg points to penultimate node
-    TriangleSecondLeg sl(is_fai, GetPoint(previous), GetPoint(origin));
-    for (ScanTaskPoint destination(origin.GetStageNumber() + 1,
-                                   origin.GetPointIndex() + 1),
-           end(origin.GetStageNumber() + 1, n_points - 1);
-         destination != end; destination.IncrementPointIndex()) {
-      TriangleSecondLeg::Result result = sl.Calculate(GetPoint(destination),
-                                                      best_d);
-      const unsigned d = result.leg_distance;
-      if (d) {
-        best_d = result.total_distance;
-
-        Link(destination, origin, GetStageWeight(origin.GetStageNumber()) * d);
-
-        // we have an improved solution
-        is_complete = true;
-
-        // need to scan again whether path is closed
-        is_closed = false;
-        first_tp = origin.GetPointIndex();
-      }
-    }
-  }
+  case 1:
+    AddTurn2Edges(origin);
     break;
+
   case 2:
-    // dummy just to close the triangle
-    Link(ScanTaskPoint(origin.GetStageNumber() + 1, n_points - 1), origin, 0);
+    AddFinishEdges(origin);
     break;
+
   default:
-    assert(1);
+    assert(false);
   }
 }
 
-
-fixed
-OLCTriangle::CalcDistance() const
+ContestResult
+OLCTriangle::CalculateResult(const ContestTraceVector &solution) const
 {
-  if (is_complete) {
-    return CalcLegDistance(0) + CalcLegDistance(1) + CalcLegDistance(2);
-  } else {
-    return fixed_zero;
-  }
-}
-
-
-fixed
-OLCTriangle::CalcTime() const
-{
-  if (!n_points)
-    return fixed_zero;
-
-  return fixed(GetPoint(n_points - 1).DeltaTime(GetPoint(0)));
-}
-
-
-fixed
-OLCTriangle::CalcScore() const
-{
-  // one point per km
-  return ApplyHandicap(CalcDistance()*fixed(0.001));
+  ContestResult result;
+  result.time = n_points > 0
+    ? fixed(GetPoint(n_points - 1).DeltaTime(GetPoint(0)))
+    : fixed_zero;
+  result.distance = is_complete
+    ? CalcLegDistance(solution, 0) + CalcLegDistance(solution, 1) + CalcLegDistance(solution, 2)
+    : fixed_zero;
+  result.score = ApplyHandicap(result.distance * fixed(0.001));
+  return result;
 }
 
 void
@@ -303,8 +335,7 @@ OLCTriangle::StartSearch()
 {
 }
 
-
-bool 
+bool
 OLCTriangle::UpdateScore()
 {
   // RESERVED FOR FUTURE USE: DO NOT DELETE
@@ -322,19 +353,13 @@ OLCTriangle::UpdateScore()
   return false;
 }
 
-bool
-OLCTriangle::SaveSolution()
+void
+OLCTriangle::CopySolution(ContestTraceVector &result) const
 {
   assert(num_stages <= MAX_STAGES);
-  assert(solution_valid);
 
-  if (AbstractContest::SaveSolution()) {
-    best_solution.clear();
-
-    for (int i = 3; i >= 0; --i)
-      best_solution.append(GetPoint(solution[i]));
-
-    return true;
-  }
-  return false;
+  ContestDijkstra::CopySolution(result);
+  assert(result.size() == 4);
+  std::swap(result[0], result[3]);
+  std::swap(result[1], result[2]);
 }

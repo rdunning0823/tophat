@@ -22,73 +22,64 @@
 */
 
 #include "Replay/NmeaReplay.hpp"
-#include "IO/FileLineReader.hpp"
-#include "Util/StringUtil.hpp"
+#include "IO/LineReader.hpp"
+#include "Device/Parser.hpp"
+#include "Device/Driver.hpp"
+#include "Device/Register.hpp"
+#include "Profile/DeviceConfig.hpp"
+#include "OS/Clock.hpp"
+#include "NMEA/Info.hpp"
 
-#include <algorithm>
+#include <string.h>
 
-#include "Navigation/GeoPoint.hpp"
-
-NmeaReplay::NmeaReplay() :
-  AbstractReplay(),
-  reader(NULL)
+NmeaReplay::NmeaReplay(NLineReader *_reader, const DeviceConfig &config)
+  :reader(_reader),
+   parser(new NMEAParser()),
+   device(NULL)
 {
-  file_name[0] = _T('\0');
+  parser->SetReal(false);
+  parser->SetIgnoreChecksum(config.ignore_checksum);
+
+  const struct DeviceRegister *driver = FindDriverByName(config.driver_name);
+  assert(driver != NULL);
+  if (driver->CreateOnPort != NULL) {
+    DeviceConfig config;
+    config.Clear();
+    device = driver->CreateOnPort(config, port);
+  }
 }
 
 NmeaReplay::~NmeaReplay()
 {
+  delete device;
+  delete parser;
   delete reader;
 }
 
-void
-NmeaReplay::Stop()
+bool
+NmeaReplay::ParseLine(const char *line, NMEAInfo &data)
 {
-  CloseFile();
+  if ((device != NULL && device->ParseNMEA(line, data)) ||
+      (parser != NULL && parser->ParseLine(line, data))) {
+    data.gps.replay = true;
+    data.alive.Update(fixed(MonotonicClockMS()) / 1000);
 
-  enabled = false;
-}
-
-void
-NmeaReplay::Start()
-{
-  if (enabled)
-    Stop();
-
-  if (!OpenFile()) {
-    OnBadFile();
-    return;
-  }
-
-  enabled = true;
-}
-
-const TCHAR*
-NmeaReplay::GetFilename()
-{
-  return file_name;
-}
-
-void
-NmeaReplay::SetFilename(const TCHAR *name)
-{
-  if (!name || StringIsEmpty(name))
-    return;
-
-  if (_tcscmp(file_name, name) != 0)
-    _tcscpy(file_name, name);
+    return true;
+  } else
+    return false;
 }
 
 bool
-NmeaReplay::ReadUntilRMC(bool ignore)
+NmeaReplay::ReadUntilRMC(NMEAInfo &data, bool ignore)
 {
   char *buffer;
 
   while ((buffer = reader->read()) != NULL) {
     if (!ignore)
-      OnSentence(buffer);
+      ParseLine(buffer, data);
 
-    if (strstr(buffer, "$GPRMC") == buffer)
+    if (StringStartsWith(buffer, "$GPRMC") ||
+        StringStartsWith(buffer, "$FLYSEN"))
       return true;
   }
 
@@ -96,49 +87,17 @@ NmeaReplay::ReadUntilRMC(bool ignore)
 }
 
 bool
-NmeaReplay::Update()
+NmeaReplay::Update(NMEAInfo &data, fixed time_scale)
 {
-  if (!enabled)
-    return false;
-
   if (!UpdateTime())
     return true;
 
   for (fixed i = fixed_one; i <= time_scale; i += fixed_one) {
-    enabled = ReadUntilRMC(i != time_scale);
-    if (!enabled) {
-      Stop();
+    if (!ReadUntilRMC(data, i != time_scale))
       return false;
-    }
-  }
-
-  assert(enabled);
-  return true;
-}
-
-bool
-NmeaReplay::OpenFile()
-{
-  if (reader)
-    return true;
-
-  if (StringIsEmpty(file_name))
-    return false;
-
-  reader = new FileLineReaderA(file_name);
-  if (reader->error()) {
-    CloseFile();
-    return false;
   }
 
   return true;
-}
-
-void
-NmeaReplay::CloseFile()
-{
-  delete reader;
-  reader = NULL;
 }
 
 bool

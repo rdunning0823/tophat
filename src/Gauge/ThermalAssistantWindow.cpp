@@ -34,19 +34,28 @@
 #include "Screen/OpenGL/Scope.hpp"
 #endif
 
+RasterPoint
+ThermalAssistantWindow::LiftPoints::GetAverage() const
+{
+  RasterPoint avg = { 0, 0 };
+
+  for (auto it = begin(), it_end = end(); it != it_end; ++it) {
+    avg.x += it->x;
+    avg.y += it->y;
+  }
+
+  avg.x /= size();
+  avg.y /= size();
+
+  return avg;
+}
+
 ThermalAssistantWindow::ThermalAssistantWindow(const ThermalAssistantLook &_look,
                                                unsigned _padding, bool _small)
   :look(_look),
-   max_lift(fixed_one),
    padding(_padding),
    small(_small),
-   direction(Angle::Zero())
-{
-  for (unsigned i = 0; i <= 36; i++) {
-    lift_points[i].x = 0;
-    lift_points[i].y = 0;
-  }
-}
+   direction(Angle::Zero()) {}
 
 void
 ThermalAssistantWindow::OnResize(UPixelScalar width, UPixelScalar height)
@@ -62,46 +71,39 @@ ThermalAssistantWindow::OnResize(UPixelScalar width, UPixelScalar height)
 bool
 ThermalAssistantWindow::LeftTurn() const
 {
-  return derived.TurningLeft();
+  return circling.TurningLeft();
 }
 
 void
-ThermalAssistantWindow::Update(const Angle &_direction,
-                               const DerivedInfo &_derived)
+ThermalAssistantWindow::Update(const DerivedInfo &derived)
 {
-  direction = _direction;
-  derived = _derived;
-
-  UpdateLiftMax();
-  UpdateLiftPoints();
+  direction = derived.heading;
+  circling = (CirclingInfo)derived;
+  vario = (VarioInfo)derived;
 
   Invalidate();
 }
 
-void
-ThermalAssistantWindow::UpdateLiftMax()
+fixed
+ThermalAssistantWindow::CalculateMaxLift() const
 {
-  max_lift = fixed_one;
-
-  for (unsigned i = 0; i < 36; i++)
-    max_lift = std::max(max_lift, fabs(derived.lift_database[i]));
-
-  max_lift = ceil(max_lift);
+  return std::max(fixed_one,
+                  *std::max_element(vario.lift_database.begin(),
+                                    vario.lift_database.end()));
 }
 
 void
-ThermalAssistantWindow::UpdateLiftPoints()
+ThermalAssistantWindow::CalculateLiftPoints(LiftPoints &lift_points,
+                                            fixed max_lift) const
 {
-  lift_point_avg.x = 0;
-  lift_point_avg.y = 0;
-
-  for (unsigned i = 0; i < 36; i++) {
+  for (unsigned i = 0; i < lift_points.size(); i++) {
     Angle d = Angle::Degrees(fixed(i * 10));
 
-    lift_points[i].x = (int)((d - direction).cos() *
-                       RangeScale(derived.lift_database[i]));
-    lift_points[i].y = (int)((d - direction).sin() *
-                       RangeScale(derived.lift_database[i]));
+    auto sincos = (d - direction).SinCos();
+    auto scale = NormalizeLift(vario.lift_database[i], max_lift) * fixed(radius);
+
+    lift_points[i].x = (int)(sincos.second * scale);
+    lift_points[i].y = (int)(sincos.first * scale);
 
     if (!LeftTurn()) {
       lift_points[i].x *= -1;
@@ -110,21 +112,14 @@ ThermalAssistantWindow::UpdateLiftPoints()
 
     lift_points[i].x += mid.x;
     lift_points[i].y += mid.y;
-
-    lift_point_avg.x += lift_points[i].x;
-    lift_point_avg.y += lift_points[i].y;
   }
-  lift_points[36] = lift_points[0];
-
-  lift_point_avg.x /= 36;
-  lift_point_avg.y /= 36;
 }
 
 fixed
-ThermalAssistantWindow::RangeScale(fixed lift) const
+ThermalAssistantWindow::NormalizeLift(fixed lift, fixed max_lift)
 {
   lift = (lift + max_lift) / Double(max_lift);
-  return std::min(fixed_one, std::max(fixed_zero, lift)) * fixed(radius);
+  return std::min(fixed_one, std::max(fixed_zero, lift));
 }
 
 void
@@ -149,7 +144,7 @@ ThermalAssistantWindow::PaintRadarPlane(Canvas &canvas) const
 }
 
 void
-ThermalAssistantWindow::PaintRadarBackground(Canvas &canvas) const
+ThermalAssistantWindow::PaintRadarBackground(Canvas &canvas, fixed max_lift) const
 {
   canvas.Clear(look.background_color);
   canvas.SelectHollowBrush();
@@ -182,7 +177,8 @@ ThermalAssistantWindow::PaintRadarBackground(Canvas &canvas) const
 }
 
 void
-ThermalAssistantWindow::PaintPoints(Canvas &canvas) const
+ThermalAssistantWindow::PaintPoints(Canvas &canvas,
+                                    const LiftPoints &lift_points) const
 {
 #ifdef ENABLE_OPENGL
   GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -192,13 +188,14 @@ ThermalAssistantWindow::PaintPoints(Canvas &canvas) const
 
   canvas.Select(look.polygon_brush);
   canvas.Select(look.polygon_pen);
-  canvas.DrawPolygon(lift_points, 36);
+  canvas.DrawPolygon(lift_points.data(), lift_points.size());
 }
 
 void
-ThermalAssistantWindow::PaintAdvisor(Canvas &canvas) const
+ThermalAssistantWindow::PaintAdvisor(Canvas &canvas,
+                                     const LiftPoints &lift_points) const
 {
-  canvas.DrawLine(mid.x, mid.y, lift_point_avg.x, lift_point_avg.y);
+  canvas.DrawLine(mid, lift_points.GetAverage());
 }
 
 void
@@ -217,13 +214,18 @@ ThermalAssistantWindow::PaintNotCircling(Canvas &canvas) const
 void
 ThermalAssistantWindow::OnPaintBuffer(Canvas &canvas)
 {
-  PaintRadarBackground(canvas);
-  if (!derived.circling) {
+  fixed max_lift = ceil(CalculateMaxLift());
+
+  PaintRadarBackground(canvas, max_lift);
+  if (!circling.circling) {
     PaintNotCircling(canvas);
     return;
   }
 
+  LiftPoints lift_points;
+  CalculateLiftPoints(lift_points, max_lift);
+  PaintPoints(canvas, lift_points);
+  PaintAdvisor(canvas, lift_points);
+
   PaintRadarPlane(canvas);
-  PaintPoints(canvas);
-  PaintAdvisor(canvas);
 }

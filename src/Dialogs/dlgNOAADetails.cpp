@@ -22,16 +22,21 @@ Copyright_License {
 */
 
 #include "Dialogs/Weather.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/JobDialog.hpp"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
+#include "Dialogs/Message.hpp"
+#include "Form/Form.hpp"
+#include "Form/Button.hpp"
+#include "Form/Edit.hpp"
 #include "Language/Language.hpp"
-#include "Net/Features.hpp"
+#include "Weather/Features.hpp"
 
-#ifdef HAVE_NET
+#ifdef HAVE_NOAA
 
 #include "Weather/NOAAGlue.hpp"
 #include "Weather/NOAAStore.hpp"
+#include "Weather/NOAAUpdater.hpp"
 #include "Weather/METAR.hpp"
 #include "Weather/ParsedMETAR.hpp"
 #include "Weather/TAF.hpp"
@@ -56,12 +61,12 @@ Update()
   StaticString<100> caption;
   caption.Format(_T("%s: "), _("METAR and TAF"));
 
-  ParsedMETAR parsed;
-  if (!station_iterator->GetParsedMETAR(parsed) ||
-      !parsed.name_available)
+  if (!station_iterator->parsed_metar_available ||
+      !station_iterator->parsed_metar.name_available)
     caption += station_iterator->GetCodeT();
   else
-    caption.AppendFormat(_T("%s (%s)"), parsed.name.c_str(),
+    caption.AppendFormat(_T("%s (%s)"),
+                         station_iterator->parsed_metar.name.c_str(),
                          station_iterator->GetCodeT());
 
   wf->SetCaption(caption);
@@ -72,7 +77,7 @@ UpdateClicked(gcc_unused WndButton &Sender)
 {
   DialogJobRunner runner(wf->GetMainWindow(), wf->GetLook(),
                          _("Download"), true);
-  station_iterator->Update(runner);
+  NOAAUpdater::Update(*station_iterator, runner);
   Update();
 }
 
@@ -98,7 +103,7 @@ CloseClicked(gcc_unused WndButton &Sender)
   wf->SetModalResult(mrOK);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(UpdateClicked),
   DeclareCallBackEntry(RemoveClicked),
   DeclareCallBackEntry(CloseClicked),

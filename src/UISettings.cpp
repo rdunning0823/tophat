@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "UISettings.hpp"
-#include "Asset.hpp"
 
 void
 UISettings::SetDefaults()
@@ -33,8 +32,7 @@ UISettings::SetDefaults()
 
   custom_fonts = false;
 
-  enable_thermal_assistant_gauge = true;
-  final_glide_bar_mc0_enabled = true;
+  enable_thermal_assistant_gauge = false;
 
   popup_message_position = smAlignCenter;
 
@@ -49,4 +47,5 @@ UISettings::SetDefaults()
   traffic.SetDefaults();
   pages.SetDefaults();
   dialog.SetDefaults();
+  sound.SetDefaults();
 }

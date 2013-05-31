@@ -27,6 +27,7 @@
 #include "Util/StaticArray.hpp"
 
 #include <windef.h> // for MAX_PATH
+#include <tchar.h>
 
 struct TaskBehaviour;
 class Waypoints;
@@ -36,6 +37,7 @@ class TaskFile
 {
 protected:
   StaticString<MAX_PATH> path;
+  StaticArray<TCHAR *, 64> namesuffixes;
 
 protected:
   TaskFile(const TCHAR *_path)
@@ -61,7 +63,7 @@ public:
                                unsigned index) const = 0;
   virtual unsigned Count() = 0;
 
-  StaticArray<TCHAR *, 64> namesuffixes;
+  const TCHAR *GetName(unsigned index) const;
 };
 
 #endif

@@ -25,13 +25,15 @@
 
 #include "Compiler.h"
 #include "Util/NonCopyable.hpp"
-#include "Tasks/AlternateTask.hpp"
-#include "Tasks/GotoTask.hpp"
-#include "Tasks/OrderedTask.hpp"
-#include "TaskStats/TaskStats.hpp"
-#include "TaskStats/CommonStats.hpp"
+#include "Unordered/AlternateTask.hpp"
+#include "Unordered/GotoTask.hpp"
+#include "Ordered/OrderedTask.hpp"
+#include "Stats/TaskStats.hpp"
+#include "Stats/CommonStats.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
 #include "TaskBehaviour.hpp"
+#include "Navigation/Aircraft.hpp"
+#include "PeriodClock.hpp"
 
 class AbstractTaskFactory;
 class TaskEvents;
@@ -76,6 +78,11 @@ private:
   TaskStats null_stats;
 
   CommonStats common_stats;
+
+  /**
+   * time stamp of when the ordered task last was committed
+   */
+  unsigned task_time_stamp;
 
 public:
   friend class Serialiser;
@@ -188,10 +195,12 @@ public:
    *
    * @param state_now Current aircraft state
    * @param state_last Aircraft state at last update
+   * @param waypoints
    * @return True if internal state changed
    */
   bool Update(const AircraftState &state_now, 
-              const AircraftState &state_last);
+              const AircraftState &state_last,
+              const Waypoints &waypoints);
 
   /**
    * Updates internal state of task to produce
@@ -213,6 +222,12 @@ public:
    * @return True if MC updated
    */
   bool UpdateAutoMC(const AircraftState& state_now, const fixed fallback_mc);
+
+  /**
+   * loads the Mat points vector to the current task if it is a Mat
+   * @param waypoints the list of active waypoints
+   */
+  void FillMatPoints(const Waypoints &waypoints);
 
   /**
    * Accessor for statistics of active task
@@ -313,7 +328,7 @@ public:
    * @param that OrderedTask to copy
    * @return True if this task changed
    */
-  bool Commit(const OrderedTask& that);
+  bool Commit(const OrderedTask& that, const Waypoints &waypoints);
 
   /**
    * Accessor for task advance system
@@ -321,7 +336,7 @@ public:
    * @return Task advance mechanism
    */
   const TaskAdvance &GetTaskAdvance() const {
-    return task_ordered.get_task_advance();
+    return task_ordered.GetTaskAdvance();
   }
 
   /**
@@ -330,7 +345,7 @@ public:
    * @return Task advance mechanism
    */
   TaskAdvance& GetTaskAdvance() {
-    return task_ordered.get_task_advance();
+    return task_ordered.GetTaskAdvance();
   }
 
   /**
@@ -514,7 +529,7 @@ public:
    * @return Read-only OrderedTaskBehaviour
    */
   const OrderedTaskBehaviour &GetOrderedTaskBehaviour() const {
-    return task_ordered.get_ordered_task_behaviour();
+    return task_ordered.GetOrderedTaskBehaviour();
   }
 
   /** 
@@ -523,7 +538,7 @@ public:
    * @return OrderedTaskBehaviour reference
    */
   OrderedTaskBehaviour &GetOrderedTaskBehaviour() {
-    return task_ordered.get_ordered_task_behaviour();
+    return task_ordered.GetOrderedTaskBehaviour();
   }
 
   /** 
@@ -557,12 +572,24 @@ public:
    */
   void TakeoffAutotask(const GeoPoint &ref, const fixed terrain_alt);
 
+  /**
+   * is the current ordered task a Mat?
+   * return True if so.
+   */
+  bool IsMat() const;
+  /**
+   * returns time stamp when ordered task was last committed
+   */
+  unsigned GetTaskTimeStamp() const {
+    return task_time_stamp;
+  }
+
 private:
   TaskMode SetMode(const TaskMode mode);
 
   void UpdateCommonStats(const AircraftState &state);
   void UpdateCommonStatsTimes(const AircraftState &state);
-  void UpdateCommonStatsTask(const AircraftState &state);
+  void UpdateCommonStatsTask();
   void UpdateCommonStatsWaypoints(const AircraftState &state);
   void UpdateCommonStatsPolar(const AircraftState &state);
 };

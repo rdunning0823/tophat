@@ -21,13 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_POLAR_WINPILOT_HPP
-#define XCSOAR_POLAR_WINPILOT_HPP
+#ifndef XCSOAR_POLAR_INFO_HPP
+#define XCSOAR_POLAR_INFO_HPP
 
+#include "Shape.hpp"
 #include "Math/fixed.hpp"
-#include <tchar.h>
 
-class TLineReader;
 struct PolarCoefficients;
 
 /**
@@ -39,21 +38,18 @@ struct PolarInfo
   //
   fixed reference_mass; /**< Reference Mass (kg) */
   fixed max_ballast;  /**< Max water ballast (l) */
-  fixed v1;           /**< Speed (m/s) of point 1 */
-  fixed w1;           /**< Sink rate (negative, m/s) of point 1  */
-  fixed v2;           /**< Speed (m/s) of point 2 */
-  fixed w2;           /**< Sink rate (negative, m/s) of point 2  */
-  fixed v3;           /**< Speed (m/s) of point 3 */
-  fixed w3;           /**< Sink rate (negative, m/s) of point 3  */
+
+  PolarShape shape;
+
   fixed wing_area;    /**< Reference wing area (m^2) */
   fixed v_no;         /**< Maximum speed for normal operations (m/s) */
 
-  bool ReadString(const TCHAR* line);
-  void GetString(TCHAR* line, size_t size, bool include_v_no = false) const;
-
+  gcc_pure
   PolarCoefficients CalculateCoefficients() const;
 
-  bool IsValid() const;
+  bool IsValid() const {
+    return shape.IsValid();
+  }
 };
 
 #endif

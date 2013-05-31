@@ -64,6 +64,13 @@ namespace InputEvents
   void LeaveMode(const TCHAR *mode);
 
   /**
+   * Is the current mode this mode?
+   * @param mode.  The mode to check against
+   * @return. true if the current mode is the same.
+   */
+  bool IsMode(const TCHAR *mode);
+
+  /**
    * Set the "flavour" of the current mode.  It is an optional string
    * that gets appended to the current mode name, separated with a
    * dot, to build a new "overlay" mode.  This may be used to replace
@@ -80,6 +87,12 @@ namespace InputEvents
    */
   gcc_pure
   bool IsFlavour(const TCHAR *flavour);
+
+  /**
+   * @return: true if current mode is MODE_DEFAULT
+   */
+  gcc_pure
+  bool IsDefault();
 
   /**
    * Process an event chain.
@@ -101,14 +114,6 @@ namespace InputEvents
   // helpers (temporary)
 
   void sub_TerrainTopography(int vswitch);
-  void SetPan(bool enable);
-  void TogglePan();
-
-  /**
-   * Leave pan mode, but only if the map is visible and currently
-   * panning.
-   */
-  void LeavePan();
 
   void sub_PanCursor(int dx, int dy);
   void sub_AutoZoom(int vswitch);
@@ -129,6 +134,7 @@ namespace InputEvents
   void eventCalculator(const TCHAR *misc);
   void eventChangeInfoBoxType(const TCHAR *misc);
   void eventChecklist(const TCHAR *misc);
+  void eventStartupTips(gcc_unused const TCHAR *misc);
   void eventClearAirspaceWarnings(const TCHAR *misc);
   void eventClearStatusMessages(const TCHAR *misc);
   void eventLogger(const TCHAR *misc);
@@ -177,6 +183,7 @@ namespace InputEvents
   void eventAutoLogger(const TCHAR *misc);
   void eventGotoLookup(const TCHAR *misc);
   void eventAddWaypoint(const TCHAR *misc);
+  void eventDownloadFlightLog(const TCHAR *misc);
   void eventOrientation(const TCHAR *misc);
   void eventTraffic(const TCHAR *misc);
   void eventFlarmTraffic(const TCHAR *misc);
@@ -184,6 +191,8 @@ namespace InputEvents
   void eventCredits(const TCHAR *misc);
   void eventWeather(const TCHAR *misc);
   void eventQuickMenu(const TCHAR *misc);
+  void eventFileManager(const TCHAR *misc);
+
   // -------
 };
 

@@ -33,6 +33,8 @@ Copyright_License {
 #include "Screen/Point.hpp"
 
 class Canvas;
+class Pen;
+struct Color;
 
 bool
 Segment(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
@@ -49,5 +51,13 @@ KeyHole(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
 void
 RoundRect(Canvas &canvas, PixelScalar left, PixelScalar top,
           PixelScalar right, PixelScalar bottom, UPixelScalar radius);
+#ifdef ENABLE_OPENGL
+/**
+ * draws fancy button
+ */
+void DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
+                     const Pen &light_border_pen, Color background_color,
+                     bool focused, bool pressed, bool transparent);
+#endif
 
 #endif

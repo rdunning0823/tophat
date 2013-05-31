@@ -19,10 +19,9 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
  */
+
 #include "GlideState.hpp"
-#include <math.h>
-#include "Util/Quadratic.hpp"
-#include "Navigation/SpeedVector.hpp"
+#include "Math/Quadratic.hpp"
 
 /**
  * Quadratic function solver for MacCready theory constraint equation

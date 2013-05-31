@@ -49,8 +49,6 @@ typedef char TCHAR;
 #define _tcscpy strcpy
 #define _tcscmp strcmp
 #define _tcsncmp strncmp
-#define _tcsicmp strcasecmp
-#define _tcsnicmp strncasecmp
 #define _tcslen strlen
 #define _tcsclen strlen
 #define _tcsstr strstr
@@ -60,31 +58,17 @@ typedef char TCHAR;
 #define _tcscat strcat
 #define _tcsncat strncat
 #define _T(x) x
-#define _TDIR DIR
-#define _topendir opendir
-#define _tclosedir closedir
-#define _treaddir readdir
-#define _tdirent dirent
-#define _tstat stat
 #define _tfopen fopen
 #define _TEOF EOF
 #define _fgetts fgets
 #define _putts puts
 #define _stscanf sscanf
 
-#define _tremove remove
-#define _tunlink unlink
-
 #define _tcstok strtok
 #define _totupper toupper
-#define _itot itoa
-#define _ttoi atoi
 #define _tcstol strtol
-#define _tcstoul strtoul
 #define _tcstod strtod
-#define _tcscspn strcspn
 
-#define _istalpha isalpha
 #define _istalnum isalnum
 #define _istpunct ispunct
 

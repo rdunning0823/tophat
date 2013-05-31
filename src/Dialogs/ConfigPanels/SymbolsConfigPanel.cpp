@@ -32,17 +32,16 @@ Copyright_License {
 #include "Form/RowFormWidget.hpp"
 #include "Dialogs/CallBackTable.hpp"
 #include "UIGlobals.hpp"
+#include "MapSettings.hpp"
 
 enum ControlIndex {
-  DisplayTrackBearing,
-  EnableFLARMMap,
-  Trail,
-  TrailDrift,
-  SnailType,
-  SnailWidthScale,
-  DetourCostMarker,
-  AircraftSymbol,
-  WindArrowStyle
+  REACH_DISPLAY,
+  ENABLE_FLARM_MAP,
+  TRAIL_LENGTH,
+  TRAIL_DRIFT,
+  TRAIL_TYPE,
+  TRAIL_WIDTH,
+  WIND_ARROW_STYLE
 };
 
 class SymbolsConfigPanel
@@ -66,61 +65,50 @@ private:
 void
 SymbolsConfigPanel::ShowTrailControls(bool show)
 {
-  SetRowVisible(TrailDrift, show);
-  SetRowVisible(SnailType, show);
-  SetRowVisible(SnailWidthScale, show);
+  SetRowVisible(TRAIL_DRIFT, show);
+  SetRowVisible(TRAIL_TYPE, show);
+  SetRowVisible(TRAIL_WIDTH, show);
 }
 
 void
 SymbolsConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(Trail, df)) {
-    TrailLength trail_length = (TrailLength)df.GetAsInteger();
-    ShowTrailControls(trail_length != TRAIL_OFF);
+  if (IsDataField(TRAIL_LENGTH, df)) {
+    TrailSettings::Length trail_length = (TrailSettings::Length)df.GetAsInteger();
+    ShowTrailControls(trail_length != TrailSettings::Length::OFF);
   }
 }
 
-static const StaticEnumChoice  track_bearing_mode_list[] = {
-  { 0, N_("Off"), N_("Disable display of track bearing.") },
-  { 1, N_("On"), N_("Always display track bearing.") },
-  { 2, N_("Auto"), N_("Display track bearing if there is a significant difference to plane heading.") },
+static const StaticEnumChoice  ground_track_mode_list[] = {
+  { (unsigned)DisplayGroundTrack::OFF, N_("Off"), N_("Disable display of ground track line.") },
+  { (unsigned)DisplayGroundTrack::ON, N_("On"), N_("Always display ground track line.") },
+  { (unsigned)DisplayGroundTrack::AUTO, N_("Auto"), N_("Display ground track line if there is a significant difference to plane heading.") },
   { 0 }
 };
 
 const TCHAR *trail_length_help = N_("Determines whether and how long a snail trail is drawn behind the glider.");
 static const StaticEnumChoice  trail_length_list[] = {
-  { TRAIL_OFF, N_("Off"), trail_length_help },
-  { TRAIL_LONG, N_("Long"), trail_length_help },
-  { TRAIL_SHORT, N_("Short"), trail_length_help },
-  { TRAIL_FULL, N_("Full"), trail_length_help },
+  { (unsigned)TrailSettings::Length::OFF, N_("Off"), trail_length_help },
+  { (unsigned)TrailSettings::Length::LONG, N_("Long"), trail_length_help },
+  { (unsigned)TrailSettings::Length::SHORT, N_("Short"), trail_length_help },
+  { (unsigned)TrailSettings::Length::FULL, N_("Full"), trail_length_help },
   { 0 }
 };
 
 const TCHAR *trail_type_help = N_("Sets the type of the snail trail display.");
 static const StaticEnumChoice  trail_type_list[] = {
-  { 0, N_("Vario #1"), trail_type_help },
-  { 1, N_("Vario #2"), trail_type_help },
-  { 2, N_("Altitude"), trail_type_help },
-  { 0 }
-};
-
-static const StaticEnumChoice  aircraft_symbol_list[] = {
-  { acSimple, N_("Simple"),
-    N_("Simplified line graphics, black with white contours.") },
-  { acSimpleLarge, N_("Simple (large)"),
-    N_("Enlarged simple graphics.") },
-  { acDetailed, N_("Detailed"),
-    N_("Detailed rendered aircraft graphics.") },
-  { acHangGlider, N_("HangGlider"),
-    N_("Simplified hang glider as line graphics, white with black contours.") },
-  { acParaGlider, N_("ParaGlider"),
-    N_("Simplified para glider as line graphics, white with black contours.") },
+  { (unsigned)TrailSettings::Type::VARIO_1, N_("Vario #1"), trail_type_help },
+  { (unsigned)TrailSettings::Type::VARIO_1_DOTS, N_("Vario #1 (with dots)"), trail_type_help },
+  { (unsigned)TrailSettings::Type::VARIO_2, N_("Vario #2"), trail_type_help },
+  { (unsigned)TrailSettings::Type::VARIO_2_DOTS, N_("Vario #2 (with dots)"), trail_type_help },
+  { (unsigned)TrailSettings::Type::ALTITUDE, N_("Altitude"), trail_type_help },
   { 0 }
 };
 
 static const StaticEnumChoice  wind_arrow_list[] = {
-  { 0, N_("Arrow head"), N_("Draws an arrow head only.") },
-  { 1, N_("Full arrow"), N_("Draws an arrow head with a dashed arrow line.") },
+  { (unsigned)WindArrowStyle::NO_ARROW, N_("Off"), N_("No wind arrow is drawn.") },
+  { (unsigned)WindArrowStyle::ARROW_HEAD, N_("Arrow head"), N_("Draws an arrow head only.") },
+  { (unsigned)WindArrowStyle::FULL_ARROW, N_("Full arrow"), N_("Draws an arrow head with a dashed arrow line.") },
   { 0 }
 };
 
@@ -128,47 +116,48 @@ void
 SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
+  const ComputerSettings &settings_computer = XCSoarInterface::GetComputerSettings();
+  const RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
 
-  AddEnum(_("Track bearing"),
-          _("Display the track bearing (ground track projection) on the map."),
-          track_bearing_mode_list, settings_map.display_track_bearing);
+  static constexpr StaticEnumChoice turning_reach_list[] = {
+    { (unsigned)RoutePlannerConfig::ReachMode::OFF, N_("Off"),
+      N_("Reachable terrain outline not displayed.") },
+    { (unsigned)RoutePlannerConfig::ReachMode::STRAIGHT, N_("On"),
+      N_("An outline is displayed over the contours of the terrain indicating how far the glider can reach in each direction.") },
+    { 0 }
+  };
+
+  AddEnum(_("Glidable terrain outline"),
+          _("Whether an outline is displayed on the terrain showing how far the glider can reach."),
+          turning_reach_list, (unsigned)route_planner.reach_calc_mode,
+          this);
 
   AddBoolean(_("FLARM traffic"), _("This enables the display of FLARM traffic on the map window."),
              settings_map.show_flarm_on_map);
 
   AddEnum(_("Trail length"), NULL, trail_length_list,
-          settings_map.trail_length, this);
-  SetExpertRow(Trail);
+          (unsigned)settings_map.trail.length, this);
+  SetExpertRow(TRAIL_LENGTH);
 
   AddBoolean(_("Trail drift"),
              _("Determines whether the snail trail is drifted with the wind when displayed in "
                  "circling mode."),
-             settings_map.trail_drift_enabled);
-  SetExpertRow(TrailDrift);
+             settings_map.trail.wind_drift_enabled);
+  SetExpertRow(TRAIL_DRIFT);
 
-  AddEnum(_("Trail type"), NULL, trail_type_list, (int)settings_map.snail_type);
-  SetExpertRow(SnailType);
+  AddEnum(_("Trail type"), NULL, trail_type_list, (int)settings_map.trail.type);
+  SetExpertRow(TRAIL_TYPE);
 
   AddBoolean(_("Trail scaled"),
              _("If set to ON the snail trail width is scaled according to the vario signal."),
-             settings_map.snail_scaling_enabled);
-  SetExpertRow(SnailWidthScale);
-
-  AddBoolean(_("Detour cost markers"),
-             _("If the aircraft heading deviates from the current waypoint, markers are displayed "
-                 "at points ahead of the aircraft. The value of each marker is the extra distance "
-                 "required to reach that point as a percentage of straight-line distance to the waypoint."),
-             settings_map.detour_cost_markers_enabled);
-  SetExpertRow(DetourCostMarker);
-
-  AddEnum(_("Aircraft symbol"), NULL, aircraft_symbol_list, settings_map.aircraft_symbol);
-  SetExpertRow(AircraftSymbol);
+             settings_map.trail.scaling_enabled);
+  SetExpertRow(TRAIL_WIDTH);
 
   AddEnum(_("Wind arrow"), _("Determines the way the wind arrow is drawn on the map."),
-          wind_arrow_list, settings_map.wind_arrow_style);
-  SetExpertRow(WindArrowStyle);
+          wind_arrow_list, (unsigned)settings_map.wind_arrow_style);
+  SetExpertRow(WIND_ARROW_STYLE);
 
-  ShowTrailControls(settings_map.trail_length != TRAIL_OFF);
+  ShowTrailControls(settings_map.trail.length != TrailSettings::Length::OFF);
 }
 
 bool
@@ -177,28 +166,25 @@ SymbolsConfigPanel::Save(bool &_changed, bool &_require_restart)
   bool changed = false, require_restart = false;
 
   MapSettings &settings_map = CommonInterface::SetMapSettings();
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
 
-  changed |= SaveValueEnum(DisplayTrackBearing, szProfileDisplayTrackBearing,
-                           settings_map.display_track_bearing);
+  changed |= SaveValueEnum(REACH_DISPLAY, ProfileKeys::TurningReach,
+                           route_planner.reach_calc_mode);
 
-  changed |= SaveValue(EnableFLARMMap, szProfileEnableFLARMMap,
+  changed |= SaveValue(ENABLE_FLARM_MAP, ProfileKeys::EnableFLARMMap,
                        settings_map.show_flarm_on_map);
 
-  changed |= SaveValueEnum(Trail, szProfileSnailTrail, settings_map.trail_length);
+  changed |= SaveValueEnum(TRAIL_LENGTH, ProfileKeys::SnailTrail, settings_map.trail.length);
 
-  changed |= SaveValue(TrailDrift, szProfileTrailDrift, settings_map.trail_drift_enabled);
+  changed |= SaveValue(TRAIL_DRIFT, ProfileKeys::TrailDrift, settings_map.trail.wind_drift_enabled);
 
-  changed |= SaveValueEnum(SnailType, szProfileSnailType, settings_map.snail_type);
+  changed |= SaveValueEnum(TRAIL_TYPE, ProfileKeys::SnailType, settings_map.trail.type);
 
-  changed |= SaveValue(SnailWidthScale, szProfileSnailWidthScale,
-                       settings_map.snail_scaling_enabled);
+  changed |= SaveValue(TRAIL_WIDTH, ProfileKeys::SnailWidthScale,
+                       settings_map.trail.scaling_enabled);
 
-  changed |= SaveValue(DetourCostMarker, szProfileDetourCostMarker,
-                       settings_map.detour_cost_markers_enabled);
-
-  changed |= SaveValueEnum(AircraftSymbol, szProfileAircraftSymbol, settings_map.aircraft_symbol);
-
-  changed |= SaveValueEnum(WindArrowStyle, szProfileWindArrowStyle, settings_map.wind_arrow_style);
+    changed |= SaveValueEnum(WIND_ARROW_STYLE, ProfileKeys::WindArrowStyle, settings_map.wind_arrow_style);
 
   _changed |= changed;
   _require_restart |= require_restart;

@@ -24,6 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_CSV_LINE_HPP
 #define XCSOAR_CSV_LINE_HPP
 
+#include "Util/Range.hpp"
 #include "Math/fixed.hpp"
 
 /**
@@ -36,8 +37,8 @@ protected:
 public:
   CSVLine(const char *line);
 
-  const char *Rest() const {
-    return data;
+  Range<const char *> Rest() const {
+    return Range<const char *>(data, end);
   }
 
   /**
@@ -56,6 +57,12 @@ public:
   }
 
   char ReadFirstChar();
+
+  /**
+   * Read a column, expect it to be exactly one character.  Returns 0
+   * on failure.
+   */
+  char ReadOneChar();
 
   void Read(char *dest, size_t size);
   bool ReadCompare(const char *value);
@@ -83,6 +90,14 @@ public:
   bool ReadChecked(long &value_r);
   bool ReadChecked(unsigned long &value_r);
   bool ReadChecked(unsigned &value_r);
+
+  /**
+   * Tries to read a hexadecimal number from the next field
+   * @param value_r A reference to the variable that the
+   * number should be written into
+   * @return True if number was read successfully, False otherwise
+   */
+  bool ReadHexChecked(long &value_r);
 
   /**
    * Read a #fixed only if the unit string which follows matches.

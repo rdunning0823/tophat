@@ -86,8 +86,6 @@ private:
   DrawInfo label_middle;
   DrawInfo label_bottom;
 
-  Unit unit;
-
   RasterPoint polys[(gmax * 2 + 1) * 3];
   RasterPoint lines[gmax * 2 + 1];
 
@@ -110,6 +108,10 @@ protected:
 
   const ComputerSettings &GetComputerSettings() const {
     return blackboard.GetComputerSettings();
+  }
+
+  const GlidePolar &GetGlidePolar() const {
+    return GetComputerSettings().polar.glide_polar_task;
   }
 
   const VarioSettings &Settings() const {

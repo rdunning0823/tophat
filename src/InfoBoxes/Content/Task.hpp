@@ -87,7 +87,7 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
-class InfoBoxContentNextLD: public InfoBoxContent
+class InfoBoxContentNextGR: public InfoBoxContent
 {
 public:
   virtual void Update(InfoBoxData &data);
@@ -123,7 +123,7 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
-class InfoBoxContentFinalLD: public InfoBoxContent
+class InfoBoxContentFinalGRTE: public InfoBoxContent
 {
 public:
   virtual void Update(InfoBoxData &data);
@@ -135,7 +135,23 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
-class InfoBoxContentHomeDistance: public InfoBoxContent
+class InfoBoxContentHome : public InfoBoxContent
+{
+public:
+  virtual const DialogContent *GetDialogContent();
+
+  static const DialogContent dlgContent;
+
+  virtual void Update(InfoBoxData &data) = 0;
+};
+
+class InfoBoxContentHomeDistance : public InfoBoxContentHome
+{
+public:
+  virtual void Update(InfoBoxData &data);
+};
+
+class InfoBoxContentHomeAltitudeDiff : public InfoBoxContentHome
 {
 public:
   virtual void Update(InfoBoxData &data);
@@ -144,8 +160,9 @@ public:
 class InfoBoxContentOLC: public InfoBoxContent
 {
 public:
+  virtual const DialogContent *GetDialogContent();
+  static const DialogContent dlgContent;
   virtual void Update(InfoBoxData &data);
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode);
 };
 
 class InfoBoxContentTaskSpeed : public InfoBoxContent
@@ -232,4 +249,9 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
+class InfoBoxContentCruiseEfficiency : public InfoBoxContent
+{
+public:
+  virtual void Update(InfoBoxData &data);
+};
 #endif

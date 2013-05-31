@@ -31,8 +31,8 @@ Copyright_License {
 struct DialogLook;
 class WndForm;
 class TabMenuDisplay;
-class OneSubMenuButton;
-class OneMainMenuButton;
+class SubMenuButton;
+class MainMenuButton;
 class ContainerWindow;
 
 /** TabMenuControl is a two-level menu structure.
@@ -74,31 +74,31 @@ public:
     unsigned main_index;
     unsigned sub_index;
 
-    gcc_constexpr_ctor
+    constexpr
     explicit MenuTabIndex(unsigned mainNum, unsigned subNum=NO_SUB_MENU)
       :main_index(mainNum), sub_index(subNum) {}
 
-    gcc_constexpr_function
+    constexpr
     static MenuTabIndex None() {
       return MenuTabIndex(NO_MAIN_MENU, NO_SUB_MENU);
     }
 
-    gcc_constexpr_method
+    constexpr
     bool IsNone() const {
       return main_index == NO_MAIN_MENU;
     }
 
-    gcc_constexpr_method
+    constexpr
     bool IsMain() const {
       return main_index != NO_MAIN_MENU && sub_index == NO_SUB_MENU;
     }
 
-    gcc_constexpr_method
+    constexpr
     bool IsSub() const {
       return sub_index != NO_SUB_MENU;
     }
 
-    gcc_constexpr_method
+    constexpr
     bool operator==(const MenuTabIndex &other) const {
       return main_index == other.main_index &&
         sub_index == other.sub_index;
@@ -108,10 +108,10 @@ public:
 protected:
   TabbedControl pager;
 
-  StaticArray<OneSubMenuButton *, 32> buttons;
+  StaticArray<SubMenuButton *, 32> buttons;
 
   /* holds info and buttons for the main menu.  not on child menus */
-  StaticArray<OneMainMenuButton *, MAX_MAIN_MENU_ITEMS> main_menu_buttons;
+  StaticArray<MainMenuButton *, MAX_MAIN_MENU_ITEMS> main_menu_buttons;
 
   TabMenuDisplay *tab_display;
 
@@ -144,7 +144,7 @@ public:
     pager.UpdateLayout();
   }
 
-  const StaticArray<OneSubMenuButton *, 32> &GetTabButtons() const {
+  const StaticArray<SubMenuButton *, 32> &GetTabButtons() const {
     return buttons;
   }
 
@@ -167,6 +167,14 @@ public:
    */
   gcc_pure
   MenuTabIndex FindPage(unsigned page) const;
+
+  /**
+   * find page index from the display name
+   * @param name. the Display name of the page
+   * @return -1 if not found, else the page index
+   */
+  gcc_pure
+  int FindPage(const TCHAR * name) const;
 
   /**
    * @return true if currently displaying the menu page
@@ -217,7 +225,7 @@ public:
    * @return pointer to button or NULL if index is out of range
    */
   gcc_pure
-  const OneMainMenuButton &GetMainMenuButton(unsigned main_menu_index) const {
+  const MainMenuButton &GetMainMenuButton(unsigned main_menu_index) const {
     assert(main_menu_index < main_menu_buttons.size());
     assert(main_menu_buttons[main_menu_index] != NULL);
 
@@ -229,7 +237,7 @@ public:
    * @return pointer to button or NULL if index is out of range
    */
   gcc_pure
-  const OneSubMenuButton &GetSubMenuButton(unsigned page) const {
+  const SubMenuButton &GetSubMenuButton(unsigned page) const {
     assert(page < GetNumPages() && page < buttons.size());
     assert(buttons[page] != NULL);
 
@@ -285,7 +293,7 @@ public:
     return last_content_page;
   }
 
-  const StaticArray<OneMainMenuButton *, MAX_MAIN_MENU_ITEMS>
+  const StaticArray<MainMenuButton *, MAX_MAIN_MENU_ITEMS>
       &GetMainMenuButtons() const { return main_menu_buttons; }
 
 protected:
@@ -366,86 +374,13 @@ public:
   void HighlightPreviousMenuItem();
 };
 
-class TabMenuDisplay : public PaintWindow {
-  TabMenuControl &menu;
-  const DialogLook &look;
-  bool dragging; // tracks that mouse is down and captured
-  bool drag_off_button; // set by mouse_move
-
-public:
-  /* used to track mouse down/up clicks */
-  TabMenuControl::MenuTabIndex down_index;
-  /* used to render which submenu is drawn and which item is highlighted */
-  TabMenuControl::MenuTabIndex selected_index;
-
-public:
-  TabMenuDisplay(TabMenuControl &_menu, const DialogLook &look,
-                 ContainerWindow &parent, PixelRect rc);
-
-  void SetSelectedIndex(TabMenuControl::MenuTabIndex di);
-
-  UPixelScalar GetTabHeight() const {
-    return this->GetHeight();
-  }
-
-  UPixelScalar GetTabWidth() const {
-    return this->GetWidth();
-  }
-
-  /**
-   * Returns index of selected (highlighted) tab
-   * @return
-   */
-  const TabMenuControl::MenuTabIndex GetSelectedIndex() { return selected_index; }
-
-protected:
-  TabMenuControl &GetTabMenuBar() {
-    return menu;
-  }
-
-  const TabMenuControl &GetTabMenuBar() const {
-    return menu;
-  }
-
-  void drag_end();
-
-  /**
-   * @return Rect of button holding down pointer capture
-   */
-  const PixelRect& GetDownButtonRC() const;
-
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
-  virtual bool OnMouseUp(PixelScalar x, PixelScalar y);
-  virtual bool OnMouseDown(PixelScalar x, PixelScalar y);
-  virtual bool OnKeyCheck(unsigned key_code) const;
-  virtual bool OnKeyDown(unsigned key_code);
-  /**
-   * canvas is the tabmenu which is the full content window, no content
-   * @param canvas
-   * Todo: support icons and "ButtonOnly" style
-   */
-  virtual void OnPaint(Canvas &canvas);
-
-  virtual void OnKillFocus();
-  virtual void OnSetFocus();
-
-  /**
-   * draw border around main menu
-   */
-  void PaintMainMenuBorder(Canvas &canvas) const;
-  void PaintMainMenuItems(Canvas &canvas, const unsigned CaptionStyle) const;
-  void PaintSubMenuBorder(Canvas &canvas,
-                          const OneMainMenuButton &main_button) const;
-  void PaintSubMenuItems(Canvas &canvas, const unsigned CaptionStyle) const;
-};
-
 /**
  * class that holds the child menu button and info for the menu
  */
-class OneSubMenuButton : public OneTabButton {
+class SubMenuButton : public TabButton {
 public:
-  OneSubMenuButton(const TCHAR* _Caption)
-    :OneTabButton(_Caption, false, NULL)
+  SubMenuButton(const TCHAR* _Caption)
+    :TabButton(_Caption, NULL)
   {
   }
 };
@@ -453,7 +388,7 @@ public:
 /**
  * class that holds the main menu button and info
  */
-class OneMainMenuButton : public OneTabButton {
+class MainMenuButton : public TabButton {
 public:
   /* index to Pages array of first page in submenu */
   const unsigned first_page_index;
@@ -461,10 +396,10 @@ public:
   /* index to Pages array of last page in submenu */
   const unsigned last_page_index;
 
-  OneMainMenuButton(const TCHAR* _Caption,
+  MainMenuButton(const TCHAR* _Caption,
                     unsigned _first_page_index,
                     unsigned _last_page_index)
-    :OneTabButton(_Caption, false, NULL),
+    :TabButton(_Caption, NULL),
      first_page_index(_first_page_index),
      last_page_index(_last_page_index)
   {

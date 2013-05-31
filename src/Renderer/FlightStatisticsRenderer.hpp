@@ -44,15 +44,13 @@ struct ChartLook;
 struct MapLook;
 
 class FlightStatisticsRenderer {
-  const FlightStatistics &fs;
   const ChartLook &chart_look;
   const MapLook &map_look;
 
   mutable TrailRenderer trail_renderer;
 
 public:
-  FlightStatisticsRenderer(const FlightStatistics &_flight_statistics,
-                           const ChartLook &_chart_look,
+  FlightStatisticsRenderer(const ChartLook &_chart_look,
                            const MapLook &_map_look);
 
 public:
@@ -73,8 +71,15 @@ public:
                   const TraceComputer *trace_computer) const;
 
   static void CaptionTask(TCHAR *sTmp, const DerivedInfo &derived);
-  static void CaptionOLC(TCHAR *sTmp, const TaskBehaviour &task_behaviour,
-                         const DerivedInfo &derived);
+
+  /**
+   * @param buffer buffer for result
+   * @param task_behaviour
+   * @derived
+   * @long_line if true formats output to use fewer lines of text
+   */
+  static void CaptionOLC(TCHAR *buffer, const TaskBehaviour &task_behaviour,
+                         const DerivedInfo &derived, bool long_line);
 };
 
 #endif

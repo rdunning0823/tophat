@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_FINAL_GLIDE_BAR_RENDERER_HPP
 
 #include "Screen/Point.hpp"
+#include <tchar.h>
 
 class Canvas;
 struct DerivedInfo;
@@ -48,7 +49,8 @@ public:
   void Draw(Canvas &canvas, const PixelRect &rc,
             const DerivedInfo &calculated,
             const GlideSettings &glide_settings,
-            const bool final_glide_bar_mc0_enabled) const;
+            const bool final_glide_bar_mc0_enabled,
+            const TCHAR* description) const;
 };
 
 #endif

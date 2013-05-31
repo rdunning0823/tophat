@@ -25,14 +25,16 @@ Copyright_License {
 #include "Wind/CirclingWind.hpp"
 #include "OS/Args.hpp"
 #include "DebugReplay.hpp"
+#include "Formatter/TimeFormatter.hpp"
 
 #include <stdio.h>
+#include <memory>
 
 int main(int argc, char **argv)
 {
   Args args(argc, argv, "DRIVER FILE");
-  DebugReplay *replay = CreateDebugReplay(args);
-  if (replay == NULL)
+  std::unique_ptr<DebugReplay> replay(CreateDebugReplay(args));
+  if (!replay)
     return EXIT_FAILURE;
 
   args.ExpectEnd();
@@ -51,10 +53,7 @@ int main(int argc, char **argv)
                               replay->Calculated(), replay->LastCalculated(),
                               replay->GetComputerSettings());
 
-    if ((replay->LastCalculated().turn_mode == CirclingMode::POSSIBLE_CLIMB &&
-         replay->Calculated().turn_mode == CirclingMode::CLIMB) ||
-        (replay->LastCalculated().turn_mode == CirclingMode::POSSIBLE_CRUISE &&
-         replay->Calculated().turn_mode == CirclingMode::CRUISE))
+    if (replay->LastCalculated().circling != replay->Calculated().circling)
       circling_wind.NewFlightMode(replay->Calculated());
 
     CirclingWind::Result result = circling_wind.NewSample(replay->Basic());
@@ -67,12 +66,12 @@ int main(int argc, char **argv)
       else
         bearing = Angle::Radians(atan2(result.wind.y, result.wind.x)).AsBearing();
 
-      printf("%d %d %d %g\n",
-             (int)replay->Basic().time,
-             result.quality, (int)bearing.Degrees(), (double)mag);
+      TCHAR time_buffer[32];
+      FormatTime(time_buffer, replay->Basic().time);
+
+      _tprintf(_T("%s %d %d %g\n"),
+               time_buffer, result.quality, (int)bearing.Degrees(), (double)mag);
     }
   }
-
-  delete replay;
 }
 

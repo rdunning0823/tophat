@@ -31,7 +31,7 @@ Copyright_License {
 #include "Formatter/TimeFormatter.hpp"
 #include "Language/Language.hpp"
 #include "Task/ProtectedTaskManager.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 
 enum Controls {
   ValidStart,
@@ -66,24 +66,17 @@ RulesStatusPanel::Refresh()
   if (common_stats.task_started) {
     FormatSignedTimeHHMM(Temp, (int)TimeLocal((int)start_state.time));
     SetText(StartTime, Temp);
-  } else {
-    SetText(StartTime, _T(""));
-  }
 
-  if (common_stats.task_started) {
     FormatUserTaskSpeed(start_state.ground_speed,
                                Temp, ARRAY_SIZE(Temp));
     SetText(StartSpeed, Temp);
-  } else {
-    SetText(StartSpeed, _T(""));
-  }
 
-  // StartMaxHeight, StartMaxSpeed;
-  if (common_stats.task_started) {
     FormatUserAltitude(start_state.altitude, Temp, ARRAY_SIZE(Temp));
     SetText(StartHeight, Temp);
   } else {
-    SetText(StartHeight, _T(""));
+    ClearValue(StartTime);
+    ClearValue(StartSpeed);
+    ClearValue(StartHeight);
   }
 
   FormatUserAltitude(protected_task_manager->GetFinishHeight(),
@@ -94,8 +87,7 @@ RulesStatusPanel::Refresh()
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
     const OrderedTask &task = task_manager->GetOrderedTask();
 
-    if (task_manager->GetMode() == TaskManager::MODE_ORDERED &&
-        task.TaskSize() > 0)
+    if (task.TaskSize() > 0)
       CopyString(Temp, task.GetTaskPoint(0).GetWaypoint().name.c_str(),
                  ARRAY_SIZE(Temp));
     else

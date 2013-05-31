@@ -34,7 +34,6 @@ Copyright_License {
 #include "Projection/MapWindowProjection.hpp"
 #include "Components.hpp"
 #include "Interface.hpp"
-#include "MainWindow.hpp"
 #include "MapWindow/GlueMapWindow.hpp"
 #include "Form/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
@@ -125,8 +124,11 @@ TerrainDisplayConfigPanel::OnPreviewPaint(Canvas &canvas)
   TerrainRenderer renderer(terrain);
   renderer.SetSettings(terrain_settings);
 
-  MapWindowProjection projection =
-    XCSoarInterface::main_window.GetProjection();
+  const GlueMapWindow *map = UIGlobals::GetMap();
+  if (map == NULL)
+    return;
+
+  MapWindowProjection projection = map->VisibleProjection();
   projection.SetScreenSize(canvas.get_width(), canvas.get_height());
   projection.SetScreenOrigin(canvas.get_width() / 2, canvas.get_height() / 2);
 
@@ -165,7 +167,7 @@ TerrainDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _("Draw topographical features (roads, rivers, lakes etc.) on the map."),
              settings_map.topography_enabled);
 
-  static gcc_constexpr_data StaticEnumChoice terrain_ramp_list[] = {
+  static constexpr StaticEnumChoice terrain_ramp_list[] = {
     { 0, N_("Low lands"), },
     { 1, N_("Mountainous"), },
     { 2, N_("Imhof 7"), },
@@ -182,7 +184,7 @@ TerrainDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           terrain_ramp_list, terrain.ramp);
   GetDataField(TerrainColors).SetListener(this);
 
-  static gcc_constexpr_data StaticEnumChoice slope_shading_list[] = {
+  static constexpr StaticEnumChoice slope_shading_list[] = {
     { (unsigned)SlopeShading::OFF, N_("Off"), },
     { (unsigned)SlopeShading::FIXED, N_("Fixed"), },
     { (unsigned)SlopeShading::SUN, N_("Sun"), },
@@ -214,7 +216,7 @@ TerrainDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     WindowStyle style;
     style.Border();
     AddRemaining(new WndOwnerDrawFrame(*(ContainerWindow *)GetWindow(),
-                                       0, 0, 100, 100,
+                                       {0, 0, 100, 100},
                                        style,
                                        ::OnPreviewPaint));
   }
@@ -232,13 +234,13 @@ TerrainDisplayConfigPanel::Save(bool &_changed, bool &_require_restart)
   changed = (settings_map.terrain != terrain_settings);
 
   settings_map.terrain = terrain_settings;
-  Profile::Set(szProfileDrawTerrain, terrain_settings.enable);
-  Profile::Set(szProfileTerrainContrast, terrain_settings.contrast);
-  Profile::Set(szProfileTerrainBrightness, terrain_settings.brightness);
-  Profile::Set(szProfileTerrainRamp, terrain_settings.ramp);
-  Profile::SetEnum(szProfileSlopeShadingType, terrain_settings.slope_shading);
+  Profile::Set(ProfileKeys::DrawTerrain, terrain_settings.enable);
+  Profile::Set(ProfileKeys::TerrainContrast, terrain_settings.contrast);
+  Profile::Set(ProfileKeys::TerrainBrightness, terrain_settings.brightness);
+  Profile::Set(ProfileKeys::TerrainRamp, terrain_settings.ramp);
+  Profile::SetEnum(ProfileKeys::SlopeShadingType, terrain_settings.slope_shading);
 
-  changed |= SaveValue(EnableTopography, szProfileDrawTopography,
+  changed |= SaveValue(EnableTopography, ProfileKeys::DrawTopography,
                        settings_map.topography_enabled);
 
   _changed |= changed;

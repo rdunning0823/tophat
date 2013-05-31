@@ -20,8 +20,9 @@
 }
 */
 
-#include "Engine/Task/Tasks/BaseTask/TaskPoint.hpp"
-#include "Engine/Navigation/Geometry/GeoVector.hpp"
+#include "Engine/Task/Points/TaskPoint.hpp"
+#include "Engine/Navigation/Aircraft.hpp"
+#include "Geo/GeoVector.hpp"
 #include "TestUtil.hpp"
 
 class DummyTaskPoint: public TaskPoint
@@ -35,15 +36,15 @@ public:
                  const fixed _elevation)
     :TaskPoint(_type, _location, _elevation) {}
 
-  virtual const GeoVector GetVectorRemaining(const GeoPoint &reference) const {
+  virtual GeoVector GetVectorRemaining(const GeoPoint &reference) const {
     return GeoVector();
   }
 
-  virtual const GeoVector GetVectorPlanned() const {
+  virtual GeoVector GetVectorPlanned() const {
     return GeoVector();
   }
 
-  virtual const GeoVector GetVectorTravelled() const {
+  virtual GeoVector GetVectorTravelled() const {
     return GeoVector();
   }
 

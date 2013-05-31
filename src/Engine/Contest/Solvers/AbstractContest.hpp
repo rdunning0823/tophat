@@ -25,23 +25,23 @@
 
 #include "Math/fixed.hpp"
 #include "../ContestResult.hpp"
+#include "../ContestTrace.hpp"
+#include "Trace/Point.hpp"
+#include "PathSolvers/SolverResult.hpp"
 
-class Trace;
+#include <assert.h>
+
 class TracePoint;
 
 /**
  * Abstract class for contest searches
  *
  */
-class AbstractContest
-{
-protected:
-  const Trace &trace_master;
-
-private:
+class AbstractContest {
   unsigned handicap;
   const unsigned finish_alt_diff;
   ContestResult best_result;
+  ContestTraceVector best_solution;
 
 public:
   /**
@@ -51,8 +51,7 @@ public:
    * @param _handicap Contest handicap factor
    * @param finish_alt_diff Maximum height loss from start to finish (m)
    */
-  AbstractContest(const Trace &_trace,
-                  const unsigned _finish_alt_diff = 1000);
+  AbstractContest(const unsigned _finish_alt_diff = 1000);
 
   void SetHandicap(unsigned _handicap) {
     handicap = _handicap;
@@ -66,7 +65,19 @@ public:
    *
    * @return True is solution was found, False otherwise
    */
-  virtual bool Score(ContestResult &result);
+  const ContestResult &GetBestResult() const {
+    return best_result;
+  }
+
+  const ContestTraceVector &GetBestSolution() const {
+    return best_solution;
+  }
+
+protected:
+  /**
+   * Calculate the result.
+   */
+  virtual ContestResult CalculateResult() const = 0;
 
   /**
    * Copy the best Contest path solution
@@ -74,30 +85,6 @@ public:
    * @param vec output vector
    */
   virtual void CopySolution(ContestTraceVector &vec) const = 0;
-
-protected:
-  /**
-   * Calculate distance of best path
-   *
-   * @return Distance (m)
-   */
-  virtual fixed CalcDistance() const = 0;
-
-  /**
-   * Calculate score of best path
-   * This is specialised by each contest type, defaults to
-   * speed in kph measured by weighted distance divided by time
-   * 
-   * @return Score (pts)
-   */
-  virtual fixed CalcScore() const = 0;
-
-  /**
-   * Calculate elapsed time of best path
-   *
-   * @return Distance (m)
-   */
-  virtual fixed CalcTime() const = 0;
 
 public:
   /**
@@ -111,12 +98,10 @@ public:
    *
    * @param exhaustive true to find the final solution, false stops
    * after a number of iterations (incremental search)
-   * @return True if solver completed in this call
    */
-  virtual bool Solve(bool exhaustive) = 0;
+  virtual SolverResult Solve(bool exhaustive) = 0;
 
 protected:
-
   /**
    * Perform check on whether score needs to be
    * updated (even if score isn't improved, due to
@@ -146,7 +131,7 @@ protected:
    *
    * @return true if #best_result was updated
    */
-  virtual bool SaveSolution();
+  bool SaveSolution();
 
   /**
    * Apply handicap.
@@ -156,7 +141,23 @@ protected:
    *
    * @return Handicap adjusted score
    */
-  fixed ApplyHandicap(const fixed& unhandicapped_score, const bool shifted=false) const;
+  gcc_pure
+  fixed ApplyHandicap(fixed unhandicapped_score) const {
+    assert(handicap != 0);
+
+    return 100 * unhandicapped_score / handicap;
+  }
+
+  /**
+   * Apply "shifted" handicap, i.e. according to OLC league/sprint
+   * rules.
+   */
+  gcc_pure
+  fixed ApplyShiftedHandicap(const fixed unhandicapped_score) const {
+    assert(handicap != 0);
+
+    return 200 * unhandicapped_score / (100 + handicap);
+  }
 };
 
 #endif

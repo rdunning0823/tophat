@@ -19,29 +19,26 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
  */
-#include "ContestManager.hpp"
 
-#include "Task/TaskStats/CommonStats.hpp"
+#include "ContestManager.hpp"
 #include "Trace/Trace.hpp"
 
 ContestManager::ContestManager(const Contests _contest,
                                const Trace &trace_full,
-                               const Trace &trace_sprint):
-  contest(_contest),
-  trace_full(trace_full),
-  trace_sprint(trace_sprint),
-  olc_sprint(trace_sprint),
-  olc_fai(trace_full),
-  olc_classic(trace_full),
-  olc_league(trace_sprint),
-  olc_plus(trace_full),
-  olc_xcontest_free(trace_full, false),
-  olc_xcontest_triangle(trace_full, false),
-  olc_dhvxc_free(trace_full, true),
-  olc_dhvxc_triangle(trace_full, true),
-  olc_sisat(trace_full),
-  olc_netcoupe(trace_full)
-
+                               const Trace &trace_sprint,
+                               bool predict_triangle)
+  :contest(_contest),
+   olc_sprint(trace_sprint),
+   olc_fai(trace_full, predict_triangle),
+   olc_classic(trace_full),
+   olc_league(trace_sprint),
+   olc_plus(),
+   olc_xcontest_free(trace_full, false),
+   olc_xcontest_triangle(trace_full, predict_triangle, false),
+   olc_dhvxc_free(trace_full, true),
+   olc_dhvxc_triangle(trace_full, predict_triangle, true),
+   olc_sisat(trace_full),
+   olc_netcoupe(trace_full)
 {
   Reset();
 }
@@ -61,6 +58,18 @@ ContestManager::SetIncremental(bool incremental)
 }
 
 void
+ContestManager::SetPredicted(const TracePoint &predicted)
+{
+  if (olc_classic.SetPredicted(predicted)) {
+    olc_league.Reset();
+    olc_plus.Reset();
+
+    if (contest == OLC_Classic || contest == OLC_League || contest == OLC_Plus)
+      stats.Reset();
+  }
+}
+
+void
 ContestManager::SetHandicap(unsigned handicap)
 {
   olc_sprint.SetHandicap(handicap);
@@ -76,31 +85,30 @@ ContestManager::SetHandicap(unsigned handicap)
   olc_netcoupe.SetHandicap(handicap);
 }
 
-bool
-ContestManager::RunContest(AbstractContest &_contest,
-                           ContestResult &result,
-                           ContestTraceVector &solution,
-                           bool exhaustive)
+static bool
+RunContest(AbstractContest &_contest,
+           ContestResult &result, ContestTraceVector &solution,
+           bool exhaustive)
 {
   // run solver, return immediately if further processing is required
   // by subsequent calls
-  if (!_contest.Solve(exhaustive))
-    return false;
+  SolverResult r = _contest.Solve(exhaustive);
+  if (r != SolverResult::VALID)
+    return r != SolverResult::INCOMPLETE;
 
   // if no improved solution was found, must have finished processing
   // with invalid data
-  if (!_contest.Score(result))
-    return true;
+  result = _contest.GetBestResult();
 
   // solver finished and improved solution was found.  save solution
   // and retrieve new trace.
 
-  _contest.CopySolution(solution);
+  solution = _contest.GetBestSolution();
 
   return true;
 }
 
-bool 
+bool
 ContestManager::UpdateIdle(bool exhaustive)
 {
   bool retval = false;
@@ -108,69 +116,67 @@ ContestManager::UpdateIdle(bool exhaustive)
   switch (contest) {
   case OLC_Sprint:
     retval = RunContest(olc_sprint, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     break;
 
   case OLC_FAI:
     retval = RunContest(olc_fai, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     break;
 
   case OLC_Classic:
     retval = RunContest(olc_classic, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     break;
 
   case OLC_League:
     retval = RunContest(olc_classic, stats.result[1],
-                         stats.solution[1], exhaustive);
+                        stats.solution[1], exhaustive);
 
-    olc_league.GetSolutionClassic() = stats.solution[1];
+    olc_league.Feed(stats.solution[1]);
 
     retval |= RunContest(olc_league, stats.result[0],
-                          stats.solution[0], exhaustive);
+                         stats.solution[0], exhaustive);
     break;
 
   case OLC_Plus:
     retval = RunContest(olc_classic, stats.result[0],
-                         stats.solution[0], exhaustive);
-
-    olc_plus.GetClassicResult() = stats.result[0];
-    olc_plus.GetClassicSolution() = stats.solution[0];
+                        stats.solution[0], exhaustive);
 
     retval |= RunContest(olc_fai, stats.result[1],
-                          stats.solution[1], exhaustive);
+                         stats.solution[1], exhaustive);
 
-    olc_plus.GetFAIResult() = stats.result[1];
-    olc_plus.GetFAISolution() = stats.solution[1];
+    if (retval) {
+      olc_plus.Feed(stats.result[0], stats.solution[0],
+                    stats.result[1], stats.solution[1]);
 
-    if (retval) 
       RunContest(olc_plus, stats.result[2],
-                  stats.solution[2], exhaustive);
+                 stats.solution[2], exhaustive);
+    }
 
     break;
 
   case OLC_XContest:
     retval = RunContest(olc_xcontest_free, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     retval |= RunContest(olc_xcontest_triangle, stats.result[1],
-                          stats.solution[1], exhaustive);
+                         stats.solution[1], exhaustive);
     break;
 
   case OLC_DHVXC:
     retval = RunContest(olc_dhvxc_free, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     retval |= RunContest(olc_dhvxc_triangle, stats.result[1],
-                          stats.solution[1], exhaustive);
+                         stats.solution[1], exhaustive);
     break;
 
   case OLC_SISAT:
     retval = RunContest(olc_sisat, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     break;
   case OLC_NetCoupe:
     retval = RunContest(olc_netcoupe, stats.result[0],
-                         stats.solution[0], exhaustive);
+                        stats.solution[0], exhaustive);
     break;
 
   };

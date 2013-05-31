@@ -61,6 +61,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Projection/MapWindowProjection.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Language/Language.hpp"
+#include "Pan.hpp"
 
 #include <algorithm>
 #include <assert.h>
@@ -68,6 +69,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include <tchar.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <memory>
 
 namespace InputEvents
 {
@@ -116,11 +118,9 @@ InputEvents::readFile()
   LoadDefaults(input_config);
 
   // Read in user defined configuration file
-  TLineReader *reader = OpenConfiguredTextFile(szProfileInputFile);
-  if (reader != NULL) {
+  std::unique_ptr<TLineReader> reader(OpenConfiguredTextFile(ProfileKeys::InputFile));
+  if (reader)
     ::ParseInputFile(input_config, *reader);
-    delete reader;
-  }
 }
 
 void
@@ -149,6 +149,14 @@ InputEvents::setMode(const TCHAR *mode)
   int m = input_config.LookupMode(mode);
   if (m >= 0)
     setMode((InputEvents::Mode)m);
+}
+
+bool
+InputEvents::IsMode(const TCHAR *mode)
+{
+  assert(mode != NULL);
+
+  return input_config.modes[current_mode] == mode;
 }
 
 void
@@ -188,6 +196,13 @@ InputEvents::IsFlavour(const TCHAR *_flavour)
 
   return StringIsEqual(flavour, _flavour);
 }
+
+bool
+InputEvents::IsDefault()
+{
+  return current_mode == MODE_DEFAULT;
+}
+
 
 void
 InputEvents::drawButtons(Mode mode, bool full)
@@ -429,7 +444,7 @@ InputEvents::processGo(unsigned eventid)
 void
 InputEvents::HideMenu()
 {
-  setMode(CommonInterface::IsPanning() ? MODE_PAN : MODE_DEFAULT);
+  setMode(IsPanning() ? MODE_PAN : MODE_DEFAULT);
 }
 
 void
@@ -453,7 +468,7 @@ InputEvents::GetMenu(const TCHAR *mode)
 void
 InputEvents::ProcessMenuTimer()
 {
-  if (CommonInterface::main_window.HasDialog())
+  if (CommonInterface::main_window->HasDialog())
     /* no menu updates while a dialog is visible */
     return;
 

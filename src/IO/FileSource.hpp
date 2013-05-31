@@ -28,16 +28,24 @@ Copyright_License {
 
 #ifdef HAVE_POSIX
 
+#include "OS/FileDescriptor.hpp"
+
 class PosixFileSource : public BufferedSource<char, 4096u> {
 private:
-  int fd;
+  FileDescriptor fd;
 
 public:
   PosixFileSource(const char *path);
-  virtual ~PosixFileSource();
 
   bool error() const {
-    return fd < 0;
+    return !fd.IsDefined();
+  }
+
+  /**
+   * Rewind the file to the beginning.
+   */
+  bool Rewind() {
+    return fd.Rewind();
   }
 
 public:
@@ -68,6 +76,13 @@ public:
 
   bool error() const {
     return handle == INVALID_HANDLE_VALUE;
+  }
+
+  /**
+   * Rewind the file to the beginning.
+   */
+  bool Rewind() {
+    return ::SetFilePointer(handle, 0, NULL, FILE_BEGIN) == 0;
   }
 
 public:

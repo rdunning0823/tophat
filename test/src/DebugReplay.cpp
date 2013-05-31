@@ -35,6 +35,8 @@ Copyright_License {
 #include "IGC/IGCFix.hpp"
 #include "Units/System.hpp"
 
+#include <memory>
+
 static DeviceConfig config;
 static NullPort port;
 
@@ -76,13 +78,12 @@ DebugReplay::Compute()
 }
 
 class DebugReplayNMEA : public DebugReplay {
-  Device *device;
+  std::unique_ptr<Device> device;
 
   NMEAParser parser;
 
 public:
   DebugReplayNMEA(NLineReader *reader, const DeviceRegister *driver);
-  ~DebugReplayNMEA();
 
   virtual bool Next();
 };
@@ -96,11 +97,6 @@ DebugReplayNMEA::DebugReplayNMEA(NLineReader *_reader,
 {
 }
 
-DebugReplayNMEA::~DebugReplayNMEA()
-{
-  delete device;
-}
-
 bool
 DebugReplayNMEA::Next()
 {
@@ -111,7 +107,7 @@ DebugReplayNMEA::Next()
   while ((line = reader->read()) != NULL) {
     if (basic.time_available)
       basic.clock = basic.time;
-    if (device == NULL || !device->ParseNMEA(line, basic))
+    if (!device || !device->ParseNMEA(line, basic))
       parser.ParseLine(line, basic);
 
     if (basic.location_available != last_basic.location_available) {
@@ -175,8 +171,11 @@ void
 DebugReplayIGC::CopyFromFix(const IGCFix &fix)
 {
   if (basic.time_available && basic.date_time_utc.hour >= 23 &&
-      fix.time.hour == 0)
+      fix.time.hour == 0) {
+    /* midnight roll-over */
     ++day;
+    basic.date_time_utc.IncrementDay();
+  }
 
   basic.clock = basic.time =
     fixed(day * 24 * 3600 + fix.time.GetSecondOfDay());
@@ -187,11 +186,17 @@ DebugReplayIGC::CopyFromFix(const IGCFix &fix)
   basic.alive.Update(basic.clock);
   basic.location = fix.location;
   basic.location_available.Update(basic.clock);
-  basic.gps_altitude = fixed(fix.gps_altitude);
-  basic.gps_altitude_available.Update(basic.clock);
-  basic.pressure_altitude = basic.baro_altitude = fixed(fix.pressure_altitude);
-  basic.pressure_altitude_available.Update(basic.clock);
-  basic.baro_altitude_available.Update(basic.clock);
+
+  if (fix.gps_altitude != 0) {
+    basic.gps_altitude = fixed(fix.gps_altitude);
+    basic.gps_altitude_available.Update(basic.clock);
+  }
+
+  if (fix.pressure_altitude != 0) {
+    basic.pressure_altitude = basic.baro_altitude = fixed(fix.pressure_altitude);
+    basic.pressure_altitude_available.Update(basic.clock);
+    basic.baro_altitude_available.Update(basic.clock);
+  }
 
   if (fix.enl >= 0) {
     basic.engine_noise_level = fix.enl;

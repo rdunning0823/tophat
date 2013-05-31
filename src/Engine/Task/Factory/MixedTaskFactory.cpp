@@ -21,37 +21,45 @@
  */
 
 #include "MixedTaskFactory.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/OrderedTaskBehaviour.hpp"
+#include "TaskFactoryConstraints.hpp"
 #include "Util/Macros.hpp"
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType mixed_start_types[] = {
-  AbstractTaskFactory::START_LINE,
-  AbstractTaskFactory::START_CYLINDER,
-  AbstractTaskFactory::START_BGA,
-  AbstractTaskFactory::START_SECTOR,
+static constexpr TaskFactoryConstraints mixed_constraints = {
+  true,
+  false,
+  false,
+  false,
+  true,
+  2, 10,
 };
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType mixed_im_types[] = {
-  AbstractTaskFactory::FAI_SECTOR,
-  AbstractTaskFactory::AST_CYLINDER,
-  AbstractTaskFactory::AAT_CYLINDER,
-  AbstractTaskFactory::AAT_SEGMENT,
-  AbstractTaskFactory::AAT_ANNULAR_SECTOR,
-  AbstractTaskFactory::KEYHOLE_SECTOR,
-  AbstractTaskFactory::BGAFIXEDCOURSE_SECTOR,
-  AbstractTaskFactory::BGAENHANCEDOPTION_SECTOR,
+static constexpr TaskPointFactoryType mixed_start_types[] = {
+  TaskPointFactoryType::START_LINE,
+  TaskPointFactoryType::START_CYLINDER,
+  TaskPointFactoryType::START_BGA,
+  TaskPointFactoryType::START_SECTOR,
 };
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType mixed_finish_types[] = {
-  AbstractTaskFactory::FINISH_SECTOR,
-  AbstractTaskFactory::FINISH_LINE,
-  AbstractTaskFactory::FINISH_CYLINDER,
+static constexpr TaskPointFactoryType mixed_im_types[] = {
+  TaskPointFactoryType::FAI_SECTOR,
+  TaskPointFactoryType::AST_CYLINDER,
+  TaskPointFactoryType::AAT_CYLINDER,
+  TaskPointFactoryType::AAT_SEGMENT,
+  TaskPointFactoryType::AAT_ANNULAR_SECTOR,
+  TaskPointFactoryType::KEYHOLE_SECTOR,
+  TaskPointFactoryType::BGAFIXEDCOURSE_SECTOR,
+  TaskPointFactoryType::BGAENHANCEDOPTION_SECTOR,
+};
+
+static constexpr TaskPointFactoryType mixed_finish_types[] = {
+  TaskPointFactoryType::FINISH_SECTOR,
+  TaskPointFactoryType::FINISH_LINE,
+  TaskPointFactoryType::FINISH_CYLINDER,
 };
 
 MixedTaskFactory::MixedTaskFactory(OrderedTask& _task,
                                    const TaskBehaviour &tb)
-  :AbstractTaskFactory(_task, tb,
+  :AbstractTaskFactory(mixed_constraints, _task, tb,
                        LegalPointConstArray(mixed_start_types,
                                             ARRAY_SIZE(mixed_start_types)),
                        LegalPointConstArray(mixed_im_types,
@@ -59,16 +67,4 @@ MixedTaskFactory::MixedTaskFactory(OrderedTask& _task,
                        LegalPointConstArray(mixed_finish_types,
                                             ARRAY_SIZE(mixed_finish_types)))
 {
-}
-
-void 
-MixedTaskFactory::UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to)
-{
-  to.task_scored = true;
-  to.fai_finish = false;  
-  to.homogeneous_tps = false;
-  to.is_closed = false;
-  to.min_points = 2;
-  to.max_points = 10;
-  to.start_requires_arm = true;
 }

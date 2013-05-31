@@ -27,7 +27,6 @@ Copyright_License {
 #include "Device/Register.hpp"
 #include "Device/Parser.hpp"
 #include "Device/device.hpp"
-#include "Engine/Navigation/GeoPoint.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Input/InputEvents.hpp"
 #include "OS/PathName.hpp"
@@ -72,10 +71,13 @@ Dump(const ExternalSettings &settings)
 static void
 Dump(const NMEAInfo &basic)
 {
-  printf("Date=%02u.%02u.%04u\n",
-         basic.date_time_utc.day, basic.date_time_utc.month, basic.date_time_utc.year);
-  printf("Time=%02u:%02u:%02u\n",
-         basic.date_time_utc.hour, basic.date_time_utc.minute, basic.date_time_utc.second);
+  if (basic.date_available)
+    printf("Date=%02u.%02u.%04u\n",
+           basic.date_time_utc.day, basic.date_time_utc.month, basic.date_time_utc.year);
+
+  if (basic.time_available)
+    printf("Time=%02u:%02u:%02u\n",
+           basic.date_time_utc.hour, basic.date_time_utc.minute, basic.date_time_utc.second);
 
   if (!basic.alive)
     printf("GPS not connected\n");
@@ -132,6 +134,28 @@ Dump(const NMEAInfo &basic)
   if (basic.humidity_available)
     printf("RelativeHumidity=%d\n", (int)basic.humidity);
 
+  const DeviceInfo &device = basic.device;
+  if (!device.product.empty())
+    printf("Device.Product=%s\n", device.product.c_str());
+  if (!device.serial.empty())
+    printf("Device.Serial=%s\n", device.serial.c_str());
+  if (!device.hardware_version.empty())
+    printf("Device.HardwareVersion=%s\n", device.hardware_version.c_str());
+  if (!device.software_version.empty())
+    printf("Device.SoftwareVersion=%s\n", device.software_version.c_str());
+
+  const DeviceInfo &device2 = basic.secondary_device;
+  if (!device2.product.empty())
+    printf("SecondaryDevice.Product=%s\n", device2.product.c_str());
+  if (!device2.serial.empty())
+    printf("SecondaryDevice.Serial=%s\n", device2.serial.c_str());
+  if (!device2.hardware_version.empty())
+    printf("SecondaryDevice.HardwareVersion=%s\n",
+           device2.hardware_version.c_str());
+  if (!device2.software_version.empty())
+    printf("SecondaryDevice.SoftwareVersion=%s\n",
+           device2.software_version.c_str());
+
   const FlarmData &flarm = basic.flarm;
   if (flarm.status.available) {
     printf("FLARM rx=%u tx=%u\n", flarm.status.rx, flarm.status.tx);
@@ -142,6 +166,12 @@ Dump(const NMEAInfo &basic)
 
   if (basic.engine_noise_level_available)
     printf("ENL=%u\n", basic.engine_noise_level);
+
+  if (basic.voltage_available)
+    printf("Battery=%fV\n", (double)basic.voltage);
+
+  if (basic.battery_level_available)
+    printf("Battery=%f%%\n", (double)basic.battery_level);
 
   Dump(basic.settings);
 }

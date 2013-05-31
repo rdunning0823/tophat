@@ -52,8 +52,8 @@ TabDisplay::TabDisplay(TabBarControl& _theTabBar, const DialogLook &_look,
 
 TabDisplay::~TabDisplay()
 {
-  for (auto i = buttons.begin(), end = buttons.end(); i != end; ++i)
-    delete *i;
+  for (const auto i : buttons)
+    delete i;
 }
 
 const PixelRect &
@@ -61,8 +61,8 @@ TabDisplay::GetButtonSize(unsigned i) const
 {
   assert(i < GetSize());
 
-  if (buttons[i]->but_size.left < buttons[i]->but_size.right)
-    return buttons[i]->but_size;
+  if (buttons[i]->rc.left < buttons[i]->rc.right)
+    return buttons[i]->rc;
 
   const UPixelScalar margin = 1;
 
@@ -113,17 +113,15 @@ TabDisplay::GetButtonSize(unsigned i) const
     rc.right = rc.left + but_width;
   }
 
-  buttons[i]->but_size = rc;
-  return buttons[i]->but_size;
+  buttons[i]->rc = rc;
+  return buttons[i]->rc;
 }
 
 void
 TabDisplay::PaintButton(Canvas &canvas, const unsigned CaptionStyle,
                         const TCHAR *caption, const PixelRect &rc,
-                        bool isButtonOnly, const Bitmap *bmp,
-                        const bool isDown, bool inverse)
+                        const Bitmap *bmp, const bool isDown, bool inverse)
 {
-
   PixelRect rcTextFinal = rc;
   const UPixelScalar buttonheight = rc.bottom - rc.top;
   const PixelSize text_size = canvas.CalcTextSize(caption);
@@ -138,14 +136,8 @@ TabDisplay::PaintButton(Canvas &canvas, const unsigned CaptionStyle,
 
   rcTextFinal.top += textheightoffset;
 
-  //button-only formatting
-  if (isButtonOnly
-      && !isDown) {
-    canvas.DrawButton(rc, false);
-    canvas.SetBackgroundTransparent();
-  } else {
-    canvas.DrawFilledRectangle(rc, canvas.GetBackgroundColor());
-  }
+  canvas.DrawFilledRectangle(rc, canvas.GetBackgroundColor());
+
   if (bmp != NULL) {
     const PixelSize bitmap_size = bmp->GetSize();
     const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
@@ -174,9 +166,9 @@ TabDisplay::PaintButton(Canvas &canvas, const unsigned CaptionStyle,
 }
 
 void
-TabDisplay::Add(const TCHAR *caption, bool button_only, const Bitmap *bmp)
+TabDisplay::Add(const TCHAR *caption, const Bitmap *bmp)
 {
-  OneTabButton *b = new OneTabButton(caption, button_only, bmp);
+  TabButton *b = new TabButton(caption, bmp);
   buttons.append(b);
 }
 
@@ -185,7 +177,7 @@ TabDisplay::GetButtonIndexAt(RasterPoint p) const
 {
   for (unsigned i = 0; i < GetSize(); i++) {
     const PixelRect &rc = GetButtonSize(i);
-    if (PtInRect(&rc, p))
+    if (IsPointInRect(rc, p))
       return i;
   }
 
@@ -203,7 +195,7 @@ TabDisplay::OnPaint(Canvas &canvas)
 
   const bool is_focused = HasFocus();
   for (unsigned i = 0; i < buttons.size(); i++) {
-    const OneTabButton &button = *buttons[i];
+    const TabButton &button = *buttons[i];
 
     const bool is_down = (int)i == down_index && !drag_off_button;
     const bool is_selected = i == tab_bar.GetCurrentPage();
@@ -215,11 +207,7 @@ TabDisplay::OnPaint(Canvas &canvas)
                                                            is_down));
 
     const PixelRect &rc = GetButtonSize(i);
-    PaintButton(canvas, CaptionStyle,
-                button.caption,
-                rc,
-                button.is_button_only,
-                button.bmp,
+    PaintButton(canvas, CaptionStyle, button.caption, rc, button.bitmap,
                 is_down, is_selected);
   }
 }
@@ -319,16 +307,12 @@ TabDisplay::OnKeyDown(unsigned key_code)
 bool
 TabDisplay::OnMouseDown(PixelScalar x, PixelScalar y)
 {
-  drag_end();
-
-  RasterPoint Pos;
-  Pos.x = x;
-  Pos.y = y;
+  EndDrag();
 
   // If possible -> Give focus to the Control
   SetFocus();
 
-  int i = GetButtonIndexAt(Pos);
+  int i = GetButtonIndexAt({ x, y });
   if (i >= 0) {
     dragging = true;
     down_index = i;
@@ -343,14 +327,10 @@ TabDisplay::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 TabDisplay::OnMouseUp(PixelScalar x, PixelScalar y)
 {
-  RasterPoint Pos;
-  Pos.x = x;
-  Pos.y = y;
-
   if (dragging) {
-    drag_end();
+    EndDrag();
 
-    int i = GetButtonIndexAt(Pos);
+    int i = GetButtonIndexAt({ x, y });
     if (i == down_index)
       tab_bar.ClickPage(i);
 
@@ -370,20 +350,17 @@ TabDisplay::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     return false;
 
   const PixelRect rc = GetButtonSize(down_index);
-  RasterPoint Pos;
-  Pos.x = x;
-  Pos.y = y;
 
-  const bool tmp = !PtInRect(&rc, Pos);
-  if (drag_off_button != tmp) {
-    drag_off_button = tmp;
+  bool not_on_button = !IsPointInRect(rc, { x, y });
+  if (drag_off_button != not_on_button) {
+    drag_off_button = not_on_button;
     Invalidate(rc);
   }
   return true;
 }
 
 void
-TabDisplay::drag_end()
+TabDisplay::EndDrag()
 {
   if (dragging) {
     dragging = false;

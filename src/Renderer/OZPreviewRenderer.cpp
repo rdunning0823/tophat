@@ -26,6 +26,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Features.hpp"
 #include "Engine/Task/ObservationZones/CylinderZone.hpp"
+#include "Engine/Task/ObservationZones/Boundary.hpp"
 #include "Renderer/AirspaceRendererSettings.hpp"
 #include "Look/AirspaceLook.hpp"
 #include "Look/TaskLook.hpp"
@@ -37,7 +38,8 @@ OZPreviewRenderer::Draw(Canvas &canvas, const ObservationZonePoint &oz,
                         const RasterPoint pt, unsigned radius,
                         const TaskLook &look,
                         const AirspaceRendererSettings &airspace_settings,
-                        const AirspaceLook &airspace_look)
+                        const AirspaceLook &airspace_look,
+                        bool has_target)
 {
   fixed scale;
   GeoPoint center;
@@ -46,12 +48,11 @@ OZPreviewRenderer::Draw(Canvas &canvas, const ObservationZonePoint &oz,
     scale = fixed(radius) / ((const CylinderZone &)oz).GetRadius();
     center = oz.GetReference();
   } else {
-    ObservationZone::Boundary boundary = oz.GetBoundary();
+    OZBoundary boundary = oz.GetBoundary();
 
-    auto it = boundary.begin();
-    GeoBounds bounds(*it);
-    for (auto it_end = boundary.end(); it != it_end; ++it)
-      bounds.Extend(*it);
+    GeoBounds bounds = GeoBounds::Invalid();
+    for (auto i = boundary.begin(), end = boundary.end(); i != end; ++i)
+      bounds.Extend(*i);
 
     center = bounds.GetCenter();
 
@@ -75,4 +76,8 @@ OZPreviewRenderer::Draw(Canvas &canvas, const ObservationZonePoint &oz,
   ozv.Draw(canvas, OZRenderer::LAYER_SHADE, projection, oz, 1);
   ozv.Draw(canvas, OZRenderer::LAYER_INACTIVE, projection, oz, 1);
   ozv.Draw(canvas, OZRenderer::LAYER_ACTIVE, projection, oz, 1);
+  if (has_target) {
+    RasterPoint p_center = projection.GeoToScreen(oz.GetReference());
+    look.target_icon.Draw(canvas, p_center.x, p_center.y);
+  }
 }

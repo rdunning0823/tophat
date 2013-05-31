@@ -126,6 +126,17 @@ LocalPath(TCHAR *gcc_restrict buffer, const TCHAR *gcc_restrict subdir,
   return buffer;
 }
 
+const TCHAR *
+RelativePath(const TCHAR *path)
+{
+  assert(data_path != NULL);
+
+  const TCHAR *p = StringAfterPrefix(path, data_path);
+  return p != NULL && IsDirSeparator(*p)
+    ? p + 1
+    : NULL;
+}
+
 /**
  * Convert backslashes to slashes on platforms where it matters.
  * @param p Pointer to the string to normalize
@@ -170,12 +181,12 @@ ContractLocalPath(TCHAR* filein)
   TCHAR output[MAX_PATH];
 
   // Get the relative file name and location (ptr)
-  const TCHAR *ptr = StringAfterPrefix(filein, data_path);
-  if (ptr == NULL || !IsDirSeparator(*ptr))
+  const TCHAR *relative = RelativePath(filein);
+  if (relative == NULL)
     return;
 
   // Replace the full local path by the code "%LOCAL_PATH%\\" (output)
-  _stprintf(output, _T("%s%s"), local_path_code, ptr + 1);
+  _stprintf(output, _T("%s%s"), local_path_code, relative);
   // ... and copy it to the buffer (filein)
   _tcscpy(filein, output);
 }
@@ -394,7 +405,7 @@ FindDataPath()
     if (stat(ANDROID_SAMSUNG_EXTERNAL_SD, &st) == 0 &&
         (st.st_mode & S_IFDIR) != 0 &&
         fgrep("/proc/mounts", ANDROID_SAMSUNG_EXTERNAL_SD " ", "tmpfs ")) {
-      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+      __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                           "Enable Samsung hack, " XCSDATADIR " in "
                           ANDROID_SAMSUNG_EXTERNAL_SD);
       return strdup(ANDROID_SAMSUNG_EXTERNAL_SD "/" XCSDATADIR);
@@ -404,7 +415,7 @@ FindDataPath()
     char buffer[MAX_PATH];
     if (Environment::getExternalStoragePublicDirectory(buffer, sizeof(buffer),
                                                        "XCSoarData") != NULL) {
-      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+      __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                           "Environment.getExternalStoragePublicDirectory()='%s'",
                           buffer);
       return strdup(buffer);
@@ -414,7 +425,7 @@ FindDataPath()
        getExternalStoragePublicDirectory() needs API level 8 */
     if (Environment::getExternalStorageDirectory(buffer,
                                                  sizeof(buffer) - 32) != NULL) {
-      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+      __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                           "Environment.getExternalStorageDirectory()='%s'",
                           buffer);
 
@@ -423,7 +434,7 @@ FindDataPath()
     }
 
     /* hard-coded path for Android */
-    __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+    __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                         "Fallback " XCSDATADIR " in " ANDROID_SDCARD);
 #endif
     return _tcsdup(_T(ANDROID_SDCARD "/" XCSDATADIR));
@@ -488,12 +499,40 @@ VisitDataFiles(const TCHAR* filter, File::Visitor &visitor)
 #endif /* _WIN32_WCE && !GNAV*/
 }
 
+#ifdef ANDROID
+/**
+ * Resolve all symlinks in the specified (allocated) string, and
+ * returns a newly allocated string.  The specified string is freed by
+ * this function.
+ */
+static char *
+RealPath(char *path)
+{
+  char buffer[4096];
+  char *result = realpath(path, buffer);
+  if (result == NULL)
+    return path;
+
+  free(path);
+  return strdup(result);
+}
+#endif
+
 bool
 InitialiseDataPath()
 {
   data_path = FindDataPath();
   if (data_path == NULL)
     return false;
+
+#ifdef ANDROID
+  /* on some Android devices, /sdcard or /sdcard/external_sd are
+     symlinks, and on some devices (Samsung phones), the Android
+     DownloadManager does not allow destination paths pointing inside
+     these symlinks; to avoid problems with this restriction, all
+     symlinks on the way must be resolved by RealPath(): */
+  data_path = RealPath(data_path);
+#endif
 
   data_path_length = _tcslen(data_path);
   return true;

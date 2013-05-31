@@ -21,10 +21,11 @@
 */
 
 #include "AbstractAirspace.hpp"
+#include "Util/StringUtil.hpp"
 #include "Navigation/Aircraft.hpp"
 #include "AirspaceAircraftPerformance.hpp"
 #include "AirspaceInterceptSolution.hpp"
-#include "Navigation/Flat/FlatBoundingBox.hpp"
+#include "Geo/Flat/FlatBoundingBox.hpp"
 #include "Geo/GeoBounds.hpp"
 #include "AirspaceIntersectionVector.hpp"
 
@@ -193,8 +194,8 @@ AbstractAirspace::Intercept(const AircraftState &state,
 
   AirspaceInterceptSolution this_solution =
     AirspaceInterceptSolution::Invalid();
-  for (auto it = vis.begin(); it != vis.end(); ++it)
-    Intercept(state, perf, this_solution, it->first, it->second);
+  for (const auto &i : vis)
+    Intercept(state, perf, this_solution, i.first, i.second);
 
   if (!this_solution.IsValid())
     return false;
@@ -219,7 +220,7 @@ AbstractAirspace::MatchNamePrefix(const TCHAR *prefix) const
                         name.c_str(), prefix_length,
                         prefix, prefix_length) == CSTR_EQUAL;
 #else
-  return _tcsnicmp(name.c_str(), prefix, prefix_length) == 0;
+  return StringIsEqualIgnoreCase(name.c_str(), prefix, prefix_length);
 #endif
 }
 
@@ -263,13 +264,13 @@ AbstractAirspace::GetClearance(const TaskProjection &projection) const
   FlatBoundingBox bb = m_clearance.CalculateBoundingbox();
   FlatGeoPoint center = bb.GetCenter();
 
-  for (auto i= m_clearance.begin(); i != m_clearance.end(); ++i) {
-    FlatGeoPoint p = i->get_flatLocation();
+  for (SearchPoint &i : m_clearance) {
+    FlatGeoPoint p = i.GetFlatLocation();
     FlatRay r(center, p);
     int mag = r.Magnitude();
     int mag_new = mag + RADIUS;
     p = r.Parametric((fixed)mag_new / mag);
-    *i = SearchPoint(projection.unproject(p), p);
+    i = SearchPoint(projection.Unproject(p), p);
   }
 
   return m_clearance;

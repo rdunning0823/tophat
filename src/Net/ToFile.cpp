@@ -23,9 +23,6 @@ Copyright_License {
 
 #include "Net/ToFile.hpp"
 #include "Net/Features.hpp"
-
-#ifdef HAVE_NET
-
 #include "Net/Request.hpp"
 #include "Operation/Operation.hpp"
 #include "OS/FileUtil.hpp"
@@ -35,7 +32,7 @@ Copyright_License {
 #include <stdio.h>
 
 static bool
-DownloadToFile(Net::Session &session, const TCHAR *url, FILE *file,
+DownloadToFile(Net::Session &session, const char *url, FILE *file,
                char *md5_digest,
                OperationEnvironment &env)
 {
@@ -43,8 +40,13 @@ DownloadToFile(Net::Session &session, const TCHAR *url, FILE *file,
   assert(file != NULL);
 
   Net::Request request(session, url, 10000);
-  if (!request.Created())
+  if (!request.Send(10000))
     return false;
+
+  int64_t total = request.GetLength();
+  if (total >= 0)
+    env.SetProgressRange(total);
+  total = 0;
 
   MD5 md5;
   md5.InitKey();
@@ -54,7 +56,10 @@ DownloadToFile(Net::Session &session, const TCHAR *url, FILE *file,
     if (env.IsCancelled())
       return false;
 
-    size_t nbytes = request.Read(buffer, sizeof(buffer), 5000);
+    ssize_t nbytes = request.Read(buffer, sizeof(buffer), 5000);
+    if (nbytes < 0)
+      return false;
+
     if (nbytes == 0)
       break;
 
@@ -62,8 +67,11 @@ DownloadToFile(Net::Session &session, const TCHAR *url, FILE *file,
       md5.Append(buffer, nbytes);
 
     size_t written = fwrite(buffer, 1, nbytes, file);
-    if (written != nbytes)
+    if (written != (size_t)nbytes)
       return false;
+
+    total += nbytes;
+    env.SetProgressPosition(total);
   }
 
   if (md5_digest != NULL) {
@@ -75,7 +83,7 @@ DownloadToFile(Net::Session &session, const TCHAR *url, FILE *file,
 }
 
 bool
-Net::DownloadToFile(Session &session, const TCHAR *url, const TCHAR *path,
+Net::DownloadToFile(Session &session, const char *url, const TCHAR *path,
                     char *md5_digest,
                     OperationEnvironment &env)
 {
@@ -107,5 +115,3 @@ Net::DownloadToFileJob::Run(OperationEnvironment &env)
 {
   success = DownloadToFile(session, url, path, md5_digest,env);
 }
-
-#endif

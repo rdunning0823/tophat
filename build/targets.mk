@@ -1,4 +1,4 @@
-TARGETS = PC WIN64 PPC2000 PPC2003 PPC2003X WM5 WM5X ALTAIR WINE UNIX ANDROID ANDROID7 ANDROID86 ANDROIDMIPS ANDROIDFAT CYGWIN
+TARGETS = PC WIN64 PPC2000 PPC2003 PPC2003X WM5 WM5X ALTAIR WINE UNIX UNIX32 UNIX64 ANDROID ANDROID7 ANDROID86 ANDROIDMIPS ANDROIDFAT CYGWIN
 
 ifeq ($(TARGET),)
   ifeq ($(HOST_IS_UNIX),y)
@@ -11,9 +11,6 @@ else
     $(error Unknown target: $(TARGET))
   endif
 endif
-
-# These targets are built when you don't specify the TARGET variable.
-DEFAULT_TARGETS = PC PPC2000 PPC2003 WM5 ALTAIR WINE
 
 TARGET_FLAVOR := $(TARGET)
 
@@ -40,19 +37,16 @@ TARGET_ARCH :=
 
 ifeq ($(TARGET),WIN64)
   X64 := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = PC
 endif
 
 ifeq ($(TARGET),PPC2003X)
   XSCALE := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = PPC2003
 endif
 
 ifeq ($(TARGET),WM5X)
   XSCALE := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = WM5
 endif
 
@@ -67,25 +61,21 @@ endif
 
 ifeq ($(TARGET),ANDROID7)
   ARMV7 := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = ANDROID
 endif
 
 ifeq ($(TARGET),ANDROID86)
   X86 := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = ANDROID
 endif
 
 ifeq ($(TARGET),ANDROIDMIPS)
   MIPS := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = ANDROID
 endif
 
 ifeq ($(TARGET),ANDROIDFAT)
   FAT_BINARY := y
-  TARGET_FLAVOR := $(TARGET)
   override TARGET = ANDROID
 endif
 
@@ -170,6 +160,19 @@ ifeq ($(TARGET),UNIX)
   # LOCAL_TCPREFIX is set in local-config.mk if configure was run.
   TCPREFIX := $(LOCAL_TCPREFIX)
   TCSUFFIX := $(LOCAL_TCSUFFIX)
+endif
+
+ifeq ($(TARGET),UNIX32)
+  override TARGET = UNIX
+  TARGET_ARCH += -m32
+endif
+
+ifeq ($(TARGET),UNIX64)
+  override TARGET = UNIX
+  TARGET_ARCH += -m64
+endif
+
+ifeq ($(TARGET),UNIX)
   HAVE_POSIX := y
   HAVE_WIN32 := n
   HAVE_MSVCRT := n
@@ -186,24 +189,27 @@ ifeq ($(filter $(TARGET),UNIX WINE),$(TARGET))
 endif
 
 ifeq ($(TARGET),ANDROID)
-  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r8
+  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r8b
 
   ANDROID_PLATFORM = android-14
   ANDROID_ARCH = arm
   ANDROID_ABI2 = arm-linux-androideabi
   ANDROID_ABI3 = armeabi
   ANDROID_ABI4 = $(ANDROID_ABI2)
-  ANDROID_GCC_VERSION = 4.4.3
+  ANDROID_ABI_SUBDIR = .
+  ANDROID_GCC_VERSION = 4.6
+  ANDROID_GCC_VERSION2 = $(ANDROID_GCC_VERSION).x-google
 
   ifeq ($(ARMV7),y)
     ANDROID_ABI3 = armeabi-v7a
+    ANDROID_ABI_SUBDIR = armv7-a
   endif
 
   ifeq ($(X86),y)
     ANDROID_ARCH = x86
     ANDROID_ABI2 = x86
     ANDROID_ABI3 = x86
-    ANDROID_ABI4 = i686-android-linux
+    ANDROID_ABI4 = i686-linux-android
   endif
 
   ifeq ($(MIPS),y)
@@ -216,6 +222,8 @@ ifeq ($(TARGET),ANDROID)
   ANDROID_TARGET_ROOT = $(ANDROID_NDK_PLATFORM)/arch-$(ANDROID_ARCH)
   ifeq ($(HOST_IS_DARWIN),y)
     ANDROID_TOOLCHAIN = $(ANDROID_NDK)/toolchains/$(ANDROID_ABI2)-$(ANDROID_GCC_VERSION)/prebuilt/darwin-x86
+  else ifeq ($(WINHOST),y)
+    ANDROID_TOOLCHAIN = $(ANDROID_NDK)/toolchains/$(ANDROID_ABI2)-$(ANDROID_GCC_VERSION)/prebuilt/windows
   else
     ANDROID_TOOLCHAIN = $(ANDROID_NDK)/toolchains/$(ANDROID_ABI2)-$(ANDROID_GCC_VERSION)/prebuilt/linux-x86
   endif
@@ -346,7 +354,7 @@ ifeq ($(HAVE_WIN32),y)
   endif
 
   WINDRESFLAGS := -I$(SRC) $(TARGET_CPPFLAGS)
-endif # UNIX
+endif
 
 ifeq ($(TARGET),PC)
   TARGET_ARCH += -mwindows -mms-bitfields
@@ -409,12 +417,11 @@ ifeq ($(TARGET),ANDROID)
   endif
 endif
 
-ifneq ($(filter PC WINE,$(TARGET)),)
+ifneq ($(filter PC WINE CYGWIN,$(TARGET)),)
   TARGET_LDLIBS += -lwinmm
 endif
 
 ifeq ($(TARGET),CYGWIN)
-  TARGET_LDLIBS += -lwinmm
   TARGET_LDLIBS += -lintl
 endif
 
@@ -435,7 +442,7 @@ endif
 ifeq ($(TARGET),ANDROID)
   TARGET_LDLIBS += -lc -lm
   TARGET_LDLIBS += -llog
-  TARGET_LDADD += $(ANDROID_TOOLCHAIN)/lib/gcc/$(ANDROID_ABI4)/$(ANDROID_GCC_VERSION)/libgcc.a
+  TARGET_LDADD += $(ANDROID_TOOLCHAIN)/lib/gcc/$(ANDROID_ABI4)/$(ANDROID_GCC_VERSION2)/$(ANDROID_ABI_SUBDIR)/libgcc.a
 endif
 
 ######## output files

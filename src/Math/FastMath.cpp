@@ -39,9 +39,6 @@ compare_squared(int a, int b, int c)
   return 0;
 }
 
-extern "C"
-{
-
 /**
  * Calculates the square root of val
  *
@@ -49,8 +46,8 @@ extern "C"
  * @param val Value
  * @return Rounded square root of val
  */
-unsigned int
-isqrt4(unsigned long val)
+unsigned
+isqrt4(unsigned val)
 {
 #if defined(__i386__) || defined(__x86_64__)
   /* x86 FPUs are extremely fast */
@@ -95,8 +92,6 @@ isqrt4(unsigned long val)
 #endif
 }
 
-}
-
 fixed
 thermal_recency_fn(unsigned x)
 {
@@ -127,7 +122,7 @@ unsigned i_rsqrt(const uint64_t x, const uint64_t yhint)
 static inline
 unsigned log2_fast(const unsigned v)
 {
-  static gcc_constexpr_data int8_t LogTable256[256] = {
+  static constexpr int8_t LogTable256[256] = {
 #define L8(n) n, n, n, n, n, n, n, n
 #define L16(n) L8(n), L8(n)
     -1, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,

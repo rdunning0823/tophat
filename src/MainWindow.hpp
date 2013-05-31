@@ -29,8 +29,8 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxLayout.hpp"
 #include "PopupMessage.hpp"
 #include "BatteryTimer.hpp"
-#include "DisplayMode.hpp"
 #include "Form/ManagedWidget.hpp"
+#include "MapWindow/MapWidgetOverlays.hpp"
 
 #include <stdint.h>
 #include <assert.h>
@@ -44,6 +44,7 @@ class StatusMessageList;
 class RasterTerrain;
 class TopographyStore;
 class MapWindowProjection;
+class TaskNavSliderWidget;
 
 /**
  * The XCSoar main window.
@@ -97,7 +98,25 @@ private:
   PixelRect map_rect;
   bool FullScreen;
 
+#ifndef ENABLE_OPENGL
+  /**
+   * This variable tracks whether the #DrawThread was suspended
+   * because the map was replaced by a #Widget.
+   */
+  bool draw_suspended;
+#endif
+
   bool airspace_warning_pending;
+
+  /**
+   * collection of widgets displayed over the map
+   */
+  MapWidgetOverlays widget_overlays;
+
+ /**
+  * used to access the widget to update the task
+  */
+  TaskNavSliderWidget *task_nav_slider_widget;
 
 public:
   MainWindow(const StatusMessageList &status_messages);
@@ -214,9 +233,6 @@ public:
   void SetTerrain(RasterTerrain *terrain);
   void SetTopography(TopographyStore *topography);
 
-  gcc_pure
-  DisplayMode GetDisplayMode() const;
-
   const Look &GetLook() const {
     assert(look != NULL);
 
@@ -265,8 +281,10 @@ public:
    * Replace the map with a #Widget.  The Widget instance gets deleted
    * when the map gets reactivated with ActivateMap() or if another
    * Widget gets set.
+   * @param full_screen.  If true, widget occupies full screen,
+   * else only map portion of screen
    */
-  void SetWidget(Widget *_widget);
+  void SetWidget(Widget *_widget, bool full_screen = false);
 
   void UpdateGaugeVisibility();
 

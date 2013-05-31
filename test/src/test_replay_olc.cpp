@@ -6,6 +6,10 @@
 #include "Engine/Contest/ContestManager.hpp"
 #include "ComputerSettings.hpp"
 #include "OS/PathName.hpp"
+#include "IO/FileLineReader.hpp"
+#include "Navigation/Aircraft.hpp"
+#include "NMEA/MoreData.hpp"
+#include "NMEA/Derived.hpp"
 
 #include <fstream>
 
@@ -48,13 +52,12 @@ inline void load_score_file(std::ifstream& fscore,
   double tmp;
   fscore >> tmp; score.score = (fixed)tmp;
   fscore >> tmp; score.distance = (fixed)tmp;
-  fscore >> tmp; score.speed = (fixed)tmp;
-  if (score.speed>fixed_zero) {
-    score.time = fixed(3600)*score.distance/score.speed;
+  fscore >> tmp; fixed speed(tmp);
+  if (speed>fixed_zero) {
+    score.time = fixed(3600)*score.distance/speed;
   } else {
     score.time = fixed_zero;
   }
-  score.speed /= fixed(3.6);
   score.distance *= fixed(1000);
 }
 
@@ -87,9 +90,9 @@ inline void load_scores(unsigned &contest_handicap) {
 class ReplayLoggerSim: public IgcReplay
 {
 public:
-  ReplayLoggerSim(): 
-    IgcReplay(),
-    started(false) {}
+  ReplayLoggerSim(NLineReader *reader)
+    :IgcReplay(reader),
+     started(false) {}
 
   AircraftState state;
 
@@ -103,8 +106,6 @@ public:
 
 protected:
   virtual void OnReset() {}
-  virtual void OnStop() {}
-  virtual void OnBadFile() {}
 
   void OnAdvance(const GeoPoint &loc,
                   const fixed speed, const Angle bearing,
@@ -132,9 +133,13 @@ test_replay(const Contests olc_type,
   GlidePolar glide_polar(fixed_two);
   AircraftState state_last;
 
-  ReplayLoggerSim sim;
-  PathName szFilename(replay_file.c_str());
-  sim.SetFilename(szFilename);
+  FileLineReaderA *reader = new FileLineReaderA(replay_file.c_str());
+  if (reader->error()) {
+    delete reader;
+    return false;
+  }
+
+  ReplayLoggerSim sim(reader);
 
   ComputerSettings settings_computer;
   settings_computer.SetDefaults();
@@ -164,12 +169,13 @@ test_replay(const Contests olc_type,
     }
   }
 
-  sim.Start();
-
   bool do_print = verbose;
   unsigned print_counter=0;
 
-  while (sim.Update() && !sim.started) {
+  MoreData basic;
+  basic.Reset();
+
+  while (sim.Update(basic, fixed_one) && !sim.started) {
   }
   state_last = sim.state;
 
@@ -178,6 +184,9 @@ test_replay(const Contests olc_type,
   FlyingComputer flying_computer;
   flying_computer.Reset();
 
+  FlyingState flying_state;
+  flying_state.Reset();
+
   TraceComputer trace_computer;
 
   ContestManager contest_manager(olc_type,
@@ -185,14 +194,20 @@ test_replay(const Contests olc_type,
                                  trace_computer.GetSprint());
   contest_manager.SetHandicap(settings_computer.task.contest_handicap);
 
-  while (sim.Update()) {
+  DerivedInfo calculated;
+
+  while (sim.Update(basic, fixed_one)) {
     if (sim.state.time>time_last) {
 
       n_samples++;
 
-      flying_computer.Compute(glide_polar.GetVTakeoff(), sim.state, sim.state);
+      flying_computer.Compute(glide_polar.GetVTakeoff(),
+                              sim.state, sim.state.time - time_last,
+                              flying_state);
 
-      trace_computer.Update(settings_computer, sim.state);
+      calculated.flight.flying = flying_state.flying;
+
+      trace_computer.Update(settings_computer, basic, calculated);
 
       contest_manager.UpdateIdle();
   
@@ -209,12 +224,11 @@ test_replay(const Contests olc_type,
     }
     time_last = sim.state.time;
   };
-  sim.Stop();
 
   contest_manager.SolveExhaustive();
 
   if (verbose) {
-    distance_counts();
+    PrintDistanceCounts();
   }
   return compare_scores(official_score, 
                         contest_manager.GetStats().GetResult(0));
@@ -223,7 +237,7 @@ test_replay(const Contests olc_type,
 
 int main(int argc, char** argv) 
 {
-  if (!parse_args(argc,argv)) {
+  if (!ParseArgs(argc,argv)) {
     return 0;
   }
 

@@ -22,6 +22,7 @@
 
 #include "Math/FastMath.h"
 #include "harness_flight.hpp"
+#include "harness_wind.hpp"
 
 static bool
 test_automc(int test_num, int n_wind)
@@ -39,7 +40,7 @@ test_automc(int test_num, int n_wind)
   if (!fine || verbose)
     printf("# time ratio %g\n", t1 / t0);
 
-  ok(fine, test_name("faster with auto mc on", test_num, n_wind), 0);
+  ok(fine, GetTestName("faster with auto mc on", test_num, n_wind), 0);
 
   return fine;
 }
@@ -50,7 +51,7 @@ main(int argc, char** argv)
   // default arguments
   autopilot_parms.SetIdeal();
 
-  if (!parse_args(argc,argv)) {
+  if (!ParseArgs(argc,argv)) {
     return 0;
   }
 

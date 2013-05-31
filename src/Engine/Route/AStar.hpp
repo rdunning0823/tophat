@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef ASTAR_HPP
 #define ASTAR_HPP
 
-#include "Util/queue.hpp"
+#include "Util/ReservablePriorityQueue.hpp"
 #include <assert.h>
 #include "Compiler.h"
 
@@ -84,13 +84,13 @@ struct AStarPriorityValue
  * Modifications by John Wharington to track optimal solution
  * @see http://en.giswiki.net/wiki/Dijkstra%27s_algorithm
  */
-template <class Node, bool m_min=true>
+template <class Node, class CompareNode=std::less<Node>, bool m_min=true>
 class AStar
 {
 #ifdef ASTAR_TR1
   typedef std::tr1::unordered_map<Node, AStarPriorityValue> node_value_map;
 #else
-  typedef std::map<Node, AStarPriorityValue> node_value_map;
+  typedef std::map<Node, AStarPriorityValue, CompareNode> node_value_map;
 #endif
 
   typedef typename node_value_map::iterator node_value_iterator;
@@ -99,7 +99,7 @@ class AStar
 #ifdef ASTAR_TR1
   typedef std::tr1::unordered_map<Node, Node> node_parent_map;
 #else
-  typedef std::map<Node, Node> node_parent_map;
+  typedef std::map<Node, Node, CompareNode> node_parent_map;
 #endif
 
   typedef typename node_parent_map::iterator node_parent_iterator;
@@ -110,7 +110,7 @@ class AStar
 
     node_value_iterator iterator;
 
-    gcc_constexpr_ctor
+    constexpr
     NodeValue(const AStarPriorityValue &_priority,
               node_value_iterator _iterator)
       :priority(_priority), iterator(_iterator) {}

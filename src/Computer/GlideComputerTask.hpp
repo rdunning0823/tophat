@@ -30,6 +30,7 @@ Copyright_License {
 
 struct NMEAInfo;
 class ProtectedTaskManager;
+class Waypoints;
 
 class GlideComputerTask
 {
@@ -40,6 +41,8 @@ class GlideComputerTask
   TraceComputer trace;
 
   ContestComputer contest;
+
+  bool last_flying;
 
 public:
   GlideComputerTask(ProtectedTaskManager &_task,
@@ -69,7 +72,9 @@ public:
   void ProcessBasicTask(const MoreData &basic, const MoreData &last_basic,
                         DerivedInfo &calculated,
                         const DerivedInfo &last_calculated,
-                        const ComputerSettings &settings_computer);
+                        const ComputerSettings &settings_computer,
+                        const Waypoints &waypoints, bool force);
+
   void ProcessMoreTask(const MoreData &basic, DerivedInfo &calculated,
                        const DerivedInfo &last_calculated,
                        const ComputerSettings &settings_computer);
@@ -81,8 +86,7 @@ public:
   /**
    * Auto-create a task on takeoff that leads back home.
    */
-  void ProcessAutoTask(const NMEAInfo &basic, const DerivedInfo &calculated,
-                       const DerivedInfo &last_calculated);
+  void ProcessAutoTask(const NMEAInfo &basic, const DerivedInfo &calculated);
 
   void ProcessIdle(const MoreData &basic, DerivedInfo &calculated,
                    const ComputerSettings &settings_computer,

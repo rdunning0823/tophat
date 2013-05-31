@@ -27,6 +27,49 @@
 
 #include <stdio.h>
 
+static constexpr struct {
+  double in;
+  unsigned out;
+} uround_test_values[] = {
+  { 0, 0 },
+  { 0.1, 0 },
+  { 0.49, 0 },
+  { 0.5, 1 },
+  { 0.51, 1 },
+  { 0.99999, 1 },
+  { 1, 1 },
+  { 4294967295.0, 4294967295u },
+  { 4294967295.4, 4294967295u },
+  { 4294967294.5, 4294967295u },
+};
+
+static constexpr struct {
+  double in;
+  int out;
+} iround_test_values[] = {
+  { 0, 0 },
+  { 0.1, 0 },
+  { 0.49, 0 },
+  { 0.51, 1 },
+  { 0.99999, 1 },
+  { 1, 1 },
+  { 2147483647, 2147483647 },
+  { 2147483647.49, 2147483647 },
+  { 2147483646.51, 2147483647 },
+};
+
+static void
+TestRound()
+{
+  for (unsigned i = 0; i < ARRAY_SIZE(uround_test_values); ++i)
+    ok1(uround(fixed(uround_test_values[i].in)) == uround_test_values[i].out);
+
+  for (unsigned i = 0; i < ARRAY_SIZE(iround_test_values); ++i) {
+    ok1(iround(fixed(iround_test_values[i].in)) == iround_test_values[i].out);
+    ok1(iround(fixed(-iround_test_values[i].in)) == -iround_test_values[i].out);
+  }
+}
+
 // tolerance is 0.3%
 
 static void test_mag_rmag(double mag) {
@@ -72,8 +115,41 @@ static void test_hypot() {
   }
 }
 
+static constexpr double tiny_hypot_test_values[][2] = {
+  { 3, 3 },
+  { 2, 2 },
+  { 1.5, 1.5 },
+  { 1, 1 },
+  { 0.1, 0.1 },
+  { 0.01, 0.01 },
+  { 0.001, 0.001 },
+  { 0.0001, 0.0001 },
+  { 0.00001, 0.00001 },
+  { 0.000001, 0.000001 },
+  { 0.0, 0.0 },
+};
+
+static void
+TestTinyHypot()
+{
+  for (unsigned i = 0; i < ARRAY_SIZE(tiny_hypot_test_values); i++) {
+    double dx = tiny_hypot_test_values[i][0];
+    double dy = tiny_hypot_test_values[i][1];
+    double d = hypot(dx, dy);
+
+    fixed fdx(dx);
+    fixed fdy(dy);
+    fixed fd(TinyHypot(fdx, fdy));
+
+    ok(fabs(fd - fixed(d)) < fixed(1.0e-3), "hypot(dx, dy)", 0);
+  }
+}
+
 int main(int argc, char** argv) {
-  plan_tests(43 + ARRAY_SIZE(Hypot_test_values));
+  plan_tests(43 + ARRAY_SIZE(Hypot_test_values)
+             + ARRAY_SIZE(uround_test_values)
+             + 2 * ARRAY_SIZE(iround_test_values)
+             + ARRAY_SIZE(tiny_hypot_test_values));
 
   /* check the division operator */
   ok((fixed_one / fixed_one) * fixed(1000) == fixed(1000), "1/1", 0);
@@ -128,7 +204,9 @@ int main(int argc, char** argv) {
     }
   }
 
+  TestRound();
   test_hypot();
+  TestTinyHypot();
 
   return exit_status();
 }

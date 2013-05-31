@@ -29,7 +29,7 @@ Copyright_License {
 
 struct Emulator {
   Port *port;
-  Port::Handler *handler;
+  DataHandler *handler;
   OperationEnvironment *env;
 
   virtual ~Emulator() {}

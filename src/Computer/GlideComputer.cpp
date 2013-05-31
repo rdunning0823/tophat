@@ -30,10 +30,8 @@ Copyright_License {
 #include "PeriodClock.hpp"
 #include "GlideComputerInterface.hpp"
 #include "ComputerSettings.hpp"
-#include "Math/Earth.hpp"
 #include "Logger/Logger.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
-#include "LocalTime.hpp"
 
 static PeriodClock last_team_code_update;
 
@@ -84,12 +82,13 @@ GlideComputer::Initialise()
  * Is called by the CalculationThread and processes the received GPS data in Basic()
  */
 bool
-GlideComputer::ProcessGPS()
+GlideComputer::ProcessGPS(bool force)
 {
   const MoreData &basic = Basic();
   DerivedInfo &calculated = SetCalculated();
+  const ComputerSettings &settings = GetComputerSettings();
 
-  calculated.date_time_local = basic.date_time_utc + GetUTCOffset();
+  calculated.date_time_local = basic.date_time_utc + settings.utc_offset;
 
   calculated.Expire(basic.clock);
 
@@ -100,7 +99,8 @@ GlideComputer::ProcessGPS()
   // Process basic task information
   task_computer.ProcessBasicTask(basic, LastBasic(),
                                  calculated, LastCalculated(),
-                                 GetComputerSettings());
+                                 GetComputerSettings(),
+                                 waypoints, force);
   task_computer.ProcessMoreTask(basic, calculated, LastCalculated(),
                                 GetComputerSettings());
 
@@ -112,7 +112,7 @@ GlideComputer::ProcessGPS()
   TakeoffLanding();
 
   if (!time_retreated())
-    task_computer.ProcessAutoTask(basic, calculated, LastCalculated());
+    task_computer.ProcessAutoTask(basic, calculated);
 
   // Process extended information
   air_data_computer.ProcessVertical(Basic(), LastBasic(),
@@ -135,7 +135,7 @@ GlideComputer::ProcessGPS()
     calculated.trace_history.append(basic);
 
   // Update the ConditionMonitors
-  ConditionMonitorsUpdate(*this);
+  ConditionMonitorsUpdate(Basic(), Calculated(), settings);
 
   return idle_clock.CheckUpdate(500);
 }
@@ -268,6 +268,7 @@ GlideComputer::CalculateTeammateBearingRange()
 void
 GlideComputer::OnTakeoff()
 {
+  task_computer.ResetFlight(true);
   // reset stats on takeoff
   air_data_computer.ResetFlight(SetCalculated(), GetComputerSettings(), false);
 

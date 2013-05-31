@@ -27,27 +27,16 @@ Copyright_License {
 #include "Replay/IgcReplay.hpp"
 #include "PeriodClock.hpp"
 
-class Logger;
-
 class IgcReplayGlue: 
   public IgcReplay
 {
   PeriodClock clock;
 
-  Logger *logger;
-
 public:
-  IgcReplayGlue(Logger *_logger);
+  IgcReplayGlue(NLineReader *_reader):IgcReplay(_reader) {}
 
 protected:
-  virtual bool UpdateTime();
-  virtual void ResetTime();
-  virtual void OnReset();
-  virtual void OnStop();
-  virtual void OnBadFile();
-  virtual void OnAdvance(const GeoPoint &loc,
-                          const fixed speed, const Angle bearing,
-                          const fixed alt, const fixed baroalt, const fixed t);
+  virtual bool UpdateTime(fixed time_scale) gcc_override;
 };
 
 #endif

@@ -36,6 +36,9 @@ bool test_task_fai(TaskManager& task_manager,
 bool test_task_aat(TaskManager& task_manager,
                    const Waypoints &waypoints);
 
+bool test_task_mat(TaskManager& task_manager,
+                   const Waypoints &waypoints);
+
 bool test_task_or(TaskManager& task_manager,
                   const Waypoints &waypoints);
 

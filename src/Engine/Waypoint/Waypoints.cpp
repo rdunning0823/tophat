@@ -112,13 +112,6 @@ Waypoints::Waypoints():
 {
 }
 
-class LandablePredicate {
-public:
-  bool operator()(const Waypoint &wp) const {
-    return wp.IsLandable();
-  }
-};
-
 void
 Waypoints::Optimise()
 {
@@ -126,10 +119,10 @@ Waypoints::Optimise()
     /* empty or already optimised */
     return;
 
-  task_projection.update_fast();
+  task_projection.Update();
 
-  for (auto it = waypoint_tree.begin(); it != waypoint_tree.end(); ++it)
-    it->Project(task_projection);
+  for (auto &i : waypoint_tree)
+    i.Project(task_projection);
 
   waypoint_tree.Optimise();
 }
@@ -147,11 +140,11 @@ Waypoints::Append(const Waypoint &_wp)
       waypoint_tree.ClearBounds();
     }
   } else if (IsEmpty())
-    task_projection.reset(wp.location);
+    task_projection.Reset(wp.location);
 
   wp.flags.watched = (wp.file_num == 3);
 
-  task_projection.scan_location(wp.location);
+  task_projection.Scan(wp.location);
   wp.id = next_id++;
 
   const Waypoint &new_wp = waypoint_tree.Add(wp);
@@ -170,7 +163,7 @@ Waypoints::GetNearest(const GeoPoint &loc, fixed range) const
 
   Waypoint bb_target(loc);
   bb_target.Project(task_projection);
-  const unsigned mrange = task_projection.project_range(loc, range);
+  const unsigned mrange = task_projection.ProjectRangeInteger(loc, range);
   const auto found = waypoint_tree.FindNearest(bb_target, mrange);
 
 #ifdef INSTRUMENT_TASK
@@ -183,17 +176,29 @@ Waypoints::GetNearest(const GeoPoint &loc, fixed range) const
   return &*found.first;
 }
 
+static bool
+IsLandable(const Waypoint &wp)
+{
+  return wp.IsLandable();
+}
+
 const Waypoint*
 Waypoints::GetNearestLandable(const GeoPoint &loc, fixed range) const
+{
+  return GetNearestIf(loc, range, IsLandable);
+}
+
+const Waypoint*
+Waypoints::GetNearestIf(const GeoPoint &loc, fixed range,
+                        std::function<bool(const Waypoint &)> predicate) const
 {
   if (IsEmpty())
     return NULL;
 
   Waypoint bb_target(loc);
   bb_target.Project(task_projection);
-  const unsigned mrange = task_projection.project_range(loc, range);
-  const auto found =
-    waypoint_tree.FindNearestIf(bb_target, mrange, LandablePredicate());
+  const unsigned mrange = task_projection.ProjectRangeInteger(loc, range);
+  const auto found = waypoint_tree.FindNearestIf(bb_target, mrange, predicate);
 
 #ifdef INSTRUMENT_TASK
   n_queries++;
@@ -229,9 +234,7 @@ Waypoints::LookupLocation(const GeoPoint &loc, const fixed range) const
 const Waypoint*
 Waypoints::FindHome()
 {
-  for (auto found = waypoint_tree.begin();
-       found != waypoint_tree.end(); ++found) {
-    const Waypoint &wp = *found;
+  for (const auto &wp : waypoint_tree) {
     if (wp.flags.home) {
       home = &wp;
       return &wp;
@@ -256,10 +259,9 @@ Waypoints::SetHome(const unsigned id)
 const Waypoint*
 Waypoints::LookupId(const unsigned id) const
 {
-  for (auto found = waypoint_tree.begin();
-       found != waypoint_tree.end(); ++found)
-    if (found->id == id)
-      return &*found;
+  for (const auto &wp : waypoint_tree)
+    if (wp.id == id)
+      return &wp;
 
   return NULL;
 }
@@ -273,7 +275,7 @@ Waypoints::VisitWithinRange(const GeoPoint &loc, const fixed range,
 
   Waypoint bb_target(loc);
   bb_target.Project(task_projection);
-  const unsigned mrange = task_projection.project_range(loc, range);
+  const unsigned mrange = task_projection.ProjectRangeInteger(loc, range);
 
   WaypointEnvelopeVisitor wve(&visitor);
 

@@ -28,8 +28,9 @@
 #include "Util/QuadTree.hpp"
 #include "Util/Serial.hpp"
 #include "Waypoint.hpp"
+#include "Geo/Flat/TaskProjection.hpp"
 
-#include "Navigation/TaskProjection.hpp"
+#include <functional>
 
 class WaypointVisitor;
 
@@ -46,12 +47,12 @@ class Waypoints: private NonCopyable
   struct WaypointAccessor {
     int GetX(const Waypoint &wp) const {
       assert(wp.flat_location_initialised);
-      return wp.flat_location.Longitude;
+      return wp.flat_location.longitude;
     }
 
     int GetY(const Waypoint &wp) const {
       assert(wp.flat_location_initialised);
-      return wp.flat_location.Latitude;
+      return wp.flat_location.latitude;
     }
   };
 
@@ -83,6 +84,8 @@ class Waypoints: private NonCopyable
   const Waypoint *home;
 
 public:
+  typedef WaypointTree::const_iterator const_iterator;
+
   /**
    * Constructor.  Task projection is updated after call to optimise().
    * As waypoints are added they are stored temporarily before applying
@@ -278,9 +281,6 @@ public:
     return name_tree.suggest(prefix, dest, max_length);
   }
 
-public:
-  typedef WaypointTree::const_iterator const_iterator;
-
   /**
    * Looks up nearest waypoint to the search location.
    * Performs search according to flat-earth internal representation,
@@ -303,6 +303,20 @@ public:
    * @return Null if none found, otherwise pointer to nearest
    */
   const Waypoint *GetNearestLandable(const GeoPoint &loc, fixed range) const;
+
+  /**
+   * Looks up nearest waypoint to the search location.
+   * Performs search according to flat-earth internal representation,
+   * so is approximate.
+   *
+   * @param loc Location from which to search
+   * @param predicate Callback that checks whether the waypoint
+   * is suitable for the request
+   *
+   * @return Null if none found, otherwise pointer to nearest
+   */
+  const Waypoint *GetNearestIf(const GeoPoint &loc, fixed range,
+                               std::function<bool(const Waypoint &)> predicate) const;
 
   /**
    * Access first waypoint in store, for use in iterators.

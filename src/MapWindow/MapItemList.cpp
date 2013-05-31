@@ -25,6 +25,7 @@ Copyright_License {
 #include "MapItem.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Engine/Airspace/AbstractAirspace.hpp"
+#include "Weather/Features.hpp"
 
 static bool
 CompareWaypointItems(const WaypointMapItem *a, const WaypointMapItem *b)
@@ -98,6 +99,14 @@ CompareMapItems(const MapItem *a, const MapItem *b)
     return ((const TaskOZMapItem *)a)->index <
            ((const TaskOZMapItem *)b)->index;
 
+  if (a->type == MapItem::TRAFFIC && b->type == MapItem::TRAFFIC)
+    return ((const TrafficMapItem *)a)->id <
+           ((const TrafficMapItem *)b)->id;
+
+  if (a->type == MapItem::THERMAL && b->type == MapItem::THERMAL)
+    return ((const ThermalMapItem *)a)->thermal.time >
+           ((const ThermalMapItem *)b)->thermal.time;
+
   if (a->type == MapItem::AIRSPACE && b->type == MapItem::AIRSPACE)
     return AirspaceAltitude::SortHighest(
         ((const AirspaceMapItem *)a)->airspace->GetBase(),
@@ -105,6 +114,12 @@ CompareMapItems(const MapItem *a, const MapItem *b)
 
   if (a->type == MapItem::MARKER && b->type == MapItem::MARKER)
     return ((const MarkerMapItem *)a)->id < ((const MarkerMapItem *)b)->id;
+
+#ifdef HAVE_NOAA
+  if (a->type == MapItem::WEATHER && b->type == MapItem::WEATHER)
+    return strcmp(((const WeatherStationMapItem *)a)->station->code,
+                  ((const WeatherStationMapItem *)b)->station->code) < 0;
+#endif
 
   return a->type < b->type;
 }

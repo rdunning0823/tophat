@@ -26,7 +26,7 @@ Copyright_License {
 #include "Asset.hpp"
 #include "IO/TextWriter.hpp"
 #include "Formatter/TimeFormatter.hpp"
-#include "OS/Clock.hpp"
+#include "DateTime.hpp"
 #include "Util/StaticString.hpp"
 
 #include <stdio.h>
@@ -37,17 +37,69 @@ Copyright_License {
 #include <android/log.h>
 #endif
 
-
-void
-LogStartUp(const TCHAR *Str, ...)
+static TextWriter
+OpenLog()
 {
   static bool initialised = false;
-  static TCHAR szFileName[MAX_PATH];
+  static TCHAR path[MAX_PATH];
 
+  const bool append = initialised;
   if (!initialised) {
-    LocalPath(szFileName, _T("xcsoar-startup.log"));
+    initialised = true;
+    LocalPath(path, _T("tophat-startup.log"));
   }
 
+  return TextWriter(path, append);
+}
+
+static void
+LogString(const char *p)
+{
+#ifdef ANDROID
+  __android_log_print(ANDROID_LOG_INFO, "TopHat", "%s", p);
+#elif defined(HAVE_POSIX) && !defined(NDEBUG)
+  fprintf(stderr, "%s\n", p);
+#endif
+
+  TextWriter writer(OpenLog());
+  if (!writer.IsOpen())
+    return;
+
+  char time_buffer[32];
+  FormatISO8601(time_buffer, BrokenDateTime::NowUTC());
+  writer.FormatLine("[%s] %s", time_buffer, p);
+}
+
+void
+LogFormat(const char *fmt, ...)
+{
+  char buf[MAX_PATH];
+  va_list ap;
+
+  va_start(ap, fmt);
+  vsprintf(buf, fmt, ap);
+  va_end(ap);
+
+  LogString(buf);
+}
+
+#ifdef _UNICODE
+
+static void
+LogString(const TCHAR *p)
+{
+  TextWriter writer(OpenLog());
+  if (!writer.IsOpen())
+    return;
+
+  TCHAR time_buffer[32];
+  FormatISO8601(time_buffer, BrokenDateTime::NowUTC());
+  writer.FormatLine(_T("[%s] %s"), time_buffer, p);
+}
+
+void
+LogFormat(const TCHAR *Str, ...)
+{
   TCHAR buf[MAX_PATH];
   va_list ap;
 
@@ -55,25 +107,7 @@ LogStartUp(const TCHAR *Str, ...)
   _vstprintf(buf, Str, ap);
   va_end(ap);
 
-  TCHAR time_buffer[32];
-  FormatTimeLong(time_buffer, fixed(MonotonicClockMS()) / 1000);
-
-#ifdef ANDROID
-  __android_log_print(ANDROID_LOG_INFO, "XCSoar", "%s", buf);
-#endif
-
-#if defined(HAVE_POSIX) && !defined(ANDROID) && !defined(NDEBUG)
-  fprintf(stderr, "%s\n", buf);
-#endif
-
-  TextWriter writer(szFileName, initialised);
-  if (writer.error())
-    return;
-
-  StaticString<MAX_PATH> output_buffer;
-  output_buffer.Format(_T("[%s] %s"), time_buffer, buf);
-  writer.writeln(output_buffer);
-
-  if (!initialised)
-    initialised = true;
+  LogString(buf);
 }
+
+#endif

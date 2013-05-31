@@ -24,7 +24,7 @@ Copyright_License {
 #include "MapWindow.hpp"
 #include "Screen/Icon.hpp"
 #include "Screen/Fonts.hpp"
-#include "Math/Earth.hpp"
+#include "Geo/Math.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Renderer/TaskRenderer.hpp"
 #include "Renderer/TaskPointRenderer.hpp"
@@ -57,6 +57,7 @@ MapWindow::DrawTask(Canvas &canvas)
 
   ProtectedTaskManager::Lease task_manager(*task);
   const AbstractTask *task = task_manager->GetActiveTask();
+  const OrderedTask &ordered_task = task_manager->GetOrderedTask();
   if (task && task->CheckTask()) {
     TaskPointRenderer::TargetVisibility target_visibility =
         IsNearSelf() ? TaskPointRenderer::ACTIVE : TaskPointRenderer::ALL;
@@ -71,7 +72,7 @@ MapWindow::DrawTask(Canvas &canvas)
                           ozv, draw_bearing, target_visibility,
                           Basic().location_available, Basic().location);
     TaskRenderer dv(tpv, render_projection.GetScreenBounds());
-    dv.Draw(*task);
+    dv.Draw(*task, ordered_task);
   }
 
   if (draw_route)

@@ -25,7 +25,6 @@ Copyright_License {
 #define XCSOAR_INFOBOX_CONTENT_TRACE_HPP
 
 #include "InfoBoxes/Content/Base.hpp"
-#include "InfoBoxes/Content/Altitude.hpp"
 
 class TraceVariableHistory;
 
@@ -61,12 +60,13 @@ public:
   virtual void OnCustomPaint(InfoBoxWindow &infobox, Canvas &canvas);
 };
 
-class InfoBoxContentBarogram : public InfoBoxContentAltitude
+class InfoBoxContentBarogram : public InfoBoxContent
 {
 public:
+  virtual const DialogContent *GetDialogContent();
+  static const DialogContent dlgContent;
   virtual void Update(InfoBoxData &data);
   virtual void OnCustomPaint(InfoBoxWindow &infobox, Canvas &canvas);
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode);
 };
 
 class InfoBoxContentThermalBand : public InfoBoxContent

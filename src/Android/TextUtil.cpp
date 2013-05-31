@@ -39,7 +39,7 @@ TextUtil::Initialise(JNIEnv *_env)
 {
   env = _env;
 
-  cls.Find(env, "org/xcsoar/TextUtil");
+  cls.Find(env, "org/tophat/TextUtil");
 
   midTextUtil = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;II)V");
   midGetFontMetrics = env->GetMethodID(cls, "getFontMetrics", "([I)V");
@@ -88,7 +88,7 @@ TextUtil::create(const char *facename, int height, bool bold, bool italic)
     paramStyle |= 2;
   paramTextSize = height;
 
-  // construct org.xcsoar.TextUtil object
+  // construct org.tophat.TextUtil object
   localObject = env->NewObject(cls, midTextUtil,
                                paramFamilyName.Get(),
                                paramStyle, paramTextSize);
@@ -133,7 +133,7 @@ TextUtil::getTextTextureGL(const char *text) const
     env->CallObjectMethod(Get(), midGetTextTextureGL,
                           text2.Get());
   jint result[3];
-  if (!Java::DiscardException(env)) {
+  if (!Java::DiscardException(env) && jresult != nullptr) {
     env->GetIntArrayRegion(jresult, 0, 3, result);
     env->DeleteLocalRef(jresult);
   } else {

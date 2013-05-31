@@ -72,6 +72,9 @@ void
 LoadFormProperty(SubForm &form, const TCHAR *control_name, unsigned int value);
 
 void
+LoadFormPropertyEnum(SubForm &form, const TCHAR *control_name, int value);
+
+void
 LoadFormProperty(SubForm &form, const TCHAR *control_name,
                  const StaticEnumChoice *list, unsigned value);
 
@@ -124,6 +127,10 @@ GetFormValueFixed(const SubForm &form, const TCHAR *control_name);
 gcc_pure
 const TCHAR *
 GetFormValueString(const SubForm &form, const TCHAR *control_name);
+
+gcc_pure
+const TCHAR *
+GetFormValueFile(const SubForm &form, const TCHAR *control_name);
 
 template<typename T>
 static inline void

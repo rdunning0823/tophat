@@ -23,10 +23,14 @@ Copyright_License {
 
 #include "Dialogs/Planes.hpp"
 #include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/Internal.hpp"
+#include "Dialogs/XML.hpp"
 #include "Dialogs/TextEntry.hpp"
+#include "Form/Form.hpp"
+#include "Form/Util.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 #include "Plane/Plane.hpp"
+#include "Language/Language.hpp"
 
 #include <cstdio>
 
@@ -131,7 +135,7 @@ PolarClicked(gcc_unused WndButton &button)
   Update();
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OKClicked),
   DeclareCallBackEntry(CancelClicked),
   DeclareCallBackEntry(RegistrationClicked),

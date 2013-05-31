@@ -29,8 +29,8 @@ Copyright_License {
 #include "MapSettings.hpp"
 #include "Computer/TraceComputer.hpp"
 #include "Projection/WindowProjection.hpp"
-#include "Engine/Math/Earth.hpp"
-#include "Engine/Contest/ContestResult.hpp"
+#include "Geo/Math.hpp"
+#include "Engine/Contest/ContestTrace.hpp"
 
 #include <algorithm>
 
@@ -77,14 +77,37 @@ GetSnailColorIndex(fixed cv)
                            (short)((cv + fixed_one) / 2 * TrailLook::NUMSNAILCOLORS)));
 }
 
+static void
+GetMinMax(fixed &value_min, fixed &value_max, TrailSettings::Type type,
+          const TracePointVector &trace)
+{
+  if (type == TrailSettings::Type::ALTITUDE) {
+    value_max = fixed(1000);
+    value_min = fixed(500);
+    for (auto it = trace.begin(); it != trace.end(); ++it) {
+      value_max = max(it->GetAltitude(), value_max);
+      value_min = min(it->GetAltitude(), value_min);
+    }
+  } else {
+    value_max = fixed(0.75);
+    value_min = fixed(-2.0);
+    for (auto it = trace.begin(); it != trace.end(); ++it) {
+      value_max = max(it->GetVario(), value_max);
+      value_min = min(it->GetVario(), value_min);
+    }
+    value_max = min(fixed(7.5), value_max);
+    value_min = max(fixed(-5.0), value_min);
+  }
+}
+
 void
 TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
                     const WindowProjection &projection, unsigned min_time,
                     bool enable_traildrift, const RasterPoint pos,
                     const NMEAInfo &basic, const DerivedInfo &calculated,
-                    const MapSettings &settings)
+                    const TrailSettings &settings)
 {
-  if (settings.trail_length == TRAIL_OFF)
+  if (settings.length == TrailSettings::Length::OFF)
     return;
 
   if (!LoadTrace(trace_computer, min_time, projection))
@@ -102,26 +125,9 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
   }
 
   fixed value_max, value_min;
+  GetMinMax(value_min, value_max, settings.type, trace);
 
-  if (settings.snail_type == stAltitude) {
-    value_max = fixed(1000);
-    value_min = fixed(500);
-    for (auto it = trace.begin(); it != trace.end(); ++it) {
-      value_max = max(it->GetAltitude(), value_max);
-      value_min = min(it->GetAltitude(), value_min);
-    }
-  } else {
-    value_max = fixed(0.75);
-    value_min = fixed(-2.0);
-    for (auto it = trace.begin(); it != trace.end(); ++it) {
-      value_max = max(it->GetVario(), value_max);
-      value_min = min(it->GetVario(), value_min);
-    }
-    value_max = min(fixed(7.5), value_max);
-    value_min = max(fixed(-5.0), value_min);
-  }
-
-  bool scaled_trail = settings.snail_scaling_enabled &&
+  bool scaled_trail = settings.scaling_enabled &&
                       projection.GetMapScale() <= fixed_int_constant(6000);
 
   const GeoBounds bounds = projection.GetScreenBounds().Scale(fixed_four);
@@ -130,9 +136,9 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
   bool last_valid = false;
   for (auto it = trace.begin(), end = trace.end(); it != end; ++it) {
     const GeoPoint gp = enable_traildrift
-      ? it->get_location().Parametric(traildrift,
-                                      it->CalculateDrift(basic.time))
-      : it->get_location();
+      ? it->GetLocation().Parametric(traildrift,
+                                     it->CalculateDrift(basic.time))
+      : it->GetLocation();
     if (!bounds.IsInside(gp)) {
       /* the point is outside of the MapWindow; don't paint it */
       last_valid = false;
@@ -142,22 +148,35 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
     RasterPoint pt = projection.GeoToScreen(gp);
 
     if (last_valid) {
-      if (settings.snail_type == stAltitude) {
+      if (settings.type == TrailSettings::Type::ALTITUDE) {
         unsigned index((it->GetAltitude() - value_min) / (value_max - value_min)
                        * (TrailLook::NUMSNAILCOLORS - 1));
         index = max(0u, min(TrailLook::NUMSNAILCOLORS - 1, index));
-        canvas.Select(look.hpSnail[index]);
+        canvas.Select(look.trail_pens[index]);
+        canvas.DrawLinePiece(last_point, pt);
       } else {
         const fixed colour_vario = negative(it->GetVario())
           ? - it->GetVario() / value_min
           : it->GetVario() / value_max ;
 
-        if (!scaled_trail)
-          canvas.Select(look.hpSnail[GetSnailColorIndex(colour_vario)]);
-        else
-          canvas.Select(look.hpSnailVario[GetSnailColorIndex(colour_vario)]);
+        unsigned color_index = GetSnailColorIndex(colour_vario);
+        if (negative(it->GetVario()) &&
+            (settings.type == TrailSettings::Type::VARIO_1_DOTS ||
+             settings.type == TrailSettings::Type::VARIO_2_DOTS)) {
+          canvas.SelectNullPen();
+          canvas.Select(look.trail_brushes[color_index]);
+          canvas.DrawCircle((pt.x + last_point.x) / 2, (pt.y + last_point.y) / 2,
+                            look.trail_widths[color_index]);
+
+        } else {
+          if (!scaled_trail)
+            canvas.Select(look.trail_pens[color_index]);
+          else
+            canvas.Select(look.scaled_trail_pens[color_index]);
+
+          canvas.DrawLinePiece(last_point, pt);
+        }
       }
-      canvas.DrawLinePiece(last_point, pt);
     }
     last_point = pt;
     last_valid = true;
@@ -192,7 +211,7 @@ TrailRenderer::DrawTraceVector(Canvas &canvas,
 
   unsigned n = 0;
   for (auto i = trace.begin(), end = trace.end(); i != end; ++i)
-    points[n++] = projection.GeoToScreen(i->get_location());
+    points[n++] = projection.GeoToScreen(i->GetLocation());
 
   canvas.DrawPolyline(points.begin(), n);
 }
@@ -205,7 +224,7 @@ TrailRenderer::DrawTraceVector(Canvas &canvas, const Projection &projection,
 
   unsigned n = 0;
   for (auto i = trace.begin(), end = trace.end(); i != end; ++i)
-    points[n++] = projection.GeoToScreen(i->get_location());
+    points[n++] = projection.GeoToScreen(i->GetLocation());
 
   canvas.DrawPolyline(points.begin(), n);
 }

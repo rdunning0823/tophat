@@ -25,14 +25,20 @@ Copyright_License {
 #define XCSOAR_MAP_ITEM_HPP
 
 #include "Util/StaticArray.hpp"
-#include "Engine/Navigation/GeoPoint.hpp"
+#include "Geo/GeoPoint.hpp"
+#include "Geo/GeoVector.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
-#include "Engine/Navigation/Geometry/GeoVector.hpp"
-#include "Engine/Task/Tasks/BaseTask/TaskPoint.hpp"
+#include "Engine/Task/Points/TaskPoint.hpp"
 #include "Markers/Markers.hpp"
 #include "FLARM/Traffic.hpp"
 #include "FLARM/Friends.hpp"
 #include "NMEA/ThermalLocator.hpp"
+#include "Weather/Features.hpp"
+#include "Engine/Route/ReachResult.hpp"
+
+#ifdef HAVE_NOAA
+#include "Weather/NOAAStore.hpp"
+#endif
 
 class AbstractAirspace;
 struct Waypoint;
@@ -44,6 +50,9 @@ struct MapItem
     ARRIVAL_ALTITUDE,
     SELF,
     TASK_OZ,
+#ifdef HAVE_NOAA
+    WEATHER,
+#endif
     AIRSPACE,
     MARKER,
     THERMAL,
@@ -79,18 +88,13 @@ struct ArrivalAltitudeMapItem: public MapItem
   /** Elevation of the point in MSL */
   RoughAltitude elevation;
 
-  /** Arrival altitude for straight glide in MSL */
-  RoughAltitude arrival_altitude_direct;
-  /** Arrival altitude around terrain in MSL */
-  RoughAltitude arrival_altitude_reach;
+  /** Arrival altitudes [m MSL] */
+  ReachResult reach;
 
   ArrivalAltitudeMapItem(RoughAltitude _elevation,
-                         RoughAltitude _arrival_altitude_direct,
-                         RoughAltitude _arrival_altitude_reach)
+                         ReachResult _reach)
     :MapItem(ARRIVAL_ALTITUDE),
-     elevation(_elevation),
-     arrival_altitude_direct(_arrival_altitude_direct),
-     arrival_altitude_reach(_arrival_altitude_reach) {}
+     elevation(_elevation), reach(_reach) {}
 };
 
 struct SelfMapItem: public MapItem
@@ -144,13 +148,23 @@ struct MarkerMapItem: public MapItem
     :MapItem(MARKER), id(_id), marker(_marker) {}
 };
 
+#ifdef HAVE_NOAA
+struct WeatherStationMapItem: public MapItem
+{
+  NOAAStore::iterator station;
+
+  WeatherStationMapItem(const NOAAStore::iterator &_station)
+    :MapItem(WEATHER), station(_station) {}
+};
+#endif
+
 struct TrafficMapItem: public MapItem
 {
-  const FlarmTraffic &traffic;
+  FlarmId id;
   FlarmFriends::Color color;
 
   TrafficMapItem(const FlarmTraffic &_traffic, FlarmFriends::Color _color)
-    :MapItem(TRAFFIC), traffic(_traffic), color(_color) {}
+    :MapItem(TRAFFIC), id(_traffic.id), color(_color) {}
 };
 
 struct ThermalMapItem: public MapItem

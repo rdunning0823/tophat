@@ -32,10 +32,31 @@ class Waypoints;
 class SingleWindow;
 class OrderedTask;
 
+/**
+ * shows list of waypoints
+ * @param location. location reference for distance and bearing of wps
+ * @param ordered_task. reference for ordered task
+ * @param ordered_task_index
+ * @param goto_button.  If true, shows "Goto" button instead of "Select" button
+ */
 const Waypoint *
 ShowWaypointListDialog(SingleWindow &parent, const GeoPoint &location,
                        OrderedTask *ordered_task = NULL,
-                       unsigned ordered_task_index = 0);
+                       unsigned ordered_task_index = 0,
+                       bool goto_button = false);
+
+/**
+ * shows list of waypoints.  Sort buttons instead of filters
+ * @param location. location reference for distance and bearing of wps
+ * @param ordered_task. reference for ordered task
+ * @param ordered_task_index
+ * @param goto_button.  If true, shows "Goto" button instead of "Select" button
+ */
+const Waypoint *
+ShowWaypointListDialogSimple(SingleWindow &parent, const GeoPoint &location,
+                             OrderedTask *ordered_task = NULL,
+                             unsigned ordered_task_index = 0,
+                             bool goto_button = false);
 
 void
 dlgConfigWaypointsShowModal();

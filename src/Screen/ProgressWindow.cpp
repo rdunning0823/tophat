@@ -46,11 +46,11 @@ ProgressWindow::ProgressWindow(ContainerWindow &parent)
 
   // Determine text height
 #ifndef USE_GDI
-  font.Set("Droid Sans", 12);
+  font.Set(_T("Droid Sans"), 12);
   text_height = font.GetHeight();
 #else
   VirtualCanvas canvas(1, 1);
-  text_height = canvas.CalcTextHeight(_T("W"));
+  text_height = canvas.GetFontHeight();
 #endif
 
   // Make progress bar height proportional to window height

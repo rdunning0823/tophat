@@ -36,17 +36,36 @@ Timer::Schedule(unsigned ms)
 void
 Timer::Cancel()
 {
+  if (!IsActive())
+    return;
+
   ::SDL_RemoveTimer(id);
   id = NULL;
 
   EventQueue::Purge(Invoke, (void *)this);
+  queued.Reset();
+}
+
+void
+Timer::Invoke()
+{
+  OnTimer();
+  queued.Reset();
 }
 
 void
 Timer::Invoke(void *ctx)
 {
   Timer *timer = (Timer *)ctx;
-  timer->OnTimer();
+  timer->Invoke();
+}
+
+Uint32
+Timer::Callback(Uint32 interval)
+{
+  if (!queued.GetAndSet(true))
+    EventQueue::Push(Invoke, (void *)this);
+  return interval;
 }
 
 Uint32
@@ -54,8 +73,7 @@ Timer::Callback(Uint32 interval, void *param)
 {
   Timer *timer = (Timer *)param;
 
-  EventQueue::Push(Invoke, (void *)timer);
-  return interval;
+  return timer->Callback(interval);
 }
 
 void

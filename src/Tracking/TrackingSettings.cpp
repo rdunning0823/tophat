@@ -40,6 +40,7 @@ TrackingSettings::SetDefaults()
   interval = 60;
   vehicleType = VehicleType::GLIDER;
 
+  skylines.SetDefaults();
   livetrack24.SetDefaults();
 }
 

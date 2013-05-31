@@ -64,9 +64,6 @@ public:
   void SetGlidePolar(const GlidePolar &glide_polar);
 
   gcc_pure
-  TaskManager::TaskMode GetMode() const;
-
-  gcc_pure
   const OrderedTaskBehaviour GetOrderedTaskBehaviour() const;
 
   gcc_pure
@@ -92,7 +89,7 @@ public:
    * @param other OrderedTask to copy
    * @return True if this task changed
    */
-  bool TaskCommit(const OrderedTask& that);
+  bool TaskCommit(const OrderedTask& that, const Waypoints &waypoints);
 
   bool TaskSave(const TCHAR *path);
 

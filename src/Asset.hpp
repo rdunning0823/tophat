@@ -52,7 +52,7 @@ extern ModelType global_model_type;
 /**
  * Returns whether this is a debug build.
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsDebug()
 {
@@ -67,7 +67,7 @@ IsDebug()
  * Returns whether the application is running on an embedded platform.
  * @return True if host hardware is an embedded platform, False otherwise
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsEmbedded()
 {
@@ -82,7 +82,7 @@ IsEmbedded()
  * Returns whether the application is running on Pocket PC / Windows
  * CE / Windows Mobile.
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsWindowsCE()
 {
@@ -98,7 +98,7 @@ IsWindowsCE()
  * Windows CE (pre 5.0).  Starting with version 5.0, several bug
  * workarounds are disabled at compile time.
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsOldWindowsCE()
 {
@@ -113,7 +113,7 @@ IsOldWindowsCE()
  * Is XCSoar running on ancient and slow hardware?  If yes, then some
  * expensive UI features are disabled.
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsAncientHardware()
 {
@@ -140,7 +140,7 @@ IsHP31X()
  * Returns whether the application is running on an Altair
  * @return True if host hardware is an Altair, False otherwise
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsAltair()
 {
@@ -154,7 +154,7 @@ IsAltair()
 /**
  * Returns whether the application is running on Android
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 IsAndroid()
 {
@@ -182,10 +182,42 @@ IsGalaxyTab22()
 }
 
 /**
+ * Returns whether the application is running on Nook Simple Touch
+ */
+static inline bool
+IsNookSimpleTouch()
+{
+#if defined(ANDROID)
+  static int cached_type = -1;
+  if (native_view == NULL)
+    return false;
+
+  if (cached_type == -1) {
+    if (_tcscmp(native_view->GetProduct(), _T("NOOK")) == 0)
+      cached_type = 1;
+    else
+      cached_type = 0;
+  }
+  return cached_type == 1;
+#else
+  return false;
+#endif
+}
+
+/**
+ * Returns whether the application is running a device with a gray-scale screen
+ */
+static inline bool
+IsGrayScaleScreen()
+{
+  return IsNookSimpleTouch();
+}
+
+/**
  * Does this device have little main memory?  On those, some expensive
  * features are disabled.
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 HasLittleMemory()
 {
@@ -195,7 +227,7 @@ HasLittleMemory()
 /**
  * Returns whether the application is compiled with IOIOLib
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 HasIOIOLib()
 {
@@ -207,11 +239,21 @@ HasIOIOLib()
 }
 
 /**
+ * Does this device an Android internal GPS?
+ */
+constexpr
+static inline bool
+HasAndroidInternalGPS()
+{
+  return IsAndroid() && !IsNookSimpleTouch();
+}
+
+/**
  * Does this device have a pointer device? (mouse or touch screen)
  * @return True if a touch screen or mouse is assumed for the hardware
  * that XCSoar is running on, False if the hardware has only buttons
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 HasPointer()
 {
@@ -222,7 +264,7 @@ HasPointer()
  * Does this device have a touch screen?  This is useful to know for
  * sizing controls, as a touch screen may require bigger areas.
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 HasTouchScreen()
 {
@@ -230,11 +272,22 @@ HasTouchScreen()
 }
 
 /**
+ * Does this device have a touch screen that is sensitive enough to
+ * support dragging?
+ */
+constexpr
+static inline bool
+HasDraggableScreen()
+{
+  return !IsOldWindowsCE();
+}
+
+/**
  * Does this device have a keyboard device?
  * @return True if a keyboard is assumed for the hardware
  * that XCSoar is running on, False if the hardware has no keyboard
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 HasKeyboard()
 {
@@ -246,7 +299,7 @@ HasKeyboard()
  *
  * XXX not yet implemented!
  */
-gcc_constexpr_function
+constexpr
 static inline bool
 HasColors()
 {

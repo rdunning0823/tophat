@@ -24,9 +24,12 @@ Copyright_License {
 #ifndef XCSOAR_CONDITION_MONITORS_HPP
 #define XCSOAR_CONDITION_MONITORS_HPP
 
-class GlideComputer;
+struct NMEAInfo;
+struct DerivedInfo;
+struct ComputerSettings;
 
 void
-ConditionMonitorsUpdate(const GlideComputer& cmp);
+ConditionMonitorsUpdate(const NMEAInfo &basic, const DerivedInfo &calculated,
+                        const ComputerSettings &settings);
 
 #endif

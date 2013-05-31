@@ -25,6 +25,7 @@ Copyright_License {
 #define AAT_TASK_FACTORY_HPP
 
 #include "AbstractTaskFactory.hpp"
+#include "Task/TaskNationalities.hpp"
 
 /**
  * Factory for construction of legal AAT tasks
@@ -43,9 +44,12 @@ public:
   AATTaskFactory(OrderedTask& _task,
                  const TaskBehaviour &tb);
 
-  ~AATTaskFactory() {};
+  AATTaskFactory(OrderedTask &_task, const TaskBehaviour &_behaviour,
+                 const LegalPointConstArray _start_types,
+                 const LegalPointConstArray _intermediate_types,
+                 const LegalPointConstArray _finish_types);
 
-  void UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to); 
+  ~AATTaskFactory() {};
 
   /**
    * swaps non AAT OZs with either AAT_SEGMENT or AAT_CYLINDER
@@ -55,8 +59,28 @@ public:
    * similar to type of tp
    */
   virtual gcc_pure
-  LegalPointType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
 };
 
 
+/**
+ * Factory for construction of legal AAT tasks for US Rules
+ */
+class AATTaskFactoryUs: public AATTaskFactory
+{
+public:
+/**
+ * Constructor
+ *
+ * @param _task Ordered task to be managed by this factory
+ * @param tb Behaviour (options)
+ */
+  AATTaskFactoryUs(OrderedTask& _task,
+                   const TaskBehaviour &tb);
+
+  ~AATTaskFactoryUs() {};
+
+  virtual gcc_pure
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+};
 #endif

@@ -52,7 +52,6 @@ enum ControlIndex {
 #endif
   StatusFile,
   MenuTimeout,
-  TextInput,
   HapticFeedback
 };
 
@@ -134,7 +133,7 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddFileReader(_("Events"),
                 _("The Input Events file defines the menu system and how XCSoar responds to "
                     "button presses and events from external devices."),
-                szProfileInputFile, _T("*.xci\0"));
+                ProfileKeys::InputFile, _T("*.xci\0"));
   SetExpertRow(InputFile);
 
 #ifndef HAVE_NATIVE_GETTEXT
@@ -160,7 +159,7 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     df.Sort(2);
 
     TCHAR value[MAX_PATH];
-    if (!Profile::GetPath(szProfileLanguageFile, value))
+    if (!Profile::GetPath(ProfileKeys::LanguageFile, value))
       value[0] = _T('\0');
 
     if (_tcscmp(value, _T("none")) == 0)
@@ -177,7 +176,7 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddFileReader(_("Status message"),
                 _("The status file can be used to define sounds to be played when certain "
                     "events occur, and how long various status messages will appear on screen."),
-                szProfileStatusFile, _T("*.xcs\0"));
+                ProfileKeys::StatusFile, _T("*.xcs\0"));
   SetExpertRow(StatusFile);
 
   AddTime(_("Menu timeout"),
@@ -186,25 +185,8 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           1, 60, 1, settings.menu_timeout / 2);
   SetExpertRow(MenuTimeout);
 
-  static gcc_constexpr_data StaticEnumChoice text_input_list[] = {
-    { (unsigned)DialogSettings::TextInputStyle::Default, N_("Default") },
-    { (unsigned)DialogSettings::TextInputStyle::Keyboard, N_("Keyboard") },
-    { (unsigned)DialogSettings::TextInputStyle::HighScore,
-      N_("HighScore Style") },
-    { 0 }
-  };
-
-  AddEnum(_("Text input style"),
-          _("Determines how the user is prompted for text input (filename, teamcode etc.)"),
-          text_input_list, (unsigned)settings.dialog.text_input_style);
-  SetExpertRow(TextInput);
-
-  /* on-screen keyboard doesn't work without a pointing device
-     (mouse or touch screen), hide the option on Altair */
-  SetRowVisible(TextInput, HasPointer());
-
-#ifdef HAVE_VIBRATOR
-  static gcc_constexpr_data StaticEnumChoice haptic_feedback_list[] = {
+  #ifdef HAVE_VIBRATOR
+  static constexpr StaticEnumChoice haptic_feedback_list[] = {
     { (unsigned) UISettings::HapticFeedback::Default, N_("OS settings") },
     { (unsigned) UISettings::HapticFeedback::Off, N_("Off") },
     { (unsigned) UISettings::HapticFeedback::On, N_("On") },
@@ -225,11 +207,11 @@ InterfaceConfigPanel::Save(bool &_changed, bool &_require_restart)
   bool changed = false, require_restart = false;;
 
 #ifdef HAVE_BLANK
-  changed |= SaveValue(AutoBlank, szProfileAutoBlank,
+  changed |= SaveValue(AutoBlank, ProfileKeys::AutoBlank,
                        settings.display.enable_auto_blank);
 #endif
 
-  require_restart |= changed |= SaveValueFileReader(InputFile, szProfileInputFile);
+  require_restart |= changed |= SaveValueFileReader(InputFile, ProfileKeys::InputFile);
 
 #ifndef HAVE_NATIVE_GETTEXT
   WndProperty *wp = (WndProperty *)&GetControl(LanguageFile);
@@ -237,7 +219,7 @@ InterfaceConfigPanel::Save(bool &_changed, bool &_require_restart)
     DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
 
     TCHAR old_value[MAX_PATH];
-    if (!Profile::GetPath(szProfileLanguageFile, old_value))
+    if (!Profile::GetPath(ProfileKeys::LanguageFile, old_value))
       old_value[0] = _T('\0');
 
     const TCHAR *old_base = BaseName(old_value);
@@ -268,26 +250,23 @@ InterfaceConfigPanel::Save(bool &_changed, bool &_require_restart)
 
     if (_tcscmp(old_value, new_value) != 0 &&
         _tcscmp(old_base, new_base) != 0) {
-      Profile::Set(szProfileLanguageFile, new_value);
+      Profile::Set(ProfileKeys::LanguageFile, new_value);
       LanguageChanged = changed = true;
     }
   }
 #endif
 
-  require_restart |= changed |= SaveValueFileReader(StatusFile, szProfileStatusFile);
+  require_restart |= changed |= SaveValueFileReader(StatusFile, ProfileKeys::StatusFile);
 
   unsigned menu_timeout = GetValueInteger(MenuTimeout) * 2;
   if (settings.menu_timeout != menu_timeout) {
     settings.menu_timeout = menu_timeout;
-    Profile::Set(szProfileMenuTimeout, menu_timeout);
+    Profile::Set(ProfileKeys::MenuTimeout, menu_timeout);
     changed = true;
   }
 
-  if (HasPointer())
-    changed |= SaveValueEnum(TextInput, szProfileAppTextInputStyle, settings.dialog.text_input_style);
-
 #ifdef HAVE_VIBRATOR
-  changed |= SaveValueEnum(HapticFeedback, szProfileHapticFeedback, settings.haptic_feedback);
+  changed |= SaveValueEnum(HapticFeedback, ProfileKeys::HapticFeedback, settings.haptic_feedback);
 #endif
 
   _changed |= changed;

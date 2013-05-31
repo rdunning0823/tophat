@@ -4,12 +4,14 @@
 #include "Replay/IgcReplay.hpp"
 #include "Task/TaskManager.hpp"
 #include "Computer/FlyingComputer.hpp"
+#include "NMEA/FlyingState.hpp"
 #include "OS/PathName.hpp"
+#include "IO/FileLineReader.hpp"
+#include "Task/Deserialiser.hpp"
+#include "XML/DataNodeXML.hpp"
+#include "NMEA/Info.hpp"
 
 #include <fstream>
-
-#include "Util/Deserialiser.hpp"
-#include "Util/DataNodeXML.hpp"
 
 static OrderedTask* task_load(OrderedTask* task) {
   PathName szFilename(task_file.c_str());
@@ -31,9 +33,9 @@ static OrderedTask* task_load(OrderedTask* task) {
 class ReplayLoggerSim: public IgcReplay
 {
 public:
-  ReplayLoggerSim(): 
-    IgcReplay(),
-    started(false) {}
+  ReplayLoggerSim(NLineReader *reader)
+    :IgcReplay(reader),
+     started(false) {}
 
   AircraftState state;
 
@@ -48,7 +50,6 @@ public:
 protected:
   virtual void OnReset() {}
   virtual void OnStop() {}
-  virtual void OnBadFile() {}
 
   void OnAdvance(const GeoPoint &loc,
                   const fixed speed, const Angle bearing,
@@ -92,7 +93,7 @@ test_replay()
 
   OrderedTask* t = task_load(blank);
   if (t) {
-    task_manager.Commit(*t);
+    task_manager.Commit(*t, waypoints);
     task_manager.Resume();
   } else {
     return false;
@@ -100,18 +101,22 @@ test_replay()
 
   // task_manager.get_task_advance().get_advance_state() = TaskAdvance::AUTO;
 
-  ReplayLoggerSim sim;
+  FileLineReaderA *reader = new FileLineReaderA(replay_file.c_str());
+  if (reader->error()) {
+    delete reader;
+    return false;
+  }
+
+  ReplayLoggerSim sim(reader);
   sim.state.netto_vario = fixed_zero;
-
-  PathName szFilename(replay_file.c_str());
-  sim.SetFilename(szFilename);
-
-  sim.Start();
 
   bool do_print = verbose;
   unsigned print_counter=0;
 
-  while (sim.Update() && !sim.started) {
+  NMEAInfo basic;
+  basic.Reset();
+
+  while (sim.Update(basic, fixed_one) && !sim.started) {
   }
   state_last = sim.state;
 
@@ -126,17 +131,23 @@ test_replay()
   FlyingComputer flying_computer;
   flying_computer.Reset();
 
-  while (sim.Update()) {
+  FlyingState flying_state;
+  flying_state.Reset();
+
+  while (sim.Update(basic, fixed_one)) {
     if (sim.state.time>time_last) {
 
       n_samples++;
 
-      flying_computer.Compute(glide_polar.GetVTakeoff(), sim.state, sim.state);
+      flying_computer.Compute(glide_polar.GetVTakeoff(),
+                              sim.state, sim.state.time - time_last,
+                              flying_state);
+      sim.state.flying = flying_state.flying;
 
       task_manager.Update(sim.state, state_last);
       task_manager.UpdateIdle(sim.state);
       task_manager.UpdateAutoMC(sim.state, fixed_zero);
-      task_manager.GetTaskAdvance().set_armed(true);
+      task_manager.GetTaskAdvance().SetArmed(true);
 
       state_last = sim.state;
 
@@ -151,10 +162,9 @@ test_replay()
     }
     time_last = sim.state.time;
   };
-  sim.Stop();
 
   if (verbose) {
-    distance_counts();
+    PrintDistanceCounts();
     printf("# task elapsed %d (s)\n", (int)task_manager.GetStats().total.time_elapsed);
     printf("# task speed %3.1f (kph)\n", (int)task_manager.GetStats().total.travelled.GetSpeed()*3.6);
     printf("# travelled distance %4.1f (km)\n", 
@@ -177,7 +187,7 @@ int main(int argc, char** argv)
   replay_file = "test/data/apf-bug554.igc";
   task_file = "test/data/apf-bug554.tsk";
 
-  if (!parse_args(argc,argv)) {
+  if (!ParseArgs(argc,argv)) {
     return 0;
   }
 

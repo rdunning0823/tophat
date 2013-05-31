@@ -29,6 +29,21 @@ Copyright_License {
 
 #include <assert.h>
 
+PolarShape
+PolarStore::Item::ToPolarShape() const
+{
+  PolarShape shape;
+
+  shape[0].v = Units::ToSysUnit(fixed(v1), Unit::KILOMETER_PER_HOUR);
+  shape[0].w = fixed(w1);
+  shape[1].v = Units::ToSysUnit(fixed(v2), Unit::KILOMETER_PER_HOUR);
+  shape[1].w = fixed(w2);
+  shape[2].v = Units::ToSysUnit(fixed(v3), Unit::KILOMETER_PER_HOUR);
+  shape[2].w = fixed(w3);
+
+  return shape;
+}
+
 PolarInfo
 PolarStore::Item::ToPolarInfo() const
 {
@@ -36,12 +51,7 @@ PolarStore::Item::ToPolarInfo() const
 
   polar.reference_mass = fixed(reference_mass);
   polar.max_ballast = fixed(max_ballast);
-  polar.v1 = Units::ToSysUnit(fixed(v1), Unit::KILOMETER_PER_HOUR);
-  polar.w1 = fixed(w1);
-  polar.v2 = Units::ToSysUnit(fixed(v2), Unit::KILOMETER_PER_HOUR);
-  polar.w2 = fixed(w2);
-  polar.v3 = Units::ToSysUnit(fixed(v3), Unit::KILOMETER_PER_HOUR);
-  polar.w3 = fixed(w3);
+  polar.shape = ToPolarShape();
   polar.wing_area = fixed(wing_area);
   polar.v_no = fixed(v_no);
 
@@ -51,7 +61,7 @@ PolarStore::Item::ToPolarInfo() const
 /**
  *  Note: new items should be added to bottom, otherwise saved index is lost
  */
-static gcc_constexpr_data PolarStore::Item internal_polars[] =
+static constexpr PolarStore::Item internal_polars[] =
 {
   // 0
   { _T("206 Hornet"), 318, 100, 80, -0.606, 120, -0.99, 160, -1.918, 9.8, 41.666, 100 },
@@ -103,7 +113,7 @@ static gcc_constexpr_data PolarStore::Item internal_polars[] =
   { _T("IS-29D2 Lark"), 360, 0, 100, -0.82, 135.67, -1.55, 184.12, -3.3, 10.4, 0.0, 0 },
   { _T("Janus B (PAS)"), 603, 170, 115.5, -0.76, 171.79, -1.98, 209.96, -4.0, 17.4, 47.222, 106 },
   { _T("Janus B (PIL)"), 508, 170, 105.7, -0.7, 157.65, -1.82, 192.68, -3.6, 17.4, 47.222, 106 },
-  { _T("Ka 6CR"), 310, 0, 87.35, -0.81, 141.92, -2.03, 174.68, -3.5, 12.4, 0.0, 84 },
+  { _T("Ka 6CR"), 310, 0, 64.83 , -0.67 , 130.0, -2.26 , 170.0, -4.69 , 12.5 , 0.0 , 82 },
   { _T("Ka 8"), 290, 0, 74.1, -0.76, 101.9, -1.27, 166.7, -4.64, 14.15, 0.0, 78 },
   { _T("L 33 Solo"), 330, 0, 87.2, -0.8, 135.64, -1.73, 174.4, -3.4, 11.0, 0.0, 0 },
   { _T("LAK17a (18m)"), 298, 180, 115, -0.680, 158, -1.379, 200, -2.975, 9.80, 0.0, 120 },
@@ -250,6 +260,14 @@ static gcc_constexpr_data PolarStore::Item internal_polars[] =
 
   // from SeeYou
   { _T("ASW-28 (15m)"), 310, 200, 92.6, -0.571, 120.38, -0.875, 148.16, -1.394, 10.5, 55.555, 108 },
+
+  // idaflieg measurement, 23.08.2012 at Aalen Elchingen (preliminary result)
+  { _T("AK-8"), 360 , 100, 87.3 , -0.658 , 130.0, -0.973 , 170.0, -1.957 , 9.75 , 50.0 , 107 },
+
+  // from factory polar (flight manual)
+  { _T("Blanik L13-AC"), 500, 0, 70, -0.85, 110, -1.25, 160, -3.2, 17.44, 44.44, 0 },
+  // from idaflieg measured 1970
+  { _T("Ka 6E"),  310, 0, 87.35, -0.81, 141.92, -2.03, 174.68, -3.5, 12.4, 0.0, 85 },
 };
 
 const PolarStore::Item &

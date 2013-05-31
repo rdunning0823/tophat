@@ -34,27 +34,23 @@ class ContainerWindow;
 class TabBarControl;
 
 /**
- * OneTabButton class holds display and callbacks data for a single tab
+ * TabButton class holds display and callbacks data for a single tab
  */
-class OneTabButton {
+class TabButton {
 public:
   StaticString<32> caption;
-  bool is_button_only;
-  const Bitmap *bmp;
-  PixelRect but_size;
+  const Bitmap *bitmap;
+  PixelRect rc;
 
 public:
-  OneTabButton(const TCHAR* _Caption,
-               bool _IsButtonOnly,
-               const Bitmap *_bmp)
-    :is_button_only(_IsButtonOnly),
-     bmp(_bmp)
+  TabButton(const TCHAR* _caption, const Bitmap *_bitmap)
+    :bitmap(_bitmap)
   {
-    caption = _Caption;
-    but_size.left = 0;
-    but_size.top = 0;
-    but_size.right = 0;
-    but_size.bottom = 0;
+    caption = _caption;
+    rc.left = 0;
+    rc.top = 0;
+    rc.right = 0;
+    rc.bottom = 0;
   };
 };
 
@@ -70,7 +66,7 @@ protected:
   TabBarControl& tab_bar;
   const DialogLook &look;
 
-  StaticArray<OneTabButton *, 32> buttons;
+  StaticArray<TabButton *, 32> buttons;
 
   bool dragging; // tracks that mouse is down and captured
   int down_index; // index of tab where mouse down occurred
@@ -95,20 +91,22 @@ public:
 
   virtual ~TabDisplay();
 
+  const DialogLook &GetLook() const {
+    return look;
+  }
+
   /**
    * Paints one button
    */
   static void PaintButton(Canvas &canvas, const unsigned CaptionStyle,
                           const TCHAR *caption, const PixelRect &rc,
-                          bool isButtonOnly, const Bitmap *bmp,
-                          const bool isDown, bool inverse);
+                          const Bitmap *bmp, const bool isDown, bool inverse);
 
   unsigned GetSize() const {
     return buttons.size();
   }
 
-  void Add(const TCHAR *caption, bool button_only=false,
-           const Bitmap *bmp=NULL);
+  void Add(const TCHAR *caption, const Bitmap *bmp = NULL);
 
   gcc_pure
   const TCHAR *GetCaption(unsigned i) const {
@@ -164,7 +162,8 @@ protected:
   virtual bool OnMouseDown(PixelScalar x, PixelScalar y);
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y);
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
-  void drag_end();
+
+  void EndDrag();
 };
 
 #endif

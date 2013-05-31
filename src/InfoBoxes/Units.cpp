@@ -28,9 +28,9 @@ Copyright_License {
 void
 InfoBoxData::SetValueFromDistance(fixed new_value)
 {
-  Unit distance_unit =
-    FormatUserDistanceSmart(new_value, value.buffer(), false);
-  SetValueUnit(distance_unit);
+
+  FormatUserDistance(new_value, value.buffer(), false, 1);
+  SetValueUnit(Units::GetUserDistanceUnit());
 }
 
 void
@@ -55,6 +55,12 @@ InfoBoxData::SetValueFromSpeed(fixed new_value, bool precision)
 }
 
 void
+InfoBoxData::SetCommentFromDistance(fixed new_value)
+{
+  FormatUserDistance(new_value, comment.buffer(), true);
+}
+
+void
 InfoBoxData::SetCommentFromAlternateAltitude(fixed new_value)
 {
   FormatAlternateUserAltitude(new_value, comment.buffer());
@@ -64,4 +70,10 @@ void
 InfoBoxData::SetCommentFromSpeed(fixed new_value, bool precision)
 {
   FormatUserSpeed(new_value, comment.buffer(), true, precision);
+}
+
+void
+InfoBoxData::SetCommentFromVerticalSpeed(fixed new_value, bool include_sign)
+{
+  FormatUserVerticalSpeed(new_value, comment.buffer(), true, include_sign);
 }

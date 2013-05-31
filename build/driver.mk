@@ -5,7 +5,7 @@ VOLKSLOGGER_SOURCES = \
 	$(DRIVER_SRC_DIR)/Volkslogger/Parser.cpp \
 	$(DRIVER_SRC_DIR)/Volkslogger/Protocol.cpp \
 	$(DRIVER_SRC_DIR)/Volkslogger/Declare.cpp \
-	$(DRIVER_SRC_DIR)/Volkslogger/CRC16.cpp \
+	$(DRIVER_SRC_DIR)/Volkslogger/Database.cpp \
 	$(DRIVER_SRC_DIR)/Volkslogger/Util.cpp \
 	$(DRIVER_SRC_DIR)/Volkslogger/dbbconv.cpp \
 	$(DRIVER_SRC_DIR)/Volkslogger/grecord.cpp \
@@ -64,6 +64,11 @@ FLARM_SOURCES = \
 	$(DRIVER_SRC_DIR)/FLARM/BinaryProtocol.cpp \
 	$(DRIVER_SRC_DIR)/FLARM/TextProtocol.cpp
 
+FLYTEC_SOURCES = \
+	$(DRIVER_SRC_DIR)/Flytec/Register.cpp \
+	$(DRIVER_SRC_DIR)/Flytec/Parser.cpp \
+	$(DRIVER_SRC_DIR)/Flytec/Logger.cpp
+
 VEGA_SOURCES = \
 	$(DRIVER_SRC_DIR)/Vega/Misc.cpp \
 	$(DRIVER_SRC_DIR)/Vega/Parser.cpp \
@@ -75,16 +80,17 @@ DRIVER_SOURCES = \
 	$(IMI_SOURCES) \
 	$(LX_SOURCES) \
 	$(FLARM_SOURCES) \
+	$(FLYTEC_SOURCES) \
 	$(VEGA_SOURCES) \
 	$(DRIVER_SRC_DIR)/AltairPro.cpp \
 	$(DRIVER_SRC_DIR)/BorgeltB50.cpp \
 	$(DRIVER_SRC_DIR)/CaiGpsNav.cpp \
 	$(DRIVER_SRC_DIR)/Condor.cpp \
+	$(DRIVER_SRC_DIR)/CProbe.cpp \
 	$(DRIVER_SRC_DIR)/EW.cpp \
 	$(DRIVER_SRC_DIR)/EWMicroRecorder.cpp \
 	$(DRIVER_SRC_DIR)/FlymasterF1.cpp \
 	$(DRIVER_SRC_DIR)/FlyNet.cpp \
-	$(DRIVER_SRC_DIR)/Flytec.cpp \
 	$(DRIVER_SRC_DIR)/Generic.cpp \
 	$(DRIVER_SRC_DIR)/Leonardo.cpp \
 	$(DRIVER_SRC_DIR)/GTAltimeter.cpp \

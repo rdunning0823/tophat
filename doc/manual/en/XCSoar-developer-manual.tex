@@ -191,7 +191,7 @@ platforms.  This section describes the C++ language features that are
 allowed to be used.
 
 XCSoar's standard compiler is \texttt{gcc}.  We need to stay
-compatible with version 4.4, because that is what \texttt{cegcc} is
+compatible with version 4.6, because that is what \texttt{cegcc} is
 based on.
 
 The following C++ features must \emph{not} be used:
@@ -209,36 +209,12 @@ C++11.  The following C++11 features are safe to use:
 \begin{itemize}
 \item \verb|auto|-typed variables
 \item Rvalue references
-\item Explicit conversion operators (with macro \verb|gcc_explicit|)
+\item Explicit conversion operators
 \item Strongly-typed enums
 \item Defaulted and deleted functions
-\item Generalized constant expressions (\verb|constexpr|): see below
-\end{itemize}
-
-\subsubsection{Generalized constant expressions}
-
-The keyword \verb|constexpr| is supported by GCC since version 4.6.
-It can be applied to functions, methods, constructors and variables.
-
-On functions, it replaces our macro \verb|gcc_const|.  Methods are
-never \verb|gcc_const|, because they usually dereference the
-\verb|this| pointer.  Attributes marked with \verb|constexpr| are
-implicitly \verb|const|, and you may not use the latter keyword then.
-
-Until we drop support for GCC versions older than 4.6, we need to have
-a fallback for older compilers.  To solve the different requirements
-for different ways to use \verb|constexpr|, we have created three new
-macros in \verb|Compiler.h|:
-
-\begin{itemize}
-\item \verb|gcc_constexpr_function| for functions. Falls back to
-  \verb|gcc_const|.
-\item \verb|gcc_constexpr_method| for methods. Falls back to
-  \verb|gcc_pure|.
-\item \verb|gcc_constexpr_ctor| for constructors. Falls back to
-  nothing.
-\item \verb|gcc_constexpr_data| For variables. Falls back to
-  \verb|const|.
+\item Generalized constant expressions (\verb|constexpr|)
+\item Range-based \verb|for|
+\item \verb|nullptr|
 \end{itemize}
 
 \subsection{Other rules}
@@ -258,7 +234,9 @@ excessive template use may bloat the binary.
 \section{Graphical User Interface}
 \subsection{Letter Cases}
 
-Following the guidline should prevent the GUI from mixtures of "ON" and "On" text elements, and lead to a systematic GUI text presentation. The goal is to recognize GUI text fast and reliable.
+Following the guidline should prevent the GUI from mixtures of "ON" and 
+"On" text elements, and lead to a systematic GUI text presentation. 
+The goal is to recognize GUI text fast and reliable.
 
 \begin{description}
   \item[Captions] Captions (button captions, windows titles) to use
@@ -301,6 +279,76 @@ Following the guidline should prevent the GUI from mixtures of "ON" and "On" tex
 
 This chapter describes XCSoar's internal code architecture.
 
+\section{Source Organisation}
+
+XCSoar's source code is stored in the \texttt{src} directory.  This
+section tries to give a rough overview where you can find what.
+
+\begin{itemize}
+
+\item \texttt{Util/}: generic C++ utilities that do not depend on
+  external libraries, such as data structures, string operations
+
+\item \texttt{Math/}: math data types (fixed-point math, angles) and
+  generic formulas
+
+\item \texttt{Geo/}: geographic data structures and formulas
+
+\item \texttt{Formatter/}: code that formats internal values to
+  strings
+
+\item \texttt{Units/}: conversion from SI units (``System'' units) to
+  configured user units
+
+\item \texttt{NMEA/}: data structures for values parsed from NMEA
+
+\item \texttt{Profile/}: user profiles, loading from and saving to
+
+\item \texttt{IGC/}: support for the IGC file format
+
+\item \texttt{Logger/}: all loggers (NMEA, IGC, flights)
+
+\item \texttt{Thread/}: multi-threading support (OS specific)
+
+\item \texttt{Screen/}: base library for the graphical user interface
+
+\item \texttt{Renderer/}: various graphical renderers, for map and
+  analysis
+
+\item \texttt{MapWindow/}: the map
+
+\item \texttt{Form/}: modal dialogs and their controls (based on the
+  screen library)
+
+\item \texttt{Dialogs/}: modal dialogs implementations (based on the
+  form library)
+
+\item \texttt{Net/}: networking code (OS specific)
+
+\item \texttt{Operation/}: generic code to support cancellable
+  long-running operations
+
+\item \texttt{Android/}: code specific to Android (the native part
+  only; Java code is in \texttt{android/src/}
+
+\item \texttt{Engine/PathSolvers/}: an implementation of Dijkstra's
+  path finding algorithm, for task and contest optimisation
+
+\item \texttt{Engine/Airspace/}: airspace data structures and airspace
+  warnings
+
+\item \texttt{Engine/Waypoint/}: waypoint data structures
+
+\item \texttt{Engine/GlideSolvers/}: a MacCready implementation
+
+\item \texttt{Engine/Task/}: task data structures and calculations
+
+\item \texttt{Engine/Contest/}: contest optimisation
+
+\item \texttt{Engine/Route/}: the route planner (airspace and terrain)
+
+\end{itemize}
+
 \section{Threads and Locking}
 
 \subsection{Threads}
@@ -334,6 +382,12 @@ rendering):
 
   \path(merge.south)+(3,-2) node(device2)[thread]{Device 2};
   \draw[->] (device2.north) -- (merge.290)
+  node[midway, above, sloped, font=\tiny]{sensor data};
+
+  \path(ui.south)+(0,-3) node(io)[thread]{I/O thread};
+  \draw[->] (io.north) -- (ui.south)
+  node[midway, above, sloped, font=\tiny]{data};
+  \draw[->] (io.east) -- (merge.west)
   node[midway, above, sloped, font=\tiny]{sensor data};
 \end{tikzpicture}
 
@@ -416,22 +470,28 @@ they are allowed in \texttt{LDLIBS}, too.
 
 \begin{itemize}
 \item Minimise the number of colours, and re-use colour groups already defined.
-\item Too much use of colour where it is not required serves only to reduce the effectiveness of bright colours for important items.
+\item Too much use of colour where it is not required serves only to reduce 
+ the effectiveness of bright colours for important items.
 \item High colour saturation elements should be reserved for high importance items
 \item High contrast against background should be reserved for high importance items
 \item Attempt to adopt colours that are intuitive based the function of the item
-\item Minimise the clutter where possible --- readibility is essential for use in flight
-\item Use colours defined in \verb|Graphics| according to functional name, not their actual colour.
-\item Try to maintain consistent use of colours in all uses of that function, such as dialog graphics as well as map overlays and infoboxes.
+\item Minimise the clutter where possible --- readibility is essential for use 
+ in flight
+\item Use colours defined in \verb|Graphics| according to functional name, not 
+ their actual colour.
+\item Try to maintain consistent use of colours in all uses of that function, 
+ such as dialogue graphics as well as map overlays and infoboxes.
 \item Text should always be monochrome.
 \end{itemize}
 
 Use aviation conventions or adopt best aviation human factors
 standards where possible, in particular:
 \begin{itemize}
-\item ICAO Internation Standards and Recommended Practices, Annex 4 to the Convention on International Civil Aviation (Aeronautical Charts).
+\item ICAO Internation Standards and Recommended Practices, Annex 4 to the 
+ Convention on International Civil Aviation (Aeronautical Charts).
 \item NASA Colour Usage recommendations and design guidelines: \verb|http://colorusage.arc.nasa.gov/|
-\item DOT/FAA/AR-03/67 {\em Human Factors Considerations in the Design and Evaluation of Electronic Flight Bags (EFBs)} \verb|http://www.volpe.dot.gov/hf/aviation/efb/docs/efb_version2.pdf|
+\item DOT/FAA/AR-03/67 {\em Human Factors Considerations in the Design and 
+ Evaluation of Electronic Flight Bags (EFBs)} \verb|http://www.volpe.dot.gov/hf/aviation/efb/docs/efb_version2.pdf|
 \item FAA Human Factors Design Standards \verb|http://hf.tc.faa.gov/hfds/|.
 \item DOT/FAA/AM-01/17 {\em Human Factors Design Guidelines for Multifunction Displays}
 \end{itemize}
@@ -441,9 +501,11 @@ This site has a useful tool that can be used to convert screenshots
 to how they would look to a person with common color blindness:
 \verb|http://www.etre.com/tools/colourcheck/|.
 
-{\bf For safety purposes, avoid use of elements that may encourage or require the user to stare at the screen continuously.}
+{\bf For safety purposes, avoid use of elements that may encourage or require 
+the user to stare at the screen continuously.}
 
-{\bf For safety purposes, avoid user controls that have significant risk of producing unsafe results if misconfigured by the pilot.}
+{\bf For safety purposes, avoid user controls that have significant risk of 
+producing unsafe results if misconfigured by the pilot.}
 
 \subsection{General colour conventions}
 Colour conventions generally in use throughout the program:
@@ -472,27 +534,28 @@ Colour conventions in use are:
 \item Buttons and other widgets rendered with an evenly shaded border
 \item Yellow for clicked items
 \item Light blue for the key focused item
-\item Medium blue for dialog title bar
+\item Medium blue for dialogue title bar
 \item Text is black if the item is enabled
 \item Text is greyed out (but still visible) if the item is disabled
 \end{itemize}
 
-\subsection{Dialog types and navigation buttons}
+\subsection{dialogue types and navigation buttons}
 There are four types of dialogs in XCSoar, and the navigation 
 buttons for each are different.  
 Navigation buttons are the Close, OK, Cancel and Select buttons.
 \begin{itemize}
-\item Dialogs that modify and save data when the dialog closes.
+\item Dialogs that modify and save data when the dialogue closes.
 
 These shall usually have a Close button (no Cancel) and may have context specific 
 function buttons
 \item Dialogs that modify data where Cancel would be important for the user.
 
 These shall have OK and Cancel buttons.  This may include dialogs with 
-children dialogs where hitting Cancel from the parent dialog cancels 
+children dialogs where hitting Cancel from the parent dialogue cancels 
 all the changes made in the children dialogs
 
-\item Dialogs that have a list of values, one of which can be selected to return to the parent dialog.
+\item Dialogs that have a list of values, one of which can be selected to 
+ return to the parent dialogue.
 
 These shall have Select and Cancel buttons
 \item Dialogs that display information that cannot be modified.
@@ -500,9 +563,10 @@ These shall have Select and Cancel buttons
 These shall have a Close button
 \end{itemize}
 
-\subsection{Dialog button placement and size}
+\subsection{dialogue button placement and size}
 \begin{itemize}
-\item The Close and Cancel buttons will never appear in the same dialog and are always located in the same place.  This location will be:
+\item The Close and Cancel buttons will never appear in the same dialogue and 
+ are always located in the same place.  This location will be:
 
 For portrait: lower right
 
@@ -513,11 +577,17 @@ For portrait: Select in lower left, Cancel in lower right
 
 For landscape: Cancel in lower left, Select immediately above it
 \item Buttons will be 35 (scaled) pixels high
-\item Buttons will be flush with the bottom of the screen and with the sides of the screen and against each other (no margins)
+\item Buttons will be flush with the bottom of the screen and with the sides of 
+ the screen and against each other (no margins)
 \item In portrait, buttons will be 33% or 50% or 100% width of the screen
-\item In landscape, buttons will be 65 to 80 (scaled) pixels wide, as wide as the frame permits.  They will generally be a vertical row of buttons flush left of the screen
-\item If text won't fit on a button, the buttons can be made larger consistently for a screen, but this should be the exception because if it must contain that much text consider using a different type of control.
-\item Exceptions to all the dialog concepts above are encouraged, but should be mocked up and reviewed with the development community prior to implementing and possibly documenting in the developers guide.
+\item In landscape, buttons will be 65 to 80 (scaled) pixels wide, as wide as the 
+ frame permits.  They will generally be a vertical row of buttons flush left of the screen
+\item If text won't fit on a button, the buttons can be made larger consistently 
+ for a screen, but this should be the exception because if it must contain that 
+ much text consider using a different type of control.
+\item Exceptions to all the dialogue concepts above are encouraged, but should be 
+ mocked up and reviewed with the development community prior to implementing and 
+ possibly documenting in the developers guide.
 \end{itemize}
 
 \subsection{Usability}
@@ -564,7 +634,8 @@ informational widgets (final glide bar, wind, north arrow) should be rendered
 so as to help those elements be visually separated from the map:
 
 \begin{itemize}
-\item Generally adopt higher contrast (higher colour saturation or darker shade) than the background map layer elements.
+\item Generally adopt higher contrast (higher colour saturation or darker shade) 
+ than the background map layer elements.
 
 \item For elements covering an area (non line), draw the entire element or a border
 with a luminosity contrasting pen, of width \verb|IBLSCALE(1)|.
@@ -581,6 +652,22 @@ It is important to keep this area clear so the aircraft symbol can be easily fou
 Elements that may be rendered over each other should be organised in order of
 priority, particularly with alert warning items above caution items above non-alert items.
 
+\section{Terminology}
+\subsection{Glide Ratio}
+'Glide ratio' is a non-specific term which can refer to the ratio of horizontal to 
+vertical motion with reference to either the surrounding airmass or the ground.
+
+To reduce confusion, ground-referenced glide ratios (eg distance travelled over 
+ground vs altitude lost) should be referred to by the term 'glide ratio over 
+ground' when space allows, or 'glide ratio' / 'GR'.
+
+Air-referenced glide ratios (eg airspeed vs sink rate) should be specified as 
+'lift/drag ratio' / 'L/D ratio' / 'LD'. The lift/drag ratio is numerically equal 
+to the air-referenced glide ratio when flying at constant speed.
+
+If usage spans both air-referenced and ground-referenced glide ratios, the 
+non-specific term 'glide ratio' / 'GR' should be used. 'Lift/drag ratio' should 
+never be used to refer to ground-referenced glide ratios.
 
 \chapter{File formats}\label{cha:file_formats}
 

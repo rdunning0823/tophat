@@ -39,23 +39,26 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxLayout.hpp"
 #include "Renderer/OZRenderer.hpp"
 #include "Engine/Task/ObservationZones/LineSectorZone.hpp"
+#include "Engine/Task/ObservationZones/MatCylinderZone.hpp"
 #include "Engine/Task/ObservationZones/FAISectorZone.hpp"
 #include "Engine/Task/ObservationZones/KeyholeZone.hpp"
 #include "Engine/Task/ObservationZones/BGAFixedCourseZone.hpp"
 #include "Engine/Task/ObservationZones/BGAEnhancedOptionZone.hpp"
 #include "Engine/Task/ObservationZones/BGAStartSectorZone.hpp"
 #include "Engine/Task/ObservationZones/AnnularSectorZone.hpp"
+#include "Engine/Task/ObservationZones/Boundary.hpp"
 #include "Projection/Projection.hpp"
 #include "Renderer/AirspaceRendererSettings.hpp"
 #include "ResourceLoader.hpp"
 
 enum {
-  NUM_OZ_TYPES = 9,
+  NUM_OZ_TYPES = 10,
 };
 
 static const TCHAR *const oz_type_names[NUM_OZ_TYPES] = {
   _T("Line"),
   _T("Cylinder"),
+  _T("MAT Cylinder"),
   _T("Sector"),
   _T("FAI Sector"),
   _T("Keyhole"),
@@ -108,6 +111,10 @@ public:
 
     case ObservationZonePoint::CYLINDER:
       oz = new CylinderZone(location, radius);
+      break;
+
+    case ObservationZonePoint::MAT_CYLINDER:
+      oz = new MatCylinderZone(location);
       break;
 
     case ObservationZonePoint::SECTOR:
@@ -176,7 +183,7 @@ OZWindow::OnPaint(Canvas &canvas)
   /* debugging for ObservationZone::GetBoundary() */
   Pen pen(1, COLOR_RED);
   canvas.Select(pen);
-  const ObservationZone::Boundary boundary = oz->GetBoundary();
+  const OZBoundary boundary = oz->GetBoundary();
   for (auto i = boundary.begin(), end = boundary.end(); i != end; ++i) {
     RasterPoint p = projection.GeoToScreen(*i);
     canvas.DrawLine(p.x - 3, p.y - 3, p.x + 3, p.y + 3);
@@ -274,7 +281,7 @@ protected:
   virtual bool OnCommand(unsigned id, unsigned code) {
     switch (id) {
     case ID_CLOSE:
-      close();
+      Close();
       return true;
     }
 

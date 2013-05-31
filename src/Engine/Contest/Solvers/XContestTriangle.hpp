@@ -30,25 +30,16 @@
  *
  * This solver alternates between searching for FAI and non-FAI triangles
  */
-class XContestTriangle: 
-  public OLCTriangle
-{
+class XContestTriangle : public OLCTriangle {
   const bool is_dhv;
 
 public:
-  friend class XContest;
-  XContestTriangle(const Trace &_trace,
-                   const bool _is_dhv=false);
-
-  void SwapMode() {
-    is_fai = !is_fai;
-  }
+  XContestTriangle(const Trace &_trace, bool predict, bool _is_dhv);
 
 protected:
   /* virtual methods from AbstractContest */
-  virtual bool Solve(bool exhaustive);
-  virtual fixed CalcScore() const;
-  virtual fixed CalcDistance() const;
+  virtual SolverResult Solve(bool exhaustive) gcc_override;
+  virtual ContestResult CalculateResult(const ContestTraceVector &solution) const gcc_override;
 };
 
 #endif

@@ -30,10 +30,43 @@
 #include "KineticManager.hpp"
 
 void
+KineticManager::Reverse()
+{
+  MoveTo(mouse_down_x);
+  mode = REVERSED;
+}
+
+void
+KineticManager::MoveTo(int x)
+{
+  stopping_time = default_stopping_time / 2;
+  last = GetPosition();
+  steady = false;
+  mode = MOVETO;
+  fixed distance = fixed(x - last);
+  clock.Update();
+  v = (distance * fixed_two) / fixed(stopping_time);
+  end = x;
+}
+
+bool
+KineticManager::IsReversed()
+{
+  return mode == REVERSED;
+}
+
+bool
+KineticManager::IsMoveTo()
+{
+  return mode == MOVETO;
+}
+
+void
 KineticManager::MouseDown(int x)
 {
-  steady = false;
-  last = x;
+  mode = NORMAL;
+  mouse_down_x = last = x;
+  stopping_time = default_stopping_time;
   clock.Update();
   v = fixed_zero;
 }
@@ -41,6 +74,7 @@ KineticManager::MouseDown(int x)
 void
 KineticManager::MouseMove(int x)
 {
+  steady = false;
   // Get time since last position update
   int dt = clock.Elapsed();
 
@@ -62,10 +96,23 @@ KineticManager::MouseMove(int x)
 }
 
 void
-KineticManager::MouseUp(int x)
+KineticManager::MouseUp(int x, unsigned max_distance_mouse_dn)
 {
-  // Calculate end position of the kinetic movement
-  end = last + (int)((v / 2) * stopping_time);
+  // Calculate distance of the kinetic movement
+  fixed distance_basic = (v / fixed_two) * fixed(stopping_time);
+  int dist_no_max = last - mouse_down_x + (int)distance_basic;
+
+  fixed distance_final = distance_basic;
+
+  // if a max_distance exists, then adjust end and v if needed
+  if (max_distance_mouse_dn > 0 &&
+      abs(dist_no_max) > (int)max_distance_mouse_dn) {
+    distance_final = (fixed)(max_distance_mouse_dn *
+        ((distance_basic > fixed_zero) ? fixed_one : fixed_minus_one) -
+        fixed(last) + fixed(mouse_down_x));
+    v = (distance_final * fixed_two) / fixed(stopping_time);
+  }
+  end = last + (int)distance_final;
 }
 
 int
@@ -73,7 +120,6 @@ KineticManager::GetPosition()
 {
   // Get time that has passed since the end of the manual movement
   int t = clock.Elapsed();
-
   // If more time has passed than allocated for the kinetic movement
   if (t >= stopping_time) {
     // Stop the kinetic movement and return the precalculated end position
@@ -85,7 +131,6 @@ KineticManager::GetPosition()
   int x = last + (int)(v * t - v * t * t / (2 * stopping_time));
   if (x == end)
     steady = true;
-
   return x;
 }
 

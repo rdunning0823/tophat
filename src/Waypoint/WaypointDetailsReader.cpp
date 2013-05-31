@@ -36,7 +36,7 @@ Copyright_License {
 #include <vector>
 
 static const Waypoint *
-find_waypoint(Waypoints &way_points, const TCHAR *name)
+FindWaypoint(Waypoints &way_points, const TCHAR *name)
 {
   const Waypoint *wp = way_points.LookupName(name);
   if (wp != NULL)
@@ -65,7 +65,7 @@ SetAirfieldDetails(Waypoints &way_points, const TCHAR *name,
                    const std::vector<tstring> &files_external,
                    const std::vector<tstring> &files_embed)
 {
-  const Waypoint *wp = find_waypoint(way_points, name);
+  const Waypoint *wp = FindWaypoint(way_points, name);
   if (wp == NULL)
     return;
 
@@ -86,61 +86,61 @@ static void
 ParseAirfieldDetails(Waypoints &way_points, TLineReader &reader,
                      OperationEnvironment &operation)
 {
-  tstring Details;
+  tstring details;
   std::vector<tstring> files_external, files_embed;
-  TCHAR Name[201];
+  TCHAR name[201];
   const TCHAR *filename;
 
-  Name[0] = 0;
+  name[0] = 0;
 
-  bool inDetails = false;
+  bool in_details = false;
   int i;
 
   long filesize = std::max(reader.size(), 1l);
   operation.SetProgressRange(100);
 
-  TCHAR *TempString;
-  while ((TempString = reader.read()) != NULL) {
-    if (TempString[0] == _T('[')) { // Look for start
-      if (inDetails)
-        SetAirfieldDetails(way_points, Name, Details, files_external,
+  TCHAR *line;
+  while ((line = reader.read()) != NULL) {
+    if (line[0] == _T('[')) { // Look for start
+      if (in_details)
+        SetAirfieldDetails(way_points, name, details, files_external,
                            files_embed);
 
-      Details.clear();
+      details.clear();
       files_external.clear();
       files_embed.clear();
 
       // extract name
       for (i = 1; i < 201; i++) {
-        if (TempString[i] == _T(']'))
+        if (line[i] == _T(']'))
           break;
 
-        Name[i - 1] = TempString[i];
+        name[i - 1] = line[i];
       }
-      Name[i - 1] = 0;
+      name[i - 1] = 0;
 
-      inDetails = true;
+      in_details = true;
 
       operation.SetProgressPosition(reader.tell() * 100 / filesize);
     } else if ((filename =
-                StringAfterPrefixCI(TempString, _T("image="))) != NULL) {
+                StringAfterPrefixCI(line, _T("image="))) != NULL) {
       files_embed.push_back(filename);
     } else if ((filename =
-                StringAfterPrefixCI(TempString, _T("file="))) != NULL) {
+                StringAfterPrefixCI(line, _T("file="))) != NULL) {
 #ifdef ANDROID
       files_external.push_back(filename);
 #endif
     } else {
       // append text to details string
-      if (!StringIsEmpty(TempString)) {
-        Details += TempString;
-        Details += _T('\n');
+      if (!StringIsEmpty(line)) {
+        details += line;
+        details += _T('\n');
       }
     }
   }
 
-  if (inDetails)
-    SetAirfieldDetails(way_points, Name, Details, files_external, files_embed);
+  if (in_details)
+    SetAirfieldDetails(way_points, name, details, files_external, files_embed);
 }
 
 /**
@@ -161,12 +161,9 @@ WaypointDetails::ReadFileFromProfile(Waypoints &way_points,
 {
   LogStartUp(_T("WaypointDetails::ReadFileFromProfile"));
 
-  TLineReader *reader =
-    OpenConfiguredTextFile(szProfileAirfieldFile, _T("airfields.txt"),
-                           ConvertLineReader::AUTO);
-  if (reader == NULL)
-    return;
-
-  ReadFile(*reader, way_points, operation);
-  delete reader;
+  std::unique_ptr<TLineReader>
+  reader(OpenConfiguredTextFile(ProfileKeys::AirfieldFile, _T("airfields.txt"),
+                                ConvertLineReader::AUTO));
+  if (reader)
+    ReadFile(*reader, way_points, operation);
 }

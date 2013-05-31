@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.io.IOException;
 import android.bluetooth.BluetoothSocket;
@@ -53,7 +53,7 @@ class BluetoothPort extends AbstractAndroidPort {
   }
 
   public int getBaudRate() {
-    return 19200;
+    return 0;
   }
 
   public boolean setBaudRate(int baudRate) {

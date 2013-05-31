@@ -141,9 +141,7 @@ WndForm::UpdateLayout()
   client_rect.top = title_rect.bottom;
 
   if (client_area.IsDefined())
-    client_area.Move(client_rect.left, client_rect.top,
-                     client_rect.right - client_rect.left,
-                     client_rect.bottom - client_rect.top);
+    client_area.Move(client_rect);
 }
 
 ContainerWindow &
@@ -378,7 +376,7 @@ WndForm::ShowModal()
   main_window.AddDialog(this);
 
 #ifndef USE_GDI
-  main_window.refresh();
+  main_window.Refresh();
 #endif
 
 #ifdef ANDROID
@@ -393,13 +391,6 @@ WndForm::ShowModal()
 #endif
 
   while ((modal_result == 0 || force) && loop.Get(event)) {
-#if defined(ENABLE_SDL) && !defined(ANDROID)
-    if (event.type == SDL_QUIT) {
-      modal_result = mrCancel;
-      continue;
-    }
-#endif
-
     if (!main_window.FilterEvent(event, this)) {
       if (modeless && is_mouse_down(event))
         break;
@@ -457,17 +448,15 @@ WndForm::ShowModal()
     // The Windows CE dialog manager does not handle VK_ESCAPE and so we have
     // to do it by ourself.
     if (is_key_down(event) && get_key_code(event) == VK_ESCAPE) {
-      modal_result = mrCancel;
+      if (IsAltair())
+        /* map VK_ESCAPE to mrOK on Altair, because the Escape key is
+           expected to be the one that saves and closes a dialog */
+        modal_result = mrOK;
+      else
+        modal_result = mrCancel;
       continue;
     }
 #endif
-
-    /* map VK_ESCAPE to mrOK on Altair, because the Escape key is expected to 
-       be the one that saves and closes a dialog */
-    if (IsAltair() && is_key_down(event) && get_key_code(event) == VK_ESCAPE) {
-      modal_result = mrOK;
-      continue;
-    }
 
     loop.Dispatch(event);
   } // End Modal Loop

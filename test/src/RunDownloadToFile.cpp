@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Net/ToFile.hpp"
 #include "Net/Session.hpp"
-#include "Net/Features.hpp"
 #include "OS/Args.hpp"
 #include "Operation/ConsoleOperationEnvironment.hpp"
 
@@ -31,9 +30,8 @@ Copyright_License {
 
 int main(int argc, char **argv)
 {
-#ifdef HAVE_NET
   Args args(argc, argv, "URL PATH");
-  tstring url = args.ExpectNextT();
+  const char *url = args.ExpectNext();
   tstring path = args.ExpectNextT();
   args.ExpectEnd();
 
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
   ConsoleOperationEnvironment env;
 
   Net::Session session;
-  if (!Net::DownloadToFile(session, url.c_str(), path.c_str(),
+  if (!Net::DownloadToFile(session, url, path.c_str(),
                            md5_digest, env)) {
     fprintf(stderr, "Error\n");
     return EXIT_FAILURE;
@@ -50,8 +48,4 @@ int main(int argc, char **argv)
 
   puts(md5_digest);
   return EXIT_SUCCESS;
-#else
-  fprintf(stderr, "Networking not available on this platform\n");
-  return EXIT_FAILURE;
-#endif
 }

@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_CONDITION_MONITOR_WIND_HPP
 
 #include "ConditionMonitor.hpp"
-#include "Engine/Navigation/SpeedVector.hpp"
+#include "Geo/SpeedVector.hpp"
 
 /** #ConditionMonitor to track/warn on significant changes in wind speed */
 class ConditionMonitorWind: public ConditionMonitor
@@ -39,9 +39,11 @@ public:
      wind(SpeedVector::Zero()), last_wind(SpeedVector::Zero()) {}
 
 protected:
-  bool CheckCondition(const GlideComputer &cmp);
-  void Notify();
-  void SaveLast();
+  virtual bool CheckCondition(const NMEAInfo &basic,
+                              const DerivedInfo &calculated,
+                              const ComputerSettings &settings) gcc_override;
+  virtual void Notify();
+  virtual void SaveLast();
 };
 
 #endif

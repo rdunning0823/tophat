@@ -51,6 +51,16 @@ Copyright_License {
 #include "Profile/Profile.hpp"
 #include "ProgressGlue.hpp"
 #include "UIState.hpp"
+#include "DrawThread.hpp"
+#include "Pan.hpp"
+#include "MapWindow/MapWidgetOverlays.hpp"
+#include "Widgets/MainMenuButtonWidget.hpp"
+#include "Widgets/TaskNavSliderWidget.hpp"
+#include "Widgets/ZoomInButtonWidget.hpp"
+#include "Widgets/ZoomOutButtonWidget.hpp"
+#include "Widgets/TaskPreviousButtonWidget.hpp"
+#include "Widgets/TaskNextButtonWidget.hpp"
+#include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
@@ -73,6 +83,9 @@ MainWindow::MainWindow(const StatusMessageList &status_messages)
    popup(status_messages, *this, CommonInterface::GetUISettings()),
    timer(*this),
    FullScreen(false),
+#ifndef ENABLE_OPENGL
+   draw_suspended(false),
+#endif
    airspace_warning_pending(false)
 {
 }
@@ -83,6 +96,7 @@ MainWindow::MainWindow(const StatusMessageList &status_messages)
  */
 MainWindow::~MainWindow()
 {
+
   reset();
 }
 
@@ -126,7 +140,7 @@ NoFontsAvailable()
 
   /* now try to get a GUI error message out to the user */
 #ifdef WIN32
-  MessageBox(NULL, msg, _T("XCSoar"), MB_ICONEXCLAMATION|MB_OK);
+  MessageBox(NULL, msg, _T("Top Hat"), MB_ICONEXCLAMATION|MB_OK);
 #elif !defined(ANDROID)
   execl("/usr/bin/xmessage", "xmessage", msg, NULL);
   execl("/usr/X11/bin/xmessage", "xmessage", msg, NULL);
@@ -187,7 +201,7 @@ MainWindow::InitialiseConfigured()
   look->InitialiseConfigured(CommonInterface::GetUISettings());
 
   LogStartUp(_T("Create info boxes"));
-  InfoBoxManager::Create(rc, ib_layout, look->info_box, look->units);
+  InfoBoxManager::Create(*this, ib_layout, look->info_box, look->units);
   map_rect = ib_layout.remaining;
 
   LogStartUp(_T("Create button labels"));
@@ -196,17 +210,35 @@ MainWindow::InitialiseConfigured()
 
   ReinitialiseLayout_vario(ib_layout);
 
-  ReinitialiseLayoutTA(rc, ib_layout);
-
   WindowStyle hidden_border;
   hidden_border.Hide();
   hidden_border.Border();
 
-  ReinitialiseLayout_flarm(rc, ib_layout);
-
   map = new GlueMapWindow(*look);
+
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+  if (!HasDraggableScreen()) {
+    widget_overlays.Add(new TaskPreviousButtonWidget(), rc_current);
+    widget_overlays.Add(new TaskNextButtonWidget(), rc_current);
+  } else {
+    task_nav_slider_widget = new TaskNavSliderWidget();
+    widget_overlays.Add(task_nav_slider_widget, rc_current);
+  }
+#ifdef ENABLE_OPENGL
+  widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
+  widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
+  widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
+#endif
+  widget_overlays.Initialise(*this, rc_current);
+  widget_overlays.Prepare(*this, rc_current);
+
+  ReinitialiseLayoutTA(rc_current, ib_layout);
+
+  ReinitialiseLayout_flarm(rc_current, ib_layout);
+
   map->SetComputerSettings(CommonInterface::GetComputerSettings());
   map->SetMapSettings(CommonInterface::GetMapSettings());
+  map->SetUIState(CommonInterface::GetUIState());
   map->set(*this, map_rect);
   map->SetFont(Fonts::map);
 
@@ -261,8 +293,9 @@ MainWindow::ReinitialiseLayoutTA(PixelRect rc,
 {
   UPixelScalar sz = std::min(layout.control_height,
                              layout.control_width) * 2;
+  rc.top += widget_overlays.HeightFromTop();
+  rc.bottom = rc.top + sz;
   rc.right = rc.left + sz;
-  rc.top = rc.bottom - sz;
   thermal_assistant.Move(rc);
 }
 
@@ -296,7 +329,7 @@ MainWindow::ReinitialiseLayout()
 
   Fonts::SizeInfoboxFont(ib_layout.control_width);
 
-  InfoBoxManager::Create(rc, ib_layout, look->info_box, look->units);
+  InfoBoxManager::Create(*this, ib_layout, look->info_box, look->units);
   InfoBoxManager::ProcessTimer();
   map_rect = ib_layout.remaining;
 
@@ -305,10 +338,6 @@ MainWindow::ReinitialiseLayout()
 
   ReinitialiseLayout_vario(ib_layout);
 
-  ReinitialiseLayout_flarm(rc, ib_layout);
-
-  ReinitialiseLayoutTA(rc, ib_layout);
-
   if (map != NULL) {
     if (FullScreen)
       InfoBoxManager::Hide();
@@ -316,16 +345,35 @@ MainWindow::ReinitialiseLayout()
       InfoBoxManager::Show();
 
     const PixelRect &current_map = FullScreen ? rc : map_rect;
-    map->Move(current_map.left, current_map.top,
-              current_map.right - current_map.left,
-              current_map.bottom - current_map.top);
+    map->Move(current_map);
     map->FullRedraw();
   }
+
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                   widget != NULL,
+                                   map != NULL, FullScreen);
+
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+  widget_overlays.Move(rc_current);
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
+#ifdef ENABLE_OPENGL
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#endif
+#ifndef ENABLE_OPENGL
+  map->SetMainMenuButtonRect();
+  map->SetZoomButtonsRect();
+#endif
+  if (!HasDraggableScreen())
+    map->SetTaskNavSliderShape();
+
+  ReinitialiseLayout_flarm(rc_current, ib_layout);
+  ReinitialiseLayoutTA(rc_current, ib_layout);
 
   if (widget != NULL) {
     const PixelRect &current_map = FullScreen ? rc : map_rect;
     widget->Move(current_map);
   }
+
 
 #ifdef ANDROID
   // move topmost dialog to fit into the current layout, or close it
@@ -365,12 +413,14 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
   case TrafficSettings::GaugeLocation::TopLeft:
     rc.right = rc.left + ib_layout.control_width * 2;
     ++rc.left;
+    rc.top += widget_overlays.HeightFromTop();
     rc.bottom = rc.top + ib_layout.control_height * 2;
     ++rc.top;
     break;
 
   case TrafficSettings::GaugeLocation::TopRight:
     rc.left = rc.right - ib_layout.control_width * 2 + 1;
+    rc.top += widget_overlays.HeightFromTop();
     rc.bottom = rc.top + ib_layout.control_height * 2;
     ++rc.top;
     break;
@@ -378,12 +428,14 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
   case TrafficSettings::GaugeLocation::BottomLeft:
     rc.right = rc.left + ib_layout.control_width * 2;
     ++rc.left;
+    rc.bottom -= widget_overlays.HeightFromBottomLeft();
     rc.top = rc.bottom - ib_layout.control_height * 2 + 1;
     break;
 
   case TrafficSettings::GaugeLocation::CentreTop:
     rc.left = (rc.left + rc.right) / 2 - ib_layout.control_width;
     rc.right = rc.left + ib_layout.control_width * 2 - 1;
+    rc.top += widget_overlays.HeightFromTop();
     rc.bottom = rc.top + ib_layout.control_height * 2;
     ++rc.top;
     break;
@@ -391,23 +443,23 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
   case TrafficSettings::GaugeLocation::CentreBottom:
     rc.left = (rc.left + rc.right) / 2 - ib_layout.control_width;
     rc.right = rc.left + ib_layout.control_width * 2 - 1;
+    rc.bottom -= widget_overlays.HeightFromBottomMax();
     rc.top = rc.bottom - ib_layout.control_height * 2 + 1;
     break;
 
   default:    // aka flBottomRight
     rc.left = rc.right - ib_layout.control_width * 2 + 1;
+    rc.bottom -= widget_overlays.HeightFromBottomRight();
     rc.top = rc.bottom - ib_layout.control_height * 2 + 1;
     break;
   }
-
   traffic_gauge.Move(rc);
 }
 
 void
 MainWindow::ReinitialisePosition()
 {
-  PixelRect rc = SystemWindowSize();
-  FastMove(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
+  FastMove(SystemWindowSize());
 }
 
 void
@@ -513,8 +565,6 @@ MainWindow::OnTimer(WindowTimer &_timer)
     return SingleWindow::OnTimer(_timer);
 
   if (globalRunningEvent.Test()) {
-    battery_timer.Process();
-
     ProcessTimer();
 
     UpdateGaugeVisibility();
@@ -537,6 +587,22 @@ MainWindow::OnTimer(WindowTimer &_timer)
         widget->Raise();
       }
     }
+
+    widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                     widget != NULL,
+                                     map != NULL, FullScreen);
+    map->SetCompassOffset(widget_overlays.HeightFromTop());
+    map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#ifndef ENABLE_OPENGL
+    map->SetMainMenuButtonRect();
+    map->SetZoomButtonsRect();
+#endif
+    if (!HasDraggableScreen())
+      map->SetTaskNavSliderShape();
+    else
+      task_nav_slider_widget->RefreshTask();
+
+    battery_timer.Process();
   }
 
   return true;
@@ -560,9 +626,7 @@ MainWindow::OnUser(unsigned id)
 
     /* un-blank the display, play a sound and show the dialog */
     ResetDisplayTimeOut();
-#ifndef GNAV
     PlayResource(_T("IDR_WAV_BEEPBWEEP"));
-#endif
     dlgAirspaceWarningsShowModal(*this, *airspace_warnings, true);
     return true;
 
@@ -590,8 +654,17 @@ MainWindow::OnUser(unsigned id)
   case Command::CALCULATED_UPDATE:
     XCSoarInterface::ReceiveCalculated();
 
-    if (map != NULL)
+    CommonInterface::SetUIState().display_mode =
+      GetNewDisplayMode(CommonInterface::GetUISettings().info_boxes,
+                        CommonInterface::GetUIState(),
+                        CommonInterface::Calculated());
+    CommonInterface::SetUIState().panel_name =
+      InfoBoxManager::GetCurrentPanelName();
+
+    if (map != NULL) {
+      map->SetUIState(CommonInterface::GetUIState());
       map->FullRedraw();
+    }
 
     InfoBoxManager::SetDirty();
     InfoBoxManager::ProcessTimer();
@@ -621,7 +694,7 @@ MainWindow::OnDestroy()
 }
 
 bool MainWindow::OnClose() {
-  if (!IsRunning())
+  if (HasDialog() || !IsRunning())
     /* no shutdown dialog if XCSoar hasn't completed initialization
        yet (e.g. if we are in the simulator prompt) */
     return SingleWindow::OnClose();
@@ -650,9 +723,27 @@ MainWindow::SetFullScreen(bool _full_screen)
 
   if (map != NULL) {
     const PixelRect rc = FullScreen ? GetClientRect() : map_rect;
-    map->FastMove(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
+    map->FastMove(rc);
   }
 
+  widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#ifndef ENABLE_OPENGL
+  map->SetMainMenuButtonRect();
+  map->SetZoomButtonsRect();
+#endif
+  if (!HasDraggableScreen())
+    map->SetTaskNavSliderShape();
+
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+  PixelRect rc = GetClientRect();
+  const InfoBoxLayout::Layout ib_layout =
+    InfoBoxLayout::Calculate(rc, ui_settings.info_boxes.geometry);
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+
+  ReinitialiseLayout_flarm(rc_current, ib_layout);
+  ReinitialiseLayoutTA(rc_current, ib_layout);
   // the repaint will be triggered by the DrawThread
 }
 
@@ -668,14 +759,6 @@ MainWindow::SetTopography(TopographyStore *topography)
 {
   if (map != NULL)
     map->SetTopography(topography);
-}
-
-DisplayMode
-MainWindow::GetDisplayMode() const
-{
-  return map != NULL
-    ? map->GetDisplayMode()
-    : DisplayMode::NONE;
 }
 
 void
@@ -708,7 +791,25 @@ MainWindow::ActivateMap()
     KillWidget();
     map->Show();
     map->SetFocus();
+
+#ifndef ENABLE_OPENGL
+    if (draw_suspended) {
+      draw_suspended = false;
+      draw_thread->Resume();
+    }
+#endif
   }
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                   widget != NULL,
+                                   map != NULL, FullScreen);
+  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+#ifndef ENABLE_OPENGL
+  map->SetMainMenuButtonRect();
+  map->SetZoomButtonsRect();
+#endif
+  if (!HasDraggableScreen())
+    map->SetTaskNavSliderShape();
 
   return map;
 }
@@ -729,7 +830,7 @@ MainWindow::KillWidget()
 }
 
 void
-MainWindow::SetWidget(Widget *_widget)
+MainWindow::SetWidget(Widget *_widget, bool full_screen)
 {
   assert(_widget != NULL);
 
@@ -737,12 +838,21 @@ MainWindow::SetWidget(Widget *_widget)
   KillWidget();
 
   /* hide the map (might be hidden already) */
-  if (map != NULL)
+  if (map != NULL) {
     map->FastHide();
+    widget_overlays.Hide();
+
+#ifndef ENABLE_OPENGL
+    if (!draw_suspended) {
+      draw_suspended = true;
+      draw_thread->BeginSuspend();
+    }
+#endif
+  }
 
   widget = _widget;
 
-  const PixelRect rc = FullScreen ? GetClientRect() : map_rect;
+  const PixelRect rc = (FullScreen || full_screen) ? GetClientRect() : map_rect;
   widget->Initialise(*this, rc);
   widget->Prepare(*this, rc);
   widget->Show(rc);

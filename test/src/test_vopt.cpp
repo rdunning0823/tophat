@@ -22,6 +22,7 @@
 
 #include "Math/FastMath.h"
 #include "harness_flight.hpp"
+#include "harness_wind.hpp"
 
 static bool
 test_speed_factor(int test_num, int n_wind)
@@ -36,12 +37,12 @@ test_speed_factor(int test_num, int n_wind)
   result = test_flight(test_num, n_wind, 0.7);
   te1 = result.time_elapsed;
   // time of this should be higher than nominal
-  ok(te0 < te1, test_name("vopt slow or", test_num, n_wind), 0);
+  ok(te0 < te1, GetTestName("vopt slow or", test_num, n_wind), 0);
 
   result = test_flight(test_num, n_wind, 1.5);
   te2 = result.time_elapsed;
   // time of this should be higher than nominal
-  ok(te0 < te2, test_name("vopt fast or", test_num, n_wind), 0);
+  ok(te0 < te2, GetTestName("vopt fast or", test_num, n_wind), 0);
 
   bool retval = (te0 < te1) && (te0 < te2);
   if (verbose || !retval) {
@@ -57,7 +58,7 @@ main(int argc, char** argv)
   // default arguments
   autopilot_parms.SetIdeal();
 
-  if (!parse_args(argc, argv))
+  if (!ParseArgs(argc, argv))
     return 0;
 
   unsigned i = rand() % NUM_WIND;

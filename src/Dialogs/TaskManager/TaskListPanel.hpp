@@ -25,19 +25,22 @@ Copyright_License {
 #define XCSOAR_TASK_LIST_PANEL_HPP
 
 #include "Form/XMLWidget.hpp"
+#include "Form/List.hpp"
 
-class WndForm;
 class TabBarControl;
-class ListControl;
+class WndButton;
 class WndOwnerDrawFrame;
 class TabbedControl;
 class Canvas;
 class OrderedTask;
 class TaskStore;
+class WndForm;
 
-class TaskListPanel : public XMLWidget {
-  WndForm &wf;
-  TabBarControl &tab_bar;
+class TaskListPanel : public XMLWidget, private ListControl::Handler {
+  /**
+   * a pointer to the tab bar if run in a tabbed environment
+   */
+  TabBarControl *tab_bar;
 
   OrderedTask **active_task;
   bool *task_modified;
@@ -46,39 +49,67 @@ class TaskListPanel : public XMLWidget {
 
   bool lazy_loaded; // if store has been loaded first time tab displayed
 
+  /**
+   * Showing all task files?  (including *.igc, *.cup)
+   */
+  bool more;
+
   ListControl *wTasks;
+  WndButton *more_button;
+  WndButton *cancel_button;
   WndOwnerDrawFrame* wTaskView;
-  TabbedControl *browse_tabbed;
-  PixelRect TaskViewRect;
-  bool fullscreen;
+
+  /**
+   * an instance to a parent form.  This form is closed by the Load function
+   * if it is not nullptr
+   * If the form is nullptr, it's assume the widget is shown in a tabbed window
+   */
+  WndForm *parent_form;
 
 public:
-  TaskListPanel(WndForm &_wf, TabBarControl &_tab_bar,
+  TaskListPanel(TabBarControl *_tab_bar,
                 OrderedTask **_active_task, bool *_task_modified)
-    :wf(_wf), tab_bar(_tab_bar),
-     active_task(_active_task), task_modified(_task_modified) {}
+    :tab_bar(_tab_bar),
+     active_task(_active_task), task_modified(_task_modified),
+     more(false),
+     wTaskView(NULL), parent_form(nullptr) {}
+
+  void SetTaskView(WndOwnerDrawFrame *_task_view) {
+    assert(wTaskView == NULL);
+    assert(_task_view != NULL);
+
+    wTaskView = _task_view;
+  }
 
   void RefreshView();
+  void DirtyList();
 
   void SaveTask();
   void LoadTask();
   void DeleteTask();
   void RenameTask();
 
-  void OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas);
-  void OnTaskPaintListItem(Canvas &canvas, const PixelRect rc,
-                           unsigned DrawListIndex);
+  /**
+   * closes the parent form when this is not run in a tabbed environment
+   */
+  void CancelForm();
 
-  void OnManageClicked();
-  void OnBrowseClicked();
-  void OnNewTaskClicked();
-  void OnDeclareClicked();
-  void OnTaskViewClick();
+  void OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas);
+
+  void OnMoreClicked();
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
-  virtual void ReClick();
   virtual void Show(const PixelRect &rc);
+  virtual void Hide();
+
+  /**
+   * set the tatic parent form
+   * and indicates the widget is being shown in a form
+   * instead of in a tabbed window
+   * also add a cancel button
+   */
+  void SetParentForm(WndForm *_parent_form);
 
 protected:
   OrderedTask *get_cursor_task();
@@ -86,7 +117,22 @@ protected:
   gcc_pure
   const TCHAR *get_cursor_name();
 
-  OrderedTask *get_task_to_display();
+private:
+  /* virtual methods from class ListControl::Handler */
+  virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
+                           unsigned idx) gcc_override;
+
+  virtual void OnCursorMoved(unsigned index) gcc_override {
+    RefreshView();
+  }
+
+  virtual bool CanActivateItem(unsigned index) const gcc_override {
+      return true;
+  }
+
+  virtual void OnActivateItem(unsigned index) gcc_override {
+    LoadTask();
+  }
 };
 
 #endif

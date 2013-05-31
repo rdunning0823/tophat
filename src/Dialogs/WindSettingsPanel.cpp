@@ -30,9 +30,33 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Units/Units.hpp"
 
-WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind)
+WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind,
+                                     bool _edit_trail_drift)
   :RowFormWidget(UIGlobals::GetDialogLook()),
-   edit_manual_wind(_edit_manual_wind) {}
+   edit_manual_wind(_edit_manual_wind),
+   edit_trail_drift(_edit_trail_drift) {}
+
+void
+WindSettingsPanel::SetVisibility()
+{
+  assert(auto_wind != nullptr);
+
+  DataFieldEnum *auto_wind_enum = (DataFieldEnum *)
+      auto_wind->GetDataField();
+  bool manual_mode = auto_wind_enum->GetAsInteger() == 0;
+
+  RowFormWidget::GetControl(ExternalWind).SetVisible(!manual_mode);
+  if (edit_trail_drift) {
+    this->GetControl(Speed).SetVisible(manual_mode);
+    this->GetControl(Direction).SetVisible(manual_mode);
+  }
+}
+
+void
+WindSettingsPanel::OnModified(DataField &df)
+{
+  SetVisibility();
+}
 
 void
 WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
@@ -43,7 +67,7 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const WindSettings &settings = CommonInterface::GetComputerSettings().wind;
   const MapSettings &map_settings = CommonInterface::GetMapSettings();
 
-  static gcc_constexpr_data StaticEnumChoice auto_wind_list[] = {
+  static constexpr StaticEnumChoice auto_wind_list[] = {
     { AUTOWIND_NONE, N_("Manual"),
       N_("When the algorithm is switched off, the pilot is responsible for setting the wind estimate.") },
     { AUTOWIND_CIRCLING, N_("Circling"),
@@ -55,19 +79,22 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { 0 }
   };
 
-  AddEnum(_("Auto wind"),
-          _("This allows switching on or off the automatic wind algorithm."),
-          auto_wind_list, settings.GetLegacyAutoWindMode());
+  auto_wind = AddEnum(_("Auto wind"),
+      _("This allows switching on or off the automatic wind algorithm."),
+      auto_wind_list, settings.GetLegacyAutoWindMode(), this);
 
   AddBoolean(_("External wind"),
              _("If enabled, then the wind vector received from external devices overrides "
                  "XCSoar's internal wind calculation."),
              settings.use_external_wind);
 
-  AddBoolean(_("Trail drift"),
-             _("Determines whether the snail trail is drifted with the wind "
-               "when displayed in circling mode."),
-             map_settings.trail_drift_enabled);
+  if (edit_trail_drift)
+    AddBoolean(_("Trail drift"),
+               _("Determines whether the snail trail is drifted with the wind "
+                 "when displayed in circling mode."),
+               map_settings.trail.wind_drift_enabled);
+  else
+    AddDummy();
 
   if (edit_manual_wind) {
     external_wind = settings.use_external_wind &&
@@ -94,6 +121,8 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                   manual_wind.bearing.Degrees());
     wp->SetEnabled(!external_wind);
   }
+
+  SetVisibility();
 }
 
 bool
@@ -106,16 +135,17 @@ WindSettingsPanel::Save(bool &_changed, bool &_require_restart)
   bool changed = false;
 
   unsigned auto_wind_mode = settings.GetLegacyAutoWindMode();
-  if (SaveValueEnum(AutoWind, szProfileAutoWind, auto_wind_mode)) {
+  if (SaveValueEnum(AutoWind, ProfileKeys::AutoWind, auto_wind_mode)) {
     settings.SetLegacyAutoWindMode(auto_wind_mode);
     changed = true;
   }
 
-  changed |= SaveValue(ExternalWind, szProfileExternalWind,
+  changed |= SaveValue(ExternalWind, ProfileKeys::ExternalWind,
                        settings.use_external_wind);
 
-  changed |= SaveValue(TrailDrift, szProfileTrailDrift,
-                       map_settings.trail_drift_enabled);
+  if (edit_trail_drift)
+    changed |= SaveValue(TrailDrift, ProfileKeys::TrailDrift,
+                         map_settings.trail.wind_drift_enabled);
 
   if (edit_manual_wind && !external_wind) {
     settings.manual_wind.norm = Units::ToSysWindSpeed(GetValueFloat(Speed));

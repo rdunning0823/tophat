@@ -23,17 +23,17 @@
 #ifndef ROUTE_PLANNER_HPP
 #define ROUTE_PLANNER_HPP
 
-#include "Navigation/Geometry/GeoVector.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
 #include "RoutePolars.hpp"
 #include "RoutePolar.hpp"
 #include "Route.hpp"
 #include "AStar.hpp"
+#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/SearchPointVector.hpp"
+#include "ReachFan.hpp"
+
 #include <utility>
 #include <algorithm>
-#include "Navigation/TaskProjection.hpp"
-#include "Navigation/SearchPointVector.hpp"
-#include "ReachFan.hpp"
 
 class GlidePolar;
 
@@ -127,8 +127,16 @@ protected:
   RoughAltitude h_max;
 
 private:
+  struct CompareRoutePoint {
+    gcc_pure
+    bool operator()(const RoutePoint &a, const RoutePoint &b) const {
+      return a.Sort(b);
+    }
+  };
+
   /** A* search algorithm */
-  AStar<RoutePoint> planner;
+  AStar<RoutePoint, CompareRoutePoint> planner;
+
   /**
    * Convex hull of search to date, used by terrain node
    * generator to prevent backtracking
@@ -274,10 +282,8 @@ public:
    * @return true if check was successful
    */
   bool FindPositiveArrival(const AGeoPoint &dest,
-                           RoughAltitude &arrival_height_reach,
-                           RoughAltitude &arrival_height_direct) const {
-    return reach.FindPositiveArrival(dest, rpolars_reach, arrival_height_reach,
-                                       arrival_height_direct);
+                           ReachResult &result_r) const {
+    return reach.FindPositiveArrival(dest, rpolars_reach, result_r);
   }
 
   RoughAltitude GetTerrainBase() const {

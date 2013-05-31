@@ -38,7 +38,6 @@ enum ControlIndex {
   TerrainHeight,
   AlternateMode,
   PolarDegradation,
-  SafetyMC,
   RiskFactor,
 };
 
@@ -60,18 +59,18 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const TaskBehaviour &task_behaviour = settings_computer.task;
 
   AddFloat(_("Arrival height"),
-           _("The height above terrain that the glider should arrive at for a safe landing."),
+           _("The height above terrain that the glider should arrive at for a safe landing.  This is also added to height to complete a task."),
            _T("%.0f %s"), _T("%.0f"),
            fixed_zero, fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival);
 
   AddFloat(_("Terrain height"),
-           _("The height above terrain that the glider must clear during final glide."),
+           _("The height above terrain that the glider must clear during final glide.  This does not affect arrival height, but displays warnings on the screen where a mountain will be hit or an X in the final glide bar."),
            _T("%.0f %s"), _T("%.0f"),
            fixed_zero, fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.route_planner.safety_height_terrain);
 
-  static gcc_constexpr_data StaticEnumChoice abort_task_mode_list[] = {
+  static constexpr StaticEnumChoice abort_task_mode_list[] = {
     { (unsigned)AbortTaskMode::SIMPLE, N_("Simple") },
     { (unsigned)AbortTaskMode::TASK, N_("Task") },
     { (unsigned)AbortTaskMode::HOME, N_("Home") },
@@ -81,6 +80,7 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Alternates mode"),
           _("Determines sorting of alternates in the alternates dialog and in abort mode:\n[Simple] The alternates will only be sorted by waypoint type (airport/outlanding field) and arrival height.\n[Task] The sorting will also take the current task direction into account.\n[Home] The sorting will try to find landing options in the current direction to the configured home waypoint."),
           abort_task_mode_list, (unsigned)task_behaviour.abort_task_mode);
+  SetExpertRow(AlternateMode);
 
   AddFloat(_("Polar degradation"), /* xgettext:no-c-format */
            _("A permanent polar degradation. "
@@ -90,13 +90,6 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(0), fixed(50), fixed_one, false,
            (fixed_one - settings_computer.polar.degradation_factor) * 100);
   SetExpertRow(PolarDegradation);
-
-  AddFloat(_("Safety MC"),
-           _("The MacCready setting used, when safety MC is enabled for reach calculations, in task abort mode and for determining arrival altitude at airfields."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed_zero, fixed_ten, fixed(0.1), false,
-           UnitGroup::VERTICAL_SPEED, task_behaviour.safety_mc);
-  SetExpertRow(SafetyMC);
 
   AddFloat(_("STF risk factor"),
            _("The STF risk factor reduces the MacCready setting used to calculate speed to fly as the glider gets low, in order to compensate for risk. Set to 0.0 for no compensation, 1.0 scales MC linearly with current height (with reference to height of the maximum climb). If considered, 0.3 is recommended."),
@@ -115,34 +108,28 @@ SafetyFactorsConfigPanel::Save(bool &_changed, bool &_require_restart)
   TaskBehaviour &task_behaviour = settings_computer.task;
 
   changed |= SaveValue(ArrivalHeight, UnitGroup::ALTITUDE,
-                       szProfileSafetyAltitudeArrival,
+                       ProfileKeys::SafetyAltitudeArrival,
                        task_behaviour.safety_height_arrival);
 
   changed |= SaveValue(TerrainHeight, UnitGroup::ALTITUDE,
-                       szProfileSafetyAltitudeTerrain,
+                       ProfileKeys::SafetyAltitudeTerrain,
                        task_behaviour.route_planner.safety_height_terrain);
 
-  changed |= SaveValueEnum(AlternateMode, szProfileAbortTaskMode,
+  changed |= SaveValueEnum(AlternateMode, ProfileKeys::AbortTaskMode,
                            task_behaviour.abort_task_mode);
 
   fixed degradation = (fixed_one - settings_computer.polar.degradation_factor) * 100;
   if (SaveValue(PolarDegradation, degradation)) {
     settings_computer.polar.SetDegradationFactor(fixed_one - degradation / 100);
-    Profile::Set(ProfilePolarDegradation,
+    Profile::Set(ProfileKeys::PolarDegradation,
                  settings_computer.polar.degradation_factor);
     if (protected_task_manager != NULL)
       protected_task_manager->SetGlidePolar(settings_computer.polar.glide_polar_task);
     changed = true;
   }
 
-  if (SaveValue(SafetyMC, UnitGroup::VERTICAL_SPEED, task_behaviour.safety_mc)) {
-    Profile::Set(szProfileSafetyMacCready,
-                 iround(task_behaviour.safety_mc * 10));
-    changed = true;
-  }
-
   if (SaveValue(RiskFactor, task_behaviour.risk_gamma)) {
-    Profile::Set(szProfileRiskGamma,
+    Profile::Set(ProfileKeys::RiskGamma,
                  iround(task_behaviour.risk_gamma * 10));
     changed = true;
   }

@@ -25,9 +25,10 @@ Copyright_License {
 #include "NMEA/Checksum.hpp"
 #include "NMEA/InputLine.hpp"
 #include "NMEA/Info.hpp"
-#include "Engine/Navigation/SpeedVector.hpp"
+#include "Geo/SpeedVector.hpp"
 #include "Units/System.hpp"
 #include "Atmosphere/Temperature.hpp"
+#include "Util/Macros.hpp"
 
 static bool
 ReadSpeedVector(NMEAInputLine &line, SpeedVector &value_r)
@@ -66,6 +67,9 @@ LXWP0(NMEAInputLine &line, NMEAInfo &info)
 
   fixed airspeed;
   bool tas_available = line.ReadChecked(airspeed);
+  if (tas_available && (airspeed < fixed(-50) || airspeed > fixed(250)))
+    /* implausible */
+    return false;
 
   fixed alt = fixed_zero;
   if (line.ReadChecked(alt))
@@ -90,18 +94,29 @@ LXWP0(NMEAInputLine &line, NMEAInfo &info)
   return true;
 }
 
-static bool
-LXWP1(gcc_unused NMEAInputLine &line, gcc_unused NMEAInfo &info)
+template<size_t N>
+static void
+ReadString(NMEAInputLine &line, NarrowString<N> &value)
+{
+  line.Read(value.buffer(), value.MAX_SIZE);
+}
+
+static void
+LXWP1(NMEAInputLine &line, DeviceInfo &device)
 {
   /*
    * $LXWP1,
-   * serial number,
    * instrument ID,
+   * serial number,
    * software version,
    * hardware version,
    * license string
    */
-  return true;
+
+  ReadString(line, device.product);
+  ReadString(line, device.serial);
+  ReadString(line, device.software_version);
+  ReadString(line, device.hardware_version);
 }
 
 static bool
@@ -149,6 +164,83 @@ LXWP3(gcc_unused NMEAInputLine &line, gcc_unused NMEAInfo &info)
    * time offset
    */
   return true;
+}
+
+/**
+ * Parse the $PLXV0 sentence (LXNav V7).
+ */
+static bool
+PLXV0(NMEAInputLine &line, DeviceSettingsMap<std::string> &settings)
+{
+  char name[64];
+  line.Read(name, ARRAY_SIZE(name));
+  if (StringIsEmpty(name))
+    return true;
+
+  char type[2];
+  line.Read(type, ARRAY_SIZE(type));
+  if (type[0] != 'W')
+    return true;
+
+  const auto value = line.Rest();
+
+  settings.Lock();
+  settings.Set(name, std::string(value.begin(), value.end()));
+  settings.Unlock();
+  return true;
+}
+
+static void
+ParseNanoInfo(NMEAInputLine &line, DeviceInfo &device)
+{
+  ReadString(line, device.product);
+  ReadString(line, device.software_version);
+  line.Skip(); /* ver.date, e.g. "May 12 2012 21:38:28" */
+  ReadString(line, device.hardware_version);
+}
+
+/**
+ * Parse the $PLXVC sentence (LXNAV Nano).
+ *
+ * $PLXVC,<key>,<type>,<values>*<checksum><cr><lf>
+ */
+static void
+PLXVC(NMEAInputLine &line, DeviceInfo &device,
+      DeviceInfo &secondary_device,
+      DeviceSettingsMap<std::string> &settings)
+{
+  char key[64];
+  line.Read(key, ARRAY_SIZE(key));
+
+  char type[2];
+  line.Read(type, ARRAY_SIZE(type));
+  if (strcmp(key, "SET") == 0 && type[0] == 'A') {
+    char name[64];
+    line.Read(name, ARRAY_SIZE(name));
+
+    const auto value = line.Rest();
+    if (!StringIsEmpty(name)) {
+      settings.Lock();
+      settings.Set(name, std::string(value.begin(), value.end()));
+      settings.Unlock();
+    }
+  } else if (strcmp(key, "INFO") == 0 && type[0] == 'A') {
+    ParseNanoInfo(line, device);
+  } else if (strcmp(key, "GPSINFO") == 0 && type[0] == 'A') {
+    /* the LXNAV V7 (firmware >= 2.01) forwards the Nano's INFO
+       sentence with the "GPS" prefix */
+
+    char name[64];
+    line.Read(name, ARRAY_SIZE(name));
+
+    if (strcmp(name, "LXWP1") == 0) {
+      LXWP1(line, secondary_device);
+    } else if (strcmp(name, "INFO") == 0) {
+      line.Read(type, ARRAY_SIZE(type));
+      if (type[0] == 'A')
+        ParseNanoInfo(line, secondary_device);
+    }
+  }
 }
 
 /**
@@ -236,8 +328,34 @@ LXDevice::ParseNMEA(const char *String, NMEAInfo &info)
   if (StringIsEqual(type, "$LXWP0"))
     return LXWP0(line, info);
 
-  if (StringIsEqual(type, "$LXWP1"))
-    return LXWP1(line, info);
+  if (StringIsEqual(type, "$LXWP1")) {
+    /* if in pass-through mode, assume that this line was sent by the
+       secondary device */
+    DeviceInfo &device_info = mode == Mode::PASS_THROUGH
+      ? info.secondary_device
+      : info.device;
+    LXWP1(line, device_info);
+
+    const bool saw_v7 = device_info.product.equals("V7");
+    const bool saw_nano = device_info.product.equals("NANO");
+
+    if (mode == Mode::PASS_THROUGH) {
+      /* in pass-through mode, we should never clear the V7 flag,
+         because the V7 is still there, even though it's "hidden"
+         currently */
+      is_v7 |= saw_v7;
+      is_nano |= saw_nano;
+      is_forwarded_nano = saw_nano;
+    } else {
+      is_v7 = saw_v7;
+      is_nano = saw_nano;
+    }
+
+    if (saw_v7 || saw_nano)
+      is_colibri = false;
+
+    return true;
+  }
 
   if (StringIsEqual(type, "$LXWP2"))
     return LXWP2(line, info);
@@ -245,11 +363,31 @@ LXDevice::ParseNMEA(const char *String, NMEAInfo &info)
   if (StringIsEqual(type, "$LXWP3"))
     return LXWP3(line, info);
 
-  if (StringIsEqual(type, "$PLXVF"))
-    return PLXVF(line, info);
+  if (StringIsEqual(type, "$PLXV0")) {
+    is_v7 = true;
+    is_colibri = false;
+    return PLXV0(line, v7_settings);
+  }
 
-  if (StringIsEqual(type, "$PLXVS"))
+  if (StringIsEqual(type, "$PLXVC")) {
+    is_nano = true;
+    is_colibri = false;
+    PLXVC(line, info.device, info.secondary_device, nano_settings);
+    is_forwarded_nano = info.secondary_device.product.equals("NANO");
+    return true;
+  }
+
+  if (StringIsEqual(type, "$PLXVF")) {
+    is_v7 = true;
+    is_colibri = false;
+    return PLXVF(line, info);
+  }
+
+  if (StringIsEqual(type, "$PLXVS")) {
+    is_v7 = true;
+    is_colibri = false;
     return PLXVS(line, info);
+  }
 
   return false;
 }

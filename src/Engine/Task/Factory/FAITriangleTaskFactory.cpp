@@ -21,12 +21,21 @@
  */
 
 #include "FAITriangleTaskFactory.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
+#include "TaskFactoryConstraints.hpp"
 #include "Task/FAITriangleValidator.hpp"
+
+static constexpr TaskFactoryConstraints fai_triangle_constraints = {
+  true,
+  true,
+  false,
+  false,
+  false,
+  4, 4,
+};
 
 FAITriangleTaskFactory::FAITriangleTaskFactory(OrderedTask& _task,
                                const TaskBehaviour &tb):
-  FAITaskFactory(_task, tb)
+  FAITaskFactory(fai_triangle_constraints, _task, tb)
 {
 }
 
@@ -36,13 +45,5 @@ FAITriangleTaskFactory::Validate()
 
   bool valid = FAITaskFactory::Validate();
 
-  return valid && FAITriangleValidator::Validate(m_task);
-}
-
-void 
-FAITriangleTaskFactory::UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to)
-{
-  FAITaskFactory::UpdateOrderedTaskBehaviour(to);
-  to.min_points = 4;
-  to.max_points = 4;
+  return valid && FAITriangleValidator::Validate(task);
 }

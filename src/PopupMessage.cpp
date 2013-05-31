@@ -25,7 +25,6 @@ Copyright_License {
 
 #include "PopupMessage.hpp"
 #include "Protection.hpp"
-#include "Screen/AnyCanvas.hpp"
 #include "Screen/Fonts.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
@@ -36,6 +35,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "StatusMessage.hpp"
 #include "UISettings.hpp"
+#include "OS/Clock.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -45,7 +45,8 @@ using std::min;
 using std::max;
 
 void
-PopupMessage::Message::Set(int _type, int _tshow, const TCHAR *_text, int now)
+PopupMessage::Message::Set(Type _type, unsigned _tshow, const TCHAR *_text,
+                           unsigned now)
 {
   type = _type;
   tshow = _tshow;
@@ -55,7 +56,7 @@ PopupMessage::Message::Set(int _type, int _tshow, const TCHAR *_text, int now)
 }
 
 bool
-PopupMessage::Message::Update(int now)
+PopupMessage::Message::Update(unsigned now)
 {
   if (IsUnknown())
     // ignore unknown messages
@@ -77,7 +78,7 @@ PopupMessage::Message::Update(int now)
 }
 
 bool
-PopupMessage::Message::AppendTo(TCHAR *buffer, int now)
+PopupMessage::Message::AppendTo(StaticString<2000> &buffer, unsigned now)
 {
   if (IsUnknown())
     // ignore unknown messages
@@ -89,9 +90,9 @@ PopupMessage::Message::AppendTo(TCHAR *buffer, int now)
     return false;
   }
 
-  if (buffer[0] != _T('\0'))
-    _tcscat(buffer, _T("\r\n"));
-  _tcscat(buffer, text);
+  if (!buffer.empty())
+    buffer.append(_T("\r\n"));
+  buffer.append(text);
   return true;
 }
 
@@ -100,10 +101,9 @@ PopupMessage::PopupMessage(const StatusMessageList &_status_messages,
   :status_messages(_status_messages),
    parent(_parent),
    settings(_settings),
-   nvisible(0),
+   n_visible(0),
    enable_sound(true)
 {
-  clock.Update();
 }
 
 void
@@ -128,7 +128,7 @@ bool
 PopupMessage::OnMouseDown(PixelScalar x, PixelScalar y)
 {
   // acknowledge with click/touch
-  Acknowledge(0);
+  Acknowledge(MSG_UNKNOWN);
 
   return true;
 }
@@ -161,21 +161,19 @@ PopupMessage::GetRect(UPixelScalar height) const
 }
 
 void
-PopupMessage::Resize()
+PopupMessage::UpdateTextAndLayout(const TCHAR *text)
 {
-  if (*msgText == _T('\0')) {
+  if (StringIsEmpty(text)) {
     Hide();
   } else {
-    SetText(msgText);
+    SetText(text);
 
-    AnyCanvas canvas;
-    canvas.Select(Fonts::map_bold);
-    PixelSize tsize = canvas.CalcTextSize(msgText);
+    const UPixelScalar font_height = Fonts::map_bold.GetHeight();
 
-    int linecount = max((unsigned)nvisible, max((unsigned)1, GetRowCount()));
+    unsigned n_lines = max(n_visible, max(1u, GetRowCount()));
 
     PixelScalar height = min((PixelScalar)((rc.bottom-rc.top) * 0.8),
-                             (PixelScalar)(tsize.cy * (linecount + 1)));
+                             (PixelScalar)(font_height * (n_lines + 1)));
 
     PixelRect rthis = GetRect(height);
 #ifdef USE_GDI
@@ -185,14 +183,12 @@ PopupMessage::Resize()
          after it has been created, so we have to destroy it and
          create a new one */
       reset();
-      set(rc);
-      SetText(msgText);
-    }
+      set(rthis);
+      SetText(text);
+    } else
 #endif
+      Move(rthis);
 
-    Move(rthis.left, rthis.top,
-         rthis.right - rthis.left,
-         rthis.bottom - rthis.top);
     ShowOnTop();
   }
 }
@@ -209,7 +205,7 @@ PopupMessage::Render()
     return false;
   }
 
-  int fpsTime = clock.Elapsed();
+  const unsigned now = MonotonicClockMS();
 
   // this has to be done quickly, since it happens in GUI thread
   // at subsecond interval
@@ -220,7 +216,7 @@ PopupMessage::Render()
 
   bool changed = false;
   for (unsigned i = 0; i < MAXMESSAGES; ++i)
-    changed = messages[i].Update(fpsTime) || changed;
+    changed = messages[i].Update(now) || changed;
 
   static bool doresize = false;
 
@@ -231,7 +227,7 @@ PopupMessage::Render()
       doresize = false;
       // do one extra resize after display so we are sure we get all
       // the text (workaround bug in getlinecount)
-      Resize();
+      UpdateTextAndLayout(text);
     }
     return false;
   }
@@ -240,15 +236,15 @@ PopupMessage::Render()
   // text box
 
   doresize = true;
-  msgText[0] = _T('\0');
-  nvisible = 0;
+  text.clear();
+  n_visible = 0;
   for (unsigned i = 0; i < MAXMESSAGES; ++i)
-    if (messages[i].AppendTo(msgText, fpsTime))
-      nvisible++;
+    if (messages[i].AppendTo(text, now))
+      n_visible++;
 
   mutex.Unlock();
 
-  Resize();
+  UpdateTextAndLayout(text);
 
   return true;
 }
@@ -260,10 +256,8 @@ PopupMessage::GetEmptySlot()
 
   // todo: make this more robust with respect to message types and if can't
   // find anything to remove..
-  int i;
-  int tmin = 0;
-  int imin = 0;
-  for (i = 0; i < MAXMESSAGES; i++) {
+  unsigned imin = 0;
+  for (unsigned i = 0, tmin = 0; i < MAXMESSAGES; i++) {
     if (i == 0 || messages[i].tstart < tmin) {
       tmin = messages[i].tstart;
       imin = i;
@@ -273,30 +267,28 @@ PopupMessage::GetEmptySlot()
 }
 
 void
-PopupMessage::AddMessage(int tshow, int type, const TCHAR *Text)
+PopupMessage::AddMessage(unsigned tshow, Type type, const TCHAR *Text)
 {
-  int i;
-  int fpsTime = clock.Elapsed();
-  i = GetEmptySlot();
+  assert(mutex.IsLockedByCurrent());
 
-  messages[i].Set(type, tshow, Text, fpsTime);
+  const unsigned now = MonotonicClockMS();
+
+  int i = GetEmptySlot();
+  messages[i].Set(type, tshow, Text, now);
 }
 
 void
-PopupMessage::Repeat(int type)
+PopupMessage::Repeat(Type type)
 {
-  int i;
-  int tmax = 0;
   int imax = -1;
 
   mutex.Lock();
-
-  int fpsTime = clock.Elapsed();
+  const unsigned now = MonotonicClockMS();
 
   // find most recent non-visible message
 
-  for (i = 0; i < MAXMESSAGES; i++) {
-    if (messages[i].texpiry < fpsTime &&
+  for (unsigned i = 0, tmax = 0; i < MAXMESSAGES; i++) {
+    if (messages[i].texpiry < now &&
         messages[i].tstart > tmax &&
         (messages[i].type == type || type == 0)) {
       imax = i;
@@ -305,7 +297,7 @@ PopupMessage::Repeat(int type)
   }
 
   if (imax >= 0) {
-    messages[imax].tstart = fpsTime;
+    messages[imax].tstart = now;
     messages[imax].texpiry = messages[imax].tstart;
   }
 
@@ -313,17 +305,16 @@ PopupMessage::Repeat(int type)
 }
 
 bool
-PopupMessage::Acknowledge(int type)
+PopupMessage::Acknowledge(Type type)
 {
   ScopeLock protect(mutex);
-  int i;
-  int fpsTime = clock.Elapsed();
+  const unsigned now = MonotonicClockMS();
 
-  for (i = 0; i < MAXMESSAGES; i++) {
+  for (unsigned i = 0; i < MAXMESSAGES; i++) {
     if (messages[i].texpiry > messages[i].tstart &&
-        (type == 0 || type == messages[i].type)) {
+        (type == MSG_UNKNOWN || type == messages[i].type)) {
       // message was previously visible, so make it expire now.
-      messages[i].texpiry = fpsTime - 1;
+      messages[i].texpiry = now - 1;
       return true;
     }
   }
@@ -348,24 +339,23 @@ PopupMessage::AddMessage(const TCHAR* text, const TCHAR *data)
 {
   ScopeLock protect(mutex);
 
-  StatusMessageSTRUCT LocalMessage = status_messages.First();
-  const StatusMessageSTRUCT *found = status_messages.Find(text);
+  StatusMessage msg = status_messages.First();
+  const StatusMessage *found = status_messages.Find(text);
   if (found != NULL)
-    LocalMessage = *found;
+    msg = *found;
 
-  if (enable_sound && LocalMessage.doSound)
-    PlayResource(LocalMessage.sound);
+  if (enable_sound && msg.sound != NULL)
+    PlayResource(msg.sound);
 
   // TODO code: consider what is a sensible size?
-  TCHAR msgcache[1024];
-  if (LocalMessage.doStatus) {
-
+  if (msg.visible) {
+    TCHAR msgcache[1024];
     _tcscpy(msgcache, text);
     if (data != NULL) {
       _tcscat(msgcache, _T(" "));
       _tcscat(msgcache, data);
     }
 
-    AddMessage(LocalMessage.delay_ms, MSG_USERINTERFACE, msgcache);
+    AddMessage(msg.delay_ms, MSG_USERINTERFACE, msgcache);
   }
 }

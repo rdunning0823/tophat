@@ -52,7 +52,11 @@ MapWindow::MapWindow(const MapLook &_look,
    trail_renderer(look.trail),
    task(NULL), route_planner(NULL), glide_computer(NULL),
    marks(NULL),
-   compass_visible(true)
+#ifdef HAVE_NOAA
+   noaa_store(NULL),
+#endif
+   compass_visible(true),
+   compass_offset_y(0), gps_status_offset_y(0)
 #ifndef ENABLE_OPENGL
    , ui_generation(1), buffer_generation(0),
    scale_buffer(0)
@@ -68,7 +72,6 @@ void
 MapWindow::set(ContainerWindow &parent, const PixelRect &rc)
 {
   WindowStyle style;
-  style.EnableDoubleClicks();
   DoubleBufferWindow::set(parent, rc.left, rc.top,
                           rc.right - rc.left, rc.bottom - rc.top,
                           style);
@@ -164,7 +167,7 @@ MapWindow::UpdateWeather()
     return false;
 
   QuietOperationEnvironment operation;
-  weather->Reload((int)Basic().time, operation);
+  weather->Reload(Calculated().date_time_local.GetSecondOfDay(), operation);
   weather->SetViewCenter(visible_projection.GetGeoScreenCenter(),
                          visible_projection.GetScreenWidthMeters() / 2);
   return weather->IsDirty();

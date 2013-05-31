@@ -25,13 +25,15 @@ Copyright_License {
 #define TRACE_POINT_HPP
 
 #include "Util/TypeTraits.hpp"
-#include "Navigation/SearchPoint.hpp"
+#include "Geo/SearchPoint.hpp"
 #include "Rough/RoughAltitude.hpp"
 #include "Rough/RoughVSpeed.hpp"
 #include "Compiler.h"
 
 #include <assert.h>
+#include <stdint.h>
 
+struct MoreData;
 struct AircraftState;
 
 /**
@@ -42,12 +44,6 @@ class TracePoint : public SearchPoint
 {
   /** Time of sample */
   unsigned time;
-  /**
-   * Thermal drift factor:
-   * 256 indicates drift rate equal to wind speed
-   * 0 indicates no drift.
-   */
-  unsigned short drift_factor;
 
   /**
    * The NavAltitude [m].
@@ -59,19 +55,33 @@ class TracePoint : public SearchPoint
    */
   RoughVSpeed vario;
 
+  /**
+   * The engine noise level (0..999).
+   */
+  uint16_t engine_noise_level;
+
+  /**
+   * Thermal drift factor:
+   * 256 indicates drift rate equal to wind speed
+   * 0 indicates no drift.
+   */
+  uint16_t drift_factor;
+
 public:
   /**
    * Non-initialising constructor.
    */
   TracePoint() = default;
 
-  /**
-   * Constructor for a TracePoint which is only used as parameter to
-   * TraceTree::find_within_range().  It initializes only the
-   * SearchPoint base class.
-   */
-  TracePoint(const GeoPoint &location):
-    SearchPoint(location) {}
+  template<typename A, typename V>
+  TracePoint(const GeoPoint &location, unsigned _time,
+             const A &_altitude, const V &_vario,
+             unsigned _drift_factor)
+    :SearchPoint(location), time(_time),
+     altitude(_altitude), vario(_vario),
+     engine_noise_level(0), drift_factor(_drift_factor) {}
+
+  explicit TracePoint(const MoreData &basic);
 
   /**
    * Constructor for actual trace points
@@ -81,7 +91,15 @@ public:
    *
    * @return Initialised object
    */
-  TracePoint(const AircraftState &state);
+  explicit TracePoint(const AircraftState &state);
+
+  gcc_const
+  static TracePoint Invalid() {
+    TracePoint point;
+    point.Clear();
+    ((SearchPoint &)point).SetInvalid();
+    return point;
+  }
 
   void Clear() {
     time = (unsigned)(0 - 1);
@@ -118,6 +136,10 @@ public:
     return altitude;
   }
 
+  unsigned GetEngineNoiseLevel() const {
+    return engine_noise_level;
+  }
+
   /**
    * Returns the altitude as an integer.  Some calculations may not
    * need the fractional part.
@@ -129,20 +151,8 @@ public:
   fixed GetVario() const {
     return vario;
   }
-
-  /** 
-   * Test match based on time (since time of a sample must be unique)
-   * 
-   * @param a Point to compare to
-   * 
-   * @return True if time matches
-   */
-  bool operator==(TracePoint const &a) const {
-    return time == a.time; 
-  }
 };
 
 static_assert(is_trivial_ndebug<TracePoint>::value, "type is not trivial");
 
 #endif
-

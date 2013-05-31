@@ -56,14 +56,10 @@ public:
     UpdateSector();
   }
 
-  virtual Boundary GetBoundary() const {
-    Boundary boundary;
-    boundary.push_front(GetSectorEnd());
-    boundary.push_front(GetSectorStart());
-    boundary.push_front(GetReference());
-    return boundary;
-  }
+  /* virtual methods from class ObservationZone */
+  virtual OZBoundary GetBoundary() const;
 
+  /* virtual methods from class ObservationZonePoint */
   virtual ObservationZonePoint *Clone(const GeoPoint &_reference) const {
     return new FAISectorZone(*this, _reference);
   }

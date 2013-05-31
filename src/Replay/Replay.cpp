@@ -21,111 +21,87 @@
 }
 */
 
-#include "Replay/Replay.hpp"
+#include "Replay.hpp"
+#include "IgcReplayGlue.hpp"
+#include "NmeaReplayGlue.hpp"
+#include "DemoReplayGlue.hpp"
 #include "Util/StringUtil.hpp"
 #include "OS/PathName.hpp"
+#include "IO/FileLineReader.hpp"
+#include "Blackboard/DeviceBlackboard.hpp"
+#include "Logger/Logger.hpp"
+#include "Components.hpp"
+#include "Interface.hpp"
+
+#include <assert.h>
 
 void
 Replay::Stop()
 {
-  switch (mode) {
-  case MODE_IGC:
-    igc_replay.Stop();
-    break;
-  case MODE_NMEA:
-    nmea_replay.Stop();
-    break;
-  case MODE_DEMO:
-    demo_replay.Stop();
-    mode = MODE_NULL;
-    break;
-  case MODE_NULL:
-    break;
-  };
-}
-
-void
-Replay::Start()
-{
-  switch (mode) {
-  case MODE_IGC:
-    igc_replay.Start();
-    break;
-  case MODE_NMEA:
-    nmea_replay.Start();
-    break;
-  case MODE_DEMO:
-    demo_replay.Start();
-    break;
-  case MODE_NULL:
-    demo_replay.Start();
-    mode = MODE_DEMO;
-    break;
-  };
-}
-
-const TCHAR*
-Replay::GetFilename()
-{
-  return (mode== MODE_IGC ? igc_replay.GetFilename() : nmea_replay.GetFilename());
-}
-
-void
-Replay::SetFilename(const TCHAR *name)
-{
-  if (!name || StringIsEmpty(name)) {
-    mode = MODE_DEMO;
+  if (replay == NULL)
     return;
-  }
 
-  Stop();
+  delete replay;
+  replay = NULL;
 
-  if (MatchesExtension(name, _T(".igc"))) {
-    mode = MODE_IGC;
-    igc_replay.SetFilename(name);
-  } else {
-    mode = MODE_NMEA;
-    nmea_replay.SetFilename(name);
-  }
+  device_blackboard->StopReplay();
+
+  if (logger != NULL)
+    logger->ClearBuffer();
 }
 
+bool
+Replay::Start(const TCHAR *_path)
+{
+  assert(_path != NULL);
+
+  /* make sure the old AbstractReplay instance has cleaned up before
+     creating a new one */
+  delete replay;
+  replay = NULL;
+
+  _tcscpy(path, _path);
+
+  if (StringIsEmpty(path)) {
+    replay = new DemoReplayGlue(task_manager);
+  } else if (MatchesExtension(path, _T(".igc"))) {
+    auto reader = new FileLineReaderA(path);
+    if (reader->error()) {
+      delete reader;
+      return false;
+    }
+
+    replay = new IgcReplayGlue(reader);
+  } else {
+    auto reader = new FileLineReaderA(path);
+    if (reader->error()) {
+      delete reader;
+      return false;
+    }
+
+    replay = new NmeaReplayGlue(reader);
+  }
+
+  if (logger != NULL)
+    logger->ClearBuffer();
+
+  return true;
+}
 
 bool
 Replay::Update()
 {
-  switch (mode) {
-  case MODE_IGC:
-    return igc_replay.Update();
-  case MODE_NMEA:
-    return nmea_replay.Update();
-  case MODE_DEMO:
-    return demo_replay.Update();
-  case MODE_NULL:
-    break;
-  };
+  if (replay != NULL) {
+    ScopeLock protect(device_blackboard->mutex);
+
+    NMEAInfo &data = device_blackboard->SetReplayState();
+    const Validity old_alive = data.alive;
+
+    replay->Update(data, time_scale);
+
+    if (data.alive.Modified(old_alive))
+      device_blackboard->ScheduleMerge();
+  }
+
   return false;
-}
-
-fixed
-Replay::GetTimeScale()
-{
-  switch (mode) {
-  case MODE_IGC:
-    return igc_replay.time_scale;
-  case MODE_NMEA:
-    return nmea_replay.time_scale;
-  case MODE_DEMO:
-    return demo_replay.time_scale;
-  case MODE_NULL:
-    break;
-  };
-  return fixed_one;
-}
-
-void
-Replay::SetTimeScale(const fixed time_scale)
-{
-  igc_replay.time_scale = time_scale;
-  nmea_replay.time_scale = time_scale;
-  demo_replay.time_scale = time_scale;
 }

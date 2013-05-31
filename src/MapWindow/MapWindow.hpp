@@ -38,6 +38,7 @@ Copyright_License {
 #include "Renderer/WaypointRenderer.hpp"
 #include "Renderer/TrailRenderer.hpp"
 #include "Compiler.h"
+#include "Weather/Features.hpp"
 
 struct MapLook;
 struct TrafficLook;
@@ -54,6 +55,7 @@ class GlideComputer;
 class GlidePolar;
 class ContainerWindow;
 class WaypointLabelList;
+class NOAAStore;
 
 class MapWindow :
   public DoubleBufferWindow,
@@ -136,7 +138,21 @@ protected:
 
   ProtectedMarkers *marks;
 
+#ifdef HAVE_NOAA
+  NOAAStore *noaa_store;
+#endif
+
   bool compass_visible;
+
+  /**
+   * distance from the top of the map where the compass is displayed
+   */
+  unsigned compass_offset_y;
+
+  /**
+   * distance from the bottom of the map where the GPSStatus is displayed
+   */
+  unsigned gps_status_offset_y;
 
 #ifndef ENABLE_OPENGL
   /**
@@ -174,6 +190,33 @@ public:
     return follow_mode == FOLLOW_SELF;
   }
 
+  /**
+   * @param y. The distance from the top of the map where the compass
+   * will display
+   */
+  void SetCompassOffset(unsigned y) {
+    compass_offset_y = y;
+  }
+
+  /**
+   * @param y. The distance from the bottom of the map where the
+   * GPSStatus will display
+   */
+  void SetGPSStatusOffset(unsigned y) {
+    gps_status_offset_y = y;
+  }
+#ifndef ENABLE_OPENGL
+  /**
+   * resizes the rc_main_menu_button for the current screen layout
+   */
+  virtual void SetMainMenuButtonRect() {};
+  /**
+   * resizes the rc_zoom_in_button and rc_zoom_out_button for the current
+   * screen layout
+   */
+  virtual void SetZoomButtonsRect() {};
+#endif
+
   bool IsPanning() const {
     return follow_mode == FOLLOW_PAN;
   }
@@ -206,6 +249,12 @@ public:
   void SetMarks(ProtectedMarkers *_marks) {
     marks = _marks;
   }
+
+#ifdef HAVE_NOAA
+  void SetNOAAStore(NOAAStore *_noaa_store) {
+    noaa_store = _noaa_store;
+  }
+#endif
 
   void ReadBlackboard(const MoreData &nmea_info,
                       const DerivedInfo &derived_info);
@@ -317,6 +366,11 @@ private:
    * @param canvas The drawing canvas
    */
   void RenderMarkers(Canvas &canvas);
+  /**
+   * Renders the NOAA stations
+   * @param canvas The drawing canvas
+   */
+  void RenderNOAAStations(Canvas &canvas);
   /**
    * Render final glide through terrain marker
    * @param canvas The drawing canvas

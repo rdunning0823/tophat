@@ -26,15 +26,16 @@ Copyright_License {
 #include "Screen/ContainerWindow.hpp"
 #include "Screen/Layout.hpp"
 
-ButtonPanel::ButtonPanel(ContainerWindow &_parent, const DialogLook &_look)
-  :parent(_parent), look(_look) {
+ButtonPanel::ButtonPanel(ContainerWindow &_parent, const DialogLook &_look,
+                         ButtonPanelPosition _position)
+  :parent(_parent), look(_look), position(_position) {
   style.TabStop();
 }
 
 ButtonPanel::~ButtonPanel()
 {
-  for (auto it = buttons.begin(), end = buttons.end(); it != end; ++it)
-    delete *it;
+  for (const auto i : buttons)
+    delete i;
 }
 
 PixelRect
@@ -44,7 +45,8 @@ ButtonPanel::UpdateLayout(const PixelRect rc)
     return rc;
 
   const bool landscape = rc.right - rc.left > rc.bottom - rc.top;
-  return landscape
+
+  return (landscape && (position != Bottom))
     ? LeftLayout(rc)
     : BottomLayout(rc);
 }
@@ -55,7 +57,7 @@ ButtonPanel::UpdateLayout()
   return UpdateLayout(parent.GetClientRect());
 }
 
-static gcc_constexpr_data PixelRect dummy_rc = { 0, 0, 100, 40 };
+static constexpr PixelRect dummy_rc = { 0, 0, 100, 40 };
 
 WndButton *
 ButtonPanel::Add(const TCHAR *caption,
@@ -110,16 +112,18 @@ ButtonPanel::VerticalRange(PixelRect rc, unsigned start, unsigned end)
   const UPixelScalar row_height = std::min(total_height, max_height) / n;
 
   PixelRect button_rc = {
-    rc.left, rc.top, PixelScalar(rc.left + width),
-    PixelScalar(rc.top + row_height),
+    rc.left,
+    PixelScalar(rc.bottom - row_height),
+    PixelScalar(rc.left + width),
+    PixelScalar(rc.bottom),
   };
   rc.left += width;
 
   for (unsigned i = start; i < end; ++i) {
     buttons[i]->Move(button_rc);
 
-    button_rc.top = button_rc.bottom;
-    button_rc.bottom += row_height;
+    button_rc.bottom = button_rc.top;
+    button_rc.top -= row_height;
   }
 
   return rc;

@@ -36,6 +36,12 @@ class ActionListener;
  */
 class WndSymbolButton : public WndButton
 {
+protected:
+  /**
+   * if true, does not paint background
+   */
+  bool transparent;
+
 public:
   /**
    * Constructor of the WndSymbolButton class
@@ -54,14 +60,21 @@ public:
                   const PixelRect &rc, const ButtonWindowStyle style,
                   ClickNotifyCallback Function = NULL)
     :WndButton(Parent, look, Caption, rc,
-               style, Function) {}
+               style, Function), transparent(false) {}
 
   WndSymbolButton(ContainerWindow &Parent, const DialogLook &look,
                   const TCHAR *Caption,
                   const PixelRect &rc, const ButtonWindowStyle style,
                   ActionListener *listener, int id)
     :WndButton(Parent, look, Caption, rc,
-               style, listener, id) {}
+               style, listener, id), transparent(false) {}
+
+  /**
+   * if true, does not draw background
+   */
+  void SetTransparent(bool _transparent) {
+    transparent = _transparent;
+  }
 
 protected:
   /**

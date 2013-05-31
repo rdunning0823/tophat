@@ -28,10 +28,20 @@ Copyright_License {
 void
 Profile::Load(RoutePlannerConfig &settings)
 {
-  Get(szProfileSafetyAltitudeTerrain, settings.safety_height_terrain);
-  GetEnum(szProfileRoutePlannerMode, settings.mode);
-  Get(szProfileRoutePlannerAllowClimb, settings.allow_climb);
-  Get(szProfileRoutePlannerUseCeiling, settings.use_ceiling);
-  GetEnum(szProfileTurningReach, settings.reach_calc_mode);
-  GetEnum(szProfileReachPolarMode, settings.reach_polar_mode);
+  Get(ProfileKeys::SafetyAltitudeTerrain, settings.safety_height_terrain);
+
+  // turn off Route planning for Top Hat
+  settings.mode = RoutePlannerConfig::Mode::NONE;
+  settings.allow_climb = false;
+  settings.use_ceiling = false;
+
+  GetEnum(ProfileKeys::TurningReach, settings.reach_calc_mode);
+  // Turning has problems and is unnecessary
+  if (settings.reach_calc_mode == RoutePlannerConfig::ReachMode::TURNING)
+    settings.reach_calc_mode = RoutePlannerConfig::ReachMode::STRAIGHT;
+
+  /** Hard code to Task MC.
+   *  Leave architecture in place, but remove option from UI
+   */
+  settings.reach_polar_mode = RoutePlannerConfig::Polar::TASK;
 }

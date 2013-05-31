@@ -21,13 +21,15 @@ Copyright_License {
 }
 */
 
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
 
 #ifdef GNAV
 
+#include "Form/Form.hpp"
 #include "Form/Util.hpp"
+#include "Form/Button.hpp"
 #include "Units/Units.hpp"
 #include "Math/FastMath.h"
 #include "Form/DataField/Base.hpp"
@@ -90,7 +92,7 @@ static void OnBrightnessData(DataField *Sender,
 }
 
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[]={
+static constexpr CallBackTableEntry CallBackTable[]={
   DeclareCallBackEntry(OnAutoData),
   DeclareCallBackEntry(OnBrightnessData),
   DeclareCallBackEntry(OnCloseClicked),

@@ -27,35 +27,12 @@
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Components.hpp"
 #include "Task/TaskManager.hpp"
-#include "Task/Factory/AbstractTaskFactory.hpp"
+#include "NMEA/Info.hpp"
 
 #define fixed_300 fixed(300)
 
-bool
-DemoReplayGlue::UpdateTime()
-{
-  if (!clock.Check(1000))
-    return false;
-  clock.Update();
-  return true;
-}
-
-void
-DemoReplayGlue::ResetTime()
-{
-  clock.Reset();
-}
-
-void
-DemoReplayGlue::OnAdvance(const GeoPoint &loc, const fixed speed,
-                           const Angle bearing, const fixed alt,
-                           const fixed baroalt, const fixed t)
-{
-  device_blackboard->SetLocation(loc, speed, bearing, alt, baroalt, t);
-}
-
-void
-DemoReplayGlue::Start()
+DemoReplayGlue::DemoReplayGlue(ProtectedTaskManager &_task_manager)
+  :task_manager(&_task_manager)
 {
   ProtectedTaskManager::ExclusiveLease protected_task_manager(*task_manager);
   const TaskAccessor ta(protected_task_manager, fixed_zero);
@@ -67,18 +44,18 @@ DemoReplayGlue::Start()
   aircraft.GetState().wind = device_blackboard->Calculated().GetWindOrZero();
 }
 
-void
-DemoReplayGlue::OnStop()
+bool
+DemoReplayGlue::UpdateTime()
 {
-  device_blackboard->StopReplay();
+  if (!clock.Check(1000))
+    return false;
+  clock.Update();
+  return true;
 }
 
 bool
-DemoReplayGlue::Update()
+DemoReplayGlue::Update(NMEAInfo &data, fixed time_scale)
 {
-  if (!enabled)
-    return false;
-
   if (!UpdateTime())
     return true;
 
@@ -87,13 +64,32 @@ DemoReplayGlue::Update()
     floor_alt += device_blackboard->Calculated().terrain_altitude;
   }
 
-  ProtectedTaskManager::ExclusiveLease protected_task_manager(*task_manager);
-  TaskAccessor ta(protected_task_manager, floor_alt);
-  bool retval = DemoReplay::Update(ta);
+  bool retval;
 
-  const AircraftState s = aircraft.GetState();
-  OnAdvance(s.location, s.ground_speed, s.track, s.altitude,
-             s.altitude, s.time);
+  {
+    ProtectedTaskManager::ExclusiveLease protected_task_manager(*task_manager);
+    TaskAccessor ta(protected_task_manager, floor_alt);
+    retval = DemoReplay::Update(time_scale, ta);
+  }
+
+  const AircraftState &s = aircraft.GetState();
+
+  data.clock = s.time;
+  data.alive.Update(data.clock);
+  data.ProvideTime(s.time);
+  data.location = s.location;
+  data.location_available.Update(data.clock);
+  data.ground_speed = s.ground_speed;
+  data.ground_speed_available.Update(data.clock);
+  data.track = s.track;
+  data.track_available.Update(data.clock);
+  data.gps_altitude = s.altitude;
+  data.gps_altitude_available.Update(data.clock);
+  data.ProvidePressureAltitude(s.altitude);
+  data.ProvideBaroAltitudeTrue(s.altitude);
+  data.gps.real = false;
+  data.gps.replay = true;
+  data.gps.simulator = false;
 
   return retval;
 }

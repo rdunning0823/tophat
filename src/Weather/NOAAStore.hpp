@@ -31,8 +31,6 @@ Copyright_License {
 #include <list>
 #include <tchar.h>
 
-class JobRunner;
-
 class NOAAStore
 {
 public:
@@ -62,39 +60,6 @@ public:
       return code;
     }
 #endif
-
-    /**
-     * Transfers the downloaded METAR into the given reference if available
-     *
-     * @param metar Destination METAR struct
-     * @return True if the data was available,
-     * False if no METAR data was available
-     */
-    bool GetMETAR(METAR &metar) const;
-
-    /**
-     * Transfers the parsed METAR into the given reference if available
-     *
-     * @param metar Destination ParsedMETAR struct
-     * @return True if the data was available,
-     * False if no parsed METAR data was available
-     */
-    bool GetParsedMETAR(ParsedMETAR &parsed_metar) const;
-
-    /**
-     * Transfers the downloaded TAF into the given reference if available
-     * @param index Index of the station in the array
-     * @param metar Destination TAF struct
-     * @return True if the data was available,
-     * False if no TAF data was available
-     */
-    bool GetTAF(TAF &taf) const;
-
-    /**
-     * Attempts to download new data.
-     * @return True if the data was downloaded successfully
-     */
-    bool Update(JobRunner &runner);
   };
 
   typedef std::list<Item> StationContainer;
@@ -147,12 +112,6 @@ public:
 #ifdef _UNICODE
   iterator AddStation(const TCHAR *code);
 #endif
-
-  /**
-   * Attempts to download new data for all stations
-   * @return True if the data for all stations was downloaded successfully
-   */
-  bool Update(JobRunner &runner);
 
   /**
    * Returns the amount of stations in the array

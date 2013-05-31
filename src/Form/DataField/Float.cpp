@@ -57,12 +57,6 @@ DataFieldFloat::GetAsDisplayString() const
   return mOutBuf;
 }
 
-void
-DataFieldFloat::Set(fixed Value)
-{
-  mValue = Value;
-}
-
 fixed
 DataFieldFloat::SetMin(fixed Value)
 {
@@ -233,11 +227,12 @@ DataFieldFloat::CreateComboList() const
     }
 
     if (!found_current && mValue <= i + epsilon) {
+      combo_list->ComboPopupItemSavedIndex = combo_list->size();
+
       if (mValue < i - epsilon)
         /* the current value is not listed - insert it here */
         AppendComboValue(*combo_list, mValue);
 
-      combo_list->ComboPopupItemSavedIndex = combo_list->size();
       found_current = true;
     }
 
@@ -247,8 +242,8 @@ DataFieldFloat::CreateComboList() const
   if (mValue > last + epsilon) {
     /* the current value out of range - append it here */
     last = mValue;
-    AppendComboValue(*combo_list, mValue);
     combo_list->ComboPopupItemSavedIndex = combo_list->size();
+    AppendComboValue(*combo_list, mValue);
   }
 
   if (last < mMax - epsilon)

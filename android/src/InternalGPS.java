@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.os.Handler;
 import android.os.Bundle;
@@ -47,7 +47,7 @@ import java.lang.Math;
  */
 public class InternalGPS
   implements LocationListener, SensorEventListener, Runnable {
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private static Handler handler;
 

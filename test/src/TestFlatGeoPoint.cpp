@@ -20,7 +20,7 @@
 }
 */
 
-#include "Engine/Navigation/Flat/FlatGeoPoint.hpp"
+#include "Geo/Flat/FlatGeoPoint.hpp"
 #include "TestUtil.hpp"
 
 int main(int argc, char **argv)
@@ -53,9 +53,9 @@ int main(int argc, char **argv)
   ok1(p3 == FlatGeoPoint(3, 10));
 
   // test <
-  ok1(p2 < p1);
-  ok1(p3 < p1);
-  ok1(p3 < p2);
+  ok1(p2.Sort(p1));
+  ok1(p3.Sort(p1));
+  ok1(p3.Sort(p2));
 
   // test * (and ==)
   ok1(p1 * fixed_two == FlatGeoPoint(2, 2));
@@ -64,13 +64,13 @@ int main(int argc, char **argv)
 
   // test +
   p2 = p2 + p1;
-  ok1(p2.Longitude == 2);
-  ok1(p2.Latitude == 3);
+  ok1(p2.longitude == 2);
+  ok1(p2.latitude == 3);
 
   // test -
   p2 = p2 - p1;
-  ok1(p2.Longitude == 1);
-  ok1(p2.Latitude == 2);
+  ok1(p2.longitude == 1);
+  ok1(p2.latitude == 2);
 
   // test distance_sq_to()
   ok1(p1.DistanceSquared(p2) == 1);

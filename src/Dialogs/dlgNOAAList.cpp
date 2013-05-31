@@ -27,9 +27,9 @@ Copyright_License {
 #include "Dialogs/JobDialog.hpp"
 #include "Dialogs/CallBackTable.hpp"
 #include "Language/Language.hpp"
-#include "Net/Features.hpp"
+#include "Weather/Features.hpp"
 
-#ifdef HAVE_NET
+#ifdef HAVE_NOAA
 
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
@@ -41,9 +41,11 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Weather/NOAAGlue.hpp"
 #include "Weather/NOAAStore.hpp"
+#include "Weather/NOAAUpdater.hpp"
 #include "Weather/METAR.hpp"
 #include "Util/TrivialArray.hpp"
 #include "Compiler.h"
+#include "Renderer/NOAAListRenderer.hpp"
 
 #include <stdio.h>
 
@@ -65,14 +67,6 @@ struct NOAAListItem
 };
 
 static TrivialArray<NOAAListItem, 20> list;
-
-gcc_pure
-static UPixelScalar
-GetRowHeight(const DialogLook &look)
-{
-  return look.list.font->GetHeight() + Layout::Scale(6)
-    + look.small_font->GetHeight();
-}
 
 static void
 UpdateList()
@@ -104,34 +98,8 @@ PaintListItem(Canvas &canvas, const PixelRect rc, unsigned index)
 {
   assert(index < list.size());
 
-  const DialogLook &look = UIGlobals::GetDialogLook();
-  const Font &code_font = *look.list.font;
-  const Font &details_font = *look.small_font;
-
-  canvas.Select(code_font);
-
-  StaticString<256> title;
-  title = list[index].code;
-  ParsedMETAR parsed;
-  if (list[index].iterator->GetParsedMETAR(parsed) &&
-      parsed.name_available)
-    title.AppendFormat(_T(": %s"), parsed.name.c_str());
-
-  canvas.text_clipped(rc.left + Layout::FastScale(2),
-                      rc.top + Layout::FastScale(2), rc, title);
-
-  canvas.Select(details_font);
-
-  METAR metar;
-  const TCHAR *tmp;
-  if (!list[index].iterator->GetMETAR(metar))
-    tmp = _("No METAR available");
-  else
-    tmp = metar.content.c_str();
-
-  canvas.text_clipped(rc.left + Layout::FastScale(2),
-                      rc.top + code_font.GetHeight() + Layout::FastScale(4),
-                      rc, tmp);
+  NOAAListRenderer::Draw(canvas, rc, *list[index].iterator,
+                         UIGlobals::GetDialogLook());
 }
 
 static void
@@ -159,7 +127,8 @@ AddClicked(gcc_unused WndButton &button)
 
   DialogJobRunner runner(wf->GetMainWindow(), wf->GetLook(),
                          _("Download"), true);
-  i->Update(runner);
+
+  NOAAUpdater::Update(*i, runner);
 
   UpdateList();
 }
@@ -169,7 +138,7 @@ UpdateClicked(gcc_unused WndButton &Sender)
 {
   DialogJobRunner runner(wf->GetMainWindow(), wf->GetLook(),
                          _("Download"), true);
-  noaa_store->Update(runner);
+  NOAAUpdater::Update(*noaa_store, runner);
   UpdateList();
 }
 
@@ -220,7 +189,7 @@ ListItemSelected(unsigned index)
   OpenDetails(index);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(PaintListItem),
   DeclareCallBackEntry(ListItemSelected),
   DeclareCallBackEntry(AddClicked),
@@ -241,7 +210,7 @@ dlgNOAAListShowModal(SingleWindow &parent)
 
   station_list = (ListControl *)wf->FindByName(_T("StationList"));
   assert(station_list != NULL);
-  station_list->SetItemHeight(GetRowHeight(UIGlobals::GetDialogLook()));
+  station_list->SetItemHeight(NOAAListRenderer::GetHeight(UIGlobals::GetDialogLook()));
   station_list->SetPaintItemCallback(PaintListItem);
   station_list->SetActivateCallback(ListItemSelected);
 

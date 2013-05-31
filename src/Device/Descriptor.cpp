@@ -25,6 +25,7 @@ Copyright_License {
 #include "Device/Driver.hpp"
 #include "Device/Parser.hpp"
 #include "Driver/FLARM/Device.hpp"
+#include "Driver/LX/Internal.hpp"
 #include "Device/Internal.hpp"
 #include "Device/Register.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
@@ -48,6 +49,7 @@ Copyright_License {
 #include "Java/Global.hpp"
 #include "Android/InternalSensors.hpp"
 #include "Android/Main.hpp"
+#include "Android/Nook.hpp"
 #endif
 
 #include <assert.h>
@@ -199,6 +201,9 @@ DeviceDescriptor::OpenInternalSensors()
   if (is_simulator())
     return true;
 
+  if (IsNookSimpleTouch())
+    return false;
+
   internal_sensors =
       InternalSensors::create(Java::GetEnv(), context, GetIndex());
   if (internal_sensors) {
@@ -249,6 +254,11 @@ DeviceDescriptor::Open(OperationEnvironment &env)
 
   if (is_simulator() || !config.IsAvailable())
     return;
+
+#ifdef ANDROID
+  if (IsNookSimpleTouch())
+    Nook::InitUsb();
+#endif
 
   CancelAsync();
 
@@ -372,7 +382,17 @@ DeviceDescriptor::IsNMEAOut() const
 bool
 DeviceDescriptor::IsManageable() const
 {
-  return driver != NULL && driver->IsManageable();
+  if (driver != NULL) {
+    if (driver->IsManageable())
+      return true;
+
+    if (_tcscmp(driver->name, _T("LX")) == 0 && device != NULL) {
+      const LXDevice &lx = *(const LXDevice *)device;
+      return lx.IsV7() || lx.IsNano();
+    }
+  }
+
+  return false;
 }
 
 bool
@@ -767,10 +787,6 @@ void
 DeviceDescriptor::OnNotification()
 {
   /* notification from AsyncJobRunner, the Job was finished */
-
-  if (!async.IsBusy())
-    /* this can happen when CancelAsync() has been called */
-    return;
 
   assert(open_job != NULL);
 

@@ -24,37 +24,55 @@ Copyright_License {
 #include "ContestDijkstra.hpp"
 #include "../ContestResult.hpp"
 #include "Trace/Trace.hpp"
+#include "Cast.hpp"
 
 #include <algorithm>
 #include <assert.h>
 #include <limits.h>
 
 // set size of reserved queue elements (may differ from Dijkstra default)
-static gcc_constexpr_data unsigned CONTEST_QUEUE_SIZE = 5000;
+static constexpr unsigned CONTEST_QUEUE_SIZE = 5000;
 
 ContestDijkstra::ContestDijkstra(const Trace &_trace,
                                  bool _continuous,
                                  const unsigned n_legs,
-                                 const unsigned finish_alt_diff):
-  AbstractContest(_trace, finish_alt_diff),
-  NavDijkstra(n_legs + 1),
-  continuous(_continuous),
-  incremental(false)
+                                 const unsigned finish_alt_diff)
+  :AbstractContest(finish_alt_diff),
+   NavDijkstra(n_legs + 1),
+   trace_master(_trace),
+   continuous(_continuous),
+   incremental(false),
+   predicted(TracePoint::Invalid())
 {
   assert(num_stages <= MAX_STAGES);
 
-  std::fill(m_weightings, m_weightings + num_stages - 1, 5);
-
-  Reset();
+  std::fill(stage_weights, stage_weights + num_stages - 1, 5);
 }
 
 bool
-ContestDijkstra::Score(ContestResult &result)
+ContestDijkstra::SetPredicted(const TracePoint &_predicted)
 {
-  assert(num_stages <= MAX_STAGES);
+  TracePoint n(_predicted);
+  if (n.IsDefined() && !trace_master.empty())
+    n.Project(trace_master.GetProjection());
 
-  return n_points >= num_stages && solution_valid &&
-    AbstractContest::Score(result);
+  bool result = false;
+  if (predicted.IsDefined() && n_points > 0) {
+    if (n.IsDefined() && !trace_master.empty() &&
+        n.GetFlatLocation() == predicted.GetFlatLocation()) {
+      /* no change since last call, but update time stamp */
+      predicted = n;
+      return false;
+    }
+
+    /* the predicted location has changed, and the solver must be
+       restarted */
+    Reset();
+    result = true;
+  }
+
+  predicted = n;
+  return result;
 }
 
 bool
@@ -81,25 +99,38 @@ ContestDijkstra::IsMasterUpdated() const
   // update trace if time and distance are greater than significance thresholds
 
   return last_master.GetTime() > last_point.GetTime() + threshold_delta_t_trace &&
-    last_master.flat_distance(last_point) > threshold_distance_trace;
+    last_master.FlatDistanceTo(last_point) > threshold_distance_trace;
 }
-
 
 void
 ContestDijkstra::ClearTrace()
 {
+  append_serial = modify_serial = Serial();
   trace_dirty = true;
   finished = false;
   trace.clear();
   n_points = 0;
 }
 
+void
+ContestDijkstra::UpdateTraceFull()
+{
+  trace.reserve(trace_master.GetMaxSize());
+  trace_master.GetPoints(trace);
+  n_points = trace.size();
+
+  if (n_points > 0 && predicted.IsDefined())
+    predicted.Project(trace_master.GetProjection());
+
+  append_serial = trace_master.GetAppendSerial();
+  modify_serial = trace_master.GetModifySerial();
+}
+
 bool
 ContestDijkstra::UpdateTraceTail()
 {
   assert(continuous);
-  assert(incremental);
-  assert(finished);
+  assert(incremental == finished);
   assert(modify_serial == trace_master.GetModifySerial());
 
   if (!trace_master.SyncPoints(trace))
@@ -107,65 +138,77 @@ ContestDijkstra::UpdateTraceTail()
     return false;
 
   n_points = trace.size();
+
+  if (n_points > 0 && predicted.IsDefined())
+    predicted.Project(trace_master.GetProjection());
+
+  append_serial = trace_master.GetAppendSerial();
   return true;
 }
 
 void
 ContestDijkstra::UpdateTrace(bool force)
 {
-  if (!IsMasterUpdated()) {
-    if ((finished || force) &&
-        append_serial != trace_master.GetAppendSerial()) {
-      const unsigned old_size = n_points;
-      if (UpdateTraceTail())
-        /* new data from the master trace, start incremental solver */
-        AddIncrementalEdges(old_size);
-    }
-
+  if (append_serial == trace_master.GetAppendSerial())
+    /* unmodified */
     return;
+
+  if (IsMasterUpdated()) {
+    UpdateTraceFull();
+
+    trace_dirty = true;
+    finished = false;
+
+    first_finish_candidate = incremental ? n_points - 1 : 0;
+  } else if (finished) {
+    const unsigned old_size = n_points;
+    if (UpdateTraceTail())
+      /* new data from the master trace, start incremental solver */
+      AddIncrementalEdges(old_size);
+  } else if (force) {
+    if (incremental && continuous) {
+      if (UpdateTraceTail()) {
+        /* new data from the master trace, restart the non-incremental
+           solver */
+        trace_dirty = true;
+        first_finish_candidate = incremental ? n_points - 1 : 0;
+      }
+    } else {
+      UpdateTraceFull();
+
+      trace_dirty = true;
+      finished = false;
+
+      first_finish_candidate = incremental ? n_points - 1 : 0;
+    }
   }
-
-  trace.reserve(trace_master.GetMaxSize());
-  trace_master.GetPoints(trace);
-  append_serial = trace_master.GetAppendSerial();
-  modify_serial = trace_master.GetModifySerial();
-  n_points = trace.size();
-  trace_dirty = true;
-  finished = false;
-
-  first_finish_candidate = incremental ? n_points - 1 : 0;
-
-  if (n_points<2) return;
 }
 
-
-bool
+SolverResult
 ContestDijkstra::Solve(bool exhaustive)
 {
   assert(num_stages <= MAX_STAGES);
 
-  solution_valid = false;
-
   if (trace_master.size() < num_stages) {
     /* not enough data in master trace */
     ClearTrace();
-    return true;
+    return SolverResult::FAILED;
   }
 
   if (finished || dijkstra.IsEmpty()) {
     UpdateTrace(exhaustive);
 
     if (n_points < num_stages)
-      return true;
+      return SolverResult::FAILED;
 
     // don't re-start search unless we have had new data appear
     if (!trace_dirty && !finished)
-      return true;
+      return SolverResult::FAILED;
   } else if (exhaustive || n_points < num_stages ||
              modify_serial != trace_master.GetModifySerial()) {
     UpdateTrace(exhaustive);
     if (n_points < num_stages)
-      return true;
+      return SolverResult::FAILED;
   }
 
   assert(n_points >= num_stages);
@@ -179,12 +222,12 @@ ContestDijkstra::Solve(bool exhaustive)
 
     StartSearch();
     AddStartEdges();
-    if (dijkstra.IsEmpty()) {
-      return true;
-    }
+    if (dijkstra.IsEmpty())
+      return SolverResult::FAILED;
   }
 
-  if (DistanceGeneral(exhaustive ? 0 - 1 : 25)) {
+  SolverResult result = DistanceGeneral(exhaustive ? 0 - 1 : 25);
+  if (result != SolverResult::INCOMPLETE) {
     if (incremental && continuous)
       /* enable the incremental solver, which considers the existing
          Dijkstra edge map */
@@ -193,73 +236,69 @@ ContestDijkstra::Solve(bool exhaustive)
       /* start the next iteration from scratch */
       dijkstra.Clear();
 
-    if (solution_valid)
-      SaveSolution();
-
-    UpdateTrace(exhaustive);
-    return true;
+    if (result == SolverResult::VALID && !SaveSolution())
+      result = SolverResult::FAILED;
   }
 
-  return !dijkstra.IsEmpty();
+  return result;
 }
 
 void
 ContestDijkstra::Reset()
 {
-  best_solution.clear();
   dijkstra.Clear();
-  solution_valid = false;
   ClearTrace();
+  predicted = TracePoint::Invalid();
 
   AbstractContest::Reset();
 }
 
-
-fixed
-ContestDijkstra::CalcTime() const
+bool
+ContestDijkstra::SaveSolution()
 {
-  assert(num_stages <= MAX_STAGES);
-  assert(solution_valid);
+  solution.resize(num_stages);
 
-  return fixed(GetPoint(solution[num_stages - 1])
-               .DeltaTime(GetPoint(solution[0])));
+  for (unsigned i = 0; i < num_stages; ++i)
+    solution[i] =
+      NavDijkstra::solution[i] == predicted_index
+      ? (predicted.IsDefined()
+         ? predicted
+         /* fallback, just in case somebody has deleted the prediction
+            meanwhile */
+         : GetPoint(n_points - 1))
+      : GetPoint(NavDijkstra::solution[i]);
+
+  return AbstractContest::SaveSolution();
 }
 
-fixed
-ContestDijkstra::CalcDistance() const
+ContestResult
+ContestDijkstra::CalculateResult(const ContestTraceVector &solution) const
 {
   assert(num_stages <= MAX_STAGES);
-  assert(solution_valid);
 
-  fixed dist = fixed_zero;
-  GeoPoint previous = GetPoint(solution[0]).get_location();
+  ContestResult result;
+  result.time = fixed(solution[num_stages - 1].DeltaTime(solution[0]));
+  result.distance = result.score = fixed_zero;
+
+  GeoPoint previous = solution[0].GetLocation();
   for (unsigned i = 1; i < num_stages; ++i) {
-    const GeoPoint &current = GetPoint(solution[i]).get_location();
-    dist += current.Distance(previous);
-    previous = current;
-  }
-
-  return dist;
-}
-
-fixed
-ContestDijkstra::CalcScore() const
-{
-  assert(num_stages <= MAX_STAGES);
-  assert(solution_valid);
-
-  fixed score = fixed_zero;
-  GeoPoint previous = GetPoint(solution[0]).get_location();
-  for (unsigned i = 1; i < num_stages; ++i) {
-    const GeoPoint &current = GetPoint(solution[i]).get_location();
-    score += GetStageWeight(i - 1) * current.Distance(previous);
+    const GeoPoint &current = solution[i].GetLocation();
+    result.distance += current.Distance(previous);
+    result.score += GetStageWeight(i - 1) * current.Distance(previous);
     previous = current;
   }
 
   #define fixed_fifth fixed(0.0002)
-  score *= fixed_fifth;
+  result.score *= fixed_fifth;
+  result.score = ApplyHandicap(result.score);
 
-  return ApplyHandicap(score);
+  return result;
+}
+
+ContestResult
+ContestDijkstra::CalculateResult() const
+{
+  return CalculateResult(solution);
 }
 
 void
@@ -300,14 +339,34 @@ ContestDijkstra::AddEdges(const ScanTaskPoint origin,
 
   const unsigned weight = GetStageWeight(origin.GetStageNumber());
 
+  bool previous_above = false;
   for (const ScanTaskPoint end(destination.GetStageNumber(), n_points);
        destination != end; destination.IncrementPointIndex()) {
-    if (GetPoint(destination).GetIntegerAltitude() >= min_altitude) {
+    bool above = GetPoint(destination).GetIntegerAltitude() >= min_altitude;
+
+    if (above) {
+      const unsigned d = weight * CalcEdgeDistance(origin, destination);
+      Link(destination, origin, d);
+    } else if (previous_above) {
+      /* After excessive thinning, the exact TracePoint that matches
+         the required altitude difference may be gone, and the
+         calculated result becomes overly pessimistic.  This code path
+         makes it optimistic, by checking if the previous point
+         matches. */
+
+      /* TODO: interpolate the distance */
       const unsigned d = weight * CalcEdgeDistance(origin, destination);
       Link(destination, origin, d);
     }
+
+    previous_above = above;
   }
 
+  if (IsFinal(destination) && predicted.IsDefined()) {
+    const unsigned d = weight * GetPoint(origin).FlatDistanceTo(predicted);
+    destination.SetPointIndex(predicted_index);
+    Link(destination, origin, d);
+  }
 }
 
 void
@@ -334,17 +393,17 @@ ContestDijkstra::AddIncrementalEdges(unsigned first_point)
   /* establish links between each old node and each new node, to
      initiate the follow-up search, hoping a better solution will be
      found here */
-  for (auto i = edges.begin(), end = edges.end(); i != end; ++i) {
-    if (IsFinal(i->first))
+  for (const auto &i : edges) {
+    if (IsFinal(i.first))
       /* ignore final nodes */
       continue;
 
     /* "seek" the Dijkstra object to the current "old" node */
-    dijkstra.SetCurrentValue(i->second.value);
+    dijkstra.SetCurrentValue(i.second.value);
 
     /* add edges from the current "old" node to all "new" nodes
        (first_point .. n_points-1) */
-    AddEdges(i->first, first_point);
+    AddEdges(i.first, first_point);
   }
 
   /* see if new start points are possible now (due to relaxed start
@@ -353,29 +412,12 @@ ContestDijkstra::AddIncrementalEdges(unsigned first_point)
   AddStartEdges();
 }
 
-bool
-ContestDijkstra::SaveSolution()
-{
-  assert(num_stages <= MAX_STAGES);
-  assert(solution_valid);
-
-  if (solution_valid && AbstractContest::SaveSolution()) {
-    best_solution.clear();
-    for (unsigned i=0; i<num_stages; ++i) {
-      best_solution.append(GetPoint(solution[i]));
-    }
-    return true;
-  }
-  return false;
-}
-
-
 void
-ContestDijkstra::CopySolution(ContestTraceVector &vec) const
+ContestDijkstra::CopySolution(ContestTraceVector &result) const
 {
   assert(num_stages <= MAX_STAGES);
 
-  vec = best_solution;
+  result = solution;
 }
 
 void 
@@ -400,7 +442,7 @@ FAI OLC:
 - weightings: 1 all
 
 OLC classic + FAI-OLC
-- min finish alt is 1000m below start altitude 
+- min finish alt is 1000m below start altitude
 - start altitude is lowest altitude before reaching start
 - start time is time at which start altitude is reached
 - The finish altitude is the highest altitude after reaching the finish point and before end of free flight.

@@ -24,6 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_WININET_HPP
 #define XCSOAR_WININET_HPP
 
+#include "Compiler.h"
 #include "Util/NonCopyable.hpp"
 #include "Thread/Trigger.hpp"
 
@@ -34,6 +35,7 @@ Copyright_License {
 #include <wininet.h>
 #include <tchar.h>
 #include <assert.h>
+#include <stdint.h>
 
 namespace WinINet {
   class Handle : private NonCopyable {
@@ -192,6 +194,40 @@ namespace WinINet {
   public:
     HttpRequestHandle() {}
     HttpRequestHandle(HINTERNET handle):RequestHandle(handle) {}
+
+    bool QueryInfo(DWORD dwInfoLevel,
+                   LPVOID lpvBuffer, LPDWORD lpdwBufferLength,
+                   LPDWORD lpdwIndex=NULL) const {
+      assert(IsDefined());
+
+      return ::HttpQueryInfo(Get(), dwInfoLevel, lpvBuffer, lpdwBufferLength,
+                             lpdwIndex);
+    }
+
+    /**
+     * Returns the HTTP status code or 0 if there was an error.
+     */
+    gcc_pure
+    unsigned GetStatusCode() const {
+      DWORD status;
+      DWORD size = sizeof(status);
+
+      return QueryInfo(HTTP_QUERY_STATUS_CODE|HTTP_QUERY_FLAG_NUMBER,
+                       &status, &size)
+        ? (unsigned)status
+        : 0;
+    }
+
+    gcc_pure
+    int64_t GetContentLength() const {
+      DWORD value;
+      DWORD size = sizeof(value);
+
+      return QueryInfo(HTTP_QUERY_CONTENT_LENGTH|HTTP_QUERY_FLAG_NUMBER,
+                       &value, &size)
+        ? (int64_t)value
+        : -1;
+    }
 
     bool SendRequest(LPCTSTR lpszHeaders, DWORD dwHeadersLength,
                      LPVOID lpOptional, DWORD dwOptionalLength) {

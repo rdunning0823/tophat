@@ -34,12 +34,11 @@ Copyright_License {
 #include "Renderer/AircraftRenderer.hpp"
 #include "Renderer/TrailRenderer.hpp"
 #include "Task/ProtectedTaskManager.hpp"
-#include "Engine/Math/Earth.hpp"
 #include "Units/Units.hpp"
 #include "Interface.hpp"
 #include "Computer/GlideComputer.hpp"
 #include "Asset.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Engine/Task/ObservationZones/ObservationZonePoint.hpp"
 #include "Engine/Task/ObservationZones/CylinderZone.hpp"
 
@@ -153,6 +152,7 @@ TargetMapWindow::DrawTask(Canvas &canvas)
 
   ProtectedTaskManager::Lease task_manager(*task);
   const AbstractTask *task = task_manager->GetActiveTask();
+  const OrderedTask &ordered_task = task_manager->GetOrderedTask();
   if (task && task->CheckTask()) {
     OZRenderer ozv(task_look, airspace_renderer.GetLook(),
                    GetMapSettings().airspace);
@@ -164,7 +164,7 @@ TargetMapWindow::DrawTask(Canvas &canvas)
                           ozv, false, TaskPointRenderer::ALL,
                           Basic().location_available, Basic().location);
     TaskRenderer dv(tpv, projection.GetScreenBounds());
-    dv.Draw(*task);
+    dv.Draw(*task, ordered_task);
   }
 }
 
@@ -266,6 +266,7 @@ GetRadius(const ObservationZonePoint &oz)
 {
   switch (oz.shape) {
   case ObservationZonePoint::LINE:
+  case ObservationZonePoint::MAT_CYLINDER:
   case ObservationZonePoint::CYLINDER:
   case ObservationZonePoint::SECTOR:
   case ObservationZonePoint::FAI_SECTOR:
@@ -284,7 +285,7 @@ GetRadius(const ObservationZonePoint &oz)
 static fixed
 GetRadius(const OrderedTaskPoint &tp)
 {
-  return GetRadius(*tp.GetOZPoint());
+  return GetRadius(tp.GetObservationZone());
 }
 
 void

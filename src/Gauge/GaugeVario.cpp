@@ -55,8 +55,7 @@ GaugeVario::GaugeVario(const FullBlackboard &_blackboard,
    nwidth(Layout::Scale(4)),
    nline(Layout::Scale(8)),
    dirty(true), layout_initialised(false), needle_initialised(false),
-   ballast_initialised(false), bugs_initialised(false),
-   unit(Unit::UNDEFINED)
+   ballast_initialised(false), bugs_initialised(false)
 {
   value_top.initialised = false;
   value_middle.initialised = false;
@@ -66,8 +65,6 @@ GaugeVario::GaugeVario(const FullBlackboard &_blackboard,
   label_bottom.initialised = false;
 
   set(parent, left, top, width, height, style);
-
-  Hide();
 }
 
 void
@@ -109,7 +106,7 @@ GaugeVario::OnPaintBuffer(Canvas &canvas)
   }
 
   if (Settings().show_mc) {
-    fixed mc = Units::ToUserVSpeed(Calculated().common_stats.current_mc);
+    fixed mc = Units::ToUserVSpeed(GetGlidePolar().GetMC());
     RenderValue(canvas, bottom_position.x, bottom_position.y,
                 &value_bottom, &label_bottom,
                 mc,
@@ -597,7 +594,7 @@ GaugeVario::RenderBallast(Canvas &canvas)
     ballast_initialised = true;
   }
 
-  unsigned ballast = uround(Calculated().common_stats.current_ballast * 100);
+  unsigned ballast = uround(GetGlidePolar().GetBugs() * 100);
 
   if (!is_persistent() || ballast != last_ballast) {
     // ballast hase been changed

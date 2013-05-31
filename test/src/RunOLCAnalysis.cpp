@@ -20,14 +20,11 @@
 }
 */
 
-#include "Engine/Math/Earth.hpp"
 #include "Engine/Trace/Trace.hpp"
 #include "Contest/ContestManager.hpp"
-#include "Engine/Navigation/Aircraft.hpp"
 #include "Printing.hpp"
 #include "OS/Args.hpp"
 #include "DebugReplay.hpp"
-#include "NMEA/Aircraft.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -36,41 +33,59 @@
 //#define BENCHMARK_LK8000
 
 #ifdef BENCHMARK_LK8000
-static Trace full_trace(60, Trace::null_time, 100);
+static Trace full_trace(0, Trace::null_time, 100);
 static Trace sprint_trace(0, 9000, 50);
 #else
-static Trace full_trace(60, Trace::null_time, 512);
+static Trace full_trace(0, Trace::null_time, 512);
 static Trace sprint_trace(0, 9000, 128);
 #endif
 
-ContestManager olc_classic(OLC_Classic, full_trace, sprint_trace);
-ContestManager olc_fai(OLC_FAI, full_trace, sprint_trace);
-ContestManager olc_sprint(OLC_Sprint, full_trace, sprint_trace);
-ContestManager olc_league(OLC_League, full_trace, sprint_trace);
-ContestManager olc_plus(OLC_Plus, full_trace, sprint_trace);
-ContestManager olc_netcoupe(OLC_NetCoupe, full_trace, sprint_trace);
+static ContestManager olc_classic(OLC_Classic, full_trace, sprint_trace);
+static ContestManager olc_fai(OLC_FAI, full_trace, sprint_trace);
+static ContestManager olc_sprint(OLC_Sprint, full_trace, sprint_trace);
+static ContestManager olc_league(OLC_League, full_trace, sprint_trace);
+static ContestManager olc_plus(OLC_Plus, full_trace, sprint_trace);
+static ContestManager xcontest(OLC_XContest, full_trace, sprint_trace);
+static ContestManager sis_at(OLC_SISAT, full_trace, sprint_trace);
+static ContestManager olc_netcoupe(OLC_NetCoupe, full_trace, sprint_trace);
 
 static int
 TestOLC(DebugReplay &replay)
 {
+  bool released = false;
+
   for (int i = 1; replay.Next(); i++) {
     if (i % 500 == 0) {
       putchar('.');
       fflush(stdout);
     }
 
-    const AircraftState state =
-      ToAircraftState(replay.Basic(), replay.Calculated());
-    full_trace.push_back(state);
-    sprint_trace.push_back(state);
+    const MoreData &basic = replay.Basic();
+    if (!basic.time_available || !basic.location_available ||
+        !basic.NavAltitudeAvailable())
+      continue;
+
+    if (!released && !negative(replay.Calculated().flight.release_time)) {
+      released = true;
+
+      full_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+      sprint_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+    }
+
+    const TracePoint point(basic);
+    full_trace.push_back(point);
+    sprint_trace.push_back(point);
 
     olc_sprint.UpdateIdle();
+    olc_league.UpdateIdle();
   }
 
   olc_classic.SolveExhaustive();
   olc_fai.SolveExhaustive();
   olc_league.SolveExhaustive();
   olc_plus.SolveExhaustive();
+  xcontest.SolveExhaustive();
+  sis_at.SolveExhaustive();
   olc_netcoupe.SolveExhaustive();
 
   putchar('\n');
@@ -78,13 +93,31 @@ TestOLC(DebugReplay &replay)
   std::cout << "classic\n";
   PrintHelper::print(olc_classic.GetStats().GetResult());
   std::cout << "league\n";
-  PrintHelper::print(olc_league.GetStats().GetResult());
+  std::cout << "# league\n";
+  PrintHelper::print(olc_league.GetStats().GetResult(0));
+  std::cout << "# classic\n";
+  PrintHelper::print(olc_league.GetStats().GetResult(1));
   std::cout << "fai\n";
   PrintHelper::print(olc_fai.GetStats().GetResult());
   std::cout << "sprint\n";
   PrintHelper::print(olc_sprint.GetStats().GetResult());
   std::cout << "plus\n";
-  PrintHelper::print(olc_plus.GetStats().GetResult());
+  std::cout << "# classic\n";
+  PrintHelper::print(olc_plus.GetStats().GetResult(0));
+  std::cout << "# triangle\n";
+  PrintHelper::print(olc_plus.GetStats().GetResult(1));
+  std::cout << "# plus\n";
+  PrintHelper::print(olc_plus.GetStats().GetResult(2));
+
+  std::cout << "xcontest\n";
+  std::cout << "# free\n";
+  PrintHelper::print(xcontest.GetStats().GetResult(0));
+  std::cout << "# triangle\n";
+  PrintHelper::print(xcontest.GetStats().GetResult(1));
+
+  std::cout << "sis_at\n";
+  PrintHelper::print(sis_at.GetStats().GetResult(0));
+
   std::cout << "netcoupe\n";
   PrintHelper::print(olc_netcoupe.GetStats().GetResult());
 

@@ -24,6 +24,7 @@ Copyright_License {
 #include "Net/Request.hpp"
 #include "Net/Session.hpp"
 #include "Net/Connection.hpp"
+#include "Util/ConvertString.hpp"
 
 #include <assert.h>
 #include <stdint.h>
@@ -41,13 +42,17 @@ RequestCallback(HINTERNET hInternet,
                     lpvStatusInformation, dwStatusInformationLength);
 }
 
-Net::Request::Request(Session &session, const TCHAR *url,
-                      unsigned long timeout)
-  :last_error(ERROR_SUCCESS)
+Net::Request::Request(Session &session, const char *url,
+                      unsigned timeout_ms)
 {
   INTERNET_STATUS_CALLBACK old_callback =
     session.handle.SetStatusCallback(RequestCallback);
-  HINTERNET h = session.handle.OpenUrl(url, NULL, 0,
+
+  UTF8ToWideConverter url2(url);
+  if (!url2.IsValid())
+    return;
+
+  HINTERNET h = session.handle.OpenUrl(url2, NULL, 0,
                                        INTERNET_FLAG_NO_AUTH |
                                        INTERNET_FLAG_NO_AUTO_REDIRECT |
                                        INTERNET_FLAG_NO_CACHE_WRITE |
@@ -57,14 +62,13 @@ Net::Request::Request(Session &session, const TCHAR *url,
 
   if (h == NULL && GetLastError() == ERROR_IO_PENDING)
     // Wait until we get the Request handle
-    completed_event.Wait(timeout);
+    opened_event.Wait(timeout_ms);
 
   session.handle.SetStatusCallback(old_callback);
 }
 
 Net::Request::Request(Connection &connection, const char *file,
-                      unsigned long timeout)
-  :last_error(ERROR_SUCCESS)
+                      unsigned timeout_ms)
 {
   INTERNET_STATUS_CALLBACK old_callback =
     connection.handle.SetStatusCallback(RequestCallback);
@@ -74,36 +78,43 @@ Net::Request::Request(Connection &connection, const char *file,
 
   if (h == NULL && GetLastError() == ERROR_IO_PENDING)
     // Wait until we get the Request handle
-    opened_event.Wait(timeout);
+    opened_event.Wait(timeout_ms);
 
   connection.handle.SetStatusCallback(old_callback);
 }
 
 bool
-Net::Request::Created() const
+Net::Request::Send(unsigned timeout_ms)
 {
-  return handle.IsDefined();
+  if (!handle.IsDefined())
+    return false;
+
+  if (!completed_event.Wait(timeout_ms))
+    /* response timeout */
+    return false;
+
+  if (last_error != ERROR_SUCCESS)
+    /* I/O error */
+    return false;
+
+  unsigned status = handle.GetStatusCode();
+  if (status < 200 || status >= 300)
+    /* unsuccessful HTTP status */
+    return false;
+
+  return true;
 }
 
-bool
-Net::Request::Send(unsigned long timeout)
+int64_t
+Net::Request::GetLength() const
 {
   assert(handle.IsDefined());
 
-  // Send request
-  if (handle.SendRequest(NULL, 0, NULL, 0))
-    return true;
-
-  // If HttpSendRequestA() failed or timeout occured in WaitForSingleObject()
-  if (GetLastError() != ERROR_IO_PENDING ||
-      !completed_event.Wait(timeout))
-    return false;
-  else
-    return last_error == ERROR_SUCCESS;
+  return handle.GetContentLength();
 }
 
-size_t
-Net::Request::Read(void *buffer, size_t buffer_size, unsigned long timeout)
+ssize_t
+Net::Request::Read(void *buffer, size_t buffer_size, unsigned timeout_ms)
 {
   INTERNET_BUFFERSA InetBuff;
   FillMemory(&InetBuff, sizeof(InetBuff), 0);
@@ -111,12 +122,9 @@ Net::Request::Read(void *buffer, size_t buffer_size, unsigned long timeout)
   InetBuff.lpvBuffer = buffer;
   InetBuff.dwBufferLength = buffer_size - 1;
 
-  // If InternetReadFileExA() failed or timeout occured in WaitForSingleObject()
-  if (!handle.Read(&InetBuff, IRF_ASYNC, (DWORD_PTR)this) &&
-      (GetLastError() != ERROR_IO_PENDING ||
-       !completed_event.Wait(timeout)))
-    // return "0 bytes read"
-    return 0;
+  if (!handle.Read(&InetBuff, IRF_ASYNC, (DWORD_PTR)this))
+    /* error */
+    return -1;
 
   ((uint8_t *)buffer)[InetBuff.dwBufferLength] = 0;
   return InetBuff.dwBufferLength;

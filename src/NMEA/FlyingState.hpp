@@ -26,7 +26,7 @@ Copyright_License {
 
 #include "Math/fixed.hpp"
 #include "Util/TypeTraits.hpp"
-#include "Navigation/GeoPoint.hpp"
+#include "Geo/GeoPoint.hpp"
 
 /**
  * Structure for flying state (takeoff/landing)
@@ -49,8 +49,27 @@ struct FlyingState
    */
   GeoPoint takeoff_location;
 
+  /**
+   * The time stamp when the aircraft released from towing.  This is
+   * an estimate based on sink.  If the aircraft was never seen on
+   * ground (i.e. XCSoar was switched on while flying), this value is
+   * not too useful.  This is negative if the aircraft is assumed to
+   * be still towing.
+   */
+  fixed release_time;
+
+  /**
+   * The location of the aircraft when it released from towing.
+   * Always check GeoPoint::IsValid() before using this value.
+   */
+  GeoPoint release_location;
+
   /** Reset flying state as if never flown */
   void Reset();
+
+  bool IsTowing() const {
+    return flying && negative(release_time);
+  }
 };
 
 static_assert(is_trivial<FlyingState>::value, "type is not trivial");

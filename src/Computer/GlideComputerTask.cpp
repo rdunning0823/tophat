@@ -53,6 +53,8 @@ GlideComputerTask::ResetFlight(const bool full)
   route.ResetFlight();
   trace.Reset();
   contest.Reset();
+
+  last_flying = false;
 }
 
 void
@@ -60,20 +62,21 @@ GlideComputerTask::ProcessBasicTask(const MoreData &basic,
                                     const MoreData &last_basic,
                                     DerivedInfo &calculated,
                                     const DerivedInfo &last_calculated,
-                                    const ComputerSettings &settings_computer)
+                                    const ComputerSettings &settings_computer,
+                                    const Waypoints &waypoints, bool force)
 {
-  if (basic.HasTimeAdvancedSince(last_basic) && basic.location_available)
-    trace.Update(settings_computer, ToAircraftState(basic, calculated));
+  trace.Update(settings_computer, basic, calculated);
 
   ProtectedTaskManager::ExclusiveLease _task(task);
 
   _task->SetTaskBehaviour(settings_computer.task);
 
-  if (basic.HasTimeAdvancedSince(last_basic) && basic.location_available) {
+  if (force || (basic.HasTimeAdvancedSince(last_basic) &&
+                basic.location_available)) {
     const AircraftState current_as = ToAircraftState(basic, calculated);
     const AircraftState last_as = ToAircraftState(last_basic, last_calculated);
 
-    _task->Update(current_as, last_as);
+    _task->Update(current_as, last_as, waypoints);
 
     const fixed fallback_mc = calculated.last_thermal.IsDefined() &&
       positive(calculated.last_thermal_average_smooth)
@@ -114,11 +117,34 @@ GlideComputerTask::ProcessMoreTask(const MoreData &basic,
   }
 }
 
+gcc_pure
+static TracePoint
+Predicted(const TaskBehaviour &settings,
+          const MoreData &basic,
+          const ElementStat &current_leg)
+{
+  if (!basic.time_available || !basic.gps_altitude_available ||
+      !settings.predict_contest ||
+      !current_leg.location_remaining.IsValid() ||
+      !current_leg.solution_remaining.IsDefined())
+    return TracePoint::Invalid();
+
+  /* predict that the next task point will be reached, using the
+     calculated remaining time and the minimum arrival altitude */
+  return TracePoint(current_leg.location_remaining,
+                    unsigned(basic.time + current_leg.time_remaining),
+                    current_leg.solution_remaining.min_arrival_altitude,
+                    fixed_zero, 0);
+}
+
 void
 GlideComputerTask::ProcessIdle(const MoreData &basic, DerivedInfo &calculated,
                                const ComputerSettings &settings_computer,
                                bool exhaustive)
 {
+  contest.SetPredicted(Predicted(settings_computer.task, basic,
+                                 calculated.task_stats.current_leg));
+
   if (exhaustive)
     contest.SolveExhaustive(settings_computer, calculated);
   else
@@ -132,12 +158,19 @@ GlideComputerTask::ProcessIdle(const MoreData &basic, DerivedInfo &calculated,
 
 void 
 GlideComputerTask::ProcessAutoTask(const NMEAInfo &basic,
-                                   const DerivedInfo &calculated,
-                                   const DerivedInfo &last_calculated)
+                                   const DerivedInfo &calculated)
 {
-  if (!calculated.flight.flying || last_calculated.flight.flying)
-    /* no takeoff detected */
+  if (!calculated.flight.flying) {
+    /* not flying (yet) */
+    last_flying = false;
     return;
+  }
+
+  if (last_flying)
+    /* still flying, not a takeoff */
+    return;
+
+  last_flying = true;
 
   if (calculated.altitude_agl_valid &&
       calculated.altitude_agl > fixed(500))

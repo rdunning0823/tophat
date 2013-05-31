@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_THREAD_OPERATION_HPP
 
 #include "Operation/Operation.hpp"
-#include "Thread/Notify.hpp"
+#include "Thread/DelayedNotify.hpp"
 #include "Thread/Mutex.hpp"
 #include "Thread/Trigger.hpp"
 #include "Util/StaticString.hpp"
@@ -38,7 +38,7 @@ Copyright_License {
  */
 class ThreadedOperationEnvironment
   : public OperationEnvironment,
-    protected Notify {
+    protected DelayedNotify {
   struct Data {
     StaticString<256u> error;
     StaticString<128u> text;
@@ -105,15 +105,17 @@ public:
   }
 
 public:
-  virtual bool IsCancelled() const;
-  virtual void Sleep(unsigned ms);
-  virtual void SetErrorMessage(const TCHAR *error);
-  virtual void SetText(const TCHAR *text);
-  virtual void SetProgressRange(unsigned range);
-  virtual void SetProgressPosition(unsigned position);
+  /* virtual methods from class OperationEnvironment */
+  virtual bool IsCancelled() const gcc_override;
+  virtual void Sleep(unsigned ms) gcc_override;
+  virtual void SetErrorMessage(const TCHAR *error) gcc_override;
+  virtual void SetText(const TCHAR *text) gcc_override;
+  virtual void SetProgressRange(unsigned range) gcc_override;
+  virtual void SetProgressPosition(unsigned position) gcc_override;
 
 protected:
-  virtual void OnNotification();
+  /* virtual methods from class Notify */
+  virtual void OnNotification() gcc_override;
 };
 
 #endif

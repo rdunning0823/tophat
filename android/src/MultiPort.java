@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -35,7 +35,7 @@ import android.util.Log;
 class MultiPort implements AndroidPort, InputListener {
   private InputListener listener;
 
-  private static final String TAG = "XCSoar";
+  private static final String TAG = "TopHat";
 
   private Collection<AndroidPort> ports = new LinkedList<AndroidPort>();
 

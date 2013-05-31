@@ -23,33 +23,37 @@ Copyright_License {
 */
 
 #include "ConditionMonitorSunset.hpp"
-#include "Computer/GlideComputer.hpp"
+#include "NMEA/Info.hpp"
+#include "NMEA/Derived.hpp"
 #include "Device/device.hpp"
-#include "LocalTime.hpp"
 #include "Language/Language.hpp"
 #include "Message.hpp"
 #include "Math/SunEphemeris.hpp"
+#include "ComputerSettings.hpp"
 
 bool
-ConditionMonitorSunset::CheckCondition(const GlideComputer& cmp)
+ConditionMonitorSunset::CheckCondition(const NMEAInfo &basic,
+                                       const DerivedInfo &calculated,
+                                       const ComputerSettings &settings)
 {
-  if (!cmp.Basic().location_available ||
-      !cmp.Calculated().flight.flying || HaveCondorDevice() ||
-      !cmp.Calculated().task_stats.task_valid)
+  if (!basic.location_available ||
+      !calculated.flight.flying || HaveCondorDevice() ||
+      !calculated.task_stats.task_valid)
     return false;
 
-  const GlideResult& res = cmp.Calculated().task_stats.total.solution_remaining;
+  const GlideResult& res = calculated.task_stats.total.solution_remaining;
   if (!res.IsOk())
     return false;
 
   /// @todo should be destination location
 
-  SunEphemeris::Result sun = SunEphemeris::CalcSunTimes(
-      cmp.Basic().location, cmp.Basic().date_time_utc,
-      fixed(GetUTCOffset()) / 3600);
+  SunEphemeris::Result sun =
+    SunEphemeris::CalcSunTimes(basic.location, basic.date_time_utc,
+                               fixed(settings.utc_offset) / 3600);
 
-  fixed d1((res.time_elapsed + fixed(DetectCurrentTime(cmp.Basic()))) / 3600);
-  fixed d0(DetectCurrentTime(cmp.Basic()) / 3600);
+  const fixed time_local = basic.time + fixed(settings.utc_offset);
+  fixed d1((time_local + res.time_elapsed) / 3600);
+  fixed d0(time_local / 3600);
 
   bool past_sunset = (d1 > sun.time_of_sunset) && (d0 < sun.time_of_sunset);
   return past_sunset;

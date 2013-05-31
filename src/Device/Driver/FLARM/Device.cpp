@@ -23,8 +23,10 @@ Copyright_License {
 
 #include "Device.hpp"
 #include "Device/Port/Port.hpp"
+#include "Util/ConvertString.hpp"
 #include "Util/StaticString.hpp"
-#include "OS/PathName.hpp"
+#include "Util/Macros.hpp"
+#include "Util/NumberParser.hpp"
 
 void
 FlarmDevice::LinkTimeout()
@@ -35,13 +37,13 @@ FlarmDevice::LinkTimeout()
 bool
 FlarmDevice::GetStealthMode(bool &enabled, OperationEnvironment &env)
 {
-  TCHAR buffer[2];
+  char buffer[2];
   if (!GetConfig("PRIV", buffer, ARRAY_SIZE(buffer), env))
     return false;
 
-  if (buffer[0] == _T('1'))
+  if (buffer[0] == '1')
     enabled = true;
-  else if (buffer[0] == _T('0'))
+  else if (buffer[0] == '0')
     enabled = false;
   else
     return false;
@@ -52,7 +54,7 @@ FlarmDevice::GetStealthMode(bool &enabled, OperationEnvironment &env)
 bool
 FlarmDevice::SetStealthMode(bool enabled, OperationEnvironment &env)
 {
-  return SetConfig("PRIV", enabled ? _T("1") : _T("0"), env);
+  return SetConfig("PRIV", enabled ? "1" : "0", env);
 }
 
 bool
@@ -63,7 +65,7 @@ FlarmDevice::GetRange(unsigned &range, OperationEnvironment &env)
     return false;
 
   TCHAR *end_ptr;
-  unsigned value = _tcstoul(buffer, &end_ptr, 10);
+  unsigned value = ParseUnsigned(buffer, &end_ptr, 10);
   if (end_ptr == buffer)
     return false;
 
@@ -74,8 +76,8 @@ FlarmDevice::GetRange(unsigned &range, OperationEnvironment &env)
 bool
 FlarmDevice::SetRange(unsigned range, OperationEnvironment &env)
 {
-  StaticString<32> buffer;
-  buffer.Format(_T("%d"), range);
+  NarrowString<32> buffer;
+  buffer.Format("%d", range);
   return SetConfig("RANGE", buffer, env);
 }
 
@@ -87,7 +89,7 @@ FlarmDevice::GetBaudRate(unsigned &baud_id, OperationEnvironment &env)
     return false;
 
   TCHAR *end_ptr;
-  unsigned value = _tcstoul(buffer, &end_ptr, 10);
+  unsigned value = ParseUnsigned(buffer, &end_ptr, 10);
   if (end_ptr == buffer)
     return false;
 
@@ -98,8 +100,8 @@ FlarmDevice::GetBaudRate(unsigned &baud_id, OperationEnvironment &env)
 bool
 FlarmDevice::SetBaudRate(unsigned baud_id, OperationEnvironment &env)
 {
-  StaticString<32> buffer;
-  buffer.Format(_T("%u"), baud_id);
+  NarrowString<32> buffer;
+  buffer.Format("%u", baud_id);
   return SetConfig("BAUD", buffer, env);
 }
 
@@ -184,7 +186,7 @@ FlarmDevice::SetCompetitionClass(const TCHAR *competition_class,
 }
 
 bool
-FlarmDevice::GetConfig(const char *setting, TCHAR *buffer, size_t length,
+FlarmDevice::GetConfig(const char *setting, char *buffer, size_t length,
                        OperationEnvironment &env)
 {
   NarrowString<256> request;
@@ -194,25 +196,16 @@ FlarmDevice::GetConfig(const char *setting, TCHAR *buffer, size_t length,
   expected_answer[6u] = 'A';
   expected_answer += ',';
 
-  char narrow_buffer[length];
-
   Send(request, env);
-  if (!Receive(expected_answer, narrow_buffer, length, env, 2000))
-    return false;
-
-  _tcscpy(buffer, PathName(narrow_buffer));
-  return true;
+  return Receive(expected_answer, buffer, length, env, 2000);
 }
 
 bool
-FlarmDevice::SetConfig(const char *setting, const TCHAR *value,
+FlarmDevice::SetConfig(const char *setting, const char *value,
                        OperationEnvironment &env)
 {
-  NarrowPathName narrow_value(value);
-
   NarrowString<256> buffer;
-  buffer.Format("PFLAC,S,%s,", setting);
-  buffer.append(narrow_value);
+  buffer.Format("PFLAC,S,%s,%s", setting, value);
 
   NarrowString<256> expected_answer(buffer);
   expected_answer[6u] = 'A';
@@ -220,6 +213,42 @@ FlarmDevice::SetConfig(const char *setting, const TCHAR *value,
   Send(buffer, env);
   return port.ExpectString(expected_answer, env, 2000);
 }
+
+#ifdef _UNICODE
+
+bool
+FlarmDevice::GetConfig(const char *setting, TCHAR *buffer, size_t length,
+                       OperationEnvironment &env)
+{
+  char narrow_buffer[length * 2];
+  if (!GetConfig(setting, narrow_buffer, length * 2, env))
+    return false;
+
+  if (StringIsEmpty(narrow_buffer)) {
+    *buffer = _T('\0');
+    return true;
+  }
+
+  UTF8ToWideConverter wide(narrow_buffer);
+  if (!wide.IsValid())
+    return false;
+
+  CopyString(buffer, wide, length);
+  return true;
+}
+
+bool
+FlarmDevice::SetConfig(const char *setting, const TCHAR *value,
+                       OperationEnvironment &env)
+{
+  WideToUTF8Converter narrow_value(value);
+  if (!narrow_value.IsValid())
+    return false;
+
+  return SetConfig(setting, narrow_value, env);
+}
+
+#endif
 
 void
 FlarmDevice::Restart(OperationEnvironment &env)

@@ -24,41 +24,36 @@ Copyright_License {
 #ifndef XCSOAR_TASK_CALCULATOR_PANEL_HPP
 #define XCSOAR_TASK_CALCULATOR_PANEL_HPP
 
-#include "Form/XMLWidget.hpp"
-#include "Form/Form.hpp"
+#include "Form/RowFormWidget.hpp"
+#include "Blackboard/BlackboardListener.hpp"
 #include "Math/fixed.hpp"
+#include "UIGlobals.hpp"
 
-class TaskCalculatorPanel : public XMLWidget {
-  WndForm &wf;
+class WndForm;
+class WndButton;
 
-  const bool *task_modified;
-
+class TaskCalculatorPanel : public RowFormWidget,
+                            private NullBlackboardListener {
   fixed emc;
-  fixed cruise_efficiency;
 
 public:
-  TaskCalculatorPanel(WndForm &_wf, const bool *_task_modified)
-    :wf(_wf), task_modified(_task_modified) {}
-
-  const DialogLook &GetLook() {
-    return wf.GetLook();
-  }
-
-  bool IsTaskModified() const {
-    return *task_modified;
-  }
-
-  void GetCruiseEfficiency();
-
-  void SetCruiseEfficiency(fixed value) {
-    cruise_efficiency = value;
-  }
+  TaskCalculatorPanel(const DialogLook &look)
+    :RowFormWidget(look) {}
 
   void Refresh();
 
+  /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Show(const PixelRect &rc);
   virtual void Hide();
+
+private:
+
+  /* virtual methods from NullBlackboardListener */
+  virtual void OnCalculatedUpdate(const MoreData &basic,
+                                  const DerivedInfo &calculated) {
+    Refresh();
+  }
 };
 
 #endif

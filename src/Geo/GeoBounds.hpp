@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_GEO_RECT_HPP
 #define XCSOAR_GEO_RECT_HPP
 
-#include "Navigation/GeoPoint.hpp"
+#include "GeoPoint.hpp"
 #include "Compiler.h"
 
 /**
@@ -37,27 +37,51 @@ struct GeoBounds {
   Angle west, north, east, south;
 
   GeoBounds() = default;
+
+  constexpr
   GeoBounds(const GeoPoint pt)
     :west(pt.longitude), north(pt.latitude),
      east(pt.longitude), south(pt.latitude) {}
+
+  constexpr
   GeoBounds(const GeoPoint _north_west, const GeoPoint _south_east)
     :west(_north_west.longitude), north(_north_west.latitude),
      east(_south_east.longitude), south(_south_east.latitude) {}
+
+  /**
+   * Construct an instance that is "invalid", i.e. IsValid() will
+   * return false.  The return value must not be used in any
+   * calculation.
+   */
+  constexpr
+  static GeoBounds Invalid() {
+    return GeoBounds(GeoPoint::Invalid());
+  }
+
+  /**
+   * Set this instance to "invalid", i.e. IsValid() will return false.
+   * The return value must not be used in any calculation.
+   */
+  void SetInvalid() {
+    north = Angle::FullCircle();
+  }
+
+  /**
+   * Check if this object is "valid".  Returns false when it was
+   * constructed by Invalid().  This is not an extensive plausibility
+   * check; it is only designed to catch instances created by
+   * Invalid().
+   */
+  constexpr
+  bool IsValid() const {
+    return north <= Angle::HalfCircle();
+  }
 
   bool IsEmpty() const {
     return west == east && north == south;
   }
 
-  void Extend(const GeoPoint pt) {
-    if (pt.longitude < west)
-      west = pt.longitude;
-    if (pt.latitude > north)
-      north = pt.latitude;
-    if (pt.longitude > east)
-      east = pt.longitude;
-    if (pt.latitude < south)
-      south = pt.latitude;
-  }
+  void Extend(const GeoPoint pt);
 
   bool IsInside(Angle longitude, Angle latitude) const {
     return longitude.Between(west, east) && latitude.Between(south, north);
@@ -92,10 +116,7 @@ public:
   }
 
   gcc_pure
-  GeoPoint GetCenter() const {
-    return GeoPoint(west.Fraction(east, fixed_half),
-                    south.Fraction(north, fixed_half));
-  }
+  GeoPoint GetCenter() const;
 
   /**
    * Returns a scaled version of the GeoBounds.
@@ -104,20 +125,7 @@ public:
    * @return A scaled version of the GeoBounds
    */
   gcc_pure
-  GeoBounds Scale(fixed factor) const {
-    Angle diff_lat_half =
-        (north - south).AsBearing() / fixed_two * (factor - fixed_one);
-    Angle diff_lon_half =
-        (east - west).AsBearing() / fixed_two * (factor - fixed_one);
-
-    GeoBounds br = *this;
-    br.east += diff_lon_half;
-    br.west -= diff_lon_half;
-    br.north += diff_lat_half;
-    br.south -= diff_lat_half;
-
-    return br;
-  }
+  GeoBounds Scale(fixed factor) const;
 };
 
 #endif

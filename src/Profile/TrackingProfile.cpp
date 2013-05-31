@@ -25,23 +25,36 @@ Copyright_License {
 #include "Profile.hpp"
 #include "ProfileKeys.hpp"
 #include "Tracking/TrackingSettings.hpp"
+#include "Util/NumberParser.hpp"
 
 #ifdef HAVE_TRACKING
+
+namespace Profile {
+  static void Load(SkyLinesTracking::Settings &settings) {
+    Get(ProfileKeys::SkyLinesTrackingEnabled, settings.enabled);
+    Get(ProfileKeys::SkyLinesTrackingInterval, settings.interval);
+
+    const TCHAR *key = Get(ProfileKeys::SkyLinesTrackingKey);
+    if (key != NULL)
+      settings.key = ParseUint64(key, NULL, 16);
+  }
+}
 
 void
 Profile::Load(LiveTrack24Settings &settings)
 {
-  Get(ProfileLiveTrack24Enabled, settings.enabled);
-  settings.server = Get(ProfileLiveTrack24Server, _T("www.livetrack24.com"));
-  settings.username = Get(ProfileLiveTrack24Username, _T(""));
-  settings.password = Get(ProfileLiveTrack24Password, _T(""));
+  Get(ProfileKeys::LiveTrack24Enabled, settings.enabled);
+  settings.server = Get(ProfileKeys::LiveTrack24Server, _T("www.livetrack24.com"));
+  settings.username = Get(ProfileKeys::LiveTrack24Username, _T(""));
+  settings.password = Get(ProfileKeys::LiveTrack24Password, _T(""));
 }
 
 void
 Profile::Load(TrackingSettings &settings)
 {
-  Get(ProfileTrackingInterval, settings.interval);
-  GetEnum(ProfileTrackingVehicleType, settings.vehicleType);
+  Get(ProfileKeys::TrackingInterval, settings.interval);
+  GetEnum(ProfileKeys::TrackingVehicleType, settings.vehicleType);
+  Load(settings.skylines);
   Load(settings.livetrack24);
 }
 

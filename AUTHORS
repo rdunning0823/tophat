@@ -1,7 +1,27 @@
-XCSoar Glide Computer - http://www.xcsoar.org/
-Copyright (C) 2000-2011 The XCSoar Project
+Top Hat - http://www.tophatsoaring.org
 
-The following people and organizations have contributed code to XCSoar:
+Copyright (C) 2000-2012
+
+The following people and organizations have contributed significantly to Top Hat:
+ Rob Dunning <rob@raspberryridgesheepfarm.com>
+ Gregg Leslie <aswgl@hotmail.com>
+
+The Nook USB Host and fastmode kernel patches were developed by:
+ Verygreen http://forum.xda-developers.com/member.php?u=3654172
+ Mali100 http://forum.xda-developers.com/member.php?u=499922
+ Renate NST http://forum.xda-developers.com/member.php?u=4474482
+ Guevor http://forum.xda-developers.com/member.php?u=2866167
+ Simon Taylor <simon.taylor.uk@gmail.com>
+ 
+Top Hat maps (.xcm files) are created and downloaded from 
+ XCSoar www.xcsoar.org
+ 
+Waypoint and airspace files are downloaded from the 
+ Worldwide Soaring Turnpoint Exchange http://soaringweb.org/TP
+ John Leibacher <john.leibacher@gmail.com> provided the parsing
+ information for this website. 
+ 
+Top Hat is based on XCSoar which was created by the following folks:
 
  Mike Roberts (original release)
  Robin Birch <robinb@ruffnready.co.uk>
@@ -33,6 +53,7 @@ The following people and organizations have contributed code to XCSoar:
  James Ward <jamesward22@gmail.com>
  Santiago Berca <santiberca@yahoo.com.ar>
  Winfried Simon <winfried.simon@googlemail.com>
+ Damiano Bortolato <damiano@damib.net>
 
 Documentation:
 
@@ -99,9 +120,11 @@ it (Italian):
  Paolo Pelloni <paolo@paolopelloni.it>
 *Enrico Girardi
 *Lucas Marchesini
+ Piero Missa <pieromissa@virgilio.it>
 
 ja (Japanese):
  Masahiro Mori <mron@n08.itscom.net>
+ Jinichi Nakazawa <jin-nakazawa@wkk.co.jp>
 
 ko (Korean):
  Mike Myungha Kuh

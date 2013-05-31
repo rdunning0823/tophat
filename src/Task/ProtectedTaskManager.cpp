@@ -22,12 +22,13 @@ Copyright_License {
 */
 
 #include "ProtectedTaskManager.hpp"
-#include "Util/Serialiser.hpp"
-#include "Util/Deserialiser.hpp"
-#include "Util/DataNodeXML.hpp"
+#include "Serialiser.hpp"
+#include "Deserialiser.hpp"
+#include "XML/DataNodeXML.hpp"
 #include "Task/TaskFile.hpp"
 #include "LocalPath.hpp"
 #include "Task/RoutePlannerGlue.hpp"
+#include "Engine/Route/ReachResult.hpp"
 
 #include <windef.h> // for MAX_PATH
 
@@ -48,13 +49,6 @@ ProtectedTaskManager::SetGlidePolar(const GlidePolar &glide_polar)
 {
   ExclusiveLease lease(*this);
   lease->SetGlidePolar(glide_polar);
-}
-
-TaskManager::TaskMode 
-ProtectedTaskManager::GetMode() const
-{
-  Lease lease(*this);
-  return lease->GetMode();
 }
 
 const OrderedTaskBehaviour 
@@ -110,7 +104,7 @@ ProtectedTaskManager::IncrementActiveTaskPointArm(int offset)
 {
   ExclusiveLease lease(*this);
 
-  switch (lease->GetTaskAdvance().get_advance_state()) {
+  switch (lease->GetTaskAdvance().GetState()) {
   case TaskAdvance::MANUAL:
   case TaskAdvance::AUTO:
     lease->IncrementActiveTaskPoint(offset);
@@ -118,7 +112,7 @@ ProtectedTaskManager::IncrementActiveTaskPointArm(int offset)
   case TaskAdvance::START_DISARMED:
   case TaskAdvance::TURN_DISARMED:
     if (offset>0) {
-      lease->GetTaskAdvance().set_armed(true);
+      lease->GetTaskAdvance().SetArmed(true);
     } else {
       lease->IncrementActiveTaskPoint(offset);
     }
@@ -128,7 +122,7 @@ ProtectedTaskManager::IncrementActiveTaskPointArm(int offset)
     if (offset>0) {
       lease->IncrementActiveTaskPoint(offset);
     } else {
-      lease->GetTaskAdvance().set_armed(false);
+      lease->GetTaskAdvance().SetArmed(false);
     }
     break;
   }
@@ -163,10 +157,10 @@ ProtectedTaskManager::TaskClone() const
 }
 
 bool
-ProtectedTaskManager::TaskCommit(const OrderedTask& that)
+ProtectedTaskManager::TaskCommit(const OrderedTask& that, const Waypoints &waypoints)
 {
   ExclusiveLease lease(*this);
-  return lease->Commit(that);
+  return lease->Commit(that, waypoints);
 }
 
 bool 
@@ -234,9 +228,14 @@ ReachIntersectionTest::Intersects(const AGeoPoint& destination)
 {
   if (!route)
     return false;
-  RoughAltitude h, h_dummy;
-  route->FindPositiveArrival(destination, h, h_dummy);
+
+  ReachResult result;
+  if (!route->FindPositiveArrival(destination, result))
+    return false;
+
   // we use find_positive_arrival here instead of is_inside, because may use
   // arrival height for sorting later
-  return (h< destination.altitude);
+  return result.terrain_valid == ReachResult::Validity::UNREACHABLE ||
+    (result.terrain_valid == ReachResult::Validity::VALID &&
+     result.terrain < destination.altitude);
 }

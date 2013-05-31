@@ -24,6 +24,7 @@
 #include "Route/RoutePolar.hpp"
 #include "Terrain/RasterMap.hpp"
 #include "ReachFanParms.hpp"
+#include "ReachResult.hpp"
 
 void
 ReachFan::Reset()
@@ -39,8 +40,8 @@ ReachFan::Solve(const AGeoPoint origin, const RoutePolars &rpolars,
   Reset();
 
   // initialise task_proj
-  task_proj.reset(origin);
-  task_proj.update_fast();
+  task_proj.Reset(origin);
+  task_proj.Update();
 
   const short h = terrain
     ? terrain->GetHeight(origin)
@@ -48,7 +49,7 @@ ReachFan::Solve(const AGeoPoint origin, const RoutePolars &rpolars,
   const RoughAltitude h2(RasterBuffer::IsSpecial(h) ? 0 : h);
 
   ReachFanParms parms(rpolars, task_proj, (int)terrain_base, terrain);
-  const AFlatGeoPoint ao(task_proj.project(origin), origin.altitude);
+  const AFlatGeoPoint ao(task_proj.ProjectInteger(origin), origin.altitude);
 
   if (!RasterBuffer::IsInvalid(h) &&
       (origin.altitude <= h2 + rpolars.GetSafetyHeight())) {
@@ -84,36 +85,41 @@ ReachFan::IsInside(const GeoPoint origin, const bool turning) const
   if (root.IsEmpty())
     return false;
 
-  const FlatGeoPoint p = task_proj.project(origin);
+  const FlatGeoPoint p = task_proj.ProjectInteger(origin);
   return root.IsInsideTree(p, turning);
 }
 
 bool
 ReachFan::FindPositiveArrival(const AGeoPoint dest, const RoutePolars &rpolars,
-                              RoughAltitude &arrival_height_reach,
-                              RoughAltitude &arrival_height_direct) const
+                              ReachResult &result_r) const
 {
-  arrival_height_reach = -1;
-  arrival_height_direct = -1;
-
   if (root.IsEmpty())
-    return true;
+    return false;
 
-  const FlatGeoPoint d(task_proj.project(dest));
+  const FlatGeoPoint d(task_proj.ProjectInteger(dest));
   const ReachFanParms parms(rpolars, task_proj, (int)terrain_base);
 
+  result_r.Clear();
+
   // first calculate direct (terrain-independent height)
-  arrival_height_direct = root.DirectArrival(d, parms);
+  result_r.direct = root.DirectArrival(d, parms);
+
+  if (root.IsDummy())
+    /* terrain reach is not available, stop here */
+    return true;
 
   // if can't reach even with no terrain, exit early
-  if (std::min(root.GetHeight(), arrival_height_direct) < dest.altitude) {
-    arrival_height_reach = arrival_height_direct;
+  if (std::min(root.GetHeight(), result_r.direct) < dest.altitude) {
+    result_r.terrain = result_r.direct;
+    result_r.terrain_valid = ReachResult::Validity::UNREACHABLE;
     return true;
   }
 
   // now calculate turning solution
-  arrival_height_reach = dest.altitude - RoughAltitude(1);
-  root.FindPositiveArrival(d, parms, arrival_height_reach);
+  result_r.terrain = dest.altitude - RoughAltitude(1);
+  result_r.terrain_valid = root.FindPositiveArrival(d, parms, result_r.terrain)
+    ? ReachResult::Validity::VALID
+    : ReachResult::Validity::UNREACHABLE;
 
   return true;
 }
@@ -125,6 +131,6 @@ ReachFan::AcceptInRange(const GeoBounds &bounds,
   if (root.IsEmpty())
     return;
 
-  const FlatBoundingBox bb = task_proj.project(bounds);
+  const FlatBoundingBox bb = task_proj.Project(bounds);
   root.AcceptInRange(bb, task_proj, visitor);
 }

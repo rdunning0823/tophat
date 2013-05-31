@@ -26,7 +26,7 @@ Copyright_License {
 
 #include "DateTime.hpp"
 #include "Util/StaticString.hpp"
-#include "Navigation/GeoPoint.hpp"
+#include "Geo/GeoPoint.hpp"
 
 struct IGCDeclarationHeader {
   /** Date and time of the declaration */

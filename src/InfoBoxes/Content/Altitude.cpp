@@ -47,7 +47,7 @@ Copyright_License {
  * Subpart callback function pointers
  */
 
-static gcc_constexpr_data
+static constexpr
 InfoBoxContentAltitude::PanelContent Panels[] = {
   InfoBoxContentAltitude::PanelContent (
     N_("Simulator"),
@@ -62,9 +62,9 @@ InfoBoxContentAltitude::PanelContent Panels[] = {
     LoadAltitudeSetupPanel)
 };
 
-static gcc_constexpr_data
+static constexpr
 InfoBoxContentAltitude::DialogContent dlgContent = {
-  ARRAY_SIZE(Panels), &Panels[0],
+  ARRAY_SIZE(Panels), &Panels[0], true,
 };
 
 const InfoBoxContentAltitude::DialogContent *
@@ -90,9 +90,9 @@ InfoBoxContentAltitudeNav::Update(InfoBoxData &data)
 
   if (basic.baro_altitude_available &&
       settings_computer.features.nav_baro_altitude_enabled)
-    data.SetTitle(InfoBoxFactory::MetaData[InfoBoxFactory::e_H_Baro].caption);
+    data.SetTitle(InfoBoxFactory::meta_data[InfoBoxFactory::e_H_Baro].caption);
   else
-    data.SetTitle(InfoBoxFactory::MetaData[InfoBoxFactory::e_HeightGPS].caption);
+    data.SetTitle(InfoBoxFactory::meta_data[InfoBoxFactory::e_HeightGPS].caption);
 
   data.SetValueFromAltitude(basic.nav_altitude);
   data.SetCommentFromAlternateAltitude(basic.nav_altitude);

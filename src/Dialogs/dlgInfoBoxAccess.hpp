@@ -24,19 +24,21 @@ Copyright_License {
 #ifndef DLGINFOBOXACCESS_HPP
 #define DLGINFOBOXACCESS_HPP
 
+#include "InfoBoxes/Content/Base.hpp"
+
 class WndForm;
 
 class dlgInfoBoxAccess
 {
 public:
-  dlgInfoBoxAccess();
-
   /**
    * @returns True if validated, False if window shall remain open
    */
   static bool OnClose();
-
-  static void dlgInfoBoxAccessShowModeless(const int id);
 };
+
+void
+dlgInfoBoxAccessShowModeless(int id,
+                             const InfoBoxContent::DialogContent *content);
 
 #endif /* DLGINFOBOXACCESS_H_ */

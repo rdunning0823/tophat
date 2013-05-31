@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_WAYPOINT_LIST_HPP
 #define XCSOAR_WAYPOINT_LIST_HPP
 
-#include "Navigation/Geometry/GeoVector.hpp"
+#include "Geo/GeoVector.hpp"
 
 #include <vector>
 
@@ -55,6 +55,7 @@ class WaypointList: public std::vector<WaypointListItem>
 {
 public:
   void SortByDistance(const GeoPoint &location);
+  void SortByName();
 };
 
 #endif

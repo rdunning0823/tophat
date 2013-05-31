@@ -30,9 +30,9 @@ Copyright_License {
 #include "Compiler.h"
 #include "tchar.h"
 #include "Device/Driver.hpp"
+#include "Device/SettingsMap.hpp"
 #include "Thread/Mutex.hpp"
 
-#include <map>
 #include <string>
 
 #include <stdint.h>
@@ -60,14 +60,9 @@ class FlarmDevice: public AbstractDevice
   uint16_t sequence_number;
 
   /**
-   * This #Mutex protects the #settings map.
-   */
-  mutable Mutex settings_mutex;
-
-  /**
    * Settings that were received in PDVSC sentences.
    */
-  std::map<std::string, std::string> settings;
+  DeviceSettingsMap<std::string> settings;
 
 public:
   FlarmDevice(Port &_port)
@@ -149,10 +144,17 @@ private:
   bool Receive(const char *prefix, char *buffer, size_t length,
                OperationEnvironment &env, unsigned timeout_ms);
 
+  bool GetConfig(const char *setting, char *buffer, size_t length,
+                 OperationEnvironment &env);
+  bool SetConfig(const char *setting, const char *value,
+                 OperationEnvironment &env);
+
+#ifdef _UNICODE
   bool GetConfig(const char *setting, TCHAR *buffer, size_t length,
                  OperationEnvironment &env);
   bool SetConfig(const char *setting, const TCHAR *value,
                  OperationEnvironment &env);
+#endif
 
   bool DeclareInternal(const Declaration &declaration,
                        OperationEnvironment &env);

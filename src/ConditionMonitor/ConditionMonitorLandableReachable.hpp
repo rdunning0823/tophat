@@ -36,9 +36,11 @@ public:
     :ConditionMonitor(60 * 5, 1), last_reachable(false) {}
 
 protected:
-  bool CheckCondition(const GlideComputer& cmp);
-  void Notify();
-  void SaveLast();
+  virtual bool CheckCondition(const NMEAInfo &basic,
+                              const DerivedInfo &calculated,
+                              const ComputerSettings &settings) gcc_override;
+  virtual void Notify();
+  virtual void SaveLast();
 };
 
 #endif

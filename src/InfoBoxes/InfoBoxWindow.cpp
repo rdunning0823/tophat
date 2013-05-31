@@ -21,8 +21,9 @@ Copyright_License {
 }
 */
 
-#include "InfoBoxes/InfoBoxWindow.hpp"
-#include "InfoBoxes/InfoBoxManager.hpp"
+#include "InfoBoxWindow.hpp"
+#include "InfoBoxSettings.hpp"
+#include "Border.hpp"
 #include "Look/InfoBoxLook.hpp"
 #include "Look/UnitsLook.hpp"
 #include "Input/InputEvents.hpp"
@@ -31,54 +32,49 @@ Copyright_License {
 #include "Screen/UnitSymbol.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/BufferCanvas.hpp"
-#include "Screen/ContainerWindow.hpp"
 #include "Screen/Key.h"
+#include "Dialogs/dlgInfoBoxAccess.hpp"
+#include "InfoBoxes/Panel/InfoBoxDescription.hpp"
 #include "Interface.hpp"
-#include "Asset.hpp"
+#include "MainWindow.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/SubCanvas.hpp"
 #endif
 
 #include <algorithm>
-#include <stdio.h>
-#include <assert.h>
 
 using std::max;
 
 #define SELECTORWIDTH Layout::Scale(5)
 
-InfoBoxWindow::InfoBoxWindow(ContainerWindow &_parent,
+InfoBoxWindow::InfoBoxWindow(ContainerWindow &parent,
                              PixelScalar x, PixelScalar y,
                              UPixelScalar width, UPixelScalar height,
-                             int border_flags, const InfoBoxSettings &_settings,
+                             unsigned border_flags,
+                             const InfoBoxSettings &_settings,
                              const InfoBoxLook &_look,
                              const UnitsLook &_units_look,
+                             unsigned _id,
                              WindowStyle style)
   :content(NULL),
-   parent(_parent),
    settings(_settings), look(_look), units_look(_units_look),
    border_kind(border_flags),
+   id(_id),
    force_draw_selector(false),
-   focus_timer(*this)
+   focus_timer(*this),
+   ignore_single_click(false),
+   single_click_timer(*this)
 {
   data.Clear();
 
   style.EnableDoubleClicks();
   set(parent, x, y, width, height, style);
-
-  id = -1;
 }
 
 InfoBoxWindow::~InfoBoxWindow() {
   delete content;
   reset();
-}
-
-void
-InfoBoxWindow::SetID(const int _id)
-{
-  id = _id;
 }
 
 void
@@ -104,8 +100,7 @@ InfoBoxWindow::PaintTitle(Canvas &canvas)
   PixelScalar halftextwidth = (title_rect.left + title_rect.right - tsize.cx) / 2;
   PixelScalar x = max(PixelScalar(1),
                       PixelScalar(title_rect.left + halftextwidth));
-  PixelScalar y = title_rect.top + 1 + font.GetCapitalHeight() -
-    font.GetAscentHeight();
+  PixelScalar y = title_rect.top;
 
   canvas.TextAutoClipped(x, y, data.title);
 
@@ -239,8 +234,7 @@ InfoBoxWindow::PaintComment(Canvas &canvas)
   PixelScalar x = max(PixelScalar(1),
                       PixelScalar((comment_rect.left + comment_rect.right
                                    - tsize.cx) / 2));
-  PixelScalar y = comment_rect.top + 1 + font.GetCapitalHeight()
-    - font.GetAscentHeight();
+  PixelScalar y = comment_rect.top;
 
   canvas.TextAutoClipped(x, y, data.comment);
 }
@@ -341,6 +335,49 @@ InfoBoxWindow::UpdateContent()
   }
 }
 
+void
+InfoBoxWindow::ShowDialog()
+{
+  force_draw_selector = true;
+
+  ShowDialog(id, GetDialogContent());
+
+  force_draw_selector = false;
+}
+
+void
+InfoBoxWindow::ShowDialog(const int id,
+                          const InfoBoxContent::DialogContent *dlgContent)
+{
+  assert (id > -1);
+
+  Widget *widget = NULL;
+
+  if (dlgContent != NULL) {
+    if (dlgContent->GetShowInTabLayout()) {
+      dlgInfoBoxAccessShowModeless(id, dlgContent);
+      return;
+    } else {
+      for (int i = 0; i < dlgContent->PANELSIZE; i++) {
+        assert(dlgContent->Panels[i].load != NULL);
+
+        widget = dlgContent->Panels[i].load(id);
+
+        // only use the first non-NULL widget
+        if (widget != NULL)
+          break;
+      }
+    }
+  }
+
+  if (widget == NULL)
+    CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id), true);
+  else
+    CommonInterface::main_window->SetWidget(widget, true);
+
+  CommonInterface::main_window->ActivateMap();
+}
+
 bool
 InfoBoxWindow::HandleKey(InfoBoxContent::InfoBoxKeyCodes keycode)
 {
@@ -359,6 +396,15 @@ InfoBoxWindow::HandleQuickAccess(const TCHAR *value)
     return true;
   }
   return false;
+}
+
+gcc_pure unsigned
+InfoBoxWindow::GetQuickAccess()
+{
+  if (content == NULL)
+    return 0;
+
+  return content->GetQuickAccess();
 }
 
 const InfoBoxContent::DialogContent *
@@ -397,12 +443,10 @@ InfoBoxWindow::OnResize(UPixelScalar width, UPixelScalar height)
     rc.bottom -= look.BORDER_WIDTH;
 
   title_rect = rc;
-  title_rect.bottom = rc.top + look.title.font->GetCapitalHeight() + 2;
+  title_rect.bottom = rc.top + look.title.font->GetHeight();
 
   comment_rect = rc;
-  comment_rect.top = comment_rect.bottom
-    - (look.comment.font->GetCapitalHeight() + 2);
-
+  comment_rect.top = comment_rect.bottom - (look.comment.font->GetHeight() + 2);
   value_rect = rc;
   value_rect.top = title_rect.bottom;
   value_rect.bottom = comment_rect.top;
@@ -436,12 +480,12 @@ InfoBoxWindow::OnKeyDown(unsigned key_code)
   case VK_RETURN:
     focus_timer.Schedule(FOCUS_TIMEOUT_MAX);
     if (!HandleKey(InfoBoxContent::ibkEnter))
-      InfoBoxManager::ShowDlgInfoBox(id);
+      ShowDialog();
     return true;
 
   case VK_ESCAPE:
     focus_timer.Cancel();
-    parent.SetFocus();
+    FocusParent();
     return true;
   }
 
@@ -458,6 +502,11 @@ InfoBoxWindow::OnKeyDown(unsigned key_code)
 bool
 InfoBoxWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
+  if (ignore_single_click)
+    return true;
+
+  single_click_timer.Cancel();
+
   SetCapture();
   click_clock.Update();
 
@@ -469,18 +518,20 @@ InfoBoxWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 InfoBoxWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 {
+  // Ignore single click event if double click detected
+  if (ignore_single_click) {
+    ignore_single_click = false;
+    return true;
+  }
+
   if (!HasFocus())
     return PaintWindow::OnMouseUp(x, y);
 
   if (click_clock.IsDefined()) {
     ReleaseCapture();
 
-    if ((unsigned)x < GetWidth() && (unsigned)y < GetHeight() &&
-        click_clock.Check(1000)) {
-      force_draw_selector = true;
-      InfoBoxManager::ShowDlgInfoBox(id);
-      force_draw_selector = false;
-    }
+    if ((unsigned)x < GetWidth() && (unsigned)y < GetHeight())
+      single_click_timer.Schedule(200);
 
     click_clock.Reset();
     return true;
@@ -491,8 +542,12 @@ InfoBoxWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 bool
 InfoBoxWindow::OnMouseDouble(PixelScalar x, PixelScalar y)
 {
-  if (!IsAltair())
+  single_click_timer.Cancel();
+
+  if (!IsAltair()) {
     InputEvents::ShowMenu();
+    ignore_single_click = true;
+  }
 
   return true;
 }
@@ -544,7 +599,11 @@ InfoBoxWindow::OnTimer(WindowTimer &timer)
 {
   if (timer == focus_timer) {
     focus_timer.Cancel();
-    parent.SetFocus();
+    FocusParent();
+    return true;
+  } else if (timer == single_click_timer) {
+    single_click_timer.Cancel();
+    ShowDialog();
     return true;
   } else
     return PaintWindow::OnTimer(timer);

@@ -33,13 +33,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 
 enum ControlIndex {
-  RoutePlannerMode,
-  RoutePlannerAllowClimb,
-  RoutePlannerUseCeiling,
-  empty_spacer,
   TurningReach,
-  FinalGlideTerrain,
-  ReachPolarMode
 };
 
 class RouteConfigPanel
@@ -49,45 +43,14 @@ public:
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 public:
-  void ShowRouteControls(bool show);
-  void ShowReachControls(bool show);
 
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed, bool &require_restart);
 
 private:
-  /* methods from DataFieldListener */
-  virtual void OnModified(DataField &df);
 };
 
-void
-RouteConfigPanel::ShowRouteControls(bool show)
-{
-  SetRowVisible(RoutePlannerAllowClimb, show);
-  SetRowVisible(RoutePlannerUseCeiling, show);
-}
-
-void
-RouteConfigPanel::ShowReachControls(bool show)
-{
-  SetRowVisible(FinalGlideTerrain, show);
-  SetRowVisible(ReachPolarMode, show);
-}
-
-void
-RouteConfigPanel::OnModified(DataField &df)
-{
-  if (IsDataField(RoutePlannerMode, df)) {
-    RoutePlannerConfig::Mode mode =
-      (RoutePlannerConfig::Mode)df.GetAsInteger();
-    ShowRouteControls(mode != RoutePlannerConfig::Mode::NONE);
-  } else if (IsDataField(TurningReach, df)) {
-    RoutePlannerConfig::ReachMode mode =
-      (RoutePlannerConfig::ReachMode)df.GetAsInteger();
-    ShowReachControls(mode != RoutePlannerConfig::ReachMode::OFF);
-  }
-}
 
 void
 RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
@@ -97,76 +60,19 @@ RouteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  static gcc_constexpr_data StaticEnumChoice route_mode_list[] = {
-    { (unsigned)RoutePlannerConfig::Mode::NONE, N_("None"),
-      N_("Neither airspace nor terrain is used for route planning.") },
-    { (unsigned)RoutePlannerConfig::Mode::TERRAIN, N_("Terrain"),
-      N_("Routes will avoid terrain.") },
-    { (unsigned)RoutePlannerConfig::Mode::AIRSPACE, N_("Airspace"),
-      N_("Routes will avoid airspace.") },
-    { (unsigned)RoutePlannerConfig::Mode::BOTH, N_("Both"),
-      N_("Routes will avoid airspace and terrain.") },
-    { 0 }
-  };
-
-  AddEnum(_("Route mode"), NULL, route_mode_list,
-          (unsigned)route_planner.mode, this);
-
-  AddBoolean(_("Route climb"),
-             _("When enabled and MC is positive, route planning allows climbs between the aircraft "
-                 "location and destination."),
-             route_planner.allow_climb);
-  SetExpertRow(RoutePlannerAllowClimb);
-
-  AddBoolean(_("Route ceiling"),
-             _("When enabled, route planning climbs are limited to ceiling defined by greater of "
-                 "current aircraft altitude plus 500 m and the thermal ceiling.  If disabled, "
-                 "climbs are unlimited."),
-             route_planner.use_ceiling);
-  SetExpertRow(RoutePlannerUseCeiling);
-
-  static gcc_constexpr_data StaticEnumChoice turning_reach_list[] = {
+  static constexpr StaticEnumChoice turning_reach_list[] = {
     { (unsigned)RoutePlannerConfig::ReachMode::OFF, N_("Off"),
-      N_("Reach calculations disabled.") },
-    { (unsigned)RoutePlannerConfig::ReachMode::STRAIGHT, N_("Straight"),
-      N_("The reach is from straight line paths from the glider.") },
-    { (unsigned)RoutePlannerConfig::ReachMode::TURNING, N_("Turning"),
-      N_("The reach is calculated allowing turns around terrain obstacles.") },
+      N_("Reachable terrain circle not displayed.") },
+    { (unsigned)RoutePlannerConfig::ReachMode::STRAIGHT, N_("On"),
+      N_("A circular shape is displayed over the contours of the terrain indicating how far the glider can reach in each direction.") },
     { 0 }
   };
-
-  AddSpacer(); // Spacer
 
   AddEnum(_("Reach mode"),
           _("How calculations are performed of the reach of the glider with respect to terrain."),
           turning_reach_list, (unsigned)route_planner.reach_calc_mode,
           this);
 
-  static gcc_constexpr_data StaticEnumChoice final_glide_terrain_list[] = {
-    { FeaturesSettings::FGT_OFF, N_("Off"), N_("Disables the reach display.") },
-    { FeaturesSettings::FGT_LINE, N_("Line"), N_("Draws a dashed line at the glide reach.") },
-    { FeaturesSettings::FGT_SHADE, N_("Shade"), N_("Shades terrain outside glide reach.") },
-    { 0 }
-  };
-
-  AddEnum(_("Reach display"), NULL, final_glide_terrain_list,
-          settings_computer.features.final_glide_terrain);
-
-  static gcc_constexpr_data StaticEnumChoice reach_polar_list[] = {
-    { (unsigned)RoutePlannerConfig::Polar::TASK, N_("Task"),
-      N_("Uses task glide polar.") },
-    { (unsigned)RoutePlannerConfig::Polar::SAFETY, N_("Safety MC"),
-      N_("Uses safety MacCready value") },
-    { 0 }
-  };
-
-  AddEnum(_("Reach polar"),
-          _("This determines the glide performance used in reach, landable arrival, abort and alternate calculations."),
-          reach_polar_list, (unsigned)route_planner.reach_polar_mode);
-  SetExpertRow(ReachPolarMode);
-
-  ShowRouteControls(route_planner.mode != RoutePlannerConfig::Mode::NONE);
-  ShowReachControls(route_planner.reach_calc_mode != RoutePlannerConfig::ReachMode::OFF);
 }
 
 bool
@@ -176,23 +82,9 @@ RouteConfigPanel::Save(bool &_changed, bool &_require_restart)
   ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
   RoutePlannerConfig &route_planner = settings_computer.task.route_planner;
 
-  changed |= SaveValueEnum(RoutePlannerMode, szProfileRoutePlannerMode,
-                           route_planner.mode);
-
-  changed |= SaveValueEnum(ReachPolarMode, szProfileReachPolarMode,
-                           route_planner.reach_polar_mode);
-
-  changed |= SaveValueEnum(FinalGlideTerrain, szProfileFinalGlideTerrain,
-                           settings_computer.features.final_glide_terrain);
-
-  changed |= SaveValue(RoutePlannerAllowClimb, szProfileRoutePlannerAllowClimb,
-                       route_planner.allow_climb);
-
-  changed |= SaveValue(RoutePlannerUseCeiling, szProfileRoutePlannerUseCeiling,
-                       route_planner.use_ceiling);
-
-  changed |= SaveValueEnum(TurningReach, szProfileTurningReach,
+  changed |= SaveValueEnum(TurningReach, ProfileKeys::TurningReach,
                            route_planner.reach_calc_mode);
+
   _changed |= changed;
   _require_restart |= require_restart;
 

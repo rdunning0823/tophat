@@ -22,18 +22,19 @@ Copyright_License {
 */
 
 #include "DebugPort.hpp"
+#include "Device/Port/Port.hpp"
 #include "Device/Port/ConfiguredPort.hpp"
 #include "Device/Driver.hpp"
 #include "Device/Driver/FLARM/Device.hpp"
 #include "Device/Register.hpp"
 #include "Device/Parser.hpp"
 #include "Device/device.hpp"
-#include "Engine/Navigation/GeoPoint.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "OS/PathName.hpp"
 #include "OS/Args.hpp"
 #include "Operation/ConsoleOperationEnvironment.hpp"
 #include "Profile/DeviceConfig.hpp"
+#include "IO/Async/GlobalIOThread.hpp"
 
 #include <stdio.h>
 
@@ -41,6 +42,25 @@ bool
 NMEAParser::ReadGeoPoint(NMEAInputLine &line, GeoPoint &value_r)
 {
   return false;
+}
+
+bool
+NMEAParser::ReadDate(NMEAInputLine &line, BrokenDate &date)
+{
+  return false;
+}
+
+bool
+NMEAParser::TimeHasAdvanced(fixed this_time, fixed &last_time, NMEAInfo &info)
+{
+  return false;
+}
+
+fixed
+NMEAParser::TimeModify(fixed fix_time, BrokenDateTime &date_time,
+                       bool date_available)
+{
+  return fixed_zero;
 }
 
 /*
@@ -82,7 +102,9 @@ int main(int argc, char **argv)
 
   assert(driver->CreateOnPort != NULL);
 
-  Port *port = OpenPort(config, *(Port::Handler *)NULL);
+  InitialiseIOThread();
+
+  Port *port = OpenPort(config, *(DataHandler *)NULL);
   if (port == NULL) {
     fprintf(stderr, "Failed to open COM port\n");
     return EXIT_FAILURE;
@@ -99,6 +121,7 @@ int main(int argc, char **argv)
 
   delete device;
   delete port;
+  DeinitialiseIOThread();
 
   for (auto i = flight_list.begin(); i != flight_list.end(); ++i) {
     const RecordedFlightInfo &flight = *i;

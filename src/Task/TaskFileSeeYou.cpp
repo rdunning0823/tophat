@@ -32,11 +32,12 @@
 #include "Task/ObservationZones/KeyholeZone.hpp"
 #include "Task/ObservationZones/BGAEnhancedOptionZone.hpp"
 #include "Task/ObservationZones/BGAFixedCourseZone.hpp"
-#include "Task/TaskPoints/AATPoint.hpp"
-#include "Task/TaskPoints/ASTPoint.hpp"
-#include "Task/TaskPoints/StartPoint.hpp"
-#include "Task/TaskPoints/FinishPoint.hpp"
-#include "Engine/Task/Tasks/OrderedTask.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/StartPoint.hpp"
+#include "Engine/Task/Ordered/Points/FinishPoint.hpp"
+#include "Engine/Task/Ordered/Points/AATPoint.hpp"
+#include "Engine/Task/Ordered/Points/ASTPoint.hpp"
+#include "Engine/Task/Factory/AbstractTaskFactory.hpp"
 #include "Operation/Operation.hpp"
 #include "Units/System.hpp"
 
@@ -425,7 +426,7 @@ AdvanceReaderToTask(FileLineReader &reader, const unsigned index)
   // Skip lines until n-th task
   unsigned count = 0;
   bool in_task_section = false;
-  static TCHAR *line;
+  TCHAR *line;
   for (unsigned i = 0; (line = reader.read()) != NULL; i++) {
     if (in_task_section) {
       if (line[0] == _T('\"') || line[0] == _T(',')) {
@@ -434,7 +435,7 @@ AdvanceReaderToTask(FileLineReader &reader, const unsigned index)
 
         count++;
       }
-    } else if (_tcsicmp(line, _T("-----Related Tasks-----")) == 0) {
+    } else if (StringIsEqualIgnoreCase(line, _T("-----Related Tasks-----"))) {
       in_task_section = true;
     }
   }
@@ -445,22 +446,26 @@ OrderedTask*
 TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
                         const Waypoints *waypoints, unsigned index) const
 {
-  // Read waypoints from the CUP file
-  Waypoints file_waypoints;
-  {
-    WaypointReaderSeeYou waypoint_file(path, 0);
-    NullOperationEnvironment operation;
-    if (!waypoint_file.Parse(file_waypoints, operation))
-      return NULL;
-  }
-  file_waypoints.Optimise();
-
   // Create FileReader for reading the task
   FileLineReader reader(path, ConvertLineReader::AUTO);
   if (reader.error())
     return NULL;
 
+  // Read waypoints from the CUP file
+  Waypoints file_waypoints;
+  {
+    WaypointReaderSeeYou waypoint_file(0);
+    NullOperationEnvironment operation;
+    waypoint_file.Parse(file_waypoints, reader, operation);
+  }
+  file_waypoints.Optimise();
+
+  if (!reader.Rewind())
+    return NULL;
+
   TCHAR *line = AdvanceReaderToTask(reader, index);
+  if (line == NULL)
+    return NULL;
 
   // Read waypoint list
   // e.g. "Club day 4 Racing task","085PRI","083BOJ","170D_K","065SKY","0844YY", "0844YY"
@@ -480,9 +485,9 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
   task->SetFactory(task_info.wp_dis ?
                     TaskFactoryType::RACING : TaskFactoryType::AAT);
   AbstractTaskFactory& fact = task->GetFactory();
-  const TaskFactoryType factType = task->get_factory_type();
+  const TaskFactoryType factType = task->GetFactoryType();
 
-  OrderedTaskBehaviour beh = task->get_ordered_task_behaviour();
+  OrderedTaskBehaviour beh = task->GetOrderedTaskBehaviour();
   if (factType == TaskFactoryType::AAT) {
     beh.aat_min_time = task_info.task_time;
   }
@@ -491,7 +496,7 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
     beh.start_max_height = (unsigned)task_info.max_start_altitude;
     beh.start_max_height_ref = HeightReferenceType::MSL;
   }
-  task->set_ordered_task_behaviour(beh);
+  task->SetOrderedTaskBehaviour(beh);
 
   // mark task waypoints.  Skip takeoff and landing point
   for (unsigned i = 0; i < n_waypoints; i++) {
@@ -590,7 +595,7 @@ TaskFileSeeYou::Count()
         // Increase the task counter
         count++;
       }
-    } else if (_tcsicmp(line, _T("-----Related Tasks-----")) == 0) {
+    } else if (StringIsEqualIgnoreCase(line, _T("-----Related Tasks-----"))) {
       // Found the marker -> all following lines are task lines
       in_task_section = true;
     }

@@ -81,7 +81,7 @@ OnPointCursorCallback(unsigned i)
   wItemHelp->SetText(itemhelp);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnCancelClicked),
   DeclareCallBackEntry(OnHelpClicked),
@@ -124,10 +124,10 @@ ListPicker(SingleWindow &parent, const TCHAR *caption,
     assert(wItemHelp);
     wItemHelp->Show();
     const UPixelScalar help_height = wItemHelp->GetHeight();
-    const PixelRect rc = list_control->GetPosition();
+    PixelRect rc = list_control->GetPosition();
     assert(rc.bottom - rc.top - help_height > 0);
-    list_control->Move(rc.left, rc.top,
-                       rc.right - rc.left, rc.bottom - rc.top - help_height);
+    rc.bottom -= help_height;
+    list_control->Move(rc);
     list_control->SetCursorCallback(OnPointCursorCallback);
     OnPointCursorCallback(initial_value);
   }

@@ -21,7 +21,8 @@
  */
 
 #include "KeyholeZone.hpp"
-#include "Navigation/Geometry/GeoVector.hpp"
+#include "Boundary.hpp"
+#include "Geo/GeoVector.hpp"
 
 GeoPoint
 KeyholeZone::GetBoundaryParametric(fixed t) const
@@ -60,6 +61,28 @@ KeyholeZone::GetBoundaryParametric(fixed t) const
   return GeoVector(d, a).EndPoint(GetReference());
 }
 
+OZBoundary
+KeyholeZone::GetBoundary() const
+{
+  OZBoundary boundary;
+  boundary.push_front(GetSectorStart());
+  boundary.push_front(GetSectorEnd());
+
+  boundary.GenerateArcExcluding(GetReference(), GetRadius(),
+                                GetStartRadial(), GetEndRadial());
+
+  const fixed small_radius = fixed(500);
+  GeoVector small_vector(small_radius, GetStartRadial());
+  boundary.push_front(small_vector.EndPoint(GetReference()));
+  small_vector.bearing = GetEndRadial();
+  boundary.push_front(small_vector.EndPoint(GetReference()));
+
+  boundary.GenerateArcExcluding(GetReference(), small_radius,
+                                GetEndRadial(), GetStartRadial());
+
+  return std::move(boundary);
+}
+
 fixed
 KeyholeZone::ScoreAdjustment() const
 {
@@ -67,9 +90,9 @@ KeyholeZone::ScoreAdjustment() const
 }
 
 bool 
-KeyholeZone::IsInSector(const AircraftState &ref) const
+KeyholeZone::IsInSector(const GeoPoint &location) const
 {
-  GeoVector f(GetReference(), ref.location);
+  GeoVector f(GetReference(), location);
 
   return f.distance <= fixed(500) ||
     (f.distance <= GetRadius() && IsAngleInSector(f.bearing));

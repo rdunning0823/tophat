@@ -30,7 +30,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Look/WindArrowLook.hpp"
 #include "Renderer/WindArrowRenderer.hpp"
-#include "Navigation/SpeedVector.hpp"
+#include "Geo/SpeedVector.hpp"
 
 #ifdef USE_GDI
 #include "ResourceLoader.hpp"
@@ -70,7 +70,7 @@ protected:
     canvas.SelectHollowBrush();
     canvas.DrawCircle(pt.x, pt.y, 2);
 
-    renderer.Draw(canvas, Angle::Zero(), wind, pt, rc, false);
+    renderer.Draw(canvas, Angle::Zero(), wind, pt, rc, WindArrowStyle::ARROW_HEAD);
   }
 };
 
@@ -139,7 +139,7 @@ protected:
   virtual bool OnCommand(unsigned id, unsigned code) {
     switch (id) {
     case ID_CLOSE:
-      close();
+      Close();
       return true;
     }
 

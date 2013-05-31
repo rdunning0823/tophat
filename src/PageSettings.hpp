@@ -25,39 +25,35 @@ Copyright_License {
 #define XCSOAR_PAGE_SETTINGS_HPP
 
 #include "Util/TypeTraits.hpp"
-#include "Compiler.h"
 
 #include <tchar.h>
 
 struct InfoBoxSettings;
 
 struct PageSettings {
-  static gcc_constexpr_data unsigned MAX_PAGES = 8;
+  static constexpr unsigned MAX_PAGES = 8;
 
   struct InfoBoxConfig {
-    bool autoSwitch;
+    bool auto_switch;
     unsigned panel;
 
     InfoBoxConfig() = default;
 
-    InfoBoxConfig(bool autoSwitch, unsigned panel)
-      : autoSwitch(autoSwitch), panel(panel) {}
+    InfoBoxConfig(bool _auto_switch, unsigned _panel)
+      : auto_switch(_auto_switch), panel(_panel) {}
 
     void SetDefaults() {
-      autoSwitch = true;
+      auto_switch = true;
       panel = 0;
     }
 
-    bool operator==(const InfoBoxConfig& ibc) const {
-      if (autoSwitch != ibc.autoSwitch)
-        return false;
-      if (panel != ibc.panel)
-        return false;
-      return true;
+    bool operator==(const InfoBoxConfig &other) const {
+      return auto_switch == other.auto_switch &&
+             panel == other.panel;
     }
 
-    bool operator!=(const InfoBoxConfig& ibc) const {
-      return !(*this == ibc);
+    bool operator!=(const InfoBoxConfig &other) const {
+      return !(*this == other);
     }
   };
 
@@ -68,33 +64,30 @@ struct PageSettings {
       tlMap,
       tlMapAndInfoBoxes,
       tlLAST = tlMapAndInfoBoxes
-    } topLayout;
+    } top_layout;
 
-    InfoBoxConfig infoBoxConfig;
+    InfoBoxConfig infobox_config;
 
     PageLayout() = default;
 
-    PageLayout(eTopLayout topLayout, InfoBoxConfig infoBoxConfig) :
-      topLayout(topLayout), infoBoxConfig(infoBoxConfig) {}
+    PageLayout(eTopLayout _top_layout, InfoBoxConfig _infobox_config) :
+      top_layout(_top_layout), infobox_config(_infobox_config) {}
 
     void SetDefaults() {
-      topLayout = tlEmpty;
-      infoBoxConfig.SetDefaults();
+      top_layout = tlEmpty;
+      infobox_config.SetDefaults();
     }
 
     void MakeTitle(const InfoBoxSettings &info_box_settings,
                    TCHAR *str, const bool concise=false) const;
 
-    bool operator==(const PageLayout& pl) const {
-      if (topLayout != pl.topLayout)
-        return false;
-      if (infoBoxConfig != pl.infoBoxConfig)
-        return false;
-      return true;
+    bool operator==(const PageLayout &other) const {
+      return top_layout == other.top_layout &&
+             infobox_config == other.infobox_config;
     }
 
-    bool operator!=(const PageLayout& pl) const {
-      return !(*this == pl);
+    bool operator!=(const PageLayout &other) const {
+      return !(*this == other);
     }
   };
 

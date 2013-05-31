@@ -22,8 +22,15 @@ Copyright_License {
 */
 
 #include "Dialogs/Dialogs.h"
+#include "Dialogs/FontEdit.hpp"
 #include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/Internal.hpp"
+#include "Dialogs/XML.hpp"
+#include "Dialogs/Message.hpp"
+#include "Form/Form.hpp"
+#include "Form/Util.hpp"
+#include "Form/Frame.hpp"
+#include "Form/Button.hpp"
+#include "Form/Edit.hpp"
 #include "Profile/ProfileKeys.hpp"
 #include "Profile/Profile.hpp"
 #include "Profile/FontConfig.hpp"
@@ -31,7 +38,13 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Form/DataField/Boolean.hpp"
 #include "Util/StringUtil.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
 #include "Compiler.h"
+
+#ifdef ENABLE_OPENGL
+#include "Screen/OpenGL/Cache.hpp"
+#endif
 
 #include <assert.h>
 
@@ -72,21 +85,21 @@ static void
 ResetFonts(bool bUseCustom)
 {
   ResetFont(TempInfoWindowFont, bUseCustom,
-            szProfileFontInfoWindowFont, log_infobox);
+            ProfileKeys::FontInfoWindowFont, log_infobox);
   ResetFont(TempTitleWindowFont, bUseCustom,
-            szProfileFontTitleWindowFont, log_title);
+            ProfileKeys::FontTitleWindowFont, log_title);
   ResetFont(TempMapWindowFont, bUseCustom,
-            szProfileFontMapWindowFont, log_map);
+            ProfileKeys::FontMapWindowFont, log_map);
   ResetFont(TempTitleSmallWindowFont, bUseCustom,
-            szProfileFontTitleSmallWindowFont, log_infobox_small);
+            ProfileKeys::FontTitleSmallWindowFont, log_infobox_small);
   ResetFont(TempMapWindowBoldFont, bUseCustom,
-            szProfileFontMapWindowBoldFont, log_map_bold);
+            ProfileKeys::FontMapWindowBoldFont, log_map_bold);
   ResetFont(TempCDIWindowFont, bUseCustom,
-            szProfileFontCDIWindowFont, log_cdi);
+            ProfileKeys::FontCDIWindowFont, log_cdi);
   ResetFont(TempMapLabelFont, bUseCustom,
-            szProfileFontMapLabelFont, log_map_label);
+            ProfileKeys::FontMapLabelFont, log_map_label);
   ResetFont(TempMapLabelImportantFont, bUseCustom,
-            szProfileFontMapLabelImportantFont, log_map_label_important);
+            ProfileKeys::FontMapLabelImportantFont, log_map_label_important);
 }
 
 static void
@@ -103,6 +116,15 @@ ShowFontEditButtons(bool bVisible)
 }
 
 static void
+RefreshPreview(const TCHAR *name, Font &font)
+{
+  WndFrame *sample = (WndFrame *)wf->FindByName(name);
+  assert(sample != nullptr);
+
+  sample->SetFont(font);
+}
+
+static void
 RefreshFonts()
 {
   WndProperty * wp;
@@ -115,40 +137,19 @@ RefreshFonts()
     ShowFontEditButtons(bUseCustomFonts);
   }
 
+#ifdef ENABLE_OPENGL
+  TextCache::Flush();
+#endif
+
   // now set SampleTexts on the Fonts frame
-  WndFrame *sample;
-
-  sample = (WndFrame *)wf->FindByName(_T("prpInfoWindowFont"));
-  if (sample)
-    sample->SetFont(TempInfoWindowFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpTitleWindowFont"));
-  if (sample)
-    sample->SetFont(TempTitleWindowFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpMapWindowFont"));
-  if (sample)
-    sample->SetFont(TempMapWindowFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpTitleSmallWindowFont"));
-  if (sample)
-    sample->SetFont(TempTitleSmallWindowFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpMapWindowBoldFont"));
-  if (sample)
-    sample->SetFont(TempMapWindowBoldFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpCDIWindowFont"));
-  if (sample)
-    sample->SetFont(TempCDIWindowFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpMapLabelFont"));
-  if (sample)
-    sample->SetFont(TempMapLabelFont);
-
-  sample = (WndFrame *)wf->FindByName(_T("prpMapLabelImportantFont"));
-  if (sample)
-    sample->SetFont(TempMapLabelImportantFont);
+  RefreshPreview(_T("prpInfoWindowFont"), TempInfoWindowFont);
+  RefreshPreview(_T("prpTitleWindowFont"), TempTitleWindowFont);
+  RefreshPreview(_T("prpMapWindowFont"), TempMapWindowFont);
+  RefreshPreview(_T("prpTitleSmallWindowFont"), TempTitleSmallWindowFont);
+  RefreshPreview(_T("prpMapWindowBoldFont"), TempMapWindowBoldFont);
+  RefreshPreview(_T("prpCDIWindowFont"), TempCDIWindowFont);
+  RefreshPreview(_T("prpMapLabelFont"), TempMapLabelFont);
+  RefreshPreview(_T("prpMapLabelImportantFont"), TempMapLabelImportantFont);
 }
 
 static void
@@ -196,51 +197,51 @@ EditFont(const TCHAR *prp_name, const TCHAR *profile_key,
 static void
 OnEditInfoWindowFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpInfoWindowFont"), szProfileFontInfoWindowFont, log_infobox);
+  EditFont(_T("prpInfoWindowFont"), ProfileKeys::FontInfoWindowFont, log_infobox);
 }
 
 static void
 OnEditTitleWindowFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpTitleWindowFont"), szProfileFontTitleWindowFont, log_title);
+  EditFont(_T("prpTitleWindowFont"), ProfileKeys::FontTitleWindowFont, log_title);
 }
 
 static void
 OnEditMapWindowFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpMapWindowFont"), szProfileFontMapWindowFont, log_map);
+  EditFont(_T("prpMapWindowFont"), ProfileKeys::FontMapWindowFont, log_map);
 }
 
 static void
 OnEditTitleSmallWindowFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpTitleSmallWindowFont"), szProfileFontTitleSmallWindowFont,
+  EditFont(_T("prpTitleSmallWindowFont"), ProfileKeys::FontTitleSmallWindowFont,
            log_infobox_small);
 }
 
 static void
 OnEditMapWindowBoldFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpMapWindowBoldFont"), szProfileFontMapWindowBoldFont,
+  EditFont(_T("prpMapWindowBoldFont"), ProfileKeys::FontMapWindowBoldFont,
            log_map_bold);
 }
 
 static void
 OnEditCDIWindowFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpCDIWindowFont"), szProfileFontCDIWindowFont, log_cdi);
+  EditFont(_T("prpCDIWindowFont"), ProfileKeys::FontCDIWindowFont, log_cdi);
 }
 
 static void
 OnEditMapLabelFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpMapLabelFont"), szProfileFontMapLabelFont, log_map_label);
+  EditFont(_T("prpMapLabelFont"), ProfileKeys::FontMapLabelFont, log_map_label);
 }
 
 static void
 OnEditMapLabelImportantFontClicked(gcc_unused WndButton &button)
 {
-  EditFont(_T("prpMapLabelImportantFont"), szProfileFontMapLabelImportantFont,
+  EditFont(_T("prpMapLabelImportantFont"), ProfileKeys::FontMapLabelImportantFont,
            log_map_label_important);
 }
 
@@ -250,7 +251,7 @@ OnCloseClicked(gcc_unused WndButton &button)
   wf->SetModalResult(mrOK);
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnUseCustomFontData),
   DeclareCallBackEntry(OnEditInfoWindowFontClicked),
   DeclareCallBackEntry(OnEditTitleWindowFontClicked),
@@ -286,7 +287,7 @@ void dlgConfigFontsShowModal()
   wf->ShowModal();
 
   changed |= SaveFormProperty(*wf, _T("prpUseCustomFonts"),
-                              szProfileUseCustomFonts,
+                              ProfileKeys::UseCustomFonts,
                               ui_settings.custom_fonts);
 
   delete wf;
@@ -294,7 +295,7 @@ void dlgConfigFontsShowModal()
   if (changed) {
     Profile::Save();
 
-    ShowMessageBox(_("Changes to configuration saved.  Restart XCSoar to apply changes."),
+    ShowMessageBox(_("Changes to configuration saved.  Restart Top Hat to apply changes."),
                 _T(""), MB_OK);
   }
 

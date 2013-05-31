@@ -32,6 +32,11 @@
 class FAITaskFactory: 
   public AbstractTaskFactory 
 {
+protected:
+  FAITaskFactory(const TaskFactoryConstraints &_constraints,
+                 OrderedTask& _task,
+                 const TaskBehaviour &tb);
+
 public:
 /** 
  * Constructor
@@ -48,7 +53,7 @@ public:
 
   /**
    * Check whether task is complete and valid according to factory rules
-   * Adds error types to m_validation_errors
+   * Adds error types to validation_errors
    *
    * @return True if task is valid according to factory rules
    */
@@ -63,7 +68,7 @@ public:
    * similar to type of tp
    */
   virtual gcc_pure
-  LegalPointType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
 
 
   /**
@@ -78,7 +83,7 @@ public:
    * sets radiuses FAI defaults
    */
   virtual gcc_pure
-  void GetPointDefaultSizes(const LegalPointType type,
+  void GetPointDefaultSizes(const TaskPointFactoryType type,
                                             fixed &start_radius,
                                             fixed &turnpoint_radius,
                                             fixed &finish_radius) const;

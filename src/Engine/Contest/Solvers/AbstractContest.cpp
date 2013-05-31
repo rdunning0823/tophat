@@ -23,13 +23,10 @@ Copyright_License {
 
 #include "ContestDijkstra.hpp"
 
-AbstractContest::AbstractContest(const Trace &_trace,
-                                 const unsigned _finish_alt_diff):
-  trace_master(_trace),
-  handicap(100),
-  finish_alt_diff(_finish_alt_diff)
+AbstractContest::AbstractContest(const unsigned _finish_alt_diff)
+  :handicap(100),
+   finish_alt_diff(_finish_alt_diff)
 {
-  Reset();
 }
 
 void
@@ -39,16 +36,6 @@ AbstractContest::Reset()
 }
 
 bool
-AbstractContest::Score(ContestResult &result)
-{
-  if (positive(CalcTime())) {
-    result = best_result;
-    return true;
-  }
-  return false;
-}
-
-bool 
 AbstractContest::UpdateScore()
 {
   // for normal contests, nothing needs to be done
@@ -58,20 +45,14 @@ AbstractContest::UpdateScore()
 bool
 AbstractContest::SaveSolution()
 {
-  const fixed score = CalcScore();
-  const bool improved = (score > best_result.score);
+  ContestResult result = CalculateResult();
+  const bool improved = result.score > best_result.score;
 
   if (!improved)
     return false;
 
-  best_result.score = score;
-  best_result.distance = CalcDistance();
-  best_result.time = CalcTime();
-  if (positive(best_result.time))
-    best_result.speed = best_result.distance / best_result.time;
-  else
-    best_result.speed = fixed_zero;
-
+  best_result = result;
+  CopySolution(best_solution);
   return true;
 }
 
@@ -81,18 +62,4 @@ AbstractContest::IsFinishAltitudeValid(const TracePoint& start,
 {
   return finish.GetIntegerAltitude() + (int)finish_alt_diff >=
     start.GetIntegerAltitude();
-}
-
-fixed 
-AbstractContest::ApplyHandicap(const fixed& unhandicapped_score,
-                                const bool shifted) const
-{
-  assert(handicap != 0);
-  if (handicap == 0)
-    return unhandicapped_score;
-
-  if (shifted)
-    return (200 * unhandicapped_score / (100 + handicap));
-
-  return (100 * unhandicapped_score / handicap);
 }

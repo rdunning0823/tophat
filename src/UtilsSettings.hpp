@@ -24,7 +24,12 @@ Copyright_License {
 #ifndef XCSOAR_UTILS_SETTINGS_HPP
 #define XCSOAR_UTILS_SETTINGS_HPP
 
+#include <tchar.h>
+/**
+ * show the system information pages
+ * @param page_name.  Show only a single page or "" = all pages.
+ */
 void
-SystemConfiguration();
+SystemConfiguration(const TCHAR *page_name = _T(""));
 
 #endif

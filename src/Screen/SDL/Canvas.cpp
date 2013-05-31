@@ -37,8 +37,8 @@ Copyright_License {
 #include <string.h>
 #include <winuser.h>
 
-#ifndef ENABLE_OPENGL
 #include "Screen/Util.hpp"
+#ifndef ENABLE_OPENGL
 
 #include <SDL_rotozoom.h>
 #include <SDL_imageFilter.h>
@@ -141,6 +141,20 @@ Canvas::DrawKeyhole(PixelScalar x, PixelScalar y,
 
 #endif /* !OPENGL */
 
+#ifdef ENABLE_OPENGL
+
+void
+Canvas::DrawButton(PixelRect rc, bool down)
+{
+  Color gray = COLOR_LIGHT_GRAY;
+  Pen bright_pen(1, LightColor(gray));
+  Pen dark_pen(1, DarkColor(gray));
+
+  DrawButtonFancy(*this, rc, dark_pen, bright_pen, gray, false, down, false);
+}
+
+#else
+
 void
 Canvas::DrawButton(PixelRect rc, bool down)
 {
@@ -167,6 +181,8 @@ Canvas::DrawButton(PixelRect rc, bool down)
   pen = old_pen;
 }
 
+#endif /* !OPENGL */
+
 const PixelSize
 Canvas::CalcTextSize(const TCHAR *text, size_t length) const
 {
@@ -175,7 +191,9 @@ Canvas::CalcTextSize(const TCHAR *text, size_t length) const
   TCHAR *duplicated = _tcsdup(text);
   duplicated[length] = 0;
 
+#ifndef UNICODE
   assert(ValidateUTF8(duplicated));
+#endif
 
   const PixelSize size = CalcTextSize(duplicated);
   free(duplicated);
@@ -187,7 +205,9 @@ const PixelSize
 Canvas::CalcTextSize(const TCHAR *text) const
 {
   assert(text != NULL);
+#ifndef UNICODE
   assert(ValidateUTF8(text));
+#endif
 
   PixelSize size = { 0, 0 };
 
@@ -212,7 +232,9 @@ void
 Canvas::text(PixelScalar x, PixelScalar y, const TCHAR *text)
 {
   assert(text != NULL);
+#ifndef UNICODE
   assert(ValidateUTF8(text));
+#endif
 
   SDL_Surface *s;
 
@@ -220,7 +242,7 @@ Canvas::text(PixelScalar x, PixelScalar y, const TCHAR *text)
     return;
 
 #ifdef UNICODE
-  s = ::TTF_RenderUNICODE_Solid(font->native(), (const Uint16 *)text,
+  s = ::TTF_RenderUNICODE_Solid(font->Native(), (const Uint16 *)text,
                                 COLOR_BLACK);
 #else
   s = ::TTF_RenderUTF8_Solid(font->Native(), text, COLOR_BLACK);
@@ -245,7 +267,9 @@ void
 Canvas::text_transparent(PixelScalar x, PixelScalar y, const TCHAR *text)
 {
   assert(text != NULL);
+#ifndef UNICODE
   assert(ValidateUTF8(text));
+#endif
 
   SDL_Surface *s;
 
@@ -273,7 +297,9 @@ Canvas::text_transparent(PixelScalar x, PixelScalar y, const TCHAR *text)
 void
 Canvas::formatted_text(PixelRect *rc, const TCHAR *text, unsigned format) {
   assert(text != NULL);
+#ifndef UNICODE
   assert(ValidateUTF8(text));
+#endif
 
   if (font == NULL)
     return;
@@ -371,7 +397,9 @@ Canvas::text(PixelScalar x, PixelScalar y, const TCHAR *_text, size_t length)
   std::copy(_text, _text + length, copy);
   copy[length] = _T('\0');
 
+#ifndef UNICODE
   assert(ValidateUTF8(copy));
+#endif
 
   text(x, y, copy);
 }
@@ -381,7 +409,9 @@ Canvas::text_opaque(PixelScalar x, PixelScalar y, const PixelRect &rc,
                     const TCHAR *_text)
 {
   assert(_text != NULL);
+#ifndef UNICODE
   assert(ValidateUTF8(_text));
+#endif
 
   DrawFilledRectangle(rc, background_color);
   text_transparent(x, y, _text);

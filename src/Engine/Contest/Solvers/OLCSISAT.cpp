@@ -18,11 +18,11 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
 
 #include "OLCSISAT.hpp"
 #include "Trace/Trace.hpp"
-#include "Navigation/SearchPointVector.hpp"
+#include "Geo/SearchPointVector.hpp"
 
 OLCSISAT::OLCSISAT(const Trace &_trace)
   :ContestDijkstra(_trace, true, 6, 1000) {}
@@ -40,15 +40,13 @@ OLCSISAT::OLCSISAT(const Trace &_trace)
               = (V + 3*S)/4
 */
 
-fixed
-OLCSISAT::CalcScore() const
+ContestResult
+OLCSISAT::CalculateResult(const ContestTraceVector &solution) const
 {
-  assert(solution_valid);
-
   // build convex hull from solution
   SearchPointVector spv;
   for (unsigned i = 0; i < num_stages; ++i)
-    spv.push_back(GetPoint(solution[i]));
+    spv.push_back(SearchPoint(solution[i].location));
 
   spv.PruneInterior();
 
@@ -57,21 +55,21 @@ OLCSISAT::CalcScore() const
 
   if (spv.size() > 1) {
     for (unsigned i = 0; i + 1 < spv.size(); ++i)
-      G += spv[i].distance(spv[i + 1].get_location());
+      G += spv[i].DistanceTo(spv[i + 1].GetLocation());
 
     // closing leg (end to start)
-    G += spv[spv.size() - 1].distance(spv[0].get_location());
+    G += spv[spv.size() - 1].DistanceTo(spv[0].GetLocation());
   }
 
   // R distance (start to end)
-  const fixed R = GetPoint(solution[0]).distance(GetPoint(solution[num_stages - 1]).get_location());
+  const fixed R = solution[0].DistanceTo(solution[num_stages - 1].GetLocation());
 
   // V zigzag-free distance
   const fixed V = G - R;
 
   // S = total distance
-  const fixed S = CalcDistance();
-
-  return ApplyHandicap((V + fixed(3) * S) * fixed(0.00025));
+  ContestResult result = ContestDijkstra::CalculateResult(solution);
+  result.score = ApplyHandicap((V + 3 * result.distance) / 4000);
+  return result;
 }
 

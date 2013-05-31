@@ -31,7 +31,7 @@ Copyright_License {
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Screen/Timer.hpp"
 #include "Screen/Features.hpp"
-#include "DisplayMode.hpp"
+#include "Widgets/TaskNavSliderShape.hpp"
 
 #include <array>
 
@@ -92,7 +92,7 @@ class GlueMapWindow : public MapWindow {
    */
   Projection drag_projection;
 
-  DisplayMode display_mode;
+  DisplayMode last_display_mode;
 
   OffsetHistory offset_history;
 
@@ -115,6 +115,8 @@ class GlueMapWindow : public MapWindow {
    * frame.
    */
   ComputerSettings next_settings_computer;
+
+  UIState next_ui_state;
 #endif
 
   ThermalBandRenderer thermal_band_renderer;
@@ -133,6 +135,7 @@ public:
 
   void SetMapSettings(const MapSettings &new_value);
   void SetComputerSettings(const ComputerSettings &new_value);
+  void SetUIState(const UIState &new_value);
 
   /**
    * Update the blackboard from DeviceBlackboard and
@@ -172,11 +175,17 @@ public:
 
 protected:
   // events
-  virtual bool OnMouseDouble(PixelScalar x, PixelScalar y);
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
   virtual bool OnMouseDown(PixelScalar x, PixelScalar y);
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y);
   virtual bool OnMouseWheel(PixelScalar x, PixelScalar y, int delta);
+
+#ifndef ENABLE_OPENGL
+  /**
+   * returns true if handled by the button overlays.
+   */
+  virtual bool ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y);
+#endif
 
 #ifdef HAVE_MULTI_TOUCH
   virtual bool OnMultiTouchDown();
@@ -212,7 +221,30 @@ private:
   virtual void DrawThermalEstimate(Canvas &canvas) const;
   virtual void RenderTrail(Canvas &canvas, const RasterPoint aircraft_pos);
 
-  void SwitchZoomClimb();
+#ifndef ENABLE_OPENGL
+  /**
+   * render transparent buttons on the screen with GDI
+   * Duplicates code in Widget that is used with OPENGL
+   * Todo: remove duplicate code
+   *
+   */
+  void DrawMainMenuButtonOverlay(Canvas &canvas) const;
+
+  /**
+   * render transparaent buttons for zoom in / out with GDI
+   * Duplicates code in Widget that is used with OPENGL
+   * Todo: remove duplicate code
+   */
+  void DrawZoomButtonOverlays(Canvas &canvas) const;
+#endif
+
+  /**
+   * draws the task nav with transparencies if !HasDraggableScreen()
+   * this does not support dragging
+   */
+  void DrawTaskNavSliderShape(Canvas &canvas);
+
+  void SwitchZoomClimb(bool circling);
 
   void SaveDisplayModeScales();
 
@@ -232,12 +264,46 @@ public:
   void UpdateDisplayMode();
   void SetMapScale(fixed scale);
 
+#ifndef ENABLE_OPENGL
+  /**
+   * resizes the rc_main_menu_button for the current screen layout
+   * when drawing without OPENGL
+   */
+  virtual void SetMainMenuButtonRect();
+  /**
+   * resizes the rc_zoom_in_button and rc_zoom_out_button for the current
+   * screen layout when drawing without OPENGL
+   */
+  virtual void SetZoomButtonsRect();
+#endif
+  /**
+   * resizes the TaskNavSlider shape for the current screen layout
+   * only when it's !HasDraggableScreen()
+   */
+  void SetTaskNavSliderShape();
+
+#ifndef ENABLE_OPENGL
+  /**
+   * locations of Map overlay buttons
+   * With OPENGL, these are separate widgets
+   */
+  PixelRect rc_main_menu_button;
+  PixelRect rc_zoom_out_button;
+  PixelRect rc_zoom_in_button;
+#endif
+  /**
+   * draws the slider shape if the screen does not have good dragging
+   * e.g. !HasDraggableScreen()
+   */
+  SliderShape slider_shape;
+
+protected:
   DisplayMode GetDisplayMode() const {
-    return display_mode;
+    return GetUIState().display_mode;
   }
 
   bool InCirclingMode() const {
-    return display_mode == DisplayMode::CIRCLING;
+    return GetUIState().display_mode == DisplayMode::CIRCLING;
   }
 };
 

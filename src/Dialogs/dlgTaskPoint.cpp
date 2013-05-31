@@ -22,19 +22,25 @@ Copyright_License {
 */
 
 #include "Dialogs/Task.hpp"
-#include "Dialogs/Internal.hpp"
 #include "Dialogs/Waypoint.hpp"
 #include "Dialogs/CallBackTable.hpp"
+#include "Dialogs/XML.hpp"
+#include "Dialogs/Message.hpp"
+#include "Form/Form.hpp"
+#include "Form/Util.hpp"
+#include "Form/Frame.hpp"
+#include "Form/Draw.hpp"
+#include "Form/Button.hpp"
+#include "Form/DataField/Float.hpp"
 #include "Screen/Layout.hpp"
 #include "Components.hpp"
 #include "Dialogs/dlgTaskHelpers.hpp"
-#include "Form/DataField/Float.hpp"
 #include "Units/Units.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/TaskPoints/StartPoint.hpp"
-#include "Task/TaskPoints/AATPoint.hpp"
-#include "Task/TaskPoints/ASTPoint.hpp"
-#include "Task/TaskPoints/FinishPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/StartPoint.hpp"
+#include "Engine/Task/Ordered/Points/FinishPoint.hpp"
+#include "Engine/Task/Ordered/Points/ASTPoint.hpp"
+#include "Engine/Task/Ordered/Points/AATPoint.hpp"
 #include "Task/ObservationZones/LineSectorZone.hpp"
 #include "Task/ObservationZones/CylinderZone.hpp"
 #include "Task/ObservationZones/AnnularSectorZone.hpp"
@@ -43,6 +49,8 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/DialogLook.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
@@ -83,9 +91,7 @@ RefreshView()
 {
   wTaskView->Invalidate();
 
-  OrderedTaskPoint* tp = ordered_task->get_tp(active_index);
-  if (!tp)
-    return;
+  const OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
 
   Refreshing = true; // tell onChange routines not to save form!
 
@@ -93,7 +99,7 @@ RefreshView()
   ShowFormControl(*wf, _T("frmOZSector"), false);
   ShowFormControl(*wf, _T("frmOZCylinder"), false);
 
-  const ObservationZonePoint &oz = *tp->GetOZPoint();
+  const ObservationZonePoint &oz = tp.GetObservationZone();
 
   switch (oz.shape) {
   case ObservationZonePoint::SECTOR:
@@ -125,6 +131,7 @@ RefreshView()
     break;
 
   case ObservationZonePoint::CYLINDER:
+  case ObservationZonePoint::MAT_CYLINDER:
     ShowFormControl(*wf, _T("frmOZCylinder"), true);
 
     LoadFormProperty(*wf, _T("prpOZCylinderRadius"), UnitGroup::DISTANCE,
@@ -138,7 +145,7 @@ RefreshView()
   WndFrame* wfrm = NULL;
   wfrm = ((WndFrame*)wf->FindByName(_T("lblType")));
   if (wfrm)
-    wfrm->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(*tp)));
+    wfrm->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
 
   SetFormControlEnabled(*wf, _T("butPrevious"), active_index > 0);
   SetFormControlEnabled(*wf, _T("butNext"),
@@ -148,20 +155,30 @@ RefreshView()
   wb = (WndButton*)wf->FindByName(_T("cmdOptionalStarts"));
   assert(wb);
   wb->SetVisible(active_index == 0);
-  if (ordered_task->optional_start_points_size() == 0)
+  if (ordered_task->GetOptionalStartPointCount() == 0)
     wb->SetCaption(_("Enable Alternate Starts"));
   else {
     StaticString<50> tmp;
     tmp.Format(_T("%s (%d)"), _("Edit Alternates"),
-               ordered_task->optional_start_points_size());
+               ordered_task->GetOptionalStartPointCount());
     wb->SetCaption(tmp);
   }
 
-  EnableSizeEdit(ordered_task->get_factory_type() != TaskFactoryType::FAI_GENERAL);
+  bool edit_disabled = (ordered_task->GetFactoryType() ==
+      TaskFactoryType::FAI_GENERAL) ||
+      ((ordered_task->GetFactoryType() == TaskFactoryType::MAT) &&
+      (active_index != ordered_task->TaskSize() - 1 && active_index != 0));
+
+  EnableSizeEdit(!edit_disabled);
+
+  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
+  assert (button_type != nullptr);
+  button_type->SetVisible(ordered_task->GetFactoryType()
+                          != TaskFactoryType::MAT);
 
   StaticString<100> name_prefix_buffer, type_buffer;
 
-  switch (tp->GetType()) {
+  switch (tp.GetType()) {
   case TaskPoint::START:
     type_buffer = _T("Start point");
     name_prefix_buffer = _T("Start: ");
@@ -193,7 +210,7 @@ RefreshView()
   if (wfrm) {
     StaticString<100> buffer;
     buffer.Format(_T("%s %s"), name_prefix_buffer.c_str(),
-                  tp->GetWaypoint().name.c_str());
+                  tp.GetWaypoint().name.c_str());
     wfrm->SetCaption(buffer);
   }
 
@@ -203,8 +220,8 @@ RefreshView()
 static void
 ReadValues()
 {
-  OrderedTaskPoint* tp = ordered_task->get_tp(active_index);
-  ObservationZonePoint &oz = *tp->GetOZPoint();
+  OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
+  ObservationZonePoint &oz = tp.GetObservationZone();
 
   switch (oz.shape) {
   case ObservationZonePoint::ANNULAR_SECTOR: {
@@ -249,6 +266,7 @@ ReadValues()
     break;
   }
 
+  case ObservationZonePoint::MAT_CYLINDER:
   case ObservationZonePoint::CYLINDER: {
     fixed radius = Units::ToSysDistance(
         GetFormValueFixed(*wf, _T("prpOZCylinderRadius")));
@@ -270,12 +288,7 @@ OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas)
 {
   PixelRect rc = Sender->GetClientRect();
 
-  OrderedTaskPoint* tp = ordered_task->get_tp(active_index);
-
-  if (!tp) {
-    canvas.ClearWhite();
-    return;
-  }
+  const OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
 
 #ifdef ENABLE_OPENGL
   /* enable clipping */
@@ -284,7 +297,7 @@ OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas)
 
   const MapLook &look = UIGlobals::GetMapLook();
   const NMEAInfo &basic = CommonInterface::Basic();
-  PaintTaskPoint(canvas, rc, *ordered_task, *tp,
+  PaintTaskPoint(canvas, rc, *ordered_task, tp,
                  basic.location_available, basic.location,
                  XCSoarInterface::GetMapSettings(),
                  look.task, look.airspace,
@@ -308,18 +321,17 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
 static void
 OnDetailsClicked(gcc_unused WndButton &Sender)
 {
-  OrderedTaskPoint* task_point = ordered_task->get_tp(active_index);
-  if (task_point)
-    dlgWaypointDetailsShowModal(wf->GetMainWindow(),
-                                task_point->GetWaypoint(), false);
+  const OrderedTaskPoint &task_point = ordered_task->GetPoint(active_index);
+  dlgWaypointDetailsShowModal(wf->GetMainWindow(),
+                              task_point.GetWaypoint(), false);
 }
 
 static void
 OnRelocateClicked(gcc_unused WndButton &Sender)
 {
-  const GeoPoint &gpBearing = (active_index ?
-                               ordered_task->get_tp(active_index - 1)->GetLocation() :
-                               XCSoarInterface::Basic().location);
+  const GeoPoint &gpBearing = active_index > 0
+    ? ordered_task->GetPoint(active_index - 1).GetLocation()
+    : CommonInterface::Basic().location;
 
   const Waypoint *wp = ShowWaypointListDialog(wf->GetMainWindow(), gpBearing,
                                          ordered_task, active_index);
@@ -380,7 +392,7 @@ OnOZData(gcc_unused DataField *Sender,
   wTaskView->Invalidate();
 }
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnRemoveClicked),
   DeclareCallBackEntry(OnRelocateClicked),
@@ -435,7 +447,7 @@ dlgTaskPointShowModal(SingleWindow &parent, OrderedTask** task,
     task_modified = true;
   } 
   if (task_modified) {
-    ordered_task->update_geometry();
+    ordered_task->UpdateGeometry();
   }
   return task_modified;
 }

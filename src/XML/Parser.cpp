@@ -49,8 +49,8 @@
 #include "Node.hpp"
 #include "Util/CharUtil.hpp"
 #include "Util/StringUtil.hpp"
+#include "Util/NumberParser.hpp"
 #include "IO/FileLineReader.hpp"
-#include "Compatibility/string.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -137,19 +137,19 @@ FromXMLString(const TCHAR *ss, size_t lo)
   while (ss < end && *ss) {
     if (*ss == _T('&')) {
       ss++;
-      if (_tcsnicmp(ss, _T("lt;" ), 3) == 0) {
+      if (StringIsEqualIgnoreCase(ss, _T("lt;" ), 3)) {
         *(d++) = _T('<' );
         ss += 3;
-      } else if (_tcsnicmp(ss, _T("gt;" ), 3) == 0) {
+      } else if (StringIsEqualIgnoreCase(ss, _T("gt;" ), 3)) {
         *(d++) = _T('>' );
         ss += 3;
-      } else if (_tcsnicmp(ss, _T("amp;" ), 4) == 0) {
+      } else if (StringIsEqualIgnoreCase(ss, _T("amp;" ), 4)) {
         *(d++) = _T('&' );
         ss += 4;
-      } else if (_tcsnicmp(ss, _T("apos;"), 5) == 0) {
+      } else if (StringIsEqualIgnoreCase(ss, _T("apos;"), 5)) {
         *(d++) = _T('\'');
         ss += 5;
-      } else if (_tcsnicmp(ss, _T("quot;"), 5) == 0) {
+      } else if (StringIsEqualIgnoreCase(ss, _T("quot;"), 5)) {
         *(d++) = _T('"' );
         ss += 5;
       } else if (*ss == '#') {
@@ -158,7 +158,7 @@ FromXMLString(const TCHAR *ss, size_t lo)
         ++ss;
 
         TCHAR *endptr;
-        unsigned long i = _tcstoul(ss, &endptr, 10);
+        unsigned i = ParseUnsigned(ss, &endptr, 10);
         if (endptr == ss || endptr >= end || *endptr != ';') {
           free(result);
           XML::global_error = true;
@@ -199,7 +199,7 @@ CompareTagName(const TCHAR *cclose, const TCHAR *copen)
   if (!cclose)
     return false;
   size_t l = _tcslen(cclose);
-  if (_tcsnicmp(cclose, copen, l) != 0)
+  if (!StringIsEqualIgnoreCase(cclose, copen, l))
     return false;
 
   const TCHAR c = copen[l];

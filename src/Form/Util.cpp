@@ -29,6 +29,7 @@ Copyright_License {
 #include "DataField/Float.hpp"
 #include "DataField/Enum.hpp"
 #include "DataField/String.hpp"
+#include "DataField/FileReader.hpp"
 
 #include <assert.h>
 
@@ -107,6 +108,20 @@ LoadFormProperty(SubForm &form, const TCHAR *control_name, unsigned int value)
     return;
 
   ctl->GetDataField()->SetAsInteger(value);
+  ctl->RefreshDisplay();
+}
+
+void
+LoadFormPropertyEnum(SubForm &form, const TCHAR *control_name, int value)
+{
+  assert(control_name != NULL);
+
+  WndProperty *ctl = (WndProperty *)form.FindByName(control_name);
+  assert(ctl != NULL);
+
+  DataFieldEnum &df = *(DataFieldEnum *)ctl->GetDataField();
+  assert(df.GetType() == DataField::Type::ENUM);
+  df.Set(value);
   ctl->RefreshDisplay();
 }
 
@@ -229,6 +244,22 @@ GetFormValueString(const SubForm &form, const TCHAR *control_name)
   assert(df.GetType() == DataField::Type::STRING);
 
   return df.GetAsString();
+}
+
+const TCHAR *
+GetFormValueFile(const SubForm &form, const TCHAR *control_name)
+{
+  assert(control_name != NULL);
+
+  const WndProperty *control =
+    (const WndProperty *)form.FindByName(control_name);
+  assert(control != NULL);
+
+  const DataFieldFileReader &df =
+    *(const DataFieldFileReader *)control->GetDataField();
+  assert(df.GetType() == DataField::Type::FILE);
+
+  return df.GetPathFile();
 }
 
 bool

@@ -24,10 +24,11 @@
 #include "GlideState.hpp"
 #include "GlideResult.hpp"
 #include "MacCready.hpp"
-#include "Util/ZeroFinder.hpp"
+#include "Math/ZeroFinder.hpp"
+#include "Math/Quadratic.hpp"
 #include "Util/Tolerances.hpp"
 #include "Navigation/Aircraft.hpp"
-#include "Util/Quadratic.hpp"
+
 #include <assert.h>
 
 GlidePolar::GlidePolar(const fixed _mc, const fixed _bugs, const fixed _ballast) :
@@ -297,11 +298,11 @@ public:
   }
 
   /**
-   * Glide ratio function
+   * Glide ratio over ground function
    *
    * @param V Speed over ground (m/s)
    *
-   * @return MacCready-adjusted inverse glide ratio
+   * @return MacCready-adjusted inverse glide ratio over ground
    */
   fixed
   f(const fixed V)
@@ -335,7 +336,9 @@ GlidePolar::SpeedToFly(const AircraftState &state,
     // stop to climb
     V_stf = Vmin;
   } else {
-    const fixed head_wind (!positive(GetMC()) ? solution.head_wind : fixed_zero);
+    const fixed head_wind(!positive(GetMC()) && solution.IsDefined()
+                          ? solution.head_wind
+                          : fixed_zero);
     const fixed stf_sink_rate (block_stf ? fixed_zero : -state.netto_vario);
 
     GlidePolarSpeedToFly gp_stf(*this, stf_sink_rate, head_wind, Vmin, Vmax);
@@ -412,7 +415,7 @@ GlidePolar::GetBestGlideRatioSpeed(fixed head_wind) const
 fixed
 GlidePolar::GetVTakeoff() const
 {
-  return half(GetVMin());
+  return fixed(0.3) * GetVMin();
 }
 
 fixed

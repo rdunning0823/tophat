@@ -22,8 +22,8 @@ Copyright_License {
 */
 
 #include "OS/FileUtil.hpp"
-
-#include "OS/PathName.hpp"
+#include "Util/StringUtil.hpp"
+#include "Util/ConvertString.hpp"
 #include "Compatibility/path.h"
 
 #include <windef.h> /* for MAX_PATH */
@@ -54,8 +54,9 @@ bool
 Directory::Exists(const TCHAR* path)
 {
 #ifdef HAVE_POSIX
+  const WideToACPConverter narrow_path(path);
   struct stat st;
-  if (stat(NarrowPathName(path), &st) != 0)
+  if (stat(narrow_path, &st) != 0)
     return false;
 
   return (st.st_mode & S_IFDIR);
@@ -83,8 +84,8 @@ IsDots(const TCHAR* str)
 static bool
 checkFilter(const TCHAR *filename, const TCHAR *filter)
 {
-  // filter = e.g. "*.igc" or "config/*.prf"
-  // todo: make filters like "config/*.prf" work
+  // filter = e.g. "*.igc" or "config/*.top"
+  // todo: make filters like "config/*.top" work
 
   // if invalid or short filter "*" -> return true
   // todo: check for asterisk
@@ -93,7 +94,7 @@ checkFilter(const TCHAR *filename, const TCHAR *filter)
 
   // Copy filter without first char into upfilter
   // *.igc         ->  .igc
-  // config/*.prf  ->  onfig/*.prf
+  // config/*.top  ->  onfig/*.top
   TCHAR upfilter[MAX_PATH];
   _tcscpy(upfilter, filter + 1);
 
@@ -300,8 +301,9 @@ bool
 File::ExistsAny(const TCHAR *path)
 {
 #ifdef HAVE_POSIX
+  const WideToACPConverter narrow_path(path);
   struct stat st;
-  return stat(NarrowPathName(path), &st) == 0;
+  return stat(narrow_path, &st) == 0;
 #else
   return GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES;
 #endif
@@ -311,8 +313,9 @@ bool
 File::Exists(const TCHAR* path)
 {
 #ifdef HAVE_POSIX
+  const WideToACPConverter narrow_path(path);
   struct stat st;
-  if (stat(NarrowPathName(path), &st) != 0)
+  if (stat(narrow_path, &st) != 0)
     return false;
 
   return (st.st_mode & S_IFREG);
@@ -321,6 +324,38 @@ File::Exists(const TCHAR* path)
   return attributes != INVALID_FILE_ATTRIBUTES &&
     (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 #endif
+}
+
+#if defined(WIN32) && defined(UNICODE) && !defined(_WIN32_WCE)
+
+bool
+File::Exists(const char *path)
+{
+  DWORD attributes = GetFileAttributesA(path);
+  return attributes != INVALID_FILE_ATTRIBUTES &&
+    (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+}
+
+#endif
+
+uint64_t
+File::GetSize(const TCHAR *path)
+{
+#ifdef HAVE_POSIX
+  struct stat st;
+  if (stat(path, &st) << 0 || !S_ISREG(st.st_mode))
+    return 0;
+
+  return st.st_size;
+#else
+  WIN32_FILE_ATTRIBUTE_DATA data;
+  if (!GetFileAttributesEx(path, GetFileExInfoStandard, &data) ||
+      (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+    return 0;
+
+  return data.nFileSizeLow | (uint64_t(data.nFileSizeHigh) << 32);
+#endif
+
 }
 
 uint64_t

@@ -26,6 +26,7 @@ Copyright_License {
 #include "Plane.hpp"
 #include "Profile/Profile.hpp"
 #include "Polar/Polar.hpp"
+#include "Polar/Parser.hpp"
 #include "Polar/PolarGlue.hpp"
 #include "ComputerSettings.hpp"
 
@@ -44,34 +45,29 @@ PlaneGlue::FromProfile(Plane &plane)
       PlaneGlue::ReadFile(plane, plane_path.c_str()))
     return;
 
-  plane.registration = Profile::Get(szProfileAircraftReg, _T(""));
-  plane.competition_id = Profile::Get(szProfileCompetitionId, _T(""));
-  plane.type = Profile::Get(szProfileAircraftType, _T(""));
-  plane.polar_name = Profile::Get(szProfilePolarName, _T(""));
+  plane.registration = Profile::Get(ProfileKeys::AircraftReg, _T(""));
+  plane.competition_id = Profile::Get(ProfileKeys::CompetitionId, _T(""));
+  plane.type = Profile::Get(ProfileKeys::AircraftType, _T(""));
+  plane.polar_name = Profile::Get(ProfileKeys::PolarName, _T(""));
 
   PolarInfo polar = PolarGlue::LoadFromProfile();
-  plane.v1 = polar.v1;
-  plane.v2 = polar.v2;
-  plane.v3 = polar.v3;
-  plane.w1 = polar.w1;
-  plane.w2 = polar.w2;
-  plane.w3 = polar.w3;
+  plane.polar_shape = polar.shape;
   plane.reference_mass = polar.reference_mass;
   plane.max_ballast = polar.max_ballast;
   plane.wing_area = polar.wing_area;
 
   if (positive(polar.v_no))
     plane.max_speed = polar.v_no;
-  else if (!Profile::Get(szProfileSafteySpeed, plane.max_speed))
+  else if (!Profile::Get(ProfileKeys::SafteySpeed, plane.max_speed))
     plane.max_speed = fixed_zero;
 
-  if (!Profile::Get(szProfileDryMass, plane.dry_mass))
+  if (!Profile::Get(ProfileKeys::DryMass, plane.dry_mass))
     plane.dry_mass = plane.reference_mass;
 
-  if (!Profile::Get(szProfileBallastSecsToEmpty, plane.dump_time))
+  if (!Profile::Get(ProfileKeys::BallastSecsToEmpty, plane.dump_time))
     plane.dump_time = 120;
 
-  if (!Profile::Get(szProfileHandicap, plane.handicap))
+  if (!Profile::Get(ProfileKeys::Handicap, plane.handicap))
     plane.handicap = 100;
 }
 
@@ -84,31 +80,26 @@ PlaneGlue::ToProfile(const Plane &plane)
     return;
   }
 
-  Profile::Set(szProfileAircraftReg, plane.registration);
-  Profile::Set(szProfileCompetitionId, plane.competition_id);
-  Profile::Set(szProfileAircraftType, plane.type);
+  Profile::Set(ProfileKeys::AircraftReg, plane.registration);
+  Profile::Set(ProfileKeys::CompetitionId, plane.competition_id);
+  Profile::Set(ProfileKeys::AircraftType, plane.type);
 
-  Profile::Set(szProfilePolarName, plane.polar_name);
+  Profile::Set(ProfileKeys::PolarName, plane.polar_name);
 
   PolarInfo polar;
-  polar.v1 = plane.v1;
-  polar.v2 = plane.v2;
-  polar.v3 = plane.v3;
-  polar.w1 = plane.w1;
-  polar.w2 = plane.w2;
-  polar.w3 = plane.w3;
+  polar.shape = plane.polar_shape;
   polar.reference_mass = plane.reference_mass;
   polar.max_ballast = plane.max_ballast;
   polar.v_no = plane.max_speed;
   polar.wing_area = plane.wing_area;
 
   TCHAR polar_string[255];
-  polar.GetString(polar_string, 255, true);
-  Profile::Set(szProfilePolar, polar_string);
-  Profile::Set(szProfileDryMass, plane.dry_mass);
+  FormatPolar(polar, polar_string, 255, true);
+  Profile::Set(ProfileKeys::Polar, polar_string);
+  Profile::Set(ProfileKeys::DryMass, plane.dry_mass);
 
-  Profile::Set(szProfileBallastSecsToEmpty, plane.dump_time);
-  Profile::Set(szProfileHandicap, plane.handicap);
+  Profile::Set(ProfileKeys::BallastSecsToEmpty, plane.dump_time);
+  Profile::Set(ProfileKeys::Handicap, plane.handicap);
 }
 
 void
@@ -117,8 +108,7 @@ PlaneGlue::Synchronize(const Plane &plane, ComputerSettings &settings,
 {
   settings.task.contest_handicap = plane.handicap;
 
-  PolarCoefficients pc = PolarCoefficients::From3VW(plane.v1, plane.v2, plane.v3,
-                                                    plane.w1, plane.w2, plane.w3);
+  PolarCoefficients pc = plane.polar_shape.CalculateCoefficients();
   if (!pc.IsValid())
     return;
 

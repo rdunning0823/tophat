@@ -31,6 +31,8 @@ Copyright_License {
 
 #include <assert.h>
 
+class Trace;
+
 /**
  * Abstract class for contest searches using dijkstra algorithm
  *
@@ -39,10 +41,11 @@ Copyright_License {
  *
  *
  */
-class ContestDijkstra:
-  public AbstractContest,
-  protected NavDijkstra
-{
+class ContestDijkstra : public AbstractContest, protected NavDijkstra {
+protected:
+  const Trace &trace_master;
+
+private:
   /**
    * This attribute tracks Trace::GetAppendSerial().  It is updated
    * when appnew copy of the master Trace is obtained, and is used to
@@ -86,6 +89,15 @@ class ContestDijkstra:
    */
   TracePointerVector trace;
 
+  /**
+   * The last solution.  Use only if Solve() has returned VALID.
+   */
+  ContestTraceVector solution;
+
+  TracePoint predicted;
+
+  static const unsigned predicted_index = 0xffff;
+
 protected:
   /** Number of points in current trace set */
   unsigned n_points;
@@ -97,9 +109,7 @@ protected:
   unsigned first_finish_candidate;
 
   /** Weightings applied to each leg distance */
-  unsigned m_weightings[MAX_STAGES];
-
-  ContestTraceVector best_solution;
+  unsigned stage_weights[MAX_STAGES];
 
 public:
   /**
@@ -109,7 +119,7 @@ public:
    * @param n_legs Maximum number of legs in Contest task
    * @param finish_alt_diff Maximum height loss from start to finish (m)
    */
-  ContestDijkstra(const Trace &_trace, 
+  ContestDijkstra(const Trace &_trace,
                   bool continuous,
                   const unsigned n_legs,
                   const unsigned finish_alt_diff = 1000);
@@ -118,7 +128,21 @@ public:
     incremental = _incremental;
   }
 
+  /**
+   * Sets the location of the "predicted" finish location.  If
+   * defined, then the algorithm will assume that you will reach it.
+   * Pass an "invalid" #TracePoint to disable this prediction (see
+   * TracePoint::Invalid()).
+   *
+   * @return true if the object was reset
+   */
+  bool SetPredicted(const TracePoint &_predicted);
+
 protected:
+  bool IsIncremental() const {
+    return incremental;
+  }
+
   gcc_pure
   const TracePoint &GetPoint(unsigned i) const {
     assert(i < n_points);
@@ -132,6 +156,11 @@ protected:
   }
 
   void ClearTrace();
+
+  /**
+   * Obtain a new #Trace copy.
+   */
+  void UpdateTraceFull();
 
   /**
    * Copy points that were added to the end of the master Trace.
@@ -160,30 +189,33 @@ protected:
     assert(num_stages <= MAX_STAGES);
     assert(index + 1 < num_stages);
 
-    return m_weightings[index];
+    return stage_weights[index];
   }
 
-  /** 
+  /**
    * Distance function for edges
-   * 
+   *
    * @param s1 Origin node
    * @param s2 Destination node
-   * 
+   *
    * @return Distance (flat) from origin to destination
    */
   gcc_pure
-  unsigned CalcEdgeDistance(const ScanTaskPoint s1, const ScanTaskPoint s2) const {
-    return GetPoint(s1).flat_distance(GetPoint(s2));
+  unsigned CalcEdgeDistance(const ScanTaskPoint s1,
+                            const ScanTaskPoint s2) const {
+    return GetPoint(s1).FlatDistanceTo(GetPoint(s2));
   }
 
-  void Link(const ScanTaskPoint node, const ScanTaskPoint parent,
+  bool Link(const ScanTaskPoint node, const ScanTaskPoint parent,
             unsigned value) {
-    NavDijkstra::Link(node, parent, DIJKSTRA_MINMAX_OFFSET - value);
+    return NavDijkstra::Link(node, parent, DIJKSTRA_MINMAX_OFFSET - value);
   }
 
 private:
   gcc_pure
   bool IsMasterUpdated() const;
+
+  bool SaveSolution();
 
 protected:
   /**
@@ -199,24 +231,21 @@ protected:
    */
   virtual void StartSearch();
   virtual void AddStartEdges();
+  virtual ContestResult CalculateResult(const ContestTraceVector &solution) const;
 
 public:
   /* public virtual methods from AbstractContest */
-  virtual bool Solve(bool exhaustive);
-  virtual bool Score(ContestResult &result);
-  virtual void CopySolution(ContestTraceVector &vec) const;
-  virtual void Reset();
+  virtual SolverResult Solve(bool exhaustive) gcc_override;
+  virtual void Reset() gcc_override;
 
 protected:
   /* protected virtual methods from AbstractContest */
-  virtual fixed CalcDistance() const;
-  virtual fixed CalcScore() const;
-  virtual fixed CalcTime() const;
-  virtual bool SaveSolution();
+  virtual ContestResult CalculateResult() const gcc_override;
+  virtual void CopySolution(ContestTraceVector &vec) const gcc_override;
 
 protected:
-  /* methods from NavDijkstra */
-  virtual void AddEdges(ScanTaskPoint curNode);
+  /* virtual methods from NavDijkstra */
+  virtual void AddEdges(ScanTaskPoint curNode) gcc_override;
 };
 
 #endif

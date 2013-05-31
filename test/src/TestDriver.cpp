@@ -25,6 +25,7 @@
 #include "Device/Driver/BorgeltB50.hpp"
 #include "Device/Driver/CAI302.hpp"
 #include "Device/Driver/Condor.hpp"
+#include "Device/Driver/CProbe.hpp"
 #include "Device/Driver/EW.hpp"
 #include "Device/Driver/EWMicroRecorder.hpp"
 #include "Device/Driver/FLARM.hpp"
@@ -380,6 +381,38 @@ TestCAI302()
 }
 
 static void
+TestCProbe()
+{
+  NullPort null;
+  Device *device = c_probe_driver.CreateOnPort(dummy_config, null);
+  ok1(device != NULL);
+
+  NMEAInfo nmea_info;
+  nmea_info.Reset();
+  nmea_info.clock = fixed_one;
+
+  ok1(device->ParseNMEA("$PCPROBE,T,FD92,FF93,00D9,FD18,017E,FEDB,0370,0075,00D6,0064,001C,000000,,",
+                        nmea_info));
+  ok1(nmea_info.attitude.pitch_angle_available);
+  ok1(equals(nmea_info.attitude.pitch_angle, 25.6034467702));
+  ok1(nmea_info.attitude.bank_angle_available);
+  ok1(equals(nmea_info.attitude.bank_angle, -11.9963939863));
+  ok1(nmea_info.attitude.heading_available);
+  ok1(equals(nmea_info.attitude.heading, 257.0554705429));
+  ok1(nmea_info.acceleration.available);
+  ok1(nmea_info.acceleration.real);
+  ok1(equals(nmea_info.acceleration.g_load, 1.0030817514));
+  ok1(nmea_info.temperature_available);
+  ok1(equals(nmea_info.temperature, 11.7));
+  ok1(nmea_info.humidity_available);
+  ok1(equals(nmea_info.humidity, 21.4));
+  ok1(nmea_info.battery_level_available);
+  ok1(equals(nmea_info.battery_level, 100.0));
+
+  delete device;
+}
+
+static void
 TestFlymasterF1()
 {
   NullPort null;
@@ -498,6 +531,8 @@ TestFlytec()
 
   ok1(device->ParseNMEA("$FLYSEN,,,,,,,,,V,,101450,02341,0334,02000,,,,,,,,,*72",
                         nmea_info));
+  ok1(!nmea_info.date_available);
+  ok1(!nmea_info.time_available);
   ok1(nmea_info.static_pressure_available);
   ok1(equals(nmea_info.static_pressure.GetPascal(), 101450));
   ok1(nmea_info.pressure_altitude_available);
@@ -512,6 +547,8 @@ TestFlytec()
 
   ok1(device->ParseNMEA("$FLYSEN,,,,,,,,,,V,,101450,02341,0334,02000,,,,,,,,,*5e",
                         nmea_info));
+  ok1(!nmea_info.date_available);
+  ok1(!nmea_info.time_available);
   ok1(nmea_info.static_pressure_available);
   ok1(equals(nmea_info.static_pressure.GetPascal(), 101450));
   ok1(nmea_info.pressure_altitude_available);
@@ -531,6 +568,14 @@ TestFlytec()
   ok1(device->ParseNMEA("$FLYSEN,241211,201500,4700.840,N,00818.457,E,092,"
                         "01100,01234,A,09,097517,01321,-001,01030,P,023,,038,"
                         "088,00090,00088,800,,*29", nmea_info));
+  ok1(nmea_info.date_available);
+  ok1(nmea_info.date_time_utc.day == 24);
+  ok1(nmea_info.date_time_utc.month == 12);
+  ok1(nmea_info.date_time_utc.year == 2011);
+  ok1(nmea_info.time_available);
+  ok1(nmea_info.date_time_utc.hour == 20);
+  ok1(nmea_info.date_time_utc.minute == 15);
+  ok1(nmea_info.date_time_utc.second == 00);
   ok1(nmea_info.location_available);
   ok1(equals(nmea_info.location, 47.014, 8.307616667));
   ok1(nmea_info.track_available);
@@ -560,6 +605,14 @@ TestFlytec()
   ok1(device->ParseNMEA("$FLYSEN,241211,201500,4700.840,N,00818.457,E,092,"
                         "01100,01234,V,09,097517,01321,-001,01030,P,023,017,038,"
                         ",00090,00088,800,,*38", nmea_info));
+  ok1(nmea_info.date_available);
+  ok1(nmea_info.date_time_utc.day == 24);
+  ok1(nmea_info.date_time_utc.month == 12);
+  ok1(nmea_info.date_time_utc.year == 2011);
+  ok1(nmea_info.time_available);
+  ok1(nmea_info.date_time_utc.hour == 20);
+  ok1(nmea_info.date_time_utc.minute == 15);
+  ok1(nmea_info.date_time_utc.second == 00);
   ok1(!nmea_info.location_available);
   ok1(!nmea_info.track_available);
   ok1(!nmea_info.ground_speed_available);
@@ -956,7 +1009,7 @@ TestZander()
 static void
 TestDeclare(const struct DeviceRegister &driver)
 {
-  FaultInjectionPort port(*(Port::Handler *)NULL);
+  FaultInjectionPort port(*(DataHandler *)NULL);
   Device *device = driver.CreateOnPort(dummy_config, port);
   ok1(device != NULL);
 
@@ -998,7 +1051,7 @@ TestDeclare(const struct DeviceRegister &driver)
 static void
 TestFlightList(const struct DeviceRegister &driver)
 {
-  FaultInjectionPort port(*(Port::Handler *)NULL);
+  FaultInjectionPort port(*(DataHandler *)NULL);
   Device *device = driver.CreateOnPort(dummy_config, port);
   ok1(device != NULL);
 
@@ -1022,7 +1075,7 @@ TestFlightList(const struct DeviceRegister &driver)
 
 int main(int argc, char **argv)
 {
-  plan_tests(515);
+  plan_tests(552);
 
   TestGeneric();
   TestTasman();
@@ -1031,6 +1084,7 @@ int main(int argc, char **argv)
   TestGTAltimeter();
   TestBorgeltB50();
   TestCAI302();
+  TestCProbe();
   TestFlymasterF1();
   TestFlytec();
   TestLeonardo();

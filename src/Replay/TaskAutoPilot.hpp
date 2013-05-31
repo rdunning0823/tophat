@@ -23,10 +23,13 @@
 #define TASK_AUTOPILOT_HPP
 
 #include "Math/fixed.hpp"
-#include "Navigation/Aircraft.hpp"
 #include "Math/Angle.hpp"
-#include "Util/Filter.hpp"
+#include "Math/Filter.hpp"
+#include "Geo/GeoPoint.hpp"
+
 #include <vector>
+
+struct AircraftState;
 
 struct AutopilotParameters {
   fixed bearing_noise;
@@ -91,14 +94,12 @@ private:
   Filter heading_filter;
   fixed climb_rate;
   fixed speed_factor;
-  bool short_flight;
   GeoPoint w[2];
 
 public:
   TaskAutoPilot(const AutopilotParameters &_parms);
 
   virtual void Start(const TaskAccessor& task);
-  virtual void Stop() {}
   virtual void UpdateMode(const TaskAccessor& task,
                           const AircraftState& state);
 
@@ -119,9 +120,13 @@ public:
 private:
   bool DoAdvance(TaskAccessor& task);
   void AdvanceIfRequired(TaskAccessor& task);
-  bool HasFinished(TaskAccessor& task);
-  void GetAWP(TaskAccessor& task);
 
+  gcc_pure
+  bool HasFinished(const TaskAccessor &task) const;
+
+  void GetAWP(const TaskAccessor &task);
+
+  gcc_pure
   bool HasTarget(const TaskAccessor& task) const;
 
   virtual GeoPoint GetStartLocation(const TaskAccessor& task,

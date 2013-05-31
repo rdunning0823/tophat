@@ -24,8 +24,9 @@
 #define TASK_BEHAVIOUR_HPP
 
 #include "Contest/Solvers/Contests.hpp"
-#include "OrderedTaskBehaviour.hpp"
-#include "Task/Factory/AbstractTaskFactory.hpp"
+#include "Task/TaskNationalities.hpp"
+#include "Ordered/OrderedTaskBehaviour.hpp"
+#include "Task/Factory/TaskPointFactoryType.hpp"
 #include "Engine/Route/Config.hpp"
 #include "GlideSolvers/GlideSettings.hpp"
 #include "Util/TypeTraits.hpp"
@@ -46,15 +47,15 @@ enum class AbortTaskMode: uint8_t {
 struct SectorDefaults
 {
   /** default start type for new tasks */
-  AbstractTaskFactory::LegalPointType start_type;
+  TaskPointFactoryType start_type;
   /** default start radius or line length for new tasks */
   fixed start_radius;
   /** default intermediate type for new tasks */
-  AbstractTaskFactory::LegalPointType turnpoint_type;
+  TaskPointFactoryType turnpoint_type;
   /** default intermediate point radius for new tasks */
   fixed turnpoint_radius;
   /** default finish type for new tasks */
-  AbstractTaskFactory::LegalPointType finish_type;
+  TaskPointFactoryType finish_type;
   /** default finish radius or line length for new tasks */
   fixed finish_radius;
 
@@ -116,6 +117,15 @@ struct TaskBehaviour : public TaskStartMargins {
 
   /** Whether to do online OLC optimisation */
   bool enable_olc;
+
+  /**
+   * For the contest score, predict that the aircraft will reach the
+   * next turn point?
+   */
+  bool predict_contest;
+
+  /** Options available for task building and behaviour */
+  ContestNationalities contest_nationality;
 
   /** Rule set to scan for in OLC */
   Contests contest;

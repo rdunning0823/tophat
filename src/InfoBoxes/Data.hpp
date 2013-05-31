@@ -31,7 +31,7 @@ Copyright_License {
 class Angle;
 
 struct InfoBoxData {
-  static gcc_constexpr_data unsigned COLOR_COUNT = 6;
+  static constexpr unsigned COLOR_COUNT = 6;
 
   StaticString<32> title;
   StaticString<32> value;
@@ -72,6 +72,11 @@ struct InfoBoxData {
    * calls SetValueInvalid() then SetCommentInvalid()
    */
   void SetInvalid();
+
+  /**
+   * sets value and comment as not configured
+   */
+  void SetNotConfigured();
 
   /**
    * Sets the InfoBox title to the given Value
@@ -143,10 +148,20 @@ struct InfoBoxData {
   void SetCommentFromSpeed(fixed value, bool precision=true);
 
   /**
+   * Set the InfoBox comment from the specified distance and unit
+   */
+  void SetCommentFromDistance(fixed new_value);
+
+  /**
    * Set the InfoBox value to the specified altitude in the alternate
    * altitude unit.
    */
   void SetCommentFromAlternateAltitude(fixed value);
+
+  /**
+   * Set the InfoBox comment value to the specified vertical speed.
+   */
+  void SetCommentFromVerticalSpeed(fixed value, bool include_sign=true);
 
   template<typename... Args>
   void FormatTitle(const TCHAR *fmt, Args&&... args) {

@@ -31,7 +31,7 @@ Copyright_License {
 #include "ThermalBandComputer.hpp"
 #include "WindComputer.hpp"
 #include "ThermalLocator.hpp"
-#include "Util/WindowFilter.hpp"
+#include "Math/WindowFilter.hpp"
 
 struct VarioInfo;
 struct OneClimbInfo;
@@ -124,22 +124,9 @@ private:
   void ResetLiftDatabase(DerivedInfo &calculated);
   void UpdateLiftDatabase(const MoreData &basic, DerivedInfo &calculated,
                           const DerivedInfo &last_calculated);
-  void MaxHeightGain(const MoreData &basic, DerivedInfo &calculated);
-  void LD(const MoreData &basic, const MoreData &last_basic,
+  void GR(const MoreData &basic, const MoreData &last_basic,
           const DerivedInfo &calculated, VarioInfo &vario_info);
-  void CruiseLD(const MoreData &basic, DerivedInfo &calculated);
-
-  /**
-   * Calculates the wind
-   */
-  void Wind(const MoreData &basic, DerivedInfo &calculated,
-            const ComputerSettings &settings_computer);
-
-  /**
-   * Choose a wind from: user input; external device; calculated.
-   */
-  void SelectWind(const NMEAInfo &basic, DerivedInfo &calculated,
-                  const ComputerSettings &settings);
+  void CruiseGR(const MoreData &basic, DerivedInfo &calculated);
 
   void TerrainHeight(const MoreData &basic, TerrainInfo &calculated);
   void FlightState(const NMEAInfo &basic, const NMEAInfo &last_basic,
@@ -167,20 +154,14 @@ private:
                         const DerivedInfo &last_calculated);
 
   /**
-   * Calculate the circling time percentage and call the thermal band calculation
-   * @param Rate Current turn rate
-   */
-  void PercentCircling(const MoreData &basic, DerivedInfo &calculated,
-                       const ComputerSettings &settings);
-
-  /**
    * Calculates the turn rate and the derived features.
    * Determines the current flight mode (cruise/circling).
    */
   void Turning(const MoreData &basic, const MoreData &last_basic,
                DerivedInfo &calculated, const DerivedInfo &last_calculated,
                const ComputerSettings &settings);
-  void ProcessSun(const NMEAInfo &basic, DerivedInfo &calculated);
+  void ProcessSun(const NMEAInfo &basic, DerivedInfo &calculated,
+                  const ComputerSettings &settings);
 
   /**
    * Calculates the thermal value of next leg that is equivalent (gives the

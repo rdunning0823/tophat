@@ -30,11 +30,11 @@ class WaypointReaderOzi:
   public WaypointReaderBase 
 {
 public:
-  WaypointReaderOzi(const TCHAR* file_name, const int _file_num,
+  WaypointReaderOzi(const int _file_num,
                     bool _compressed = false)
-    :WaypointReaderBase(file_name, _file_num, _compressed) {}
+    :WaypointReaderBase(_file_num, _compressed) {}
 
-  bool VerifyFormat(TLineReader &reader) const;
+  static bool VerifyFormat(TLineReader &reader);
 
 protected:
   bool ParseLine(const TCHAR* line, const unsigned linenum,

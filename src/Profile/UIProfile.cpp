@@ -34,44 +34,69 @@ namespace Profile {
   static void Load(VarioSettings &settings);
   static void Load(TrafficSettings &settings);
   static void Load(DialogSettings &settings);
+  static void Load(SoundSettings &settings);
+  static void Load(VarioSoundSettings &settings);
 };
 
 void
 Profile::Load(DisplaySettings &settings)
 {
-  Get(szProfileAutoBlank, settings.enable_auto_blank);
-  GetEnum(szProfileDisplayOrientation, settings.orientation);
+  Get(ProfileKeys::AutoBlank, settings.enable_auto_blank);
+  GetEnum(ProfileKeys::DisplayOrientation, settings.orientation);
 }
 
 void
 Profile::Load(VarioSettings &settings)
 {
-  Get(szProfileAppGaugeVarioSpeedToFly, settings.show_speed_to_fly);
-  Get(szProfileAppGaugeVarioAvgText, settings.show_average);
-  Get(szProfileAppGaugeVarioMc, settings.show_mc);
-  Get(szProfileAppGaugeVarioBugs, settings.show_bugs);
-  Get(szProfileAppGaugeVarioBallast, settings.show_ballast);
-  Get(szProfileAppGaugeVarioGross, settings.show_gross);
-  Get(szProfileAppAveNeedle, settings.show_average_needle);
+  Get(ProfileKeys::AppGaugeVarioSpeedToFly, settings.show_speed_to_fly);
+  Get(ProfileKeys::AppGaugeVarioAvgText, settings.show_average);
+  Get(ProfileKeys::AppGaugeVarioMc, settings.show_mc);
+  Get(ProfileKeys::AppGaugeVarioBugs, settings.show_bugs);
+  Get(ProfileKeys::AppGaugeVarioBallast, settings.show_ballast);
+  Get(ProfileKeys::AppGaugeVarioGross, settings.show_gross);
+  Get(ProfileKeys::AppAveNeedle, settings.show_average_needle);
 }
 
 void
 Profile::Load(TrafficSettings &settings)
 {
-  Get(szProfileEnableFLARMGauge, settings.enable_gauge);
-  Get(szProfileAutoCloseFlarmDialog, settings.auto_close_dialog);
-  Get(szProfileFlarmAutoZoom, settings.auto_zoom);
-  Get(szProfileFlarmNorthUp, settings.north_up);
-  GetEnum(szProfileFlarmLocation, settings.gauge_location);
+  Get(ProfileKeys::EnableFLARMGauge, settings.enable_gauge);
+  Get(ProfileKeys::AutoCloseFlarmDialog, settings.auto_close_dialog);
+  Get(ProfileKeys::FlarmAutoZoom, settings.auto_zoom);
+  Get(ProfileKeys::FlarmNorthUp, settings.north_up);
 }
 
 void
 Profile::Load(DialogSettings &settings)
 {
-  GetEnum(szProfileAppDialogStyle, settings.dialog_style);
-  GetEnum(szProfileAppTextInputStyle, settings.text_input_style);
-  GetEnum(szProfileAppDialogTabStyle, settings.tab_style);
-  Get(szProfileUserLevel, settings.expert);
+  // use default tab style
+//  GetEnum(ProfileKeys::AppDialogTabStyle, settings.tab_style);
+  Get(ProfileKeys::UserLevel, settings.expert);
+}
+
+void
+Profile::Load(VarioSoundSettings &settings)
+{
+  Get(ProfileKeys::SoundAudioVario, settings.enabled);
+  Get(ProfileKeys::SoundVolume, settings.volume);
+  Get(ProfileKeys::VarioDeadBandEnabled, settings.dead_band_enabled);
+
+  Get(ProfileKeys::VarioMinFrequency, settings.min_frequency);
+  Get(ProfileKeys::VarioZeroFrequency, settings.zero_frequency);
+  Get(ProfileKeys::VarioMaxFrequency, settings.max_frequency);
+
+  Get(ProfileKeys::VarioMinPeriod, settings.min_period_ms);
+  Get(ProfileKeys::VarioMaxPeriod, settings.max_period_ms);
+}
+
+void
+Profile::Load(SoundSettings &settings)
+{
+  Get(ProfileKeys::SoundTask, settings.sound_task_enabled);
+  Get(ProfileKeys::SoundModes, settings.sound_modes_enabled);
+  Get(ProfileKeys::SoundDeadband, settings.sound_deadband);
+
+  Load(settings.vario);
 }
 
 void
@@ -79,18 +104,20 @@ Profile::Load(UISettings &settings)
 {
   Load(settings.display);
 
-  Get(szProfileMenuTimeout, settings.menu_timeout);
+  Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 
-  Get(szProfileUseCustomFonts, settings.custom_fonts);
+  Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
-  Get(szProfileEnableTAGauge, settings.enable_thermal_assistant_gauge);
-  Get(szProfileEnableFinalGlideBarMC0, settings.final_glide_bar_mc0_enabled);
+  Get(ProfileKeys::UseCustomFonts, settings.custom_fonts);
 
-  GetEnum(szProfileAppStatusMessageAlignment, settings.popup_message_position);
+  Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);
 
-  GetEnum(szProfileHapticFeedback, settings.haptic_feedback);
+  // hard code to default value
+//  GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
 
-  GetEnum(szProfileLatLonUnits, settings.coordinate_format);
+  GetEnum(ProfileKeys::HapticFeedback, settings.haptic_feedback);
+
+  GetEnum(ProfileKeys::LatLonUnits, settings.coordinate_format);
 
   LoadUnits(settings.units);
   Load(settings.map);
@@ -99,4 +126,5 @@ Profile::Load(UISettings &settings)
   Load(settings.traffic);
   Load(settings.pages);
   Load(settings.dialog);
+  Load(settings.sound);
 }

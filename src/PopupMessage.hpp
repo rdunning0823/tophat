@@ -26,7 +26,6 @@ Copyright_License {
 
 #include "Thread/Mutex.hpp"
 #include "Util/StaticString.hpp"
-#include "PeriodClock.hpp"
 #include "Screen/EditWindow.hpp"
 
 #include <tchar.h>
@@ -53,7 +52,7 @@ class StatusMessageList;
 class PopupMessage : public EditWindow
 {
 public:
-  enum {
+  enum Type {
     MSG_UNKNOWN = 0,
     MSG_AIRSPACE = 1,
     MSG_USERINTERFACE = 2,
@@ -65,10 +64,10 @@ private:
   enum { MAXMESSAGES = 20 };
 
   struct Message {
-    int type;
-    int tstart; // time message was created
-    int texpiry; // time message will expire
-    int tshow; // time message is visible for
+    Type type;
+    unsigned tstart; // time message was created
+    unsigned texpiry; // time message will expire
+    unsigned tshow; // time message is visible for
 
     StaticString<256u> text;
 
@@ -89,24 +88,22 @@ private:
     /**
      * Expired for the first time?
      */
-    bool IsNewlyExpired(int now) const {
+    bool IsNewlyExpired(unsigned now) const {
       return texpiry <= now && texpiry > tstart;
     }
 
-    void Set(int type, int tshow, const TCHAR *text, int now);
+    void Set(Type type, unsigned tshow, const TCHAR *text, unsigned now);
 
     /**
      * @return true if something was changed
      */
-    bool Update(int now);
+    bool Update(unsigned now);
 
     /**
      * @return true if a message has been appended
      */
-    bool AppendTo(TCHAR *buffer, int now);
+    bool AppendTo(StaticString<2000> &buffer, unsigned now);
   };
-
-  PeriodClock clock;
 
   const StatusMessageList &status_messages;
 
@@ -117,9 +114,9 @@ private:
 
   Mutex mutex;
   struct Message messages[MAXMESSAGES];
-  TCHAR msgText[2000];
+  StaticString<2000> text;
 
-  unsigned nvisible;
+  unsigned n_visible;
 
   bool enable_sound;
 
@@ -134,25 +131,25 @@ public:
 
 protected:
   /** Caller must hold the lock. */
-  void AddMessage(int tshow, int type, const TCHAR *Text);
+  void AddMessage(unsigned tshow, Type type, const TCHAR *Text);
 
 public:
   void AddMessage(const TCHAR* text, const TCHAR *data=NULL);
 
   /**
    * Repeats last non-visible message of specified type
-   * (or any message type=0).
+   * (or any message type=MSG_UNKNOWN).
    */
-  void Repeat(int type);
+  void Repeat(Type type=MSG_UNKNOWN);
 
   /** Clears all visible messages (of specified type or if type=0, all). */
-  bool Acknowledge(int type);
+  bool Acknowledge(Type type=MSG_UNKNOWN);
 
 private:
   gcc_pure
   PixelRect GetRect(UPixelScalar height) const;
 
-  void Resize();
+  void UpdateTextAndLayout(const TCHAR *text);
   int GetEmptySlot();
 
 protected:

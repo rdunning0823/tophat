@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "Device/Windows/Enumerator.hpp"
+#include "Util/StringUtil.hpp"
 
 gcc_pure
 static bool
@@ -30,7 +31,7 @@ CompareRegistryValue(const RegistryKey &registry,
 {
   TCHAR real_value[64];
   return registry.get_value(name, real_value, 64) &&
-    _tcsicmp(value, real_value) == 0;
+    StringIsEqualIgnoreCase(value, real_value);
 }
 
 gcc_pure
@@ -69,7 +70,11 @@ GetDeviceFriendlyName(const TCHAR *key, TCHAR *buffer, size_t max_size)
 
 PortEnumerator::PortEnumerator()
   :drivers_active(HKEY_LOCAL_MACHINE, _T("Drivers\\Active"), true),
-   i(0)
+   bluetooth_ports(HKEY_LOCAL_MACHINE,
+                   _T("SOFTWARE\\Microsoft\\Bluetooth\\Serial\\Ports"), true),
+   bluetooth_device(HKEY_LOCAL_MACHINE,
+                    _T("SOFTWARE\\Microsoft\\Bluetooth\\Device"), true),
+   i(0), j(0)
 {
 }
 
@@ -79,6 +84,9 @@ PortEnumerator::Next()
   assert(!drivers_active.error());
 
   TCHAR key_name[64];
+
+  /* enumerate regular serial ports first */
+
   while (drivers_active.enum_key(i++, key_name, 64)) {
     RegistryKey device(drivers_active, key_name, true);
     if (device.error())
@@ -102,6 +110,49 @@ PortEnumerator::Next()
 
       return true;
     }
+  }
+
+  /* virtual Bluetooth serial ports will not be found by the above;
+     the following is necessary to enumerate those */
+
+  while (bluetooth_ports.enum_key(j++, key_name, 64)) {
+    RegistryKey port(bluetooth_ports, key_name, true);
+    if (port.error())
+      continue;
+
+    if (!port.get_value(_T("Port"), name.buffer(), name.MAX_SIZE - 1))
+      continue;
+
+    /* the trailing colon is missing in this part of the registry */
+    name.Append(_T(':'));
+
+    display_name = name;
+
+    /* see if we can find a human-readable name */
+    const TCHAR *kn = key_name;
+    RegistryKey device(bluetooth_device, kn, true);
+    while (device.error() && *kn == _T('0')) {
+      /* turns out Windows CE strips four leading zeroes for the
+         Bluetooth\Device\* key (12 digits instead of 16); this is an
+         attempt to kludge around this weirdness */
+      ++kn;
+      device = RegistryKey(bluetooth_device, kn, true);
+    }
+
+    if (!device.error()) {
+      const size_t length = display_name.length();
+      TCHAR *const tail = display_name.buffer() + length;
+      const size_t remaining = display_name.MAX_SIZE - length - 3;
+
+      if (device.get_value(_T("name"), tail + 2, remaining)) {
+        /* build a string in the form: "COM1: (Friendly Name)" */
+        tail[0] = _T(' ');
+        tail[1] = _T('(');
+        _tcscat(tail, _T(")"));
+      }
+    }
+
+    return true;
   }
 
   return false;

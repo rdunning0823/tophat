@@ -24,18 +24,21 @@
 #include "Replay/IgcReplay.hpp"
 #include "IGC/IGCParser.hpp"
 #include "IGC/IGCFix.hpp"
-#include "Util/StringUtil.hpp"
+#include "IO/LineReader.hpp"
+#include "NMEA/Info.hpp"
 
-#include <algorithm>
-
-#include "Navigation/GeoPoint.hpp"
-
-IgcReplay::IgcReplay() :
-  AbstractReplay(),
-  cli(fixed(0.98)),
-  reader(NULL)
+IgcReplay::IgcReplay(NLineReader *_reader)
+  :AbstractReplay(),
+   cli(fixed(0.98)),
+   reader(_reader),
+   t_simulation(fixed_zero)
 {
-  file_name[0] = _T('\0');
+  cli.Reset();
+}
+
+IgcReplay::~IgcReplay()
+{
+  delete reader;
 }
 
 bool
@@ -58,7 +61,7 @@ IgcReplay::ReadPoint(IGCFix &fix)
 }
 
 bool
-IgcReplay::UpdateTime()
+IgcReplay::UpdateTime(fixed time_scale)
 {
   const fixed t_simulation_last = t_simulation;
 
@@ -67,72 +70,17 @@ IgcReplay::UpdateTime()
   return (t_simulation > t_simulation_last);
 }
 
-void
-IgcReplay::ResetTime()
-{
-  t_simulation = fixed_zero;
-}
-
-void
-IgcReplay::Stop()
-{
-  CloseFile();
-
-  OnStop();
-
-  enabled = false;
-}
-
-void
-IgcReplay::Start()
-{
-  if (enabled)
-    Stop();
-
-  if (!OpenFile()) {
-    OnBadFile();
-    return;
-  }
-
-  cli.Reset();
-  ResetTime();
-  OnReset();
-
-  enabled = true;
-}
-
-const TCHAR*
-IgcReplay::GetFilename()
-{
-  return file_name;
-}
-
-void
-IgcReplay::SetFilename(const TCHAR *name)
-{
-  if (!name || StringIsEmpty(name))
-    return;
-
-  if (_tcscmp(file_name, name) != 0)
-    _tcscpy(file_name, name);
-}
-
 bool
-IgcReplay::Update()
+IgcReplay::Update(NMEAInfo &data, fixed time_scale)
 {
-  if (!enabled)
-    return false;
-
-  if (positive(t_simulation) && !UpdateTime())
+  if (positive(t_simulation) && !UpdateTime(time_scale))
     return true;
 
   // if need a new point
   while (cli.NeedData(t_simulation)) {
     IGCFix fix;
-    if (!ReadPoint(fix)) {
-      Stop();
+    if (!ReadPoint(fix))
       return false;
-    }
 
     if (fix.pressure_altitude == 0 && fix.gps_altitude > 0)
       /* no pressure altitude was recorded - fall back to GPS
@@ -149,33 +97,23 @@ IgcReplay::Update()
 
   const CatmullRomInterpolator::Record r = cli.Interpolate(t_simulation);
   const GeoVector v = cli.GetVector(t_simulation);
-  OnAdvance(r.location, v.distance, v.bearing, r.gps_altitude, r.baro_altitude, t_simulation);
+
+  data.clock = t_simulation;
+  data.alive.Update(data.clock);
+  data.ProvideTime(t_simulation);
+  data.location = r.location;
+  data.location_available.Update(data.clock);
+  data.ground_speed = v.distance;
+  data.ground_speed_available.Update(data.clock);
+  data.track = v.bearing;
+  data.track_available.Update(data.clock);
+  data.gps_altitude = r.gps_altitude;
+  data.gps_altitude_available.Update(data.clock);
+  data.ProvidePressureAltitude(r.baro_altitude);
+  data.ProvideBaroAltitudeTrue(r.baro_altitude);
+  data.gps.real = false;
+  data.gps.replay = true;
+  data.gps.simulator = false;
 
   return true;
-}
-
-bool
-IgcReplay::OpenFile()
-{
-  if (reader)
-    return true;
-
-  if (StringIsEmpty(file_name))
-    return false;
-
-  reader = new FileLineReaderA(file_name);
-  if (!reader->error())
-    return true;
-
-  return false;
-}
-
-void
-IgcReplay::CloseFile()
-{
-  if (!reader)
-    return;
-
-  delete reader;
-  reader = NULL;
 }

@@ -21,25 +21,34 @@
  */
 
 #include "TouringTaskFactory.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/OrderedTaskBehaviour.hpp"
+#include "TaskFactoryConstraints.hpp"
+#include "Task/Ordered/OrderedTaskBehaviour.hpp"
 #include "Util/Macros.hpp"
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType touring_start_types[] = {
-  AbstractTaskFactory::START_CYLINDER,
+static constexpr TaskFactoryConstraints touring_constraints = {
+  false,
+  false,
+  true,
+  false,
+  false,
+  2, 10,
 };
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType touring_im_types[] = {
-  AbstractTaskFactory::FAI_SECTOR,
+static constexpr TaskPointFactoryType touring_start_types[] = {
+  TaskPointFactoryType::START_CYLINDER,
 };
 
-static gcc_constexpr_data AbstractTaskFactory::LegalPointType touring_finish_types[] = {
-  AbstractTaskFactory::FINISH_CYLINDER,
+static constexpr TaskPointFactoryType touring_im_types[] = {
+  TaskPointFactoryType::FAI_SECTOR,
+};
+
+static constexpr TaskPointFactoryType touring_finish_types[] = {
+  TaskPointFactoryType::FINISH_CYLINDER,
 };
 
 TouringTaskFactory::TouringTaskFactory(OrderedTask& _task,
                                const TaskBehaviour &tb)
-  :AbstractTaskFactory(_task, tb,
+  :AbstractTaskFactory(touring_constraints, _task, tb,
                        LegalPointConstArray(touring_start_types,
                                             ARRAY_SIZE(touring_start_types)),
                        LegalPointConstArray(touring_im_types,
@@ -52,17 +61,12 @@ TouringTaskFactory::TouringTaskFactory(OrderedTask& _task,
 void 
 TouringTaskFactory::UpdateOrderedTaskBehaviour(OrderedTaskBehaviour& to)
 {
-  to.task_scored = false;
+  AbstractTaskFactory::UpdateOrderedTaskBehaviour(to);
+
   to.aat_min_time = fixed_zero;
-  to.fai_finish = false;  
-  to.homogeneous_tps = true;
-  to.min_points = 2;
-  to.max_points = 10;
-  to.is_closed = false;
 
   to.start_max_speed = fixed_zero;
   to.start_max_height = 0;
   to.start_max_height_ref = HeightReferenceType::AGL;
   to.finish_min_height = 0;
-  to.start_requires_arm = false;
 }

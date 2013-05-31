@@ -56,27 +56,42 @@ TriggerGPSUpdate()
 }
 
 void
+ForceCalculation()
+{
+  if (calculation_thread != NULL)
+    calculation_thread->ForceTrigger();
+}
+
+void
 TriggerVarioUpdate()
 {
-  CommonInterface::main_window.SendGPSUpdate();
+  assert(CommonInterface::main_window != NULL);
+
+  CommonInterface::main_window->SendGPSUpdate();
 }
 
 void
 TriggerMapUpdate()
 {
-  CommonInterface::main_window.FullRedraw();
+  assert(CommonInterface::main_window != NULL);
+
+  CommonInterface::main_window->FullRedraw();
 }
 
 void
 TriggerCalculatedUpdate()
 {
-  CommonInterface::main_window.SendCalculatedUpdate();
+  assert(CommonInterface::main_window != NULL);
+
+  CommonInterface::main_window->SendCalculatedUpdate();
 }
 
 void
 TriggerAirspaceWarning()
 {
-  CommonInterface::main_window.SendAirspaceWarning();
+  assert(CommonInterface::main_window != NULL);
+
+  CommonInterface::main_window->SendAirspaceWarning();
 }
 
 void
@@ -95,7 +110,7 @@ CreateCalculationThread()
   /* initialise the GlideComputer and run the first iteration */
   glide_computer->ReadBlackboard(device_blackboard->Basic());
   glide_computer->ReadComputerSettings(device_blackboard->GetComputerSettings());
-  glide_computer->ProcessGPS();
+  glide_computer->ProcessGPS(true);
 
   /* copy GlideComputer results to DeviceBlackboard */
   device_blackboard->ReadBlackboard(glide_computer->Calculated());
@@ -107,16 +122,22 @@ CreateCalculationThread()
 void
 SuspendAllThreads()
 {
+  assert(CommonInterface::main_window != NULL);
+  assert(calculation_thread != NULL);
+
   /* not suspending MergeThread, because it does not access shared
      unprotected data structures */
 
-  CommonInterface::main_window.SuspendThreads();
+  CommonInterface::main_window->SuspendThreads();
   calculation_thread->Suspend();
 }
 
 void
 ResumeAllThreads()
 {
+  assert(calculation_thread != NULL);
+  assert(CommonInterface::main_window != NULL);
+
   calculation_thread->Resume();
-  CommonInterface::main_window.ResumeThreads();
+  CommonInterface::main_window->ResumeThreads();
 }

@@ -31,30 +31,38 @@ MapItemListSettings::SetDefaults()
 }
 
 void
+TrailSettings::SetDefaults()
+{
+  wind_drift_enabled = true;
+  scaling_enabled = true;
+  type = Type::VARIO_1;
+  length = Length::LONG;
+}
+
+void
 MapSettings::SetDefaults()
 {
   circle_zoom_enabled = true;
   max_auto_zoom_distance = fixed(100000); /* 100 km */
   topography_enabled = true;
   terrain.SetDefaults();
-  aircraft_symbol = acSimple;
-  trail_drift_enabled = true;
+  aircraft_symbol = acSimpleLarge;
   detour_cost_markers_enabled = false;
-  display_track_bearing = dtbAuto;
+  display_ground_track = DisplayGroundTrack::AUTO;
   auto_zoom_enabled = false;
-  snail_scaling_enabled = true;
-  snail_type = stStandardVario;
-  wind_arrow_style = 0;
+  wind_arrow_style = WindArrowStyle::ARROW_HEAD;
   waypoint.SetDefaults();
-  trail_length = TRAIL_LONG;
   airspace.SetDefaults();
-  glider_screen_position = 20; // 20% from bottom
-  circling_orientation = TRACKUP;
-  cruise_orientation = TRACKUP;
+  glider_screen_position = 30; // 30% from bottom
+  circling_orientation = TARGETUP;
+  cruise_orientation = TARGETUP;
   circling_scale = fixed_one / 2;
   cruise_scale = fixed_one / 60;
   show_flarm_on_map = true;
+  show_flarm_alarm_level = true;
   show_thermal_profile = true;
+  final_glide_bar_mc0_enabled = false;
 
+  trail.SetDefaults();
   item_list.SetDefaults();
 }

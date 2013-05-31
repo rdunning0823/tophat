@@ -58,7 +58,7 @@ public:
    * @param _handler the callback object for input received on the
    * port
    */
-  SerialPort(Port::Handler &_handler);
+  SerialPort(DataHandler &_handler);
 
   /**
    * Closes the serial port (Destructor)
@@ -81,6 +81,14 @@ protected:
     return ::ClearCommError(hPort, &errors, &com_stat) &&
       com_stat.cbInQue > 0;
   }
+
+  /**
+   * Determine the number of bytes in the driver's send buffer.
+   *
+   * @return the number of bytes, or -1 on error
+   */
+  gcc_pure
+  int GetDataQueued() const;
 
   /**
    * Determine the number of bytes in the driver's receive buffer.

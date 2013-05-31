@@ -30,8 +30,6 @@
 #ifndef XCSOAR_SLICE_ALLOCATOR_HPP
 #define XCSOAR_SLICE_ALLOCATOR_HPP
 
-#include "Compiler.h"
-
 #include <utility>
 #include <cstddef>
 #include <assert.h>
@@ -91,14 +89,14 @@ private:
 #endif
 
     Area()
-      :next(NULL), available(&items[0])
+      :next(nullptr), available(&items[0])
 #ifndef NDEBUG
       , num_available(size)
 #endif
     {
       for (unsigned i = 0; i < size - 1; ++i)
         items[i].next = &items[i + 1];
-      items[size - 1].next = NULL;
+      items[size - 1].next = nullptr;
     }
 
     ~Area() {
@@ -106,8 +104,8 @@ private:
     }
 
     Item *allocate() {
-      if (available == NULL)
-        return NULL;
+      if (available == nullptr)
+        return nullptr;
 
       Item *i = available;
       available = available->next;
@@ -142,14 +140,14 @@ protected:
   Area *head;
 
 public:
-  gcc_constexpr_ctor
-  SliceAllocator():head(NULL) {}
+  constexpr
+  SliceAllocator():head(nullptr) {}
 
-  gcc_constexpr_ctor
-  SliceAllocator(const SliceAllocator &other):head(NULL) {}
+  constexpr
+  SliceAllocator(const SliceAllocator &other):head(nullptr) {}
 
   ~SliceAllocator() {
-    while (head != NULL) {
+    while (head != nullptr) {
       Area *area = head;
       head = head->next;
       delete area;
@@ -162,18 +160,18 @@ public:
     /* try to allocate in one of the existing areas */
 
     Area *area;
-    for (area = head; area != NULL; area = area->next) {
+    for (area = head; area != nullptr; area = area->next) {
       Item *i = area->allocate();
-      if (i != NULL)
+      if (i != nullptr)
         return static_cast<T *>(static_cast<void *>(i));
     }
 
     /* no room, create a new Area and insert it into the linked list */
 
     area = new Area();
-    if (area == NULL)
+    if (area == nullptr)
       /* out of memory */
-      return NULL;
+      return nullptr;
 
     area->next = head;
     head = area;
@@ -190,7 +188,7 @@ public:
     Item *i = static_cast<Item *>(static_cast<void *>(t));
 
     for (Area *area = head;; area = area->next) {
-      assert(area != NULL);
+      assert(area != nullptr);
 
       if (area->deallocate(i))
         return;
@@ -239,7 +237,7 @@ public:
   GlobalSliceAllocator() = default;
 
   template<typename U>
-  gcc_constexpr_ctor
+  constexpr
   GlobalSliceAllocator(const GlobalSliceAllocator<U, size> &_other) {}
 
   T *allocate(const size_type n) {

@@ -26,14 +26,11 @@
 #include "IO/ConfiguredFile.hpp"
 #include "Profile/Profile.hpp"
 #include "Polar/Polar.hpp"
+#include "Polar/Parser.hpp"
 #include "Polar/PolarFileGlue.hpp"
 #include "Polar/PolarStore.hpp"
+#include "Util/ConvertString.hpp"
 #include "Util/Macros.hpp"
-
-#ifdef _UNICODE
-#include <windows.h>
-#endif
-
 
 TLineReader*
 OpenConfiguredTextFile(const TCHAR *profile_key, ConvertLineReader::charset cs)
@@ -46,31 +43,31 @@ TestBasic()
 {
   // Test ReadString()
   PolarInfo polar;
-  polar.ReadString(_T("318, 100, 80, -0.606, 120, -0.99, 160, -1.918"));
+  ParsePolar(polar, _T("318, 100, 80, -0.606, 120, -0.99, 160, -1.918"));
   ok1(equals(fixed(polar.reference_mass), 318));
   ok1(equals(fixed(polar.max_ballast), 100));
-  ok1(equals(fixed(polar.v1), 22.2222222));
-  ok1(equals(fixed(polar.w1), -0.606));
-  ok1(equals(fixed(polar.v2), 33.3333333));
-  ok1(equals(fixed(polar.w2), -0.99));
-  ok1(equals(fixed(polar.v3), 44.4444444));
-  ok1(equals(fixed(polar.w3), -1.918));
+  ok1(equals(fixed(polar.shape[0].v), 22.2222222));
+  ok1(equals(fixed(polar.shape[0].w), -0.606));
+  ok1(equals(fixed(polar.shape[1].v), 33.3333333));
+  ok1(equals(fixed(polar.shape[1].w), -0.99));
+  ok1(equals(fixed(polar.shape[2].v), 44.4444444));
+  ok1(equals(fixed(polar.shape[2].w), -1.918));
   ok1(equals(fixed(polar.wing_area), 0.0));
 
-  polar.ReadString(_T("318, 100, 80, -0.606, 120, -0.99, 160, -1.918, 9.8"));
+  ParsePolar(polar, _T("318, 100, 80, -0.606, 120, -0.99, 160, -1.918, 9.8"));
   ok1(equals(fixed(polar.reference_mass), 318));
   ok1(equals(fixed(polar.max_ballast), 100));
-  ok1(equals(fixed(polar.v1), 22.2222222));
-  ok1(equals(fixed(polar.w1), -0.606));
-  ok1(equals(fixed(polar.v2), 33.3333333));
-  ok1(equals(fixed(polar.w2), -0.99));
-  ok1(equals(fixed(polar.v3), 44.4444444));
-  ok1(equals(fixed(polar.w3), -1.918));
+  ok1(equals(fixed(polar.shape[0].v), 22.2222222));
+  ok1(equals(fixed(polar.shape[0].w), -0.606));
+  ok1(equals(fixed(polar.shape[1].v), 33.3333333));
+  ok1(equals(fixed(polar.shape[1].w), -0.99));
+  ok1(equals(fixed(polar.shape[2].v), 44.4444444));
+  ok1(equals(fixed(polar.shape[2].w), -1.918));
   ok1(equals(fixed(polar.wing_area), 9.8));
 
   // Test GetString()
   TCHAR polar_string[255];
-  polar.GetString(polar_string, 255);
+  FormatPolar(polar, polar_string, 255);
   ok(_tcscmp(_T("318,100,80.000,-0.606,120.000,-0.990,160.000,-1.918,9.800"),
              polar_string) == 0, "GetString()");
 }
@@ -83,12 +80,12 @@ TestFileImport()
   PolarGlue::LoadFromFile(polar, _T("test/data/test.plr"));
   ok1(equals(fixed(polar.reference_mass), 318));
   ok1(equals(fixed(polar.max_ballast), 100));
-  ok1(equals(fixed(polar.v1), 22.2222222));
-  ok1(equals(fixed(polar.w1), -0.606));
-  ok1(equals(fixed(polar.v2), 33.3333333));
-  ok1(equals(fixed(polar.w2), -0.99));
-  ok1(equals(fixed(polar.v3), 44.4444444));
-  ok1(equals(fixed(polar.w3), -1.918));
+  ok1(equals(fixed(polar.shape[0].v), 22.2222222));
+  ok1(equals(fixed(polar.shape[0].w), -0.606));
+  ok1(equals(fixed(polar.shape[1].v), 33.3333333));
+  ok1(equals(fixed(polar.shape[1].w), -0.99));
+  ok1(equals(fixed(polar.shape[2].v), 44.4444444));
+  ok1(equals(fixed(polar.shape[2].w), -1.918));
   ok1(equals(fixed(polar.wing_area), 9.8));
 }
 
@@ -98,18 +95,9 @@ TestBuiltInPolars()
   unsigned count = PolarStore::Count();
   for(unsigned i = 0; i < count; i++) {
     PolarInfo polar = PolarStore::GetItem(i).ToPolarInfo();
-#ifdef _UNICODE
-  size_t wide_length = _tcslen(PolarStore::GetItem(i).name);
-  char narrow[wide_length * 4 + 1];
-  int narrow_length =
-      ::WideCharToMultiByte(CP_ACP, 0, PolarStore::GetItem(i).name, wide_length,
-                            narrow, sizeof(narrow), NULL, NULL);
-  narrow[narrow_length] = 0;
 
-  ok(polar.IsValid(), narrow);
-#else
-  ok(polar.IsValid(), PolarStore::GetItem(i).name);
-#endif
+    WideToUTF8Converter narrow(PolarStore::GetItem(i).name);
+    ok(polar.IsValid(), narrow);
   }
 }
 
@@ -161,20 +149,11 @@ TestBuiltInPolarsPlausibility()
     assert(i < PolarStore::Count());
     unsigned si = performanceData[i].storeIndex;
     PolarInfo polar = PolarStore::GetItem(si).ToPolarInfo();
-    PolarCoefficients pc = PolarCoefficients::From3VW(
-                              polar.v1, polar.v2, polar.v3,
-                              polar.w1, polar.w2, polar.w3);
+    PolarCoefficients pc =
+      PolarCoefficients::From3VW(polar.shape[0].v, polar.shape[1].v, polar.shape[2].v,
+                                 polar.shape[0].w, polar.shape[1].w, polar.shape[2].w);
 
-#ifdef _UNICODE
-    size_t wide_length = _tcslen(PolarStore::GetItem(i).name);
-    char polarName[wide_length * 4 + 1];
-    int narrow_length =
-        ::WideCharToMultiByte(CP_ACP, 0, PolarStore::GetItem(i).name, wide_length,
-                              polarName, sizeof(polarName), NULL, NULL);
-    polarName[narrow_length] = 0;
-#else
-    const char* polarName=PolarStore::GetItem(si).name;
-#endif
+    WideToUTF8Converter polarName(PolarStore::GetItem(i).name);
 
     ok(pc.IsValid(), polarName);
 

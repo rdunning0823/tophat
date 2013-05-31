@@ -144,3 +144,18 @@
 #define IDB_OBSTACLE_HD                5366
 #define IDB_MOUNTAIN_PASS               367
 #define IDB_MOUNTAIN_PASS_HD           5367
+#define IDB_WEATHER_STATION             368
+#define IDB_WEATHER_STATION_HD         5368
+#define IDB_MENU_BUTTON                 500
+#define IDB_MENU_BUTTON_HD             5500
+#define IDB_ZOOM_OUT_BUTTON             501
+#define IDB_ZOOM_OUT_BUTTON_HD         5501
+#define IDB_ZOOM_IN_BUTTON              502
+#define IDB_ZOOM_IN_BUTTON_HD          5502
+#define IDB_CHECK_MARK                  503
+#define IDB_CHECK_MARK_HD              5503
+#define IDB_SEARCH                      504
+#define IDB_SEARCH_HD                  5504
+#define IDB_SEARCH_CHECKED              505
+#define IDB_SEARCH_CHECKED_HD          5505
+

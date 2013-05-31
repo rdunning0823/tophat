@@ -21,47 +21,19 @@ Copyright_License {
 }
 */
 
+#include "DebugReplay.hpp"
 #include "IO/TextWriter.hpp"
-#include "Replay/IgcReplay.hpp"
-#include "OS/PathName.hpp"
-#include "Util/StaticString.hpp"
 #include "NMEA/Checksum.hpp"
 #include "Units/System.hpp"
 #include "OS/Args.hpp"
 
 #include <stdio.h>
 
-class IGCConverterReplay: public IgcReplay
-{
-  TextWriter writer;
-
-public:
-  IGCConverterReplay(const char *input_file, const char *output_file);
-
-  bool HasError() {
-    return writer.error();
-  }
-
-  virtual void OnReset() {}
-  virtual void OnStop() {}
-  virtual void OnBadFile() {}
-  virtual void OnAdvance(const GeoPoint &loc,
-                          const fixed speed, const Angle bearing,
-                          const fixed alt, const fixed baroalt, const fixed t);
-};
-
-IGCConverterReplay::IGCConverterReplay(const char *input_file,
-                                       const char *output_file)
-  :writer(output_file)
-{
-  PathName path(input_file);
-  SetFilename(path);
-}
-
-void
-IGCConverterReplay::OnAdvance(const GeoPoint &loc, const fixed speed,
-                               const Angle bearing, const fixed alt,
-                               const fixed baroalt, const fixed t)
+static void
+GenerateNMEA(TextWriter &writer,
+             const GeoPoint &loc, const fixed speed,
+             const Angle bearing, const fixed alt,
+             const fixed baroalt, const fixed t)
 {
   unsigned time = (unsigned)t;
   unsigned hour = time / 3600;
@@ -91,7 +63,7 @@ IGCConverterReplay::OnAdvance(const GeoPoint &loc, const fixed speed,
   gprmc.AppendFormat(",%.0f", (double)bearing.Degrees());
   AppendNMEAChecksum(gprmc.buffer());
 
-  writer.writeln(gprmc);
+  writer.WriteLine(gprmc);
   printf("%s\n", gprmc.c_str());
 
   NarrowString<256> gpgga("$GPGGA");
@@ -104,14 +76,14 @@ IGCConverterReplay::OnAdvance(const GeoPoint &loc, const fixed speed,
   gpgga.AppendFormat(",%.0f,m", (double)alt);
   AppendNMEAChecksum(gpgga.buffer());
 
-  writer.writeln(gpgga);
+  writer.WriteLine(gpgga);
   printf("%s\n", gpgga.c_str());
 
   NarrowString<256> pgrmz("$PGRMZ");
   pgrmz.AppendFormat(",%.0f,m", (double)baroalt);
   AppendNMEAChecksum(pgrmz.buffer());
 
-  writer.writeln(pgrmz);
+  writer.WriteLine(pgrmz);
   printf("%s\n", pgrmz.c_str());
 }
 
@@ -119,17 +91,25 @@ int
 main(int argc, char **argv)
 {
   Args args(argc, argv, "INFILE.igc OUTFILE.nmea");
+  DebugReplay *replay = CreateDebugReplay(args);
+  if (replay == NULL)
+    return EXIT_FAILURE;
 
-  const char *input_file = args.ExpectNext();
   const char *output_file = args.ExpectNext();
   args.ExpectEnd();
 
-  IGCConverterReplay replay(input_file, output_file);
-  if (replay.HasError())
+  TextWriter writer(output_file);
+  if (!writer.IsOpen()) {
+    fprintf(stderr, "Failed to create output file\n");
     return EXIT_FAILURE;
+  }
 
-  replay.Start();
-  while (replay.Update());
+  while (replay->Next()) {
+    const NMEAInfo &basic = replay->Basic();
+    GenerateNMEA(writer, basic.location,
+                 basic.ground_speed, basic.track, basic.gps_altitude,
+                 basic.baro_altitude, basic.time);
+  }
 
   return EXIT_SUCCESS;
 }

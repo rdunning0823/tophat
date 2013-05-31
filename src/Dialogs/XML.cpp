@@ -53,6 +53,8 @@ Copyright_License {
 #include "Form/CheckBox.hpp"
 #include "Form/DockWindow.hpp"
 #include "Util/StringUtil.hpp"
+#include "Util/ConvertString.hpp"
+#include "Util/NumberParser.hpp"
 #include "ResourceLoader.hpp"
 #include "Look/DialogLook.hpp"
 #include "Inflate.hpp"
@@ -95,7 +97,7 @@ typedef Window *(*CreateWindowCallback_t)(ContainerWindow &parent,
                                           const WindowStyle style);
 
 static Window *
-LoadChild(SubForm &form, ContainerWindow &parent,
+LoadChild(SubForm &form, ContainerWindow &parent, const PixelRect &parent_rc,
           const CallBackTableEntry *lookup_table, XMLNode node,
           int bottom_most = 0,
           WindowStyle style=WindowStyle());
@@ -117,7 +119,7 @@ StringToIntDflt(const TCHAR *string, long _default)
 {
   if (string == NULL || StringIsEmpty(string))
     return _default;
-  return _tcstol(string, NULL, 0);
+  return ParseInt(string, NULL, 0);
 }
 
 /**
@@ -304,24 +306,12 @@ LoadXMLFromResource(const TCHAR* resource, XML::Results *xml_results)
 
   char *buffer = InflateToString(data.first, data.second);
 
-#ifdef _UNICODE
-  int length = strlen(buffer);
-  TCHAR *buffer2 = new TCHAR[length + 1];
-  length = MultiByteToWideChar(CP_UTF8, 0, buffer, length,
-                               buffer2, length);
-  buffer2[length] = _T('\0');
-  delete[] buffer;
-#else
-  const char *buffer2 = buffer;
-#endif
+  UTF8ToWideConverter buffer2(buffer);
+  assert(buffer2.IsValid());
 
   XMLNode *x = XML::ParseString(buffer2, xml_results);
 
-#ifdef _UNICODE
-  delete[] buffer2;
-#else
   delete[] buffer;
-#endif
 
   return x;
 }
@@ -363,25 +353,10 @@ InitScaleWidth(const PixelSize size, const PixelRect rc)
     dialog_width_scale = 1024;
 }
 
-/**
- * Loads a stand-alone XML file as a single top-level XML node
- * into an existing SubForm object and sets its parent to the parent parameter
- * Ignores additional top-level XML nodes.
- * Scales based on the DialogStyle of the last XML form loaded by XCSoar.
- * The Window is destroyed by its Form's destructor
- *
- * @param LookUpTable The CallBackTable
- * @param form The WndForm into which the Window is added
- * @param parent The parent window of the control being created
- *    set parent to "form-GetClientRect()" to make top level control
- *    or to a PanelControl to add it to a tab window
- * @param FileName The XML filename
- * @return the pointer to the Window added to the form
- */
 Window *
 LoadWindow(const CallBackTableEntry *lookup_table, SubForm *form,
-           ContainerWindow &parent, const TCHAR *resource,
-           WindowStyle style)
+           ContainerWindow &parent, const PixelRect &rc,
+           const TCHAR *resource, WindowStyle style)
 {
   if (!form)
     return NULL;
@@ -390,7 +365,7 @@ LoadWindow(const CallBackTableEntry *lookup_table, SubForm *form,
   assert(node != NULL);
 
   // load only one top-level control.
-  Window *window = LoadChild(*form, parent, lookup_table, *node, 0, style);
+  Window *window = LoadChild(*form, parent, rc, lookup_table, *node, 0, style);
   delete node;
 
   assert(!XML::global_error);
@@ -398,16 +373,15 @@ LoadWindow(const CallBackTableEntry *lookup_table, SubForm *form,
   return window;
 }
 
-/**
- * This function returns a WndForm created either from the ressources or
- * from the XML file in XCSoarData(if found)
- * @param LookUpTable The CallBackTable
- * @param FileName The XML filename to search for in XCSoarData
- * @param Parent The parent window (e.g. XCSoarInterface::main_window)
- * @param resource The resource to look for
- * @param targetRect The area where to move the dialog if not parent
- * @return The WndForm object
- */
+Window *
+LoadWindow(const CallBackTableEntry *lookup_table, SubForm *form,
+           ContainerWindow &parent, const TCHAR *resource,
+           WindowStyle style)
+{
+  return LoadWindow(lookup_table, form, parent, parent.GetClientRect(),
+                    resource, style);
+}
+
 WndForm *
 LoadDialog(const CallBackTableEntry *lookup_table, SingleWindow &parent,
            const TCHAR *resource, const PixelRect *target_rc)
@@ -503,10 +477,10 @@ LoadDataField(const XMLNode &node, const CallBackTableEntry *LookUpTable)
   DataField::DataAccessCallback callback = (DataField::DataAccessCallback)
     GetCallBack(LookUpTable, node, _T("OnDataAccess"));
 
-  if (_tcsicmp(data_type, _T("enum")) == 0)
+  if (StringIsEqualIgnoreCase(data_type, _T("enum")))
     return new DataFieldEnum(callback);
 
-  if (_tcsicmp(data_type, _T("filereader")) == 0) {
+  if (StringIsEqualIgnoreCase(data_type, _T("filereader"))) {
     DataFieldFileReader *df = new DataFieldFileReader(callback);
 
     if (StringToIntDflt(node.GetAttribute(_T("Nullable")), true))
@@ -515,14 +489,14 @@ LoadDataField(const XMLNode &node, const CallBackTableEntry *LookUpTable)
     return df;
   }
 
-  if (_tcsicmp(data_type, _T("boolean")) == 0)
+  if (StringIsEqualIgnoreCase(data_type, _T("boolean")))
     return new DataFieldBoolean(false, _("On"), _("Off"), callback);
 
-  if (_tcsicmp(data_type, _T("double")) == 0)
+  if (StringIsEqualIgnoreCase(data_type, _T("double")))
     return new DataFieldFloat(edit_format, display_format, min, max,
                               fixed_zero, fixed(step), fine, callback);
 
-  if (_tcsicmp(data_type, _T("time")) == 0) {
+  if (StringIsEqualIgnoreCase(data_type, _T("time"))) {
     DataFieldTime *df = new DataFieldTime((int)min, (int)max, 0,
                                           (unsigned)step, callback);
     unsigned max_token = StringToIntDflt(node.GetAttribute(_T("MaxTokens")), 2);
@@ -530,11 +504,11 @@ LoadDataField(const XMLNode &node, const CallBackTableEntry *LookUpTable)
     return df;
   }
 
-  if (_tcsicmp(data_type, _T("integer")) == 0)
+  if (StringIsEqualIgnoreCase(data_type, _T("integer")))
     return new DataFieldInteger(edit_format, display_format, (int)min, (int)max,
                                 0, (int)step, callback);
 
-  if (_tcsicmp(data_type, _T("string")) == 0)
+  if (StringIsEqualIgnoreCase(data_type, _T("string")))
     return new DataFieldString(_T(""), callback);
 
   return NULL;
@@ -549,7 +523,7 @@ LoadDataField(const XMLNode &node, const CallBackTableEntry *LookUpTable)
  * @param node The XMLNode that represents the control
  */
 static Window *
-LoadChild(SubForm &form, ContainerWindow &parent,
+LoadChild(SubForm &form, ContainerWindow &parent, const PixelRect &parent_rc,
           const CallBackTableEntry *lookup_table, XMLNode node,
           int bottom_most,
           WindowStyle style)
@@ -560,12 +534,11 @@ LoadChild(SubForm &form, ContainerWindow &parent,
   // and caption of the control
   const TCHAR* name = GetName(node);
   const TCHAR* caption = GetCaption(node);
-  PixelRect rc = parent.GetClientRect();
-  ControlPosition pos = GetPosition(node, rc, bottom_most);
+  ControlPosition pos = GetPosition(node, parent_rc, bottom_most);
   if (!pos.no_scaling)
     pos.x = ScaleWidth(pos.x);
 
-  ControlSize size = GetSize(node, rc, pos);
+  ControlSize size = GetSize(node, parent_rc, pos);
   if (!size.no_scaling)
     size.cx = ScaleWidth(size.cx);
 
@@ -575,6 +548,7 @@ LoadChild(SubForm &form, ContainerWindow &parent,
   if (StringToIntDflt(node.GetAttribute(_T("Border")), 0))
     style.Border();
 
+  PixelRect rc;
   rc.left = pos.x;
   rc.top = pos.y;
   rc.right = rc.left + size.cx;
@@ -767,8 +741,7 @@ LoadChild(SubForm &form, ContainerWindow &parent,
 
     // Create the DrawControl
     WndOwnerDrawFrame* canvas =
-      new WndOwnerDrawFrame(parent, pos.x, pos.y, size.cx, size.cy,
-                            style, paint_callback);
+      new WndOwnerDrawFrame(parent, rc, style, paint_callback);
 
     window = canvas;
 
@@ -826,11 +799,11 @@ LoadChild(SubForm &form, ContainerWindow &parent,
 
     window = tabbed;
 
-    for (auto i = node.begin(), end = node.end(); i != end; ++i) {
+    for (const auto &i : node) {
       // Load each child control from the child nodes
-      Window *child = LoadChild(form, *tabbed,
+      Window *child = LoadChild(form, *tabbed, tabbed->GetClientRect(),
                                 lookup_table,
-                                *i);
+                                i);
       if (child != NULL)
         tabbed->AddClient(child);
     }
@@ -910,9 +883,8 @@ LoadChildrenFromXML(SubForm &form, ContainerWindow &parent,
   // Iterate through the childnodes
   for (auto i = node->begin(), end = node->end(); i != end; ++i) {
     // Load each child control from the child nodes
-    Window *window = LoadChild(form, parent, lookup_table,
-                               *i,
-                               bottom_most);
+    Window *window = LoadChild(form, parent, parent.GetClientRect(),
+                               lookup_table, *i, bottom_most);
     if (window == NULL)
       continue;
 

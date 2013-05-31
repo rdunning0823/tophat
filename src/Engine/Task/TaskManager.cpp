@@ -22,11 +22,12 @@
 
 #include "TaskManager.hpp"
 #include "Visitors/TaskPointVisitor.hpp"
-#include "Tasks/TaskSolvers/TaskSolution.hpp"
-#include "Tasks/BaseTask/UnorderedTaskPoint.hpp"
-#include "Tasks/BaseTask/OrderedTaskPoint.hpp"
-#include "TaskPoints/AATPoint.hpp"
+#include "Solvers/TaskSolution.hpp"
+#include "Engine/Task/Unordered/UnorderedTaskPoint.hpp"
+#include "Ordered/Points/OrderedTaskPoint.hpp"
+#include "Ordered/Points/AATPoint.hpp"
 #include "Util/StringUtil.hpp"
+#include "OS/Clock.hpp"
 
 TaskManager::TaskManager(const TaskBehaviour &_task_behaviour,
                          const Waypoints &wps)
@@ -36,7 +37,8 @@ TaskManager::TaskManager(const TaskBehaviour &_task_behaviour,
    task_goto(task_behaviour, wps),
    task_abort(task_behaviour, wps),
    mode(MODE_NULL),
-   active_task(NULL) {
+   active_task(NULL),
+   task_time_stamp(0) {
   null_stats.reset();
 }
 
@@ -59,12 +61,14 @@ TaskManager::SetMode(const TaskMode _mode)
   case (MODE_ABORT):
     active_task = &task_abort;
     mode = MODE_ABORT;
+    task_time_stamp = MonotonicClockMS();
     break;
 
   case (MODE_ORDERED):
     if (task_ordered.TaskSize()) {
       active_task = &task_ordered;
       mode = MODE_ORDERED;
+      task_time_stamp = MonotonicClockMS();
       break;
     }
 
@@ -72,12 +76,14 @@ TaskManager::SetMode(const TaskMode _mode)
     if (task_goto.GetActiveTaskPoint()) {
       active_task = &task_goto;
       mode = MODE_GOTO;
+      task_time_stamp = MonotonicClockMS();
       break;
     }
 
   case (MODE_NULL):
     active_task = NULL;
     mode = MODE_NULL;
+    task_time_stamp = MonotonicClockMS();
     break;
   };
   return mode;
@@ -136,8 +142,8 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
     common_stats.ordered_has_targets = task_ordered.HasTargets();
 
     common_stats.aat_time_remaining =
-        task_ordered.get_ordered_task_behaviour().aat_min_time -
-        task_stats.total.time_elapsed;
+      task_ordered.GetOrderedTaskBehaviour().aat_min_time -
+      task_stats.total.time_elapsed;
 
     if (task_stats.total.remaining.IsDefined() &&
         positive(common_stats.aat_time_remaining))
@@ -147,7 +153,7 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
     else
       common_stats.aat_speed_remaining = -fixed_one;
 
-    fixed aat_min_time = task_ordered.get_ordered_task_behaviour().aat_min_time;
+    fixed aat_min_time = task_ordered.GetOrderedTaskBehaviour().aat_min_time;
 
     if (positive(aat_min_time)) {
       common_stats.aat_speed_max = task_stats.distance_max / aat_min_time;
@@ -161,10 +167,12 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
     common_stats.task_time_elapsed = task_stats.total.time_elapsed;
 
     const fixed start_max_height =
-        fixed(task_ordered.get_ordered_task_behaviour().start_max_height) +
-        fixed(task_ordered.get_ordered_task_behaviour().start_max_height_ref
-              == HeightReferenceType::MSL ? fixed_zero : task_ordered.get_tp(0)->GetElevation());
-    if (positive(start_max_height) && state.flying) {
+      fixed(task_ordered.GetOrderedTaskBehaviour().start_max_height) +
+      (task_ordered.GetOrderedTaskBehaviour().start_max_height_ref == HeightReferenceType::MSL
+       ? fixed_zero
+       : task_ordered.GetPoint(0).GetElevation());
+    if (positive(start_max_height) &&
+        state.location.IsValid() && state.flying) {
       if (!positive(common_stats.TimeUnderStartMaxHeight) &&
           state.altitude < start_max_height) {
         common_stats.TimeUnderStartMaxHeight = state.time;
@@ -176,7 +184,7 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
       common_stats.TimeUnderStartMaxHeight = -fixed_one;
     }
 
-    task_ordered.update_summary(common_stats.ordered_summary);
+    task_ordered.UpdateSummary(common_stats.ordered_summary);
 
   } else {
     common_stats.ResetTask();
@@ -186,37 +194,15 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
 void
 TaskManager::UpdateCommonStatsWaypoints(const AircraftState &state)
 {
-  common_stats.vector_home = task_abort.GetHomeVector(state);
+  common_stats.vector_home = state.location.IsValid()
+    ? task_abort.GetHomeVector(state)
+    : GeoVector::Invalid();
 
   common_stats.landable_reachable = task_abort.HasReachableLandable();
-
-  const TaskWaypoint *tp = GetActiveTaskPoint();
-  if (tp != NULL) {
-    // must make an UnorderedTaskPoint here so we pick up arrival height requirements
-    const UnorderedTaskPoint fp(tp->GetWaypoint(), task_behaviour);
-
-    // @todo: consider change to task_abort.get_safety_polar();
-    GlidePolar glide_polar = GetGlidePolar();
-
-    common_stats.next_solution =
-      TaskSolution::GlideSolutionRemaining(fp, state, task_behaviour.glide,
-                                           glide_polar);
-
-    if (positive(glide_polar.GetMC())) {
-      glide_polar.SetMC(fixed_zero);
-      common_stats.next_solution_mc0 =
-        TaskSolution::GlideSolutionRemaining(fp, state, task_behaviour.glide,
-                                             glide_polar);
-    } else
-      common_stats.next_solution_mc0 = common_stats.next_solution;
-  } else {
-    common_stats.next_solution.Reset();
-    common_stats.next_solution_mc0.Reset();
-  }
 }
 
 void
-TaskManager::UpdateCommonStatsTask(const AircraftState &state)
+TaskManager::UpdateCommonStatsTask()
 {
   common_stats.mode_abort = (mode == MODE_ABORT);
   common_stats.mode_goto = (mode == MODE_GOTO);
@@ -251,9 +237,8 @@ TaskManager::UpdateCommonStatsTask(const AircraftState &state)
 void
 TaskManager::UpdateCommonStatsPolar(const AircraftState &state)
 {
-  common_stats.current_mc = glide_polar.GetMC();
-  common_stats.current_bugs = glide_polar.GetBugs();
-  common_stats.current_ballast = glide_polar.GetBallast();
+  if (!state.location.IsValid())
+    return;
 
   common_stats.current_risk_mc =
     glide_polar.GetRiskMC(state.working_band_fraction,
@@ -279,15 +264,23 @@ void
 TaskManager::UpdateCommonStats(const AircraftState &state)
 {
   UpdateCommonStatsTimes(state);
-  UpdateCommonStatsTask(state);
+  UpdateCommonStatsTask();
   UpdateCommonStatsWaypoints(state);
   UpdateCommonStatsPolar(state);
 }
 
 bool
 TaskManager::Update(const AircraftState &state,
-                    const AircraftState &state_last)
+                    const AircraftState &state_last,
+                    const Waypoints &waypoints)
 {
+  if (!state.location.IsValid()) {
+    /* in case of GPS failure or and during startup (before the first
+       GPS fix), update only the stats */
+    UpdateCommonStats(state);
+    return false;
+  }
+
   /* always update ordered task so even if we are temporarily in a
      different mode, so the task stats are still updated.  Otherwise,
      the task stats would freeze and sampling etc would not be
@@ -300,10 +293,9 @@ TaskManager::Update(const AircraftState &state,
   if (state_last.time > state.time)
     Reset();
 
-  if (task_ordered.TaskSize() > 1)
-    // always update ordered task
+  if (task_ordered.TaskSize() > 1) {
     retval |= task_ordered.Update(state, state_last, glide_polar);
-
+  }
   // inform the abort task whether it is running as the task or not
   task_abort.SetActive(active_task == &task_abort);
 
@@ -359,11 +351,23 @@ TaskManager::GetStats() const
   return null_stats;
 }
 
+/**
+ * loads the Mat points vector to the current task if it is a Mat
+ */
+void
+TaskManager::FillMatPoints(const Waypoints &waypoints)
+{
+  if (!IsMat())
+    return;
+  task_ordered.FillMatPoints(waypoints);
+}
+
 bool
 TaskManager::DoGoto(const Waypoint &wp)
 {
   if (task_goto.DoGoto(wp)) {
     SetMode(MODE_GOTO);
+    task_time_stamp = MonotonicClockMS();
     return true;
   }
 
@@ -387,6 +391,7 @@ TaskManager::Reset()
   task_abort.Reset();
   common_stats.Reset();
   glide_polar.SetCruiseEfficiency(fixed_one);
+  task_time_stamp = MonotonicClockMS();
 }
 
 unsigned
@@ -433,6 +438,9 @@ bool
 TaskManager::UpdateAutoMC(const AircraftState &state_now,
                           const fixed fallback_mc)
 {
+  if (!state_now.location.IsValid())
+    return false;
+
   if (active_task &&
       active_task->UpdateAutoMC(glide_polar, state_now, fallback_mc))
     return true;
@@ -475,7 +483,7 @@ TaskManager::GetLocationTarget(const unsigned index,
 
   const AATPoint *ap = task_ordered.GetAATTaskPoint(index);
   if (ap)
-    return ap->get_location_target();
+    return ap->GetTargetLocation();
 
  return fallback_location;
 }
@@ -514,7 +522,7 @@ TaskManager::SetTarget(const unsigned index, const GeoPoint &loc,
 
   AATPoint *ap = task_ordered.GetAATTaskPoint(index);
   if (ap)
-    ap->set_target(loc, override_lock);
+    ap->SetTarget(loc, override_lock);
 
   return true;
 }
@@ -528,7 +536,7 @@ TaskManager::SetTarget(const unsigned index, const fixed range,
 
   AATPoint *ap = task_ordered.GetAATTaskPoint(index);
   if (ap)
-    ap->set_target(range, radial, task_ordered.GetTaskProjection());
+    ap->SetTarget(range, radial, task_ordered.GetTaskProjection());
 
   return true;
 }
@@ -542,7 +550,7 @@ TaskManager::GetTargetRangeRadial(const unsigned index, fixed &range,
 
   const AATPoint *ap = task_ordered.GetAATTaskPoint(index);
   if (ap)
-    ap->get_target_range_radial(range, radial);
+    ap->GetTargetRangeRadial(range, radial);
 
   return true;
 }
@@ -555,7 +563,7 @@ TaskManager::TargetLock(const unsigned index, bool do_lock)
 
   AATPoint *ap = task_ordered.GetAATTaskPoint(index);
   if (ap)
-    ap->target_lock(do_lock);
+    ap->LockTarget(do_lock);
 
   return true;
 }
@@ -567,11 +575,13 @@ TaskManager::Clone(const TaskBehaviour &tb) const
 }
 
 bool
-TaskManager::Commit(const OrderedTask &other)
+TaskManager::Commit(const OrderedTask &other, const Waypoints &waypoints)
 {
-  bool retval = task_ordered.Commit(other);
+  bool retval = task_ordered.Commit(other, waypoints);
 
   if (other.TaskSize()) {
+    task_time_stamp = MonotonicClockMS();
+
     // if valid, resume the task
     switch (mode) {
     case MODE_NULL:
@@ -602,4 +612,10 @@ TaskManager::TakeoffAutotask(const GeoPoint &loc, const fixed terrain_alt)
   // create a goto task on takeoff
   if (!active_task && task_goto.TakeoffAutotask(loc, terrain_alt))
     SetMode(MODE_GOTO);
+}
+
+bool
+TaskManager::IsMat() const
+{
+  return task_ordered.GetFactoryType() == TaskFactoryType::MAT;
 }

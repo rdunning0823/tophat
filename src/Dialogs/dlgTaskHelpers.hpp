@@ -27,7 +27,7 @@ Copyright_License {
 
 #include "Task/Factory/AbstractTaskFactory.hpp"
 #include "Task/TaskBehaviour.hpp"
-#include "Task/Tasks/BaseTask/TaskPoint.hpp"
+#include "Task/Points/TaskPoint.hpp"
 
 class SingleWindow;
 
@@ -43,12 +43,19 @@ const TCHAR* OrderedTaskFactoryName(TaskFactoryType type);
 void OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks);
 void OrderedTaskPointLabel(TaskPoint::Type type, const TCHAR *name,
                            unsigned index, TCHAR* buffer);
+
+/**
+ * label for task points with actionable labels
+ * when clicked on the Map List popup
+ */
+void OrderedTaskPointLabelMapAction(TaskPoint::Type type, const TCHAR *name,
+                                    unsigned index, TCHAR* buffer);
 void OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* radius);
 bool OrderedTaskSave(SingleWindow &parent,
                      const OrderedTask& task, bool noask=false);
 
-const TCHAR* OrderedTaskPointDescription(AbstractTaskFactory::LegalPointType type);
-const TCHAR* OrderedTaskPointName(AbstractTaskFactory::LegalPointType type);
+const TCHAR* OrderedTaskPointDescription(TaskPointFactoryType type);
+const TCHAR* OrderedTaskPointName(TaskPointFactoryType type);
 const TCHAR* getTaskValidationErrors(
    const AbstractTaskFactory::TaskValidationErrorVector v);
 const TCHAR* TaskValidationError(

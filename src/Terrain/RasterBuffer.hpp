@@ -33,24 +33,24 @@ Copyright_License {
 class RasterBuffer : private NonCopyable {
 public:
   /** invalid value for terrain */
-  static const short TERRAIN_INVALID = -32768;
-  static const short TERRAIN_WATER_THRESHOLD = -30000;
+  static constexpr short TERRAIN_INVALID = -32768;
+  static constexpr short TERRAIN_WATER_THRESHOLD = -30000;
 
   enum class TerrainType: uint8_t {
     UNKNOWN, GROUND, WATER
   };
 
-  gcc_const
+  constexpr
   static bool IsInvalid(short h) {
     return h == TERRAIN_INVALID;
   }
 
-  gcc_const
+  constexpr
   static bool IsWater(short h) {
     return h <= TERRAIN_WATER_THRESHOLD && !IsInvalid(h);
   }
 
-  gcc_const
+  constexpr
   static bool IsSpecial(short h) {
     return h <= TERRAIN_WATER_THRESHOLD;
   }

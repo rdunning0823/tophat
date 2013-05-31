@@ -61,31 +61,34 @@ namespace InfoBoxManager
    */
   void ProcessQuickAccess(const int id, const TCHAR *Value);
 
+  /**
+   * GetQuickAccess takes the id of the InfoBox and returns the value
+   * determined by the InfoBox. It doesn't expect the target InfoBox to be focussed.
+   * @param id
+   * @return value set by InfoBoxContent or 0 if no content exists.
+   */
+  gcc_pure unsigned GetQuickAccess(const int id);
+
   bool Click(InfoBoxWindow &ib);
 
   void ProcessTimer();
   void SetDirty();
 
-  void Create(PixelRect rc, const InfoBoxLayout::Layout &layout,
+  void Create(ContainerWindow &parent, const InfoBoxLayout::Layout &layout,
               const InfoBoxLook &look, const UnitsLook &units_look);
   void Destroy();
   void Show();
   void Hide();
 
-  const InfoBoxContent::DialogContent *GetDialogContent(const int id);
-
   unsigned GetCurrentPanel();
   const TCHAR* GetCurrentPanelName();
   const TCHAR* GetPanelName(unsigned panel);
 
-  InfoBoxFactory::t_InfoBox GetType(unsigned box, unsigned panel);
   const TCHAR* GetTitle(unsigned box);
 
   bool IsEmpty(unsigned panel);
 
   bool HasFocus();
-
-  void ShowDlgInfoBox(const int id);
 
   /**
    * Opens a dialog to select the InfoBox contents for

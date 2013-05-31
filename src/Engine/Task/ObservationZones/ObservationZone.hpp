@@ -27,10 +27,8 @@
 #include "Math/fixed.hpp"
 #include "Compiler.h"
 
-#include <forward_list>
-
 struct GeoPoint;
-struct AircraftState;
+class OZBoundary;
 
 /**
  * Abstract class giving properties of a zone which is used to measure
@@ -39,8 +37,6 @@ struct AircraftState;
 class ObservationZone
 {
 public:
-  typedef std::forward_list<GeoPoint> Boundary;
-
   virtual ~ObservationZone() {}
 
   /** 
@@ -49,7 +45,7 @@ public:
    * @return True if reference point is inside sector
    */
   gcc_pure
-  virtual bool IsInSector(const AircraftState &ref) const = 0;
+  virtual bool IsInSector(const GeoPoint &location) const = 0;
 
   /**
    * If zone when used for start can trigger task start via vertical exit
@@ -70,38 +66,8 @@ public:
    * @return True if constraints are satisfied
    */
   gcc_pure
-  virtual bool TransitionConstraint(const AircraftState &ref_now,
-                                    const AircraftState &ref_last) const = 0;
-
-  /** 
-   * Check if aircraft has transitioned to inside sector
-   * 
-   * @param ref_now Current aircraft state
-   * @param ref_last Previous aircraft state
-   *
-   * @return True if aircraft now inside (and was outside)
-   */
-  gcc_pure
-  virtual bool CheckEnterTransition(const AircraftState &ref_now,
-                                    const AircraftState &ref_last) const {
-    return IsInSector(ref_now) &&
-           !IsInSector(ref_last) &&
-           TransitionConstraint(ref_now, ref_last);
-  }
-
-  /** 
-   * Check if aircraft has transitioned to outside sector
-   * 
-   * @param ref_now Current aircraft state
-   * @param ref_last Previous aircraft state
-   *
-   * @return True if aircraft now outside (and was inside)
-   */
-  gcc_pure
-  virtual bool CheckExitTransition(const AircraftState &ref_now,
-                                   const AircraftState &ref_last) const {
-    return CheckEnterTransition(ref_last, ref_now);
-  }
+  virtual bool TransitionConstraint(const GeoPoint &location,
+                                    const GeoPoint &last_location) const = 0;
 
   /**
    * Get point on boundary from parametric representation
@@ -126,7 +92,7 @@ public:
    * measurable advantage.
    */
   gcc_pure
-  virtual Boundary GetBoundary() const = 0;
+  virtual OZBoundary GetBoundary() const = 0;
 
   /**
    * Distance reduction for scoring when outside this OZ

@@ -24,7 +24,7 @@ Copyright_License {
 #include "Integer.hpp"
 #include "ComboList.hpp"
 #include "Math/FastMath.h"
-#include "Compatibility/string.h"
+#include "Util/NumberParser.hpp"
 #include "Asset.hpp"
 
 #include <stdlib.h>
@@ -55,12 +55,6 @@ DataFieldInteger::GetAsDisplayString() const
 }
 
 void
-DataFieldInteger::Set(int _value)
-{
-  value = _value;
-}
-
-void
 DataFieldInteger::SetAsInteger(int _value)
 {
   if (_value < min)
@@ -76,7 +70,7 @@ DataFieldInteger::SetAsInteger(int _value)
 void
 DataFieldInteger::SetAsString(const TCHAR *_value)
 {
-  SetAsInteger(_ttoi(_value));
+  SetAsInteger(ParseInt(_value));
 }
 
 void
@@ -153,11 +147,12 @@ DataFieldInteger::CreateComboList() const
   bool found_current = false;
   for (int i = first; i <= last; i += step) {
     if (!found_current && value <= i) {
+      combo_list->ComboPopupItemSavedIndex = combo_list->size();
+
       if (value < i)
         /* the current value is not listed - insert it here */
         AppendComboValue(*combo_list, value);
 
-      combo_list->ComboPopupItemSavedIndex = combo_list->size();
       found_current = true;
     }
 
@@ -167,8 +162,8 @@ DataFieldInteger::CreateComboList() const
   if (value > last) {
     /* the current value out of range - append it here */
     last = value;
-    AppendComboValue(*combo_list, value);
     combo_list->ComboPopupItemSavedIndex = combo_list->size();
+    AppendComboValue(*combo_list, value);
   }
 
   if (last < max)

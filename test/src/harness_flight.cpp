@@ -22,6 +22,7 @@
 
 #include "harness_flight.hpp"
 #include "harness_airspace.hpp"
+#include "harness_wind.hpp"
 #include "TaskEventsPrint.hpp"
 #include "Util/AircraftStateFilter.hpp"
 #include "Replay/TaskAutoPilot.hpp"
@@ -40,33 +41,6 @@ aat_min_time(int test_num)
   default:
     return beh.aat_min_time;
   }
-}
-
-static fixed
-wind_to_mag(int n_wind)
-{
-  if (n_wind)
-    return (fixed(n_wind - 1) / 4 + fixed_one) * 5;
-
-  return fixed_zero;
-}
-
-static Angle
-wind_to_dir(int n_wind)
-{
-  if (n_wind)
-    return Angle::Degrees(fixed(90 * ((n_wind - 1) % 4))).AsBearing();
-
-  return Angle::Zero();
-}
-
-const char*
-wind_name(int n_wind)
-{
-  static char buffer[80];
-  sprintf(buffer,"%d m/s @ %d", (int)wind_to_mag(n_wind),
-          (int)wind_to_dir(n_wind).Degrees());
-  return buffer;
 }
 
 #include "Task/TaskManager.hpp"
@@ -102,7 +76,7 @@ protected:
     }
   }
   virtual void OnClose() {
-    wait_prompt();
+    WaitPrompt();
   }
 };
 
@@ -209,7 +183,7 @@ run_flight(TestFlightComponents components, TaskManager &task_manager,
           printf("# airspace warnings updated, size %d\n",
                  (int)airspace_warnings->size());
           print_warnings(*airspace_warnings);
-          wait_prompt();
+          WaitPrompt();
         }
       }
     }
@@ -234,8 +208,6 @@ run_flight(TestFlightComponents components, TaskManager &task_manager,
 
   } while (autopilot.UpdateAutopilot(ta, aircraft.GetState(), aircraft.GetLastState()));
 
-  autopilot.Stop();
-
   if (verbose) {
     PrintHelper::taskmanager_print(task_manager, aircraft.GetState());
 
@@ -248,7 +220,7 @@ run_flight(TestFlightComponents components, TaskManager &task_manager,
     f4.flush();
     task_report(task_manager, "end of task\n");
   }
-  wait_prompt();
+  WaitPrompt();
 
   result.time_elapsed = (double)task_manager.GetStats().total.time_elapsed;
   result.time_planned = (double)task_manager.GetStats().total.time_planned;
@@ -256,7 +228,7 @@ run_flight(TestFlightComponents components, TaskManager &task_manager,
   result.calc_effective_mc = (double)task_manager.GetStats().effective_mc;
 
   if (verbose)
-    distance_counts();
+    PrintDistanceCounts();
 
   if (airspace_warnings)
     delete airspace_warnings;
@@ -284,7 +256,7 @@ test_flight(TestFlightComponents components, int test_num, int n_wind,
   SetupWaypoints(waypoints);
 
   if (verbose)
-    distance_counts();
+    PrintDistanceCounts();
 
   TaskBehaviour task_behaviour;
   task_behaviour.SetDefaults();

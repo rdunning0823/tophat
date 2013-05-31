@@ -33,7 +33,6 @@ Copyright_License {
 #include "Form/List.hpp"
 #include "Form/Button.hpp"
 #include "Form/DockWindow.hpp"
-#include "Math/Earth.hpp"
 #include "ComputerSettings.hpp"
 #include "LocalPath.hpp"
 #include "Screen/Bitmap.hpp"
@@ -188,7 +187,7 @@ OnGotoClicked(gcc_unused WndButton &button)
   protected_task_manager->DoGoto(*waypoint);
   wf->SetModalResult(mrOK);
 
-  CommonInterface::main_window.FullRedraw();
+  CommonInterface::main_window->FullRedraw();
 }
 
 #if 0
@@ -314,7 +313,7 @@ OnFileListItemPaint(Canvas &canvas, const PixelRect paint_rc, unsigned i)
 }
 #endif
 
-static gcc_constexpr_data CallBackTableEntry CallBackTable[] = {
+static constexpr CallBackTableEntry CallBackTable[] = {
     DeclareCallBackEntry(OnMagnifyClicked),
     DeclareCallBackEntry(OnShrinkClicked),
     DeclareCallBackEntry(OnNextClicked),
@@ -332,22 +331,24 @@ UpdateCaption(const TCHAR *waypoint_name, int8_t file_num)
   buffer.Format(_T("%s: %s"), _("Waypoint"), waypoint_name);
 
   if (file_num > 0) {
-    const TCHAR *key;
+    const TCHAR *key = NULL;
     switch (file_num) {
     case 1:
-      key = szProfileWaypointFile;
+      key = ProfileKeys::WaypointFile;
       break;
     case 2:
-      key = szProfileAdditionalWaypointFile;
+      key = ProfileKeys::AdditionalWaypointFile;
       break;
     case 3:
-      key = szProfileWatchedWaypointFile;
+      key = ProfileKeys::WatchedWaypointFile;
       break;
     }
 
-    const TCHAR *filename = Profile::GetPathBase(key);
-    if (filename != NULL)
-      buffer.AppendFormat(_T(" (%s)"), filename);
+    if (key != NULL) {
+      const TCHAR *filename = Profile::GetPathBase(key);
+      if (filename != NULL)
+        buffer.AppendFormat(_T(" (%s)"), filename);
+    }
   }
 
   wf->SetCaption(buffer);

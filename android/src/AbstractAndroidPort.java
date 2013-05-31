@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,10 +73,6 @@ abstract class AbstractAndroidPort implements AndroidPort {
   }
 
   public void close() {
-    /* clear the listener to allow reusing this object (e.g. by
-       IOIOHelper) */
-    listener = null;
-
     InputThread i = stealInput();
     if (i != null)
       i.close();

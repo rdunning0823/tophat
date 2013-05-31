@@ -31,6 +31,7 @@ Copyright_License {
 
 #include <assert.h>
 #include <stdlib.h>
+#include <memory>
 
 TaskFile::~TaskFile()
 {
@@ -64,11 +65,18 @@ OrderedTask *
 TaskFile::GetTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
                   const Waypoints *waypoints, unsigned index)
 {
-  TaskFile  *file = TaskFile::Create(path);
-  if (file == NULL)
+  std::unique_ptr<TaskFile> file(TaskFile::Create(path));
+  if (!file)
     return NULL;
 
-  OrderedTask *task = file->GetTask(task_behaviour, waypoints, index);
-  delete file;
-  return task;
+  return file->GetTask(task_behaviour, waypoints, index);
+}
+
+const TCHAR *
+TaskFile::GetName(unsigned index) const
+{
+  if (index >= namesuffixes.size())
+    return NULL;
+
+  return namesuffixes[index];
 }

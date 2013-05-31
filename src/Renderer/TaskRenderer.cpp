@@ -22,17 +22,16 @@ Copyright_License {
 */
 
 #include "TaskRenderer.hpp"
-#include "Task/Tasks/AbstractTask.hpp"
-#include "Task/Tasks/GotoTask.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/Tasks/AbortTask.hpp"
-#include "Task/TaskPoints/StartPoint.hpp"
-#include "Task/TaskPoints/FinishPoint.hpp"
-#include "Engine/Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Unordered/GotoTask.hpp"
+#include "Engine/Task/Unordered/AbortTask.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/StartPoint.hpp"
+#include "Engine/Task/Ordered/Points/FinishPoint.hpp"
 #include "TaskPointRenderer.hpp"
 
 TaskRenderer::TaskRenderer(TaskPointRenderer &_tpv, GeoBounds _screen_bounds)
-  :tpv(_tpv), screen_bounds(_screen_bounds) {}
+  :tpv(_tpv), screen_bounds(_screen_bounds),
+   show_only_ordered_outlines(false) {}
 
 void 
 TaskRenderer::Draw(const AbortTask &task)
@@ -50,23 +49,36 @@ TaskRenderer::Draw(const AbortTask &task)
 void 
 TaskRenderer::Draw(const OrderedTask &task)
 {
-  tpv.SetBoundingBox(task.get_bounding_box(screen_bounds));
+  tpv.SetBoundingBox(task.GetBoundingBox(screen_bounds));
   tpv.SetActiveIndex(task.GetActiveIndex());
-  for (unsigned i = 0; i < 4; i++) {
+  unsigned layer_start = 0;
+  unsigned layer_end = 3;
+  if (show_only_ordered_outlines) {
+    layer_start = layer_end = 2;
+  }
+
+  for (unsigned i = layer_start; i <= layer_end; i++) {
     tpv.ResetIndex();
 
     if (i != TaskPointRenderer::LAYER_SYMBOLS &&
         i != TaskPointRenderer::LAYER_LEG) {
       tpv.SetModeOptional(true);
 
-      for (unsigned j = 0, end = task.optional_start_points_size(); j < end; ++j)
-        tpv.Draw(*task.get_optional_start(j), (TaskPointRenderer::Layer)i);
+      for (unsigned j = 0, end = task.GetOptionalStartPointCount(); j < end; ++j)
+        tpv.Draw(task.GetOptionalStartPoint(j), (TaskPointRenderer::Layer)i);
     }
 
     tpv.SetModeOptional(false);
     for (unsigned j = 0, end = task.TaskSize(); j < end; ++j)
       tpv.Draw(task.GetTaskPoint(j), (TaskPointRenderer::Layer)i);
   }
+  // now draw MAT circles
+  tpv.ResetIndex();
+  tpv.SetModeOptional(false);
+
+  for (unsigned j = 0, end = task.GetMatPoints().size(); j < end; ++j)
+    tpv.Draw(*task.GetMatPoints()[j], (TaskPointRenderer::Layer)2);
+
 }
 
 void 
@@ -82,19 +94,28 @@ TaskRenderer::Draw(const GotoTask &task)
 }
 
 void
-TaskRenderer::Draw(const TaskInterface &task)
+TaskRenderer::Draw(const TaskInterface &active_task,
+                   const OrderedTask &ordered_task)
 {
-  switch (task.GetType()) {
+  switch (active_task.GetType()) {
   case TaskInterface::ORDERED:
-    Draw((const OrderedTask &)task);
+    Draw((const OrderedTask &)active_task);
     break;
 
   case TaskInterface::ABORT:
-    Draw((const AbortTask &)task);
+    Draw((const AbortTask &)active_task);
+    if (ordered_task.TaskSize() > 1) {
+      show_only_ordered_outlines = true;
+      Draw(ordered_task);
+    }
     break;
 
   case TaskInterface::GOTO:
-    Draw((const GotoTask &)task);
+    Draw((const GotoTask &)active_task);
+    if (ordered_task.TaskSize() > 1) {
+      show_only_ordered_outlines = true;
+      Draw(ordered_task);
+    }
     break;
   }
 }

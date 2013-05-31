@@ -25,37 +25,35 @@ Copyright_License {
 #define NMEA_REPLAY_HPP
 
 #include "AbstractReplay.hpp"
+#include "Device/Port/NullPort.hpp"
 
-#include <tchar.h>
-#include <windef.h> /* for MAX_PATH */
-
-class FileLineReaderA;
+class NLineReader;
+class NMEAParser;
+class Device;
+struct DeviceConfig;
+struct NMEAInfo;
 
 class NmeaReplay: public AbstractReplay
 {
-  TCHAR file_name[MAX_PATH];
-  FileLineReaderA *reader;
+  NLineReader *reader;
+
+  NMEAParser *parser;
+  NullPort port;
+  Device *device;
 
 public:
-  NmeaReplay();
+  NmeaReplay(NLineReader *reader, const DeviceConfig &config);
   ~NmeaReplay();
 
-  bool Update();
-  void Stop();
-  void Start();
-  const TCHAR* GetFilename();
-  void SetFilename(const TCHAR *name);
+  virtual bool Update(NMEAInfo &data, fixed time_scale) gcc_override;
 
 protected:
+  bool ParseLine(const char *line, NMEAInfo &data);
+
   virtual bool UpdateTime();
-  virtual void ResetTime() = 0;
-  virtual void OnBadFile() = 0;
-  virtual void OnSentence(const char *line) = 0;
 
 private:
-  bool OpenFile();
-  void CloseFile();
-  bool ReadUntilRMC(bool ignore);
+  bool ReadUntilRMC(NMEAInfo &data, bool ignore);
 };
 
 #endif

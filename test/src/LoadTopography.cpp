@@ -27,9 +27,10 @@ Copyright_License {
  */
 
 #include "Topography/TopographyStore.hpp"
+#include "Topography/TopographyFile.hpp"
+#include "Topography/XShape.hpp"
 #include "OS/PathName.hpp"
 #include "IO/ZipLineReader.hpp"
-#include "Projection/WindowProjection.hpp"
 #include "Operation/Operation.hpp"
 
 #include <zzip/zzip.h>
@@ -38,43 +39,25 @@ Copyright_License {
 #include <tchar.h>
 
 #ifdef ENABLE_OPENGL
-#include "Screen/OpenGL/Triangulate.hpp"
 
-unsigned
-PolygonToTriangles(const RasterPoint *points, unsigned num_points,
-                   AllocatedArray<GLushort> &triangles,
-                   unsigned min_distance)
+static void
+TriangulateAll(const TopographyFile &file)
 {
-  return 0;
+  const unsigned short *count;
+  for (const XShape &shape : file)
+    if (shape.get_type() == MS_SHAPE_POLYGON)
+      for (unsigned i = 0; i < 4; ++i)
+        shape.get_indices(i, 1, count);
 }
 
-unsigned
-PolygonToTriangles(const ShapePoint *points, unsigned num_points,
-                   GLushort *triangles, unsigned min_distance)
+static void
+TriangulateAll(const TopographyStore &store)
 {
-  return 0;
+  for (unsigned i = 0; i < store.size(); ++i)
+    TriangulateAll(store[i]);
 }
 
-unsigned
-TriangleToStrip(GLushort *triangles, unsigned index_count,
-                unsigned vertex_count, unsigned polygon_count)
-{
-  return 0;
-}
-
-#endif /* OpenGL */
-
-class TestProjection : public WindowProjection {
-public:
-  TestProjection() {
-    SetScreenOrigin(0, 0);
-    SetScale(fixed(640) / (fixed(100) * 2));
-    SetGeoLocation(GeoPoint(Angle::Degrees(fixed(7.7061111111111114)),
-                            Angle::Degrees(fixed(51.051944444444445))));
-    SetScreenSize(640, 480);
-    UpdateScreenBounds();
-  }
-};
+#endif
 
 int main(int argc, char **argv)
 {
@@ -102,9 +85,11 @@ int main(int argc, char **argv)
   topography.Load(operation, reader, NULL, dir);
   zzip_dir_close(dir);
 
-  TestProjection projection;
+  topography.LoadAll();
 
-  topography.ScanVisibility(projection);
+#ifdef ENABLE_OPENGL
+  TriangulateAll(topography);
+#endif
 
   return EXIT_SUCCESS;
 }

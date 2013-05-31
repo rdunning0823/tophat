@@ -33,20 +33,36 @@ class TLineReader;
 /**
  * Struct used to store status message items
  */
-struct StatusMessageSTRUCT {
-	const TCHAR *key;		/* English key */
-	const TCHAR *sound;		/* What sound entry to play */
-	bool doStatus;
-	bool doSound;
-	int delay_ms;		/* Delay for DoStatusMessage */
+struct StatusMessage {
+  /** English key */
+  const TCHAR *key;
+
+  /** What sound entry to play */
+  const TCHAR *sound;
+
+  bool visible;
+
+  /** Delay for DoStatusMessage */
+  unsigned delay_ms;
+
+  void Clear() {
+    key = NULL;
+    sound = NULL;
+    delay_ms = 2500;
+    visible = true;
+  }
+
+  bool IsEmpty() const {
+    return key == NULL;
+  }
 };
 
 /**
  * Class to manage a list of active and recent status messages
  */
 class StatusMessageList {
-  StaticArray<StatusMessageSTRUCT, 1000> StatusMessageData;
-  int olddelay;
+  StaticArray<StatusMessage, 1000> list;
+  int old_delay;
 
 public:
   StatusMessageList();
@@ -56,14 +72,11 @@ public:
 
   void Startup(bool first);
 
-  const StatusMessageSTRUCT &First() const {
-    return StatusMessageData[0];
+  const StatusMessage &First() const {
+    return list[0];
   }
 
-  const StatusMessageSTRUCT *Find(const TCHAR *key) const;
-
-private:
-  void _init_Status(StatusMessageSTRUCT &m);
+  const StatusMessage *Find(const TCHAR *key) const;
 };
 
 #endif

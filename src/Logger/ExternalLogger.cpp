@@ -118,7 +118,7 @@ ExternalLogger::Declare(const Declaration &decl, const Waypoint *home)
   for (unsigned i = 0; i < NUMDEV; ++i) {
     DeviceDescriptor &device = *device_list[i];
 
-    if (device.CanDeclare()) {
+    if (device.CanDeclare() && device.IsOpen()) {
       found_logger = true;
       DeviceDeclare(device, decl, home);
     }
@@ -127,6 +127,19 @@ ExternalLogger::Declare(const Declaration &decl, const Waypoint *home)
   if (!found_logger)
     ShowMessageBox(_("No logger connected"),
                 _("Declare task"), MB_OK | MB_ICONINFORMATION);
+}
+
+unsigned
+ExternalLogger::LoggerAttachedCount()
+{
+  unsigned count = 0;
+  for (unsigned i = 0; i < NUMDEV; ++i) {
+    DeviceDescriptor &device = *device_list[i];
+
+    if (device.CanDeclare() && device.IsOpen())
+      ++count;
+  }
+  return count;
 }
 
 class ReadFlightListJob : public Job {

@@ -22,21 +22,9 @@
 */
 
 #include "Replay/IgcReplayGlue.hpp"
-#include "Logger/Logger.hpp"
-#include "Dialogs/Message.hpp"
-#include "Language/Language.hpp"
-#include "Blackboard/DeviceBlackboard.hpp"
-#include "Components.hpp"
-
-#include <algorithm>
-
-IgcReplayGlue::IgcReplayGlue(Logger *_logger)
-  :logger(_logger)
-{
-}
 
 bool
-IgcReplayGlue::UpdateTime()
+IgcReplayGlue::UpdateTime(fixed time_scale)
 {
   // Allow for poor time slicing, we never get called more
   // than 4 times per second, so this will yield 1 second updates
@@ -47,42 +35,4 @@ IgcReplayGlue::UpdateTime()
   clock.Update();
 
   return true;
-}
-
-void
-IgcReplayGlue::ResetTime()
-{
-  clock.Reset();
-  t_simulation = fixed_zero;
-}
-
-void
-IgcReplayGlue::OnAdvance(const GeoPoint &loc, const fixed speed,
-                          const Angle bearing, const fixed alt,
-                          const fixed baroalt, const fixed t)
-{
-  device_blackboard->SetLocation(loc, speed, bearing, alt, baroalt, t);
-}
-
-void
-IgcReplayGlue::OnStop()
-{
-  device_blackboard->StopReplay();
-
-  if (logger != NULL)
-    logger->ClearBuffer();
-}
-
-void
-IgcReplayGlue::OnBadFile()
-{
-  ShowMessageBox(_("Could not open IGC file!"),
-              _("Flight replay"), MB_OK | MB_ICONINFORMATION);
-}
-
-void
-IgcReplayGlue::OnReset()
-{
-  if (logger != NULL)
-    logger->ClearBuffer();
 }

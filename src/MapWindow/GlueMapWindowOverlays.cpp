@@ -24,11 +24,17 @@ Copyright_License {
 #include "GlueMapWindow.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/TaskLook.hpp"
+#include "Look/IconLook.hpp"
+#include "UIGlobals.hpp"
 #include "Screen/Icon.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Layout.hpp"
 #include "Logger/Logger.hpp"
 #include "Task/ProtectedTaskManager.hpp"
+#include "Engine/Task/TaskManager.hpp"
+#include "Task/Ordered/OrderedTask.hpp"
+#include "Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Engine/Task/Points/TaskWaypoint.hpp"
 #include "Screen/TextInBox.hpp"
 #include "Screen/Fonts.hpp"
 #include "Screen/UnitSymbol.hpp"
@@ -37,13 +43,17 @@ Copyright_License {
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "UIState.hpp"
-#include "Interface.hpp"
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Units/Units.hpp"
 #include "Terrain/RasterTerrain.hpp"
 #include "Util/Macros.hpp"
 #include "Look/GestureLook.hpp"
 #include "Input/InputEvents.hpp"
+#include "Widgets/MapOverlayButton.hpp"
+#include "Util/StaticString.hpp"
+#include "Components.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "GlideSolvers/GlideState.hpp"
 
 #include <stdio.h>
 
@@ -66,6 +76,173 @@ GlueMapWindow::DrawGesture(Canvas &canvas) const
   auto it_last = it++;
   for (auto it_end = points.end(); it != it_end; it_last = it++)
     canvas.DrawLinePiece(*it_last, *it);
+}
+
+#ifndef ENABLE_OPENGL
+/**
+ * DrawTwoLines seems to always use pen width = 1,
+ * we we'll draw consecutive rectangles to emulate thicker pen
+ */
+static void
+DrawRect(Canvas &canvas, const PixelRect &rc)
+{
+  canvas.DrawTwoLines(rc.left, rc.bottom,
+                      rc.right, rc.bottom,
+                      rc.right, rc.top);
+  canvas.DrawTwoLines(rc.left, rc.bottom,
+                      rc.left, rc.top,
+                      rc.right, rc.top);
+  PixelRect rc1 {rc.left + 1, rc.top + 1, rc.right - 1, rc.bottom - 1 };
+
+  canvas.DrawTwoLines(rc1.left, rc1.bottom,
+                      rc1.right, rc1.bottom,
+                      rc1.right, rc1.top);
+  canvas.DrawTwoLines(rc1.left, rc1.bottom,
+                      rc1.left, rc1.top,
+                      rc1.right, rc1.top);
+}
+
+void
+GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
+{
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *bmp = &icons.hBmpMenuButton;
+  const PixelSize bitmap_size = bmp->GetSize();
+
+  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
+  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
+  DrawRect(canvas, rc_main_menu_button);
+
+  const UPixelScalar menu_button_height = rc_main_menu_button.bottom -
+      rc_main_menu_button.top;
+  const UPixelScalar menu_button_width = rc_main_menu_button.right -
+      rc_main_menu_button.left;
+
+  const int offsetx = (menu_button_width - bitmap_size.cx / 2) / 2;
+  const int offsety = (menu_button_height - bitmap_size.cy) / 2;
+  canvas.CopyAnd(rc_main_menu_button.left + offsetx,
+                 rc_main_menu_button.top + offsety,
+                  bitmap_size.cx / 2,
+                  bitmap_size.cy,
+                  *bmp,
+                  bitmap_size.cx / 2, 0);
+}
+
+void
+GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
+{
+
+  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
+  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
+  DrawRect(canvas, rc_zoom_out_button);
+  DrawRect(canvas, rc_zoom_in_button);
+
+  const IconLook &icon_look = UIGlobals::GetIconLook();
+  const Bitmap *bmp_zoom_in = &icon_look.hBmpZoomInButton;
+  const PixelSize bitmap_in_size = bmp_zoom_in->GetSize();
+  const int offsetx = (rc_zoom_in_button.right - rc_zoom_in_button.left - bitmap_in_size.cx / 2) / 2;
+  const int offsety = (rc_zoom_in_button.bottom - rc_zoom_in_button.top - bitmap_in_size.cy) / 2;
+  canvas.CopyAnd(rc_zoom_in_button.left + offsetx,
+                  rc_zoom_in_button.top + offsety,
+                  bitmap_in_size.cx / 2,
+                  bitmap_in_size.cy,
+                  *bmp_zoom_in,
+                  bitmap_in_size.cx / 2, 0);
+
+  const Bitmap *bmp_zoom_out = &icon_look.hBmpZoomOutButton;
+  const PixelSize bitmap_out_size = bmp_zoom_out->GetSize();
+  canvas.CopyAnd(rc_zoom_out_button.left + offsetx,
+                  rc_zoom_out_button.top + offsety,
+                  bitmap_out_size.cx / 2,
+                  bitmap_out_size.cy,
+                  *bmp_zoom_out,
+                  bitmap_out_size.cx / 2, 0);
+
+}
+#endif
+
+void
+GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
+{
+  TaskWaypoint *tp;
+  TaskManager::TaskMode task_mode = TaskManager::MODE_GOTO;
+  const OrderedTask *ot;
+  const Waypoint *wp;
+  if (true) {
+    ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+    ot = &task_manager->GetOrderedTask();
+    tp = task_manager->GetActiveTaskPoint();
+    task_mode = task_manager->GetMode();
+  }
+  StaticString<255> wp_name(_T(""));
+  unsigned task_size = 1;
+  bool has_entered, has_exited;
+  unsigned idx = 0;
+  bool tp_valid = tp != nullptr;
+
+  if (task_mode == TaskManager::MODE_ORDERED) {
+    task_size = ot->TaskSize();
+    idx = ot->GetActiveIndex();
+    const OrderedTaskPoint *otp = &ot->GetTaskPoint(idx);
+    if (otp != nullptr) {
+      has_entered = otp->HasEntered();
+      has_exited = otp->HasExited();
+      wp_name = otp->GetWaypoint().name.c_str();
+      wp = &otp->GetWaypoint();
+      tp_valid = true;
+    }
+  } else {
+    if (tp != nullptr) {
+      wp_name = tp->GetWaypoint().name.c_str();
+      wp = &tp->GetWaypoint();
+    }
+  }
+  bool distance_valid = false, altitude_difference_valid = false;
+  fixed distance = fixed_zero, altitude_difference = fixed_zero;
+  if (wp != nullptr) {
+    const MoreData &more_data = Basic();
+    // altitude differential
+    if (Basic().location_available && more_data.NavAltitudeAvailable() &&
+        GetComputerSettings().polar.glide_polar_task.IsValid()) {
+      const GlideState glide_state(
+          Basic().location.DistanceBearing(wp->location),
+        wp->elevation + GetComputerSettings().task.safety_height_arrival,
+        more_data.nav_altitude,
+        Calculated().GetWindOrZero());
+
+      const GlideResult &result =
+        MacCready::Solve(GetComputerSettings().task.glide,
+                         GetComputerSettings().polar.glide_polar_task,
+                         glide_state);
+      altitude_difference = result.pure_glide_altitude_difference;
+      altitude_difference_valid = true;
+    }
+
+    // New dist & bearing
+    if (Basic().location_available) {
+      const GeoVector vector = Basic().location.DistanceBearing(wp->location);
+      distance = vector.distance;
+      distance_valid = true;
+    }
+
+  }
+  const TerrainRendererSettings &terrain = GetMapSettings().terrain;
+  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
+  PixelRect outer_rect = slider_shape.GetOuterRect();
+  UPixelScalar x_offset = (GetClientRect().right - GetClientRect().left -
+      (outer_rect.right - outer_rect.left)) / 2;
+  MoveRect(outer_rect, x_offset, 0);
+
+  slider_shape.Draw(canvas, outer_rect,
+                    idx, false,
+                    wp_name.c_str(),
+                    has_entered, has_exited,
+                    task_mode,
+                    task_size,
+                    tp_valid, distance, distance_valid,
+                    altitude_difference,
+                    altitude_difference_valid,
+                    border_width);
 }
 
 void
@@ -138,7 +315,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
 }
 
 void
-GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
+GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc_unadjusted,
                              const NMEAInfo &info) const
 {
   const TCHAR *txt;
@@ -154,12 +331,16 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
     // early exit
     return;
 
+  PixelRect rc = rc_unadjusted;
+  rc.top -= gps_status_offset_y;
+  rc.bottom -= gps_status_offset_y;
+
   PixelScalar x = rc.left + Layout::FastScale(2);
-  PixelScalar y = rc.bottom - Layout::FastScale(35);
+  PixelScalar y = rc.bottom - Layout::FastScale(2) - icon->GetSize().cy;
   icon->Draw(canvas, x, y);
 
   x += icon->GetSize().cx + Layout::FastScale(4);
-  y = rc.bottom - Layout::FastScale(34);
+  y += Layout::Scale(1);
 
   TextInBoxMode mode;
   mode.mode = RM_ROUNDED_BLACK;
@@ -168,23 +349,68 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
   TextInBox(canvas, txt, x, y, mode, rc, NULL);
 }
 
+
+void
+GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
+                            const MapWindowProjection &projection) const
+{
+  StaticString<80> buffer;
+
+  fixed map_width = projection.GetScreenWidthMeters();
+
+  canvas.Select(Fonts::map_bold);
+  FormatUserMapScale(map_width, buffer.buffer(), true);
+  PixelSize text_size = canvas.CalcTextSize(buffer);
+  const PixelScalar text_padding_x = Layout::Scale(2);
+  PixelSize bmp_size = look.map_scale_left_icon.GetSize();
+  const PixelScalar bmp_y = (text_size.cy + bmp_size.cy) / 2;
+
+
+  UPixelScalar zoom_button_width = Fonts::map_bold.GetHeight() *
+      MapOverlayButton::GetScale() + 2 * Layout::Scale(2);
+
+  PixelScalar x = rc.left + (Layout::landscape ? 2 : 1) * zoom_button_width;
+
+  canvas.DrawFilledRectangle(x, rc.bottom - text_size.cy - Layout::Scale(1),
+                             x + 2 * bmp_size.cx + text_size.cx + Layout::Scale(2),
+                             rc.bottom, COLOR_WHITE);
+
+  look.map_scale_left_icon.Draw(canvas, x, rc.bottom - bmp_y);
+  x += bmp_size.cx;
+
+  canvas.SetBackgroundColor(COLOR_WHITE);
+  canvas.SetBackgroundOpaque();
+  canvas.SetTextColor(COLOR_BLACK);
+  canvas.text(x, rc.bottom - text_size.cy - Layout::Scale(1),
+              buffer);
+
+  x += text_padding_x + text_size.cx;
+  look.map_scale_right_icon.Draw(canvas, x, rc.bottom - bmp_y);
+}
+
 void
 GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 {
-  PixelScalar offset = 0;
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *menu_bitmap = &icons.hBmpMenuButton;
+  const PixelSize menu_bitmap_size = menu_bitmap->GetSize();
+
+  PixelScalar offset = menu_bitmap_size.cx / 2;
 
   // draw logger status
   if (logger != NULL && logger->IsLoggerActive()) {
     bool flip = (Basic().date_time_utc.second % 2) == 0;
     const MaskedIcon &icon = flip ? look.logger_on_icon : look.logger_off_icon;
-    offset = icon.GetSize().cx;
+    offset += icon.GetSize().cx;
     icon.Draw(canvas, rc.right - offset, rc.bottom - icon.GetSize().cy);
   }
+
+  return; // don't show the rest of this stuff.  We know if we're circling etc
 
   // draw flight mode
   const MaskedIcon *bmp;
 
-  if (task != NULL && (task->GetMode() == TaskManager::MODE_ABORT))
+  if (Calculated().common_stats.mode_abort)
     bmp = &look.abort_mode_icon;
   else if (GetDisplayMode() == DisplayMode::CIRCLING)
     bmp = &look.climb_mode_icon;
@@ -198,121 +424,80 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   bmp->Draw(canvas, rc.right - offset,
             rc.bottom - bmp->GetSize().cy - Layout::Scale(4));
 
-  // draw flarm status
-  if (CommonInterface::GetUISettings().traffic.enable_gauge)
-    // Don't show indicator when the gauge is indicating the traffic anyway
-    return;
+  // draw "Simulator/Replay & InfoBox name
+  StaticString<80> buffer;
+  const UIState &ui_state = GetUIState();
 
-  const FlarmStatus &flarm = Basic().flarm.status;
-  if (!flarm.available)
-    return;
+  canvas.Select(Fonts::title);
+  canvas.SetBackgroundOpaque();
+  canvas.SetBackgroundColor(COLOR_WHITE);
+  canvas.SetTextColor(COLOR_BLACK);
 
-  switch (flarm.alarm_level) {
-  case FlarmTraffic::AlarmType::NONE:
-    bmp = &look.traffic_safe_icon;
-    break;
-  case FlarmTraffic::AlarmType::LOW:
-  case FlarmTraffic::AlarmType::INFO_ALERT:
-    bmp = &look.traffic_warning_icon;
-    break;
-  case FlarmTraffic::AlarmType::IMPORTANT:
-  case FlarmTraffic::AlarmType::URGENT:
-    bmp = &look.traffic_alarm_icon;
-    break;
-  };
+  buffer.clear();
 
-  offset += bmp->GetSize().cx + Layout::Scale(6);
+  if (Basic().gps.replay)
+    buffer += _T("REPLAY");
+  else if (Basic().gps.simulator) {
+    buffer += _("Simulator");
+  }
 
-  bmp->Draw(canvas, rc.right - offset,
-            rc.bottom - bmp->GetSize().cy - Layout::Scale(2));
+  if (weather != NULL && weather->GetParameter() > 0) {
+    const TCHAR *label = weather->ItemLabel(weather->GetParameter());
+    if (label != NULL) {
+      buffer += _T(" ");
+      buffer += label;
+    }
+  }
+
+  if (ui_state.auxiliary_enabled) {
+    if (!buffer.empty())
+      buffer += _T(", ");
+    buffer += ui_state.panel_name;
+  }
+
+  if (!buffer.empty()) {
+    offset += canvas.CalcTextWidth(buffer) + Layout::Scale(2);
+
+    canvas.text(rc.right - offset, rc.bottom - canvas.CalcTextSize(buffer).cy, buffer);
+  }
+
+  const PolarSettings &polar_settings = GetComputerSettings().polar;
+  // calc "Ballast" and draw above sim/replay info
+  if (((int)polar_settings.glide_polar_task.GetBallastLitres() > 0 ||
+      !Calculated().flight.flying)
+      && polar_settings.glide_polar_task.IsBallastable()) {
+    buffer = _("Ballast");
+    buffer.AppendFormat(
+      _T(" %d L"),
+      (int)computer_settings.polar.glide_polar_task.GetBallastLitres());
+
+    canvas.text(rc.right - offset, rc.bottom - 2 * canvas.CalcTextSize(buffer).cy, buffer);
+ }
 }
 
 void
 GlueMapWindow::DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const
 {
+  StaticString<64> description;
+
+  ProtectedTaskManager::Lease task_manager(*task);
+  if (task_manager->GetMode() == TaskManager::MODE_ORDERED)
+    description = _("Task");
+  else {
+    const TaskWaypoint* wp = task_manager->GetActiveTaskPoint();
+    if (wp != nullptr) {
+      description = wp->GetWaypoint().name.c_str();
+      if (description == _T("(takeoff)"))
+        description = _T("TakeOff");
+    } else
+      description = _T("");
+  }
+
+
   final_glide_bar_renderer.Draw(canvas, rc, Calculated(),
                                 GetComputerSettings().task.glide,
-    CommonInterface::GetUISettings().final_glide_bar_mc0_enabled);
-}
-
-void
-GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
-                            const MapWindowProjection &projection) const
-{
-  StaticString<80> buffer;
-
-  fixed map_width = projection.GetScreenWidthMeters();
-
-  canvas.Select(Fonts::map_bold);
-  FormatUserMapScale(map_width, buffer.buffer(), true);
-  PixelSize text_size = canvas.CalcTextSize(buffer);
-
-  const PixelScalar text_padding_x = Layout::Scale(2);
-  const PixelScalar height = Fonts::map_bold.GetCapitalHeight() + Layout::Scale(2);
-
-  PixelScalar x = 0;
-  look.map_scale_left_icon.Draw(canvas, 0, rc.bottom - height);
-
-  x += look.map_scale_left_icon.GetSize().cx;
-  canvas.DrawFilledRectangle(x, rc.bottom - height,
-                             x + 2 * text_padding_x + text_size.cx,
-                             rc.bottom, COLOR_WHITE);
-
-  canvas.SetBackgroundTransparent();
-  canvas.SetTextColor(COLOR_BLACK);
-  x += text_padding_x;
-  canvas.text(x, rc.bottom - Fonts::map_bold.GetAscentHeight() - Layout::Scale(1),
-              buffer);
-
-  x += text_padding_x + text_size.cx;
-  look.map_scale_right_icon.Draw(canvas, x, rc.bottom - height);
-
-  buffer.clear();
-  if (GetMapSettings().auto_zoom_enabled)
-    buffer = _T("AUTO ");
-
-  switch (follow_mode) {
-  case FOLLOW_SELF:
-    break;
-
-  case FOLLOW_PAN:
-    buffer += _T("PAN ");
-    break;
-  }
-
-  const UIState &ui_state = CommonInterface::GetUIState();
-  if (ui_state.auxiliary_enabled) {
-    buffer += InfoBoxManager::GetCurrentPanelName();
-    buffer += _T(" ");
-  }
-
-  if (Basic().gps.replay)
-    buffer += _T("REPLAY ");
-  else if (Basic().gps.simulator) {
-    buffer += _("Simulator");
-    buffer += _T(" ");
-  }
-
-  if (GetComputerSettings().polar.ballast_timer_active)
-    buffer.AppendFormat(
-        _T("BALLAST %d LITERS "),
-        (int)GetComputerSettings().polar.glide_polar_task.GetBallastLitres());
-
-  if (weather != NULL && weather->GetParameter() > 0) {
-    const TCHAR *label = weather->ItemLabel(weather->GetParameter());
-    if (label != NULL)
-      buffer += label;
-  }
-
-  if (!buffer.empty()) {
-    int y = rc.bottom - height;
-
-    canvas.Select(Fonts::title);
-    canvas.SetBackgroundOpaque();
-    canvas.SetBackgroundColor(COLOR_WHITE);
-
-    canvas.text(0, y - canvas.CalcTextSize(buffer).cy, buffer);
-  }
+                                GetMapSettings().final_glide_bar_mc0_enabled,
+                                description.c_str());
 }
 
 void
@@ -337,22 +522,22 @@ void
 GlueMapWindow::RenderTrail(Canvas &canvas, const RasterPoint aircraft_pos)
 {
   unsigned min_time;
-  switch(GetMapSettings().trail_length) {
-  case TRAIL_OFF:
+  switch(GetMapSettings().trail.length) {
+  case TrailSettings::Length::OFF:
     return;
-  case TRAIL_LONG:
+  case TrailSettings::Length::LONG:
     min_time = max(0, (int)Basic().time - 3600);
     break;
-  case TRAIL_SHORT:
+  case TrailSettings::Length::SHORT:
     min_time = max(0, (int)Basic().time - 600);
     break;
-  case TRAIL_FULL:
+  case TrailSettings::Length::FULL:
     min_time = 0; // full
     break;
   }
 
   DrawTrail(canvas, aircraft_pos, min_time,
-            GetMapSettings().trail_drift_enabled && InCirclingMode());
+            GetMapSettings().trail.wind_drift_enabled && InCirclingMode());
 }
 
 void
@@ -402,4 +587,75 @@ GlueMapWindow::DrawStallRatio(Canvas &canvas, const PixelRect &rc) const
     canvas.SelectBlackPen();
     canvas.DrawLine(rc.right - 1, rc.bottom - m, rc.right - 11, rc.bottom - m);
   }
+}
+
+#ifndef ENABLE_OPENGL
+void
+GlueMapWindow::SetMainMenuButtonRect()
+{
+  UPixelScalar clear_border_width = Layout::Scale(2);
+
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *bmp = &icons.hBmpMenuButton;
+  const PixelSize bitmap_size = bmp->GetSize();
+  PixelSize menu_button_size;
+
+  menu_button_size.cx = (bitmap_size.cx / 2 * MapOverlayButton::GetScale() / 2.5) -
+      2 * clear_border_width;
+  menu_button_size.cy = (bitmap_size.cy * MapOverlayButton::GetScale()) / 2.5 -
+      2 * clear_border_width;
+
+  UPixelScalar pen_width = Layout::Scale(2);
+  rc_main_menu_button = GetClientRect();
+  rc_main_menu_button.left -= pen_width;
+  rc_main_menu_button.top -= pen_width;
+  rc_main_menu_button.left = rc_main_menu_button.right -  menu_button_size.cx;
+  rc_main_menu_button.top = rc_main_menu_button.bottom -  menu_button_size.cy;
+}
+
+void
+GlueMapWindow::SetZoomButtonsRect()
+{
+  UPixelScalar clear_border_width = Layout::Scale(2);
+  const PixelRect rc_map = GetClientRect();
+
+  PixelSize button_size;
+  button_size.cx = button_size.cy = Fonts::map_bold.GetHeight()
+      * MapOverlayButton::GetScale() * .8;
+
+  rc_zoom_in_button.left = rc_map.left;
+  if (Layout::landscape) {
+    rc_zoom_in_button.right = rc_zoom_in_button.left + button_size.cx +
+        2 * clear_border_width;
+    rc_zoom_in_button.bottom = rc_map.bottom;
+    rc_zoom_in_button.top = rc_zoom_in_button.bottom - button_size.cy -
+        2 * clear_border_width;
+  } else {
+    rc_zoom_in_button.right = rc_zoom_in_button.left +
+        (button_size.cx + 2 * clear_border_width);
+    rc_zoom_in_button.bottom = rc_map.bottom - button_size.cy -
+        2 * clear_border_width;
+    rc_zoom_in_button.top = rc_zoom_in_button.bottom - (button_size.cy +
+        2 * clear_border_width);
+  }
+
+  if (Layout::landscape) {
+    rc_zoom_out_button.left = rc_map.left + button_size.cx + 2 * clear_border_width;
+    rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx + 2 * clear_border_width;
+  } else {
+    rc_zoom_out_button.left = rc_map.left;
+    rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx + 2 * clear_border_width;
+  }
+  rc_zoom_out_button.bottom = rc_map.bottom;
+  rc_zoom_out_button.top = rc_zoom_out_button.bottom - button_size.cx - 2 * clear_border_width;
+
+  assert (rc_map.bottom >= rc_zoom_in_button.top);
+  SetGPSStatusOffset(rc_map.bottom - rc_zoom_in_button.top);
+}
+#endif
+
+void
+GlueMapWindow::SetTaskNavSliderShape()
+{
+  slider_shape.Resize(GetClientRect().right - GetClientRect().left);
 }

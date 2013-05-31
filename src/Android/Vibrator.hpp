@@ -28,12 +28,20 @@ Copyright_License {
 
 class Context;
 
-class Vibrator : Java::Object {
+class Vibrator {
+  static jmethodID cancel_method, vibrate_method;
+
   Java::Object object;
-  jmethodID cancel_method, vibrate_method;
 
 public:
-  Vibrator(JNIEnv *env, jclass cls, jobject obj);
+  /**
+   * Global initialisation.  Looks up the methods of the
+   * Vibrator Java class.
+   */
+  static void Initialise(JNIEnv *env);
+
+  Vibrator(JNIEnv *env, jobject obj):object(env, obj) {}
+
   static Vibrator *Create(JNIEnv *env, Context &context);
 
   void Cancel(JNIEnv *env);

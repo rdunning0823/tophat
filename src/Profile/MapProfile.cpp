@@ -30,38 +30,34 @@ Copyright_License {
 void
 Profile::Load(MapSettings &settings)
 {
-  Get(szProfileCircleZoom, settings.circle_zoom_enabled);
-  Get(szProfileMaxAutoZoomDistance, settings.max_auto_zoom_distance);
-  Get(szProfileDrawTopography, settings.topography_enabled);
+  Get(ProfileKeys::CircleZoom, settings.circle_zoom_enabled);
+  Get(ProfileKeys::MaxAutoZoomDistance, settings.max_auto_zoom_distance);
+  Get(ProfileKeys::DrawTopography, settings.topography_enabled);
 
   LoadTerrainRendererSettings(settings.terrain);
 
-  GetEnum(szProfileAircraftSymbol, settings.aircraft_symbol);
+// hard code aircraft_symbol to default
+//  GetEnum(ProfileKeys::AircraftSymbol, settings.aircraft_symbol);
 
-  Get(szProfileTrailDrift, settings.trail_drift_enabled);
-  Get(szProfileDetourCostMarker, settings.detour_cost_markers_enabled);
-  GetEnum(szProfileDisplayTrackBearing, settings.display_track_bearing);
-  Get(szProfileAutoZoom, settings.auto_zoom_enabled);
-  Get(szProfileSnailWidthScale, settings.snail_scaling_enabled);
+// hard code detour_cost_markers_enabled to default
+//  Get(ProfileKeys::DetourCostMarker, settings.detour_cost_markers_enabled);
+// hard code display_ground_track to default
+//  GetEnum(ProfileKeys::DisplayTrackBearing, settings.display_ground_track);
+  Get(ProfileKeys::AutoZoom, settings.auto_zoom_enabled);
 
-  GetEnum(szProfileSnailType, settings.snail_type);
-
-  unsigned Temp;
-  if (Get(szProfileWindArrowStyle, Temp))
-    settings.wind_arrow_style = Temp;
+  GetEnum(ProfileKeys::WindArrowStyle, settings.wind_arrow_style);
 
   settings.waypoint.LoadFromProfile();
 
-  GetEnum(szProfileSnailTrail, settings.trail_length);
-
   Load(settings.airspace);
 
-  Get(szProfileGliderScreenPosition, settings.glider_screen_position);
+  // always use the default for this
+  //Get(ProfileKeys::GliderScreenPosition, settings.glider_screen_position);
 
   bool orientation_found = false;
 
-  Temp = NORTHUP;
-  if (Get(szProfileOrientationCircling, Temp))
+  unsigned Temp = NORTHUP;
+  if (Get(ProfileKeys::OrientationCircling, Temp))
     orientation_found = true;
 
   switch (Temp) {
@@ -74,10 +70,13 @@ Profile::Load(MapSettings &settings)
   case TARGETUP:
     settings.circling_orientation = TARGETUP;
     break;
+  case HEADINGUP:
+    settings.circling_orientation = HEADINGUP;
+    break;
   }
 
   Temp = NORTHUP;
-  if (Get(szProfileOrientationCruise, Temp))
+  if (Get(ProfileKeys::OrientationCruise, Temp))
     orientation_found = true;
 
   switch (Temp) {
@@ -90,11 +89,14 @@ Profile::Load(MapSettings &settings)
   case TARGETUP:
     settings.cruise_orientation = TARGETUP;
     break;
+  case HEADINGUP:
+    settings.cruise_orientation = HEADINGUP;
+    break;
   }
 
   if (!orientation_found) {
     Temp = 1;
-    Get(szProfileDisplayUpValue, Temp);
+    Get(ProfileKeys::DisplayUpValue, Temp);
     switch (Temp) {
     case 0:
       settings.cruise_orientation = TRACKUP;
@@ -120,25 +122,37 @@ Profile::Load(MapSettings &settings)
   }
 
   fixed tmp;
-  if (Profile::Get(szProfileClimbMapScale, tmp))
+  if (Profile::Get(ProfileKeys::ClimbMapScale, tmp))
     settings.circling_scale =
       std::max(fixed(0.0003), std::min(tmp / 10000, fixed(10)));
 
-  if (Profile::Get(szProfileCruiseMapScale, tmp))
+  if (Profile::Get(ProfileKeys::CruiseMapScale, tmp))
     settings.cruise_scale =
       std::max(fixed(0.0003), std::min(tmp / 10000, fixed(10)));
 
-  GetEnum(szProfileMapShiftBias, settings.map_shift_bias);
-  Get(szProfileEnableFLARMMap, settings.show_flarm_on_map);
+  GetEnum(ProfileKeys::MapShiftBias, settings.map_shift_bias);
+  Get(ProfileKeys::EnableFLARMMap, settings.show_flarm_on_map);
 
-  Get(szProfileEnableThermalProfile, settings.show_thermal_profile);
+  Get(ProfileKeys::EnableThermalProfile, settings.show_thermal_profile);
+  Get(ProfileKeys::EnableFinalGlideBarMC0,
+      settings.final_glide_bar_mc0_enabled);
 
+  Load(settings.trail);
   Load(settings.item_list);
+}
+
+void
+Profile::Load(TrailSettings &settings)
+{
+  Get(ProfileKeys::TrailDrift, settings.wind_drift_enabled);
+  Get(ProfileKeys::SnailWidthScale, settings.scaling_enabled);
+  GetEnum(ProfileKeys::SnailType, settings.type);
+  GetEnum(ProfileKeys::SnailTrail, settings.length);
 }
 
 void
 Profile::Load(MapItemListSettings &settings)
 {
-  Get(EnableLocationMapItemProfileKey, settings.add_location);
-  Get(EnableArrivalAltitudeMapItemProfileKey, settings.add_arrival_altitude);
+  Get(ProfileKeys::EnableLocationMapItem, settings.add_location);
+  Get(ProfileKeys::EnableArrivalAltitudeMapItem, settings.add_arrival_altitude);
 }

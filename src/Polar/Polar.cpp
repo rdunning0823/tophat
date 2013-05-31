@@ -23,90 +23,9 @@ Copyright_License {
 
 #include "Polar/Polar.hpp"
 #include "Engine/GlideSolvers/PolarCoefficients.hpp"
-#include "Units/System.hpp"
-
-#include <stdlib.h>
-#include <cstdio>
 
 PolarCoefficients
 PolarInfo::CalculateCoefficients() const
 {
-  return PolarCoefficients::From3VW(v1, v2, v3, w1, w2, w3);
-}
-
-bool
-PolarInfo::IsValid() const
-{
-  return CalculateCoefficients().IsValid();
-}
-
-void
-PolarInfo::GetString(TCHAR* line, size_t size, bool include_v_no) const
-{
-  fixed V1, V2, V3;
-  V1 = Units::ToUserUnit(v1, Unit::KILOMETER_PER_HOUR);
-  V2 = Units::ToUserUnit(v2, Unit::KILOMETER_PER_HOUR);
-  V3 = Units::ToUserUnit(v3, Unit::KILOMETER_PER_HOUR);
-
-  if (include_v_no)
-    _sntprintf(line, size, _T("%.0f,%.0f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f"),
-               (double)reference_mass, (double)max_ballast, (double)V1, (double)w1,
-               (double)V2, (double)w2, (double)V3, (double)w3,
-               (double)wing_area, (double)v_no);
-  else
-    _sntprintf(line, size, _T("%.0f,%.0f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f"),
-               (double)reference_mass, (double)max_ballast, (double)V1, (double)w1,
-               (double)V2, (double)w2, (double)V3, (double)w3,
-               (double)wing_area);
-}
-
-bool
-PolarInfo::ReadString(const TCHAR *line)
-{
-  PolarInfo polar;
-  // Example:
-  // *LS-3  WinPilot POLAR file: MassDryGross[kg], MaxWaterBallast[liters], Speed1[km/h], Sink1[m/s], Speed2, Sink2, Speed3, Sink3
-  // 403, 101, 115.03, -0.86, 174.04, -1.76, 212.72,  -3.4
-
-  if (line[0] == _T('*'))
-    /* a comment */
-    return false;
-
-  TCHAR *p;
-
-  polar.reference_mass = fixed(_tcstod(line, &p));
-  if (*p != _T(','))
-    return false;
-
-  polar.max_ballast = fixed(_tcstod(p + 1, &p));
-  if (*p != _T(','))
-    return false;
-
-  polar.v1 = Units::ToSysUnit(fixed(_tcstod(p + 1, &p)), Unit::KILOMETER_PER_HOUR);
-  if (*p != _T(','))
-    return false;
-
-  polar.w1 = fixed(_tcstod(p + 1, &p));
-  if (*p != _T(','))
-    return false;
-
-  polar.v2 = Units::ToSysUnit(fixed(_tcstod(p + 1, &p)), Unit::KILOMETER_PER_HOUR);
-  if (*p != _T(','))
-    return false;
-
-  polar.w2 = fixed(_tcstod(p + 1, &p));
-  if (*p != _T(','))
-    return false;
-
-  polar.v3 = Units::ToSysUnit(fixed(_tcstod(p + 1, &p)), Unit::KILOMETER_PER_HOUR);
-  if (*p != _T(','))
-    return false;
-
-  polar.w3 = fixed(_tcstod(p + 1, &p));
-  polar.wing_area = (*p != _T(',')) ? fixed_zero : fixed(_tcstod(p + 1, &p));
-  polar.v_no = (*p != _T(',')) ? fixed_zero : fixed(_tcstod(p + 1, &p));
-
-  *this = polar;
-
-  return true;
+  return shape.CalculateCoefficients();
 }

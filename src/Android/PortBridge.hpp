@@ -25,7 +25,8 @@ Copyright_License {
 #define XCSOAR_ANDROID_PORT_BRIDGE_HPP
 
 #include "Java/Object.hpp"
-#include "Device/Port/Port.hpp"
+
+class DataHandler;
 
 class PortBridge : protected Java::Object {
   static jmethodID close_method;
@@ -35,7 +36,7 @@ class PortBridge : protected Java::Object {
   static jmethodID getBaudRate_method, setBaudRate_method;
   static jmethodID write_method;
 
-  static gcc_constexpr_data size_t write_buffer_size = 4096;
+  static constexpr size_t write_buffer_size = 4096;
   Java::GlobalRef<jbyteArray> write_buffer;
 
 public:
@@ -55,7 +56,7 @@ public:
     env->CallVoidMethod(Get(), close_method);
   }
 
-  void setListener(JNIEnv *env, Port::Handler *handler);
+  void setListener(JNIEnv *env, DataHandler *handler);
 
   bool isValid(JNIEnv *env) {
     return env->CallBooleanMethod(Get(), isValid_method);

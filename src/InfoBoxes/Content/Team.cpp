@@ -22,12 +22,30 @@ Copyright_License {
 */
 
 #include "InfoBoxes/Content/Team.hpp"
+#include "InfoBoxes/Panel/TeamCode.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "Interface.hpp"
 #include "Formatter/Units.hpp"
+#include "Language/Language.hpp"
+#include "Util/Macros.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
+
+static constexpr InfoBoxContentTeamCode::PanelContent panels[] = {
+  InfoBoxContentTeamCode::PanelContent (
+    N_("Edit"),
+    LoadTeamCodePanel),
+};
+
+const InfoBoxContentTeamCode::DialogContent InfoBoxContentTeamCode::dlgContent = {
+  ARRAY_SIZE(panels), &panels[0], false,
+};
+
+const InfoBoxContentTeamCode::DialogContent*
+InfoBoxContentTeamCode::GetDialogContent() {
+  return &dlgContent;
+}
 
 void
 InfoBoxContentTeamCode::Update(InfoBoxData &data)
@@ -54,43 +72,6 @@ InfoBoxContentTeamCode::Update(InfoBoxData &data)
   }
   else
     data.SetCommentInvalid();
-}
-
-bool
-InfoBoxContentTeamCode::HandleKey(const InfoBoxKeyCodes keycode)
-{
-  TeamCodeSettings &settings =
-    CommonInterface::SetComputerSettings().team_code;
-  const TrafficList &flarm = XCSoarInterface::Basic().flarm.traffic;
-  const FlarmTraffic *traffic =
-    settings.team_flarm_id.IsDefined()
-    ? flarm.FindTraffic(settings.team_flarm_id)
-    : NULL;
-
-  if (keycode == ibkUp)
-    traffic = (traffic == NULL ?
-               flarm.FirstTraffic() : flarm.NextTraffic(traffic));
-  else if (keycode == ibkDown)
-    traffic = (traffic == NULL ?
-               flarm.LastTraffic() : flarm.PreviousTraffic(traffic));
-  else
-    return false;
-
-  if (traffic != NULL) {
-    settings.team_flarm_id = traffic->id;
-
-    if (traffic->HasName()) {
-      // copy the 3 first chars from the name to TeamFlarmCNTarget
-      settings.team_flarm_callsign = traffic->name;
-    } else {
-      settings.team_flarm_callsign.clear();
-    }
-  } else {
-    // no flarm traffic to select!
-    settings.team_flarm_id.Clear();
-    settings.team_flarm_callsign.clear();
-  }
-  return true;
 }
 
 void

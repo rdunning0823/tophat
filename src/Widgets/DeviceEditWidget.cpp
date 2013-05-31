@@ -25,8 +25,8 @@
 #include "UIGlobals.hpp"
 #include "Compiler.h"
 #include "Util/Macros.hpp"
+#include "Util/NumberParser.hpp"
 #include "Language/Language.hpp"
-#include "Compatibility/string.h"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Boolean.hpp"
 #include "Device/Register.hpp"
@@ -39,6 +39,8 @@
 #ifdef ANDROID
 #include "Java/Global.hpp"
 #include "Android/BluetoothHelper.hpp"
+#include "Asset.hpp"
+#include "Android/Nook.hpp"
 #ifdef IOIOLIB
 #include "Device/Port/AndroidIOIOUartPort.hpp"
 #endif
@@ -54,7 +56,7 @@ enum ControlIndex {
   IgnoreCheckSum,
 };
 
-static gcc_constexpr_data struct {
+static constexpr struct {
   DeviceConfig::PortType type;
   const TCHAR *label;
 } port_types[] = {
@@ -63,19 +65,20 @@ static gcc_constexpr_data struct {
   { DeviceConfig::PortType::AUTO, N_("GPS Intermediate Driver") },
 #endif
 #ifdef ANDROID
-  { DeviceConfig::PortType::INTERNAL, N_("Built-in GPS") },
+  { DeviceConfig::PortType::INTERNAL, N_("Built-in GPS & sensors") },
   { DeviceConfig::PortType::RFCOMM_SERVER, N_("Bluetooth server") },
 #endif
 
-  /* label not translated for now, until we have a TCP port
+  /* label not translated for now, until we have a TCP/UDP port
      selection UI */
   { DeviceConfig::PortType::TCP_LISTENER, N_("TCP Port") },
+  { DeviceConfig::PortType::UDP_LISTENER, N_("UDP Port") },
 
   { DeviceConfig::PortType::SERIAL, NULL } /* sentinel */
 };
 
 /** the number of fixed port types (excludes Serial, Bluetooth and IOIOUart) */
-static gcc_constexpr_data unsigned num_port_types = ARRAY_SIZE(port_types) - 1;
+static constexpr unsigned num_port_types = ARRAY_SIZE(port_types) - 1;
 
 static unsigned
 AddPort(DataFieldEnum &df, DeviceConfig::PortType type,
@@ -103,6 +106,11 @@ DetectSerialPorts(DataFieldEnum &df)
     return false;
 
   unsigned sort_start = df.Count();
+
+#ifdef ANDROID
+  if (IsNookSimpleTouch())
+    Nook::InitUsb();
+#endif
 
   bool found = false;
   struct dirent *ent;
@@ -320,6 +328,7 @@ SetPort(DataFieldEnum &df, const DeviceConfig &config)
   case DeviceConfig::PortType::AUTO:
   case DeviceConfig::PortType::INTERNAL:
   case DeviceConfig::PortType::TCP_LISTENER:
+  case DeviceConfig::PortType::UDP_LISTENER:
   case DeviceConfig::PortType::PTY:
   case DeviceConfig::PortType::RFCOMM_SERVER:
     break;
@@ -522,7 +531,7 @@ DeviceEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   baud_rate_df->SetListener(this);
   FillBaudRates(*baud_rate_df);
   baud_rate_df->Set(config.baud_rate);
-  Add(_("Baudrate"), NULL, baud_rate_df);
+  Add(_("Baud rate"), NULL, baud_rate_df);
 
   DataFieldEnum *bulk_baud_rate_df = new DataFieldEnum(NULL);
   bulk_baud_rate_df->SetListener(this);
@@ -605,6 +614,7 @@ FinishPortField(DeviceConfig &config, const DataFieldEnum &df)
   case DeviceConfig::PortType::AUTO:
   case DeviceConfig::PortType::INTERNAL:
   case DeviceConfig::PortType::TCP_LISTENER:
+  case DeviceConfig::PortType::UDP_LISTENER:
   case DeviceConfig::PortType::RFCOMM_SERVER:
     if (new_type == config.port_type)
       return false;
@@ -636,11 +646,11 @@ FinishPortField(DeviceConfig &config, const DataFieldEnum &df)
   case DeviceConfig::PortType::IOIOUART:
     /* IOIO UART */
     if (new_type == config.port_type &&
-        config.ioio_uart_id == (unsigned)_ttoi(df.GetAsString()))
+        config.ioio_uart_id == (unsigned)ParseUnsigned(df.GetAsString()))
       return false;
 
     config.port_type = new_type;
-    config.ioio_uart_id = (unsigned)_ttoi(df.GetAsString());
+    config.ioio_uart_id = (unsigned)ParseUnsigned(df.GetAsString());
     return true;
   }
 

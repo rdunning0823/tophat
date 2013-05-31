@@ -41,10 +41,8 @@ namespace NOAADownloader
    * @return Same as buffer if parsing failed,
    * otherwise the pointer to the next character after the parsed string portion
    */
-  const char *ParseDateTime(const char *buffer, BrokenDateTime &dest);
-  bool ParseDecodedDateTime(const char *buffer, BrokenDateTime &dest);
-
-  void AppendToContentString(const char *buffer, METAR::ContentString &content);
+  static const char *ParseDateTime(const char *buffer, BrokenDateTime &dest);
+  static bool ParseDecodedDateTime(const char *buffer, BrokenDateTime &dest);
 }
 
 const char *
@@ -142,26 +140,6 @@ NOAADownloader::ParseDecodedDateTime(const char *buffer, BrokenDateTime &dest)
   return true;
 }
 
-void
-NOAADownloader::AppendToContentString(const char *buffer,
-                                      METAR::ContentString &content)
-{
-#ifdef _UNICODE
-  int length = strlen(buffer);
-  TCHAR *buffer2 = new TCHAR[length + 1];
-  length = MultiByteToWideChar(CP_UTF8, 0, buffer, length, buffer2, length);
-  buffer2[length] = _T('\0');
-#else
-  const char *buffer2 = buffer;
-#endif
-
-  content += buffer2;
-
-#ifdef _UNICODE
-  delete[] buffer2;
-#endif
-}
-
 bool
 NOAADownloader::DownloadMETAR(const char *code, METAR &metar,
                               JobRunner &runner)
@@ -177,7 +155,6 @@ NOAADownloader::DownloadMETAR(const char *code, METAR &metar,
   char url[256] = "http://weather.noaa.gov/pub/data/observations/metar/decoded/";
   strcat(url, code);
   strcat(url, ".TXT");
-  PathName path(url);
 
   // Open download session
   Net::Session session;
@@ -186,7 +163,7 @@ NOAADownloader::DownloadMETAR(const char *code, METAR &metar,
 
   // Request the file
   char buffer[4096];
-  Net::DownloadToBufferJob job(session, path, buffer, sizeof(buffer) - 1);
+  Net::DownloadToBufferJob job(session, url, buffer, sizeof(buffer) - 1);
   if (!runner.Run(job) || job.GetLength() < 0)
     return false;
 
@@ -248,11 +225,8 @@ NOAADownloader::DownloadMETAR(const char *code, METAR &metar,
   if (*p != 0)
     *p = 0;
 
-  metar.content.clear();
-  AppendToContentString(ob, metar.content);
-
-  metar.decoded.clear();
-  AppendToContentString(buffer, metar.decoded);
+  metar.content.SetASCII(ob);
+  metar.decoded.SetASCII(buffer);
 
   // Trim the content strings
   TrimRight(metar.content.buffer());
@@ -276,7 +250,6 @@ NOAADownloader::DownloadTAF(const char *code, TAF &taf,
   char url[256] = "http://weather.noaa.gov/pub/data/forecasts/taf/stations/";
   strcat(url, code);
   strcat(url, ".TXT");
-  PathName path(url);
 
   // Open download session
   Net::Session session;
@@ -285,7 +258,7 @@ NOAADownloader::DownloadTAF(const char *code, TAF &taf,
 
   // Request the file
   char buffer[4096];
-  Net::DownloadToBufferJob job(session, path, buffer, sizeof(buffer) - 1);
+  Net::DownloadToBufferJob job(session, url, buffer, sizeof(buffer) - 1);
   if (!runner.Run(job) || job.GetLength() < 0)
     return false;
 
@@ -322,8 +295,7 @@ NOAADownloader::DownloadTAF(const char *code, TAF &taf,
     return false;
 
   // Read rest of the response into the content string
-  taf.content.clear();
-  AppendToContentString(p, taf.content);
+  taf.content.SetASCII(p);
 
   // Trim the content string
   TrimRight(taf.content.buffer());

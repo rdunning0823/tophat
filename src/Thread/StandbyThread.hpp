@@ -95,6 +95,8 @@ public:
 
 private:
   void TriggerCommand() {
+    assert(mutex.IsLockedByCurrent());
+
 #ifdef HAVE_POSIX
     cond.Signal();
 #else
@@ -103,6 +105,8 @@ private:
   }
 
   void TriggerDone() {
+    assert(mutex.IsLockedByCurrent());
+
 #ifdef HAVE_POSIX
     cond.Signal();
 #else
@@ -127,7 +131,22 @@ protected:
    */
   gcc_pure
   bool IsBusy() const {
+    assert(mutex.IsLockedByCurrent());
+
     return pending || busy;
+  }
+
+  /**
+   * Was the thread asked to stop?  The Tick() implementation should
+   * use this to check whether to cancel the operation.
+   *
+   * Caller must lock the mutex.
+   */
+  gcc_pure
+  bool IsStopped() const {
+    assert(mutex.IsLockedByCurrent());
+
+    return stop;
   }
 
   /**
@@ -145,6 +164,16 @@ protected:
   void WaitDone();
 
   /**
+   * Same as WaitDone(), but automatically lock and unlock the mutex.
+   *
+   * Caller must not lock the mutex.
+   */
+  void LockWaitDone() {
+    ScopeLock protect(mutex);
+    WaitDone();
+  }
+
+  /**
    * Wait until the thread has exited.
    *
    * Caller must lock the mutex.
@@ -157,6 +186,8 @@ protected:
    * Caller must lock the mutex.
    */
   void Stop() {
+    assert(mutex.IsLockedByCurrent());
+
     StopAsync();
     WaitStopped();
   }

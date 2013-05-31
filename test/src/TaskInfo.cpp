@@ -1,7 +1,7 @@
 #include "OS/Args.hpp"
-#include "Engine/Task/Tasks/OrderedTask.hpp"
-#include "Engine/Util/Deserialiser.hpp"
-#include "Engine/Util/DataNodeXML.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "XML/DataNodeXML.hpp"
+#include "Task/Deserialiser.hpp"
 
 static OrderedTask *
 LoadTask(const TCHAR *path, const TaskBehaviour &task_behaviour)

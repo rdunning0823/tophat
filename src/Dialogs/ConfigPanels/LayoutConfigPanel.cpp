@@ -37,27 +37,20 @@ Copyright_License {
 enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
-  AppFlarmLocation,
-  TabDialogStyle,
-  AppStatusMessageAlignment,
-  DialogStyle,
   AppInverseInfoBox,
-  AppInfoBoxColors,
-  AppInfoBoxBorder
 };
 
-const TCHAR *display_orientation_help = N_("Rotate the display on devices that support it.");
 static const StaticEnumChoice display_orientation_list[] = {
   { (unsigned)DisplaySettings::Orientation::DEFAULT,
-    N_("Default"), display_orientation_help },
+    N_("Default") },
   { (unsigned)DisplaySettings::Orientation::PORTRAIT,
-    N_("Portrait"), display_orientation_help },
+    N_("Portrait") },
   { (unsigned)DisplaySettings::Orientation::LANDSCAPE,
-    N_("Landscape"), display_orientation_help },
+    N_("Landscape") },
   { (unsigned)DisplaySettings::Orientation::REVERSE_PORTRAIT,
-    N_("Reverse Portrait"), display_orientation_help },
+    N_("Reverse Portrait") },
   { (unsigned)DisplaySettings::Orientation::REVERSE_LANDSCAPE,
-    N_("Reverse Landscape"), display_orientation_help },
+    N_("Reverse Landscape") },
   { 0 }
 };
 
@@ -101,54 +94,6 @@ static const StaticEnumChoice info_box_geometry_list[] = {
   { 0 }
 };
 
-const TCHAR *flarm_display_help = N_("Choose a location for the FLARM display.");
-static const StaticEnumChoice flarm_display_location_list[] = {
-  { (unsigned)TrafficSettings::GaugeLocation::Auto,
-    N_("Auto (follow infoboxes)"), flarm_display_help },
-  { (unsigned)TrafficSettings::GaugeLocation::TopLeft,
-    N_("Top Left"), flarm_display_help },
-  { (unsigned)TrafficSettings::GaugeLocation::TopRight,
-    N_("Top Right"), flarm_display_help },
-  { (unsigned)TrafficSettings::GaugeLocation::BottomLeft,
-    N_("Bottom Left"), flarm_display_help },
-  { (unsigned)TrafficSettings::GaugeLocation::BottomRight,
-    N_("Bottom Right"), flarm_display_help },
-  { (unsigned)TrafficSettings::GaugeLocation::CentreTop,
-    N_("Centre Top"), flarm_display_help },
-  { (unsigned)TrafficSettings::GaugeLocation::CentreBottom,
-    N_("Centre Bottom"), flarm_display_help },
-  { 0 }
-};
-
-static const StaticEnumChoice tabdialog_style_list[] = {
-  { (unsigned)DialogSettings::TabStyle::Text, N_("Text"),
-    N_("Show text on tabbed dialogs.") },
-  { (unsigned)DialogSettings::TabStyle::Icon, N_("Icons"),
-    N_("Show icons on tabbed dialogs.")},
-  { 0 }
-};
-
-static const StaticEnumChoice popup_msg_position_list[] = {
-  { 0, N_("Center"), N_("Center the status message boxes.") },
-  { 1, N_("Topleft"), N_("Show status message boxes in the top left corner.") },
-  { 0 }
-};
-
-const TCHAR *dialog_style_help = N_("Choose the display size of dialogs.");
-static const StaticEnumChoice dialog_style_list[] = {
-  { 0, N_("Full width"), dialog_style_help },
-  { 1, N_("Scaled"), dialog_style_help },
-  { 2, N_("Scaled centered"), dialog_style_help },
-  { 3, N_("Fixed"), dialog_style_help },
-  { 0 }
-};
-
-static const StaticEnumChoice infobox_border_list[] = {
-  { 0, N_("Box"), N_("Draws boxes around each InfoBox.") },
-  { 1, N_("Tab"), N_("Draws a tab at the top of the InfoBox across the title.") },
-  { 0 }
-};
-
 class LayoutConfigPanel : public RowFormWidget {
 public:
   LayoutConfigPanel()
@@ -166,41 +111,19 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  AddEnum(_("Display orientation"), NULL,
-          display_orientation_list, (unsigned)ui_settings.display.orientation);
-  SetRowVisible(DisplayOrientation, Display::RotateSupported());
+  if (Display::RotateSupported())
+    AddEnum(_("Display orientation"), _("Rotate the display on devices that support it."),
+            display_orientation_list, (unsigned)ui_settings.display.orientation);
+  else
+    AddDummy();
 
   AddEnum(_("InfoBox geometry"),
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
 
-  AddEnum(_("FLARM display"), NULL, flarm_display_location_list,
-          (unsigned)ui_settings.traffic.gauge_location);
-  SetExpertRow(AppFlarmLocation);
-
-  AddEnum(_("Tab dialog style"), NULL,
-          tabdialog_style_list, (unsigned)ui_settings.dialog.tab_style);
-
-  AddEnum(_("Message display"), NULL,
-          popup_msg_position_list, ui_settings.popup_message_position);
-  SetExpertRow(AppStatusMessageAlignment);
-
-  AddEnum(_("Dialog size"), NULL,
-          dialog_style_list, ui_settings.dialog.dialog_style);
-  SetExpertRow(DialogStyle);
-
   AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
              ui_settings.info_boxes.inverse);
   SetExpertRow(AppInverseInfoBox);
-
-  AddBoolean(_("Colored InfoBoxes"),
-             _("If true, certain InfoBoxes will have coloured text.  For example, the active waypoint "
-                 "InfoBox will be blue when the glider is above final glide."),
-             ui_settings.info_boxes.use_colors);
-  SetExpertRow(AppInfoBoxColors);
-
-  AddEnum(_("InfoBox border"), NULL, infobox_border_list, ui_settings.info_boxes.border_style);
-  SetExpertRow(AppInfoBoxBorder);
 }
 
 bool
@@ -214,7 +137,7 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   if (Display::RotateSupported()) {
     orientation_changed =
-      SaveValueEnum(DisplayOrientation, szProfileDisplayOrientation,
+      SaveValueEnum(DisplayOrientation, ProfileKeys::DisplayOrientation,
                     ui_settings.display.orientation);
     changed |= orientation_changed;
   }
@@ -222,32 +145,13 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
   bool info_box_geometry_changed = false;
 
   info_box_geometry_changed |=
-    SaveValueEnum(AppInfoBoxGeom, szProfileInfoBoxGeometry,
+    SaveValueEnum(AppInfoBoxGeom, ProfileKeys::InfoBoxGeometry,
                   ui_settings.info_boxes.geometry);
-
-  info_box_geometry_changed |=
-    SaveValueEnum(AppFlarmLocation, szProfileFlarmLocation,
-                  ui_settings.traffic.gauge_location);
 
   changed |= info_box_geometry_changed;
 
-  changed |= SaveValueEnum(AppStatusMessageAlignment, szProfileAppStatusMessageAlignment,
-                           ui_settings.popup_message_position);
-
-  changed |= SaveValueEnum(DialogStyle, szProfileAppDialogStyle,
-                           ui_settings.dialog.dialog_style);
-
   changed |= require_restart |=
-    SaveValueEnum(AppInfoBoxBorder, szProfileAppInfoBoxBorder, ui_settings.info_boxes.border_style);
-
-  changed |= require_restart |=
-    SaveValue(AppInverseInfoBox, szProfileAppInverseInfoBox, ui_settings.info_boxes.inverse);
-
-  changed |= require_restart |=
-    SaveValue(AppInfoBoxColors, szProfileAppInfoBoxColors, ui_settings.info_boxes.use_colors);
-
-  DialogSettings &dialog_settings = CommonInterface::SetUISettings().dialog;
-  changed |= SaveValueEnum(TabDialogStyle, szProfileAppDialogTabStyle, dialog_settings.tab_style);
+    SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
 
   if (orientation_changed) {
     assert(Display::RotateSupported());
@@ -259,7 +163,7 @@ LayoutConfigPanel::Save(bool &_changed, bool &_require_restart)
         LogStartUp(_T("Display rotation failed"));
     }
   } else if (info_box_geometry_changed)
-    XCSoarInterface::main_window.ReinitialiseLayout();
+    CommonInterface::main_window->ReinitialiseLayout();
 
   _changed |= changed;
   _require_restart |= require_restart;

@@ -26,20 +26,23 @@ Copyright_License {
 
 #include "Compiler.h"
 
-#include <tchar.h>
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
 
+#ifdef _UNICODE
+#include <tchar.h>
+#endif
+
 static inline bool
-StringIsEmpty(const TCHAR *string)
+StringIsEmpty(const char *string)
 {
   return *string == 0;
 }
 
 #ifdef _UNICODE
 static inline bool
-StringIsEmpty(const char *string)
+StringIsEmpty(const TCHAR *string)
 {
   return *string == 0;
 }
@@ -141,19 +144,42 @@ StringFormatUnsafe(TCHAR *buffer, const TCHAR *fmt, Args&&... args)
 /**
  * Returns the portion of the string after a prefix.  If the string
  * does not begin with the specified prefix, this function returns
- * NULL.
+ * nullptr.
  */
+gcc_nonnull_all
+const char *
+StringAfterPrefix(const char *string, const char *prefix);
+
+/**
+ * Returns the portion of the string after a prefix.  If the string
+ * does not begin with the specified prefix, this function returns
+ * nullptr.
+ * This function is case-independent.
+ */
+gcc_nonnull_all
+const char *
+StringAfterPrefixCI(const char *string, const char *prefix);
+
+#ifdef _UNICODE
+/**
+ * Returns the portion of the string after a prefix.  If the string
+ * does not begin with the specified prefix, this function returns
+ * nullptr.
+ */
+gcc_nonnull_all
 const TCHAR *
 StringAfterPrefix(const TCHAR *string, const TCHAR *prefix);
 
 /**
  * Returns the portion of the string after a prefix.  If the string
  * does not begin with the specified prefix, this function returns
- * NULL.
+ * nullptr.
  * This function is case-independent.
  */
+gcc_nonnull_all
 const TCHAR *
 StringAfterPrefixCI(const TCHAR *string, const TCHAR *prefix);
+#endif
 
 /**
  * Copy a string.  If the buffer is too small, then the string is
@@ -163,8 +189,9 @@ StringAfterPrefixCI(const TCHAR *string, const TCHAR *prefix);
  * terminator)
  * @return a pointer to the null terminator
  */
-TCHAR *
-CopyString(TCHAR *dest, const TCHAR *src, size_t size);
+gcc_nonnull_all
+char *
+CopyString(char *dest, const char *src, size_t size);
 
 #ifdef _UNICODE
 /**
@@ -175,8 +202,9 @@ CopyString(TCHAR *dest, const TCHAR *src, size_t size);
  * terminator)
  * @return a pointer to the null terminator
  */
-char *
-CopyString(char *dest, const char *src, size_t size);
+gcc_nonnull_all
+TCHAR *
+CopyString(TCHAR *dest, const TCHAR *src, size_t size);
 #endif
 
 /**
@@ -185,15 +213,45 @@ CopyString(char *dest, const char *src, size_t size);
  * destination buffer must be as large as the source buffer.  Can be
  * used for in-place operation.
  */
+gcc_nonnull_all
 void
 CopyASCII(char *dest, const char *src);
 
+/**
+ * Copy all ASCII characters to the destination string
+ * (i.e. 0x01..0x7f), ignoring the others.
+ *
+ * This function does not null-terminate the destination buffer.
+ *
+ * @param dest_size the size of the destination buffer
+ * @return a pointer to the written end of the destination buffer
+ */
+gcc_nonnull_all
+char *
+CopyASCII(char *dest, size_t dest_size, const char *src, const char *src_end);
+
 #ifdef _UNICODE
+gcc_nonnull_all
 void
 CopyASCII(TCHAR *dest, const TCHAR *src);
 
+gcc_nonnull_all
+TCHAR *
+CopyASCII(TCHAR *dest, size_t dest_size,
+          const TCHAR *src, const TCHAR *src_end);
+
+gcc_nonnull_all
 void
 CopyASCII(TCHAR *dest, const char *src);
+
+gcc_nonnull_all
+TCHAR *
+CopyASCII(TCHAR *dest, size_t dest_size, const char *src, const char *src_end);
+
+gcc_nonnull_all
+char *
+CopyASCII(char *dest, size_t dest_size, const TCHAR *src, const TCHAR *src_end);
+
 #endif
 
 /**
@@ -202,24 +260,27 @@ CopyASCII(TCHAR *dest, const char *src);
  * non-whitespace characters, then a pointer to the NULL terminator is
  * returned.
  */
-gcc_pure
-const TCHAR *
-TrimLeft(const TCHAR *p);
-
-#ifdef _UNICODE
-gcc_pure
+gcc_pure gcc_nonnull_all
 const char *
 TrimLeft(const char *p);
+
+#ifdef _UNICODE
+gcc_pure gcc_nonnull_all
+const TCHAR *
+TrimLeft(const TCHAR *p);
 #endif
 
 /**
  * Strips trailing whitespace.
  */
-void TrimRight(TCHAR *p);
-
-#ifdef _UNICODE
+gcc_nonnull_all
 void
 TrimRight(char *p);
+
+#ifdef _UNICODE
+gcc_nonnull_all
+void
+TrimRight(TCHAR *p);
 #endif
 
 /**
@@ -232,8 +293,15 @@ TrimRight(char *p);
  * @param src the source string
  * @return the destination buffer
  */
+gcc_nonnull_all
+char *
+NormalizeSearchString(char *dest, const char *src);
+
+#ifdef _UNICODE
+gcc_nonnull_all
 TCHAR *
 NormalizeSearchString(TCHAR *dest, const TCHAR *src);
+#endif
 
 /**
  * Checks whether str1 and str2 are equal.
@@ -242,12 +310,12 @@ NormalizeSearchString(TCHAR *dest, const TCHAR *src);
  * @return True if equal, False otherwise
  */
 static inline bool
-StringIsEqual(const TCHAR *str1, const TCHAR *str2)
+StringIsEqual(const char *str1, const char *str2)
 {
-  assert(str1 != NULL);
-  assert(str2 != NULL);
+  assert(str1 != nullptr);
+  assert(str2 != nullptr);
 
-  return _tcscmp(str1, str2) == 0;
+  return strcmp(str1, str2) == 0;
 }
 
 #ifdef _UNICODE
@@ -258,12 +326,50 @@ StringIsEqual(const TCHAR *str1, const TCHAR *str2)
  * @return True if equal, False otherwise
  */
 static inline bool
-StringIsEqual(const char *str1, const char *str2)
+StringIsEqual(const TCHAR *str1, const TCHAR *str2)
 {
-  assert(str1 != NULL);
-  assert(str2 != NULL);
+  assert(str1 != nullptr);
+  assert(str2 != nullptr);
 
-  return strcmp(str1, str2) == 0;
+  return _tcscmp(str1, str2) == 0;
+}
+#endif
+
+static inline bool
+StringIsEqualIgnoreCase(const char *a, const char *b)
+{
+  assert(a != nullptr);
+  assert(b != nullptr);
+
+  return strcasecmp(a, b) == 0;
+}
+
+static inline bool
+StringIsEqualIgnoreCase(const char *a, const char *b, size_t size)
+{
+  assert(a != nullptr);
+  assert(b != nullptr);
+
+  return strncasecmp(a, b, size) == 0;
+}
+
+#ifdef _UNICODE
+static inline bool
+StringIsEqualIgnoreCase(const TCHAR *a, const TCHAR *b)
+{
+  assert(a != nullptr);
+  assert(b != nullptr);
+
+  return _tcsicmp(a, b) == 0;
+}
+
+static inline bool
+StringIsEqualIgnoreCase(const TCHAR *a, const TCHAR *b, size_t size)
+{
+  assert(a != nullptr);
+  assert(b != nullptr);
+
+  return _tcsnicmp(a, b, size) == 0;
 }
 #endif
 
@@ -284,7 +390,7 @@ DuplicateString(const char *p)
  * string.  The return value will be null-terminated and must be freed
  * with free().
  */
-gcc_malloc
+gcc_malloc gcc_nonnull_all
 char *
 DuplicateString(const char *p, size_t length);
 
@@ -297,7 +403,7 @@ DuplicateString(const TCHAR *p)
   return _tcsdup(p);
 }
 
-gcc_malloc
+gcc_malloc gcc_nonnull_all
 TCHAR *
 DuplicateString(const TCHAR *p, size_t length);
 

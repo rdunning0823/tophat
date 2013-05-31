@@ -33,7 +33,7 @@ TestMap()
     int value;
     ok1(!Profile::Exists(_T("key1")));
     ok1(!Profile::Get(_T("key1"), value));
-    ok1(Profile::Set(_T("key1"), 4));
+    Profile::Set(_T("key1"), 4);
     ok1(Profile::Exists(_T("key1")));
     ok1(Profile::Get(_T("key1"), value));
     ok1(value == 4);
@@ -42,7 +42,7 @@ TestMap()
   {
     short value;
     ok1(!Profile::Get(_T("key2"), value));
-    ok1(Profile::Set(_T("key2"), 123));
+    Profile::Set(_T("key2"), 123);
     ok1(Profile::Get(_T("key2"), value));
     ok1(value == 123);
   }
@@ -50,7 +50,7 @@ TestMap()
   {
     unsigned value;
     ok1(!Profile::Get(_T("key3"), value));
-    ok1(Profile::Set(_T("key3"), -42));
+    Profile::Set(_T("key3"), -42);
     ok1(Profile::Get(_T("key3"), value));
     ok1(value == -42u);
   }
@@ -58,10 +58,10 @@ TestMap()
   {
     bool value;
     ok1(!Profile::Get(_T("key4"), value));
-    ok1(Profile::Set(_T("key4"), true));
+    Profile::Set(_T("key4"), true);
     ok1(Profile::Get(_T("key4"), value));
     ok1(value);
-    ok1(Profile::Set(_T("key4"), false));
+    Profile::Set(_T("key4"), false);
     ok1(Profile::Get(_T("key4"), value));
     ok1(!value);
   }
@@ -69,7 +69,7 @@ TestMap()
   {
     fixed value;
     ok1(!Profile::Get(_T("key5"), value));
-    ok1(Profile::Set(_T("key5"), fixed(1.337)));
+    Profile::Set(_T("key5"), fixed(1.337));
     ok1(Profile::Get(_T("key5"), value));
     ok1(equals(value, 1.337));
   }
@@ -82,9 +82,9 @@ TestWriter()
   Profile::Set(_T("key1"), 4);
   Profile::Set(_T("key2"), _T("value2"));
 
-  Profile::SaveFile(_T("output/TestProfileWriter.prf"));
+  Profile::SaveFile(_T("output/TestProfileWriter.top"));
 
-  FileLineReader reader(_T("output/TestProfileWriter.prf"));
+  FileLineReader reader(_T("output/TestProfileWriter.top"));
   if (reader.error()) {
     skip(3, 0, "read error");
     return;
@@ -112,7 +112,7 @@ static void
 TestReader()
 {
   Profile::Clear();
-  Profile::LoadFile(_T("test/data/TestProfileReader.prf"));
+  Profile::LoadFile(_T("test/data/TestProfileReader.top"));
 
   {
     int value;
@@ -138,7 +138,7 @@ TestReader()
 
 int main(int argc, char **argv)
 {
-  plan_tests(37);
+  plan_tests(31);
 
   TestMap();
   TestWriter();

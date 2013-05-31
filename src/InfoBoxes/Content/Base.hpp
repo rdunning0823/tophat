@@ -24,8 +24,6 @@ Copyright_License {
 #ifndef XCSOAR_INFOBOX_CONTENT_HPP
 #define XCSOAR_INFOBOX_CONTENT_HPP
 
-#include "Compiler.h"
-
 #include <tchar.h>
 
 struct InfoBoxData;
@@ -62,8 +60,14 @@ public:
    */
   virtual bool HandleQuickAccess(const TCHAR *misc);
 
+  /**
+   * This is a generic handler for the InfoBox. It return an unsigned value
+   * @return a value to be interpreted by the caller
+   */
+  virtual unsigned GetQuickAccess();
+
   struct PanelContent {
-    gcc_constexpr_ctor
+    constexpr
     PanelContent(const TCHAR* _name,
                         Widget *(*_load)(unsigned id)) :
                         name(_name),
@@ -75,6 +79,14 @@ public:
   struct DialogContent {
     const int PANELSIZE;
     const PanelContent *Panels;
+    /**
+     * Tells consumer of content whether to display it
+     * in a tab format or not.
+     */
+    bool show_in_tab_layout;
+    bool GetShowInTabLayout() const {
+      return show_in_tab_layout;
+    }
   };
 
   virtual const DialogContent *GetDialogContent();

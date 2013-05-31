@@ -83,7 +83,7 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
 
   RowFormWidget::Prepare(parent, rc);
 
-  static gcc_constexpr_data StaticEnumChoice wp_labels_list[] = {
+  static constexpr StaticEnumChoice wp_labels_list[] = {
     { (unsigned)WaypointRendererSettings::DisplayTextType::NAME,
       N_("Full name"),
       N_("The full name of each waypoint is displayed.") },
@@ -103,7 +103,7 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
   AddEnum(_("Label format"), _("Determines how labels are displayed with each waypoint"),
           wp_labels_list, (unsigned)settings.display_text_type);
 
-  static gcc_constexpr_data StaticEnumChoice wp_arrival_list[] = {
+  static constexpr StaticEnumChoice wp_arrival_list[] = {
     { (unsigned)WaypointRendererSettings::ArrivalHeightDisplay::NONE,
       N_("None"),
       N_("No arrival height is displayed.") },
@@ -137,7 +137,7 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
   AddEnum(_("Label style"), NULL, wp_label_list, settings.landable_render_mode);
   SetExpertRow(WaypointLabelStyle);
 
-  static gcc_constexpr_data StaticEnumChoice wp_selection_list[] = {
+  static constexpr StaticEnumChoice wp_selection_list[] = {
     { (unsigned)WaypointRendererSettings::LabelSelection::ALL,
       N_("All"), N_("All waypoint labels will be displayed.") },
     { (unsigned)WaypointRendererSettings::LabelSelection::TASK_AND_LANDABLE,
@@ -156,7 +156,7 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
           wp_selection_list, (unsigned)settings.label_selection);
   SetExpertRow(WaypointLabelSelection);
 
-  static gcc_constexpr_data StaticEnumChoice wp_style_list[] = {
+  static constexpr StaticEnumChoice wp_style_list[] = {
     { (unsigned)WaypointRendererSettings::LandableStyle::PURPLE_CIRCLE,
       N_("Purple circle"),
       N_("Airports and outlanding fields are displayed as purple circles. If the waypoint is "
@@ -206,26 +206,26 @@ WaypointDisplayConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   WaypointRendererSettings &settings = CommonInterface::SetMapSettings().waypoint;
 
-  changed |= SaveValueEnum(WaypointLabels, szProfileDisplayText, settings.display_text_type);
+  changed |= SaveValueEnum(WaypointLabels, ProfileKeys::DisplayText, settings.display_text_type);
 
-  changed |= SaveValueEnum(WaypointArrivalHeightDisplay, szProfileWaypointArrivalHeightDisplay,
+  changed |= SaveValueEnum(WaypointArrivalHeightDisplay, ProfileKeys::WaypointArrivalHeightDisplay,
                            settings.arrival_height_display);
 
-  changed |= SaveValueEnum(WaypointLabelStyle, szProfileWaypointLabelStyle,
+  changed |= SaveValueEnum(WaypointLabelStyle, ProfileKeys::WaypointLabelStyle,
                            settings.landable_render_mode);
 
-  changed |= SaveValueEnum(WaypointLabelSelection, szProfileWaypointLabelSelection,
+  changed |= SaveValueEnum(WaypointLabelSelection, ProfileKeys::WaypointLabelSelection,
                            settings.label_selection);
 
-  changed |= SaveValueEnum(AppIndLandable, szProfileAppIndLandable, settings.landable_style);
+  changed |= SaveValueEnum(AppIndLandable, ProfileKeys::AppIndLandable, settings.landable_style);
 
-  changed |= SaveValue(AppUseSWLandablesRendering, szProfileAppUseSWLandablesRendering,
+  changed |= SaveValue(AppUseSWLandablesRendering, ProfileKeys::AppUseSWLandablesRendering,
                        settings.vector_landable_rendering);
 
-  changed |= SaveValue(AppLandableRenderingScale, szProfileAppLandableRenderingScale,
+  changed |= SaveValue(AppLandableRenderingScale, ProfileKeys::AppLandableRenderingScale,
                        settings.landable_rendering_scale);
 
-  changed |= SaveValue(AppScaleRunwayLength, szProfileAppScaleRunwayLength,
+  changed |= SaveValue(AppScaleRunwayLength, ProfileKeys::AppScaleRunwayLength,
                        settings.scale_runway_length);
 
   _changed |= changed;

@@ -22,8 +22,9 @@ Copyright_License {
 */
 
 #include "NativeInputListener.hpp"
+#include "IO/DataHandler.hpp"
 #include "Java/Class.hpp"
-#include "org_xcsoar_NativeInputListener.h"
+#include "org_tophat_NativeInputListener.h"
 
 #include <stddef.h>
 
@@ -34,7 +35,7 @@ namespace NativeInputListener {
 };
 
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeInputListener_dataReceived(JNIEnv *env, jobject obj,
+Java_org_tophat_NativeInputListener_dataReceived(JNIEnv *env, jobject obj,
                                                  jbyteArray data, jint length)
 {
   jlong ptr = env->GetLongField(obj, NativeInputListener::ptr_field);
@@ -42,7 +43,7 @@ Java_org_xcsoar_NativeInputListener_dataReceived(JNIEnv *env, jobject obj,
     /* not yet set */
     return;
 
-  Port::Handler &handler = *(Port::Handler *)(void *)ptr;
+  DataHandler &handler = *(DataHandler *)(void *)ptr;
 
   jbyte *data2 = env->GetByteArrayElements(data, NULL);
   handler.DataReceived(data2, length);
@@ -52,7 +53,7 @@ Java_org_xcsoar_NativeInputListener_dataReceived(JNIEnv *env, jobject obj,
 void
 NativeInputListener::Initialise(JNIEnv *env)
 {
-  cls.Find(env, "org/xcsoar/NativeInputListener");
+  cls.Find(env, "org/tophat/NativeInputListener");
 
   ctor = env->GetMethodID(cls, "<init>", "(J)V");
   ptr_field = env->GetFieldID(cls, "ptr", "J");
@@ -65,7 +66,7 @@ NativeInputListener::Deinitialise(JNIEnv *env)
 }
 
 jobject
-NativeInputListener::Create(JNIEnv *env, Port::Handler &handler)
+NativeInputListener::Create(JNIEnv *env, DataHandler &handler)
 {
   assert(cls != NULL);
 

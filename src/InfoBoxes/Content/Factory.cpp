@@ -63,7 +63,7 @@ struct IBFHelperInt {
 // Groups:
 //   Altitude: e_HeightGPS,e_HeightAGL,e_H_Terrain,e_H_Baro,e_H_QFE,e_FlightLevel,e_Barogram
 //   Aircraft info: e_Bearing,e_Speed_GPS,e_Track_GPS,e_AirSpeed_Ext,e_Load_G,e_WP_BearingDiff,e_Speed,e_Horizon
-//   LD: e_LD_Instantaneous,e_LD_Cruise,e_Fin_LD,e_Fin_GR,e_WP_LD,e_LD,e_LD_Avg
+//   LD: e_GR_Instantaneous,e_GR_Cruise,e_Fin_GR_TE,e_Fin_GR,e_WP_GR,e_LD,e_GR_Avg
 //   Vario: e_Thermal_30s,e_TL_Avg,e_TL_Gain,e_TL_Time,e_Thermal_Avg,e_Thermal_Gain,e_Climb_Avg,e_VerticalSpeed_GPS,e_VerticalSpeed_Netto,e_Vario_spark,e_NettoVario_spark,e_CirclingAverage_spark,e_ThermalBand
 //   Wind: e_WindSpeed_Est,e_WindBearing_Est,e_HeadWind,e_Temperature,e_HumidityRel,e_Home_Temperature
 //   MacCready: e_MacCready,e_WP_Speed_MC,e_Climb_Perc,e_Act_Speed,NextLegEqThermal
@@ -74,25 +74,27 @@ struct IBFHelperInt {
 //   Alternates: e_Alternate_1_Name,e_Alternate_2_Name,e_Alternate_1_GR
 //   Experimental: e_Experimental1,e_Experimental2
 //   Obstacles: e_NearestAirspaceHorizontal,e_NearestAirspaceVertical,TerrainCollision
-const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
+const InfoBoxFactory::MetaData InfoBoxFactory::meta_data[NUM_TYPES] = {
   // e_HeightGPS
   {
-    N_("Height GPS"),
-    N_("H GPS"),
-    N_("This is the height above mean sea level reported by the GPS. Touch-screen/PC only: In simulation mode, this value is adjustable with the up/down arrow keys and the right/left arrow keys also cause the glider to turn."),
+    N_("Altitude GPS"),
+    N_("Alt GPS"),
+    N_("This is the altitude above mean sea level reported by the GPS. Touch-screen/PC only: In simulation mode, this value is adjustable with the up/down arrow keys and the right/left arrow keys also cause the glider to turn."),
     IBFHelper<InfoBoxContentAltitudeGPS>::Create,
     e_HeightAGL, // H AGL
     e_FlightLevel, // Flight Level
+    STANDARD,
   },
 
   // e_HeightAGL
   {
-    N_("Height AGL"),
-    N_("H AGL"),
+    N_("Altitude AGL"),
+    N_("Alt AGL"),
     N_("This is the navigation altitude minus the terrain height obtained from the terrain file. The value is coloured red when the glider is below the terrain safety clearance height."),
     IBFHelper<InfoBoxContentAltitudeAGL>::Create,
     e_H_Terrain, // H GND
     e_HeightGPS, // H GPS
+    STANDARD,
   },
 
   // e_Thermal_30s
@@ -103,6 +105,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermal30s>::Create,
     e_TL_Avg, // TL Avg
     e_VerticalSpeed_Netto, // Netto
+    STANDARD,
   },
 
   // e_Bearing
@@ -113,26 +116,29 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBearing>::Create,
     e_Speed_GPS, // V GND
     e_Horizon,
+    DEPRECATED,
   },
 
-  // e_LD_Instantaneous
+  // e_GR_Instantaneous
   {
-    N_("L/D instantaneous"),
-    N_("L/D Inst"),
-    N_("Instantaneous glide ratio, given by the ground speed divided by the vertical speed (GPS speed) over the last 20 seconds. Negative values indicate climbing cruise. If the vertical speed is close to zero, the displayed value is '---'."),
-    IBFHelper<InfoBoxContentLDInstant>::Create,
-    e_LD_Cruise, // LD Cruise
-    e_LD_Avg, // LD Avg
+    N_("Glide ratio instantaneous"),
+    N_("GR Inst"),
+    N_("Instantaneous glide ratio over ground, given by the ground speed divided by the vertical speed (GPS speed) over the last 20 seconds. Negative values indicate climbing cruise. If the vertical speed is close to zero, the displayed value is '---'."),
+    IBFHelper<InfoBoxContentGRInstant>::Create,
+    e_GR_Cruise, // GR Cruise
+    e_GR_Avg, // GR Avg
+    STANDARD,
   },
 
-  // e_LD_Cruise
+  // e_GR_Cruise
   {
-    N_("L/D cruise"),
-    N_("L/D Cruise"),
-    N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'."),
-    IBFHelper<InfoBoxContentLDCruise>::Create,
-    e_Fin_LD, // Final LD
-    e_LD_Instantaneous, // LD Inst
+    N_("Glide ratio cruise"),
+    N_("GR Cruise"),
+    N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'.  Cruise distance shown also."),
+    IBFHelper<InfoBoxContentGRCruise>::Create,
+    e_Fin_GR_TE, // Final LD
+    e_GR_Instantaneous, // LD Inst
+    STANDARD,
   },
 
   // e_Speed_GPS
@@ -143,6 +149,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeedGround>::Create,
     e_Track_GPS, // Track
     e_Bearing, // Bearing
+    STANDARD,
   },
 
   // e_TL_Avg
@@ -153,6 +160,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalLastAvg>::Create,
     e_TL_Gain, // TL Gain
     e_Thermal_30s, // TC 30s
+    STANDARD,
   },
 
   // e_TL_Gain
@@ -163,6 +171,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalLastGain>::Create,
     e_TL_Time, // TL Time
     e_TL_Avg, // TL Avg
+    STANDARD,
   },
 
   // e_TL_Time
@@ -173,6 +182,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalLastTime>::Create,
     e_Thermal_Avg, // TC Avg
     e_TL_Gain, // TL Gain
+    STANDARD,
   },
 
   // e_MacCready
@@ -183,6 +193,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentMacCready>::Create,
     e_WP_Speed_MC, // V MC
     NextLegEqThermal,
+    STANDARD,
   },
 
   // e_WP_Distance
@@ -193,26 +204,29 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextDistance>::Create,
     e_WP_AltDiff, // WP AltD
     e_TaskProgress, // Progress
+    DEPRECATED,
   },
 
   // e_WP_AltDiff
   {
     N_("Next altitude difference"),
     N_("WP AltD"),
-    N_("Arrival altitude at the next waypoint relative to the safety arrival height."),
+    N_("Arrival altitude at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used."),
     IBFHelper<InfoBoxContentNextAltitudeDiff>::Create,
     e_WP_MC0AltDiff, // WP MC0 AltD
     e_WP_Distance, // WP Dist
+    DEPRECATED,
   },
 
   // e_WP_AltReq
   {
     N_("Next altitude required"),
     N_("WP AltR"),
-    N_("Additional altitude required to reach the next turn point."),
+    N_("Additional altitude required to reach the next turn point. For AAT tasks, the target within the AAT sector is used."),
     IBFHelper<InfoBoxContentNextAltitudeRequire>::Create,
     e_Fin_AltDiff, // Fin AltD
     e_WP_AltDiff, // WP AltD
+    DEPRECATED,
   },
 
   // e_WP_Name
@@ -223,6 +237,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextWaypoint>::Create,
     e_TimeSinceTakeoff, // Time flt
     e_TaskMaxHeightTime, // Start height
+    DEPRECATED,
   },
 
   // e_Fin_AltDiff
@@ -233,6 +248,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalAltitudeDiff>::Create,
     e_Fin_AltReq, // Fin AltR
     e_WP_AltReq, // WP AltR
+    DEPRECATED,
   },
 
   // e_Fin_AltReq
@@ -243,16 +259,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalAltitudeRequire>::Create,
     e_SpeedTaskAvg, // V Task Av
     e_Fin_AltDiff, // Fin AltD
+    DEPRECATED,
   },
 
   // e_SpeedTaskAvg
   {
-    N_("Speed task average"),
-    N_("V Task Avg"),
-    N_("Average cross country speed while on current task, not compensated for altitude."),
+    N_("Speed task achieved"),
+    N_("V Task Ach"),
+    N_("Achieved speed while on current task, not compensated for altitude."),
     IBFHelper<InfoBoxContentTaskSpeed>::Create,
     e_CC_SpeedInst, // V Task Inst
     e_Fin_AltReq, // Fin AltR
+    STANDARD,
   },
 
   // e_Fin_Distance
@@ -263,16 +281,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalDistance>::Create,
     e_AA_Time, // AA Time
     e_CC_Speed, // V Task Ach
+    STANDARD,
   },
 
-  // e_Fin_LD
+  // e_Fin_GR_TE
   {
-    N_("Final L/D"),
-    N_("Final L/D"),
-    N_("The required glide ratio to finish the task, given by the distance to go divided by the height required to arrive at the safety arrival height. Negative values indicate a climb is necessary to finish. If the height required is close to zero, the displayed value is '---'. Note that this calculation may be optimistic because it reduces the height required to finish by the excess energy height of the glider if its true airspeed is greater than the MacCready and best L/D speeds."),
-    IBFHelper<InfoBoxContentFinalLD>::Create,
+    N_("Final glide ratio (TE Compensated)"),
+    N_("Fin GR-TE"),
+    N_("The required glide ratio over ground to finish the task, given by the distance to go divided by the height required to arrive at the safety arrival height. Negative values indicate a climb is necessary to finish. If the height required is close to zero, the displayed value is '---'. Note that this calculation may be optimistic because it reduces the height required to finish by the excess energy height of the glider if its true airspeed is greater than the MacCready and best L/D speeds."),
+    IBFHelper<InfoBoxContentFinalGRTE>::Create,
     e_Fin_GR, // Final GR
-    e_LD_Cruise, // LD Cruise
+    e_GR_Cruise, // GR Cruise
+    DEPRECATED,
   },
 
   // e_H_Terrain
@@ -283,6 +303,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTerrainHeight>::Create,
     e_H_Baro, // H Baro
     e_HeightAGL, // H AGL
+    STANDARD,
   },
 
   // e_Thermal_Avg
@@ -293,6 +314,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalAvg>::Create,
     e_Thermal_Gain, // TC Gain
     e_TL_Time, // TL Time
+    STANDARD,
   },
 
   // e_Thermal_Gain
@@ -303,6 +325,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalGain>::Create,
     e_Climb_Avg, // TC All
     e_Thermal_Avg, // TC Avg
+    STANDARD,
   },
 
   // e_Track_GPS
@@ -313,6 +336,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTrack>::Create,
     e_AirSpeed_Ext, // V IAS
     e_Speed_GPS, // V GND
+    STANDARD,
   },
 
   // e_VerticalSpeed_GPS
@@ -323,6 +347,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVario>::Create,
     e_VerticalSpeed_Netto, // Netto
     e_Climb_Avg, // TC All
+    DEPRECATED,
   },
 
   // e_WindSpeed_Est
@@ -333,6 +358,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentWindSpeed>::Create,
     e_WindBearing_Est, // Wind B
     e_Home_Temperature, // Max Temp
+    STANDARD,
   },
 
   // e_WindBearing_Est
@@ -343,16 +369,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentWindBearing>::Create,
     HeadWindSimplified,
     e_WindSpeed_Est, // Wind V
+    DEPRECATED,
   },
 
   // e_AA_Time
   {
-    N_("AAT time"),
-    N_("AAT time"),
-    N_("Assigned Area Task time remaining. Goes red when time remaining has expired."),
+    N_("Task time remaining"),
+    N_("Task T rem"),
+    N_("Task time remaining. Goes red when time remaining has expired."),
     IBFHelper<InfoBoxContentTaskAATime>::Create,
     e_AA_TimeDiff, // AA dTime
     e_Fin_Distance, // Fin Dis
+    STANDARD,
   },
 
   // e_AA_DistanceMax
@@ -363,6 +391,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAADistanceMax>::Create,
     e_AA_DistanceMin, // AA Dmin
     e_AA_TimeDiff, // AA dTime
+    DEPRECATED,
   },
 
   // e_AA_DistanceMin
@@ -373,6 +402,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAADistanceMin>::Create,
     e_AA_SpeedMax, // AA Vmax
     e_AA_DistanceMax, // AA Dmax
+    DEPRECATED,
   },
 
   // e_AA_SpeedMax
@@ -383,6 +413,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAASpeedMax>::Create,
     e_AA_SpeedMin, // AA Vmin
     e_AA_DistanceMin, // AA Dmin
+    DEPRECATED,
   },
 
   // e_AA_SpeedMin
@@ -393,6 +424,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAASpeedMin>::Create,
     e_Fin_AA_Distance, // AA Dtgt
     e_AA_SpeedMax, // AA Vmax
+    DEPRECATED,
   },
 
   // e_AirSpeed_Ext
@@ -403,6 +435,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeedIndicated>::Create,
     e_Load_G, // G load
     e_Track_GPS, // Track
+    DEPRECATED,
   },
 
   // e_H_Baro
@@ -413,6 +446,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeBaro>::Create,
     e_H_QFE, // QFE GPS
     e_H_Terrain, // H GND
+    STANDARD,
   },
 
   // e_WP_Speed_MC
@@ -423,6 +457,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeedMacCready>::Create,
     e_Climb_Perc, // % Climb
     e_MacCready, // MC
+    DEPRECATED,
   },
 
   // e_Climb_Perc
@@ -433,6 +468,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalRatio>::Create,
     e_Act_Speed, // V Opt
     e_WP_Speed_MC, // V MC
+    STANDARD,
   },
 
   // e_TimeSinceTakeoff
@@ -443,6 +479,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTimeFlight>::Create,
     e_TimeLocal, // Time local
     e_WP_Name, // Next
+    STANDARD,
   },
 
   // e_Load_G
@@ -453,16 +490,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentGLoad>::Create,
     e_WP_BearingDiff, // Bearing D
     e_AirSpeed_Ext, // Track
+    DEPRECATED,
   },
 
-  // e_WP_LD
+  // e_WP_GR
   {
-    N_("Next L/D"),
-    N_("WP L/D"),
-    N_("The required glide ratio to reach the next waypoint, given by the distance to next waypoint divided by the height required to arrive at the safety arrival height. Negative values indicate a climb is necessary to reach the waypoint. If the height required is close to zero, the displayed value is '---'.   Note that this calculation may be optimistic because it reduces the height required to reach the waypoint by the excess energy height of the glider if its true airspeed is greater than the MacCready and best L/D speeds."),
-    IBFHelper<InfoBoxContentNextLD>::Create,
+    N_("Next glide ratio (TE Compensated)"),
+    N_("WP GR-TE"),
+    N_("The required glide ratio over ground to reach the next waypoint, given by the distance to next waypoint divided by the height required to arrive at the safety arrival height. Negative values indicate a climb is necessary to reach the waypoint. If the height required is close to zero, the displayed value is '---'.   Note that this calculation may be optimistic because it reduces the height required to reach the waypoint by the excess energy height of the glider if its true airspeed is greater than the MacCready and best L/D speeds."),
+    IBFHelper<InfoBoxContentNextGR>::Create,
     e_LD, // LD Vario
     e_Fin_GR, // Final GR
+    DEPRECATED,
   },
 
   // e_TimeLocal
@@ -473,6 +512,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTimeLocal>::Create,
     e_TimeUTC, // Time UTC
     e_TimeSinceTakeoff, // Time flt
+    STANDARD,
   },
 
   // e_TimeUTC
@@ -483,26 +523,29 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTimeUTC>::Create,
     e_Fin_Time, // Fin ETE
     e_TimeLocal, // Time local
+    DEPRECATED,
   },
 
   // e_Fin_Time
   {
-    N_("Task time to go"),
+    N_("Task time to go (MacCready)"),
     N_("Fin ETE"),
     N_("Estimated time required to complete task, assuming performance of ideal MacCready cruise/climb cycle."),
     IBFHelper<InfoBoxContentFinalETE>::Create,
     e_Fin_ETE_VMG,
     e_TimeUTC, // Time UTC
+    DEPRECATED,
   },
 
   // e_WP_Time
   {
-    N_("Next time to go"),
+    N_("Next time to go (MacCready)"),
     N_("WP ETE"),
     N_("Estimated time required to reach next waypoint, assuming performance of ideal MacCready cruise/climb cycle."),
     IBFHelper<InfoBoxContentNextETE>::Create,
     e_WP_ETE_VMG,
-    e_Fin_ETE_VMG
+    e_Fin_ETE_VMG,
+    STANDARD,
   },
 
   // e_Act_Speed
@@ -512,7 +555,8 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     N_("The instantaneous MacCready speed-to-fly, making use of netto vario calculations to determine dolphin cruise speed in the glider's current bearing. In cruise flight mode, this speed-to-fly is calculated for maintaining altitude. In final glide mode, this speed-to-fly is calculated for descent. In climb mode, this switches to the speed for minimum sink at the current load factor (if an accelerometer is connected). When Block mode speed to fly is selected, this InfoBox displays the MacCready speed."),
     IBFHelper<InfoBoxContentSpeedDolphin>::Create,
     NextLegEqThermal,
-    e_Climb_Perc // % Climb
+    e_Climb_Perc, // % Climb
+    STANDARD,
   },
 
   // e_VerticalSpeed_Netto
@@ -523,6 +567,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVarioNetto>::Create,
     e_Vario_spark, // Vario trace
     e_VerticalSpeed_GPS, // Vario
+    STANDARD,
   },
 
   // e_Fin_TimeLocal
@@ -533,6 +578,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalETA>::Create,
     e_WP_TimeLocal, // WP ETA
     e_WP_ETE_VMG,
+    STANDARD,
   },
 
   // e_WP_TimeLocal
@@ -543,6 +589,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextETA>::Create,
     e_RH_Trend, // RH Trend
     e_Fin_TimeLocal, // Fin ETA
+    STANDARD,
   },
 
   // e_WP_BearingDiff
@@ -553,6 +600,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBearingDiff>::Create,
     e_Speed, // V TAS
     e_Load_G, // G load
+    DEPRECATED,
   },
 
   // e_Temperature
@@ -563,6 +611,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTemperature>::Create,
     e_HumidityRel, // RelHum
     e_HeadWind,
+    STANDARD,
   },
 
   // e_HumidityRel
@@ -573,6 +622,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHumidity>::Create,
     e_Home_Temperature, // MaxTemp
     e_Temperature, // OAT
+    DEPRECATED,
   },
 
   // e_Home_Temperature
@@ -583,16 +633,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTemperatureForecast>::Create,
     e_WindSpeed_Est, // Wind V
     e_HumidityRel, // RelHum
+    DEPRECATED,
   },
 
   // e_Fin_AA_Distance
   {
-    N_("AAT distance around target"),
-    N_("AAT Dtgt"),
+    N_("Task distance remaining"),
+    N_("Task D Rem"),
     N_("Assigned Area Task distance around target points for remainder of task."),
     IBFHelper<InfoBoxContentTaskAADistance>::Create,
     e_AA_SpeedAvg, // AA Vtgt
     e_AA_SpeedMin, // AA Vmin
+    STANDARD,
   },
 
   // e_AA_SpeedAvg
@@ -603,16 +655,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskAASpeed>::Create,
     e_Home_Distance, // Home Dis
     e_Fin_AA_Distance, // AA Dtgt
+    DEPRECATED,
   },
 
   // e_LD
   {
     N_("L/D vario"),
     N_("L/D vario"),
-    N_("Instantaneous glide ratio, given by the indicated airspeed divided by the total energy vertical speed, when connected to an intelligent variometer. Negative values indicate climbing cruise. If the total energy vario speed is close to zero, the displayed value is '---'."),
+    N_("Instantaneous lift/drag ratio, given by the indicated airspeed divided by the total energy vertical speed, when connected to an intelligent variometer. Negative values indicate climbing cruise. If the total energy vario speed is close to zero, the displayed value is '---'."),
     IBFHelper<InfoBoxContentLDVario>::Create,
-    e_LD_Avg, // LD Avg
-    e_WP_LD, // Next LD
+    e_GR_Avg, // GR Avg
+    e_WP_GR, // Next LD
+    DEPRECATED,
   },
 
   // e_Speed
@@ -623,6 +677,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentSpeed>::Create,
     e_Horizon,
     e_WP_BearingDiff, // Bearing Diff
+    DEPRECATED,
   },
 
   // e_Team_Code
@@ -633,6 +688,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamCode>::Create,
     e_Team_Bearing, // Team Bearing
     e_Team_Range, // Team Range
+    DEPRECATED,
   },
 
   // e_Team_Bearing
@@ -643,6 +699,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamBearing>::Create,
     e_Team_BearingDiff, // Team Bearing Diff
     e_Team_Code, // Team Code
+    DEPRECATED,
   },
 
   // e_Team_BearingDiff
@@ -653,6 +710,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamBearingDiff>::Create,
     e_Team_Range, // Team Range
     e_Team_Bearing, // Team Bearing
+    DEPRECATED,
   },
 
   // e_Team_Range
@@ -663,6 +721,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTeamDistance>::Create,
     e_Team_Code, // Team Code
     e_Team_BearingDiff, // Team Bearing Diff
+    DEPRECATED,
   },
 
   // e_CC_SpeedInst
@@ -673,16 +732,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskSpeedInstant>::Create,
     e_CC_Speed, // V Task Ach
     e_SpeedTaskAvg, // V Task Av
+    DEPRECATED,
   },
 
   // e_Home_Distance
   {
-    N_("Distance home"),
+    N_("Home distance"),
     N_("Home Dist"),
-    N_("Distance to home waypoint (if defined)."),
+    N_("Distance to home waypoint.  User can change the home waypoint by clicking."),
     IBFHelper<InfoBoxContentHomeDistance>::Create,
     e_OC_Distance, // OLC
     e_AA_SpeedAvg, // AA Vtgt
+    STANDARD,
   },
 
   // e_CC_Speed
@@ -693,16 +754,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskSpeedAchieved>::Create,
     e_Fin_Distance, // Fin Dis
     e_CC_SpeedInst, // V Task Inst
+    DEPRECATED,
   },
 
   // e_AA_TimeDiff
   {
-    N_("AAT delta time"),
-    N_("AAT dT"),
-    N_("Difference between estimated task time and AAT minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
+    N_("Task delta time"),
+    N_("Task dT"),
+    N_("Difference between estimated task time and task minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
     IBFHelper<InfoBoxContentTaskAATimeDelta>::Create,
     e_AA_DistanceMax, // AA Dmax
     e_AA_Time, // AA Time
+    STANDARD,
   },
 
   // e_Climb_Avg
@@ -713,6 +776,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalAllAvg>::Create,
     e_VerticalSpeed_GPS, // Vario
     e_Thermal_Gain, // TC Gain
+    STANDARD,
   },
 
   // e_RH_Trend
@@ -723,6 +787,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVarioDistance>::Create,
     e_TaskMaxHeightTime, // Start height
     e_WP_TimeLocal, // WP ETA
+    DEPRECATED,
   },
 
   // e_Battery
@@ -737,16 +802,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBattery>::Create,
     e_CPU_Load, // CPU
     e_CPU_Load, // CPU
+    STANDARD,
   },
 
   // e_Fin_GR
   {
-    N_("Final GR"),
+    N_("Final glide ratio"),
     N_("Fin GR"),
     N_("Geometric gradient to the arrival height above the final waypoint. This is not adjusted for total energy."),
     IBFHelper<InfoBoxContentFinalGR>::Create,
-    e_WP_LD, // Next LD
-    e_Fin_LD, // Fin LD
+    e_WP_GR, // Next LD
+    e_Fin_GR_TE, // Fin LD
+    DEPRECATED,
   },
 
   // e_Alternate_1_Name
@@ -757,6 +824,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelperInt<InfoBoxContentAlternateName, 0>::Create,
     e_Alternate_2_Name, // Altern2 name
     e_Alternate_1_GR, // Altern1 GR
+    STANDARD,
   },
 
   // e_Alternate_2_Name
@@ -767,16 +835,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelperInt<InfoBoxContentAlternateName, 1>::Create,
     e_Alternate_1_GR, // Altern1 GR
     e_Alternate_1_Name, // Altern1 name
+    STANDARD,
   },
 
   // e_Alternate_1_GR
   {
-    N_("Alternate 1 GR"),
+    N_("Alternate 1 glide ratio"),
     N_("Altn1 GR"),
     N_("Geometric gradient to the arrival height above the best alternate. This is not adjusted for total energy."),
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
     e_Alternate_1_Name, // Altern1 name
     e_Alternate_2_Name, // Altern2 name
+    STANDARD,
   },
 
   // e_H_QFE
@@ -787,16 +857,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeQFE>::Create,
     e_FlightLevel, // Flight Level
     e_H_Baro, // H Baro
+    DEPRECATED,
   },
 
-  // e_LD_Avg
+  // e_GR_Avg
   {
-    N_("L/D average"),
-    N_("L/D Avg"),
+    N_("Glide ratio average"),
+    N_("GR Avg"),
     N_("The distance made in the configured period of time , divided by the altitude lost since then. Negative values are shown as ^^^ and indicate climbing cruise (height gain). Over 200 of L/D the value is shown as +++ . You can configure the period of averaging in the system setup. Suggested values are 60, 90 or 120. Lower values will be closed to L/D INST, and higher values will be closed to L/D Cruise. Notice that the distance is NOT the straight line between your old and current position, it's exactly the distance you have made even in a zigzag glide. This value is not calculated while circling."),
-    IBFHelper<InfoBoxContentLDAvg>::Create,
-    e_LD_Instantaneous, // LD Inst
+    IBFHelper<InfoBoxContentGRAvg>::Create,
+    e_GR_Instantaneous, // LD Inst
     e_LD, // LD Vario
+    STANDARD,
   },
 
   // e_Experimental
@@ -807,6 +879,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentExperimental1>::Create,
     e_Experimental2, // Exp2
     e_Experimental2, // Exp2
+    DEPRECATED,
   },
 
   // e_OC_Distance
@@ -817,6 +890,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentOLC>::Create,
     e_TaskProgress, // Progress
     e_Home_Distance, // Home Dis
+    STANDARD,
   },
 
   // e_Experimental2
@@ -827,6 +901,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentExperimental2>::Create,
     e_Experimental1, // Exp1
     e_Experimental1, // Exp1
+    DEPRECATED,
   },
 
   // e_CPU_Load
@@ -837,16 +912,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentCPULoad>::Create,
     e_Battery, // Battery
     e_Battery, // Battery
+    DEPRECATED,
   },
 
   // e_WP_H
   {
     N_("Next altitude arrival"),
     N_("WP alt.A"),
-    N_("Absolute arrival altitude at the next waypoint in final glide."),
+    N_("Absolute arrival altitude at the next waypoint in final glide.  For AAT tasks, the target within the AAT sector is used."),
     IBFHelper<InfoBoxContentNextAltitudeArrival>::Create,
     e_WP_AltReq, // WP AltR
     e_WP_AltDiff, // WP AltD
+    DEPRECATED,
   },
 
   // e_Free_RAM
@@ -857,6 +934,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFreeRAM>::Create,
     e_CPU_Load, // CPU Load
     e_CPU_Load, // CPU Load
+    DEPRECATED,
   },
 
   // e_FlightLevel
@@ -867,6 +945,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFlightLevel>::Create,
     e_Barogram, // Barogram
     e_H_QFE, // QFE GPS
+    DEPRECATED,
   },
 
   // e_Barogram
@@ -877,6 +956,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentBarogram>::Create,
     e_HeightGPS, // H GPS
     e_FlightLevel, // Flight level
+    DEPRECATED,
   },
 
   // e_Vario_spark
@@ -887,6 +967,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentVarioSpark>::Create,
     e_NettoVario_spark, // Netto trace
     e_VerticalSpeed_Netto, // Netto
+    DEPRECATED,
   },
 
   // e_NettoVario_spark
@@ -897,6 +978,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNettoVarioSpark>::Create,
     e_CirclingAverage_spark, // TC trace
     e_Vario_spark, // Vario trace
+    DEPRECATED,
   },
   
   // e_CirclingAverage_spark
@@ -907,6 +989,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentCirclingAverageSpark>::Create,
     e_ThermalBand, // Climb band
     e_NettoVario_spark, // Netto trace
+    DEPRECATED,
   },
 
   // e_ThermalBand
@@ -917,6 +1000,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentThermalBand>::Create,
     e_Thermal_30s, // TC 30s
     e_CirclingAverage_spark, // TC trace
+    DEPRECATED,
   },
 
   // e_TaskProgress
@@ -927,6 +1011,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskProgress>::Create,
     e_WP_Distance, // WP Dist
     e_OC_Distance, // OLC
+    DEPRECATED,
   },
 
   // e_TaskMaxHeightTime
@@ -937,6 +1022,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTaskTimeUnderMaxHeight>::Create,
     e_WP_Name, // Next WP
     e_RH_Trend, // RH Trend
+    STANDARD,
   },
 
   // e_Fin_ETE_VMG
@@ -947,6 +1033,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentFinalETEVMG>::Create,
     e_WP_Time, // WP ETE
     e_Fin_Time,
+    STANDARD,
   },
 
   // e_WP_ETE_VMG
@@ -957,6 +1044,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextETEVMG>::Create,
     e_Fin_TimeLocal, // Fin ETA
     e_WP_Time,
+    STANDARD,
   },
 
   // e_Horizon
@@ -967,6 +1055,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHorizon>::Create,
     e_Bearing,
     e_Speed,
+    DEPRECATED,
   },
 
   // e_NearestAirspaceHorizontal
@@ -977,6 +1066,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNearestAirspaceHorizontal>::Create,
     e_NearestAirspaceVertical,
     TerrainCollision,
+    DEPRECATED,
   },
 
   // e_NearestAirspaceVertical
@@ -987,16 +1077,18 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNearestAirspaceVertical>::Create,
     TerrainCollision,
     e_NearestAirspaceHorizontal,
+    DEPRECATED,
   },
 
   // e_WP_MC0AltDiff
   {
     N_("Next MC0 altitude difference"),
     N_("WP MC0 AltD"),
-    N_("Arrival altitude at the next waypoint with MC 0 setting relative to the safety arrival height."),
+    N_("Arrival altitude at the next waypoint with MC 0 setting relative to the safety arrival height.  For AAT tasks, the target within the AAT sector is used."),
     IBFHelper<InfoBoxContentNextMC0AltitudeDiff>::Create,
     e_WP_H, // WP AltA
     e_WP_AltDiff, // WP AltD
+    DEPRECATED,
   },
 
   // e_HeadWind
@@ -1007,6 +1099,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHeadWind>::Create,
     e_Temperature, // OAT
     HeadWindSimplified,
+    STANDARD,
   },
 
   // TerrainCollision
@@ -1017,6 +1110,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentTerrainCollision>::Create,
     e_NearestAirspaceHorizontal,
     e_NearestAirspaceVertical,
+    DEPRECATED,
   },
 
   {
@@ -1026,6 +1120,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentAltitudeNav>::Create,
     NavAltitude,
     NavAltitude,
+    DEPRECATED,
   },
 
   // NextLegEqThermal
@@ -1036,6 +1131,7 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentNextLegEqThermal>::Create,
     e_MacCready, // MC
     e_Act_Speed, // V Opt
+    DEPRECATED,
   },
 
   // HeadWindSimplified
@@ -1046,12 +1142,44 @@ const InfoBoxFactory::InfoBoxMetaData InfoBoxFactory::MetaData[NUM_TYPES] = {
     IBFHelper<InfoBoxContentHeadWindSimplified>::Create,
     e_HeadWind, // OAT
     e_WindBearing_Est,
+    DEPRECATED,
   },
 
+  {
+    N_("Task cruise efficiency"),
+    N_("Cruise Eff"),
+    N_("Efficiency of cruise.  100 indicates perfect MacCready performance. "
+       "This value estimates your cruise efficiency according to the current "
+       "flight history with the set MC value.  Calculation begins after task is started."),
+    IBFHelper<InfoBoxContentCruiseEfficiency>::Create,
+    CruiseEfficiency,
+    CruiseEfficiency,
+    DEPRECATED,
+  },
+
+  {
+    N_("Wind arrow"),
+    N_("Wind"),
+    N_("Wind speed estimated by XCSoar. (Touch-screen/PC only) Manual adjustment is possible by pressing the up/down cursor keys to adjust magnitude and left/right cursor keys to adjust bearing when the InfoBox is active. Pressing the enter cursor key saves the wind value as the initial value when XCSoar next starts."),
+    IBFHelper<InfoBoxContentWindArrow>::Create,
+    WIND_ARROW,
+    WIND_ARROW,
+    DEPRECATED,
+  },
+
+  {
+    N_("Home altitude difference"),
+    N_("Home alt diff"),
+    N_("Arrival altitude for the home waypoint (including safety height).  User can change the home waypoint by clicking.  Distance shown in comment."),
+    IBFHelper<InfoBoxContentHomeAltitudeDiff>::Create,
+    HomeAltitudeDiff,
+    HomeAltitudeDiff,
+    STANDARD,
+  },
 };
 
 bool
-InfoBoxFactory::Get(const TCHAR *key, InfoBoxFactory::t_InfoBox &val)
+InfoBoxFactory::Get(const TCHAR *key, InfoBoxFactory::Type &val)
 {
   unsigned _val = val;
   bool ret = ProfileMap::Get(key, _val);
@@ -1059,14 +1187,14 @@ InfoBoxFactory::Get(const TCHAR *key, InfoBoxFactory::t_InfoBox &val)
   if (_val >= e_NUM_TYPES)
     return false;
 
-  val = (InfoBoxFactory::t_InfoBox)_val;
+  val = (InfoBoxFactory::Type)_val;
   return ret;
 }
 
 InfoBoxContent*
-InfoBoxFactory::Create(t_InfoBox InfoBoxType)
+InfoBoxFactory::Create(Type infobox_type)
 {
-  assert(MetaData[InfoBoxType].Create != NULL);
+  assert(meta_data[infobox_type].Create != NULL);
 
-  return MetaData[InfoBoxType].Create();
+  return meta_data[infobox_type].Create();
 }

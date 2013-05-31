@@ -37,15 +37,15 @@ BluetoothHelper::Initialise(JNIEnv *env)
   assert(!cls.IsDefined());
   assert(env != NULL);
 
-  if (!cls.FindOptional(env, "org/xcsoar/BluetoothHelper"))
+  if (!cls.FindOptional(env, "org/tophat/BluetoothHelper"))
     /* Android < 2.0 doesn't have Bluetooth support */
     return false;
 
   list_method = env->GetStaticMethodID(cls, "list", "()[Ljava/lang/String;");
   connect_method = env->GetStaticMethodID(cls, "connect",
-                                          "(Ljava/lang/String;)Lorg/xcsoar/AndroidPort;");
+                                          "(Ljava/lang/String;)Lorg/tophat/AndroidPort;");
   createServer_method = env->GetStaticMethodID(cls, "createServer",
-                                               "()Lorg/xcsoar/AndroidPort;");
+                                               "()Lorg/tophat/AndroidPort;");
   return true;
 }
 

@@ -21,7 +21,7 @@
  */
 
 #include "Navigation/Aircraft.hpp"
-#include "Navigation/Geometry/GeoVector.hpp"
+#include "Geo/GeoVector.hpp"
 
 AircraftState 
 AircraftState::GetPredictedState(const fixed &in_time) const
@@ -37,10 +37,10 @@ void
 AircraftState::Reset()
 {
   AltitudeState::Reset();
-  FlyingState::Reset();
 
   g_load = fixed_one;
   wind = SpeedVector::Zero();
+  flying = false;
 }
 
 void

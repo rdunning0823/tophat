@@ -31,11 +31,11 @@ Copyright_License {
 #include "Util/CharUtil.hpp"
 #include "Util/StringUtil.hpp"
 #include "Util/Macros.hpp"
-#include "Math/Earth.hpp"
+#include "Geo/Math.hpp"
 #include "IO/LineReader.hpp"
 #include "Airspace/AirspacePolygon.hpp"
 #include "Airspace/AirspaceCircle.hpp"
-#include "Engine/Navigation/Geometry/GeoVector.hpp"
+#include "Geo/GeoVector.hpp"
 #include "Compatibility/string.h"
 #include "Engine/Airspace/AirspaceClass.hpp"
 #include "Util/StaticString.hpp"
@@ -45,8 +45,6 @@ Copyright_License {
 #include <assert.h>
 #include <stdio.h>
 #include <windef.h> /* for MAX_PATH */
-
-#define fixed_7_5 fixed(7.5)
 
 enum AirspaceFileType {
   AFT_UNKNOWN,
@@ -185,16 +183,32 @@ struct TempAirspaceType
     airspace_database.Add(as);
   }
 
+  static fixed
+  ArcStepWidth(fixed radius)
+  {
+    if (radius > fixed_int_constant(50000))
+      return fixed_int_constant(1);
+    if (radius > fixed_int_constant(25000))
+      return fixed_int_constant(2);
+    if (radius > fixed_int_constant(10000))
+      return fixed_int_constant(3);
+
+    return fixed_int_constant(5);
+  }
+
   void
   AppendArc(const GeoPoint start, const GeoPoint end)
   {
-    // 5 or -5, depending on direction
-    const Angle step = Angle::Degrees(rotation * fixed(5));
 
     // Determine start bearing and radius
     const GeoVector v = center.DistanceBearing(start);
     Angle start_bearing = v.bearing;
     const fixed radius = v.distance;
+
+    // 5 or -5, depending on direction
+    const fixed _step = ArcStepWidth(radius);
+    const Angle step = Angle::Degrees(rotation * _step);
+    const fixed threshold = _step * fixed(1.5);
 
     // Determine end bearing
     Angle end_bearing = center.Bearing(end);
@@ -203,7 +217,7 @@ struct TempAirspaceType
     points.push_back(start);
 
     // Add intermediate polygon points
-    while ((end_bearing - start_bearing).AbsoluteDegrees() > fixed_7_5) {
+    while ((end_bearing - start_bearing).AbsoluteDegrees() > threshold) {
       start_bearing = (start_bearing + step).AsBearing();
       points.push_back(FindLatitudeLongitude(center, start_bearing, radius));
     }
@@ -216,13 +230,15 @@ struct TempAirspaceType
   AppendArc(Angle start, Angle end)
   {
     // 5 or -5, depending on direction
-    const Angle step = Angle::Degrees(rotation * fixed(5));
+    const fixed _step = ArcStepWidth(radius);
+    const Angle step = Angle::Degrees(rotation * _step);
+    const fixed threshold = _step * fixed(1.5);
 
     // Add first polygon point
     points.push_back(FindLatitudeLongitude(center, start, radius));
 
     // Add intermediate polygon points
-    while ((end - start).AbsoluteDegrees() > fixed_7_5) {
+    while ((end - start).AbsoluteDegrees() > threshold) {
       start = (start + step).AsBearing();
       points.push_back(FindLatitudeLongitude(center, start, radius));
     }
@@ -258,14 +274,14 @@ ReadAltitude(const TCHAR *buffer, AirspaceAltitude &altitude)
       TCHAR *endptr;
       value = fixed(_tcstod(p, &endptr));
       p = endptr;
-    } else if (_tcsnicmp(p, _T("GND"), 3) == 0 ||
-               _tcsnicmp(p, _T("AGL"), 3) == 0) {
+    } else if (StringIsEqualIgnoreCase(p, _T("GND"), 3) ||
+               StringIsEqualIgnoreCase(p, _T("AGL"), 3)) {
       type = AGL;
       p += 3;
-    } else if (_tcsnicmp(p, _T("SFC"), 3) == 0) {
+    } else if (StringIsEqualIgnoreCase(p, _T("SFC"), 3)) {
       type = SFC;
       p += 3;
-    } else if (_tcsnicmp(p, _T("FL"), 2) == 0) {
+    } else if (StringIsEqualIgnoreCase(p, _T("FL"), 2)) {
       type = FL;
       p += 2;
     } else if (*p == _T('F') || *p == _T('f')) {
@@ -274,16 +290,16 @@ ReadAltitude(const TCHAR *buffer, AirspaceAltitude &altitude)
 
       if (*p == _T('T') || *p == _T('t'))
         ++p;
-    } else if (_tcsnicmp(p, _T("MSL"), 3) == 0) {
+    } else if (StringIsEqualIgnoreCase(p, _T("MSL"), 3)) {
       type = MSL;
       p += 3;
     } else if (*p == _T('M') || *p == _T('m')) {
       unit = Unit::METER;
       ++p;
-    } else if (_tcsnicmp(p, _T("STD"), 3) == 0) {
+    } else if (StringIsEqualIgnoreCase(p, _T("STD"), 3)) {
       type = STD;
       p += 3;
-    } else if (_tcsnicmp(p, _T("UNL"), 3) == 0) {
+    } else if (StringIsEqualIgnoreCase(p, _T("UNL"), 3)) {
       type = UNLIMITED;
       p += 3;
     } else if (*p == _T('\0'))
@@ -634,7 +650,7 @@ static AirspaceClass
 ParseTypeTNP(const TCHAR *buffer)
 {
   for (unsigned i = 0; i < ARRAY_SIZE(airspace_tnp_type_strings); i++)
-    if (_tcsicmp(buffer, airspace_tnp_type_strings[i].string) == 0)
+    if (StringIsEqualIgnoreCase(buffer, airspace_tnp_type_strings[i].string))
       return airspace_tnp_type_strings[i].type;
 
   return OTHER;
@@ -749,9 +765,9 @@ ParseLineTNP(Airspaces &airspace_database, TCHAR *line,
 
   const TCHAR* parameter;
   if ((parameter = StringAfterPrefixCI(line, _T("INCLUDE="))) != NULL) {
-    if (_tcsicmp(parameter, _T("YES")) == 0)
+    if (StringIsEqualIgnoreCase(parameter, _T("YES")))
       ignore = false;
-    else if (_tcsicmp(parameter, _T("NO")) == 0)
+    else if (StringIsEqualIgnoreCase(parameter, _T("NO")))
       ignore = true;
 
     return true;
@@ -806,11 +822,11 @@ ParseLineTNP(Airspaces &airspace_database, TCHAR *line,
   } else if ((parameter = StringAfterPrefixCI(line, _T("RADIO="))) != NULL) {
     temp_area.radio = parameter;
   } else if ((parameter = StringAfterPrefixCI(line, _T("ACTIVE="))) != NULL) {
-    if (_tcsicmp(parameter, _T("WEEKEND")) == 0)
+    if (StringIsEqualIgnoreCase(parameter, _T("WEEKEND")))
       temp_area.days_of_operation.SetWeekend();
-    else if (_tcsicmp(parameter, _T("WEEKDAY")) == 0)
+    else if (StringIsEqualIgnoreCase(parameter, _T("WEEKDAY")))
       temp_area.days_of_operation.SetWeekdays();
-    else if (_tcsicmp(parameter, _T("EVERYDAY")) == 0)
+    else if (StringIsEqualIgnoreCase(parameter, _T("EVERYDAY")))
       temp_area.days_of_operation.SetAll();
   }
 

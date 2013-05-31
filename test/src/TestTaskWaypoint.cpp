@@ -20,8 +20,9 @@
 }
 */
 
-#include "Engine/Task/Tasks/BaseTask/TaskWaypoint.hpp"
-#include "Engine/Navigation/Geometry/GeoVector.hpp"
+#include "Engine/Task/Points/TaskWaypoint.hpp"
+#include "Engine/Navigation/Aircraft.hpp"
+#include "Geo/GeoVector.hpp"
 #include "TestUtil.hpp"
 
 class DummyTaskWaypoint: public TaskWaypoint
@@ -34,15 +35,15 @@ public:
   DummyTaskWaypoint(Type _type, const Waypoint & wp)
     :TaskWaypoint(_type, wp) {}
 
-  virtual const GeoVector GetVectorRemaining(const GeoPoint &reference) const {
+  virtual GeoVector GetVectorRemaining(const GeoPoint &reference) const {
     return GeoVector();
   }
 
-  virtual const GeoVector GetVectorPlanned() const {
+  virtual GeoVector GetVectorPlanned() const {
     return GeoVector();
   }
 
-  virtual const GeoVector GetVectorTravelled() const {
+  virtual GeoVector GetVectorTravelled() const {
     return GeoVector();
   }
 

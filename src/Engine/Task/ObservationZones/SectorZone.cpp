@@ -21,7 +21,8 @@
 */
 
 #include "SectorZone.hpp"
-#include "Navigation/Geometry/GeoVector.hpp"
+#include "Boundary.hpp"
+#include "Geo/GeoVector.hpp"
 
 GeoPoint
 SectorZone::GetBoundaryParametric(fixed t) const
@@ -46,25 +47,17 @@ SectorZone::GetBoundaryParametric(fixed t) const
 }
 
 
-ObservationZone::Boundary
+OZBoundary
 SectorZone::GetBoundary() const
 {
-  Boundary boundary;
+  OZBoundary boundary;
 
   boundary.push_front(GetReference());
   boundary.push_front(GetSectorStart());
   boundary.push_front(GetSectorEnd());
 
-  const unsigned steps = 20;
-  const Angle delta = Angle::FullCircle() / steps;
-  const Angle start = GetStartRadial().AsBearing();
-  Angle end = GetEndRadial().AsBearing();
-  if (end <= start + Angle::FullCircle() / 512)
-    end += Angle::FullCircle();
-
-  GeoVector vector(GetRadius(), start + delta);
-  for (; vector.bearing < end; vector.bearing += delta)
-    boundary.push_front(vector.EndPoint(GetReference()));
+  boundary.GenerateArcExcluding(GetReference(), GetRadius(),
+                                GetStartRadial(), GetEndRadial());
 
   return boundary;
 }
@@ -83,9 +76,9 @@ SectorZone::UpdateSector()
 }
 
 bool 
-SectorZone::IsInSector(const AircraftState &ref) const
+SectorZone::IsInSector(const GeoPoint &location) const
 {
-  GeoVector f(GetReference(), ref.location);
+  GeoVector f(GetReference(), location);
 
   return f.distance <= GetRadius() && IsAngleInSector(f.bearing);
 }

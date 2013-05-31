@@ -28,19 +28,17 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Form/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
+#include "Profile/Profile.hpp"
+#include "Units/UnitsStore.hpp"
 
 enum ControlIndex {
-  StartMaxSpeed,
   StartMaxSpeedMargin,
-  spacer_1,
-  StartMaxHeight,
   StartMaxHeightMargin,
-  StartHeightRef,
-  spacer_2,
-  FinishMinHeight,
-  FinishHeightRef,
-  spacer_3,
-  Contests
+  AATTimeMargin,
+  ContestNationality,
+  spacer_1,
+  Contests,
+  PREDICT_CONTEST,
 };
 
 class TaskRulesConfigPanel : public RowFormWidget {
@@ -61,26 +59,11 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  AddFloat(_("Start max. speed"), _("Maximum speed allowed in start observation zone.  Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5), false, UnitGroup::HORIZONTAL_SPEED,
-           task_behaviour.ordered_defaults.start_max_speed);
-  SetExpertRow(StartMaxSpeed);
-
   AddFloat(_("Start max. speed margin"),
            _("Maximum speed above maximum start speed to tolerate.  Set to 0 for no tolerance."),
            _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5), false, UnitGroup::HORIZONTAL_SPEED,
            task_behaviour.start_max_speed_margin);
   SetExpertRow(StartMaxSpeedMargin);
-
-  AddSpacer();
-  SetExpertRow(spacer_1);
-
-  AddFloat(_("Start max. height"),
-           _("Maximum height based on start height reference (AGL or MSL) while starting the task.  "
-               "Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(10000), fixed(50), false, UnitGroup::ALTITUDE,
-           fixed(task_behaviour.ordered_defaults.start_max_height));
-  SetExpertRow(StartMaxHeight);
 
   AddFloat(_("Start max. height margin"),
            _("Maximum height above maximum start height to tolerate.  Set to 0 for no tolerance."),
@@ -88,36 +71,25 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(task_behaviour.start_max_height_margin));
   SetExpertRow(StartMaxHeightMargin);
 
-  static gcc_constexpr_data StaticEnumChoice start_max_height_ref_list[] = {
-    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for start maximum height rule (above start point).") },
-    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for start maximum height rule (above sea level).") },
-    { 0 }
-  };
-  AddEnum(_("Start height ref."), NULL, start_max_height_ref_list,
-          (unsigned)task_behaviour.ordered_defaults.start_max_height_ref);
-  SetExpertRow(StartHeightRef);
+  AddTime(_("Optimisation margin"),
+          _("Safety margin for AAT task optimisation.  Optimisation "
+            "seeks to complete the task at the minimum time plus this margin time."),
+          0, 30 * 60, 60, (unsigned)task_behaviour.optimise_targets_margin);
+  SetExpertRow(AATTimeMargin);
+
+  WndProperty *wp = AddEnum(_("Nationality"), N_("If a specific nation is selected, then building a task is simplified to show only appropriate options.  Sets the appropriate system units also."));
+  DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
+  df.EnableItemHelp(true);
+
+  unsigned len = Units::Store::Count();
+  df.addEnumText(_("Unknown"), (unsigned)0, _("Unknown nationality"));
+  for (unsigned i = 0; i < len; i++)
+    df.addEnumText(Units::Store::GetName(i), i+1);
+
+  LoadValueEnum(ContestNationality, (unsigned)task_behaviour.contest_nationality);
 
   AddSpacer();
-  SetExpertRow(spacer_2);
-
-  AddFloat(_("Finish min. height"),
-           _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  "
-               "Set to 0 for no limit."),
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(10000), fixed(50), false, UnitGroup::ALTITUDE,
-           fixed(task_behaviour.ordered_defaults.finish_min_height));
-  SetExpertRow(FinishMinHeight);
-
-  static gcc_constexpr_data StaticEnumChoice finish_min_height_ref_list[] = {
-    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for finish minimum height rule (above finish point).") },
-    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for finish minimum height rule (above sea level).") },
-    { 0 }
-  };
-  AddEnum(_("Finish height ref."), NULL, finish_min_height_ref_list,
-          (unsigned)task_behaviour.ordered_defaults.finish_min_height_ref);
-  SetExpertRow(FinishHeightRef);
-
-  AddSpacer();
-  SetExpertRow(spacer_3);
+  SetExpertRow(spacer_1);
 
   const StaticEnumChoice contests_list[] = {
     { OLC_FAI, ContestToString(OLC_FAI),
@@ -140,6 +112,12 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
       _("Select the rules used for calculating optimal points for the On-Line Contest. "
           "The implementation  conforms to the official release 2010, Sept.23."),
           contests_list, task_behaviour.contest);
+
+  AddBoolean(_("Predict Contest"),
+             _("If enabled, then the next task point is included in the "
+               "score calculation, assuming that you will reach it."),
+             task_behaviour.predict_contest);
+  SetExpertRow(PREDICT_CONTEST);
 }
 
 
@@ -150,26 +128,70 @@ TaskRulesConfigPanel::Save(bool &_changed, bool &_require_restart)
 
   ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
   TaskBehaviour &task_behaviour = settings_computer.task;
-  OrderedTaskBehaviour &otb = task_behaviour.ordered_defaults;
 
-  changed |= SaveValue(StartMaxSpeed, UnitGroup::HORIZONTAL_SPEED, szProfileStartMaxSpeed, otb.start_max_speed);
-
-  changed |= SaveValue(StartMaxSpeedMargin, UnitGroup::HORIZONTAL_SPEED, szProfileStartMaxSpeedMargin,
+  changed |= SaveValue(StartMaxSpeedMargin, UnitGroup::HORIZONTAL_SPEED, ProfileKeys::StartMaxSpeedMargin,
                        task_behaviour.start_max_speed_margin);
 
-  changed |= SaveValue(StartMaxHeight, UnitGroup::ALTITUDE, szProfileStartMaxHeight, otb.start_max_height);
-
-  changed |= SaveValue(StartMaxHeightMargin, UnitGroup::ALTITUDE, szProfileStartMaxHeightMargin,
+  changed |= SaveValue(StartMaxHeightMargin, UnitGroup::ALTITUDE, ProfileKeys::StartMaxHeightMargin,
                        task_behaviour.start_max_height_margin);
 
-  changed |= SaveValueEnum(StartHeightRef, szProfileStartHeightRef, otb.start_max_height_ref);
+  bool nat_changed = SaveValueEnum(ContestNationality, ProfileKeys::ContestNationality,
+                                   task_behaviour.contest_nationality);
+  if (nat_changed) {
+    // use british (0th index) if unknown
+    unsigned the_unit = (task_behaviour.contest_nationality > 0)
+        ? task_behaviour.contest_nationality - 1 : 0;
+    UnitSetting units = Units::Store::Read(the_unit);
+    UnitSetting &config = CommonInterface::SetUISettings().units;
+    config = units;
 
-  changed |= SaveValue(FinishMinHeight, UnitGroup::ALTITUDE, szProfileFinishMinHeight,
-                       otb.finish_min_height);
+    /* the Units settings affect how other form values are read and translated
+     * so changes to Units settings should be processed after all other form settings
+     */
+    Profile::Set(ProfileKeys::ContestNationality,
+                 (int)task_behaviour.contest_nationality);
 
-  changed |= SaveValueEnum(FinishHeightRef, szProfileFinishHeightRef, otb.finish_min_height_ref);
+//    SaveValueEnum(UnitsSpeed, ProfileKeys::SpeedUnitsValue, config.speed_unit);
+    config.wind_speed_unit = config.speed_unit; // Mapping the wind speed to the speed unit
+    Profile::Set(ProfileKeys::SpeedUnitsValue,
+                 (int)config.speed_unit);
 
-  changed |= SaveValueEnum(Contests, szProfileOLCRules, task_behaviour.contest);
+//    SaveValueEnum(UnitsDistance, ProfileKeys::DistanceUnitsValue, config.distance_unit);
+    Profile::Set(ProfileKeys::DistanceUnitsValue,
+                 (int)config.distance_unit);
+
+//    SaveValueEnum(UnitsLift, ProfileKeys::LiftUnitsValue, config.vertical_speed_unit);
+    Profile::Set(ProfileKeys::LiftUnitsValue,
+                 (int)config.vertical_speed_unit);
+
+//    SaveValueEnum(UnitsAltitude, ProfileKeys::AltitudeUnitsValue, config.altitude_unit);
+    Profile::Set(ProfileKeys::AltitudeUnitsValue,
+                 (int)config.altitude_unit);
+
+//    SaveValueEnum(UnitsTemperature, ProfileKeys::TemperatureUnitsValue, config.temperature_unit);
+    Profile::Set(ProfileKeys::ContestNationality,
+                 (int)task_behaviour.contest_nationality);
+
+//    SaveValueEnum(UnitsTaskSpeed, ProfileKeys::TaskSpeedUnitsValue, config.task_speed_unit);
+    Profile::Set(ProfileKeys::TaskSpeedUnitsValue,
+                 (int)config.temperature_unit);
+
+//    SaveValueEnum(UnitsPressure, ProfileKeys::PressureUnitsValue, config.pressure_unit);
+    Profile::Set(ProfileKeys::PressureUnitsValue,
+                 (int)config.pressure_unit);
+  }
+  changed |= nat_changed;
+
+  unsigned aatmargin = task_behaviour.optimise_targets_margin;
+  if (SaveValue(AATTimeMargin, aatmargin)) {
+    task_behaviour.optimise_targets_margin = aatmargin;
+    Profile::Set(ProfileKeys::AATTimeMargin, aatmargin);
+    changed = true;
+  }
+
+  changed |= SaveValueEnum(Contests, ProfileKeys::OLCRules, task_behaviour.contest);
+  changed |= SaveValueEnum(PREDICT_CONTEST, ProfileKeys::PredictContest,
+                           task_behaviour.predict_contest);
 
   _changed |= changed;
   _require_restart |= require_restart;

@@ -22,20 +22,13 @@
 #ifndef ROUTELINK_HPP
 #define ROUTELINK_HPP
 
-#include <limits.h>
 #include "Config.hpp"
 #include "Math/fixed.hpp"
 #include "Math/Angle.hpp"
-#include "Navigation/SearchPoint.hpp"
 #include "Rough/RoughAltitude.hpp"
+#include "Geo/Flat/FlatGeoPoint.hpp"
 
-#include <utility>
-
-class GlidePolar;
-struct GlideResult;
 class TaskProjection;
-class RasterMap;
-struct SpeedVector;
 
 typedef AFlatGeoPoint RoutePoint;
 
@@ -78,17 +71,17 @@ struct RouteLinkBase {
   bool
   operator<(const RouteLinkBase &o) const
   {
-    if (first.Longitude != o.first.Longitude)
-      return first.Longitude < o.first.Longitude;
-    if (first.Latitude != o.first.Latitude)
-      return first.Latitude < o.first.Latitude;
+    if (first.longitude != o.first.longitude)
+      return first.longitude < o.first.longitude;
+    if (first.latitude != o.first.latitude)
+      return first.latitude < o.first.latitude;
     if (first.altitude != o.first.altitude)
       return first.altitude < o.first.altitude;
 
-    if (second.Longitude != o.second.Longitude)
-      return second.Longitude < o.second.Longitude;
-    if (second.Latitude != o.second.Latitude)
-      return second.Latitude < o.second.Latitude;
+    if (second.longitude != o.second.longitude)
+      return second.longitude < o.second.longitude;
+    if (second.latitude != o.second.latitude)
+      return second.latitude < o.second.latitude;
     if (second.altitude != o.second.altitude)
       return second.altitude < o.second.altitude;
 

@@ -25,18 +25,22 @@ Copyright_License {
 #define XCSOAR_NET_FEATURES_HPP
 
 #if defined(WIN32) && !defined(_WIN32_WCE)
-#define HAVE_NET
+#define HAVE_HTTP
 #define HAVE_WININET
 #endif
 
 #if !defined(WIN32) && defined(HAVE_POSIX) && !defined(ANDROID) && !defined(__APPLE__)
-#define HAVE_NET
+#define HAVE_HTTP
 #define HAVE_CURL
 #endif
 
 #ifdef ANDROID
-#define HAVE_NET
+#define HAVE_HTTP
 #define HAVE_JAVA_NET
+#endif
+
+#ifdef HAVE_HTTP
+#define HAVE_DOWNLOAD_MANAGER
 #endif
 
 #endif

@@ -27,96 +27,81 @@ Copyright_License {
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Boolean.hpp"
 #include "Form/DataField/Float.hpp"
-#include "Dialogs/CallBackTable.hpp"
 #include "Dialogs/dlgTaskHelpers.hpp"
-#include "Form/Util.hpp"
 #include "Form/Edit.hpp"
 #include "Form/Draw.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Task/TaskNationalities.hpp"
 #include "Units/Units.hpp"
 #include "Language/Language.hpp"
+#include "Components.hpp"
+#include "Interface.hpp"
 
-#include <assert.h>
-#include <stdio.h>
+enum Controls {
+  MIN_TIME,
+  START_MAX_SPEED,
+  START_MAX_HEIGHT,
+  START_HEIGHT_REF,
+  FINISH_MIN_HEIGHT,
+  FINISH_HEIGHT_REF,
+  FAI_FINISH_HEIGHT,
+  TASK_TYPE,
+};
 
-/** XXX this hack is needed because the form callbacks don't get a
-    context pointer - please refactor! */
-static TaskPropertiesPanel *instance;
-
-void
-TaskPropertiesPanel::InitView()
+/**
+ * returns true if task is an FAI type
+ * @param ftype. task type being checked
+ */
+static bool
+IsFai(TaskFactoryType ftype)
 {
-  WndProperty* wp;
-
-  static gcc_constexpr_data StaticEnumChoice start_max_height_ref_list[] = {
-    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for start maximum height rule (above start point).") },
-    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for start maximum height rule (above sea level).") },
-    { 0 }
-  };
-  LoadFormProperty(form, _T("prpStartHeightRef"), start_max_height_ref_list,
-                   (unsigned)HeightReferenceType::AGL);
-
-  static gcc_constexpr_data StaticEnumChoice finish_min_height_ref_list[] = {
-    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for finish minimum height rule (above finish point).") },
-    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for finish minimum height rule (above sea level).") },
-    { 0 }
-  };
-  LoadFormProperty(form, _T("prpFinishHeightRef"), finish_min_height_ref_list,
-                   (unsigned)HeightReferenceType::AGL);
-
-  wp = (WndProperty *)form.FindByName(_T("prpTaskType"));
-  if (wp) {
-    const std::vector<TaskFactoryType> factory_types =
-        ordered_task->GetFactoryTypes();
-    DataFieldEnum* dfe = (DataFieldEnum*)wp->GetDataField();
-    dfe->EnableItemHelp(true);
-
-    for (unsigned i = 0; i < factory_types.size(); i++) {
-      dfe->addEnumText(OrderedTaskFactoryName(factory_types[i]),
-          (unsigned)factory_types[i], OrderedTaskFactoryDescription(
-              factory_types[i]));
-      if (factory_types[i] == ordered_task->get_factory_type())
-        dfe->Set((unsigned)factory_types[i]);
-    }
-    wp->RefreshDisplay();
-  }
+  return (ftype == TaskFactoryType::FAI_GENERAL) ||
+      (ftype == TaskFactoryType::FAI_GOAL) ||
+      (ftype == TaskFactoryType::FAI_OR) ||
+      (ftype == TaskFactoryType::FAI_TRIANGLE);
 }
 
 void
 TaskPropertiesPanel::RefreshView()
 {
-  const TaskFactoryType ftype = ordered_task->get_factory_type();
-  OrderedTaskBehaviour &p = ordered_task->get_ordered_task_behaviour();
+  const TaskFactoryType ftype = ordered_task->GetFactoryType();
+  const OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
 
-  bool aat_types = (ftype == TaskFactoryType::AAT);
+  bool aat_types = (ftype == TaskFactoryType::AAT || ftype == TaskFactoryType::MAT);
   bool fai_start_finish = p.fai_finish;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
 
-  LoadFormProperty(form, _T("prpTaskType"),(int)ftype);
+  SetRowVisible(MIN_TIME, aat_types);
+  LoadValueTime(MIN_TIME, (int)p.aat_min_time);
 
-  ShowFormControl(form, _T("prpMinTime"), aat_types);
-  LoadFormProperty(form, _T("prpMinTime"), (int)p.aat_min_time);
+  SetRowVisible(START_MAX_SPEED, !fai_start_finish &&
+                (!is_usa || positive(p.start_max_speed)));
+  LoadValue(START_MAX_SPEED, p.start_max_speed, UnitGroup::HORIZONTAL_SPEED);
 
-  LoadFormProperty(form, _T("prpFAIFinishHeight"), p.fai_finish);
+  SetRowVisible(START_MAX_HEIGHT, !fai_start_finish);
+  LoadValue(START_MAX_HEIGHT, fixed(p.start_max_height), UnitGroup::ALTITUDE);
 
-  ShowFormControl(form, _T("prpStartMaxSpeed"), !fai_start_finish);
-  LoadFormProperty(form, _T("prpStartMaxSpeed"),
-                   UnitGroup::HORIZONTAL_SPEED, p.start_max_speed);
+  SetRowVisible(START_HEIGHT_REF, !fai_start_finish &&
+                (!is_usa || p.start_max_height_ref == HeightReferenceType::AGL));
+  LoadValueEnum(START_HEIGHT_REF, p.start_max_height_ref);
 
-  ShowFormControl(form, _T("prpStartMaxHeight"), !fai_start_finish);
-  LoadFormProperty(form, _T("prpStartMaxHeight"),
-                   UnitGroup::ALTITUDE, p.start_max_height);
+  SetRowVisible(FINISH_MIN_HEIGHT, !fai_start_finish);
+  LoadValue(FINISH_MIN_HEIGHT, fixed(p.finish_min_height),
+            UnitGroup::ALTITUDE);
 
-  ShowFormControl(form, _T("prpFinishMinHeight"), !fai_start_finish);
-  LoadFormProperty(form, _T("prpFinishMinHeight"),
-                   UnitGroup::ALTITUDE, p.finish_min_height);
+  SetRowVisible(FINISH_HEIGHT_REF, !fai_start_finish &&
+                (!is_usa || p.finish_min_height_ref == HeightReferenceType::AGL));
+  LoadValueEnum(FINISH_HEIGHT_REF, p.finish_min_height_ref);
 
-  ShowFormControl(form, _T("prpStartHeightRef"), !fai_start_finish);
-  LoadFormProperty(form, _T("prpStartHeightRef"), (unsigned)p.start_max_height_ref);
+  SetRowVisible(FAI_FINISH_HEIGHT, IsFai(ftype));
+  LoadValue(FAI_FINISH_HEIGHT, p.fai_finish);
 
-  ShowFormControl(form, _T("prpFinishHeightRef"), !fai_start_finish);
-  LoadFormProperty(form, _T("prpFinishHeightRef"), (unsigned)p.finish_min_height_ref);
+  LoadValueEnum(TASK_TYPE, ftype);
 
-  wTaskView->Invalidate();
+  if (wTaskView != NULL)
+    wTaskView->Invalidate();
 
   // fixed aat_min_time
   // finish_min_height
@@ -125,57 +110,46 @@ TaskPropertiesPanel::RefreshView()
 void
 TaskPropertiesPanel::ReadValues()
 {
-  OrderedTaskBehaviour &p = ordered_task->get_ordered_task_behaviour();
+  OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
 
-  TaskFactoryType newtype = ordered_task->get_factory_type();
-  *task_changed |= SaveFormPropertyEnum(form, _T("prpTaskType"), newtype);
+  TaskFactoryType newtype = ordered_task->GetFactoryType();
+  *task_changed |= SaveValueEnum(TASK_TYPE, newtype);
 
-  int min_time = GetFormValueInteger(form, _T("prpMinTime"));
+  int min_time = GetValueInteger(MIN_TIME);
   if (min_time != (int)p.aat_min_time) {
     p.aat_min_time = fixed(min_time);
     *task_changed = true;
   }
 
-  unsigned max_height =
-    iround(Units::ToSysAltitude(GetFormValueFixed(form, _T("prpStartMaxHeight"))));
-  if (max_height != p.start_max_height) {
-    p.start_max_height = max_height;
-    *task_changed = true;
-  }
-
-  fixed max_speed =
-    Units::ToSysSpeed(GetFormValueFixed(form, _T("prpStartMaxSpeed")));
+  fixed max_speed = Units::ToSysSpeed(GetValueFloat(START_MAX_SPEED));
   if (max_speed != p.start_max_speed) {
     p.start_max_speed = max_speed;
     *task_changed = true;
   }
 
+  unsigned max_height =
+    iround(Units::ToSysAltitude(GetValueFloat(START_MAX_HEIGHT)));
+  if (max_height != p.start_max_height) {
+    p.start_max_height = max_height;
+    *task_changed = true;
+  }
+
+  *task_changed |= SaveValueEnum(START_HEIGHT_REF, p.start_max_height_ref);
+
   unsigned min_height =
-    iround(Units::ToSysAltitude(GetFormValueFixed(form, _T("prpFinishMinHeight"))));
+    iround(Units::ToSysAltitude(GetValueFloat(FINISH_MIN_HEIGHT)));
   if (min_height != p.finish_min_height) {
     p.finish_min_height = min_height;
     *task_changed = true;
   }
 
-  HeightReferenceType height_ref_start = (HeightReferenceType)
-      GetFormValueInteger(form, _T("prpStartHeightRef"));
-  if (height_ref_start != p.start_max_height_ref) {
-    p.start_max_height_ref = height_ref_start;
-    *task_changed = true;
-  }
-
-  HeightReferenceType height_ref_finish = (HeightReferenceType)
-      GetFormValueInteger(form, _T("prpFinishHeightRef"));
-  if (height_ref_finish != p.finish_min_height_ref) {
-    p.finish_min_height_ref = height_ref_finish;
-    *task_changed = true;
-  }
+  *task_changed |= SaveValueEnum(FINISH_HEIGHT_REF, p.finish_min_height_ref);
 }
 
 void
 TaskPropertiesPanel::OnFAIFinishHeightChange(DataFieldBoolean &df)
 {
-  OrderedTaskBehaviour &p = ordered_task->get_ordered_task_behaviour();
+  OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
   bool newvalue = df.GetAsBoolean();
   if (newvalue != p.fai_finish) {
     p.fai_finish = newvalue;
@@ -184,89 +158,146 @@ TaskPropertiesPanel::OnFAIFinishHeightChange(DataFieldBoolean &df)
   }
 }
 
-static void
-OnFAIFinishHeightData(DataField *Sender, DataField::DataAccessMode Mode)
-{
-  if (Mode == DataField::daChange)
-    instance->OnFAIFinishHeightChange(*(DataFieldBoolean*)Sender);
-}
-
 void
 TaskPropertiesPanel::OnTaskTypeChange(DataFieldEnum &df)
 {
   const TaskFactoryType newtype =
     (TaskFactoryType)df.GetAsInteger();
-  if (newtype != ordered_task->get_factory_type()) {
+  if (newtype != ordered_task->GetFactoryType()) {
     ReadValues();
     ordered_task->SetFactory(newtype);
+    ordered_task->FillMatPoints(way_points);
     *task_changed =true;
     RefreshView();
   }
 }
 
-static void
-OnTaskTypeData(DataField *Sender, DataField::DataAccessMode Mode)
+void
+TaskPropertiesPanel::OnModified(DataField &df)
 {
-  if (Mode == DataField::daChange)
-    instance->OnTaskTypeChange(*(DataFieldEnum *)Sender);
+  if (IsDataField(FAI_FINISH_HEIGHT, df))
+    OnFAIFinishHeightChange((DataFieldBoolean &)df);
+  else if (IsDataField(TASK_TYPE, df))
+    OnTaskTypeChange((DataFieldEnum &)df);
 }
-
-static gcc_constexpr_data CallBackTableEntry task_properties_callbacks[] = {
-  DeclareCallBackEntry(dlgTaskManager::OnTaskPaint),
-
-  DeclareCallBackEntry(OnTaskTypeData),
-  DeclareCallBackEntry(OnFAIFinishHeightData),
-
-  DeclareCallBackEntry(NULL)
-};
 
 void
 TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  instance = this;
+  ComputerSettings &settings_computer = XCSoarInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  bool us_rules = tb.contest_nationality == ContestNationalities::AMERICAN;
 
-  LoadWindow(task_properties_callbacks, parent,
-             Layout::landscape
-             ? _T("IDR_XML_TASKPROPERTIES_L") : _T("IDR_XML_TASKPROPERTIES"));
+  AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
+          0, 36000, 60, 180);
 
-  wTaskView = (WndOwnerDrawFrame*)form.FindByName(_T("frmTaskViewProperties"));
-  assert(wTaskView != NULL);
-  wTaskView->SetOnMouseDownNotify(dlgTaskManager::OnTaskViewClick);
+  AddFloat(_("Start max. speed"),
+           _("Maximum speed allowed in start observation zone.  Set to 0 for no limit."),
+           _T("%.0f %s"), _T("%.0f"),
+           fixed_zero, fixed(300), fixed(5), false, fixed_zero);
 
-  InitView();
+  StaticString<25> label;
+  StaticString<100> help;
+  if (us_rules) {
+    label = _("Start max. height (MSL)");
+    help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
+  }
+  else {
+    label = _("Start max. height");
+    help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
+  }
+  AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
+           fixed_zero, fixed(10000), fixed(25), false, fixed_zero);
+
+  static constexpr StaticEnumChoice start_max_height_ref_list[] = {
+    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for start maximum height rule (above start point).") },
+    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for start maximum height rule (above sea level).") },
+    { 0 }
+  };
+
+  AddEnum(_("Start height ref."),
+          _("Reference used for start max height rule\n"
+            "[MSL] Reference is altitude above mean sea level\n"
+            "[AGL] Reference is the height above the start point"),
+          start_max_height_ref_list);
+
+  if (us_rules) {
+    label = _("Finish min. height (MSL)");
+    help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
+  }
+  else {
+    label = _("Finish min. height");
+    help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
+  }
+  AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
+           fixed_zero, fixed(10000), fixed(25), false, fixed_zero);
+
+  static constexpr StaticEnumChoice finish_min_height_ref_list[] = {
+    { (unsigned)HeightReferenceType::AGL, N_("AGL"), N_("Reference AGL for finish minimum height rule (above finish point).") },
+    { (unsigned)HeightReferenceType::MSL, N_("MSL"), N_("Reference MSL for finish minimum height rule (above sea level).") },
+    { 0 }
+  };
+  AddEnum(_("Finish height ref."),
+          _("Reference used for finish min height rule\n"
+            "[MSL] Reference is altitude above mean sea level\n"
+            "[AGL] Reference is the height above the finish point"),
+          finish_min_height_ref_list);
+
+  AddBoolean(_("FAI start / finish rules"),
+             _("If enabled, has no max start height or max start speed and requires the minimum height above ground for finish to be greater than 1000m below the start height."),
+             false, this);
+
+  DataFieldEnum *dfe = new DataFieldEnum(NULL);
+  dfe->SetListener(this);
+  dfe->EnableItemHelp(true);
+  const std::vector<TaskFactoryType> factory_types =
+    ordered_task->GetFactoryTypes();
+  for (unsigned i = 0; i < factory_types.size(); i++) {
+    dfe->addEnumText(OrderedTaskFactoryName(factory_types[i]),
+                     (unsigned)factory_types[i],
+                     OrderedTaskFactoryDescription(factory_types[i]));
+    if (factory_types[i] == ordered_task->GetFactoryType())
+      dfe->Set((unsigned)factory_types[i]);
+  }
+  Add(_("Task type"), _("Sets the behaviour for the current task."), dfe);
 }
 
 void
 TaskPropertiesPanel::ReClick()
 {
-  dlgTaskManager::OnTaskViewClick(wTaskView, 0, 0);
+  if (wTaskView != NULL)
+    dlgTaskManager::OnTaskViewClick(wTaskView, 0, 0);
 }
 
 void
 TaskPropertiesPanel::Show(const PixelRect &rc)
 {
-  ordered_task = *ordered_task_pointer;
-  orig_taskType = ordered_task->get_factory_type();
+  if (wTaskView != NULL)
+    wTaskView->Show();
 
-  LoadFormProperty(form, _T("prpTaskType"), (unsigned)orig_taskType);
-  dlgTaskManager::TaskViewRestore(wTaskView);
+  ordered_task = *ordered_task_pointer;
+  orig_taskType = ordered_task->GetFactoryType();
+
   RefreshView();
 
-  XMLWidget::Show(rc);
+  RowFormWidget::Show(rc);
+}
+
+void
+TaskPropertiesPanel::Hide()
+{
+  if (wTaskView != NULL)
+    dlgTaskManager::ResetTaskView(wTaskView);
+
+  RowFormWidget::Hide();
 }
 
 bool
 TaskPropertiesPanel::Leave()
 {
   ReadValues();
-  if (orig_taskType != ordered_task->get_factory_type())
+  if (orig_taskType != ordered_task->GetFactoryType())
     ordered_task->GetFactory().MutateTPsToTaskType();
 
   return true;
-}
-
-void
-TaskPropertiesPanel::Hide()
-{
-  XMLWidget::Hide();
 }

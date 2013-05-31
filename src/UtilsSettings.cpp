@@ -52,6 +52,7 @@ Copyright_License {
 #include "Computer/GlideComputer.hpp"
 #include "Language/LanguageGlue.hpp"
 #include "Units/Units.hpp"
+#include "Formatter/UserGeoPointFormatter.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Audio/VarioGlue.hpp"
 
@@ -64,8 +65,6 @@ bool MapFileChanged = false;
 bool AirspaceFileChanged = false;
 bool AirfieldFileChanged = false;
 bool WaypointFileChanged = false;
-bool TerrainFileChanged = false;
-bool TopographyFileChanged = false;
 bool PolarFileChanged = false;
 bool LanguageFileChanged = false;
 bool StatusFileChanged = false;
@@ -75,7 +74,7 @@ bool LanguageChanged = false;
 static void
 SettingsEnter()
 {
-  CommonInterface::main_window.SuspendThreads();
+  CommonInterface::main_window->SuspendThreads();
 
   // This prevents the map and calculation threads from doing anything
   // with shared data while it is being changed (also prevents drawing)
@@ -84,8 +83,6 @@ SettingsEnter()
   AirspaceFileChanged = false;
   AirfieldFileChanged = false;
   WaypointFileChanged = false;
-  TerrainFileChanged = false;
-  TopographyFileChanged = false;
   PolarFileChanged = false;
   LanguageFileChanged = false;
   StatusFileChanged = false;
@@ -104,11 +101,12 @@ SettingsLeave(const UISettings &old_ui_settings)
 
   VerboseOperationEnvironment operation;
 
-  MainWindow &main_window = XCSoarInterface::main_window;
+  MainWindow &main_window = *CommonInterface::main_window;
 
   if (LanguageChanged)
     ReadLanguageFile();
 
+  bool TerrainFileChanged = false, TopographyFileChanged = false;
   if (MapFileChanged) {
     /* set these flags, because they may be loaded from the map
        file */
@@ -151,6 +149,7 @@ SettingsLeave(const UISettings &old_ui_settings)
       delete task;
 
       way_points.Optimise();
+      lease->FillMatPoints(way_points);
     }
   }
 
@@ -188,24 +187,25 @@ SettingsLeave(const UISettings &old_ui_settings)
   const UISettings &ui_settings = CommonInterface::GetUISettings();
 
   Units::SetConfig(ui_settings.units);
+  SetUserCoordinateFormat(ui_settings.coordinate_format);
 
   const MapSettings &old_settings_map = old_ui_settings.map;
   const MapSettings &settings_map = ui_settings.map;
 
-  if (settings_map.snail_type != old_settings_map.snail_type ||
-      settings_map.snail_scaling_enabled != old_settings_map.snail_scaling_enabled)
-    main_window.SetLook().map.trail.Initialise(settings_map);
+  if (settings_map.trail.type != old_settings_map.trail.type ||
+      settings_map.trail.scaling_enabled != old_settings_map.trail.scaling_enabled)
+    main_window.SetLook().map.trail.Initialise(settings_map.trail);
 
   if (settings_map.waypoint.landable_style != old_settings_map.waypoint.landable_style)
     main_window.SetLook().map.waypoint.Initialise(settings_map.waypoint);
 
   ResumeAllThreads();
-  CommonInterface::main_window.ResumeThreads();
+  main_window.ResumeThreads();
   // allow map and calculations threads to continue
 
   ActionInterface::SendMapSettings(true);
 
-  AudioVarioGlue::Configure(CommonInterface::GetComputerSettings().sound);
+  AudioVarioGlue::Configure(CommonInterface::GetUISettings().sound.vario);
 
   operation.Hide();
   InfoBoxManager::SetDirty();
@@ -214,11 +214,11 @@ SettingsLeave(const UISettings &old_ui_settings)
 }
 
 void
-SystemConfiguration()
+SystemConfiguration(const TCHAR *page_name)
 {
   const UISettings old_ui_settings = CommonInterface::GetUISettings();
 
   SettingsEnter();
-  dlgConfigurationShowModal();
+  dlgConfigurationShowModal(page_name);
   SettingsLeave(old_ui_settings);
 }

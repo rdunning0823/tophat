@@ -25,48 +25,39 @@
 
 #include "AbstractContest.hpp"
 
+class Trace;
+
 /**
  * Abstract class for contest searches using dijkstra algorithm
  *
  */
-class OLCLeague:
-  public AbstractContest
+class OLCLeague : public AbstractContest
 {
+  const Trace &trace;
+
   ContestTraceVector solution_classic;
 
-  ContestTraceVector best_solution;
   ContestTraceVector solution;
 
 public:
   OLCLeague(const Trace &_trace);
 
-  virtual void CopySolution(ContestTraceVector &vec) const;
-
-protected:
-  virtual fixed CalcDistance() const;
-  virtual fixed CalcScore() const;
-  virtual fixed CalcTime() const;
-
-public:
   /**
-   * Reset the optimiser as if never flown
+   * Feed the result from OLCClassic.  This must be called
+   * before this class can do any calculation.
    */
-  virtual void Reset();
-
-  /**
-   * Update the solver.  The solver is incremental, so this method can
-   * be safely called every time step.
-   *
-   * @return True if solver completed in this call
-   */
-  virtual bool Solve(bool exhaustive);
-
-  ContestTraceVector &GetSolutionClassic() {
-    return solution_classic;
+  void Feed(const ContestTraceVector &_solution_classic) {
+    solution_classic = _solution_classic;
   }
 
 protected:
-  virtual bool SaveSolution();
+  virtual ContestResult CalculateResult() const;
+
+public:
+  /* virtual methods from class AbstractContest */
+  virtual void Reset() gcc_override;
+  virtual SolverResult Solve(bool exhaustive) gcc_override;
+  virtual void CopySolution(ContestTraceVector &vec) const gcc_override;
 };
 
 #endif

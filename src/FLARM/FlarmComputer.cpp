@@ -24,7 +24,7 @@ Copyright_License {
 #include "FLARM/FlarmComputer.hpp"
 #include "FLARM/FlarmDetails.hpp"
 #include "NMEA/Info.hpp"
-#include "Engine/Navigation/Geometry/GeoVector.hpp"
+#include "Geo/GeoVector.hpp"
 
 void
 FlarmComputer::Process(FlarmData &flarm, const FlarmData &last_flarm,
@@ -58,10 +58,7 @@ FlarmComputer::Process(FlarmData &flarm, const FlarmData &last_flarm,
   }
 
   // for each item in traffic
-  for (auto it = flarm.traffic.list.begin(), end = flarm.traffic.list.end();
-       it != end; ++it) {
-    FlarmTraffic &traffic = *it;
-
+  for (auto &traffic : flarm.traffic.list) {
     // if we don't know the target's name yet
     if (!traffic.HasName()) {
       // lookup the name of this target's id

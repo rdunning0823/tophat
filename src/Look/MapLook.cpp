@@ -34,8 +34,12 @@ MapLook::Initialise(const MapSettings &settings)
   aircraft.Initialise();
   task.Initialise();
   marker.Initialise();
-  trail.Initialise(settings);
+  trail.Initialise(settings.trail);
   wind.Initialise();
+
+#ifdef HAVE_NOAA
+  noaa.Initialise();
+#endif
 
 #ifdef HAVE_HATCHED_BRUSH
   above_terrain_bitmap.Load(IDB_ABOVETERRAIN);
@@ -44,15 +48,15 @@ MapLook::Initialise(const MapSettings &settings)
 
   terrain_warning_icon.Load(IDB_TERRAINWARNING, IDB_TERRAINWARNING_HD);
 
-  compass_brush.Set(Color(207, 207, 207));
-  compass_pen.Set(Layout::ScalePenWidth(1), COLOR_GRAY);
+  compass_brush.Set(COLOR_GRAY);
+  compass_pen.Set(Layout::ScalePenWidth(1), COLOR_BLACK);
 
   traffic_safe_icon.Load(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, false);
   traffic_warning_icon.Load(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, false);
   traffic_alarm_icon.Load(IDB_TRAFFIC_ALARM, IDB_TRAFFIC_ALARM_HD, false);
 
-  static gcc_constexpr_data Color clrSepia(0x78,0x31,0x18);
-  reach_pen.Set(Pen::DASH, Layout::ScalePenWidth(1), clrSepia);
+  static constexpr Color clrSepia(0x78,0x31,0x18);
+  reach_pen.Set(Pen::DASH, Layout::ScalePenWidth(2), clrSepia);
   reach_pen_thick.Set(Pen::DASH, Layout::ScalePenWidth(2), clrSepia);
 
   track_line_pen.Set(3, COLOR_GRAY);

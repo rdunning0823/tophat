@@ -27,6 +27,7 @@ Copyright_License {
 #include "Units/System.hpp"
 #include "Atmosphere/Temperature.hpp"
 #include "Util/CharUtil.hpp"
+#include "Util/NumberParser.hpp"
 #include "Compatibility/string.h"
 
 #include <tchar.h>
@@ -137,11 +138,11 @@ DetectWindToken(const TCHAR *token)
   if (length != 8 && length != 7)
     return false;
 
-  if (_tcsicmp(token + 5, _T("MPS")) != 0 &&
-      _tcsicmp(token + 5, _T("KT")) != 0)
+  if (!StringIsEqualIgnoreCase(token + 5, _T("MPS")) &&
+      !StringIsEqualIgnoreCase(token + 5, _T("KT")))
     return false;
 
-  bool variable = (_tcsnicmp(token, _T("VRB"), 3) == 0);
+  bool variable = (StringIsEqualIgnoreCase(token, _T("VRB"), 3));
 
   for (unsigned i = variable ? 3 : 0; i < 5; ++i)
     if (!IsDigitASCII(token[i]))
@@ -156,7 +157,7 @@ ParseWind(const TCHAR *token, ParsedMETAR &parsed)
   assert(DetectWindToken(token));
 
   // variable wind directions
-  if (_tcsnicmp(token, _T("VRB"), 3) == 0)
+  if (StringIsEqualIgnoreCase(token, _T("VRB"), 3))
     // parsing okay but don't provide wind
     return true;
 
@@ -168,9 +169,9 @@ ParseWind(const TCHAR *token, ParsedMETAR &parsed)
   unsigned bearing = (int)(wind_code / 100);
   wind_code -= bearing * 100;
 
-  if (_tcsicmp(endptr, _T("MPS")) == 0)
+  if (StringIsEqualIgnoreCase(endptr, _T("MPS")))
     parsed.wind.norm = fixed(wind_code);
-  else if (_tcsicmp(endptr, _T("KT")) == 0)
+  else if (StringIsEqualIgnoreCase(endptr, _T("KT")))
     parsed.wind.norm = Units::ToSysUnit(fixed(wind_code), Unit::KNOTS);
   else
     return false;
@@ -184,7 +185,7 @@ ParseWind(const TCHAR *token, ParsedMETAR &parsed)
 static bool
 DetectCAVOK(const TCHAR *token)
 {
-  return (_tcslen(token) == 5 && _tcsicmp(token, _T("CAVOK")) == 0);
+  return (_tcslen(token) == 5 && StringIsEqualIgnoreCase(token, _T("CAVOK")));
 }
 
 /** Detects a token with exactly 5 digits */
@@ -471,13 +472,19 @@ ParseLocation(const TCHAR *buffer, ParsedMETAR &parsed)
 {
   // 51-18N 006-46E
   TCHAR *end;
-  unsigned lat_deg = _tcstoul(buffer, &end, 10);
+  unsigned lat_deg = ParseUnsigned(buffer, &end, 10);
 
   if (*end != '-')
     return false;
   end++;
 
-  unsigned lat_min = _tcstoul(end, &end, 10);
+  unsigned lat_min = ParseUnsigned(end, &end, 10);
+
+  unsigned lat_sec = 0;
+  if (*end == _T('-')) {
+    ++end;
+    lat_sec = ParseUnsigned(end, &end, 10);
+  }
 
   bool north;
   if (*end == _T('N') || *end == _T('n'))
@@ -492,13 +499,19 @@ ParseLocation(const TCHAR *buffer, ParsedMETAR &parsed)
     return false;
   end++;
 
-  unsigned lon_deg = _tcstoul(end, &end, 10);
+  unsigned lon_deg = ParseUnsigned(end, &end, 10);
 
   if (*end != '-')
     return false;
   end++;
 
-  unsigned lon_min = _tcstoul(end, &end, 10);
+  unsigned lon_min = ParseUnsigned(end, &end, 10);
+
+  unsigned lon_sec = 0;
+  if (*end == _T('-')) {
+    ++end;
+    lon_sec = ParseUnsigned(end, &end, 10);
+  }
 
   bool east;
   if (*end == _T('E') || *end == _T('e'))
@@ -510,8 +523,12 @@ ParseLocation(const TCHAR *buffer, ParsedMETAR &parsed)
   end++;
 
   GeoPoint location;
-  location.latitude = Angle::Degrees(fixed(lat_deg) + fixed(lat_min) / 60);
-  location.longitude = Angle::Degrees(fixed(lon_deg) + fixed(lon_min) / 60);
+  location.latitude = Angle::Degrees(fixed(lat_deg) +
+                                     fixed(lat_min) / 60 +
+                                     fixed(lat_sec) / 3600);
+  location.longitude = Angle::Degrees(fixed(lon_deg) +
+                                      fixed(lon_min) / 60 +
+                                      fixed(lon_sec) / 3600);
 
   if (!north)
     location.latitude.Flip();

@@ -34,6 +34,8 @@ Copyright_License {
 #include "Android/NativeInputListener.hpp"
 #include "Android/TextUtil.hpp"
 #include "Android/LogCat.hpp"
+#include "Android/Nook.hpp"
+#include "Asset.hpp"
 #include "Language/Language.hpp"
 #include "LocalPath.hpp"
 #include "LogFile.hpp"
@@ -52,7 +54,9 @@ Copyright_License {
 #include "Java/InputStream.hpp"
 #include "Java/URL.hpp"
 #include "Compiler.h"
-#include "org_xcsoar_NativeView.h"
+#include "org_tophat_NativeView.h"
+#include "IO/Async/GlobalIOThread.hpp"
+#include "Thread/Debug.hpp"
 
 #ifdef IOIOLIB
 #include "Android/IOIOHelper.hpp"
@@ -87,12 +91,16 @@ extern "C" {
 
 gcc_visibility_default
 JNIEXPORT jboolean JNICALL
-Java_org_xcsoar_NativeView_initializeNative(JNIEnv *env, jobject obj,
+Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
                                             jobject _context,
                                             jint width, jint height,
                                             jint xdpi, jint ydpi,
                                             jint sdk_version, jstring product)
 {
+  InitThreadDebug();
+
+  InitialiseIOThread();
+
   Java::Init(env);
   Java::File::Initialise(env);
   Java::InputStream::Initialise(env);
@@ -113,7 +121,7 @@ Java_org_xcsoar_NativeView_initializeNative(JNIEnv *env, jobject obj,
 
   InitialiseDataPath();
 
-  LogStartUp(_T("Starting XCSoar %s"), XCSoar_ProductToken);
+  LogStartUp(_T("Starting %s %s"), TopHat_ProductToken, XCSoar_ProductToken);
 
   OpenGL::Initialise();
   TextUtil::Initialise(env);
@@ -125,6 +133,7 @@ Java_org_xcsoar_NativeView_initializeNative(JNIEnv *env, jobject obj,
   event_queue = new EventQueue();
 
   SoundUtil::Initialise(env);
+  Vibrator::Initialise(env);
   vibrator = Vibrator::Create(env, *context);
 
 #ifdef IOIOLIB
@@ -133,13 +142,21 @@ Java_org_xcsoar_NativeView_initializeNative(JNIEnv *env, jobject obj,
 
   ScreenInitialized();
   AllowLanguage();
+
+  if (IsNookSimpleTouch()) {
+    Nook::EnterFastMode();
+    Nook::SetCharge500();
+  }
+
   return XCSoarInterface::Startup();
 }
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeView_runNative(JNIEnv *env, jobject obj)
+Java_org_tophat_NativeView_runNative(JNIEnv *env, jobject obj)
 {
+  InitThreadDebug();
+
   OpenGL::Initialise();
 
   if (CheckLogCat())
@@ -151,14 +168,20 @@ Java_org_xcsoar_NativeView_runNative(JNIEnv *env, jobject obj)
                    _T("XCSoar has crashed recently"),
                    MB_OK|MB_ICONERROR);
 
-  CommonInterface::main_window.RunEventLoop();
+  CommonInterface::main_window->RunEventLoop();
 }
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
+Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
 {
-  CommonInterface::main_window.reset();
+  if (IsNookSimpleTouch())
+    Nook::ExitFastMode();
+
+  InitThreadDebug();
+
+  delete CommonInterface::main_window;
+
   DisallowLanguage();
   Fonts::Deinitialize();
 
@@ -166,6 +189,9 @@ Java_org_xcsoar_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
   delete ioio_helper;
   ioio_helper = NULL;
 #endif
+
+  delete vibrator;
+  vibrator = NULL;
 
   SoundUtil::Deinitialise(env);
   delete event_queue;
@@ -188,17 +214,19 @@ Java_org_xcsoar_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
   AndroidTimer::Deinitialise(env);
   Environment::Deinitialise(env);
   Java::URL::Deinitialise(env);
+
+  DeinitialiseIOThread();
 }
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeView_resizedNative(JNIEnv *env, jobject obj,
+Java_org_tophat_NativeView_resizedNative(JNIEnv *env, jobject obj,
                                          jint width, jint height)
 {
   if (event_queue == NULL)
     return;
 
-  CommonInterface::main_window.AnnounceResize(width, height);
+  CommonInterface::main_window->AnnounceResize(width, height);
 
   event_queue->Purge(Event::RESIZE);
 
@@ -208,14 +236,14 @@ Java_org_xcsoar_NativeView_resizedNative(JNIEnv *env, jobject obj,
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeView_pauseNative(JNIEnv *env, jobject obj)
+Java_org_tophat_NativeView_pauseNative(JNIEnv *env, jobject obj)
 {
   if (event_queue == NULL)
     /* pause before we have initialized the event subsystem does not
        work - let's bail out, nothing is lost anyway */
     exit(0);
 
-  CommonInterface::main_window.Pause();
+  CommonInterface::main_window->Pause();
 
   assert(num_textures == 0);
   assert(num_buffers == 0);
@@ -223,18 +251,18 @@ Java_org_xcsoar_NativeView_pauseNative(JNIEnv *env, jobject obj)
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeView_resumeNative(JNIEnv *env, jobject obj)
+Java_org_tophat_NativeView_resumeNative(JNIEnv *env, jobject obj)
 {
   if (event_queue == NULL)
     /* there is nothing here yet which can be resumed */
     exit(0);
 
-  CommonInterface::main_window.Resume();
+  CommonInterface::main_window->Resume();
 }
 
 gcc_visibility_default
 JNIEXPORT void JNICALL
-Java_org_xcsoar_NativeView_setHapticFeedback(JNIEnv *env, jobject obj,
+Java_org_tophat_NativeView_setHapticFeedback(JNIEnv *env, jobject obj,
                                              jboolean on)
 {
   os_haptic_feedback_enabled = on;

@@ -112,8 +112,6 @@ public:
   }
 
   void SetStartupLocation(const GeoPoint &loc, const fixed alt);
-  void SetLocation(const GeoPoint &loc, const fixed speed, const Angle bearing,
-                   const fixed alt, const fixed baroalt, const fixed t);
   void ProcessSimulation();
   void StopReplay();
   void SetTrack(Angle val);
@@ -134,7 +132,7 @@ public:
    * @return true if the connection has just expired, false if the
    * connection status has not changed
    */
-  void expire_wall_clock();
+  void ExpireWallClock();
 
   /**
    * Trigger the MergeThread, which will call Merge().  Call this

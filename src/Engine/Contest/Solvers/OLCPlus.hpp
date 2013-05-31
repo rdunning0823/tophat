@@ -29,44 +29,38 @@
  * Abstract class for contest searches using dijkstra algorithm
  *
  */
-class OLCPlus:
-  public AbstractContest
-{
+class OLCPlus : public AbstractContest {
   ContestTraceVector solution_classic;
   ContestTraceVector solution_fai;
   ContestResult result_classic;
   ContestResult result_fai;
 
 public:
-  OLCPlus(const Trace &_trace);
+  OLCPlus();
 
-  virtual void CopySolution(ContestTraceVector &vec) const;
-
-protected:
-  virtual fixed CalcDistance() const;
-  virtual fixed CalcScore() const;
-  virtual fixed CalcTime() const;
+  /**
+   * Feed results from OLCClassic and OLCFAI.  This must be called
+   * before this class can do any calculation.
+   */
+  void Feed(const ContestResult &_result_classic,
+            const ContestTraceVector &_solution_classic,
+            const ContestResult &_result_fai,
+            const ContestTraceVector &_solution_fai) {
+    result_classic = _result_classic;
+    solution_classic = _solution_classic;
+    result_fai = _result_fai;
+    solution_fai = _solution_fai;
+  }
 
 public:
-  virtual void Reset();
+  /* virtual methods from class AbstractContest */
+  virtual void Reset() gcc_override;
+  virtual SolverResult Solve(bool exhaustive) gcc_override;
+  virtual void CopySolution(ContestTraceVector &vec) const gcc_override;
 
-  bool Solve(bool exhaustive);
-
-  ContestTraceVector &GetClassicSolution() {
-    return solution_classic;
-  }
-
-  ContestTraceVector &GetFAISolution() {
-    return solution_fai;
-  }
-
-  ContestResult &GetClassicResult() {
-    return result_classic;
-  }
-
-  ContestResult &GetFAIResult() {
-    return result_fai;
-  }
+protected:
+  /* virtual methods from class AbstractContest */
+  virtual ContestResult CalculateResult() const gcc_override;
 };
 
 #endif

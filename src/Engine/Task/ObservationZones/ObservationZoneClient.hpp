@@ -23,17 +23,17 @@
 #ifndef OBSERVATIONZONECLIENT_HPP
 #define OBSERVATIONZONECLIENT_HPP
 
-#include "ObservationZone.hpp"
+#include "Math/fixed.hpp"
 
 class ObservationZonePoint;
+class OZBoundary;
 class TaskPoint;
+struct GeoPoint;
 
 /**
  * Class holding an ObzervationZonePoint, directing calls to it
  */
-class ObservationZoneClient: 
-  public virtual ObservationZone
-{
+class ObservationZoneClient {
   ObservationZonePoint *oz_point;
 
 public:
@@ -44,83 +44,44 @@ public:
    */
   ObservationZoneClient(ObservationZonePoint* _oz_point):oz_point(_oz_point) {}
 
-  virtual ~ObservationZoneClient();
+  ~ObservationZoneClient();
 
   /**
    * Accessor for OZ (for modifying parameters etc)
    *
    * @return Observation zone
    */
-  ObservationZonePoint* GetOZPoint() const {
-    return oz_point;
+  ObservationZonePoint &GetObservationZone() {
+    return *oz_point;
   }
 
-  /**
-   * Test whether aircraft is inside observation zone.
-   *
-   * @param ref Aircraft state to test
-   *
-   * @return True if aircraft is inside observation zone
-   */
-  virtual bool IsInSector(const AircraftState &ref) const;
+  const ObservationZonePoint &GetObservationZone() const {
+    return *oz_point;
+  }
 
-  /**
-   * If zone when used for start can trigger task start via vertical exit
-   *
-   * @return True if zone type can have a valid start through top
-   */
-  virtual bool CanStartThroughTop() const;
+  bool IsInSector(const GeoPoint &location) const;
 
-  /**
-   * Generate a random location inside the OZ (to be used for testing)
-   *
-   * @param mag proportional magnitude of error from center (0-1)
-   *
-   * @return Location of point
-   */
-  GeoPoint GetRandomPointInSector(const fixed mag) const;
+  gcc_pure
+  bool CanStartThroughTop() const;
 
-  /**
-   * Calculate distance reduction for achieved task point,
-   * to calcuate scored distance.
-   *
-   * @return Distance reduction once achieved
-   */
-  virtual fixed ScoreAdjustment() const;
+  gcc_pure
+  bool TransitionConstraint(const GeoPoint &location,
+                            const GeoPoint &last_location) const;
 
-  /**
-   * Calculate boundary point from parametric border
-   *
-   * @param t t value (0,1) of parameter
-   *
-   * @return Boundary point
-   */
+  gcc_pure
   GeoPoint GetBoundaryParametric(fixed t) const;
 
-  virtual Boundary GetBoundary() const;
+  gcc_pure
+  OZBoundary GetBoundary() const;
 
-protected:
-  /**
-   * Check transition constraints
-   *
-   * @param ref_now Current aircraft state
-   * @param ref_last Previous aircraft state
-   *
-   * @return True if constraints are satisfied
-   */
-  virtual bool TransitionConstraint(const AircraftState & ref_now, 
-                                    const AircraftState & ref_last) const;
+  virtual fixed ScoreAdjustment() const;
 
-  /**
-   * Set previous/next taskpoints to allow OZ to update its geometry
-   *
-   * @param previous Origin tp of inbound leg
-   * @param current Tp of this OZ
-   * @param next Destination of outbound leg
-   */
-  virtual void SetLegs(const TaskPoint *previous,
-                       const TaskPoint *current,
-                       const TaskPoint *next);
+  /* virtual methods from class ObservationZonePoint */
+  void SetLegs(const TaskPoint *previous, const TaskPoint *current,
+               const TaskPoint *next);
+
+  gcc_pure
+  GeoPoint GetRandomPointInSector(const fixed mag) const;
 };
 
 

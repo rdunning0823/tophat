@@ -23,13 +23,14 @@ Copyright_License {
 
 #include "InputEvents.hpp"
 #include "Interface.hpp"
-#include "MainWindow.hpp"
+#include "UIGlobals.hpp"
 #include "Look/Look.hpp"
 #include "Dialogs/DeviceListDialog.hpp"
 #include "Device/device.hpp"
 #include "Device/List.hpp"
 #include "Device/Descriptor.hpp"
 #include "Operation/PopupOperationEnvironment.hpp"
+#include "Simulator.hpp"
 
 #include <assert.h>
 
@@ -76,7 +77,30 @@ InputEvents::eventDevice(const TCHAR *misc)
   assert(misc != NULL);
 
   if (StringIsEqual(misc, _T("list")))
-    ShowDeviceList(CommonInterface::main_window,
-                   CommonInterface::main_window.GetLook().dialog,
-                   CommonInterface::main_window.GetLook().terminal);
+    ShowDeviceList(UIGlobals::GetMainWindow(),
+                   UIGlobals::GetDialogLook(),
+                   UIGlobals::GetLook().terminal);
+}
+
+
+void
+InputEvents::eventDownloadFlightLog(const TCHAR *misc)
+{
+  if (is_simulator())
+    return;
+
+  bool found_logger = false;
+
+  for (unsigned i = 0; i < NUMDEV; ++i) {
+    DeviceDescriptor &device = *device_list[i];
+
+    if (device.IsLogger() && device.IsOpen()) {
+      found_logger = true;
+      break;
+    }
+  }
+  if (found_logger)
+    ShowDeviceList(UIGlobals::GetMainWindow(),
+                   UIGlobals::GetDialogLook(),
+                   UIGlobals::GetLook().terminal);
 }

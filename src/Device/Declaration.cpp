@@ -26,21 +26,19 @@ Copyright_License {
 #include "Plane/Plane.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
 #include "Engine/Task/ObservationZones/CylinderZone.hpp"
-#include "Task/Tasks/OrderedTask.hpp"
-#include "Task/Tasks/BaseTask/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
 
 gcc_pure
 static Declaration::TurnPoint::Shape
 get_shape(const OrderedTaskPoint &tp)
 {
-  const ObservationZonePoint *oz = tp.GetOZPoint();
-  if (oz == NULL)
-    return Declaration::TurnPoint::SECTOR;
-
-  switch (oz->shape) {
+  const ObservationZonePoint &oz = tp.GetObservationZone();
+  switch (oz.shape) {
   case ObservationZonePoint::LINE:
     return Declaration::TurnPoint::LINE;
 
+  case ObservationZonePoint::MAT_CYLINDER:
   case ObservationZonePoint::CYLINDER:
     return Declaration::TurnPoint::CYLINDER;
 
@@ -53,11 +51,8 @@ gcc_pure
 static unsigned
 get_radius(const OrderedTaskPoint &tp)
 {
-  const ObservationZonePoint *oz = tp.GetOZPoint();
-  if (oz == NULL)
-    return Declaration::TurnPoint::SECTOR;
-
-  return (unsigned)((const CylinderZone *)oz)->GetRadius();
+  const CylinderZone &oz = (const CylinderZone &)tp.GetObservationZone();
+  return (unsigned)oz.GetRadius();
 }
 
 Declaration::TurnPoint::TurnPoint(const OrderedTaskPoint &tp)

@@ -29,37 +29,28 @@ Copyright_License {
 #include "Operation/Operation.hpp"
 #include "Language/Language.hpp"
 #include "LogFile.hpp"
-#include "IO/FileLineReader.hpp"
-#include "IO/ZipLineReader.hpp"
+#include "IO/TextFile.hpp"
 #include "Profile/Profile.hpp"
 
 #include <windef.h> /* for MAX_PATH */
-
-static bool
-ParseAirspaceFile(AirspaceParser &parser, const TCHAR *path,
-                  TLineReader &reader, OperationEnvironment &operation)
-{
-  if (parser.Parse(reader, operation))
-    return true;
-
-  LogStartUp(_T("Failed to parse airspace file: %s"), path);
-  return false;
-}
+#include <memory>
 
 static bool
 ParseAirspaceFile(AirspaceParser &parser, const TCHAR *path,
                   OperationEnvironment &operation)
 {
-  FileLineReader reader(path, ConvertLineReader::AUTO);
-  if (!reader.error())
-    return ParseAirspaceFile(parser, path, reader, operation);
+  std::unique_ptr<TLineReader> reader(OpenTextFile(path, ConvertLineReader::AUTO));
+  if (!reader) {
+    LogStartUp(_T("Failed to open airspace file: %s"), path);
+    return false;
+  }
 
-  ZipLineReader zip_reader(path, ConvertLineReader::AUTO);
-  if (!zip_reader.error())
-    return ParseAirspaceFile(parser, path, zip_reader, operation);
+  if (!parser.Parse(*reader, operation)) {
+    LogStartUp(_T("Failed to parse airspace file: %s"), path);
+    return false;
+  }
 
-  LogStartUp(_T("Failed to open airspace file: %s"), path);
-  return false;
+  return true;
 }
 
 void
@@ -77,13 +68,13 @@ ReadAirspace(Airspaces &airspaces,
 
   // Read the airspace filenames from the registry
   TCHAR path[MAX_PATH];
-  if (Profile::GetPath(szProfileAirspaceFile, path))
+  if (Profile::GetPath(ProfileKeys::AirspaceFile, path))
     airspace_ok |= ParseAirspaceFile(parser, path, operation);
 
-  if (Profile::GetPath(szProfileAdditionalAirspaceFile, path))
+  if (Profile::GetPath(ProfileKeys::AdditionalAirspaceFile, path))
     airspace_ok |= ParseAirspaceFile(parser, path, operation);
 
-  if (Profile::GetPath(szProfileMapFile, path)) {
+  if (Profile::GetPath(ProfileKeys::MapFile, path)) {
     _tcscat(path, _T("/airspace.txt"));
     airspace_ok |= ParseAirspaceFile(parser, path, operation);
   }
