@@ -242,7 +242,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     height_width = canvas.CalcTextWidth(height_buffer.c_str());
     width = distance_width + height_width;
     UPixelScalar offset = rc.left;
-    if ((PixelScalar)width < (rc.right - rc.left - label_width -
+    if ((PixelScalar)width < (rc.right - rc.left - (PixelScalar)label_width -
         Layout::FastScale(15))) {
       canvas.text(rc.left + Layout::FastScale(2),
                   line_one_y_offset, buffer.c_str());
