@@ -43,7 +43,7 @@ $(eval $(call convert-to-bmp,$(BMP_ICONS) $(BMP_ICONS_160),%.bmp,%_tile.png))
 
 ####### splash logo
 
-SVG_SPLASH = Data/graphics/logo.svg Data/graphics/logo_red.svg
+SVG_SPLASH = Data/graphics/logo.svg Data/graphics/logo_red.svg Data/graphics/logo_no_horizon.svg
 PNG_SPLASH_160 = $(patsubst Data/graphics/%.svg,$(DATA)/graphics/%_160.png,$(SVG_SPLASH))
 BMP_SPLASH_160 = $(PNG_SPLASH_160:.png=.bmp)
 PNG_SPLASH_80 = $(patsubst Data/graphics/%.svg,$(DATA)/graphics/%_80.png,$(SVG_SPLASH))
