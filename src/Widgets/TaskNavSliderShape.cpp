@@ -166,7 +166,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     bitmap_size = bmp->GetSize();
   }
   width = canvas.CalcTextWidth(tp_name) + bitmap_size.cx / 2;
-  if (width > (rc_outer.right - rc_outer.left)) {
+  if ((PixelScalar)width > (rc_outer.right - rc_outer.left)) {
     canvas.text_clipped(rc_outer.left + bitmap_size.cx / 2,
                         line_two_y_offset,
                         rc_outer.right - rc_outer.left - bitmap_size.cx / 2,
