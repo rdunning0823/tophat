@@ -41,6 +41,7 @@ enum class TaskValidationErrorType : uint8_t {
   EMPTY_TASK,
   NON_FAI_OZS,
   NON_MAT_OZS,
+  REPEATED_TASK_POINT,
 
   /**
    * This special value is used to determine the number of items
