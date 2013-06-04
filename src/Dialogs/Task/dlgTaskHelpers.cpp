@@ -193,11 +193,11 @@ OrderedTaskPointLabel(TaskPointType type, const TCHAR *name,
     break;
 
   case TaskPointType::AST:
-    _stprintf(buffer, _T("T%d: %s"), index, name);
+    _stprintf(buffer, _T("%d: %s"), index, name);
     break;
 
   case TaskPointType::AAT:
-    _stprintf(buffer, _T("A%d: %s"), index, name);
+    _stprintf(buffer, _T("%d: %s"), index, name);
     break;
 
   case TaskPointType::FINISH:
@@ -257,13 +257,10 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
     return;
 
   case ObservationZone::Shape::CYLINDER:
-    _stprintf(buffer,_T("%s - %s: %.1f%s"), _("Cylinder"), _("Radius"),
+  case ObservationZone::Shape::MAT_CYLINDER:
+    _stprintf(buffer,_T("%.1f%s"),
               (double)Units::ToUserDistance(((const CylinderZone &)ozp).GetRadius()),
               Units::GetDistanceName());
-    return;
-
-  case ObservationZone::Shape::MAT_CYLINDER:
-    _tcscpy(buffer, _("MAT cylinder"));
     return;
 
   case ObservationZone::Shape::CUSTOM_KEYHOLE:
