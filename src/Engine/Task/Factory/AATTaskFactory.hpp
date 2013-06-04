@@ -25,13 +25,14 @@ Copyright_License {
 #define AAT_TASK_FACTORY_HPP
 
 #include "AbstractTaskFactory.hpp"
+#include "Task/TaskNationalities.hpp"
 
 /**
  * Factory for construction of legal AAT tasks
  * Currently the validate() method simply checks that there is at least one
  * AAT turnpoint.
  */
-class AATTaskFactory final : public AbstractTaskFactory
+class AATTaskFactory : public AbstractTaskFactory
 {
 public:
 /** 
@@ -42,6 +43,11 @@ public:
  */  
   AATTaskFactory(OrderedTask& _task,
                  const TaskBehaviour &tb);
+
+  AATTaskFactory(OrderedTask &_task, const TaskBehaviour &_behaviour,
+                 const LegalPointSet &_start_types,
+                 const LegalPointSet &_intermediate_types,
+                 const LegalPointSet &_finish_types);
 
   ~AATTaskFactory() {};
 
@@ -57,4 +63,24 @@ public:
 };
 
 
+/**
+ * Factory for construction of legal AAT tasks for US Rules
+ */
+class AATTaskFactoryUs final: public AATTaskFactory
+{
+public:
+/**
+ * Constructor
+ *
+ * @param _task Ordered task to be managed by this factory
+ * @param tb Behaviour (options)
+ */
+  AATTaskFactoryUs(OrderedTask& _task,
+                   const TaskBehaviour &tb);
+
+  ~AATTaskFactoryUs() {};
+
+  virtual gcc_pure
+  TaskPointFactoryType GetMutatedPointType(const OrderedTaskPoint &tp) const;
+};
 #endif

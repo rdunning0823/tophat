@@ -31,6 +31,8 @@ Copyright_License {
 #include "MatTaskFactory.hpp"
 #include "MixedTaskFactory.hpp"
 #include "TouringTaskFactory.hpp"
+#include "Task/TaskNationalities.hpp"
+#include "Task/TaskBehaviour.hpp"
 
 #include <assert.h>
 
@@ -55,7 +57,10 @@ CreateTaskFactory(TaskFactoryType type, OrderedTask &task,
     return new FAIGoalTaskFactory(task, task_behaviour);
 
   case TaskFactoryType::AAT:
+    if (task_behaviour.contest_nationality == ContestNationalities::USA)
+      return new AATTaskFactoryUs(task, task_behaviour);
     return new AATTaskFactory(task, task_behaviour);
+
 
   case TaskFactoryType::MAT:
     return new MatTaskFactory(task, task_behaviour);
