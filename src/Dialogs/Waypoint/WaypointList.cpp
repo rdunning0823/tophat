@@ -416,7 +416,8 @@ static constexpr CallBackTableEntry callback_table[] = {
 
 const Waypoint*
 ShowWaypointListDialog(const GeoPoint &_location,
-                       OrderedTask *_ordered_task, unsigned _ordered_task_index)
+                       OrderedTask *_ordered_task, unsigned _ordered_task_index,
+                       bool goto_button)
 {
   dialog = LoadDialog(callback_table, UIGlobals::GetMainWindow(),
                       Layout::landscape ?
@@ -436,6 +437,11 @@ ShowWaypointListDialog(const GeoPoint &_location,
   waypoint_list_control->SetItemRenderer(&dialog2);
   waypoint_list_control->SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
   waypoint_list_control->SetCursorHandler(&dialog2);
+  if (goto_button) {
+    WndButton *button_select = (WndButton*)dialog->FindByName(_T("cmdSelect"));
+    assert(button_select != nullptr);
+    button_select->SetCaption(_T("Goto"));
+  }
 
   FilterDataFieldListener listener;
 
