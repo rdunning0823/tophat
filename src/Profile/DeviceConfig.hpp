@@ -68,6 +68,12 @@ struct DeviceConfig {
     AUTO,
 
     /**
+     * Triggers intialization of the Nook Simple Touches USB Host mode
+     * and used /dev/tty/USB0
+     */
+    NOOK_NST_USB_HOST,
+
+    /**
      * The built-in GPS receiver.
      */
     INTERNAL,
@@ -166,7 +172,7 @@ struct DeviceConfig {
    */
   static bool UsesSpeed(PortType port_type) {
     return port_type == PortType::SERIAL || port_type == PortType::AUTO ||
-      port_type == PortType::IOIOUART;
+      port_type == PortType::IOIOUART || port_type == PortType::NOOK_NST_USB_HOST;
   }
 
   bool IsDisabled() const {
@@ -245,7 +251,8 @@ struct DeviceConfig {
       port_type == PortType::RFCOMM_SERVER ||
       port_type == PortType::AUTO || port_type == PortType::TCP_LISTENER ||
       port_type == PortType::IOIOUART || port_type == PortType::PTY ||
-      port_type == PortType::UDP_LISTENER;
+      port_type == PortType::UDP_LISTENER ||
+      port_type == PortType::NOOK_NST_USB_HOST;
   }
 
   bool UsesDriver() const {
@@ -310,6 +317,7 @@ struct DeviceConfig {
    */
   gcc_pure
   const TCHAR *GetPortName(TCHAR *buffer, size_t max_size) const;
+  bool IsSerial();
 };
 
 namespace Profile

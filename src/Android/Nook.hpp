@@ -24,6 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_ANDROID_NOOK_HPP
 #define XCSOAR_ANDROID_NOOK_HPP
 
+#include "Language/Language.hpp"
+
 namespace Nook {
 
   /**
@@ -109,6 +111,11 @@ namespace Nook {
    * Set charge rate to 100mA.
    */
   void SetCharge100();
+
+#define GetNookUsbHostDriverName() "Nook ST USB Host"
+
+  const char* GetUsbHostDriverHelp();
+  const char* GetUsbHostDriverPath();
 
 }
 

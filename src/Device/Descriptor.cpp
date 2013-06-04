@@ -257,7 +257,8 @@ DeviceDescriptor::Open(OperationEnvironment &env)
 
 #ifdef ANDROID
   if (IsNookSimpleTouch())
-    Nook::InitUsb();
+    if (config.IsSerial())
+      Nook::InitUsb();
 #endif
 
   CancelAsync();

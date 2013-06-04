@@ -26,6 +26,7 @@ Copyright_License {
 #include "Asset.hpp"
 #include "Language/Language.hpp"
 #include "Util/Macros.hpp"
+#include "Android/Nook.hpp"
 
 #include <stdio.h>
 
@@ -63,6 +64,9 @@ DeviceConfig::IsAvailable() const
   case PortType::AUTO:
     return IsWindowsCE();
 
+  case PortType::NOOK_NST_USB_HOST:
+    return IsNookSimpleTouch();
+
   case PortType::INTERNAL:
     return IsAndroid();
 
@@ -90,11 +94,16 @@ DeviceConfig::ShouldReopenOnTimeout() const
     return false;
 
   case PortType::SERIAL:
+    return (IsWindowsCE() && !IsAltair()) || IsNookSimpleTouch();
+
   case PortType::AUTO:
     /* auto-reopen on Windows CE due to its quirks, but not Altair,
        because Altair ports are known to be "kind of sane" (no flaky
        Bluetooth drivers, because there's no Bluetooth) */
     return IsWindowsCE() && !IsAltair();
+
+  case PortType::NOOK_NST_USB_HOST:
+    return IsNookSimpleTouch();
 
   case PortType::RFCOMM:
   case PortType::RFCOMM_SERVER:
@@ -122,6 +131,16 @@ DeviceConfig::ShouldReopenOnTimeout() const
   return false;
 }
 
+bool
+DeviceConfig::IsSerial()
+{
+  if (IsNookSimpleTouch())
+    return port_type == PortType::SERIAL ||
+        port_type == PortType::NOOK_NST_USB_HOST;
+  else
+    return port_type == PortType::SERIAL;
+}
+
 const TCHAR *
 DeviceConfig::GetPortName(TCHAR *buffer, size_t max_size) const
 {
@@ -147,6 +166,9 @@ DeviceConfig::GetPortName(TCHAR *buffer, size_t max_size) const
 
   case PortType::AUTO:
     return _("GPS Intermediate Driver");
+
+  case PortType::NOOK_NST_USB_HOST:
+    return _(GetNookUsbHostDriverName());
 
   case PortType::INTERNAL:
     return _("Built-in GPS & sensors");
