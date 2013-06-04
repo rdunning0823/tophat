@@ -32,6 +32,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/List.hpp"
 #include "Form/Edit.hpp"
+#include "Form/Frame.hpp"
 #include "Form/DataField/Base.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "Form/DataField/Prefix.hpp"
@@ -57,6 +58,9 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Blackboard/ScopeGPSListener.hpp"
 #include "Language/Language.hpp"
+#include "GlideSolvers/GlideState.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "Math/SunEphemeris.hpp"
 
 #include <algorithm>
 #include <list>
@@ -74,6 +78,9 @@ static WndProperty *name_control;
 static WndProperty *distance_filter;
 static WndProperty *direction_filter;
 static WndProperty *type_filter;
+static WndFrame *summary_labels1;
+static WndFrame *summary_values1;
+
 
 static OrderedTask *ordered_task;
 static unsigned ordered_task_index;
@@ -140,6 +147,9 @@ public:
   }
 
   virtual void OnActivateItem(unsigned index) override;
+
+  virtual void OnCursorMoved(unsigned index) override;
+
 };
 
 static WaypointListDialogState dialog_state;
@@ -345,8 +355,58 @@ WaypointListDialog::OnActivateItem(unsigned index)
   OnWaypointListEnter();
 }
 
+void
+WaypointListDialog::OnCursorMoved(gcc_unused unsigned i)
+{
+  StaticString<100> values1;
+  StaticString<100> sunset_buffer;
+  StaticString<100> alt_buffer;
+  assert (summary_labels1 != nullptr);
+  assert (summary_values1 != nullptr);
+
+
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const struct WaypointListItem &info = waypoint_list[i];
+
+  alt_buffer.clear();
+  sunset_buffer.clear();
+  if (basic.location_available && more_data.NavAltitudeAvailable() &&
+      settings.polar.glide_polar_task.IsValid()) {
+    const GlideState glide_state(
+      basic.location.DistanceBearing(info.waypoint->location),
+      info.waypoint->elevation + settings.task.safety_height_arrival,
+      more_data.nav_altitude,
+      calculated.GetWindOrZero());
+
+    const GlideResult &result =
+      MacCready::Solve(settings.task.glide,
+                       settings.polar.glide_polar_task,
+                       glide_state);
+    FormatRelativeUserAltitude(result.pure_glide_altitude_difference,
+                               alt_buffer.buffer(), true);
+  }
+
+  if (basic.time_available) {
+    const SunEphemeris::Result sun =
+      SunEphemeris::CalcSunTimes(info.waypoint->location, basic.date_time_utc,
+                                 settings.utc_offset);
+
+    const unsigned sunset_hour = (int)sun.time_of_sunset;
+    const unsigned sunset_minute = (int)((sun.time_of_sunset - fixed(sunset_hour)) * 60);
+
+    sunset_buffer.UnsafeFormat(_T("%02u:%02u"), sunset_hour, sunset_minute);
+  }
+
+  summary_labels1->SetCaption(_T("Alt. diff:\nSunset:"));
+  values1.Format(_T("%s\n%s"), alt_buffer.c_str(), sunset_buffer.c_str());
+  summary_values1->SetCaption(values1.c_str());
+}
+
 static void
-OnSelectClicked()
+OnSelectClicked(gcc_unused WndButton &button)
 {
   OnWaypointListEnter();
 }
@@ -435,8 +495,8 @@ ShowWaypointListDialog(const GeoPoint &_location,
   waypoint_list_control = (ListControl*)dialog->FindByName(_T("frmWaypointList"));
   assert(waypoint_list_control != nullptr);
   waypoint_list_control->SetItemRenderer(&dialog2);
-  waypoint_list_control->SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
   waypoint_list_control->SetCursorHandler(&dialog2);
+  waypoint_list_control->SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
   if (goto_button) {
     WndButton *button_select = (WndButton*)dialog->FindByName(_T("cmdSelect"));
     assert(button_select != nullptr);
@@ -463,6 +523,12 @@ ShowWaypointListDialog(const GeoPoint &_location,
   type_filter = (WndProperty *)dialog->FindByName(_T("prpFltType"));
   assert(type_filter != nullptr);
   type_filter->GetDataField()->SetListener(&listener);
+
+  summary_labels1 = (WndFrame *)dialog->FindByName(_T("frmSummaryLabels1"));
+  summary_values1 = (WndFrame *)dialog->FindByName(_T("frmSummaryValues1"));
+  assert(summary_labels1);
+  assert(summary_values1);
+
 
   location = _location;
   ordered_task = _ordered_task;
