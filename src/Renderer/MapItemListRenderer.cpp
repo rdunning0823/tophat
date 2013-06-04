@@ -111,7 +111,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const DialogLook &dialog_look)
 {
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   const unsigned text_padding = Layout::GetTextPadding();
   int left = rc.left + text_padding;
@@ -142,7 +142,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     _stprintf(info_buffer, _T("%s: %s"), _("Elevation"), _T("???"));
   }
 
-  canvas.Select(small_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, info_buffer);
@@ -195,7 +195,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   const unsigned text_padding = Layout::GetTextPadding();
   int left = rc.left + line_height + text_padding;
@@ -257,7 +257,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   // Draw comment row
 
-  canvas.Select(small_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, buffer);
@@ -274,7 +274,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const unsigned text_padding = Layout::GetTextPadding();
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   int left = rc.left + line_height + text_padding;
   canvas.Select(name_font);
@@ -284,7 +284,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   TCHAR buffer[128];
   FormatGeoPoint(item.location, buffer, 128);
 
-  canvas.Select(small_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, buffer);
@@ -333,7 +333,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   look.icon.Draw(canvas, pt);
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   int left = rc.left + line_height + text_padding;
 
@@ -347,7 +347,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   FormatTimespanSmart(timespan_buffer, BrokenDateTime::NowUTC() - marker.time);
   buffer.Format(_("dropped %s ago"), timespan_buffer);
   buffer.AppendFormat(_T(" (%s)"), time_buffer);
-  canvas.Select(small_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, buffer);
@@ -383,7 +383,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   look.thermal_source_icon.Draw(canvas, pt);
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   int left = rc.left + line_height + text_padding;
 
@@ -406,7 +406,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   buffer.append(_T(" - "));
   buffer.AppendFormat(_("left %s ago"), timespan_buffer);
   buffer.AppendFormat(_T(" (%s)"), time_buffer);
-  canvas.Select(small_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, buffer);
@@ -426,7 +426,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const Waypoint &waypoint = item.waypoint;
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   TCHAR buffer[256];
 
@@ -434,7 +434,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   int top2 = rc.top + name_font.GetHeight() + 2 * text_padding;
 
   // Use small font for details
-  canvas.Select(small_font);
+  canvas.Select(text_font);
 
   // Draw details line
   UPixelScalar left = rc.left + line_height + text_padding;
@@ -474,7 +474,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   // Now render the text information
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
   int left = rc.left + line_height + text_padding;
 
   const FlarmNetRecord *record = FlarmDetails::LookupRecord(item.id);
@@ -517,7 +517,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
       info_string.AppendFormat(_T(", %s: %s"), _("Vario"), tmp);
     }
   }
-  canvas.Select(small_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, info_string);
@@ -562,7 +562,7 @@ Draw(Canvas &canvas, const PixelRect rc,
      const DialogLook &dialog_look)
 {
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   const unsigned line_height = rc.bottom - rc.top;
   const unsigned text_padding = Layout::GetTextPadding();
@@ -573,7 +573,7 @@ Draw(Canvas &canvas, const PixelRect rc,
   canvas.DrawText(left, top, item.name);
 
   if (CommonInterface::Basic().time_available) {
-    canvas.Select(small_font);
+    canvas.Select(text_font);
 
     StaticString<64> buffer;
     buffer.UnsafeFormat(_("%u minutes ago"),
