@@ -25,8 +25,18 @@ Copyright_License {
 #define XCSOAR_DIALOGS_H
 
 class SingleWindow;
+class Waypoint;
 
 void dlgBasicSettingsShowModal();
+
+/**
+ * displays a popup describing the "what if" task stats if the
+ * wp is appended before the finish of the current MAT task
+ * Allows user to either append it or cancel
+ * @param wp. the waypoint to be added.
+ * return true if the "More options" button was clicked
+ */
+bool dlgMatItemClickShowModal(const Waypoint &wp);
 void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 

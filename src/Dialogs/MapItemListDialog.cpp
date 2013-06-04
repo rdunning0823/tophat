@@ -44,8 +44,10 @@ Copyright_License {
 #include "Components.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Airspace/ProtectedAirspaceWarningManager.hpp"
+#include "Waypoint/Waypoint.hpp"
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
+#include "Dialogs/Dialogs.h"
 
 
 #ifdef HAVE_NOAA
@@ -478,6 +480,16 @@ ShowMapItemDialog(const MapItem &item,
   }
 }
 
+/**
+ * returns true if current ordered task is a Mat
+ */
+static bool IsMat()
+{
+  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+  return task_manager->IsMat() &&
+      task_manager->GetMode() == TaskType::ORDERED;
+}
+
 void
 ShowMapItemListDialog(const MapItemList &list,
                       const DialogLook &dialog_look,
@@ -488,10 +500,24 @@ ShowMapItemListDialog(const MapItemList &list,
                       ProtectedAirspaceWarningManager *airspace_warnings)
 {
   unsigned list_list_count = 0;
+  bool show_more_options = true;
+  bool is_mat = IsMat();
   for (auto i = list.begin(); i != list.end(); i++) {
     if (HasDetails(**i))
         list_list_count++;
+
+    const MapItem &item = **i;
+    if (item.type == MapItem::WAYPOINT &&
+        ((const WaypointMapItem &)item).waypoint.IsTurnpoint() && is_mat) {
+      show_more_options =
+          dlgMatItemClickShowModal(((const WaypointMapItem &)item).waypoint);
+      if (!show_more_options)
+        break;
+    }
   }
+
+  if (!show_more_options)
+    return;
 
   if (list_list_count == 1)
     /* only one map item without details, show it.
