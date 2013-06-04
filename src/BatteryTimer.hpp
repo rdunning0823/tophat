@@ -25,6 +25,9 @@ Copyright_License {
 #define XCSOAR_BATTERY_TIMER_HPP
 
 #include "PeriodClock.hpp"
+#ifdef ANDROID
+#include "Android/Nook.hpp"
+#endif
 
 class BatteryTimer {
   // Battery status for SIMULATOR mode
@@ -35,6 +38,9 @@ class BatteryTimer {
   static const unsigned BATTERY_REMINDER = 5 * 60 * 1000;
 
   PeriodClock last_warning;
+#ifdef ANDROID
+  Nook::BatteryController nook_battery_controller;
+#endif
 
 public:
   void Process();

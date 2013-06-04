@@ -27,6 +27,63 @@ Copyright_License {
 namespace Nook {
 
   /**
+   * controls the Nook's charge level so it gently charges or
+   * discharges the battery.
+   * Does this by keeping battery level within a range around the
+   * battery percent on startup
+   * The difficulty is that if we set the charge rate too high,
+   * the Nook's USB and IOIO connections appear less reliable
+   */
+  class BatteryController
+  {
+    /**
+     * the rate we told the Nook we want to charge (mA)
+     */
+    unsigned last_charge_rate;
+
+    /**
+     * upper limit of range where we want to maintain the battery level
+     */
+    unsigned upper_battery_threshhold;
+
+    bool initialised;
+
+  public:
+    BatteryController()
+      :last_charge_rate(0) {
+    }
+
+  public:
+    void ProcessChargeRate(unsigned value);
+    /**
+     * true if we told the Nook to Charge at 500mA or higher
+     */
+
+    void Initialise(unsigned value);
+
+    bool IsInitialised() {
+      return initialised;
+    }
+
+    bool IsCharging() {
+      return last_charge_rate > 100;
+    }
+
+  protected:
+    unsigned GetUpperChargeThreshhold() {
+      return upper_battery_threshhold;
+    }
+
+    unsigned GetLowerChargeThreshhold() {
+      return upper_battery_threshhold - 2;
+    }
+
+    void SetCharging();
+
+    void SetDischarging();
+  };
+
+  /**
    * initialize USB mode in Nook (must be rooted with USB Kernel)
    */
   void InitUsb();
@@ -48,6 +105,10 @@ namespace Nook {
    */
   void SetCharge500();
 
+  /**
+   * Set charge rate to 100mA.
+   */
+  void SetCharge100();
 
 }
 
