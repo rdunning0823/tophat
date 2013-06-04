@@ -47,7 +47,7 @@ UPixelScalar
 AirspaceListRenderer::GetHeight(const DialogLook &look)
 {
   return look.list.font->GetHeight() + Layout::Scale(6) +
-         look.small_font->GetHeight();
+         look.text_font->GetHeight();
 }
 
 void
@@ -60,12 +60,12 @@ AirspaceListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const PixelScalar line_height = rc.bottom - rc.top;
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &small_font = *dialog_look.small_font;
+  const Font &text_font = *dialog_look.text_font;
 
   // Y-Coordinate of the second row
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
 
-  canvas.Select(small_font);
+  canvas.Select(text_font);
 
   // Draw upper airspace altitude limit
   TCHAR buffer[40];
@@ -73,7 +73,7 @@ AirspaceListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   UPixelScalar altitude_width = canvas.CalcTextWidth(buffer);
   canvas.DrawClippedText(rc.right - altitude_width - Layout::FastScale(4),
                          rc.top + name_font.GetHeight() -
-                         small_font.GetHeight() + Layout::FastScale(2), rc,
+                         text_font.GetHeight() + Layout::FastScale(2), rc,
                          buffer);
 
   UPixelScalar max_altitude_width = altitude_width;
