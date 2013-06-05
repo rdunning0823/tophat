@@ -9,10 +9,9 @@
     <List Name="List" X="0" Y="91" Width="130" Height="177"/>
     <Canvas Name="frmTaskView" X="0" Y="0" Width="90" Height="90" Border="1" OnPaint="OnTaskPaint" />
 
-    <Panel Name="frmButtons" X="152" Y="92" Width="75" Height="140" Border="0">
+    <Panel Name="frmButtons" X="152" Y="92" Width="75" Height="105" Border="0">
       <Button Name="butRelocate" Caption="Change" X="0" Y="0" Width="73" Height="35" OnClick="OnRelocateClicked"/>
       <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
-      <Button Name="butDetails" Caption="Details" X="0" Y="105" Width="73" Height="35" OnClick="OnDetailsClicked"/>
     </Panel>
 
     <Panel Name="frmType" X="92" Y="2" Height="88" Border="1">

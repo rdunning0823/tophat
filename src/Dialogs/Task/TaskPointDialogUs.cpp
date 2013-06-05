@@ -364,13 +364,6 @@ OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
   RefreshView();
 }
 
-static void
-OnDetailsClicked(gcc_unused WndButton &Sender)
-{
-  const OrderedTaskPoint &task_point = ordered_task->GetPoint(active_index);
-  dlgWaypointDetailsShowModal(task_point.GetWaypoint(), false);
-}
-
 /**
  * appends or inserts a task point after the current item
  */
@@ -451,7 +444,6 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnRemoveClicked),
   DeclareCallBackEntry(OnAddClicked),
   DeclareCallBackEntry(OnRelocateClicked),
-  DeclareCallBackEntry(OnDetailsClicked),
   DeclareCallBackEntry(OnTypeClicked),
   DeclareCallBackEntry(OnTaskPaint),
   DeclareCallBackEntry(OnOZData),
