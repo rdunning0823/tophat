@@ -35,7 +35,11 @@ extern bool MapFileChanged;
 extern bool LanguageChanged;
 extern bool require_restart;
 
+/**
+ * show the system information pages
+ * @param page.  Show only a single page or -1 = all pages.
+ */
 void
-SystemConfiguration();
+SystemConfiguration(int page = -1);
 
 #endif

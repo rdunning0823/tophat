@@ -41,7 +41,7 @@ void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();
-void dlgConfigurationShowModal();
+void dlgConfigurationShowModal(int page = -1);
 void dlgConfigFontsShowModal();
 
 /**
