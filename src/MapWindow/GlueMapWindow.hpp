@@ -186,7 +186,6 @@ protected:
                            const RasterPoint aircraft_pos) override;
 
   /* virtual methods from class Window */
-  virtual bool OnMouseDouble(PixelScalar x, PixelScalar y) override;
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
   virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
