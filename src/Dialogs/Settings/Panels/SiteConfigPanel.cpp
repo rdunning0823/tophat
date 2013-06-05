@@ -33,6 +33,7 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Waypoint/Patterns.hpp"
+#include "Interface.hpp"
 
 enum ControlIndex {
   DataPath,
@@ -63,7 +64,7 @@ public:
 void
 SiteConfigPanel::Show(const PixelRect &rc)
 {
-  buttonWaypoints->SetVisible(true);
+  buttonWaypoints->SetVisible(CommonInterface::SetUISettings().dialog.expert);
   RowFormWidget::Show(rc);
 }
 
