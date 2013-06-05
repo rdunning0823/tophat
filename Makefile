@@ -149,6 +149,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/JobDialog.cpp \
 	$(SRC)/Dialogs/WidgetDialog.cpp \
 	$(SRC)/Dialogs/FileManager.cpp \
+	$(SRC)/Dialogs/FilePickAndDownload.cpp \
 	$(SRC)/Dialogs/Device/DeviceEditWidget.cpp \
 	$(SRC)/Dialogs/Device/DeviceListDialog.cpp \
 	$(SRC)/Dialogs/Device/PortMonitor.cpp \
