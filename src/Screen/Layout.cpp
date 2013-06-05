@@ -67,7 +67,7 @@ Layout::Initialize(PixelSize new_size)
 
   text_padding = Scale(2);
 
-  minimum_control_height = Scale(22);
+  minimum_control_height = Scale(30);
 
   if (HasTouchScreen()) {
     /* larger rows for touch screens */
