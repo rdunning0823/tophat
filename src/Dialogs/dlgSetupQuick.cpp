@@ -46,6 +46,9 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Profile/Profile.hpp"
 #include "Device/Register.hpp"
+#include "Formatter/UserUnits.hpp"
+#include "Task/TaskBehaviour.hpp"
+#include "Units/UnitsStore.hpp"
 
 #include <math.h>
 #include <assert.h>
@@ -54,6 +57,8 @@ Copyright_License {
     SITE_FILES,
     DEVICE,
     PLANE,
+    NATIONALITY,
+    SAFETY,
     ADVANCED,
     OK,
   };
@@ -74,11 +79,15 @@ private:
   PixelRect rc_prompt;
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
+  PixelRect rc_safety_text, rc_nationality_text;
+  PixelRect rc_safety_button, rc_nationality_button;
   PixelRect rc_ok, rc_advanced;
 
   WndFrame *prompt;
   WndFrame *site_files_text, *plane_text, *device_text;
+  WndFrame *safety_text, *nationality_text;
   WndButton *site_files_button, *plane_button, *device_button;
+  WndButton *safety_button, *nationality_button;
   WndButton *ok, *advanced;
 
   /**
@@ -120,7 +129,7 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 {
   PixelRect rc = WndForm::GetClientRect();
   rc.bottom -= WndForm::GetTitleHeight();
-  PixelScalar height = Layout::Scale(35);
+  PixelScalar height = Layout::Scale(25);
 
   PixelRect rc_left = rc;
   PixelRect rc_right = rc;
@@ -133,13 +142,18 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_left.right = PixelScalar (fixed(rc.right + rc.left) / fixed(2.5));
   rc_right.left = rc_left.right + Layout::Scale(1);
 
-  rc_site_files_text = rc_plane_text = rc_device_text = rc_right;
-  rc_site_files_button = rc_plane_button = rc_device_button = rc_left;
+  rc_site_files_text = rc_plane_text = rc_device_text = rc_safety_text
+      = rc_nationality_text = rc_right;
+  rc_site_files_button = rc_plane_button = rc_device_button
+      = rc_safety_button = rc_nationality_button = rc_left;
 
-  rc_site_files_text.top = rc_site_files_button.top = height / 2 + rc_prompt.bottom;
-  rc_site_files_text.top = rc_site_files_button.top = height / 2 + rc_prompt.bottom;
+  rc_site_files_text.top = rc_site_files_button.top = rc_prompt.bottom;
+  rc_site_files_text.top = rc_site_files_button.top = rc_prompt.bottom;
   rc_plane_text.top = rc_plane_button.top = rc_site_files_text.top + height;
   rc_device_text.top = rc_device_button.top = rc_plane_text.top + height;
+
+  rc_safety_text.top = rc_safety_button.top = rc_device_text.top + height;
+  rc_nationality_text.top = rc_nationality_button.top = rc_safety_text.top + height;
 
   rc_site_files_text.bottom = rc_site_files_button.bottom =
       rc_site_files_text.top + height;
@@ -147,6 +161,10 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       rc_plane_button.top + height;
   rc_device_text.bottom = rc_device_button.bottom =
       rc_device_button.top + height;
+  rc_safety_text.bottom = rc_safety_button.bottom =
+      rc_safety_button.top + height;
+  rc_nationality_text.bottom = rc_nationality_button.bottom =
+      rc_nationality_button.top + height;
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
@@ -154,28 +172,43 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_advanced.right = rc_right.right;
   rc_advanced.left = rc_advanced.right - Layout::Scale(80);
   rc_advanced.bottom = rc_ok.top - 1;
-  rc_advanced.top = rc_advanced.bottom - height;
+  rc_advanced.top = rc_advanced.bottom - (height * 3) / 4;;
 }
 
 void
 SetupQuick::OnAction(int id)
 {
-  if (id == SITE_FILES) {
-    SystemConfiguration(_T("Site Files"));
+  switch(id) {
+  case SITE_FILES:
+    SystemConfiguration(N_("Site Files"));
+    break;
 
-  } else if (id == PLANE) {
+  case PLANE:
     dlgPlanesShowModal();
+    break;
 
-  } else if (id == DEVICE) {
+  case DEVICE:
     ShowDeviceList(UIGlobals::GetMainWindow(),
                    UIGlobals::GetDialogLook(),
                    UIGlobals::GetLook().terminal);
+    break;
 
-  } else if (id == ADVANCED) {
+  case SAFETY:
+    SystemConfiguration(N_("Safety Factors"));
+    break;
+
+  case NATIONALITY:
+    SystemConfiguration(N_("Contest"));
+    break;
+
+  case ADVANCED:
     SystemConfiguration();
+    break;
 
-  } else if (id == OK) {
+
+  case OK:
       SetModalResult(mrOK);
+      break;
   }
 
   RefreshForm();
@@ -230,8 +263,19 @@ SetupQuick::RefreshForm()
       text = unconfigured;
   plane_text->SetCaption(text.c_str());
 
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &task_behaviour = settings_computer.task;
+  FormatRelativeUserAltitude(task_behaviour.safety_height_arrival, text.buffer(), true);
+  safety_text->SetCaption(text.c_str());
+
+  text = ((unsigned)task_behaviour.contest_nationality > 0)
+      ? Units::Store::GetName((unsigned)task_behaviour.contest_nationality - 1)
+      : unconfigured;
+
+  nationality_text->SetCaption(text.c_str());
+
   if (auto_prompt) {
-    prompt->SetCaption(_("Please configure Top Hat using the three buttons below."));
+    prompt->SetCaption(_("Please configure Top Hat using the buttons below."));
   }
 }
 
@@ -263,6 +307,16 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              style_frame);
                              device_text->SetVAlignCenter();
 
+  safety_text = new WndFrame(GetClientAreaWindow(), look,
+                             rc_safety_text,
+                             style_frame);
+                             safety_text->SetVAlignCenter();
+
+  nationality_text = new WndFrame(GetClientAreaWindow(), look,
+                                  rc_nationality_text,
+                                  style_frame);
+                                  nationality_text->SetVAlignCenter();
+
   if (auto_prompt) {
     prompt = new WndFrame(GetClientAreaWindow(), look,
                           rc_prompt,
@@ -289,6 +343,16 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                 rc_device_button,
                                 button_style, *this, DEVICE);
 
+  safety_button = new WndButton(GetClientAreaWindow(), dialog_look,
+                                _T("Safety heights"),
+                                rc_safety_button,
+                                button_style, *this, SAFETY);
+
+  nationality_button = new WndButton(GetClientAreaWindow(), dialog_look,
+                                _T("Nationality"),
+                                rc_nationality_button,
+                                button_style, *this, NATIONALITY);
+
   ok = new WndButton(GetClientAreaWindow(), dialog_look, _("Close"),
                      rc_ok,
                      button_style, *this, OK);
@@ -306,9 +370,13 @@ SetupQuick::Unprepare()
   delete site_files_text;
   delete plane_text;
   delete device_text;
+  delete safety_text;
+  delete nationality_text;
   delete site_files_button;
   delete plane_button;
   delete device_button;
+  delete safety_button;
+  delete nationality_button;
   delete ok;
   delete advanced;
   if (auto_prompt)
