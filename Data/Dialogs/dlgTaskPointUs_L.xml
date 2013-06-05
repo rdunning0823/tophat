@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+
+<Form Caption="Waypoint">
+  <Button Caption="Close" X="2" Y="-37" Width="123" Height="35" OnClick="OnCloseClicked"/>
+  <Button Name="butAdd" Caption="Insert after" X="242" Y="121" Width="73" Height="35" OnClick="OnAddClicked"/>
+
+  <Panel Name="frmDetails" X="0" Y="0" Width="320" Height="251">
+    <List Name="List" X="0" Y="0" Width="125" Height="191"/>
+
+    <Panel Name="frmType" X="127" Y="2" Width="191" Height="70" Border="1">
+      <Label Name="lblType" Caption="Type" X="2" Y="3" Width="105" Height="36"/>
+      <Button Name="butType" Caption="Change Type" X="110" Y="3" Width="75" Height="35" OnClick="OnTypeClicked"/>
+
+      <Panel Name="frmOZLine" X="2" Y="41" Width="184" Height="26">
+        <Edit Name="prpOZLineLength" Caption="Gate Width" Height="25" CaptionWidth="60" Help="Width of the start/finish gate.">
+         <DataField DataType="double" DisplayFormat="%.1f %s" EditFormat="%.1f" Min="0.1" Max="100" Step="1.0" Fine="1" OnDataAccess="OnOZData"/>
+        </Edit>
+     </Panel>
+
+      <Panel Name="frmOZCylinder" X="2" Y="41" Width="184" Height="26">
+        <Edit Name="prpOZCylinderRadius" Caption="Radius" Height="25" CaptionWidth="60" Help="Radius of the OZ cylinder.">
+          <DataField DataType="double" DisplayFormat="%.1f %s" EditFormat="%.1f" Min="0.1" Max="100" Step="1.0" Fine="1" OnDataAccess="OnOZData"/>
+        </Edit>
+      </Panel>
+
+      <Panel Name="frmOZSector" X="2" Y="41" Width="184" Height="100">
+        <Edit Name="prpOZSectorRadius" Caption="Radius" Height="25" CaptionWidth="80" Help="Radius of the OZ sector.">
+          <DataField DataType="double" DisplayFormat="%.1f %s" EditFormat="%.1f" Min="0.1" Max="100" Step="1.0" Fine="1" OnDataAccess="OnOZData"/>
+        </Edit>
+
+        <Edit Name="prpOZSectorStartRadial" Caption="Start radial" Height="25" CaptionWidth="80" Help="Start radial of the OZ area">
+          <DataField DataType="double" DisplayFormat="%.0f°" EditFormat="%.0f" Min="0" Max="360" Step="10" Fine="1" OnDataAccess="OnOZData"/>
+        </Edit>
+
+        <Edit Name="prpOZSectorFinishRadial" Caption="Finish radial" Height="25" CaptionWidth="80" Help="Finish radial of the OZ area">
+          <DataField DataType="double" DisplayFormat="%.0f°" EditFormat="%.0f" Min="0" Max="360" Step="10" Fine="1" OnDataAccess="OnOZData"/>
+        </Edit>
+
+        <Edit Name="prpOZSectorInnerRadius" Caption="Inner radius" Height="25" CaptionWidth="80" Help="Inner radius of the OZ sector.">
+          <DataField DataType="double" DisplayFormat="%.1f %s" EditFormat="%.1f" Min="0.0" Max="100" Step="1.0" Fine="1"
+           OnDataAccess="OnOZData"/>
+        </Edit>
+      </Panel>
+
+    </Panel>
+
+    <Panel Name="frmButtons" X="242" Y="86" Width="76" Height="140" Border="0">
+      <Button Name="butRelocate" Caption="Change" X="0" Y="0" Width="73" Height="35" OnClick="OnRelocateClicked"/>
+      <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
+      <Button Name="butDetails" Caption="Details" X="0" Y="105" Width="73" Height="35" OnClick="OnDetailsClicked"/>
+    </Panel>
+
+    <Canvas Name="frmTaskView" X="132" Y="103" Width="92" Height="82" Border="1" OnPaint="OnTaskPaint" />
+
+  </Panel>
+
+</Form>
