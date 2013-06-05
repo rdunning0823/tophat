@@ -35,8 +35,6 @@ enum ControlIndex {
   OrientationCircling,
   CirclingZoom,
   MAP_SHIFT_BIAS,
-  GliderScreenPosition,
-  AUTO_ZOOM,
   MaxAutoZoomDistance,
   PAGES_DISTINCT_ZOOM,
 };
@@ -132,17 +130,6 @@ MapDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           this);
   SetExpertRow(MAP_SHIFT_BIAS);
 
-  AddInteger(_("Glider position offset"),
-             _("Defines the location of the glider drawn on the screen in percent from the screen edge."),
-             _T("%d %%"), _T("%d"), 10, 50, 5,
-             settings_map.glider_screen_position);
-  SetExpertRow(GliderScreenPosition);
-
-  AddBoolean(_("Auto zoom"),
-             _("Automatically zoom in when approaching a waypoint to keep the waypoint at a reasonable screen distance."),
-             settings_map.auto_zoom_enabled);
-  SetExpertRow(AUTO_ZOOM);
-
   AddFloat(_("Max. auto zoom distance"),
            _("The upper limit for auto zoom distance."),
            _T("%.0f %s"), _T("%.0f"), fixed(20), fixed(250), fixed(10), false,
@@ -174,14 +161,9 @@ MapDisplayConfigPanel::Save(bool &_changed)
   changed |= SaveValueEnum(MAP_SHIFT_BIAS, ProfileKeys::MapShiftBias,
                            settings_map.map_shift_bias);
 
-  changed |= SaveValue(GliderScreenPosition, ProfileKeys::GliderScreenPosition,
-                       settings_map.glider_screen_position);
-
   changed |= SaveValue(CirclingZoom, ProfileKeys::CircleZoom,
                        settings_map.circle_zoom_enabled);
 
-  changed |= SaveValue(AUTO_ZOOM, ProfileKeys::AutoZoom,
-                       settings_map.auto_zoom_enabled);
 
   changed |= SaveValue(MaxAutoZoomDistance, UnitGroup::DISTANCE,
                        ProfileKeys::MaxAutoZoomDistance,
