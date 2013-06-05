@@ -11,8 +11,8 @@
     <List Name="List" X="0" Y="0" Width="125" Height="191"/>
 
     <Panel Name="frmType" X="127" Y="2" Width="191" Height="70" Border="1">
-      <Label Name="lblType" Caption="Type" X="2" Y="3" Width="105" Height="36"/>
-      <Button Name="butType" Caption="Change Type" X="110" Y="3" Width="75" Height="35" OnClick="OnTypeClicked"/>
+      <Label Name="lblType" X="2" Y="3" Width="184" Height="35"/>
+      <Button Name="butType" X="2" Y="3" Width="184" Height="35" OnClick="OnTypeClicked"/>
 
       <Panel Name="frmOZLine" X="2" Y="41" Width="184" Height="26">
         <Edit Name="prpOZLineLength" Caption="Gate Width" Height="25" CaptionWidth="60" Help="Width of the start/finish gate.">
