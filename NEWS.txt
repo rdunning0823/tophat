@@ -17,6 +17,7 @@ First release of Top Hat based on XCSoar 6.6 features:
 Version 6.6.2 - not yet released
 * infoboxes
   - ensure that the unit symbol is visible
+  - fix ballast display in vario gauge (#2911)
 * tasks
   - update all settings after task type change
 * devices
