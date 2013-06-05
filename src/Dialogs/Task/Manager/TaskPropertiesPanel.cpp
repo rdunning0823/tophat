@@ -81,7 +81,7 @@ TaskPropertiesPanel::RefreshView()
   const bool aat_types = ftype == TaskFactoryType::AAT ||
     ftype == TaskFactoryType::MAT;
   bool fai_start_finish = p.finish_constraints.fai_finish;
-  bool is_usa = tb.contest_nationality == ContestNationalities::USA;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
 
   SetRowVisible(MIN_TIME, aat_types);
   LoadValueTime(MIN_TIME, (int)p.aat_min_time);
@@ -236,7 +236,7 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
   TaskBehaviour &tb = settings_computer.task;
-  bool us_rules = tb.contest_nationality == ContestNationalities::USA;
+  bool us_rules = tb.contest_nationality == ContestNationalities::AMERICAN;
 
   AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
           0, 36000, 60, 180);
