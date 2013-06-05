@@ -25,7 +25,10 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
+#include "Dialogs/FilePickAndDownload.hpp"
 #include "Form/Button.hpp"
+#include "Form/DataField/Listener.hpp"
+#include "Form/DataField/FileReader.hpp"
 #include "LocalPath.hpp"
 #include "UtilsSettings.hpp"
 #include "ConfigPanel.hpp"
@@ -33,7 +36,13 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Waypoint/Patterns.hpp"
+#include "Language/Language.hpp"
+#include "Util/StaticString.hpp"
+#include "Util/ConvertString.hpp"
 #include "Interface.hpp"
+#include "Repository/AvailableFile.hpp"
+
+#include <string>
 
 enum ControlIndex {
   DataPath,
@@ -46,20 +55,79 @@ enum ControlIndex {
   AirfieldFile
 };
 
-class SiteConfigPanel final : public RowFormWidget {
-public:
-  SiteConfigPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook()), buttonWaypoints(0) {}
-
+class SiteConfigPanel final : public RowFormWidget, DataFieldListener {
 private:
   WndButton *buttonWaypoints;
+  StaticString<50> download_name;
+
+public:
+  SiteConfigPanel()
+    :RowFormWidget(UIGlobals::GetDialogLook()), buttonWaypoints(0),
+     download_name(N_("Download from internet")){}
 
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
   virtual void Show(const PixelRect &rc) override;
   virtual void Hide() override;
+
+private:
+  /* methods from DataFieldListener */
+  virtual void OnModified(DataField &df) override;
 };
+
+void
+SiteConfigPanel::OnModified(DataField &df)
+{
+  if (IsDataField(MapFile, df)) {
+    const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+    const TaskBehaviour &task_behaviour = settings_computer.task;
+
+    DataFieldFileReader* dff = (DataFieldFileReader*)&df;
+    StaticString<255> label;
+    label.clear();
+    if (dff->GetAsDisplayString() != nullptr)
+      label = dff->GetAsDisplayString();
+    if (label == dff->GetScanInternetLabel()) {
+      AvailableFile file_filter;
+      file_filter.type = AvailableFile::Type::MAP;
+      StaticString<15> nationality;
+      switch (task_behaviour.contest_nationality) {
+      case UNKNOWN:
+      case EUROPEAN:
+        nationality.clear();
+        break;
+      case BRITISH:
+        nationality = _T("br");
+        break;
+      case AUSTRALIAN:
+        nationality = _T("au");
+        break;
+      case AMERICAN:
+        nationality = _T("us");
+        break;
+      }
+
+      WideToACPConverter base(nationality.c_str());
+      file_filter.area = base;
+      AvailableFile result = ShowFilePickAndDownload(file_filter);
+      if (result.IsValid()) {
+        ACPToWideConverter base(result.GetName());
+        if (!base.IsValid())
+          return;
+        StaticString<255> temp_name(base);
+        DataFieldFileReader *maps = (DataFieldFileReader*)&df;
+        StaticString<255> buffer;
+        LocalPath(buffer.buffer(), base);
+        maps->AddFile(base, buffer.c_str());
+        if (buffer == dff->GetScanInternetLabel())
+          maps->SetAsInteger(0);
+        else
+          maps->Lookup(buffer.c_str());
+      }
+    }
+  }
+}
 
 void
 SiteConfigPanel::Show(const PixelRect &rc)
@@ -86,10 +154,12 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   wp->SetText(GetPrimaryDataPath());
   wp->SetEnabled(false);
 
-  AddFileReader(_("Map database"),
-                _("The name of the file (.xcm) containing terrain, topography, and optionally "
-                    "waypoints, their details and airspaces."),
-                ProfileKeys::MapFile, _T("*.xcm\0*.lkm\0"));
+  wp = AddFileReader(_("Map database"),
+                     _("The name of the file (.xcm) containing terrain, topography, and optionally "
+                         "waypoints, their details and airspaces."),
+                     ProfileKeys::MapFile, _T("*.xcm\0*.lkm\0"), true, this);
+  DataFieldFileReader *dff = (DataFieldFileReader *)(wp->GetDataField());
+  dff->EnableInternetDownload();
 
   AddFileReader(_("Waypoints"),
                 _("Primary waypoints file.  Supported file types are Cambridge/WinPilot files (.dat), "
