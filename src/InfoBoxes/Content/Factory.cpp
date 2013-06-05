@@ -455,7 +455,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentWindBearing>::Create,
     HeadWindSimplified,
     e_WindSpeed_Est, // Wind V
-    Category::STANDARD,
+    Category::DEPRECATED,
   },
 
   // e_AA_Time
