@@ -56,6 +56,9 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
+#include "Util/StaticString.hpp"
+#include "Formatter/TimeFormatter.hpp"
+#include "Formatter/UserUnits.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
@@ -83,6 +86,19 @@ public:
   /* virtual methods from ListCursorHandler */
   virtual void OnCursorMoved(unsigned index) override;
 };
+
+/**
+ * returns true if task is an FAI type
+ * @param ftype. task type being checked
+ */
+static bool
+IsFai(TaskFactoryType ftype)
+{
+  return (ftype == TaskFactoryType::FAI_GENERAL) ||
+      (ftype == TaskFactoryType::FAI_GOAL) ||
+      (ftype == TaskFactoryType::FAI_OR) ||
+      (ftype == TaskFactoryType::FAI_TRIANGLE);
+}
 
 static void
 OnCloseClicked(gcc_unused WndButton &Sender)
@@ -201,6 +217,35 @@ RefreshView()
     .CopyTo(std::back_inserter(point_types));
   button_type->SetVisible(point_types.size() > 1u);
 
+
+  WndButton *button_properties = (WndButton*) wf->FindByName(_T("butTaskProperties"));
+  assert (button_type != nullptr);
+  StaticString<255> text;
+
+  const OrderedTaskBehaviour &otb = ordered_task->GetOrderedTaskBehaviour();
+  const TaskFactoryType ftype = ordered_task->GetFactoryType();
+  text = OrderedTaskFactoryName(ftype);
+
+  if (ordered_task->HasTargets()) {
+    StaticString<50> time_info;
+    FormatSignedTimeHHMM(time_info.buffer(), (int)otb.aat_min_time);
+    text.AppendFormat(_T(".  %s %s"), _("Time"), time_info.c_str());
+  }
+  text.append(_T("\n"));
+
+  if (!IsFai(ordered_task->GetFactoryType())) {
+    StaticString<25> start_height;
+    StaticString<25> finish_height;
+
+    FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
+    FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
+
+    text.AppendFormat(_T("%s %s %s\n%s %s %s"),
+                      _("Start"), _("MSL:"), start_height.c_str(),
+                      _("Finish"), _("MSL:"), finish_height.c_str());
+  }
+  button_properties->SetCaption(text.c_str());
+
   Refreshing = false; // reactivate onChange routines
 }
 
@@ -312,6 +357,14 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
 }
 
 static void
+OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
+{
+  const DialogLook &look = UIGlobals::GetDialogLook();
+  dlgTaskPropertiesUsShowModal(look, &ordered_task, task_modified);
+  RefreshView();
+}
+
+static void
 OnDetailsClicked(gcc_unused WndButton &Sender)
 {
   const OrderedTaskPoint &task_point = ordered_task->GetPoint(active_index);
@@ -392,6 +445,8 @@ OnOZData(gcc_unused DataField *Sender,
 }
 
 static constexpr CallBackTableEntry CallBackTable[] = {
+
+  DeclareCallBackEntry(OnTaskPropertiesClicked),
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnRemoveClicked),
   DeclareCallBackEntry(OnAddClicked),
