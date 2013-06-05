@@ -109,7 +109,7 @@ dlgStartupShowModal()
   DataFieldFileReader* dfe = (DataFieldFileReader*)wp->GetDataField();
   assert(dfe != NULL);
 
-  dfe->ScanDirectoryTop(_T("*.prf"));
+  dfe->ScanDirectoryTop(_T("*.top"));
 
   if (dfe->GetNumFiles() <= 1) {
     SelectProfile(dfe->GetPathFile());

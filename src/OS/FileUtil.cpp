@@ -84,8 +84,8 @@ IsDots(const TCHAR* str)
 static bool
 checkFilter(const TCHAR *filename, const TCHAR *filter)
 {
-  // filter = e.g. "*.igc" or "config/*.prf"
-  // todo: make filters like "config/*.prf" work
+  // filter = e.g. "*.igc" or "config/*.top"
+  // todo: make filters like "config/*.top" work
 
   // if invalid or short filter "*" -> return true
   // todo: check for asterisk
