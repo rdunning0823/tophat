@@ -53,12 +53,14 @@ WidgetDialog::Create(SingleWindow &parent,
                      const TCHAR *caption, const PixelRect &rc,
                      Widget *_widget,
                      DialogFooter::Listener *_listener,
-                     UPixelScalar _footer_height)
+                     UPixelScalar _footer_height,
+                     ButtonPanel::ButtonPanelPosition button_position)
 {
   auto_size = false;
   WndForm::Create(parent, rc, caption, GetDialogStyle());
   dialog_footer.Create(GetClientAreaWindow(), _listener, _footer_height);
   widget.Set(_widget);
+  buttons.SetButtonPosition(button_position);
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 }
 
@@ -66,10 +68,11 @@ void
 WidgetDialog::CreateFull(SingleWindow &parent, const TCHAR *caption,
                          Widget *widget,
                          DialogFooter::Listener *_listener,
-                         UPixelScalar _footer_height)
+                         UPixelScalar _footer_height,
+                         ButtonPanel::ButtonPanelPosition button_position)
 {
   Create(parent, caption, parent.GetClientRect(), widget, _listener,
-         _footer_height);
+         _footer_height, button_position);
 }
 
 void

@@ -86,6 +86,10 @@ public:
   PixelRect BottomLayout(PixelRect rc);
   PixelRect BottomLayout();
 
+  void SetButtonPosition(ButtonPanelPosition _position) {
+    position = _position;
+  }
+
   void ShowAll();
   void HideAll();
 

@@ -101,14 +101,18 @@ public:
   void Create(SingleWindow &parent, const TCHAR *caption,
               const PixelRect &rc, Widget *widget,
               DialogFooter::Listener *_listener = nullptr,
-              UPixelScalar footer_height = 0);
+              UPixelScalar footer_height = 0,
+              ButtonPanel::ButtonPanelPosition button_position =
+                                 ButtonPanel::ButtonPanelPosition::Auto);
 
   /**
    * Create a full-screen dialog.
    */
   void CreateFull(SingleWindow &parent, const TCHAR *caption, Widget *widget,
                   DialogFooter::Listener *_listener = nullptr,
-                  UPixelScalar footer_height = 0);
+                  UPixelScalar footer_height = 0,
+                  ButtonPanel::ButtonPanelPosition button_position =
+                                     ButtonPanel::ButtonPanelPosition::Auto);
 
   /**
    * Create a dialog with an automatic size (by
@@ -123,6 +127,7 @@ public:
   void CreatePreliminary(SingleWindow &parent, const TCHAR *caption);
 
   void FinishPreliminary(Widget *widget);
+
 
   bool GetChanged() const {
     return changed;
@@ -141,7 +146,9 @@ public:
 
   WndButton *AddButton(const TCHAR *caption,
                        ActionListener &listener, int id) {
-    return buttons.Add(caption, listener, id);
+    WndButton * but = buttons.Add(caption, listener, id);
+    OnResize(PixelSize {GetWidth(), GetHeight()});
+    return but;
   }
 
   WndButton *AddButton(const TCHAR *caption, int modal_result) {
