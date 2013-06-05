@@ -54,10 +54,10 @@ Copyright_License {
 #include <assert.h>
 
   enum ControlIndex {
+    NATIONALITY,
     SITE_FILES,
     DEVICE,
     PLANE,
-    NATIONALITY,
     SAFETY,
     PILOT,
     ADVANCED,
@@ -148,14 +148,18 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_site_files_button = rc_plane_button = rc_device_button
       = rc_safety_button = rc_nationality_button = rc_pilot_button = rc_left;
 
-  rc_site_files_text.top = rc_site_files_button.top = rc_prompt.bottom;
-  rc_site_files_text.top = rc_site_files_button.top = rc_prompt.bottom;
+  rc_nationality_text.top = rc_nationality_button.top = rc_prompt.bottom;
+  rc_site_files_text.top = rc_site_files_button.top = rc_nationality_text.top
+      + height;
+
   rc_plane_text.top = rc_plane_button.top = rc_site_files_text.top + height;
   rc_device_text.top = rc_device_button.top = rc_plane_text.top + height;
 
   rc_safety_text.top = rc_safety_button.top = rc_device_text.top + height;
-  rc_nationality_text.top = rc_nationality_button.top = rc_safety_text.top + height;
-  rc_pilot_text.top = rc_pilot_button.top = rc_nationality_text.top + height;
+  rc_pilot_text.top = rc_pilot_button.top = rc_safety_text.top + height;
+
+  rc_nationality_text.bottom = rc_nationality_button.bottom =
+      rc_nationality_button.top + height;
 
   rc_site_files_text.bottom = rc_site_files_button.bottom =
       rc_site_files_text.top + height;
@@ -165,8 +169,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       rc_device_button.top + height;
   rc_safety_text.bottom = rc_safety_button.bottom =
       rc_safety_button.top + height;
-  rc_nationality_text.bottom = rc_nationality_button.bottom =
-      rc_nationality_button.top + height;
   rc_pilot_text.bottom = rc_pilot_button.bottom =
       rc_pilot_button.top + height;
 
@@ -183,6 +185,10 @@ void
 SetupQuick::OnAction(int id)
 {
   switch(id) {
+  case NATIONALITY:
+    SystemConfiguration(N_("Contest"));
+    break;
+
   case SITE_FILES:
     SystemConfiguration(N_("Site Files"));
     break;
@@ -199,10 +205,6 @@ SetupQuick::OnAction(int id)
 
   case SAFETY:
     SystemConfiguration(N_("Safety Factors"));
-    break;
-
-  case NATIONALITY:
-    SystemConfiguration(N_("Contest"));
     break;
 
   case PILOT:
@@ -305,6 +307,11 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WindowStyle style_frame;
   style_frame.Border();
 
+  nationality_text = new WndFrame(GetClientAreaWindow(), look,
+                                  rc_nationality_text,
+                                  style_frame);
+                                  nationality_text->SetVAlignCenter();
+
   site_files_text = new WndFrame(GetClientAreaWindow(), look,
                                  rc_site_files_text,
                                  style_frame);
@@ -325,11 +332,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              style_frame);
                              safety_text->SetVAlignCenter();
 
-  nationality_text = new WndFrame(GetClientAreaWindow(), look,
-                                  rc_nationality_text,
-                                  style_frame);
-                                  nationality_text->SetVAlignCenter();
-
   pilot_text = new WndFrame(GetClientAreaWindow(), look,
                             rc_pilot_text,
                             style_frame);
@@ -346,6 +348,11 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
+
+  nationality_button = new WndButton(GetClientAreaWindow(), dialog_look,
+                                _T("Nationality"),
+                                rc_nationality_button,
+                                button_style, *this, NATIONALITY);
 
   site_files_button = new WndButton(GetClientAreaWindow(), dialog_look,
                                     _T("Site files"),
@@ -366,11 +373,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                 rc_safety_button,
                                 button_style, *this, SAFETY);
 
-  nationality_button = new WndButton(GetClientAreaWindow(), dialog_look,
-                                _T("Nationality"),
-                                rc_nationality_button,
-                                button_style, *this, NATIONALITY);
-
   pilot_button = new WndButton(GetClientAreaWindow(), dialog_look,
                                _T("Pilot"),
                                rc_pilot_button,
@@ -389,17 +391,17 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
 void
 SetupQuick::Unprepare()
 {
+  delete nationality_text;
   delete site_files_text;
   delete plane_text;
   delete device_text;
   delete safety_text;
-  delete nationality_text;
   delete pilot_text;
+  delete nationality_button;
   delete site_files_button;
   delete plane_button;
   delete device_button;
   delete safety_button;
-  delete nationality_button;
   delete pilot_button;
   delete ok;
   delete advanced;
