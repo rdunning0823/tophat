@@ -30,6 +30,11 @@ class Waypoint;
 void dlgBasicSettingsShowModal();
 
 /**
+ * Allows setting up of the critical items for Top Hat
+ */
+void ShowDialogSetupQuick();
+
+/**
  * displays a popup describing the "what if" task stats if the
  * wp is appended before the finish of the current MAT task
  * Allows user to either append it or cancel
