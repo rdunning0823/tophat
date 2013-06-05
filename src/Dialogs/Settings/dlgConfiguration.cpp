@@ -249,7 +249,7 @@ static constexpr CallBackTableEntry CallBackTable[] = {
 };
 
 static void
-PrepareConfigurationDialog(int page)
+PrepareConfigurationDialog(const TCHAR *page_name)
 {
   gcc_unused ScopeBusyIndicator busy;
 
@@ -268,7 +268,9 @@ PrepareConfigurationDialog(int page)
   dialog->FilterAdvanced(expert_mode);
 
   PrepareConfigurationMenu();
+  int page = tab_menu->FindPage(page_name);
   single_page = (page >= 0);
+  cb->SetVisible(!single_page);
   if (single_page) {
     assert((unsigned)page < tab_menu->GetNumPages());
     WndButton *b = (WndButton*)dialog->FindByName(_T("cmdPrev"));
@@ -307,9 +309,9 @@ Save()
   }
 }
 
-void dlgConfigurationShowModal(int page)
+void dlgConfigurationShowModal(const TCHAR *page_name)
 {
-  PrepareConfigurationDialog(page);
+  PrepareConfigurationDialog(page_name);
 
   dialog->ShowModal();
 

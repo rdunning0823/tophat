@@ -24,6 +24,9 @@ Copyright_License {
 #if !defined(XCSOAR_DIALOGS_H)
 #define XCSOAR_DIALOGS_H
 
+#include <tchar.h>
+
+
 class SingleWindow;
 class Waypoint;
 
@@ -47,7 +50,7 @@ void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();
-void dlgConfigurationShowModal(int page = -1);
+void dlgConfigurationShowModal(const TCHAR *page_name = _T(""));
 void dlgConfigFontsShowModal();
 
 /**

@@ -161,7 +161,7 @@ void
 SetupQuick::OnAction(int id)
 {
   if (id == SITE_FILES) {
-    SystemConfiguration(0);
+    SystemConfiguration(_T("Site Files"));
 
   } else if (id == PLANE) {
     dlgPlanesShowModal();

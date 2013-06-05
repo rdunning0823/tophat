@@ -24,6 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_UTILS_SETTINGS_HPP
 #define XCSOAR_UTILS_SETTINGS_HPP
 
+#include <tchar.h>
+
 // changed only in config or by user interface
 // used in settings dialog
 extern bool DevicePortChanged;
@@ -37,9 +39,9 @@ extern bool require_restart;
 
 /**
  * show the system information pages
- * @param page.  Show only a single page or -1 = all pages.
+ * @param page_name.  Show only a single page or "" = all pages.
  */
 void
-SystemConfiguration(int page = -1);
+SystemConfiguration(const TCHAR *page_name = _T(""));
 
 #endif
