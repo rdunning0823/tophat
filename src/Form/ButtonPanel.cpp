@@ -28,8 +28,9 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Screen/Font.hpp"
 
-ButtonPanel::ButtonPanel(ContainerWindow &_parent, const DialogLook &_look)
-  :parent(_parent), look(_look) {
+ButtonPanel::ButtonPanel(ContainerWindow &_parent, const DialogLook &_look,
+                         ButtonPanelPosition _position)
+  :parent(_parent), look(_look), position(_position) {
   style.TabStop();
 }
 
@@ -45,7 +46,7 @@ ButtonPanel::UpdateLayout(const PixelRect rc)
   if (buttons.empty())
     return rc;
 
-  return Layout::landscape
+  return (Layout::landscape && (position != Bottom))
     ? LeftLayout(rc)
     : BottomLayout(rc);
 }
