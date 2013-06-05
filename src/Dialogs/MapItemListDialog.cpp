@@ -48,6 +48,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
 #include "Dialogs/Dialogs.h"
+#include "Terrain/TerrainSettings.hpp"
 
 
 #ifdef HAVE_NOAA
@@ -498,6 +499,9 @@ ShowMapItemListDialog(const MapItemList &list,
     /* only one map item without details, show it.
      * non-details items are at start of list) */
     ShowMapItemDialog(*list[list.size() - 1], airspace_warnings);
+  //don't show terrain-only info if terrain is disabled
+  else if (list_list_count == 0 && !settings.terrain.enable)
+    return;
   else {
     /* more than one map item: show a list */
     int i = ShowMapItemListDialog(list, dialog_look, look,
