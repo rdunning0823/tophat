@@ -132,7 +132,11 @@ TaskFileIGC::GetTask(const TaskBehaviour &task_behaviour,
 
     ++i;
   }
-
+  // Check if the task is valid
+  if (!task->CheckTask()) {
+    delete task;
+    return nullptr;
+  }
   return task;
 }
 

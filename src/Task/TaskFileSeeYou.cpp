@@ -542,6 +542,11 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
 
     delete pt;
   }
+  // Check if the task is valid
+  if (!task->CheckTask()) {
+    delete task;
+    return nullptr;
+  }
   return task;
 }
 

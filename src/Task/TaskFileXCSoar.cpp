@@ -55,7 +55,7 @@ TaskFileXCSoar::GetTask(const TaskBehaviour &task_behaviour,
   // Check if the task is valid
   if (!task->CheckTask()) {
     delete task;
-    return NULL;
+    return nullptr;
   }
 
   // Return the parsed task
