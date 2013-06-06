@@ -47,13 +47,6 @@ dlgTaskListUsShowModal(OrderedTask** task, bool &task_changed);
 void
 dlgTaskPropertiesUsShowModal(const DialogLook &look, OrderedTask** task,
                              bool &task_changed);
-/**
- * shows dlg task point with limitations to US task rules
- * returns true if task is modified
- */
-bool
-dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task, const unsigned index);
-
 bool
 dlgTaskPointType(OrderedTask **task, unsigned index);
 

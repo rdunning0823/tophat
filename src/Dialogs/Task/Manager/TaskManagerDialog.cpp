@@ -27,6 +27,7 @@ Copyright_License {
 #include "TaskPropertiesPanel.hpp"
 #include "TaskMiscPanel.hpp"
 #include "TaskClosePanel.hpp"
+#include "Dialogs/Task/TaskManagerDialogUs.hpp"
 #include "../TaskDialogs.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
@@ -410,6 +411,14 @@ dlgTaskManagerShowModal(SingleWindow &parent)
 {
   if (protected_task_manager == NULL)
     return;
+
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &tb = settings_computer.task;
+  bool is_usa = tb.contest_nationality == ContestNationalities::AMERICAN;
+  if (is_usa) {
+    TaskManagerDialogUsShowModal(parent);
+    return;
+  }
 
   TaskManagerDialog dialog(UIGlobals::GetDialogLook());
   instance = &dialog;
