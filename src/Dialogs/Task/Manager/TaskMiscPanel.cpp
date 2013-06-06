@@ -32,7 +32,7 @@ TaskMiscPanel::TaskMiscPanel(TaskManagerDialog &dialog,
     new TaskActionsPanel(dialog, *this, _active_task, _task_modified);
   Add(actions_panel);
 
-  Add(CreateTaskListPanel(dialog, _active_task, _task_modified));
+  Add(CreateTaskListPanel(&dialog, _active_task, _task_modified));
 }
 
 void

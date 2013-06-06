@@ -71,6 +71,7 @@ static WndForm *wf = nullptr;
 static WndFrame* wTaskView = nullptr;
 ListControl *wTaskPoints;
 static OrderedTask* ordered_task = nullptr;
+static OrderedTask** ordered_task_pointer = nullptr;
 static bool task_modified = false;
 static unsigned active_index = 0;
 
@@ -382,6 +383,16 @@ OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
   dlgTaskPropertiesUsShowModal(look, &ordered_task, task_modified);
   RefreshView();
 }
+/**
++ * shows the task browse dialog, and updates the task as needed
++ */
+static void
+OnBrowseClicked(gcc_unused WndButton &Sender)
+{
+  dlgTaskListUsShowModal(ordered_task_pointer, task_modified);
+  ordered_task = *ordered_task_pointer;
+  RefreshView();
+}
 
 /**
  * appends or inserts a task point after the current item
@@ -461,6 +472,7 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnTaskPropertiesClicked),
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnRemoveClicked),
+  DeclareCallBackEntry(OnBrowseClicked),
   DeclareCallBackEntry(OnAddClicked),
   DeclareCallBackEntry(OnRelocateClicked),
   DeclareCallBackEntry(OnTypeClicked),
@@ -519,6 +531,7 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
                       const unsigned index)
 {
   ordered_task = *task_pointer;
+  ordered_task_pointer = task_pointer;
   task_modified = false;
   active_index = index;
 

@@ -26,6 +26,7 @@ Copyright_License {
 
 class SingleWindow;
 class OrderedTask;
+class WndForm;
 struct DialogLook;
 
 void
@@ -33,6 +34,12 @@ dlgTaskManagerShowModal(SingleWindow &parent);
 
 bool
 dlgTaskPointShowModal(SingleWindow &parent, OrderedTask** task, const unsigned index);
+
+/**
+ * dialog with task properties needed for American task rules
+ */
+void
+dlgTaskListUsShowModal(OrderedTask** task, bool &task_changed);
 
 /**
  * dialog with task properties needed for American task rules

@@ -27,10 +27,19 @@ Copyright_License {
 class Widget;
 class TaskManagerDialog;
 class OrderedTask;
+class WndForm;
 
+/**
+ * @param dialog.  pointer to TaskManagerDialog if use in that environment
+ * @param active_task
+ * @param task_modified
+ * @param parent_form.  pointer to parent form if used in that environment.
+ *  either dialog or parent_form must be nullptr
+ */
 Widget *
-CreateTaskListPanel(TaskManagerDialog &dialog,
-                    OrderedTask **active_task, bool *task_modified);
+CreateTaskListPanel(TaskManagerDialog *dialog,
+                    OrderedTask **active_task, bool *task_modified,
+                    WndForm *parent_form = nullptr);
 
 /**
  * Mark the previously scanned list of tasks as "dirty".  Before the

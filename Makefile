@@ -269,6 +269,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/TaskPointDialog.cpp \
 	$(SRC)/Dialogs/Task/TaskPointDialogUs.cpp \
 	$(SRC)/Dialogs/Task/TaskPropertiesDialogUs.cpp \
+	$(SRC)/Dialogs/Task/TaskListDialogUs.cpp \
 	$(SRC)/Dialogs/Task/MutateTaskPointDialog.cpp \
 	$(SRC)/Dialogs/Task/dlgTaskHelpers.cpp \
 	$(SRC)/Dialogs/Task/TargetDialog.cpp \

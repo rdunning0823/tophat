@@ -43,6 +43,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
+#include "UIGlobals.hpp"
 
 #include <assert.h>
 #include <windef.h>
@@ -61,9 +62,10 @@ class TaskListPanel final
     RENAME,
     DELETE,
     MORE,
+    CANCEL,
   };
 
-  TaskManagerDialog &dialog;
+  TaskManagerDialog *dialog;
 
   OrderedTask **active_task;
   bool *task_modified;
@@ -78,17 +80,23 @@ class TaskListPanel final
 
   WndButton *more_button;
   TextWidget &summary;
+  /**
+   * pointer to parent form if not used in task manager environment
+   */
+  WndForm *parent_form;
   TwoWidgets *two_widgets;
   ButtonPanelWidget *buttons;
 
 public:
-  TaskListPanel(TaskManagerDialog &_dialog,
+  TaskListPanel(TaskManagerDialog *_dialog,
                 OrderedTask **_active_task, bool *_task_modified,
-                TextWidget &_summary)
+                TextWidget &_summary, WndForm *_parent_form)
     :dialog(_dialog),
      active_task(_active_task), task_modified(_task_modified),
      more(false),
-     summary(_summary)  {}
+     summary(_summary), parent_form(_parent_form)  {
+    assert(dialog == nullptr || parent_form == nullptr);
+  }
 
   void SetTwoWidgets(TwoWidgets &_two_widgets) {
     two_widgets = &_two_widgets;
@@ -99,6 +107,8 @@ public:
   }
 
   void CreateButtons(ButtonPanel &buttons) {
+    if (parent_form != nullptr)
+      buttons.Add(_("Cancel"), *this, CANCEL);
     buttons.Add(_("Load"), *this, LOAD);
     buttons.Add(_("Rename"), *this, RENAME);
     buttons.Add(_("Delete"), *this, DELETE);
@@ -112,6 +122,7 @@ public:
   void RenameTask();
 
   void OnMoreClicked();
+  void OnCancelClicked();
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual void Unprepare() override;
@@ -200,6 +211,10 @@ TaskListPanel::OnAction(int id)
   case MORE:
     OnMoreClicked();
     break;
+
+  case CANCEL:
+    OnCancelClicked();
+    break;
   }
 }
 
@@ -220,10 +235,12 @@ TaskListPanel::RefreshView()
 {
   GetList().SetLength(task_store->Size());
 
-  dialog.InvalidateTaskView();
+  if (dialog != nullptr)
+    dialog->InvalidateTaskView();
 
   OrderedTask* ordered_task = get_cursor_task();
-  dialog.ShowTaskView(ordered_task);
+  if (dialog != nullptr)
+    dialog->ShowTaskView(ordered_task);
 
   if (ordered_task == NULL) {
     summary.SetText(_T(""));
@@ -259,7 +276,10 @@ TaskListPanel::LoadTask()
   RefreshView();
   *task_modified = true;
 
-  dialog.SwitchToEditTab();
+  if (parent_form != nullptr)
+    OnCancelClicked();
+  else
+    dialog->SwitchToEditTab();
 }
 
 void
@@ -352,9 +372,16 @@ TaskListPanel::OnMoreClicked()
 }
 
 void
+TaskListPanel::OnCancelClicked()
+{
+  assert(parent_form != nullptr);
+  parent_form->SetModalResult(ModalResult::mrCancel);
+}
+
+void
 TaskListPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  CreateList(parent, dialog.GetLook(),
+  CreateList(parent, UIGlobals::GetDialogLook(),
              rc, Layout::GetMinimumControlHeight());
 
   CreateButtons(buttons->GetButtonPanel());
@@ -382,7 +409,8 @@ TaskListPanel::Show(const PixelRect &rc)
     task_store->Scan(more);
   }
 
-  dialog.ShowTaskView(get_cursor_task());
+  if (dialog != nullptr)
+    dialog->ShowTaskView(get_cursor_task());
 
   GetList().SetCursorIndex(0); // so Save & Declare are always available
   RefreshView();
@@ -392,18 +420,22 @@ TaskListPanel::Show(const PixelRect &rc)
 void
 TaskListPanel::Hide()
 {
-  dialog.ResetTaskView();
+  if (dialog != nullptr)
+    dialog->ResetTaskView();
 
   ListWidget::Hide();
 }
 
 Widget *
-CreateTaskListPanel(TaskManagerDialog &dialog,
-                    OrderedTask **active_task, bool *task_modified)
+CreateTaskListPanel(TaskManagerDialog *dialog,
+                    OrderedTask **active_task, bool *task_modified,
+                    WndForm *parent_form)
 {
+  assert(dialog == nullptr || parent_form == nullptr);
+
   TextWidget *summary = new TextWidget();
   TaskListPanel *widget = new TaskListPanel(dialog, active_task, task_modified,
-                                            *summary);
+                                            *summary, parent_form);
   TwoWidgets *tw = new TwoWidgets(widget, summary);
   widget->SetTwoWidgets(*tw);
 
