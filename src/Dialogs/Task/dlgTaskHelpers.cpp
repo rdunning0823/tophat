@@ -148,7 +148,8 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
              OrderedTaskFactoryName(task->GetFactoryType()));
   } else {
     if (task->HasTargets())
-      _stprintf(text, _T("%s%s%.0f %s%s%s %.0f %s%s%s %.0f %s (%s) %s"),
+      _stprintf(text, _T("%s. %s%s%.0f %s%s%s %.0f %s%s%s %.0f %s %s"),
+                OrderedTaskFactoryName(task->GetFactoryType()),
                 summary_shape,
                 linebreak,
                 (double)Units::ToUserDistance(stats.distance_nominal),
@@ -161,16 +162,15 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
                 _("min."),
                 (double)Units::ToUserDistance(stats.distance_min),
                 Units::GetDistanceName(),
-                OrderedTaskFactoryName(task->GetFactoryType()),
                 gate_info.c_str());
     else
-      _stprintf(text, _T("%s%s%s %.0f %s (%s) %s"),
+      _stprintf(text, _T("%s. %s%s%s %.0f %s %s"),
+                OrderedTaskFactoryName(task->GetFactoryType()),
                 summary_shape,
                 linebreak,
                 _("dist."),
                 (double)Units::ToUserDistance(stats.distance_nominal),
                 Units::GetDistanceName(),
-                OrderedTaskFactoryName(task->GetFactoryType()),
                 gate_info.c_str());
   }
 }
