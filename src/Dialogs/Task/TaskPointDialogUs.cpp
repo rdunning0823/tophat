@@ -152,6 +152,16 @@ EnableSizeEdit(bool enable)
   SetFormControlEnabled(*wf, _T("prpOZCylinderRadius"), enable);
 }
 
+/**
+ * for AT and MAT tasks, the 1-mile radius is in the description, so hide
+ */
+static void
+ShowSizeEdit(bool visible)
+{
+  ShowFormControl(*wf, _T("prpOZLineLength"), visible);
+  ShowFormControl(*wf, _T("prpOZCylinderRadius"), visible);
+}
+
 static void
 ShowDetails(bool visible)
 {
@@ -302,6 +312,12 @@ RefreshView()
       (active_index != ordered_task->TaskSize() - 1 && active_index != 0));
 
   EnableSizeEdit(!edit_disabled);
+  bool hidden = ((ordered_task->GetFactoryType() == TaskFactoryType::MAT) ||
+      (ordered_task->GetFactoryType() == TaskFactoryType::RACING)) &&
+      (active_index != ordered_task->TaskSize() - 1 && active_index != 0);
+
+  ShowSizeEdit(!hidden);
+
   Refreshing = false; // reactivate onChange routines
 }
 
