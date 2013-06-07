@@ -26,6 +26,8 @@ Copyright_License {
 #include "Engine/Task/Factory/TaskPointFactoryType.hpp"
 #include "Engine/Task/Points/Type.hpp"
 #include "Language/Language.hpp"
+#include "Interface.hpp"
+#include "Engine/Task/TaskBehaviour.hpp"
 #include "Util/Macros.hpp"
 
 #include <assert.h>
@@ -42,13 +44,30 @@ static const TCHAR *const task_factory_names[] = {
   N_("Touring"),
 };
 
+static const TCHAR *const task_factory_names_us[] = {
+  N_("FAI badges/records"),
+  N_("FAI triangle"),
+  N_("FAI out and return"),
+  N_("FAI goal"),
+  N_("AT"),
+  N_("TAT"),
+  N_("MAT"),
+  N_("Mixed"),
+  N_("Touring"),
+};
+
 static_assert(ARRAY_SIZE(task_factory_names) == unsigned(TaskFactoryType::COUNT),
               "Wrong array size");
 
 const TCHAR*
 OrderedTaskFactoryName(TaskFactoryType type)
 {
-  return gettext(task_factory_names[unsigned(type)]);
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  if (tb.contest_nationality == ContestNationalities::AMERICAN)
+    return gettext(task_factory_names_us[unsigned(type)]);
+  else
+    return gettext(task_factory_names[unsigned(type)]);
 }
 
 static const TCHAR *const task_factory_descriptions[] = {
@@ -66,13 +85,31 @@ static const TCHAR *const task_factory_descriptions[] = {
   N_("Casual touring task, uses start and finish cylinders and FAI sector turn points."),
 };
 
+static const TCHAR *const task_factory_descriptions_us[] = {
+  N_("FAI rules, allows only FAI start, finish and turn point types, for badges and "
+     "records.  Enables FAI finish height for final glide calculation."),
+  N_("FAI rules, path from a start to two turn points and return."),
+  N_("FAI rules, path from start to a single turn point and return."),
+  N_("FAI rules, path from start to a goal destination."),
+  N_("Assigned task.  1-mile turn point cylinders.  No minimum time."),
+  N_("Turn area task.  Has cylinders of varying sizes.  Minimum task time applies."),
+  N_("Modified area task.  Task with start, finish and at least one mandatory turnpoint.  Pilot can add additional points as needed.  1-mile cylinders.  Minimum task time applies."),
+  N_("Racing task with a mix of assigned areas and turn points, minimum task time applies."),
+  N_("Casual touring task, uses start and finish cylinders and FAI sector turn points."),
+};
+
 static_assert(ARRAY_SIZE(task_factory_descriptions) == unsigned(TaskFactoryType::COUNT),
               "Wrong array size");
 
 const TCHAR*
 OrderedTaskFactoryDescription(TaskFactoryType type)
 {
-  return gettext(task_factory_descriptions[unsigned(type)]);
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  TaskBehaviour &tb = settings_computer.task;
+  if (tb.contest_nationality == ContestNationalities::AMERICAN)
+    return gettext(task_factory_descriptions_us[unsigned(type)]);
+  else
+    return gettext(task_factory_descriptions[unsigned(type)]);
 }
 
 static const TCHAR *const tp_factory_descriptions[] = {
