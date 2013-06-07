@@ -130,8 +130,9 @@ public:
 
 #ifdef HAVE_DOWNLOAD_MANAGER
   /**
-   * This mutex protects the attributes repository_modified
-   * and repository_failed.
+   * This mutex protects the attributes repository_modified, repository_failed,
+   * the_item.download_status, the_item.downloading and
+   * the_item.failed properies.
    */
   mutable Mutex mutex;
 

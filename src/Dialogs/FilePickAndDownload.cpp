@@ -102,7 +102,9 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
   status_message->SetFont(*look.list.font);
   status_message->SetCaption(_("Downloading list of files"));
 
+  mutex.Lock();
   the_item.Set(_T(""), nullptr, false);
+  mutex.Unlock();
   the_file.Clear();
 
   LoadRepositoryFile();
@@ -188,6 +190,7 @@ ManagedFilePickAndDownloadWidget::RefreshTheItem()
     WideToACPConverter item_name2(the_item.name);
 
     if (StringIsEqual(item_name2, file.name.c_str())) {
+      mutex.Lock();
 
       DownloadStatus download_status = the_item.download_status;
 
@@ -197,13 +200,16 @@ ManagedFilePickAndDownloadWidget::RefreshTheItem()
       the_item.Set(BaseName(path),
                    the_item.downloading ? &download_status : nullptr,
                    the_item.failed);
-
+      mutex.Unlock();
       the_file = remote_file;
     }
   }
 
 #ifdef HAVE_DOWNLOAD_MANAGER
-  if (the_item.downloading && !Timer::IsActive())
+  mutex.Lock();
+  bool downloading = the_item.downloading;
+  mutex.Unlock();
+  if (downloading && !Timer::IsActive())
     Timer::Schedule(1000);
 #endif
 }
@@ -218,6 +224,8 @@ ManagedFilePickAndDownloadWidget::RefreshForm()
 
 
   message.append(the_item.name.c_str());
+
+  mutex.Lock();
 
   if (the_item.downloading || the_item.failed) {
     StaticString<64> status(_T(""));
@@ -254,6 +262,9 @@ ManagedFilePickAndDownloadWidget::RefreshForm()
 
     status_message->SetCaption(message.c_str());
   }
+
+  mutex.Unlock();
+
 }
 
 #ifdef HAVE_DOWNLOAD_MANAGER
@@ -319,7 +330,9 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
     return;
   }
 
+  mutex.Lock();
   the_item.Set(base, nullptr, false);
+  mutex.Unlock();
   picker_state = PickerState::ALREADY_SHOWN;
   Net::DownloadManager::Enqueue(remote_file.GetURI(), base);
 #endif
@@ -331,7 +344,11 @@ ManagedFilePickAndDownloadWidget::Close(bool success)
 #ifdef HAVE_DOWNLOAD_MANAGER
   assert(Net::DownloadManager::IsAvailable());
 
-  if (!the_item.name.empty() && the_item.downloading)
+  mutex.Lock();
+  const bool item_downloading = the_item.downloading;
+  mutex.Unlock();
+
+  if (!the_item.name.empty() && item_downloading)
     Net::DownloadManager::Cancel(the_item.name);
 #endif
   if (!success)
@@ -357,7 +374,12 @@ ManagedFilePickAndDownloadWidget::OnAction(int id)
 void
 ManagedFilePickAndDownloadWidget::OnTimer()
 {
-  if (the_item.downloading) {
+
+  mutex.Lock();
+  bool downloading = the_item.downloading;
+  mutex.Unlock();
+
+  if (downloading) {
     Net::DownloadManager::Enumerate(*this);
     RefreshTheItem();
     RefreshForm();
@@ -379,8 +401,10 @@ ManagedFilePickAndDownloadWidget::OnDownloadAdded(const TCHAR *path_relative,
     return;
 
   if (the_item.name == name) {
+    mutex.Lock();
     the_item.download_status = DownloadStatus{size, position};
     the_item.downloading = true;
+    mutex.Unlock();
   }
 
   SendNotification();
@@ -454,10 +478,15 @@ ManagedFilePickAndDownloadWidget::OnNotification()
     ShowMessageBox(_("Failed to download the repository index."),
                    _("Error"), MB_OK);
 
-  if(the_item.failed)
+  mutex.Lock();
+  const bool item_downloading = the_item.downloading;
+  const bool item_failed = the_item.failed;
+  mutex.Unlock();
+
+  if(item_failed)
     Close(false);
 
-  if (!the_item.failed && !the_item.downloading &&
+  if (!item_failed && !item_downloading &&
       picker_state == PickerState::ALREADY_SHOWN)
     Close(true);
 
