@@ -57,7 +57,6 @@ public:
   UnitsConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
-  void UpdateUnitFields(const UnitSetting &units);
   void PresetCheck();
 
   /* methods from Widget */
@@ -68,20 +67,6 @@ private:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
 };
-
-void
-UnitsConfigPanel::UpdateUnitFields(const UnitSetting &units)
-{
-  LoadValueEnum(UnitsSpeed, units.speed_unit);
-  LoadValueEnum(UnitsDistance, units.distance_unit);
-  LoadValueEnum(UnitsLift, units.vertical_speed_unit);
-  LoadValueEnum(UnitsAltitude, units.altitude_unit);
-  LoadValueEnum(UnitsTemperature, units.temperature_unit);
-  LoadValueEnum(UnitsTaskSpeed, units.task_speed_unit);
-  LoadValueEnum(UnitsPressure, units.pressure_unit);
-
-  // Ignore the coord.format for the preset selection.
-}
 
 void
 UnitsConfigPanel::PresetCheck()
@@ -102,16 +87,7 @@ UnitsConfigPanel::PresetCheck()
 void
 UnitsConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(UnitsPreset, df)) {
-    const DataFieldEnum &dfe = (const DataFieldEnum &)df;
-    int result = dfe.GetValue();
-    if (result > 0) {
-      // First selection means not to load any preset.
-      const UnitSetting &units = Units::Store::Read(result - 1);
-      UpdateUnitFields(units);
-    }
-  } else
-    PresetCheck();
+  PresetCheck();
 }
 
 void
@@ -123,7 +99,7 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  WndProperty *wp = AddEnum(_("Preset"), _("Load a set of units."));
+  WndProperty *wp = AddEnum(_("Preset"), _("Your nationality's units."));
   DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
 
   df.addEnumText(_("Custom"), (unsigned)0, _("My individual set of units."));
@@ -131,8 +107,8 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   for (unsigned i = 0; i < len; i++)
     df.addEnumText(Units::Store::GetName(i), i+1);
 
-  LoadValueEnum(UnitsPreset, Units::Store::EqualsPresetUnits(config));
   wp->GetDataField()->SetListener(this);
+  wp->SetReadOnly(true);
 
   AddSpacer();
   SetExpertRow(spacer_1);
