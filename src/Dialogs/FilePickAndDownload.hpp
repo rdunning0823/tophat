@@ -57,6 +57,7 @@ Copyright_License {
 class WndButton;
 class WndFrame;
 class WidgetDialog;
+class DataFieldEnum;
 
 AvailableFile
 ShowFilePickAndDownload(AvailableFile &file_filter);
@@ -70,12 +71,18 @@ class ManagedFilePickAndDownloadWidget
 #ifdef HAVE_DOWNLOAD_MANAGER
     private Timer, private Net::DownloadListener, private Notify,
 #endif
-    private ActionListener, ListItemRenderer
+    private ActionListener, ListItemRenderer, DataFieldListener
 {
 
 public:
   enum Controls {
-    HEADER_TEXT,
+    HEADER_TEXT = 0,
+    AREA_FILTER,
+    SUBAREA_FILTER,
+  };
+
+  enum Buttons {
+    SEARCH_BUTTON = 100,
   };
 
   struct DownloadStatus {
@@ -124,7 +131,15 @@ public:
   UPixelScalar font_height;
 
   WndButton *close_button;
+  WndButton *search_button;
   WndFrame *status_message;
+  DataFieldEnum *area_filter;
+  DataFieldEnum *subarea_filter;
+  /**
+   * pointer to the property behind the area_filter datafield
+   */
+  WndProperty *wp_area_filter;
+  WndProperty *wp_subarea_filter;
 
   FileRepository repository;
 
@@ -155,6 +170,17 @@ public:
   AvailableFile the_file;
 
   FileItem the_item;
+
+  /**
+   * a vector holding the list of areas for the repository
+   */
+  std::vector<std::string> area_vector;
+
+  /**
+   * a vector holding the list of areas for the repository or a
+   * subset of the repository if an optional area filter exists
+   */
+  std::vector<std::string> subarea_vector;
 
   /**
    * uses the type and area properties to filter the files shown for selection
@@ -195,10 +221,42 @@ public:
 
   void PromptAndAdd();
 
+  /**
+   * loads the area_vector property with a sorted list of areas
+   * of all the items in the repository
+   * @param repository
+   */
+  void BuildAreaFilter(FileRepository &repository);
+
+  /**
+   * loads subarea_vector property with a sorted list of sub areas
+   * of items in the repository based on the area_filter
+   * @param repository
+   * @param area_filter. the filter used on the repository
+   */
+  void BuildSubAreaFilter(FileRepository &repository, const char *area_filter);
+
 protected:
   void LoadRepositoryFile();
+
+  /**
+   * replaces all the cryptic area names from the XCSoar repository items
+   * with readable ones
+   * Should be called before the filters are built from the repository
+   */
+  void EnhanceAreaNames();
   void RefreshForm();
   void RefreshTheItem();
+
+  /**
+   * shows or hides the Filter page
+   */
+  void SetFilterVisible(bool visible);
+
+  /**
+   * @return. true if the Filter page is visible
+   */
+  bool IsFilterVisible();
 
   /**
    * @param success. true if the files was successfully downloaded
@@ -232,9 +290,13 @@ public:
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
+  virtual void Show(const PixelRect &rc) override;
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
+
+  /* methods from DataFieldListener */
+  virtual void OnModified(DataField &df);
 
 #ifdef HAVE_DOWNLOAD_MANAGER
   /* virtual methods from class Timer */

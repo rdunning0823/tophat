@@ -29,6 +29,7 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Form.hpp"
+#include "Form/DataField/Enum.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Canvas.hpp"
 #include "Language/Language.hpp"
@@ -44,6 +45,9 @@ Copyright_License {
 #include "Android/Main.hpp"
 #endif
 
+#ifdef HAVE_DOWNLOAD_MANAGER
+#include <map>
+#endif
 
 #include <assert.h>
 #include <windef.h> /* for MAX_PATH */
@@ -73,7 +77,14 @@ void
 ManagedFilePickAndDownloadWidget::CreateButtons(WidgetDialog &dialog)
 {
   close_button = dialog.AddButton(_("Cancel"), *this, mrCancel);
+  search_button = dialog.AddButton(_("Search"), *this, SEARCH_BUTTON);
   parent_widget_dialog = &dialog;
+}
+
+void
+ManagedFilePickAndDownloadWidget::Show(const PixelRect &rc){
+  RowFormWidget::Show(rc);
+  SetFilterVisible(false);
 }
 
 void
@@ -102,11 +113,23 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
   status_message->SetFont(*look.list.font);
   status_message->SetCaption(_("Downloading list of files"));
 
+  wp_area_filter = AddEnum(_("Continent or Country"),
+                            _("The country or continent where you are flying"),
+                            this);
+  area_filter = (DataFieldEnum*)wp_area_filter->GetDataField();
+
+  wp_subarea_filter = AddEnum(_("State"),
+                              _("The state or country where you are flying"),
+                              this);
+  subarea_filter = (DataFieldEnum*)wp_subarea_filter->GetDataField();
+
   mutex.Lock();
   the_item.Set(_T(""), nullptr, false);
   mutex.Unlock();
   the_file.Clear();
 
+  SetFilterVisible(false);
+  assert(!IsFilterVisible());
   LoadRepositoryFile();
   RefreshForm();
 
@@ -154,6 +177,57 @@ ManagedFilePickAndDownloadWidget::LoadRepositoryFile()
     return;
 
   ParseFileRepository(repository, reader);
+  if (file_filter.type == AvailableFile::Type::MAP)
+    EnhanceAreaNames();
+}
+
+
+void
+ManagedFilePickAndDownloadWidget::EnhanceAreaNames()
+{
+  std::map<std::string, AvailableFile > area_map;
+
+  area_map["alps"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Alps"), AvailableFile::Type::UNKNOWN};
+  area_map["na"] = AvailableFile {"", "", "", NarrowString<25ul>("Africa"), NarrowString<25ul>("Namibia"), AvailableFile::Type::UNKNOWN};
+  area_map["za"] = AvailableFile {"", "", "", NarrowString<25ul>("Africa"), NarrowString<25ul>("South Africa"), AvailableFile::Type::UNKNOWN};
+  area_map["au"] = AvailableFile {"", "", "", NarrowString<25ul>("Australia"), NarrowString<25ul>("Australia"), AvailableFile::Type::UNKNOWN};
+  area_map["ca"] = AvailableFile {"", "", "", NarrowString<25ul>("Canada"), NarrowString<25ul>("Canada"), AvailableFile::Type::UNKNOWN};
+  area_map["alps"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Alps"), AvailableFile::Type::UNKNOWN};
+  area_map["cz_sk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Czech Republic"), AvailableFile::Type::UNKNOWN};
+  area_map["fi"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Finland"), AvailableFile::Type::UNKNOWN};
+  area_map["fr"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("France"), AvailableFile::Type::UNKNOWN};
+  area_map["de"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Germany"), AvailableFile::Type::UNKNOWN};
+  area_map["hu"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Hungary"), AvailableFile::Type::UNKNOWN};
+  area_map["ie"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Ireland"), AvailableFile::Type::UNKNOWN};
+  area_map["il"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Israel"), AvailableFile::Type::UNKNOWN};
+  area_map["it"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Italy"), AvailableFile::Type::UNKNOWN};
+  area_map["benelux"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Netherlands"), AvailableFile::Type::UNKNOWN};
+  area_map["nl"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Netherlands"), AvailableFile::Type::UNKNOWN};
+  area_map["no"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Norway"), AvailableFile::Type::UNKNOWN};
+  area_map["pl"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Poland"), AvailableFile::Type::UNKNOWN};
+  area_map["pt"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Portugal"), AvailableFile::Type::UNKNOWN};
+  area_map["es"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Spain"), AvailableFile::Type::UNKNOWN};
+  area_map["se"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Sweden"), AvailableFile::Type::UNKNOWN};
+  area_map["uk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("United Kingdom"), AvailableFile::Type::UNKNOWN};
+  area_map["jp"] = AvailableFile {"", "", "", NarrowString<25ul>("Japan"), NarrowString<25ul>("Japan"), AvailableFile::Type::UNKNOWN};
+  area_map["mx"] = AvailableFile {"", "", "", NarrowString<25ul>("Mexico"), NarrowString<25ul>("Central America"), AvailableFile::Type::UNKNOWN};
+  area_map["nz"] = AvailableFile {"", "", "", NarrowString<25ul>("New Zealand"), NarrowString<25ul>("New Zealand"), AvailableFile::Type::UNKNOWN};
+  area_map["ar"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Argentina"), AvailableFile::Type::UNKNOWN};
+  area_map["br"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Brazil"), AvailableFile::Type::UNKNOWN};
+  area_map["cl"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Chile"), AvailableFile::Type::UNKNOWN};
+  area_map["co"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Colombia"), AvailableFile::Type::UNKNOWN};
+  area_map["us"] = AvailableFile {"", "", "", NarrowString<25ul>("United States"), NarrowString<25ul>("United States"), AvailableFile::Type::UNKNOWN};
+
+  for (auto i = repository.begin1(), end = repository.end1(); i != end; ++i) {
+    AvailableFile &repo_file = *i;
+
+    auto j = area_map.find(repo_file.area.c_str());
+    if (j != area_map.end()) {
+      AvailableFile area_file = j->second;
+      repo_file.area = area_file.area;
+      repo_file.subarea = area_file.subarea;
+    }
+  }
 }
 
 const char*
@@ -215,13 +289,37 @@ ManagedFilePickAndDownloadWidget::RefreshTheItem()
 }
 
 void
+ManagedFilePickAndDownloadWidget::SetFilterVisible(bool visible)
+{
+  assert(wp_area_filter != nullptr);
+  if (wp_area_filter == nullptr)
+    return;
+
+  wp_area_filter->SetVisible(visible);
+  wp_subarea_filter->SetVisible(visible && subarea_filter->Count() > 1);
+  search_button->SetVisible(visible);
+
+  if (visible)
+    status_message->SetCaption(_("Where will you be flying?"));
+}
+
+bool
+ManagedFilePickAndDownloadWidget::IsFilterVisible()
+{
+  assert(wp_area_filter != nullptr);
+  if (wp_area_filter == nullptr)
+    return false;
+
+  return wp_area_filter->IsVisible();
+}
+
+void
 ManagedFilePickAndDownloadWidget::RefreshForm()
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
   const Font& font = *look.list.font;
   StaticString<512> message(_T(""));
   UPixelScalar frame_width = status_message->GetWidth();
-
 
   message.append(the_item.name.c_str());
 
@@ -252,9 +350,10 @@ ManagedFilePickAndDownloadWidget::RefreshForm()
     UPixelScalar text_width = name_size.cx + status_size.cx + space_size.cx;
 
     if (frame_width >= text_width) {
-      unsigned spaces_needed = (frame_width - text_width) / space_size.cx;
+      unsigned spaces_needed = (frame_width - text_width) / space_size.cx - 1;
       StaticString<100> spaces (_T("                                                                                                    "));
-      spaces.Truncate(spaces_needed);
+      if (spaces_needed < spaces.length())
+        spaces.Truncate(spaces_needed);
       message.AppendFormat(_T("%s%s\n%s"),spaces.c_str(), status.c_str(),
                            the_item.size.c_str());
     } else
@@ -290,6 +389,76 @@ ManagedFilePickAndDownloadWidget::OnPaintItem(Canvas &canvas,
 #endif
 
 void
+ManagedFilePickAndDownloadWidget::BuildAreaFilter(FileRepository &repository)
+{
+  assert(area_filter->Count() == 0);
+
+  std::map<std::string, int> area_map;
+  area_vector.clear();
+  for (auto i = repository.begin(), end = repository.end(); i != end; ++i) {
+    const AvailableFile &remote_file = *i;
+    std::string temp = remote_file.GetArea();
+    if (area_map.find(temp) == area_map.end()) {
+      area_map.insert(std::pair<std::string, int>(temp,0));
+      area_vector.push_back(temp);
+    }
+  }
+
+  unsigned id = 0;
+  for (auto i = area_vector.begin(), end = area_vector.end(); i != end; ++i) {
+    std::string t1 = (std::string)(*i);
+    ACPToWideConverter base(t1.c_str());
+    StaticString<100> t2(base);
+    area_filter->AddChoice(id++, t2.c_str(), t2.c_str());
+  }
+  area_filter->Sort(0);
+  area_filter->SetAsInteger(0);
+  wp_area_filter->RefreshDisplay();
+  OnModified(*area_filter);
+  SetFilterVisible(true);
+}
+
+void
+ManagedFilePickAndDownloadWidget::BuildSubAreaFilter(FileRepository &repository,
+                                                     const char *area_filter)
+{
+  std::map<std::string, int> subarea_map;
+  subarea_vector.clear();
+  for (auto i = repository.begin(), end = repository.end(); i != end; ++i) {
+    const AvailableFile &remote_file = *i;
+    std::string area = remote_file.GetArea();
+
+    if ((area_filter == nullptr) || (area == area_filter)) {
+      std::string subarea = remote_file.GetSubArea();
+      if (subarea_map.find(subarea) == subarea_map.end()) {
+        subarea_map.insert(std::pair<std::string, int>(subarea,0));
+        subarea_vector.push_back(subarea);
+      }
+    }
+  }
+
+  // sort vector instead of datafield so IDs of enums are in order
+  sort(subarea_vector.begin(), subarea_vector.end(), [](std::string const& a,
+       std::string const& b)
+  {
+      return a < b;
+  });
+
+  unsigned id = 0;
+  for (auto i = subarea_vector.begin(), end = subarea_vector.end(); i != end; ++i) {
+    std::string t1 = (std::string)(*i);
+    ACPToWideConverter base(t1.c_str());
+    StaticString<100> t2(base);
+    if (id >= subarea_filter->Count())
+      subarea_filter->AddChoice(id++, t2.c_str(), t2.c_str());
+    else
+      subarea_filter->replaceEnumText(id++, t2.c_str());
+  }
+  subarea_filter->Truncate(id);
+  subarea_filter->SetAsInteger(0);
+}
+
+void
 ManagedFilePickAndDownloadWidget::PromptAndAdd()
 {
   picker_state = PickerState::VISIBLE;
@@ -301,6 +470,8 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
   for (auto i = repository.begin(), end = repository.end(); i != end; ++i) {
     const AvailableFile &remote_file = *i;
     if ((file_filter.area.empty() || (remote_file.area == file_filter.area)) &&
+        (file_filter.subarea.empty() || (remote_file.subarea
+            == file_filter.subarea)) &&
         (file_filter.type == AvailableFile::Type::UNKNOWN ||
             (file_filter.type == remote_file.type)))
       list.push_back(remote_file);
@@ -310,6 +481,12 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
     picker_state = PickerState::INVALID;
     return;
   }
+
+  sort(list.begin(), list.end(), [](AvailableFile const& a, AvailableFile const& b)
+  {
+      return a.display_name < b.display_name;
+  });
+
   add_list = &list;
   int i = ListPicker(_("Select a file"),
                      list.size(), 0, Layout::FastScale(18),
@@ -363,8 +540,43 @@ ManagedFilePickAndDownloadWidget::OnAction(int id)
   switch (id) {
   case mrCancel:
     Close(false);
-    parent_widget_dialog->OnAction(mrCancel);
     break;
+
+  case SEARCH_BUTTON:
+    SetFilterVisible(false);
+    PromptAndAdd();
+    SetFilterVisible(picker_state == PickerState::CANCELLED);
+    break;
+  }
+}
+
+void
+ManagedFilePickAndDownloadWidget::OnModified(DataField &df)
+{
+  if (IsDataField(AREA_FILTER, df)) {
+    DataFieldEnum *dff = (DataFieldEnum*)&df;
+
+    file_filter.area.clear();
+    if (dff->GetAsDisplayString() != nullptr) {
+      WideToACPConverter disp_string(dff->GetAsDisplayString());
+      file_filter.area = disp_string;
+    }
+
+    BuildSubAreaFilter(repository, file_filter.area.c_str());
+    if (subarea_filter->Count() > 0) {
+      subarea_filter->Set((unsigned)0);
+      wp_subarea_filter->RefreshDisplay();
+    }
+    wp_subarea_filter->SetVisible(subarea_filter->Count() > 1);
+    OnModified(*subarea_filter);
+
+  } else if (IsDataField(SUBAREA_FILTER, df)) {
+    DataFieldEnum *dff = (DataFieldEnum*)&df;
+    file_filter.subarea.clear();
+    if (dff->GetAsDisplayString() != nullptr) {
+      WideToACPConverter disp_string(dff->GetAsDisplayString());
+      file_filter.subarea = disp_string;
+    }
   }
 }
 
@@ -374,7 +586,6 @@ ManagedFilePickAndDownloadWidget::OnAction(int id)
 void
 ManagedFilePickAndDownloadWidget::OnTimer()
 {
-
   mutex.Lock();
   bool downloading = the_item.downloading;
   mutex.Unlock();
@@ -454,21 +665,8 @@ ManagedFilePickAndDownloadWidget::OnNotification()
 
   if (repository_modified2) {
     LoadRepositoryFile();
-
-      switch (picker_state) {
-      case NOT_YET_SHOWN:
-        PromptAndAdd();
-        break;
-      case VISIBLE:
-        break;
-
-      case ALREADY_SHOWN:
-        assert(false);
-        break;
-      case INVALID:
-      case CANCELLED:
-        break;
-    }
+    BuildAreaFilter(repository);
+    SetFilterVisible(true);
   }
 
   RefreshTheItem();
