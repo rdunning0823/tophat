@@ -25,8 +25,9 @@ Copyright_License {
 #define XCSOAR_DIALOGS_FILE_PICK_AND_DOWNLOAD_HPP
 
 #include "Repository/AvailableFile.hpp"
-#include "Widget/Widget.hpp"
-#include "Form/Form.hpp"
+#include "Widget/RowFormWidget.hpp"
+#include "Form/DataField/Listener.hpp"
+#include "Form/ActionListener.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Time/BrokenDateTime.hpp"
 #include "LocalPath.hpp"
@@ -55,15 +56,7 @@ Copyright_License {
 
 class WndButton;
 class WndFrame;
-
-static WindowStyle
-GetDialogStyle()
-{
-  WindowStyle style;
-  style.Hide();
-  style.ControlParent();
-  return style;
-}
+class WidgetDialog;
 
 AvailableFile
 ShowFilePickAndDownload(AvailableFile &file_filter);
@@ -73,13 +66,16 @@ ShowFilePickAndDownload(AvailableFile &file_filter);
  * download it.
  */
 class ManagedFilePickAndDownloadWidget
-  : public NullWidget, public WndForm
+  : public RowFormWidget,
 #ifdef HAVE_DOWNLOAD_MANAGER
-    , private Timer, private Net::DownloadListener, private Notify, ListItemRenderer
+    private Timer, private Net::DownloadListener, private Notify,
 #endif
+    private ActionListener, ListItemRenderer
 {
-  enum Buttons {
-    CLOSE,
+
+public:
+  enum Controls {
+    HEADER_TEXT,
   };
 
   struct DownloadStatus {
@@ -198,11 +194,14 @@ class ManagedFilePickAndDownloadWidget
    */
   bool repository_loaded;
 
+  /**
+   * pointer to the parent widget dialog so we can close it as needed
+   */
+  WidgetDialog *parent_widget_dialog;
+
 public:
   ManagedFilePickAndDownloadWidget(AvailableFile& _file_filter)
-    :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
-             UIGlobals::GetMainWindow().GetClientRect(),
-             _T(""), GetDialogStyle()),
+    :RowFormWidget(UIGlobals::GetDialogLook()),
              file_filter(_file_filter),
              picker_state(PickerState::NOT_YET_SHOWN)
   {}
@@ -211,14 +210,7 @@ public:
 
 protected:
   gcc_pure
-  bool IsDownloading(const char *name) const {
-#ifdef HAVE_DOWNLOAD_MANAGER
-    ScopeLock protect(mutex);
-    return downloads.find(name) != downloads.end();
-#else
-    return false;
-#endif
-  }
+  bool IsDownloading(const char *name) const;
 
   gcc_pure
   bool IsDownloading(const AvailableFile &file) const {
@@ -226,19 +218,7 @@ protected:
   }
 
   gcc_pure
-  bool IsDownloading(const char *name, DownloadStatus &status_r) const {
-#ifdef HAVE_DOWNLOAD_MANAGER
-    ScopeLock protect(mutex);
-    auto i = downloads.find(name);
-    if (i == downloads.end())
-      return false;
-
-    status_r = i->second;
-    return true;
-#else
-    return false;
-#endif
-  }
+  bool IsDownloading(const char *name, DownloadStatus &status_r) const;
 
   gcc_pure
   bool IsDownloading(const AvailableFile &file,
@@ -247,14 +227,7 @@ protected:
   }
 
   gcc_pure
-  bool HasFailed(const char *name) const {
-#ifdef HAVE_DOWNLOAD_MANAGER
-    ScopeLock protect(mutex);
-    return failures.find(name) != failures.end();
-#else
-    return false;
-#endif
-  }
+  bool HasFailed(const char *name) const;
 
   gcc_pure
   bool HasFailed(const AvailableFile &file) const {
@@ -270,21 +243,30 @@ protected:
 
   /**
    * @param success. true if the files was successfully downloaded
+   * Cancels the download manager and sets the the_item state accordingly
+   * And closes the dialog
    */
   void Close(bool success);
 
 public:
+  /**
+   * creates buttons with form as listener as necessary
+   */
+  void CreateButtons(WidgetDialog &dialog);
   /**
    * returns a copy of the struct with the file information
    * or cleared struct if error or cancel
    */
   AvailableFile GetResult();
 
+  /**
+   * return. string in singular describing filter type for files
+   */
+  const TCHAR * GetTypeFilterName() const;
+
   /* virtual methods from class Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual void Unprepare() override;
-  virtual void Hide() {};
-  virtual void Show(const PixelRect &rc) {};
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;

@@ -50,6 +50,8 @@ Copyright_License {
 
 #define REPOSITORY_URI "http://download.xcsoar.org/repository"
 
+static ManagedFilePickAndDownloadWidget *instance;
+
 static bool
 LocalPath(TCHAR *buffer, const AvailableFile &file)
 {
@@ -68,43 +70,37 @@ ManagedFilePickAndDownloadWidget::GetResult()
 }
 
 void
+ManagedFilePickAndDownloadWidget::CreateButtons(WidgetDialog &dialog)
+{
+  close_button = dialog.AddButton(_("Cancel"), *this, mrCancel);
+  parent_widget_dialog = &dialog;
+}
+
+void
 ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  SetCaption(_("Download files from internet"));
-
+  RowFormWidget::Prepare(parent, rc);
   const DialogLook &look = UIGlobals::GetDialogLook();
-  UPixelScalar margin = Layout::Scale(2);
   font_height = look.list.font->GetHeight();
 
+  UPixelScalar margin = Layout::Scale(2);
   UPixelScalar height = std::max(unsigned(3 * margin + 2 * font_height),
                                  Layout::GetMaximumControlHeight());
 
   PixelRect rc_status = rc;
   rc_status.left += Layout::Scale(2);
   rc_status.right -= Layout::Scale(2);
-  rc_status.top = height;
   rc_status.bottom = rc_status.top + height;
 
   WindowStyle style_frame;
   style_frame.Border();
-  status_message = new WndFrame(GetClientAreaWindow(), look,
+
+  status_message = new WndFrame(*(ContainerWindow*)RowFormWidget::GetWindow(), look,
                                 rc_status,
                                 style_frame);
+  RowFormWidget::Add(status_message);
   status_message->SetFont(*look.list.font);
   status_message->SetCaption(_("Downloading list of files"));
-
-  PixelRect rc_close = rc;
-  rc_close.left += Layout::Scale(2);
-  rc_close.right -= Layout::Scale(2);
-  rc_close.top = (rc_close.top + rc_close.bottom) / 2;
-  rc_close.bottom = rc_close.top + Layout::Scale(35);
-
-  ButtonWindowStyle button_style;
-  button_style.TabStop();
-  button_style.multiline();
-  close_button = new WndButton(GetClientAreaWindow(), look, _T("Cancel"),
-                               rc_close,
-                               button_style, *this, CLOSE);
 
   the_item.Set(_T(""), nullptr, false);
   the_file.Clear();
@@ -134,8 +130,7 @@ ManagedFilePickAndDownloadWidget::Unprepare()
   ClearNotification();
 #endif
 
-  delete status_message;
-  delete close_button;
+  //delete status_message;
 }
 
 void
@@ -245,8 +240,8 @@ static const std::vector<AvailableFile> *add_list;
 
 void
 ManagedFilePickAndDownloadWidget::OnPaintItem(Canvas &canvas,
-                                                 const PixelRect rc,
-                                                 unsigned i)
+                                              const PixelRect rc,
+                                              unsigned i)
 {
 
   assert(add_list != NULL);
@@ -260,6 +255,44 @@ ManagedFilePickAndDownloadWidget::OnPaintItem(Canvas &canvas,
 }
 
 #endif
+
+bool
+ManagedFilePickAndDownloadWidget::IsDownloading(const char *name) const
+{
+#ifdef HAVE_DOWNLOAD_MANAGER
+  ScopeLock protect(mutex);
+  return downloads.find(name) != downloads.end();
+#else
+  return false;
+#endif
+}
+
+bool
+ManagedFilePickAndDownloadWidget::IsDownloading(const char *name, DownloadStatus &status_r) const
+{
+#ifdef HAVE_DOWNLOAD_MANAGER
+  ScopeLock protect(mutex);
+  auto i = downloads.find(name);
+  if (i == downloads.end())
+    return false;
+
+  status_r = i->second;
+  return true;
+#else
+  return false;
+#endif
+}
+
+bool
+ManagedFilePickAndDownloadWidget::HasFailed(const char *name) const
+{
+#ifdef HAVE_DOWNLOAD_MANAGER
+  ScopeLock protect(mutex);
+  return failures.find(name) != failures.end();
+#else
+  return false;
+#endif
+}
 
 void
 ManagedFilePickAndDownloadWidget::PromptAndAdd()
@@ -314,22 +347,22 @@ ManagedFilePickAndDownloadWidget::Close(bool success)
 #ifdef HAVE_DOWNLOAD_MANAGER
   assert(Net::DownloadManager::IsAvailable());
 
-  if (!the_item.name.empty())
+  if (!the_item.name.empty() && the_item.downloading)
     Net::DownloadManager::Cancel(the_item.name);
 #endif
   if (!success)
     the_file.Clear();
 
-  WndForm::SetModalResult(mrOK);
+  parent_widget_dialog->OnAction(mrCancel);
 }
 
 void
 ManagedFilePickAndDownloadWidget::OnAction(int id)
 {
   switch (id) {
-
-  case CLOSE:
+  case mrCancel:
     Close(false);
+    parent_widget_dialog->OnAction(mrCancel);
     break;
   }
 }
@@ -405,7 +438,6 @@ ManagedFilePickAndDownloadWidget::OnDownloadComplete(const TCHAR *path_relative,
       the_item.failed = !success;
       the_item.downloading = false;
     }
-
   }
 
   mutex.Unlock();
@@ -461,21 +493,44 @@ ManagedFilePickAndDownloadWidget::OnNotification()
     Close(false);
 }
 
+const TCHAR *
+ManagedFilePickAndDownloadWidget::GetTypeFilterName() const
+{
+  switch (file_filter.type) {
+  case AvailableFile::Type::UNKNOWN:
+    return _("all");
+  case AvailableFile::Type::AIRSPACE:
+    return _("airspace");
+  case AvailableFile::Type::WAYPOINT:
+    return _("waypoint");
+  case AvailableFile::Type::MAP:
+    return _("map");
+  case AvailableFile::Type::FLARMNET:
+    return _("FlarmNet ");
+  }
+  return _("");
+}
+
 static AvailableFile
 ShowFilePickAndDownload2(AvailableFile &file_filter)
 {
-  ManagedFilePickAndDownloadWidget widget(file_filter);
 
-  ContainerWindow &w = UIGlobals::GetMainWindow();
-  widget.Initialise(w, w.GetClientRect());
-  widget.Prepare(w, w.GetClientRect());
-  widget.ShowModal();
-  widget.Hide();
-  widget.Unprepare();
+  instance = new ManagedFilePickAndDownloadWidget(file_filter);
 
-  AvailableFile result = widget.GetResult();
-  return result;
+  StaticString<50> title;
+  title.Format(_T("%s %ss"), _("Download"), instance->GetTypeFilterName());
+
+  ButtonPanel::ButtonPanelPosition position = ButtonPanel::ButtonPanelPosition::Bottom;
+  WidgetDialog dialog(UIGlobals::GetDialogLook());
+
+  dialog.CreateFull(UIGlobals::GetMainWindow(), title.c_str(), instance, nullptr, 0, position);
+
+  instance->CreateButtons(dialog);
+  dialog.ShowModal();
+
+  return instance->GetResult();
 }
+
 
 #endif
 
