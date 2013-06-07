@@ -636,6 +636,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Audio/Settings.cpp \
 	$(SRC)/Audio/VarioSettings.cpp \
 	$(SRC)/Computer/Settings.cpp \
+	$(SRC)/FilePickAndDownloadSettings.cpp \
 	$(SRC)/MergeThread.cpp \
 	$(SRC)/CalculationThread.cpp \
 	$(SRC)/DisplayMode.cpp \

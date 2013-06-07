@@ -266,4 +266,6 @@ const char VarioDeadBandMax[] = "VarioDeadBandMax";
 
 const char PagesDistinctZoom[] = "PagesDistinctZoom";
 
+const char FilePickAndDownloadAreaFilter[] = "FilePickAndDownloadAreaFilter";
+const char FilePickAndDownloadSubAreaFilter[] = "FilePickAndDownloadSubAreaFilter";
 }

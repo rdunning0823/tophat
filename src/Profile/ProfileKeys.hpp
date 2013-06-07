@@ -262,6 +262,9 @@ extern const char VarioDeadBandMax[];
 
 extern const char PagesDistinctZoom[];
 
+extern const char FilePickAndDownloadAreaFilter[];
+extern const char FilePickAndDownloadSubAreaFilter[];
+
 }
 
 #endif

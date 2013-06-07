@@ -37,6 +37,7 @@ Copyright_License {
 #include "Logger/Settings.hpp"
 #include "Airspace/AirspaceComputerSettings.hpp"
 #include "TeamCode/Settings.hpp"
+#include "FilePickAndDownloadSettings.hpp"
 #include "Plane/Plane.hpp"
 #include "Wind/Settings.hpp"
 #include "Audio/VegaVoiceSettings.hpp"
@@ -167,6 +168,10 @@ struct ComputerSettings {
   PolarSettings polar;
 
   TeamCodeSettings team_code;
+  /**
+   * settings for defaults for the FilePickAndDownload dialog
+   */
+  FilePickAndDownloadSettings file_pick_and_download;
 
   VoiceSettings voice;
 

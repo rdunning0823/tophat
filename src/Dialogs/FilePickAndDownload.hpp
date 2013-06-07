@@ -291,6 +291,7 @@ public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc) override;
+  virtual bool Save(bool &changed);
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;

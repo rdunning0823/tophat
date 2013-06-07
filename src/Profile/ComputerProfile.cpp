@@ -34,6 +34,7 @@ namespace Profile {
   static void Load(PolarSettings &settings);
   static void Load(LoggerSettings &settings);
   static void Load(TeamCodeSettings &settings);
+  static void Load(FilePickAndDownloadSettings &settings);
   static void Load(VoiceSettings &settings);
   static void Load(PlacesOfInterestSettings &settings);
   static void Load(FeaturesSettings &settings);
@@ -79,6 +80,13 @@ void
 Profile::Load(TeamCodeSettings &settings)
 {
   Get(ProfileKeys::TeamcodeRefWaypoint, settings.team_code_reference_waypoint);
+}
+
+void
+Profile::Load(FilePickAndDownloadSettings &settings)
+{
+  Get(ProfileKeys::FilePickAndDownloadAreaFilter, settings.area_filter);
+  Get(ProfileKeys::FilePickAndDownloadSubAreaFilter, settings.subarea_filter);
 }
 
 void
@@ -150,6 +158,7 @@ Profile::Load(ComputerSettings &settings)
   Load(settings.wind);
   Load(settings.polar);
   Load(settings.team_code);
+  Load(settings.file_pick_and_download);
   Load(settings.voice);
   Load(settings.poi);
   Load(settings.features);
