@@ -49,9 +49,9 @@ static const TCHAR *const task_factory_names_us[] = {
   N_("FAI triangle"),
   N_("FAI out and return"),
   N_("FAI goal"),
-  N_("AT"),
-  N_("TAT"),
-  N_("MAT"),
+  N_("AT - Assigned task"),
+  N_("TAT - Turn area task"),
+  N_("MAT - Modified area task"),
   N_("Mixed"),
   N_("Touring"),
 };
