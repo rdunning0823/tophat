@@ -355,7 +355,8 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   const bool last_finished = stats.task_finished;
 
   const int t_min = std::max(0, (int)active_task_point - 1);
-  const int t_max = std::min(n_task - 1, (int)active_task_point);
+  const int t_max_active = std::max(active_task_point, GetLastIntermediateAchieved() + 1);
+  const int t_max = std::min(n_task - 1, (int)t_max_active);
   bool full_update = false;
 
   for (int i = t_min; i <= t_max; i++) {
