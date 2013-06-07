@@ -46,7 +46,6 @@ static constexpr LegalPointSet aat_start_types{
  * valid AAT start types for US rules
  */
 static constexpr LegalPointSet aat_start_types_us{
-  TaskPointFactoryType::START_LINE,
   TaskPointFactoryType::START_CYLINDER,
 };
 
@@ -92,10 +91,10 @@ AATTaskFactoryUs::GetMutatedPointType(const OrderedTaskPoint &tp) const
   TaskPointFactoryType newtype = oldtype;
 
   switch (oldtype) {
-  case TaskPointFactoryType::START_LINE:
   case TaskPointFactoryType::START_CYLINDER:
     break;
 
+  case TaskPointFactoryType::START_LINE:
   case TaskPointFactoryType::START_SECTOR:
   case TaskPointFactoryType::START_BGA:
     newtype = TaskPointFactoryType::START_CYLINDER;
