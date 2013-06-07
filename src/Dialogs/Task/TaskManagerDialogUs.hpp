@@ -135,6 +135,12 @@ public:
   virtual void Show(const PixelRect &rc) {};
   virtual void Hide() {};
 
+  virtual bool Save(bool &changed);
+
+  /**
+   * prompts pilot to declare to any attached loggers
+   */
+  void Declare();
   /**
    * from ActionListener (WndForm)
    */

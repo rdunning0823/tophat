@@ -130,6 +130,20 @@ ExternalLogger::Declare(const Declaration &decl, const Waypoint *home)
                 _("Declare task"), MB_OK | MB_ICONINFORMATION);
 }
 
+unsigned
+ExternalLogger::LoggerAttachedCount()
+{
+  unsigned count = 0;
+  for (unsigned i = 0; i < NUMDEV; ++i) {
+    DeviceDescriptor &device = *device_list[i];
+
+    if (device.CanDeclare() && device.IsAlive())
+      ++count;
+  }
+  return count;
+}
+
+
 class ReadFlightListJob : public Job {
   DeviceDescriptor &device;
   RecordedFlightList &flight_list;

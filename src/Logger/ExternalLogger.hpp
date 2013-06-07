@@ -32,6 +32,11 @@ namespace ExternalLogger {
   void Declare(const Declaration &decl, const Waypoint *home);
 
   /**
+   * returns count of attached and active loggers
+   */
+  unsigned LoggerAttachedCount();
+
+  /**
    * Caller is responsible for calling DeviceDescriptor::Borrow() and
    * DeviceDescriptor::Return().
    */
