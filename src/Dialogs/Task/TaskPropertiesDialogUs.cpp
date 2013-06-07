@@ -46,10 +46,10 @@ Copyright_License {
 #include "Screen/SingleWindow.hpp"
 
 enum Controls {
+  TASK_TYPE,
   MIN_TIME,
   START_MAX_HEIGHT,
   FINISH_MIN_HEIGHT,
-  TASK_TYPE,
 };
 
 /**
@@ -187,6 +187,20 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   TaskBehaviour &tb = settings_computer.task;
   bool us_rules = tb.contest_nationality == ContestNationalities::AMERICAN;
 
+  DataFieldEnum *dfe = new DataFieldEnum(NULL);
+  dfe->SetListener(this);
+  dfe->EnableItemHelp(true);
+  const std::vector<TaskFactoryType> factory_types =
+    ordered_task->GetFactoryTypes();
+  for (unsigned i = 0; i < factory_types.size(); i++) {
+    dfe->addEnumText(OrderedTaskFactoryName(factory_types[i]),
+                     (unsigned)factory_types[i],
+                     OrderedTaskFactoryDescription(factory_types[i]));
+    if (factory_types[i] == ordered_task->GetFactoryType())
+      dfe->Set((unsigned)factory_types[i]);
+  }
+  Add(_("Task type"), _("Sets the behavior for the current task."), dfe);
+
   AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
           0, 36000, 60, 180);
 
@@ -213,20 +227,6 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
-
-  DataFieldEnum *dfe = new DataFieldEnum(NULL);
-  dfe->SetListener(this);
-  dfe->EnableItemHelp(true);
-  const std::vector<TaskFactoryType> factory_types =
-    ordered_task->GetFactoryTypes();
-  for (unsigned i = 0; i < factory_types.size(); i++) {
-    dfe->addEnumText(OrderedTaskFactoryName(factory_types[i]),
-                     (unsigned)factory_types[i],
-                     OrderedTaskFactoryDescription(factory_types[i]));
-    if (factory_types[i] == ordered_task->GetFactoryType())
-      dfe->Set((unsigned)factory_types[i]);
-  }
-  Add(_("Task type"), _("Sets the behavior for the current task."), dfe);
 }
 
 void
