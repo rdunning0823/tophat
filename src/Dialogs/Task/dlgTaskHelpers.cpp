@@ -89,7 +89,7 @@ TaskSummaryShape(OrderedTask* task, TCHAR* text)
       FAIShape = true;
     }
     else
-      _tcscpy(text, _("non-FAI triangle"));
+      _tcscpy(text, _("triangle"));
     break;
 
   default:
