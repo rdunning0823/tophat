@@ -959,7 +959,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxGRAvg,
     e_GR_Instantaneous, // GR Inst
     e_LD, // LD Vario
-    Category::DEPRECATED,
+    Category::STANDARD,
   },
 
   // e_Experimental
