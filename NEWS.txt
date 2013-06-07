@@ -17,6 +17,7 @@ First release of Top Hat based on XCSoar 6.6 features:
 Version 6.6.2 - not yet released
 * map
   - fix misplaced topography labels (#2564)
+  - fix keyboard panning with track up (#2908)
 * infoboxes
   - ensure that the unit symbol is visible
   - fix ballast display in vario gauge (#2911)
