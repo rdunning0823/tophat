@@ -22,12 +22,14 @@ Copyright_License {
 */
 
 #include "WaypointDialogs.hpp"
+#include "Dialogs/TextEntry.hpp"
 #include "Dialogs/CallBackTable.hpp"
 #include "Dialogs/XML.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Canvas.hpp"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/List.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
@@ -69,6 +71,7 @@ static WndFrame *summary_labels2;
 static WndFrame *summary_values2;
 static WndButton *name_sort_button;
 static WndButton *distance_sort_button;
+static WndSymbolButton *search_button;
 static WndFrame *name_sort_frame;
 static WndFrame *distance_sort_frame;
 
@@ -197,6 +200,10 @@ UpdateButtons()
 {
   name_sort_button->SetVisible(sort_direction != SortDirection::NAME);
   distance_sort_button->SetVisible(sort_direction != SortDirection::DISTANCE);
+  if (dialog_state.name.empty())
+    search_button->SetCaption(_T("Search"));
+  else
+    search_button->SetCaption(_T("SearchChecked"));
   //bearing_sort_button->SetVisible(sort_direction != SortDirection::BEARING);
 
   name_sort_frame->SetVisible(sort_direction == SortDirection::NAME);
@@ -270,6 +277,13 @@ UpdateList()
   waypoint_list_control->Invalidate();
 }
 
+static const TCHAR *
+WaypointNameAllowedCharacters(const TCHAR *prefix)
+{
+  static TCHAR buffer[256];
+  return way_points.SuggestNamePrefix(prefix, buffer, ARRAY_SIZE(buffer));
+}
+
 void
 WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
                                       unsigned i)
@@ -340,6 +354,36 @@ OnPaintButtonsBackground(WndOwnerDrawFrame *Sender, Canvas &canvas)
 }
 
 static void
+OnSearchClicked(gcc_unused WndButton &button)
+{
+  TCHAR new_name_filter[WaypointFilter::NAME_LENGTH + 1];
+  CopyString(new_name_filter, dialog_state.name.c_str(),
+             WaypointFilter::NAME_LENGTH + 1);
+
+  TextEntryDialog(new_name_filter, WaypointFilter::NAME_LENGTH,
+                  _("Waypoint name"),
+                  WaypointNameAllowedCharacters);
+
+  int i = _tcslen(new_name_filter) - 1;
+  while (i >= 0) {
+    if (new_name_filter[i] != _T(' '))
+      break;
+
+    new_name_filter[i] = 0;
+    i--;
+  }
+
+  CopyString(dialog_state.name.buffer(), new_name_filter,
+             WaypointFilter::NAME_LENGTH + 1);
+
+  UpdateList();
+  if (sort_direction == SortDirection::NAME)
+    name_sort_button->SetFocus();
+  else
+    distance_sort_button->SetFocus();
+}
+
+static void
 OnSelectClicked(gcc_unused WndButton &button)
 {
   OnWaypointListEnter();
@@ -358,6 +402,7 @@ static constexpr CallBackTableEntry callback_table[] = {
   DeclareCallBackEntry(OnByDistanceClicked),
   DeclareCallBackEntry(OnByBearingClicked),
   DeclareCallBackEntry(OnPaintButtonsBackground),
+  DeclareCallBackEntry(OnSearchClicked),
   DeclareCallBackEntry(nullptr)
 };
 
@@ -401,10 +446,12 @@ ShowWaypointListSimpleDialog(const GeoPoint &_location,
 
   name_sort_button = (WndButton*)dialog->FindByName(_T("cmdByName"));
   distance_sort_button = (WndButton*)dialog->FindByName(_T("cmdByDistance"));
+  search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));
   assert(name_sort_button != nullptr);
   assert(distance_sort_button != nullptr);
+  assert(search_button != nullptr);
 
-  name_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByName"));
+    name_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByName"));
   distance_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByDistance"));
   assert(name_sort_frame != nullptr);
   assert(distance_sort_frame != nullptr);
