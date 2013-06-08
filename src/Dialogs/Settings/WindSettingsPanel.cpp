@@ -60,9 +60,9 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { 0 }
   };
 
-  AddEnum(_("Auto wind"),
-          _("This allows switching on or off the automatic wind algorithm."),
-          auto_wind_list, settings.GetLegacyAutoWindMode());
+  auto_wind = AddEnum(_("Auto wind"),
+                      _("This allows switching on or off the automatic wind algorithm."),
+                      auto_wind_list, settings.GetLegacyAutoWindMode(),  this);
 
   AddBoolean(_("Prefer external wind"),
              _("If enabled, then the wind vector received from external devices overrides "
@@ -108,6 +108,26 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     AddButton(_("Clear"), *this, CLEAR_MANUAL);
 
   UpdateVector();
+  UpdatetManualVisibility();
+}
+
+void
+WindSettingsPanel::UpdatetManualVisibility()
+{
+  if (!edit_manual_wind)
+    return;
+
+  assert(auto_wind != nullptr);
+
+  DataFieldEnum *auto_wind_enum = (DataFieldEnum *)
+      auto_wind->GetDataField();
+  bool manual_mode = auto_wind_enum->GetAsInteger() == 0;
+
+  RowFormWidget::GetControl(ExternalWind).SetVisible(!manual_mode);
+  if (edit_manual_wind) {
+    this->GetControl(Speed).SetVisible(manual_mode);
+    this->GetControl(Direction).SetVisible(manual_mode);
+  }
 }
 
 void
@@ -119,6 +139,7 @@ WindSettingsPanel::Show(const PixelRect &rc)
   }
 
   RowFormWidget::Show(rc);
+  UpdatetManualVisibility();
 }
 
 void
@@ -170,6 +191,8 @@ WindSettingsPanel::OnAction(int id)
 void
 WindSettingsPanel::OnModified(DataField &df)
 {
+  UpdatetManualVisibility();
+
   if (!edit_manual_wind)
     return;
 
@@ -234,3 +257,4 @@ WindSettingsPanel::OnCalculatedUpdate(const MoreData &basic,
 {
   UpdateVector();
 }
+

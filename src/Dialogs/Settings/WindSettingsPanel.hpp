@@ -49,6 +49,11 @@ class WindSettingsPanel final
    */
   bool manual_modified;
 
+  /**
+   * pointer to the main choice: what type of wind shall we use
+   */
+  WndProperty *auto_wind;
+
 public:
   enum Buttons {
     /**
@@ -82,6 +87,12 @@ private:
   /* virtual methods from class BlackboardListener */
   virtual void OnCalculatedUpdate(const MoreData &basic,
                                   const DerivedInfo &calculated) override;
+
+  /**
+   * show or hide the manual editing buttons based on whether
+   * the "Manual" type of wind is selected
+   */
+  void UpdatetManualVisibility();
 };
 
 #endif
