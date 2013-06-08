@@ -79,7 +79,6 @@ void
 MapWindow::Create(ContainerWindow &parent, const PixelRect &rc)
 {
   WindowStyle style;
-  style.EnableDoubleClicks();
   DoubleBufferWindow::Create(parent, rc, style);
 
   // initialize other systems
