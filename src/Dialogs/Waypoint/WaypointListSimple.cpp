@@ -276,6 +276,45 @@ WaypointNameAllowedCharacters(const TCHAR *prefix)
   return way_points.SuggestNamePrefix(prefix, buffer, ARRAY_SIZE(buffer));
 }
 
+static void
+OnSearchClicked(gcc_unused WndButton &button)
+{
+  TCHAR new_name_filter[WaypointFilter::NAME_LENGTH + 1];
+  CopyString(new_name_filter, dialog_state.name.c_str(),
+             WaypointFilter::NAME_LENGTH + 1);
+
+  TextEntryDialog(new_name_filter, WaypointFilter::NAME_LENGTH,
+                  _("Waypoint name"),
+                  WaypointNameAllowedCharacters);
+
+  int i = _tcslen(new_name_filter) - 1;
+  while (i >= 0) {
+    if (new_name_filter[i] != _T(' '))
+      break;
+
+    new_name_filter[i] = 0;
+    i--;
+  }
+
+  CopyString(dialog_state.name.buffer(), new_name_filter,
+             WaypointFilter::NAME_LENGTH + 1);
+
+  UpdateList();
+  if (sort_direction == SortDirection::NAME)
+    name_sort_button->SetFocus();
+  else
+    distance_sort_button->SetFocus();
+}
+
+static void
+OnWaypointListEnter()
+{
+  if (waypoint_list.size() > 0)
+    dialog->SetModalResult(mrOK);
+  else
+    OnSearchClicked(*search_button);
+}
+
 void
 WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
                                       unsigned i)
@@ -284,14 +323,14 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
     assert(i == 0);
 
     const UPixelScalar line_height = rc.bottom - rc.top;
-    const Font &name_font =
-      *UIGlobals::GetDialogLook().list.font;
-    canvas.SetTextColor(COLOR_BLACK);
+    const DialogLook &look = UIGlobals::GetDialogLook();
+    const Font &name_font = *look.list.font;
+    canvas.SetTextColor(look.list.GetTextColor(true, true, false));
     canvas.Select(name_font);
-    canvas.DrawText(rc.left + line_height + Layout::FastScale(2),
+    canvas.DrawText(rc.left + Layout::FastScale(2),
                     rc.top + line_height / 2 - name_font.GetHeight() / 2,
                     dialog_state.IsDefined() || way_points.IsEmpty() ?
-                    _("No Match!") : _("Choose a filter or click here"));
+                _ ("No Match!") : _("Too many points. Use Search or click here"));
     return;
   }
 
@@ -304,12 +343,6 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
                              UIGlobals::GetDialogLook(),
                              UIGlobals::GetMapLook().waypoint,
                              CommonInterface::GetMapSettings().waypoint);
-}
-
-static void
-OnWaypointListEnter()
-{
-  dialog->SetModalResult(mrOK);
 }
 
 void
@@ -343,36 +376,6 @@ static void
 OnPaintButtonsBackground(WndOwnerDrawFrame *Sender, Canvas &canvas)
 {
   canvas.Clear(COLOR_BLACK);
-}
-
-static void
-OnSearchClicked(gcc_unused WndButton &button)
-{
-  TCHAR new_name_filter[WaypointFilter::NAME_LENGTH + 1];
-  CopyString(new_name_filter, dialog_state.name.c_str(),
-             WaypointFilter::NAME_LENGTH + 1);
-
-  TextEntryDialog(new_name_filter, WaypointFilter::NAME_LENGTH,
-                  _("Waypoint name"),
-                  WaypointNameAllowedCharacters);
-
-  int i = _tcslen(new_name_filter) - 1;
-  while (i >= 0) {
-    if (new_name_filter[i] != _T(' '))
-      break;
-
-    new_name_filter[i] = 0;
-    i--;
-  }
-
-  CopyString(dialog_state.name.buffer(), new_name_filter,
-             WaypointFilter::NAME_LENGTH + 1);
-
-  UpdateList();
-  if (sort_direction == SortDirection::NAME)
-    name_sort_button->SetFocus();
-  else
-    distance_sort_button->SetFocus();
 }
 
 static void
