@@ -22,24 +22,13 @@ Copyright_License {
 */
 
 #include "Widgets/TaskNavSliderWidget.hpp"
-#include "Language/Language.hpp"
 #include "Input/InputEvents.hpp"
 #include "Util/StaticString.hpp"
 #include "OS/Clock.hpp"
 
-#include "Math/fixed.hpp"
-#include "Formatter/AngleFormatter.hpp"
-#include "Formatter/UserUnits.hpp"
-#include "Renderer/OZPreviewRenderer.hpp"
-#include "Formatter/AngleFormatter.hpp"
-
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
 #include "Look/DialogLook.hpp"
-#include "Look/IconLook.hpp"
-#include "Look/MapLook.hpp"
-#include "Look/TaskLook.hpp"
-#include "Look/InfoBoxLook.hpp"
 #include "Dialogs/Message.hpp"
 #include "Dialogs/Task/dlgTaskHelpers.hpp"
 #include "Screen/Color.hpp"
@@ -52,7 +41,6 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
-#include "Terrain/TerrainSettings.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -64,7 +52,6 @@ Copyright_License {
 #include <stdio.h>
 #include <stdlib.h>
 
-
 TaskNavSliderWidget::TaskNavSliderWidget()
   :slider_shape(UIGlobals::GetDialogLook(), UIGlobals::GetLook().info_box),
   task_data_cache(CommonInterface::GetComputerSettings(),
@@ -72,10 +59,8 @@ TaskNavSliderWidget::TaskNavSliderWidget()
                   CommonInterface::Calculated().task_stats) {}
 
 void
-TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc,
-                                      bool is_panning,
-                                      bool is_main_window_widget,
-                                      bool is_map)
+TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc, bool is_panning,
+                                      bool is_main_window_widget, bool is_map)
 {
   if (is_map && !is_main_window_widget && !is_panning)
     Show(rc);
@@ -151,215 +136,34 @@ TaskNavSliderWidget::RefreshList(TaskType mode)
   GetList().Invalidate();
 }
 
-#ifdef _WIN32
-void
-TaskNavSliderWidget::PaintBackground(Canvas &canvas, unsigned idx,
-                                     const DialogLook &dialog_look,
-                                     const PixelRect rc_outer)
-{
-  // clear area b/c Win32 does not draw background transparently
-  UPixelScalar x_offset = rc_outer.left;
-  if (idx == 0) {
-    RasterPoint left_mid = slider_shape.GetPoint(7);
-    canvas.DrawFilledRectangle(0, 0, x_offset + left_mid.x, rc_outer.bottom,
-                               Brush(dialog_look.list.GetBackgroundColor(
-                                     false, true, false)));
-  }
-  if (idx == (GetList().GetLength() - 1)){
-    RasterPoint right_mid = slider_shape.GetPoint(3);
-    canvas.DrawFilledRectangle(x_offset + right_mid.x + 1, 0,
-                               x_offset + right_mid.x + slider_shape.GetHintWidth() + 1,
-                               rc_outer.bottom,
-                               Brush(dialog_look.list.GetBackgroundColor(
-                                     false, true, false)));
-  }
-}
-#endif
-
 void
 TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                                  unsigned idx)
 {
   // if task is not current (e.g. the tp being drawn may no longer exist) then abort drawing
   // hold lease on task_manager until drawing is done
-  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-  if (task_manager->GetTaskTimeStamp() != task_data_cache.GetTaskManagerTimeStamp())
-    return;
-
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  const IconLook &icon_look = UIGlobals::GetIconLook();
-  const MapSettings &settings_map = CommonInterface::GetMapSettings();
-  const TerrainRendererSettings &terrain = settings_map.terrain;
+  {
+    ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+    if (task_manager->GetTaskTimeStamp()
+        != task_data_cache.GetTaskManagerTimeStamp())
+      return;
+  }
 
   TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
-  bool draw_checkmark =
-      (task_data_cache.GetTaskMode() == TaskType::ORDERED)
-      && (task_data_cache.GetOrderedTaskSize() > 1)
-      && ((idx > 0 && tp.GetHasEntered()) || (idx == 0 && tp.GetHasExited()));
 
-  const bool selected = GetList().GetCursorDownIndex() == (int)idx;
-
-  StaticString<120> buffer;
-  const Font &name_font = slider_shape.GetLargeFont();
-  const Font &small_font = slider_shape.GetSmallFont();
-  const Font &medium_font = slider_shape.GetMediumFont();
-  UPixelScalar width;
-  PixelRect rc = rc_outer;
-  rc.left += slider_shape.GetHintWidth();
-  rc.right -= slider_shape.GetHintWidth();
-  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
-
-  if (!tp.IsValid()) {
-    canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
-    canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
-      selected, true, false)));
-    slider_shape.Draw(canvas, rc_outer, border_width);
-    canvas.Select(small_font);
-    buffer = _("Click to navigate");
-    width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.DrawText(rc.left + (rc.right - rc.left - width) / 2,
-                    rc.top + (rc.bottom - rc.top - small_font.GetHeight()) / 2,
-                    buffer.c_str());
-#ifdef _WIN32
-    TaskNavSliderWidget::PaintBackground(canvas, idx, dialog_look, rc_outer);
-#endif
-    return;
-  }
-
-  canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
-  canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
-    selected, true, false)));
-  slider_shape.Draw(canvas, rc_outer, border_width);
-#ifdef _WIN32
-    TaskNavSliderWidget::PaintBackground(canvas, idx, dialog_look, rc_outer);
-#endif
-
-  const unsigned line_one_y_offset = rc.top + slider_shape.GetLine1Y();
-  const unsigned line_two_y_offset = rc.top + slider_shape.GetLine2Y();
-
-  // Draw turnpoint name
-  canvas.Select(name_font);
-  PixelSize bitmap_size {0, 0};
-  UPixelScalar left_bitmap;
-  const Bitmap *bmp = &icon_look.hBmpCheckMark;
-  if (draw_checkmark) {
-    bitmap_size = bmp->GetSize();
-  }
-  width = canvas.CalcTextWidth(tp.waypoint->name.c_str()) + bitmap_size.cx / 2;
-  if (width > (rc_outer.right - rc_outer.left)) {
-    canvas.DrawClippedText(rc_outer.left + bitmap_size.cx / 2,
-                           line_two_y_offset,
-                           rc_outer.right - rc_outer.left - bitmap_size.cx / 2,
-                           tp.waypoint->name.c_str());
-    left_bitmap = rc_outer.left;
-  } else {
-    left_bitmap = rc_outer.left + (rc_outer.right - rc_outer.left - width) / 2;
-    canvas.DrawText(left_bitmap + bitmap_size.cx / 2,
-                    line_two_y_offset,
-                    tp.waypoint->name.c_str());
-  }
-
-  // draw checkmark next to name if oz entered
-  if (draw_checkmark) {
-    const int offsety = line_two_y_offset +
-        (rc.bottom - line_two_y_offset - bitmap_size.cy) / 2;
-    canvas.CopyAnd(left_bitmap,
-                    rc.top + offsety,
-                    bitmap_size.cx / 2,
-                    bitmap_size.cy,
-                    *bmp,
-                    bitmap_size.cx / 2, 0);
-  }
-
-  UPixelScalar distance_width = 0u;
-  UPixelScalar label_width = 0u;
-  UPixelScalar height_width = 0u;
-  StaticString<100> distance_buffer(_T(""));
-  StaticString<100> height_buffer(_T(""));
-
-  // Draw distance to turnpoint
-  if (tp.distance_valid) {
-
-    canvas.Select(medium_font);
-    FormatUserDistanceSmart(tp.distance, distance_buffer.buffer(), true);
-    distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
-    canvas.DrawText(rc.right - Layout::FastScale(2) - distance_width,
-                    line_one_y_offset, distance_buffer.c_str());
-  }
-
-  // calculate but don't yet draw label "goto" abort, tp#
-  switch (task_data_cache.GetTaskMode()) {
-  case TaskType::ORDERED:
-    if (task_data_cache.GetOrderedTaskSize() == 0)
-      buffer = _("Go'n home:");
-
-    else if (idx == 0)
-      buffer = _("Start");
-    else if (idx + 1 == task_data_cache.GetOrderedTaskSize())
-        buffer = _("Finish");
-    else
-      _stprintf(buffer.buffer(), _T("TP %u"), idx);
-
-    break;
-  case TaskType::GOTO:
-  case TaskType::ABORT:
-    buffer = _("Goto:");
-    break;
-
-  case TaskType::NONE:
-    buffer = _("Go'n home:");
-
-    break;
-  }
-  label_width = canvas.CalcTextWidth(buffer.c_str());
-  canvas.Select(small_font);
-
-  // draw arrival altitude centered between label and distance.
-  // draw label if room
-  canvas.Select(small_font);
-  if (tp.altitude_difference_valid) {
-    FormatRelativeUserAltitude(tp.altitude_difference, height_buffer.buffer(),
-                               true);
-    height_width = canvas.CalcTextWidth(height_buffer.c_str());
-    width = distance_width + height_width;
-    UPixelScalar offset = rc.left;
-    if ((PixelScalar)width < (rc.right - rc.left - label_width -
-        Layout::FastScale(15))) {
-      canvas.DrawText(rc.left + Layout::FastScale(2),
-                      line_one_y_offset, buffer.c_str());
-      offset = rc.left + label_width +
-          (rc.right - rc.left - width - label_width) / 2;
-    }
-    canvas.DrawText(offset, line_one_y_offset, height_buffer.c_str());
-  }
-
-  // bearing delta waypoint for ordered when not start
-  // or for non ordered task
-  // TODO make this configurable to show delta or true bearing
-  bool do_bearing = false;
-  Angle bearing;
-  if (tp.bearing_valid && task_data_cache.GetTaskMode() ==
-      TaskType::ORDERED && idx > 0) {
-    do_bearing = true;
-    bearing = tp.delta_bearing;
-  } else if (task_data_cache.GetTaskMode() != TaskType::ORDERED &&
-      tp.bearing_valid) {
-    do_bearing = true;
-    bearing = tp.delta_bearing;
-  }
-
-  if (false && do_bearing) {
-    FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE, bearing);
-    width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.Select(small_font);
-    canvas.DrawText((rc.left + rc.right - width) / 2,
-                    line_one_y_offset, buffer.c_str());
-  }
+  slider_shape.DrawText(canvas, rc_outer,
+                        idx, GetList().GetCursorDownIndex() == (int)idx,
+                        tp.IsValid() ? tp.waypoint->name.c_str() : _T(""),
+                        tp.GetHasEntered(), tp.GetHasExited(),
+                        task_data_cache.GetTaskMode(),
+                        task_data_cache.GetOrderedTaskSize(),
+                        tp.IsValid(), tp.distance, tp.distance_valid,
+                        tp.altitude_difference,
+                        tp.altitude_difference_valid);
 }
 
 void
-TaskNavSliderWidget::Prepare(ContainerWindow &parent,
-                              const PixelRect &rc)
+TaskNavSliderWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
@@ -372,8 +176,8 @@ bool
 TaskNavSliderWidget::TaskIsCurrent()
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-  return task_manager->GetTaskTimeStamp() ==
-      task_data_cache.GetTaskManagerTimeStamp();
+  return task_manager->GetTaskTimeStamp()
+      == task_data_cache.GetTaskManagerTimeStamp();
 }
 
 void
@@ -385,20 +189,21 @@ TaskNavSliderWidget::ReadWaypointIndex()
     return; // non-ordered mode
   }
 
-  if ((task_manager_current_index != (int)waypoint_index) && GetList().IsSteady())
-      GetList().ScrollToItem(task_manager_current_index);
+  if ((task_manager_current_index != (int)waypoint_index)
+      && GetList().IsSteady())
+    GetList().ScrollToItem(task_manager_current_index);
 }
 
 HorizontalListControl &
 TaskNavSliderWidget::CreateListEmpty(ContainerWindow &parent,
-                                const DialogLook &look,
-                                const PixelRect &rc)
+                                     const DialogLook &look,
+                                     const PixelRect &rc)
 {
   WindowStyle list_style;
   list_style.TabStop();
 
-  HorizontalListControl *list =
-    new HorizontalListControl(parent, look, rc, list_style, 20);
+  HorizontalListControl *list = new HorizontalListControl(parent, look, rc,
+                                                          list_style, 20);
   list->SetHasScrollBar(false);
   list->SetLength(0);
   list->SetHandler(this);
@@ -432,7 +237,8 @@ TaskNavSliderWidget::GetCurrentWaypoint()
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
 
   task_data_cache.SetActiveWaypoint(task_manager->GetActiveTaskPoint());
-  task_data_cache.SetActiveTaskPointIndex(task_manager->GetActiveTaskPointIndex());
+  task_data_cache.SetActiveTaskPointIndex(
+      task_manager->GetActiveTaskPointIndex());
 
   if (task_manager->GetMode() != TaskType::ORDERED)
     return -1;
@@ -490,8 +296,8 @@ TaskNavSliderWidget::OnActivateItem(unsigned index)
   menu_ordered = _T("NavOrdered");
   menu_goto = _T("NavGoto");
 
-  if (InputEvents::IsMode(menu_ordered.buffer()) ||
-      InputEvents::IsMode(menu_goto.buffer()))
+  if (InputEvents::IsMode(menu_ordered.buffer())
+      || InputEvents::IsMode(menu_goto.buffer()))
     InputEvents::HideMenu();
   else if (task_data_cache.GetTaskMode() == TaskType::GOTO ||
         task_data_cache.GetTaskMode() == TaskType::ABORT)
