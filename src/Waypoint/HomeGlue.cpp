@@ -44,6 +44,8 @@ WaypointGlue::FindHomeId(Waypoints &waypoints,
 
   settings.home_location = wp->location;
   settings.home_location_available = true;
+  settings.home_elevation = wp->elevation;
+  settings.home_elevation_available = true;
   waypoints.SetHome(wp->id);
   return wp;
 }
@@ -52,15 +54,21 @@ const Waypoint *
 WaypointGlue::FindHomeLocation(Waypoints &waypoints,
                                PlacesOfInterestSettings &settings)
 {
-  if (!settings.home_location_available)
+  if (!settings.home_location_available) {
+    settings.home_elevation_available = false;
     return NULL;
+  }
 
   const Waypoint *wp = waypoints.LookupLocation(settings.home_location,
                                                 fixed(100));
   if (wp == NULL || !wp->IsAirport()) {
     settings.home_location_available = false;
+    settings.home_elevation_available = false;
     return NULL;
   }
+
+  settings.home_elevation = wp->elevation;
+  settings.home_elevation_available = true;
 
   settings.home_waypoint = wp->id;
   waypoints.SetHome(wp->id);
@@ -131,6 +139,11 @@ WaypointGlue::SaveHome(const PlacesOfInterestSettings &poi_settings,
   Profile::Set(ProfileKeys::HomeWaypoint, poi_settings.home_waypoint);
   if (poi_settings.home_location_available)
     Profile::SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
+
+  Profile::Set(ProfileKeys::HomeElevationAvailable, poi_settings.home_elevation_available);
+  if (poi_settings.home_elevation_available)
+    Profile::Set(ProfileKeys::HomeElevation, poi_settings.home_elevation);
+
 
   Profile::Set(ProfileKeys::TeamcodeRefWaypoint,
                team_code_settings.team_code_reference_waypoint);

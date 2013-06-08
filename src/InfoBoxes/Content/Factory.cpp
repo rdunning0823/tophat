@@ -827,10 +827,10 @@ static constexpr MetaData meta_data[] = {
 
   // e_Home_Distance
   {
-    N_("Distance home"),
+    N_("Home distance"),
     N_("Home Dist"),
-    N_("Distance to home waypoint (if defined)."),
-    UpdateInfoBoxHomeDistance,
+    N_("Distance to home waypoint.  User can change the home waypoint by clicking."),
+    IBFHelper<InfoBoxContentHomeDistance>::Create,
     e_OC_Distance, // OLC
     e_AA_SpeedAvg, // AA Vtgt
     Category::STANDARD,
@@ -1314,6 +1314,16 @@ static constexpr MetaData meta_data[] = {
     NEXT_RADIAL,
     NEXT_RADIAL,
     Category::STANDARD,
+  },
+
+  {
+    N_("Home altitude required"),
+    N_("Home Alt Req"),
+    N_("Altitude required to reach the home waypoint (including safety height).  User can change the home waypoint by clicking."),
+    IBFHelper<InfoBoxContentHomeAltitudeRequired>::Create,
+    HomeAltitudeRequired,
+    HomeAltitudeRequired,
+    STANDARD,
   },
 };
 

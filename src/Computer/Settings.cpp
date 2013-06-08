@@ -42,6 +42,7 @@ PlacesOfInterestSettings::ClearHome()
 {
   home_waypoint = -1;
   home_location_available = false;
+  home_elevation_available = false;
 }
 
 void

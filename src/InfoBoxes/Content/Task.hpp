@@ -93,6 +93,24 @@ UpdateInfoBoxTaskSpeed(InfoBoxData &data);
 void
 UpdateInfoBoxTaskSpeedAchieved(InfoBoxData &data);
 
+extern const InfoBoxPanel home_infobox_panels[];
+
+class InfoBoxContentHome: public InfoBoxContentNonTabbed
+{
+};
+
+class InfoBoxContentHomeDistance : public InfoBoxContentHome
+{
+public:
+  virtual void Update(InfoBoxData &data);
+};
+
+class InfoBoxContentHomeAltitudeRequired : public InfoBoxContentHome
+{
+public:
+  virtual void Update(InfoBoxData &data);
+};
+
 void
 UpdateInfoBoxTaskSpeedInstant(InfoBoxData &data);
 

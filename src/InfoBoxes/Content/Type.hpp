@@ -143,6 +143,7 @@ namespace InfoBoxFactory
 
     NEXT_RADIAL,
     ATC_RADIAL,
+    HomeAltitudeRequired, /* Altitude required to reach home waypoint (if defined) */
 
     e_NUM_TYPES /* Last item */
   };

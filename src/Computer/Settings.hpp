@@ -115,6 +115,16 @@ struct PlacesOfInterestSettings {
    */
   GeoPoint atc_reference;
 
+  /**
+   * is the elevation of home available
+   */
+  bool home_elevation_available;
+
+  /**
+   * the elevation of home if available
+   */
+  fixed home_elevation;
+
   void SetDefaults() {
     ClearHome();
     atc_reference.SetInvalid();

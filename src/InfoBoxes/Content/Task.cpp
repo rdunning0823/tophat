@@ -36,6 +36,8 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Widget/CallbackWidget.hpp"
 #include "UIGlobals.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "GlideSolvers/GlideState.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -513,6 +515,70 @@ UpdateInfoBoxFinalGR(InfoBoxData &data)
     data.SetValueFromGlideRatio(gradient);
   else
     data.SetInvalid();
+}
+
+void
+InfoBoxContentHomeDistance::Update(InfoBoxData &data)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
+
+  if (!common_stats.vector_home.IsValid()) {
+    data.SetInvalid();
+    return;
+  }
+  // Set Value
+  data.SetValueFromDistance(common_stats.vector_home.distance);
+
+  if (basic.track_available) {
+    Angle bd = common_stats.vector_home.bearing - basic.track;
+    data.SetCommentFromBearingDifference(bd);
+  } else
+    data.SetCommentInvalid();
+}
+
+void
+InfoBoxContentHomeAltitudeRequired::Update(InfoBoxData &data)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+
+  if (!common_stats.vector_home.IsValid() ||
+      !settings.poi.home_location_available ||
+      !settings.poi.home_elevation_available) {
+    data.SetInvalid();
+    return;
+  }
+
+  // altitude differential
+
+  if (basic.location_available && more_data.NavAltitudeAvailable() &&
+      settings.polar.glide_polar_task.IsValid()) {
+    const GlideState glide_state(
+      basic.location.DistanceBearing(settings.poi.home_location),
+      settings.poi.home_elevation + settings.task.safety_height_arrival,
+      more_data.nav_altitude,
+      calculated.GetWindOrZero());
+
+    const GlideResult &result =
+      MacCready::Solve(settings.task.glide,
+                       settings.polar.glide_polar_task,
+                       glide_state);
+    data.SetValueFromArrival(result.pure_glide_altitude_difference);
+  }
+  else
+    data.SetInvalid();
+
+  // Set Comment (bearing)
+  if (basic.track_available) {
+    const GeoVector vector = basic.location.DistanceBearing(settings.poi.home_location);
+    Angle bd = vector.bearing - basic.track;
+    data.SetCommentFromBearingDifference(bd);
+  } else
+    data.SetCommentInvalid();
 }
 
 void
