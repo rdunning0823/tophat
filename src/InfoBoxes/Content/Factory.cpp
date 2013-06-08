@@ -460,9 +460,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_AA_Time
   {
-    N_("AAT time"),
-    N_("AAT Time"),
-    N_("Assigned Area Task time remaining. Goes red when time remaining has expired."),
+    N_("Task time remaining"),
+    N_("Task T rem"),
+    N_("Task time remaining. Goes red when time remaining has expired."),
     UpdateInfoBoxTaskAATime,
     e_AA_TimeDiff, // AA dTime
     e_Fin_Distance, // Fin Dis
@@ -728,8 +728,8 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_AA_Distance
   {
-    N_("AAT distance around target"),
-    N_("AAT Dtgt"),
+    N_("Task distance remaining"),
+    N_("Task D Rem"),
     N_("Assigned Area Task distance around target points for remainder of task."),
     UpdateInfoBoxTaskAADistance,
     e_AA_SpeedAvg, // AA Vtgt
@@ -849,9 +849,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_AA_TimeDiff
   {
-    N_("AAT delta time"),
-    N_("AAT dT"),
-    N_("Difference between estimated task time and AAT minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
+    N_("Task delta time"),
+    N_("Task dT"),
+    N_("Difference between estimated task time and task minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
     UpdateInfoBoxTaskAATimeDelta,
     e_AA_DistanceMax, // AA Dmax
     e_AA_Time, // AA Time
