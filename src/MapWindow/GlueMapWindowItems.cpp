@@ -38,6 +38,7 @@ Copyright_License {
 #include "Dialogs/Dialogs.h"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/TaskManager.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Components.hpp"
 
 

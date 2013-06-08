@@ -75,6 +75,7 @@ public:
                                     const GlideResult &solution_remaining_total,
                                     const GlideResult &solution_remaining_leg) override;
   virtual bool IsScored() const override { return false; }
+  virtual bool IsOptimizable() const { return false; }
 };
 
 #endif

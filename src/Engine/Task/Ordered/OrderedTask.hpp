@@ -737,6 +737,12 @@ protected:
                                     DistanceStat &leg_remaining_effective,
                                     const GlideResult &solution_remaining_total,
                                     const GlideResult &solution_remaining_leg) override;
+public:
+  /**
+   * is this type of task optimizable?
+   */
+  virtual bool IsOptimizable() const;
+
 protected:
   virtual bool IsScored() const override;
 public:

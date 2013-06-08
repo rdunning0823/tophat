@@ -226,10 +226,11 @@ RefreshCalculator()
 
   {
     ProtectedTaskManager::Lease lease(*protected_task_manager);
+
     const OrderedTask &task = lease->GetOrderedTask();
     const AATPoint *ap = task.GetAATTaskPoint(target_point);
 
-    is_aat = ap != nullptr;
+    is_aat = ((ap != nullptr) && lease->GetOrderedTask().IsOptimizable());
 
     if (!is_aat) {
       nodisplay = true;

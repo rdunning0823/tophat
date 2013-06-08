@@ -383,6 +383,10 @@ protected:
                                     const GlideResult &solution_remaining_total,
                                     const GlideResult &solution_remaining_leg) = 0;
 
+  /** Determines whether the task type should have its targets optimized */
+  gcc_pure
+  virtual bool IsOptimizable() const = 0;
+
   /** Determines whether this task is scored */
   gcc_pure
   virtual bool IsScored() const = 0;
