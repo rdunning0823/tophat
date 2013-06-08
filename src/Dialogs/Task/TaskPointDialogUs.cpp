@@ -183,43 +183,43 @@ RefreshTaskProperties()
 {
   WndButton *button_properties = (WndButton*) wf->FindByName(_T("butTaskProperties"));
   assert (button_properties != nullptr);
-  StaticString<255> text;
+  StaticString<255> line_1;
+  StaticString<255> line_2;
+  StaticString<255> both_lines;
 
   const OrderedTaskBehaviour &otb = ordered_task->GetOrderedTaskBehaviour();
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
-  text = OrderedTaskFactoryName(ftype);
+  line_1 = OrderedTaskFactoryName(ftype);
+
+  wf->SetCaption(line_1.c_str());
+
+  if (IsFai(ordered_task->GetFactoryType())) {
+    button_properties->SetCaption(line_1.c_str());
+    return;
+  }
 
   if (ordered_task->HasTargets()) {
     StaticString<50> time_info;
     FormatSignedTimeHHMM(time_info.buffer(), (int)otb.aat_min_time);
-    text.AppendFormat(_T(".  %s %s"), _("Time"), time_info.c_str());
+    line_1.AppendFormat(_T(".  %s %s"), _("Time"), time_info.c_str());
   }
+  StaticString<25> start_height;
+  StaticString<25> finish_height;
 
-  if (!IsFai(ordered_task->GetFactoryType())) {
-    StaticString<25> start_height;
-    StaticString<25> finish_height;
+  FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
+  FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
 
-    FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
-    FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
+  StaticString<50> text_start;
+  StaticString<50> text_finish;
+  text_start.Format(_T("%s %s %s"),
+                    _("Start"), _("MSL:"), start_height.c_str());
 
-    text.AppendFormat(_T("   -   %s %s %s"),
-                      _("Start"), _("MSL:"), start_height.c_str());
-    const DialogLook &look = UIGlobals::GetDialogLook();
+  text_finish.Format(_T("%s %s %s"),
+                     _("Finish"), _("MSL:"), finish_height.c_str());
 
-    StaticString<50> text2;
-    text2.Format(_T("%s %s %s"),
-                 _("Finish"), _("MSL:"), finish_height.c_str());
-    PixelSize size = look.caption.font->TextSize(text.c_str());
-    PixelSize size2 = look.caption.font->TextSize(text2.c_str());
-    PixelSize size_space = look.caption.font->TextSize(_T(" "));
-
-    assert(size.cx >= size2.cx);
-    unsigned spaces_needed = (size.cx - size2.cx) / size_space.cx;
-    StaticString<150> spaces (_T("                                                                                                                                                      "));
-    spaces.Truncate(spaces_needed);
-    text.AppendFormat(_T("\n%s%s"),spaces.c_str(), text2.c_str());
-  }
-  button_properties->SetCaption(text.c_str());
+  line_2.Format(_T("%s, %s"), text_start.c_str(), text_finish.c_str());
+  both_lines.Format(_T("%s\n%s"), line_1.c_str(), line_2.c_str());
+  button_properties->SetCaption(both_lines.c_str());
 }
 
 static void
