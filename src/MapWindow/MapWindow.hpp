@@ -211,6 +211,17 @@ public:
   void SetGPSStatusOffset(unsigned y) {
     gps_status_offset_y = y;
   }
+#ifndef ENABLE_OPENGL
+  /**
+   * resizes the rc_main_menu_button for the current screen layout
+   */
+  virtual void SetMainMenuButtonRect() {};
+  /**
+   * resizes the rc_zoom_in_button and rc_zoom_out_button for the current
+   * screen layout
+   */
+  virtual void SetZoomButtonsRect() {};
+#endif
 
   bool IsPanning() const {
     return follow_mode == FOLLOW_PAN;

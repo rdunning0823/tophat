@@ -73,6 +73,89 @@ GlueMapWindow::DrawGesture(Canvas &canvas) const
     canvas.DrawLinePiece(*it_last, *it);
 }
 
+#ifndef ENABLE_OPENGL
+/**
+ * DrawTwoLines seems to always use pen widthe = 1,
+ * we we'll draw consecutive rectangles to emulate thicker pen
+ */
+static void
+DrawRect(Canvas &canvas, const PixelRect &rc)
+{
+  canvas.DrawTwoLines(rc.left, rc.bottom,
+                      rc.right, rc.bottom,
+                      rc.right, rc.top);
+  canvas.DrawTwoLines(rc.left, rc.bottom,
+                      rc.left, rc.top,
+                      rc.right, rc.top);
+  PixelRect rc1 {rc.left + 1, rc.top + 1, rc.right - 1, rc.bottom - 1 };
+
+  canvas.DrawTwoLines(rc1.left, rc1.bottom,
+                      rc1.right, rc1.bottom,
+                      rc1.right, rc1.top);
+  canvas.DrawTwoLines(rc1.left, rc1.bottom,
+                      rc1.left, rc1.top,
+                      rc1.right, rc1.top);
+}
+
+void
+GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
+{
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *bmp = &icons.hBmpMenuButton;
+  const PixelSize bitmap_size = bmp->GetSize();
+
+  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
+  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
+  DrawRect(canvas, rc_main_menu_button);
+
+  const UPixelScalar menu_button_height = rc_main_menu_button.bottom -
+      rc_main_menu_button.top;
+  const UPixelScalar menu_button_width = rc_main_menu_button.right -
+      rc_main_menu_button.left;
+
+  const int offsetx = (menu_button_width - bitmap_size.cx / 2) / 2;
+  const int offsety = (menu_button_height - bitmap_size.cy) / 2;
+  canvas.CopyAnd(rc_main_menu_button.left + offsetx,
+                 rc_main_menu_button.top + offsety,
+                  bitmap_size.cx / 2,
+                  bitmap_size.cy,
+                  *bmp,
+                  bitmap_size.cx / 2, 0);
+}
+
+void
+GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
+{
+
+  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
+  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
+  DrawRect(canvas, rc_zoom_out_button);
+  DrawRect(canvas, rc_zoom_in_button);
+
+  const IconLook &icon_look = UIGlobals::GetIconLook();
+  const Bitmap *bmp_zoom_in = &icon_look.hBmpZoomInButton;
+  const PixelSize bitmap_in_size = bmp_zoom_in->GetSize();
+  const int offsetx = (rc_zoom_in_button.right - rc_zoom_in_button.left - bitmap_in_size.cx / 2) / 2;
+  const int offsety = (rc_zoom_in_button.bottom - rc_zoom_in_button.top - bitmap_in_size.cy) / 2;
+  canvas.CopyAnd(rc_zoom_in_button.left + offsetx,
+                  rc_zoom_in_button.top + offsety,
+                  bitmap_in_size.cx / 2,
+                  bitmap_in_size.cy,
+                  *bmp_zoom_in,
+                  bitmap_in_size.cx / 2, 0);
+
+  const Bitmap *bmp_zoom_out = &icon_look.hBmpZoomOutButton;
+  const PixelSize bitmap_out_size = bmp_zoom_out->GetSize();
+  canvas.CopyAnd(rc_zoom_out_button.left + offsetx,
+                  rc_zoom_out_button.top + offsety,
+                  bitmap_out_size.cx / 2,
+                  bitmap_out_size.cy,
+                  *bmp_zoom_out,
+                  bitmap_out_size.cx / 2, 0);
+
+}
+#endif
+
 void
 GlueMapWindow::DrawCrossHairs(Canvas &canvas) const
 {
@@ -439,3 +522,69 @@ GlueMapWindow::DrawStallRatio(Canvas &canvas, const PixelRect &rc) const
     canvas.DrawLine(rc.right - 1, rc.bottom - m, rc.right - 11, rc.bottom - m);
   }
 }
+
+#ifndef ENABLE_OPENGL
+void
+GlueMapWindow::SetMainMenuButtonRect()
+{
+  UPixelScalar clear_border_width = Layout::Scale(2);
+
+  const IconLook &icons = UIGlobals::GetIconLook();
+  const Bitmap *bmp = &icons.hBmpMenuButton;
+  const PixelSize bitmap_size = bmp->GetSize();
+  PixelSize menu_button_size;
+
+  menu_button_size.cx = (bitmap_size.cx / 2 * MapOverlayButton::GetScale() / 2.5) -
+      2 * clear_border_width;
+  menu_button_size.cy = (bitmap_size.cy * MapOverlayButton::GetScale()) / 2.5 -
+      2 * clear_border_width;
+
+  UPixelScalar pen_width = Layout::Scale(2);
+  rc_main_menu_button = GetClientRect();
+  rc_main_menu_button.left -= pen_width;
+  rc_main_menu_button.top -= pen_width;
+  rc_main_menu_button.left = rc_main_menu_button.right -  menu_button_size.cx;
+  rc_main_menu_button.top = rc_main_menu_button.bottom -  menu_button_size.cy;
+}
+
+void
+GlueMapWindow::SetZoomButtonsRect()
+{
+  UPixelScalar clear_border_width = Layout::Scale(2);
+  const PixelRect rc_map = GetClientRect();
+
+  PixelSize button_size;
+  button_size.cx = button_size.cy = Fonts::map_bold.GetHeight()
+      * MapOverlayButton::GetScale();
+
+  rc_zoom_in_button.left = rc_map.left;
+  if (Layout::landscape) {
+    rc_zoom_in_button.right = rc_zoom_in_button.left + button_size.cx +
+        2 * clear_border_width;
+    rc_zoom_in_button.bottom = rc_map.bottom;
+    rc_zoom_in_button.top = rc_zoom_in_button.bottom - button_size.cy -
+        2 * clear_border_width;
+  } else {
+    rc_zoom_in_button.right = rc_zoom_in_button.left +
+        (button_size.cx + 2 * clear_border_width);
+    rc_zoom_in_button.bottom = rc_map.bottom - button_size.cy -
+        2 * clear_border_width;
+    rc_zoom_in_button.top = rc_zoom_in_button.bottom - (button_size.cy +
+        2 * clear_border_width);
+  }
+
+  if (Layout::landscape) {
+    rc_zoom_out_button.left = rc_map.left + button_size.cx + 2 * clear_border_width;
+    rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx + 2 * clear_border_width;
+  } else {
+    rc_zoom_out_button.left = rc_map.left;
+    rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx + 2 * clear_border_width;
+  }
+  rc_zoom_out_button.bottom = rc_map.bottom;
+  rc_zoom_out_button.top = rc_zoom_out_button.bottom - button_size.cx - 2 * clear_border_width;
+
+  assert (rc_map.bottom >= rc_zoom_in_button.top);
+  SetGPSStatusOffset(rc_map.bottom - rc_zoom_in_button.top);
+
+}
+#endif
