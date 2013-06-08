@@ -40,6 +40,7 @@ Copyright_License {
 #include "Screen/Color.hpp"
 #include "Formatter/AngleFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Asset.hpp"
 
 static
 void DrawClippedPolygon(Canvas &canvas, const RasterPoint* points,
@@ -53,15 +54,18 @@ void DrawClippedPolygon(Canvas &canvas, const RasterPoint* points,
       points_clipped[i].x = rc.left;
     else if (points[i].x > rc.right)
       points_clipped[i].x = rc.right;
-    else points_clipped[i].x = points[i].x;
+    else
+      points_clipped[i].x = points[i].x;
 
     if (points[i].y < rc.top)
       points_clipped[i].y = rc.top;
     else if (points[i].y > rc.bottom)
       points_clipped[i].y = rc.bottom;
-    else points_clipped[i].y = points[i].y;
+    else
+      points_clipped[i].y = points[i].y;
   }
-  canvas.DrawPolygon(points_clipped, size);
+//  canvas.DrawPolygon(points_clipped, size);
+  canvas.DrawPolygon(points, size);
 }
 
 const Font &
@@ -90,7 +94,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   RasterPoint poly[8];
   for (unsigned i=0; i < 8; i++) {
     poly[i].x = GetPoint(i).x + x_offset;
-    poly[i].y = GetPoint(i).y + y_offset;
+    poly[i].y = GetPoint(i).y + y_offset - 1;
   }
 
   canvas.Select(Pen(width, COLOR_BLACK));
@@ -130,12 +134,11 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
                       TaskType task_mode, unsigned task_size,
                       bool tp_valid, fixed tp_distance, bool distance_valid,
                       fixed tp_altitude_difference,
-                      bool altitude_difference_valid)
+                      bool altitude_difference_valid,
+                      unsigned border_width)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
-  const MapSettings &settings_map = CommonInterface::GetMapSettings();
-  const TerrainRendererSettings &terrain = settings_map.terrain;
 
   bool draw_checkmark = (task_mode == TaskType::ORDERED)
       && (task_size > 1)
@@ -149,7 +152,6 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
   PixelRect rc = rc_outer;
   rc.left += GetHintWidth();
   rc.right -= GetHintWidth();
-  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
 
   if (!tp_valid) {
     canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
@@ -163,7 +165,8 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
                     rc.top + (rc.bottom - rc.top - small_font.GetHeight()) / 2,
                     buffer.c_str());
 #ifdef _WIN32
-    PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
+    if (!IsOldWindowsCE())
+      PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
 #endif
     return;
   }
@@ -173,6 +176,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
     selected, true, false)));
   DrawOutline(canvas, rc_outer, border_width);
 #ifdef _WIN32
+  if (!IsOldWindowsCE())
     PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
 #endif
 
@@ -312,14 +316,14 @@ SliderShape::Resize(UPixelScalar map_width)
   const UPixelScalar arrow_point_bluntness = Layout::Scale(4);
 
   SetLine1Y(0u);
-  SetLine2Y(total_height - large_font_height);
+  SetLine2Y(total_height - large_font_height - 1);
   SetLine3Y(0u);
 
   //top
   points[0].x = Layout::Scale(20);
-  points[0].y = 1;
+  points[0].y = 0;
   points[1].x = Layout::Scale(340);
-  points[1].y = 1;
+  points[1].y = 0;
 
   //right arrow tip
   points[2].x = Layout::Scale(360);

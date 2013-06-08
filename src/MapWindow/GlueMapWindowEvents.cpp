@@ -36,6 +36,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Pan.hpp"
 #include "Util/Clamp.hpp"
+#include "Asset.hpp"
 
 #ifdef ENABLE_SDL
 #include <SDL_keyboard.h>
@@ -387,9 +388,10 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
 #ifndef ENABLE_OPENGL
   if (!IsPanning())
     DrawMainMenuButtonOverlay(canvas);
-
   DrawZoomButtonOverlays(canvas);
 #endif
+  if (IsOldWindowsCE())
+    DrawTaskNavSliderShape(canvas);
 
 #ifdef ENABLE_OPENGL
   LeaveDrawThread();
@@ -487,6 +489,27 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
     InputEvents::HideMenu();
     return true;
   }
+  if (IsPointInRect(slider_shape.GetInnerRect(), p)) {
+    StaticString<20> menu_ordered(_T("NavOrdered"));
+    StaticString<20> menu_goto(_T("NavGoto"));
+    TaskManager::TaskMode task_mode;
+    {
+      ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+      task_mode = task_manager->GetMode();
+    }
+
+    if (InputEvents::IsMode(menu_ordered.buffer())
+        || InputEvents::IsMode(menu_goto.buffer()))
+      InputEvents::HideMenu();
+    else if (task_mode == TaskManager::MODE_GOTO
+        || task_mode == TaskManager::MODE_ABORT)
+      InputEvents::setMode(menu_goto.buffer());
+    else
+      InputEvents::setMode(menu_ordered.buffer());
+
+    return true;
+  }
+
   return false;
 }
 #endif

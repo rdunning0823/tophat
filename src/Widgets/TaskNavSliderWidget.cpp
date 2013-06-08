@@ -53,10 +53,9 @@ Copyright_License {
 #include <stdlib.h>
 
 TaskNavSliderWidget::TaskNavSliderWidget()
-  :slider_shape(UIGlobals::GetDialogLook(), UIGlobals::GetLook().info_box),
-  task_data_cache(CommonInterface::GetComputerSettings(),
-                  CommonInterface::Basic(),
-                  CommonInterface::Calculated().task_stats) {}
+  :task_data_cache(CommonInterface::GetComputerSettings(),
+                   CommonInterface::Basic(),
+                   CommonInterface::Calculated().task_stats) {}
 
 void
 TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc, bool is_panning,
@@ -151,6 +150,9 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
   TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
 
+  const MapSettings &settings_map = CommonInterface::GetMapSettings();
+  const TerrainRendererSettings &terrain = settings_map.terrain;
+  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
   slider_shape.DrawText(canvas, rc_outer,
                         idx, GetList().GetCursorDownIndex() == (int)idx,
                         tp.IsValid() ? tp.waypoint->name.c_str() : _T(""),
@@ -159,7 +161,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                         task_data_cache.GetOrderedTaskSize(),
                         tp.IsValid(), tp.distance, tp.distance_valid,
                         tp.altitude_difference,
-                        tp.altitude_difference_valid);
+                        tp.altitude_difference_valid,
+                        border_width);
 }
 
 void
