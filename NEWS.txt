@@ -1,11 +1,11 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 0.1.7 Beta
-* Task
- - Mat: remove "auto add" turnpoint feature when fly over it
- 
-TopHat 0.1.6 Beta
+TopHat 0.1.7 Beta 6/9/2013
+* Support for IOIO (requires new root - see tophatsoaring.org)
+* Made button placement more consistent
+* Many small UI enhancements
+* Task - Mat: remove "auto add" turnpoint feature when fly over it
 * Infoboxes:
  - Glide ratio "cruise" - show cruise distance
  - Home Altitude Req - show home distance
