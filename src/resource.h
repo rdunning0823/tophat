@@ -148,9 +148,14 @@
 #define IDB_THERMAL_HOTSPOT_HD         5369
 #define IDB_MENU_BUTTON                 500
 #define IDB_MENU_BUTTON_HD             5500
-#define IDB_CHECK_MARK                  503
-#define IDB_CHECK_MARK_HD              5503
 #define IDB_ZOOM_OUT_BUTTON             501
 #define IDB_ZOOM_OUT_BUTTON_HD         5501
 #define IDB_ZOOM_IN_BUTTON              502
 #define IDB_ZOOM_IN_BUTTON_HD          5502
+#define IDB_CHECK_MARK                  503
+#define IDB_CHECK_MARK_HD              5503
+#define IDB_SEARCH                      504
+#define IDB_SEARCH_HD                  5504
+#define IDB_SEARCH_CHECKED              505
+#define IDB_SEARCH_CHECKED_HD          5505
+

@@ -101,6 +101,31 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   else if (ParseHexColor(caption.c_str(), color)) {
     rc.Grow(-3);
     canvas.DrawFilledRectangle(rc, color);
+
+    //draw search icon
+  } else if (caption == _("Search") || caption == _("SearchChecked")) {
+    Bitmap bmp(caption == _("Search") ?
+        (Layout::scale == 1 ? IDB_SEARCH : IDB_SEARCH_HD) :
+        (Layout::scale == 1 ? IDB_SEARCH_CHECKED : IDB_SEARCH_CHECKED_HD));
+
+    const PixelSize bitmap_size = bmp.GetSize();
+    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
+    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
+    if (IsDown())
+      canvas.CopyNotOr(rc.left + offsetx,
+                       rc.top + offsety,
+                       bitmap_size.cx / 2,
+                       bitmap_size.cy,
+                       bmp,
+                       bitmap_size.cx / 2, 0);
+    else
+      canvas.CopyAnd(rc.left + offsetx,
+                      rc.top + offsety,
+                      bitmap_size.cx / 2,
+                      bitmap_size.cy,
+                      bmp,
+                      bitmap_size.cx / 2, 0);
+
   }
 
   //draw gear for set up icon
@@ -124,6 +149,41 @@ WndSymbolButton::OnPaint(Canvas &canvas)
                       bitmap_size.cy,
                       bmp,
                       bitmap_size.cx / 2, 0);
+
+  } else if (caption == _("More") || caption == _("Less")) {
+    bool up = caption == _("Less");
+    // Draw arrow symbols instead of v and ^
+    const Font &font = *look.button.font;
+    canvas.Select(font);
+    canvas.SetBackgroundTransparent();
+    PixelSize text_size = font.TextSize(caption.c_str());
+
+    UPixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / 8;
+    size = std::min(size, (UPixelScalar)(font.GetHeight() / 2));
+    unsigned offset_x = (rc.right - rc.left -
+        (text_size.cx + size * 2 + Layout::Scale(1))) / 2;
+
+    unsigned left = rc.left + offset_x;
+
+    RasterPoint Arrow[3];
+    Arrow[0].x = left + size;
+    Arrow[0].y = (rc.top + rc.bottom) / 2 +
+                 (int)(up ? size : -size) * 2 / 3;
+    Arrow[1].x = left;
+    Arrow[1].y = (rc.top + rc.bottom) / 2 +
+                 (up ? -size : size);
+    Arrow[2].x = left - size;
+    Arrow[2].y = (rc.top + rc.bottom) / 2 +
+                 (int)(up ? size : -size) * 2 / 3;
+
+    canvas.DrawText(left + size * 2 + Layout::Scale(1),
+                    (rc.bottom - rc.top - text_size.cy) / 2 , caption.c_str());
+    canvas.DrawTriangleFan(Arrow, 3);
+
+
+    canvas.Select(Pen(Layout::Scale(1), COLOR_BLACK));
+    canvas.SelectHollowBrush();
+    canvas.DrawCircle(left, (rc.top + rc.bottom) / 2, (UPixelScalar)(size * 1.5));
   } else {
     WndButton::OnPaint(canvas);
   }

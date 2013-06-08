@@ -44,6 +44,8 @@ struct IconLook {
 
   Bitmap hBmpMenuButton;
   Bitmap hBmpCheckMark;
+  Bitmap hBmpSearch;
+  Bitmap hBmpSearchChecked;
   Bitmap hBmpZoomOutButton;
   Bitmap hBmpZoomInButton;
 
