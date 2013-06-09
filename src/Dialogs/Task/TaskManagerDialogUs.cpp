@@ -424,7 +424,7 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
   }
 
   bool task_modified = task_editor_return == TaskEditorReturn::TASK_MODIFIED;
-
+  bool changed;
   ContainerWindow &w = UIGlobals::GetMainWindow();
   TaskManagerDialogUs *instance;
   instance = new TaskManagerDialogUs(look, &active_task, task_modified);
@@ -432,6 +432,7 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
   instance->Initialise(w, w.GetClientRect());
   instance->Prepare(w, w.GetClientRect());
   instance->ShowModal();
+  instance->Save(changed);
   instance->Hide();
   instance->Unprepare();
   delete instance;
