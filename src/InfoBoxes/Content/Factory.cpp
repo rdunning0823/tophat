@@ -844,7 +844,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxTaskSpeedAchieved,
     e_Fin_Distance, // Fin Dis
     e_CC_SpeedInst, // V Task Inst
-    Category::STANDARD,
+    Category::DEPRECATED,
   },
 
   // e_AA_TimeDiff
