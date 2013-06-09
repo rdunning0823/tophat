@@ -107,7 +107,7 @@ dlgAirspaceDetails(const AbstractAirspace &airspace,
   AirspaceDetailsWidget *widget =
     new AirspaceDetailsWidget(airspace, warnings);
   WidgetDialog dialog(UIGlobals::GetDialogLook());
-  dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Airspace Details"), widget);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Airspace Details"), widget);
   dialog.AddButton(_("Close"), mrOK);
 
   if (warnings != nullptr) {
