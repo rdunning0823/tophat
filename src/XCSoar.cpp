@@ -113,7 +113,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   StartupLogFreeRamAndStorage();
 
   // Write startup note + version to logfile
-  LogFormat(_T("Starting %s based on %s"), TopHat_ProductToken, XCSoar_ProductToken);
+    LogFormat(_T("Starting %s %s"), TopHat_ProductToken, XCSoar_ProductToken);
 
   // Read options from the command line
   {
