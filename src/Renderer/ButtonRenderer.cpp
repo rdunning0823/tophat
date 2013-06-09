@@ -26,6 +26,21 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Pen.hpp"
 #include "Look/ButtonLook.hpp"
+#include "Screen/Util.hpp"
+
+#ifdef ENABLE_OPENGL
+
+void
+ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
+                           bool pressed, bool transparent)
+{
+  const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+
+  DrawButtonFancy(canvas, rc, _look.dark_border_pen, _look.light_border_pen,
+                  _look.background_color, focused, pressed, transparent);
+}
+
+#else
 
 void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
@@ -48,6 +63,7 @@ ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
   canvas.DrawTwoLines(rc.left + 2, rc.bottom - 2, rc.right - 2, rc.bottom - 2,
                       rc.right - 2, rc.top + 2);
 }
+#endif
 
 PixelRect
 ButtonRenderer::GetDrawingRect(PixelRect rc, bool pressed)
