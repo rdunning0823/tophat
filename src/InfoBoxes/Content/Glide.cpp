@@ -22,10 +22,15 @@ Copyright_License {
 */
 
 #include "InfoBoxes/Content/Glide.hpp"
+#include "InfoBoxes/Content/Task.hpp"
+#include "InfoBoxes/Panel/Panel.hpp"
 #include "Engine/Util/Gradient.hpp"
 #include "Computer/GlideRatioCalculator.hpp"
 #include "InfoBoxes/Data.hpp"
+#include "InfoBoxes/Panel/GrAverage.hpp"
 #include "Interface.hpp"
+#include "Util/Macros.hpp"
+#include "Language/Language.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -58,8 +63,23 @@ UpdateInfoBoxGRCruise(InfoBoxData &data)
   data.SetValueFromGlideRatio(cruise_gr);
 }
 
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel gr_average_infobox_panels[] = {
+  { N_("Set average period"), LoadGrAveragePanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentGRAvg::GetDialogContent()
+{
+  return gr_average_infobox_panels;
+}
+
 void
-UpdateInfoBoxGRAvg(InfoBoxData &data)
+InfoBoxContentGRAvg::Update(InfoBoxData &data)
 {
   const fixed average_gr = CommonInterface::Calculated().average_gr;
 

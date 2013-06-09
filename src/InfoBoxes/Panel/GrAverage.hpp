@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2012 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,29 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_INFOBOX_CONTENT_GLIDE_HPP
-#define XCSOAR_INFOBOX_CONTENT_GLIDE_HPP
+#ifndef XCSOAR_GR_AVERAGE_PANEL_HPP
+#define XCSOAR_GR_AVERAGE_PANEL_HPP
 
-#include "InfoBoxes/Content/Base.hpp"
+class Widget;
 
-struct InfoBoxData;
-
-void
-UpdateInfoBoxGRInstant(InfoBoxData &data);
-
-void
-UpdateInfoBoxGRCruise(InfoBoxData &data);
-
-void
-UpdateInfoBoxLDVario(InfoBoxData &data);
-
-extern const InfoBoxPanel gr_average_infobox_panels[];
-
-class InfoBoxContentGRAvg: public InfoBoxContentNonTabbed
-{
-public:
-  virtual const InfoBoxPanel *GetDialogContent() override;
-  virtual void Update(InfoBoxData &data);
-};
+Widget *
+LoadGrAveragePanel(unsigned id);
 
 #endif
