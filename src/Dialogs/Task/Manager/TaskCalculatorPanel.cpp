@@ -66,8 +66,7 @@ TaskCalculatorPanel::Refresh()
 
   SetRowVisible(AAT_ESTIMATED, common_stats.ordered_has_targets);
   if (common_stats.ordered_has_targets) {
-    FormatTimespanSmart(time.buffer(), (int)(common_stats.aat_time_remaining
-                        + task_stats.GetEstimatedTotalTime()), 2);
+    FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
     SetText(AAT_ESTIMATED, time.c_str());
   }
   fixed rPlanned = task_stats.total.solution_remaining.IsDefined()
