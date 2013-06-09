@@ -305,7 +305,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
   StaticString<20> label_text;
 
   WindowStyle style_frame;
-  style_frame.Border();
 
   nationality_text = new WndFrame(GetClientAreaWindow(), look,
                                   rc_nationality_text,
