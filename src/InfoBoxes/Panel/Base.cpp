@@ -258,3 +258,17 @@ RatchetListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ratchet_down_rc.top = ratchet_up_rc.bottom + 1;
   ratchet_down_rc.bottom = rc.bottom;
 }
+
+void
+TwoButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  upper_rc = rc;
+  upper_rc.Grow(-2, 0);
+  lower_rc = upper_rc;
+  const UPixelScalar height = GetFooterHeight();
+  upper_rc.top = rc.top + (rc.bottom - rc.top - 2 * height) / 2;
+  upper_rc.bottom = upper_rc.top + height;
+
+  lower_rc.top = upper_rc.bottom + 1;
+  lower_rc.bottom = lower_rc.top + height;
+}

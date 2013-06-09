@@ -38,6 +38,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
+#include "InfoBoxes/Panel/Home.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -515,6 +516,21 @@ UpdateInfoBoxFinalGR(InfoBoxData &data)
     data.SetValueFromGlideRatio(gradient);
   else
     data.SetInvalid();
+}
+
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel home_infobox_panels[] = {
+  { N_("Set home"), LoadHomePanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentHome::GetDialogContent()
+{
+  return home_infobox_panels;
 }
 
 void

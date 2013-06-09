@@ -97,6 +97,8 @@ extern const InfoBoxPanel home_infobox_panels[];
 
 class InfoBoxContentHome: public InfoBoxContentNonTabbed
 {
+public:
+  virtual const InfoBoxPanel *GetDialogContent() override;
 };
 
 class InfoBoxContentHomeDistance : public InfoBoxContentHome
