@@ -150,7 +150,7 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   wp = AddFileReader(_("Waypoints"),
                      _("Primary waypoints file.  Supported file types are Cambridge/WinPilot files (.dat), "
-                         "Zander files (.wpz) or SeeYou files (.cup)."),
+                         "Zander files (.wpz) or SeeYou files (.cup).  Available at http://soaringweb.org/TP"),
                      ProfileKeys::WaypointFile, WAYPOINT_FILE_PATTERNS,
                      true, this);
   dff = (DataFieldFileReader *)(wp->GetDataField());
@@ -168,7 +168,7 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                 ProfileKeys::WatchedWaypointFile, WAYPOINT_FILE_PATTERNS);
   SetExpertRow(WatchedWaypointFile);
 
-  wp = AddFileReader(_("Airspaces"), _("The file name of the primary airspace file."),
+  wp = AddFileReader(_("Airspaces"), _("The file name of the primary airspace file.  Available at http://soaringweb.org/TP"),
                      ProfileKeys::AirspaceFile, _T("*.txt\0*.air\0*.sua\0"),
                      true, this);
   dff = (DataFieldFileReader *)(wp->GetDataField());
