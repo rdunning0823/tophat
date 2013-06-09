@@ -342,7 +342,8 @@ StartupAssistant::Save(bool &changed)
 void
 dlgStartupAssistantShowModal(bool conditional)
 {
-  ShowDialogSetupQuick(true);
+  if (conditional)
+    ShowDialogSetupQuick(true);
 
   StaticString<32> decline_ver;
   decline_ver = Profile::Get(ProfileKeys::StartupTipDeclineVersion, _T(""));
