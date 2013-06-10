@@ -335,8 +335,9 @@ public:
    * Replace the map with a #Widget.  The Widget instance gets deleted
    * when the map gets reactivated with ActivateMap() or if another
    * Widget gets set.
-   */
-  void SetWidget(Widget *_widget);
+   * @param full_screen.  If true, widget occupies full screen,
+   * else only map portion of screen   */
+  void SetWidget(Widget *_widget, bool full_screen = false);
 
   /**
    * Returns the current #Widget, but only if the specified flavour is

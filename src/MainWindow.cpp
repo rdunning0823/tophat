@@ -963,7 +963,7 @@ MainWindow::SetBottomWidget(Widget *_widget)
 }
 
 void
-MainWindow::SetWidget(Widget *_widget)
+MainWindow::SetWidget(Widget *_widget, bool full_screen)
 {
   assert(_widget != NULL);
 
@@ -990,7 +990,7 @@ MainWindow::SetWidget(Widget *_widget)
 
   widget = _widget;
 
-  const PixelRect rc = GetMainRect();
+  const PixelRect rc = (full_screen) ? GetClientRect() : GetMainRect();
   widget->Initialise(*this, rc);
   widget->Prepare(*this, rc);
   widget->Show(rc);

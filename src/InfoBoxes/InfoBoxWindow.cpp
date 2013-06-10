@@ -389,9 +389,9 @@ InfoBoxWindow::ShowDialog(const int id,
   }
  // Widget *widget = panels->load(id);
   if (widget == nullptr)
-    CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id));
+    CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id), true);
   else
-    CommonInterface::main_window->SetWidget(widget);
+    CommonInterface::main_window->SetWidget(widget, true);
 
   CommonInterface::main_window->ActivateMap();
 }
