@@ -182,13 +182,13 @@ ListPicker(const TCHAR *caption,
 
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, widget);
 
-  if (_help_callback != nullptr)
-    dialog.AddButton(_("Help"), *list_widget, HELP);
+  dialog.AddButton(_("Cancel"), mrCancel);
 
   if (num_items > 0)
-    dialog.AddButton(_("Select"), mrOK);
+  dialog.AddButton(_("Select"), mrOK);
 
-  dialog.AddButton(_("Cancel"), mrCancel);
+  if (_help_callback != nullptr)
+      dialog.AddButton(_("Help"), *list_widget, HELP);
 
   auto update_timer = MakeLambdaTimer([list_widget](){
       list_widget->GetList().Invalidate();
