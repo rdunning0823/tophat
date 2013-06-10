@@ -531,27 +531,12 @@ InfoBoxWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 
     if (was_pressed) {
       SetFocus();
-
-      if (GetDialogContent() != nullptr)
-        /* delay the dialog, so double click detection works */
-        dialog_timer.Schedule(300);
+      ShowDialog();
     }
-
     return true;
   }
 
   return false;
-}
-
-bool
-InfoBoxWindow::OnMouseDouble(PixelScalar x, PixelScalar y)
-{
-  dialog_timer.Cancel();
-
-  if (!IsAltair())
-    InputEvents::ShowMenu();
-
-  return true;
 }
 
 bool
