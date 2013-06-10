@@ -27,6 +27,7 @@ Copyright_License {
 #include "TCPPort.hpp"
 #include "K6BtPort.hpp"
 #include "Profile/DeviceConfig.hpp"
+#include "Android/Nook.hpp"
 #include "LogFile.hpp"
 
 #ifdef _WIN32_WCE
@@ -153,6 +154,12 @@ OpenPortInternal(const DeviceConfig &config, DataHandler &handler)
     LogFormat(_T("GPS detected: %s"), buffer);
 
     path = buffer;
+    break;
+
+  case DeviceConfig::PortType::NOOK_NST_USB_HOST:
+#ifdef ANDROID
+    path = Nook::GetUsbHostDriverPath();
+#endif
     break;
 
   case DeviceConfig::PortType::INTERNAL:

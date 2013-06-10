@@ -121,11 +121,6 @@ DetectSerialPorts(DataFieldEnum &df)
 
   unsigned sort_start = df.Count();
 
-#ifdef ANDROID
-  if (IsNookSimpleTouch())
-    Nook::InitUsb();
-#endif
-
   bool found = false;
   const char *path;
   while ((path = enumerator.Next()) != nullptr) {
@@ -268,6 +263,22 @@ FillAndroidBluetoothPorts(DataFieldEnum &df, const DeviceConfig &config)
 #endif
 }
 
+#if defined(ANDROID)
+static void
+FillNookSimpleTouchTypes(DataFieldEnum &df, const DeviceConfig &config)
+{
+  if (!IsNookSimpleTouch())
+    return;
+
+  unsigned id = AddPort(df, DeviceConfig::PortType::NOOK_NST_USB_HOST,
+                        _T(GetNookUsbHostDriverName()), _T(GetNookUsbHostDriverName()),
+                        _T(Nook::GetUsbHostDriverHelp()));
+  if (config.port_type == DeviceConfig::PortType::NOOK_NST_USB_HOST)
+    df.Set(id);
+}
+#endif
+
+
 static void
 FillAndroidIOIOPorts(DataFieldEnum &df, const DeviceConfig &config)
 {
@@ -292,6 +303,10 @@ FillAndroidIOIOPorts(DataFieldEnum &df, const DeviceConfig &config)
 static void
 FillPorts(DataFieldEnum &df, const DeviceConfig &config)
 {
+#if defined(ANDROID)
+  if (IsNookSimpleTouch())
+    FillNookSimpleTouchTypes(df, config);
+#endif
   FillPortTypes(df, config);
   FillSerialPorts(df, config);
   FillAndroidBluetoothPorts(df, config);
@@ -364,6 +379,7 @@ SetPort(DataFieldEnum &df, const DeviceConfig &config)
   case DeviceConfig::PortType::RFCOMM_SERVER:
     break;
 
+  case DeviceConfig::PortType::NOOK_NST_USB_HOST:
   case DeviceConfig::PortType::SERIAL:
     SetPort(df, config.port_type, config.path);
     return;
@@ -705,6 +721,7 @@ FinishPortField(DeviceConfig &config, const DataFieldEnum &df)
     config.port_type = new_type;
     return true;
 
+  case DeviceConfig::PortType::NOOK_NST_USB_HOST:
   case DeviceConfig::PortType::SERIAL:
   case DeviceConfig::PortType::PTY:
     /* Serial Port */

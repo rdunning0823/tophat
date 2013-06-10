@@ -71,3 +71,15 @@ Nook::SetCharge500()
 {
   system(cmd_set_charge_500);
 }
+
+const char*
+Nook::GetUsbHostDriverHelp()
+{
+  return "Sets Nook to USB Host mode.  This disables IOIO until Nook is REBOOTED!";
+}
+
+const char*
+Nook::GetUsbHostDriverPath()
+{
+  return "/dev/ttyUSB0";
+}

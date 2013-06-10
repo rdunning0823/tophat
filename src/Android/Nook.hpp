@@ -24,6 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_ANDROID_NOOK_HPP
 #define XCSOAR_ANDROID_NOOK_HPP
 
+#include "Language/Language.hpp"
+
 namespace Nook {
 
   /**
@@ -48,6 +50,11 @@ namespace Nook {
    */
   void SetCharge500();
 
+
+#define GetNookUsbHostDriverName() "Nook ST USB Host"
+
+  const char* GetUsbHostDriverHelp();
+  const char* GetUsbHostDriverPath();
 
 }
 
