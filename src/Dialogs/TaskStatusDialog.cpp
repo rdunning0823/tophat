@@ -32,7 +32,7 @@ ShowTaskStatusDialog()
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
   WidgetDialog dialog(look);
-  dialog.CreateAuto(UIGlobals::GetMainWindow(),
+  dialog.CreateFull(UIGlobals::GetMainWindow(),
                     _("Task Status"),
                     new TaskCalculatorPanel(look));
   dialog.AddButton(_("OK"), mrOK);
