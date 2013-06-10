@@ -217,10 +217,10 @@ static constexpr MetaData meta_data[] = {
   {
     N_("GR cruise"),
     N_("GR Cruise"),
-    N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'."),
+    N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'.  Cruise distance shown also."),
     UpdateInfoBoxGRCruise,
-    e_Fin_GR_TE, // Final GR
-    e_GR_Instantaneous, // GR Inst
+    e_Fin_GR_TE, // Final LD
+    e_GR_Instantaneous, // LD Inst
     Category::STANDARD,
   },
 

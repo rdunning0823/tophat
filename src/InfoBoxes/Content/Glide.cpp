@@ -61,6 +61,9 @@ UpdateInfoBoxGRCruise(InfoBoxData &data)
 
   // Set Value
   data.SetValueFromGlideRatio(cruise_gr);
+
+  data.SetCommentFromDistance(CommonInterface::Basic().location.Distance(
+      CommonInterface::Calculated().cruise_start_location));
 }
 
 #ifdef __clang__
