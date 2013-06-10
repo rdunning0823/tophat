@@ -554,7 +554,7 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
 }
 
 void
-InfoBoxContentHomeAltitudeRequired::Update(InfoBoxData &data)
+InfoBoxContentHomeAltitudeDiff::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();

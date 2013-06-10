@@ -107,7 +107,7 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
-class InfoBoxContentHomeAltitudeRequired : public InfoBoxContentHome
+class InfoBoxContentHomeAltitudeDiff : public InfoBoxContentHome
 {
 public:
   virtual void Update(InfoBoxData &data);

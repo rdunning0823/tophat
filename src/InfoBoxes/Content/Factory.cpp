@@ -1317,12 +1317,12 @@ static constexpr MetaData meta_data[] = {
   },
 
   {
-    N_("Home altitude required"),
-    N_("Home Alt Req"),
-    N_("Altitude required to reach the home waypoint (including safety height).  User can change the home waypoint by clicking.  Distance shown in comment."),
-    IBFHelper<InfoBoxContentHomeAltitudeRequired>::Create,
-    HomeAltitudeRequired,
-    HomeAltitudeRequired,
+    N_("Home altitude difference"),
+    N_("Home alt diff"),
+    N_("Arrival altitude difference for the home waypoint (including safety height).  User can change the home waypoint by clicking.  Distance shown in comment."),
+    IBFHelper<InfoBoxContentHomeAltitudeDiff>::Create,
+    HomeAltitudeDiff,
+    HomeAltitudeDiff,
     STANDARD,
   },
 };
