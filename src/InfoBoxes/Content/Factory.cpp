@@ -204,7 +204,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_GR_Instantaneous
   {
-    N_("GR instantaneous"),
+    N_("Glide ratio instantaneous"),
     N_("GR Inst"),
     N_("Instantaneous glide ratio over ground, given by the ground speed divided by the vertical speed (GPS speed) over the last 20 seconds. Negative values indicate climbing cruise. If the vertical speed is close to zero, the displayed value is '---'."),
     UpdateInfoBoxGRInstant,
@@ -215,7 +215,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_GR_Cruise
   {
-    N_("GR cruise"),
+    N_("Glide ratio cruise"),
     N_("GR Cruise"),
     N_("The distance from the top of the last thermal, divided by the altitude lost since the top of the last thermal. Negative values indicate climbing cruise (height gain since leaving the last thermal). If the vertical speed is close to zero, the displayed value is '---'.  Cruise distance shown also."),
     UpdateInfoBoxGRCruise,
@@ -372,9 +372,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_GR_TE
   {
-    _T("Final GR (TE) deprecated"),
-    _T("---"),
-    _T("Deprecated, there is no TE compensation on GR, you should switch to the \"Final GR\" info box."),
+    N_("Final glide ratio (TE) deprecated"),
+    N_("---"),
+    N_("Deprecated, there is no TE compensation on glide ratio, you should switch to the \"Final glide ratio\" info box."),
     UpdateInfoBoxFinalGR,
     e_Fin_GR, // Final GR
     e_GR_Cruise, // GR Cruise
@@ -582,7 +582,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_GR
   {
-    N_("Next GR"),
+    N_("Next glide ratio"),
     N_("WP GR"),
     N_("The required glide ratio over ground to reach the next waypoint, given by the distance to next waypoint divided by the height required to arrive at the safety arrival height."),
     UpdateInfoBoxNextGR,
@@ -897,7 +897,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_GR
   {
-    N_("Final GR"),
+    N_("Final glide ratio"),
     N_("Fin GR"),
     N_("Geometric gradient to the arrival height above the final waypoint. This is not adjusted for total energy."),
     UpdateInfoBoxFinalGR,
@@ -930,7 +930,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_Alternate_1_GR
   {
-    N_("Alternate 1 GR"),
+    N_("Alternate 1 glide ratio"),
     N_("Altn1 GR"),
     N_("Geometric gradient to the arrival height above the best alternate. This is not adjusted for total energy."),
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
@@ -953,7 +953,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_GR_Avg
   {
-    N_("GR average"),
+    N_("Glide ratio average"),
     N_("GR Avg"),
     N_("The distance made in the configured period of time , divided by the altitude lost since then. Negative values are shown as ^^^ and indicate climbing cruise (height gain). Over 200 of GR the value is shown as +++ . You can configure the period of averaging in the system setup. Suggested values are 60, 90 or 120. Lower values will be closed to GR Inst, and higher values will be closed to GR Cruise. Notice that the distance is NOT the straight line between your old and current position, it's exactly the distance you have made even in a zigzag glide. This value is not calculated while circling."),
     IBFHelper<InfoBoxContentGRAvg>::Create,
