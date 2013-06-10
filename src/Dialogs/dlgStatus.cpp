@@ -109,7 +109,7 @@ dlgStatusShowModal(int start_page)
   const Bitmap *TimesIcon = enable_icons ? &icons.hBmpTabTimes : NULL;
 
   Widget *flight_panel = new FlightStatusPanel(look, nearest_waypoint);
-  tab_bar.AddTab(flight_panel, _("Flight"), FlightIcon);
+  tab_bar.AddTab(flight_panel, _("Plane"), FlightIcon);
 
   Widget *system_panel = new SystemStatusPanel(look);
   tab_bar.AddTab(system_panel, _("System"), SystemIcon);
