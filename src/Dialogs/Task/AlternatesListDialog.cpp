@@ -21,84 +21,45 @@ Copyright_License {
 }
 */
 
+#include "AlternatesListDialog.hpp"
 #include "TaskDialogs.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
-#include "Widget/ListWidget.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Font.hpp"
 #include "Look/DialogLook.hpp"
-#include "Task/ProtectedTaskManager.hpp"
-#include "Engine/Task/Unordered/AlternateList.hpp"
 #include "Components.hpp"
+#include "Task/ProtectedTaskManager.hpp"
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
 #include "Look/MapLook.hpp"
 #include "Renderer/WaypointListRenderer.hpp"
 #include "Language/Language.hpp"
 
-class AlternatesListWidget final
-  : public ListWidget, private ActionListener {
-  enum Buttons {
-    SETTINGS,
-    GOTO,
-  };
 
-  const DialogLook &dialog_look;
+void
+AlternatesListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
+                                  unsigned index)
+{
+  assert(index < alternates.size());
 
-  WndButton *details_button, *cancel_button, *goto_button;
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const Waypoint &waypoint = alternates[index].waypoint;
+  const GlideResult& solution = alternates[index].solution;
 
-public:
-  AlternateList alternates;
+  WaypointListRenderer::Draw(canvas, rc, waypoint, solution.vector.distance,
+                             solution.SelectAltitudeDifference(settings.task.glide),
+                             UIGlobals::GetDialogLook(),
+                             UIGlobals::GetMapLook().waypoint,
+                             CommonInterface::GetMapSettings().waypoint);
+}
 
-public:
-  void CreateButtons(WidgetDialog &dialog);
-
-public:
-  AlternatesListWidget(const DialogLook &_dialog_look)
-    :dialog_look(_dialog_look) {}
-
-  unsigned GetCursorIndex() const {
-    return GetList().GetCursorIndex();
-  }
-
-  void Update() {
-    ProtectedTaskManager::Lease lease(*protected_task_manager);
-    alternates = lease->GetAlternates();
-  }
-
-public:
-  /* virtual methods from class Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual void Unprepare() override {
-    DeleteWindow();
-  }
-
-  /* virtual methods from class List::Handler */
-  virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
-                           unsigned index) override {
-    assert(index < alternates.size());
-
-    const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-    const Waypoint &waypoint = alternates[index].waypoint;
-    const GlideResult& solution = alternates[index].solution;
-
-    WaypointListRenderer::Draw(canvas, rc, waypoint, solution.vector.distance,
-                               solution.SelectAltitudeDifference(settings.task.glide),
-                               UIGlobals::GetDialogLook(),
-                               UIGlobals::GetMapLook().waypoint,
-                               CommonInterface::GetMapSettings().waypoint);
-  }
-
-  virtual bool CanActivateItem(unsigned index) const {
-    return true;
-  }
-
-  virtual void OnActivateItem(unsigned index) override;
-
-  /* virtual methods from class ActionListener */
-  virtual void OnAction(int id) override;
-};
+void
+AlternatesListWidget::Update()
+{
+  ProtectedTaskManager::Lease lease(*protected_task_manager);
+  alternates = lease->GetAlternates();
+}
 
 void
 AlternatesListWidget::CreateButtons(WidgetDialog &dialog)
