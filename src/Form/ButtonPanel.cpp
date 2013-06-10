@@ -139,11 +139,13 @@ ButtonPanel::HorizontalRange(PixelRect rc, unsigned start, unsigned end)
                       rc.left + width, rc.bottom);
   rc.bottom -= row_height;
 
-  for (unsigned i = start; i < end; ++i) {
-    buttons[i]->Move(button_rc);
+  for (unsigned i = end - 1; ; --i) {
+    buttons[buttons.size() - i - 1]->Move(button_rc);
 
     button_rc.left = button_rc.right;
     button_rc.right += width;
+    if (i == start)
+      break;
   }
 
   return rc;
@@ -173,10 +175,10 @@ ButtonPanel::BottomLayout(PixelRect rc)
   unsigned end = buttons.size();
   while (end > 0) {
     unsigned start = end - 1;
-    UPixelScalar max_width = Width(start);
+    UPixelScalar max_width = Width(buttons.size() - start - 1);
     while (start > 0) {
       --start;
-      UPixelScalar width = Width(start);
+      UPixelScalar width = Width(buttons.size() - start - 1);
       UPixelScalar new_width = std::max(width, max_width);
       if ((end - start) * new_width > total_width) {
         ++start;
