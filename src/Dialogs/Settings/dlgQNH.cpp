@@ -188,7 +188,7 @@ dlgQNHShowModal()
 
   StaticString<128> caption(_("QNH"));
   WidgetDialog dialog(UIGlobals::GetDialogLook());
-  dialog.CreateAuto(UIGlobals::GetMainWindow(), caption, instance);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), caption, instance);
 
 
   dialog.AddButton(_("OK"), mrOK);
