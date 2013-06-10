@@ -28,6 +28,7 @@ Copyright_License {
 #ifdef ENABLE_OPENGL
 #include "Screen/Pen.hpp"
 #include "Screen/Color.hpp"
+#include "Screen/Layout.hpp"
 #endif
 
 gcc_const
@@ -182,76 +183,31 @@ RoundRect(Canvas &canvas, PixelScalar left, PixelScalar top,
 }
 #ifdef ENABLE_OPENGL
 void
-BuildButtonShape(RasterPoint *points, const PixelRect &rc)
-{
-  unsigned scale = 1; //(rc.bottom - rc.top > 30) ? 4 : 1;
-
-  //left to left top
-  points[0].x = rc.left;
-  points[0].y = rc.top + 4 * scale;
-  points[1].x = rc.left + 1 * scale;
-  points[1].y = rc.top + 2 * scale;
-
-  points[2].x = rc.left + 2 * scale;
-  points[2].y = rc.top + 1 * scale;
-  points[3].x = rc.left + 4 * scale;
-  points[3].y = rc.top;
-
-  //top to top right
-  points[4].x = rc.right - 4 * scale;
-  points[4].y = points[3].y;
-  points[5].x = rc.right - 2 * scale;
-  points[5].y = points[2].y;
-
-  points[6].x = rc.right - 1 * scale;
-  points[6].y = points[1].y;
-  points[7].x = rc.right;
-  points[7].y = points[0].y;
-
-  //right to right bottom
-  points[8].x = points[7].x;
-  points[8].y = rc.bottom - 4 * scale;
-  points[9].x = points[6].x;
-  points[9].y = rc.bottom - 2 * scale;
-
-  points[10].x = points[5].x;
-  points[10].y = rc.bottom - 1 * scale;
-  points[11].x = points[4].x;
-  points[11].y = rc.bottom;
-
-  //bottom to bottom left
-  points[12].x = points[3].x;
-  points[12].y = points[11].y;
-  points[13].x = points[2].x;
-  points[13].y = points[10].y;
-
-  points[14].x = points[1].x;
-  points[14].y = points[9].y;
-  points[15].x = points[0].x;
-  points[15].y = points[8].y;
-}
-
-void
 DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
                 const Pen &light_border_pen, Color background_color,
                 bool focused, bool pressed, bool transparent)
 {
-  canvas.Select(pressed ? light_border_pen : dark_border_pen);
-  RasterPoint points[16];
+  Pen pen_thick(2, pressed ? light_border_pen.GetColor() :
+      dark_border_pen.GetColor());
+  canvas.Select(pen_thick);
   rc.right -= 1;
+  rc.top += 1;
 
-  if (!transparent) {
-    PixelRect rc_inner = rc;
-    rc_inner.Grow(-1, -1);
-    canvas.DrawFilledRectangle(rc_inner, background_color);
-  }
+  if (transparent)
+    canvas.SelectHollowBrush();
+  else
+    canvas.Select(Brush(background_color));
 
-  canvas.SelectHollowBrush();
-  BuildButtonShape(points, rc);
-  canvas.DrawPolygon(points, 16);
+  canvas.DrawRoundRectangle(rc.left, rc.top,
+                            rc.right, rc.bottom,
+                            20,
+                            20);
 
   rc.Grow(-1, -1);
-  BuildButtonShape(points, rc);
-  canvas.DrawPolygon(points, 16);
+  rc.Offset(0, -1);
+  canvas.DrawRoundRectangle(rc.left, rc.top,
+                            rc.right, rc.bottom,
+                            20,
+                            20);
 }
 #endif /* ENABLE_OPENGL */

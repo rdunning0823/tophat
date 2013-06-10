@@ -53,13 +53,6 @@ RoundRect(Canvas &canvas, PixelScalar left, PixelScalar top,
           PixelScalar right, PixelScalar bottom, UPixelScalar radius);
 #ifdef ENABLE_OPENGL
 /**
- * Creates a shape of a fancy button outline
- * @param points: array of points
- * @param rc: outline of square button area
- */
-void BuildButtonShape(RasterPoint *points, const PixelRect &rc);
-
-/**
  * draws fancy button
  */
 void DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
