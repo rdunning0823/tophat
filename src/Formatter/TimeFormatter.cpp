@@ -99,15 +99,10 @@ FormatTimeTwoLines(TCHAR *buffer1, TCHAR *buffer2, int _time)
 
   const BrokenTime time = BrokenTime::FromSecondOfDay(abs(_time));
 
-  if (time.hour > 0) { // hh:mm, ss
-    // Set Value
-    _stprintf(buffer1, _T("%02u:%02u"), time.hour, time.minute);
-    _stprintf(buffer2, _T("%02u"), time.second);
+  // Set Value
+  _stprintf(buffer1, _T("%02u:%02u"), time.hour, time.minute);
+  _stprintf(buffer2, _T("%02u"), time.second);
 
-  } else { // mm:ss
-    _stprintf(buffer1, _T("%02u'%02u"), time.minute, time.second);
-    buffer2[0] = '\0';
-  }
 }
 
 static void
