@@ -28,7 +28,7 @@ Copyright_License {
 
 extern const InfoBoxPanel altitude_infobox_panels[];
 
-class InfoBoxContentAltitude : public InfoBoxContent
+class InfoBoxContentAltitude : public InfoBoxContentTabbed
 {
 public:
   virtual const InfoBoxPanel *GetDialogContent() override;

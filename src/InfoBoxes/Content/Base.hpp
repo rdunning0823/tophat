@@ -59,7 +59,7 @@ public:
    * in a legacy tab format or not.
    */
   virtual bool ShowInTabLayout() const {
-    return true;
+    return false;
   }
 };
 
@@ -69,6 +69,16 @@ class InfoBoxContentNonTabbed : public InfoBoxContent {
    */
   virtual bool ShowInTabLayout() const {
     return false;
+  }
+
+};
+
+class InfoBoxContentTabbed : public InfoBoxContent {
+  /**
+   * Tells consumer of content to show in a tabbed layout (not full screen)
+   */
+  virtual bool ShowInTabLayout() const {
+    return true;
   }
 
 };

@@ -26,11 +26,11 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
-class InfoBoxContentAlternateName : public InfoBoxContent
+class InfoBoxContentAlternateName : public InfoBoxContentTabbed
 {
 public:
-  InfoBoxContentAlternateName(const unsigned _index):
-    InfoBoxContent(), index(_index) {}
+  InfoBoxContentAlternateName(const unsigned _index)
+  :index(_index) {}
   virtual void Update(InfoBoxData &data) override;
   virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
   virtual const InfoBoxPanel *GetDialogContent() override;
@@ -39,11 +39,11 @@ private:
   unsigned index;
 };
 
-class InfoBoxContentAlternateGR : public InfoBoxContent
+class InfoBoxContentAlternateGR : public InfoBoxContentTabbed
 {
 public:
-  InfoBoxContentAlternateGR(const unsigned _index):
-    InfoBoxContent(), index(_index) {}
+  InfoBoxContentAlternateGR(const unsigned _index)
+  :index(_index) {}
   virtual void Update(InfoBoxData &data) override;
   virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
   virtual const InfoBoxPanel *GetDialogContent() override;
