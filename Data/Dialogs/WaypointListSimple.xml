@@ -12,6 +12,6 @@
   <Label Name="frmSummaryLabels2" X="120" Width="50" Y="-55" Height="20"/>
   <Label Name="frmSummaryValues2" X="170" Y="-55" Width="70" Height="20"/>
 
-  <Button Name="cmdSelect" Caption="Select" X="0" Y="-35" Width="-120" Height="35" OnClick="OnSelectClicked" />
-  <Button Name="cmdClose" Caption="Cancel" X="-120" Y="-35" Height="35" OnClick="OnCloseClicked" />
+  <Button Name="cmdClose" Caption="Cancel" X="0" Y="-35" Width="-120" Height="35" OnClick="OnCloseClicked" />
+  <Button Name="cmdSelect" Caption="Select" X="-120" Y="-35" Height="35" OnClick="OnSelectClicked" />
 </Form>
