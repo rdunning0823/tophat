@@ -1,11 +1,195 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 0.1.7 Beta
-* Task
- - Mat: remove "auto add" turnpoint feature when fly over it
- 
-TopHat 0.1.6 Beta
+TopHat 1.0.1 Beta June 12, 2013
+* Many more device drivers including i2c and LNAV
+First release of Top Hat based on XCSoar 6.6 features:
+* map
+  - optional distinct map zoom on each page (#1603)
+  - add label selection "Task waypoints & airfields"
+  - allow configuration of "Final glide bar" display (#2554)
+  - new snail trail option "Vario-scaled dots and lines"
+  - topography icons
+  - don't draw pan info over north arrow (#2765)
+* cross section
+  - show airspace names (#1149, #2390)
+  - use glide polar instead of current glide ratio (#2687)
+* infoboxes
+  - green InfoBox distance when inside observation zone (#2560)
+  - limit the InfoBox aspect ratio
+  - new InfoBox styles "Shaded" (#1852), "Glass" (#2466)
+  - waypoint details button in target dialog (#1967)
+  - show distance in radial InfoBox comment (#2577)
+  - new InfoBox "ATC radial" with distance in nautical miles (#2269, #2706)
+  - improved wind edit panel (#2770)
+* user interface
+  - replay fast-forward
+  - new waypoint location editor (#343)
+  - show required glide ratio in waypoint details (#1573)
+  - add airspace ack button to map item list (#2139)
+  - additionally show airspace altitude in feet (#2379)
+  - show more files in replay file picker (#2582)
+  - clicking with Ctrl key pressed moves the simulator (#199)
+  - vario bar at the right edge of the map
+* tasks
+  - custom symmetric quadrant (#2125)
+  - AAT keyhole (#1687)
+  - add AST point option "Score exit" (#2544)
+  - optimise start point
+  - allow up to 30 turn points in racing tasks
+  - local time for task start open/close time (#2645)
+  - enforce the task start open/close time (#2678)
+  - fix start auto-advance
+* calculations
+  - improve the circling wind algorithm (#2690)
+* devices
+  - Volkslogger: support IGC file download (#1972)
+  - Volkslogger: declaration no longer erases waypoint database from logger
+  - CAI302: support uploading all waypoint file types (#2054)
+  - V7: support for QNH synchronization to V7 vario
+* Android
+  - faster map renderer on some Android devices
+* other
+  - new polars for two G 102 Astir variants (#2701)
+  - new option "auto bugs" increases bug setting every hour (#1526)
+* configuration
+  - fix saving of configuration values in non-metric setups (#2771)
+XCS 6.5.4
+* devices
+  - Volkslogger: increase timeout for reading flight list
+  - V7: fix QNH change
+* logger
+  - fix failing IGC logger (#2658, #2735, #2736, #2746, #2751)
+XCS 6.5.3
+* user interface
+  - eliminate flickering in the cross section on Windows
+  - fix wrong radial display in target dialog
+  - start at terrain center when there's no GPS fix and no home location
+* task
+  - fix line OZ rounding error (#2599)
+* devices
+  - FLARM: fix IGC file download on firmware 5.09 (#2619)
+* Android
+  - fix crash with Hebrew language
+* Mac OS X
+  - fix crash on startup (#2607, #2667)
+  - show missing serial ports, hide internal devices (#2668)
+* infoboxes
+  - fix rendering of thermal assistant aircraft symbol (#2702)
+XCS 6.5.2
+* user interface
+  - fix hang during startup (#2662, #2663)
+  - fix freeze in dialogs (#2664)
+  - automatically re-enable manual wind controls (#2336)
+  - fix crash after connecting FLARM (#2669)
+XCS 6.5.1
+* infoboxes
+  - fix MacCready adjustment for non-metric units (#2654)
+* user interface
+  - fix bogus "restart XCSoar" messages
+  - fix cross section render error on some OpenGL chips (#2631, #2661)
+  - allow gestures in cross section (#2655)
+* devices
+  - fix crash in Android Bluetooth driver (#2636, #2656)
+  - fix NMEA input on Android Bluetooth Server
+* data files
+  - use the terrain cache even when the system clock is wrong
+  - fix G record regression (#2657)
+XCS 6.5
+* map
+  - lower zoom levels possible while circling (#1120)
+  - draw FAI triangle areas (#1563)
+  - optimise the terrain renderer
+  - added "Wind Up" display orientation
+  - high-resolution terrain renderer (Android/Linux only)
+  - kinetic panning (Android/Linux only)
+  - new terrain color ramp "Gaudy"
+* calculations
+  - don't detect landing while climbing in a wave (#1330, #2289, #2406)
+  - basic support for the contest "DMSt" (#2208)
+* tasks
+  - add task start countdown (#136, #1080)
+  - optimise racing tasks for minimum distance
+  - allow observation zone sizes up to 200km (#2401)
+  - always use "arrival safety height" when calculating arrival heights
+    for intermediate task turnpoints
+* devices
+  - LX: support flight download from LXNAV Nano (#2085)
+  - LX: support flight download from LX5000/LX7000 pro IGC
+  - LX: read bugs setting from the LX160 vario (#2167)
+  - Android/IOIO: support BMP085 sensor (DroidSoar V2)
+  - Android/IOIO: support MS5611 pressure sensor
+  - added driver for Levil AHRS device
+  - Leonardo: read indicated airspeed from PDGFTL1 sentence
+  - C-Probe: read IAS/TAS from the device
+  - K6Bt: fix baud rate switching with various drivers
+  - K6Bt: fix configured baud rate setup on Android
+* data files
+  - added MATZ airspace class (#2530)
+  - integrated handicaps from DAEC 2012
+* logger
+  - auto-flush IGC logger after every fix
+* user interface
+  - preselect first item with details in map item list for
+    faster access (#2069, #2207)
+  - non-modal FLARM radar (with InfoBoxes and menu)
+  - show FAI triangle sectors in task manager
+  - can drag modal dialogs
+  - short click opens InfoBox dialog
+  - support keyboard input on desktop computer
+  - improved angle input (e.g. wind direction, sector radials)
+  - faster map initialisation during startup
+  - reduce audio vario latency
+  - better bold fonts on Linux
+  - add page option to show cross section below map
+  - allow pages with FLARM radar and thermal assistant
+  - double click on vario opens main menu
+  - allow opening main menu while panning
+  - new translations: Hebrew, Vietnamese
+* infoboxes
+  - added thermal assistant infobox
+  - inverse colors for wind arrow infobox and flarm gauge (#2337)
+* track friends via internet connection (SkyLines live tracking)
+* SkyLines tracking enabled on Windows CE
+* Android
+  - check if external storage is mounted
+* Documentation
+  - started a French translation of the manual
+  - included an almost complete German translation of the manual
+XCS 6.4.6
+* devices
+  - Leonardo: fixed vario parser for the $c sentence
+  - C-Probe: fixed temperature offset bug
+  - GTAltimeter: fixed vario parser
+  - SerialPort: fixed lockup/hang problem when closing for some CE devices (#2515)
+* user interface
+  - sort airspaces properly in the airspace list dialog (#2528)
+* infoboxes
+  - fixes broken wind arrow display in some situations (#2295)
+  - fix font scaling on screen rotation change (Android/Linux OpenGL)
+* data files
+  - fixed arc airspace approximation threshold handling (#2360)
+* configuration
+  - save waypoint label display configuration changed from menu (#2548)
+XCS 6.4.5
+* calculations
+  - fix rounding error in convex boundary calculation (#2477)
+* devices
+  - Vega: fix MacCready setting feedback loop (#1218, #2490)
+* user interface
+  - faster gesture drawing
+  - fix crash in InfoBox page setup (#2122)
+  - allow scrolling the check list on Altair (#1289)
+* map
+  - fix crash in terrain renderer with broken map file (#2478)
+* data files
+  - added "LAK-12" polar
+
+TopHat 1.0 June 11, 2011
+* Support for IOIO (requires new root - see tophatsoaring.org)
+* Made button placement more consistent
+* Many small UI enhancements
+* Task - Mat: remove "auto add" turnpoint feature when fly over it
 * Infoboxes:
  - Glide ratio "cruise" - show cruise distance
  - Home Altitude Req - show home distance
@@ -21,7 +205,6 @@ TopHat 0.1.5 Beta 4/7/2013
 * fix bug in Advanced wind setup
 
 TopHat 0.1.4 Beta 3/30/2013
-
 * Task
  - Made Nav Bar thinner
  - Cleaned up task editor, redundant information
@@ -96,196 +279,4 @@ TopHat 0.1.1 1/22/2013 (based on XCSoar 6.4.4)
 * Added "one stop shopping" for all navigation needs with a clickable/slidable 
   task bar at top of screen that shows destination information
 * Add menu button and zoom buttons to the main screen
-
-
-* Upgraded from XCSoar 6.4.4 to 6.6
-Version 6.6 - 2013/04/23
-* map
-  - optional distinct map zoom on each page (#1603)
-  - add label selection "Task waypoints & airfields"
-  - allow configuration of "Final glide bar" display (#2554)
-  - new snail trail option "Vario-scaled dots and lines"
-  - topography icons
-  - don't draw pan info over north arrow (#2765)
-* cross section
-  - show airspace names (#1149, #2390)
-  - use glide polar instead of current glide ratio (#2687)
-* infoboxes
-  - green InfoBox distance when inside observation zone (#2560)
-  - limit the InfoBox aspect ratio
-  - new InfoBox styles "Shaded" (#1852), "Glass" (#2466)
-  - waypoint details button in target dialog (#1967)
-  - show distance in radial InfoBox comment (#2577)
-  - new InfoBox "ATC radial" with distance in nautical miles (#2269, #2706)
-  - improved wind edit panel (#2770)
-* user interface
-  - replay fast-forward
-  - new waypoint location editor (#343)
-  - show required glide ratio in waypoint details (#1573)
-  - add airspace ack button to map item list (#2139)
-  - additionally show airspace altitude in feet (#2379)
-  - show more files in replay file picker (#2582)
-  - clicking with Ctrl key pressed moves the simulator (#199)
-  - vario bar at the right edge of the map
-* tasks
-  - MAT tasks (#563)
-  - custom symmetric quadrant (#2125)
-  - AAT keyhole (#1687)
-  - add AST point option "Score exit" (#2544)
-  - optimise start point
-  - allow up to 30 turn points in racing tasks
-  - local time for task start open/close time (#2645)
-  - enforce the task start open/close time (#2678)
-  - fix start auto-advance
-* calculations
-  - improve the circling wind algorithm (#2690)
-* devices
-  - Volkslogger: support IGC file download (#1972)
-  - Volkslogger: declaration no longer erases waypoint database from logger
-  - CAI302: support uploading all waypoint file types (#2054)
-  - V7: support for QNH synchronization to V7 vario
-* Android
-  - faster map renderer on some Android devices
-* other
-  - new polars for two G 102 Astir variants (#2701)
-  - new option "auto bugs" increases bug setting every hour (#1526)
-* configuration
-  - fix saving of configuration values in non-metric setups (#2771)
-
-Version 6.5.4 - 2013/04/10
-* devices
-  - Volkslogger: increase timeout for reading flight list
-  - V7: fix QNH change
-* logger
-  - fix failing IGC logger (#2658, #2735, #2736, #2746, #2751)
-
-Version 6.5.3 - 2013/03/26
-* user interface
-  - eliminate flickering in the cross section on Windows
-  - fix wrong radial display in target dialog
-  - start at terrain center when there's no GPS fix and no home location
-* task
-  - fix line OZ rounding error (#2599)
-* devices
-  - FLARM: fix IGC file download on firmware 5.09 (#2619)
-* Android
-  - fix crash with Hebrew language
-* Mac OS X
-  - fix crash on startup (#2607, #2667)
-  - show missing serial ports, hide internal devices (#2668)
-* infoboxes
-  - fix rendering of thermal assistant aircraft symbol (#2702)
-
-Version 6.5.2 - 2013/03/15
-* user interface
-  - fix hang during startup (#2662, #2663)
-  - fix freeze in dialogs (#2664)
-  - automatically re-enable manual wind controls (#2336)
-  - fix crash after connecting FLARM (#2669)
-
-Version 6.5.1 - 2013/03/12
-* infoboxes
-  - fix MacCready adjustment for non-metric units (#2654)
-* user interface
-  - fix bogus "restart XCSoar" messages
-  - fix cross section render error on some OpenGL chips (#2631, #2661)
-  - allow gestures in cross section (#2655)
-* devices
-  - fix crash in Android Bluetooth driver (#2636, #2656)
-  - fix NMEA input on Android Bluetooth Server
-* data files
-  - use the terrain cache even when the system clock is wrong
-  - fix G record regression (#2657)
-
-Version 6.5 - 2013/03/08
-* map
-  - lower zoom levels possible while circling (#1120)
-  - draw FAI triangle areas (#1563)
-  - optimise the terrain renderer
-  - added "Wind Up" display orientation
-  - high-resolution terrain renderer (Android/Linux only)
-  - kinetic panning (Android/Linux only)
-  - new terrain color ramp "Gaudy"
-* calculations
-  - don't detect landing while climbing in a wave (#1330, #2289, #2406)
-  - basic support for the contest "DMSt" (#2208)
-* tasks
-  - add task start countdown (#136, #1080)
-  - optimise racing tasks for minimum distance
-  - allow observation zone sizes up to 200km (#2401)
-  - always use "arrival safety height" when calculating arrival heights
-    for intermediate task turnpoints
-* devices
-  - LX: support flight download from LXNAV Nano (#2085)
-  - LX: support flight download from LX5000/LX7000 pro IGC
-  - LX: read bugs setting from the LX160 vario (#2167)
-  - Android/IOIO: support BMP085 sensor (DroidSoar V2)
-  - Android/IOIO: support MS5611 pressure sensor
-  - added driver for Levil AHRS device
-  - Leonardo: read indicated airspeed from PDGFTL1 sentence
-  - C-Probe: read IAS/TAS from the device
-  - K6Bt: fix baud rate switching with various drivers
-  - K6Bt: fix configured baud rate setup on Android
-* data files
-  - added MATZ airspace class (#2530)
-  - integrated handicaps from DAEC 2012
-* logger
-  - auto-flush IGC logger after every fix
-* user interface
-  - preselect first item with details in map item list for
-    faster access (#2069, #2207)
-  - non-modal FLARM radar (with InfoBoxes and menu)
-  - show FAI triangle sectors in task manager
-  - can drag modal dialogs
-  - short click opens InfoBox dialog
-  - support keyboard input on desktop computer
-  - improved angle input (e.g. wind direction, sector radials)
-  - faster map initialisation during startup
-  - reduce audio vario latency
-  - better bold fonts on Linux
-  - add page option to show cross section below map
-  - allow pages with FLARM radar and thermal assistant
-  - double click on vario opens main menu
-  - allow opening main menu while panning
-  - new translations: Hebrew, Vietnamese
-* infoboxes
-  - added thermal assistant infobox
-  - inverse colors for wind arrow infobox and flarm gauge (#2337)
-* track friends via internet connection (SkyLines live tracking)
-* SkyLines tracking enabled on Windows CE
-* Android
-  - check if external storage is mounted
-* Documentation
-  - started a French translation of the manual
-  - included an almost complete German translation of the manual
-
-Version 6.4.6 - 2013/01/23
-* devices
-  - Leonardo: fixed vario parser for the $c sentence
-  - C-Probe: fixed temperature offset bug
-  - GTAltimeter: fixed vario parser
-  - SerialPort: fixed lockup/hang problem when closing for some CE devices (#2515)
-* user interface
-  - sort airspaces properly in the airspace list dialog (#2528)
-* infoboxes
-  - fixes broken wind arrow display in some situations (#2295)
-  - fix font scaling on screen rotation change (Android/Linux OpenGL)
-* data files
-  - fixed arc airspace approximation threshold handling (#2360)
-* configuration
-  - save waypoint label display configuration changed from menu (#2548)
-
-Version 6.4.5 - 2012/12/14
-* calculations
-  - fix rounding error in convex boundary calculation (#2477)
-* devices
-  - Vega: fix MacCready setting feedback loop (#1218, #2490)
-* user interface
-  - faster gesture drawing
-  - fix crash in InfoBox page setup (#2122)
-  - allow scrolling the check list on Altair (#1289)
-* map
-  - fix crash in terrain renderer with broken map file (#2478)
-* data files
-  - added "LAK-12" polar
-
+* Simplified InfoBox selection by removing redundant items
