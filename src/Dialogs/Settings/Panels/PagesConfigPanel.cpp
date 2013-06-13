@@ -169,7 +169,6 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   static constexpr StaticEnumChoice main_list[] = {
     { (unsigned)PageLayout::Main::MAP, N_("Map") },
-    { (unsigned)PageLayout::Main::FLARM_RADAR, N_("FLARM radar") },
     { (unsigned)PageLayout::Main::THERMAL_ASSISTANT, N_("Thermal assistant") },
     { 0 }
   };
