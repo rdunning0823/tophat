@@ -75,6 +75,13 @@ public:
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 
+  /**
+   * Hides properties that aren't available with the Main type
+   * Bottom is only available with MAP
+   * InfoBoxes are not available with ThermalAssistant or Flarm
+   */
+  void UpdateVisibility();
+
 private:
   /* virtual methods from class DataFieldListener */
   virtual void OnModified(DataField &df) override;
@@ -219,11 +226,29 @@ PageLayoutEditWidget::SetValue(const PageLayout &_value)
 }
 
 void
+PageLayoutEditWidget::UpdateVisibility()
+{
+  bool is_map = value.main == PageLayout::Main::MAP;
+  bool is_flarm = value.main == PageLayout::Main::FLARM_RADAR;
+  RowFormWidget::GetControl(INFO_BOX_PANEL).SetVisible(!is_flarm);
+  RowFormWidget::GetControl(BOTTOM).SetVisible(is_map);
+  if (!is_map) {
+    LoadValueEnum(BOTTOM, PageLayout::Bottom::NOTHING);
+    value.bottom = PageLayout::Bottom::NOTHING;
+  }
+  if (is_flarm) {
+    LoadValueEnum(INFO_BOX_PANEL, IBP_NONE);
+    value.infobox_config.enabled = false;
+  }
+}
+
+void
 PageLayoutEditWidget::OnModified(DataField &df)
 {
   if (&df == &GetDataField(MAIN)) {
     const DataFieldEnum &dfe = (const DataFieldEnum &)df;
     value.main = (PageLayout::Main)dfe.GetValue();
+    UpdateVisibility();
   } else if (&df == &GetDataField(INFO_BOX_PANEL)) {
     const DataFieldEnum &dfe = (const DataFieldEnum &)df;
     const unsigned ibp = dfe.GetValue();
@@ -359,6 +384,7 @@ PageListWidget::OnCursorMoved(unsigned idx)
   UpdateButtons();
 
   editor->SetValue(settings.pages[idx]);
+  editor->UpdateVisibility();
 }
 
 void

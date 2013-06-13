@@ -187,7 +187,9 @@ PageActions::LoadLayout(const PageLayout &layout)
 
   DisablePan();
 
-  if (!layout.infobox_config.enabled) {
+  // don't allow IBs w/ Flarm
+  if (!layout.infobox_config.enabled ||
+      layout.main == PageLayout::Main::FLARM_RADAR) {
     CommonInterface::main_window->SetFullScreen(true);
     ui_state.auxiliary_enabled = false;
   } else {
@@ -203,18 +205,22 @@ PageActions::LoadLayout(const PageLayout &layout)
     }
   }
 
-  switch (layout.bottom) {
-  case PageLayout::Bottom::NOTHING:
+  // only allow bottom widget if MAP is displayed
+  if (layout.main == PageLayout::Main::MAP) {
+    switch (layout.bottom) {
+    case PageLayout::Bottom::NOTHING:
+      CommonInterface::main_window->SetBottomWidget(nullptr);
+      break;
+
+    case PageLayout::Bottom::CROSS_SECTION:
+      CommonInterface::main_window->SetBottomWidget(new CrossSectionWidget());
+      break;
+    case PageLayout::Bottom::MAX:
+      gcc_unreachable();
+    }
+  } else
     CommonInterface::main_window->SetBottomWidget(nullptr);
-    break;
 
-  case PageLayout::Bottom::CROSS_SECTION:
-    CommonInterface::main_window->SetBottomWidget(new CrossSectionWidget());
-    break;
-
-  case PageLayout::Bottom::MAX:
-    gcc_unreachable();
-  }
 
   switch (layout.main) {
   case PageLayout::Main::MAP:
