@@ -24,18 +24,28 @@ Copyright_License {
 #include "TrafficLook.hpp"
 #include "Screen/Layout.hpp"
 #include "resource.h"
+#include "Asset.hpp"
 
 void
 TrafficLook::Initialise()
 {
-  safe_color = Color(0x1d,0x9b,0xc5);
-  warning_color = Color(0xfe,0x84,0x38);
-  alarm_color = Color(0xfb,0x35,0x2f);
+  if(!IsGrayScaleScreen()) {
+    safe_color = Color(0xfe,0x84,0x38);
+    warning_color = Color(0xfe,0x84,0x38);
+    alarm_color = COLOR_BLACK;
 
-  safe_brush.Set(safe_color);
-  warning_brush.Set(warning_color);
-  alarm_brush.Set(alarm_color);
+    safe_brush.Set(safe_color);
+    warning_brush.Set(warning_color);
+    alarm_brush.Set(alarm_color);
+  } else {
+    safe_color = Color(0x1d,0x9b,0xc5);
+    warning_color = Color(0xfe,0x84,0x38);
+    alarm_color = Color(0xfb,0x35,0x2f);
 
+    safe_brush.Set(safe_color);
+    warning_brush.Set(warning_color);
+    alarm_brush.Set(alarm_color);
+  }
   UPixelScalar width = Layout::ScalePenWidth(2);
   team_pen_green.Set(width, Color(0x74, 0xFF, 0));
   team_pen_blue.Set(width, Color(0, 0x90, 0xFF));
@@ -43,4 +53,5 @@ TrafficLook::Initialise()
   team_pen_magenta.Set(width, Color(0xFF, 0, 0xCB));
 
   teammate_icon.Load(IDB_TEAMMATE_POS, IDB_TEAMMATE_POS_HD);
+
 }
