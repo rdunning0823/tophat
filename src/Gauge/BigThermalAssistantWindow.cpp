@@ -48,6 +48,7 @@ BigThermalAssistantWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 BigThermalAssistantWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 {
+  InputEvents::HideMenu();
   if (dragging) {
     StopDragging();
 
