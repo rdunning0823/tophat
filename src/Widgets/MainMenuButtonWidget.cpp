@@ -30,7 +30,7 @@ Copyright_License {
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
 #include "Language/Language.hpp"
-#include "Input/InputEvents.hpp"
+#include "Menu/TophatMenu.hpp"
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
@@ -158,31 +158,7 @@ MainMenuButtonWidget::GetHeight() const
 void
 MainMenuButtonWidget::OnAction(int id)
 {
-  StaticString<20> menu;
-  StaticString<20> menu_1;
-  StaticString<20> menu_2;
-  StaticString<20> menu_last;
-
-  menu = _T("Menu");
-  menu_1 = _T("Menu1");
-  menu_2 = _T("Menu2");
-  menu_last = _T("MenuLast");
-
-  if (InputEvents::IsMode(menu.buffer()))
-    InputEvents::setMode(menu_1.buffer());
-
-  else if (InputEvents::IsMode(menu_1.buffer()))
-    InputEvents::setMode(menu_2.buffer());
-
-  else if (InputEvents::IsMode(menu_2.buffer()))
-    InputEvents::setMode(menu_last.buffer());
-
-  else if (InputEvents::IsMode(menu_last.buffer()))
-    InputEvents::HideMenu();
-
-  else InputEvents::setMode(menu.buffer());
-
-  return;
+  TophatMenu::RotateMenu();
 }
 
 MainMenuButton &
