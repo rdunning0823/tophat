@@ -164,8 +164,18 @@ InputEvents::eventScreenModes(const TCHAR *misc)
         Message::AddMessage(_("Default InfoBoxes"));
   } else if (StringIsEqual(misc, _T("previous")))
     PageActions::Prev();
-  else
+  else {
+    StaticString<128> buffer;
+    const PageLayout *pl =
+      &CommonInterface::SetUISettings().pages.pages[PageActions::NextIndex()];
+    const InfoBoxSettings &info_box_settings =
+      CommonInterface::GetUISettings().info_boxes;
+    assert(pl != NULL);
+    pl->MakeTitle(info_box_settings, buffer.buffer(), true);
+
     PageActions::Next();
+    Message::AddMessage(_("Screen switch:"), buffer.c_str());
+  }
 
 
   trigger_redraw();
