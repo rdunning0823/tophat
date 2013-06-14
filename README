@@ -22,7 +22,7 @@ can be downloaded with the following command:
  
  Note: because Top Hat is currently rebased regurlarly off XCSoar, the 
  working branch of Top Hat is NOT "master".
- Our current working branch is TopHat_master_6.6_WIP.  This will change soon!
+ Our current working branch is TopHat_master_6.6.  This will change soon!
 
 To update your repository, type:
 
