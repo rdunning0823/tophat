@@ -681,7 +681,6 @@ MainWindow::OnTimer(WindowTimer &_timer)
     if (!thermal_assistant.IsDefined())
       thermal_assistant.Set(new GaugeThermalAssistant(CommonInterface::GetLiveBlackboard(),
                                                       look->thermal_assistant_gauge));
-
     if (!thermal_assistant.IsVisible()) {
       thermal_assistant.Show();
 
@@ -690,6 +689,7 @@ MainWindow::OnTimer(WindowTimer &_timer)
       widget->Raise();
     }
   }
+
   widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
@@ -703,6 +703,17 @@ MainWindow::OnTimer(WindowTimer &_timer)
       map->SetTaskNavSliderShape();
     else
       task_nav_slider_widget->RefreshTask();  battery_timer.Process();
+
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+  PixelRect rc = GetClientRect();
+  const InfoBoxLayout::Layout ib_layout =
+    InfoBoxLayout::Calculate(rc, ui_settings.info_boxes.geometry);
+  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
+
+  if (thermal_assistant.IsVisible())
+    ReinitialiseLayoutTA(rc_current, ib_layout);
+  if (traffic_gauge.IsVisible())
+    ReinitialiseLayout_flarm(rc_current, ib_layout);
 
   return true;
 }
