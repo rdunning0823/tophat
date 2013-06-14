@@ -54,7 +54,6 @@ public:
 
 private:
   enum Controls {
-    MAIN,
     INFO_BOX_PANEL,
     BOTTOM,
   };
@@ -74,13 +73,6 @@ public:
 
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-
-  /**
-   * Hides properties that aren't available with the Main type
-   * Bottom is only available with MAP
-   * InfoBoxes are not available with ThermalAssistant or Flarm
-   */
-  void UpdateVisibility();
 
 private:
   /* virtual methods from class DataFieldListener */
@@ -167,16 +159,6 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const InfoBoxSettings &info_box_settings =
     CommonInterface::GetUISettings().info_boxes;
 
-  static constexpr StaticEnumChoice main_list[] = {
-    { (unsigned)PageLayout::Main::MAP, N_("Map") },
-    { (unsigned)PageLayout::Main::THERMAL_ASSISTANT, N_("Thermal assistant") },
-    { 0 }
-  };
-  AddEnum(_("Main area"),
-          _("Specifies what should be displayed in the main area."),
-          main_list,
-          (unsigned)PageLayout::Main::MAP, this);
-
   static constexpr StaticEnumChoice ib_list[] = {
     { IBP_AUTO, N_("Auto") },
     { IBP_NONE, N_("None") },
@@ -207,7 +189,6 @@ PageLayoutEditWidget::SetValue(const PageLayout &_value)
 {
   value = _value;
 
-  LoadValueEnum(MAIN, value.main);
   LoadValueEnum(BOTTOM, value.bottom);
 
   unsigned ib = IBP_NONE;
@@ -225,30 +206,9 @@ PageLayoutEditWidget::SetValue(const PageLayout &_value)
 }
 
 void
-PageLayoutEditWidget::UpdateVisibility()
-{
-  bool is_map = value.main == PageLayout::Main::MAP;
-  bool is_flarm = value.main == PageLayout::Main::FLARM_RADAR;
-  RowFormWidget::GetControl(INFO_BOX_PANEL).SetVisible(!is_flarm);
-  RowFormWidget::GetControl(BOTTOM).SetVisible(is_map);
-  if (!is_map) {
-    LoadValueEnum(BOTTOM, PageLayout::Bottom::NOTHING);
-    value.bottom = PageLayout::Bottom::NOTHING;
-  }
-  if (is_flarm) {
-    LoadValueEnum(INFO_BOX_PANEL, IBP_NONE);
-    value.infobox_config.enabled = false;
-  }
-}
-
-void
 PageLayoutEditWidget::OnModified(DataField &df)
 {
-  if (&df == &GetDataField(MAIN)) {
-    const DataFieldEnum &dfe = (const DataFieldEnum &)df;
-    value.main = (PageLayout::Main)dfe.GetValue();
-    UpdateVisibility();
-  } else if (&df == &GetDataField(INFO_BOX_PANEL)) {
+  if (&df == &GetDataField(INFO_BOX_PANEL)) {
     const DataFieldEnum &dfe = (const DataFieldEnum &)df;
     const unsigned ibp = dfe.GetValue();
     if (ibp == IBP_AUTO) {
@@ -332,22 +292,7 @@ PageListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned idx)
 
   StaticString<64> buffer;
 
-  switch (value.main) {
-  case PageLayout::Main::MAP:
-    buffer = _("Map");
-    break;
-
-  case PageLayout::Main::FLARM_RADAR:
-    buffer = _("FLARM radar");
-    break;
-
-  case PageLayout::Main::THERMAL_ASSISTANT:
-    buffer = _("Thermal assistant");
-    break;
-
-  case PageLayout::Main::MAX:
-    gcc_unreachable();
-  }
+  buffer = _("Map");
 
   if (value.infobox_config.enabled) {
     buffer.AppendFormat(_T(", %s"), _("InfoBoxes"));
@@ -383,7 +328,6 @@ PageListWidget::OnCursorMoved(unsigned idx)
   UpdateButtons();
 
   editor->SetValue(settings.pages[idx]);
-  editor->UpdateVisibility();
 }
 
 void
