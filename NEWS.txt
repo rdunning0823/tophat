@@ -1,6 +1,9 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 1.0.3 Beta June 16, 2013
+* fixed bug where MC popup crashed if no task was defined
+
 TopHat 1.0.2 Beta June 14, 2013
 * fixed logo version number
 * disallow "Page types" for Thermal Asst & Flarm.
