@@ -319,7 +319,10 @@ MacCreadyEditPanel::FinalGlideChart::OnPaint(Canvas &canvas)
     description = _("Task");
   else {
     const TaskWaypoint* wp = task_manager->GetActiveTaskPoint();
-    description = wp->GetWaypoint().name.c_str();
+    if (wp != nullptr)
+      description = wp->GetWaypoint().name.c_str();
+    else
+      description.clear();
   }
 
 
