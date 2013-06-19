@@ -3,6 +3,7 @@ SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.0.3 Beta June 16, 2013
 * fixed bug where MC popup crashed if no task was defined
+* fix spurious errors after IOIO baud rate change (#2733, #2754)
 
 TopHat 1.0.2 Beta June 14, 2013
 * fixed logo version number
