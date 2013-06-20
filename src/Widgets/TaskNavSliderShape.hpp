@@ -163,6 +163,8 @@ public:
                 bool tp_valid, fixed tp_distance, bool distance_valid,
                 fixed tp_altitude_difference,
                 bool altitude_difference_valid,
+                Angle delta_bearing,
+                bool bearing_valid,
                 unsigned border_width);
 
 #ifdef _WIN32

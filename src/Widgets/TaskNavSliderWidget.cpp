@@ -162,6 +162,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                         tp.IsValid(), tp.distance, tp.distance_valid,
                         tp.altitude_difference,
                         tp.altitude_difference_valid,
+                        tp.delta_bearing,
+                        tp.bearing_valid,
                         border_width);
 }
 

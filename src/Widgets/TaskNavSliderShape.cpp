@@ -109,6 +109,8 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
                       bool tp_valid, fixed tp_distance, bool distance_valid,
                       fixed tp_altitude_difference,
                       bool altitude_difference_valid,
+                      Angle delta_bearing,
+                      bool bearing_valid,
                       unsigned border_width)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
@@ -195,6 +197,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
   UPixelScalar height_width = 0u;
   StaticString<100> distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
+  StaticString<5> bearing_chevrons_buffer(_T(""));
 
   // calculate but don't yet draw label "goto" abort, tp#
   switch (task_mode) {
@@ -234,12 +237,49 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
                     line_one_y_offset, height_buffer.c_str());
   }
 
-  // draw distance centered between label and altitude.
+  // bearing chevrons around distance for ordered when not start
+  // or for non ordered task
+  bool do_bearing = false;
+  Angle bearing;
+  if (bearing_valid && task_mode ==
+      TaskType::ORDERED && idx > 0) {
+    do_bearing = true;
+    bearing = delta_bearing;
+  } else if (task_mode != TaskType::ORDERED &&
+      bearing_valid) {
+    do_bearing = true;
+    bearing = delta_bearing;
+  }
+
+  if (do_bearing) {
+    if (bearing.AsDelta().Degrees() > fixed(10))
+      bearing_chevrons_buffer = _T(">>");
+    else if (bearing.AsDelta().Degrees() < fixed(-10))
+      bearing_chevrons_buffer = _T("<<");
+    else if (bearing.AsDelta().Degrees() > fixed(3))
+      bearing_chevrons_buffer = _T(">");
+    else if (bearing.AsDelta().Degrees() < fixed(-3))
+      bearing_chevrons_buffer = _T("<");
+  }
+
+  // draw distance and bearing chevrons centered between label and altitude.
   // draw label if room
   canvas.Select(medium_font);
   if (distance_valid) {
+    StaticString<100> distance_bearing_buffer(_T(""));
     FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
-    distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
+    if (do_bearing) {
+      if (bearing.AsDelta().Degrees() > fixed(0))
+        distance_bearing_buffer.Format(_T("%s %s"), distance_buffer.c_str(),
+                                       bearing_chevrons_buffer.c_str());
+      else
+        distance_bearing_buffer.Format(_T("%s %s"),
+                                       bearing_chevrons_buffer.c_str(),
+                                       distance_buffer.c_str());
+    } else
+      distance_bearing_buffer = distance_buffer;
+
+    distance_width = canvas.CalcTextWidth(distance_bearing_buffer.c_str());
     width = distance_width + height_width;
     UPixelScalar offset = rc.left;
     if ((PixelScalar)width < (rc.right - rc.left - label_width -
@@ -249,8 +289,9 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
       offset = rc.left + label_width +
           (rc.right - rc.left - width - label_width) / 2;
     }
-    canvas.DrawText(offset, line_one_y_offset, distance_buffer.c_str());
+    canvas.DrawText(offset, line_one_y_offset, distance_bearing_buffer.c_str());
   }
+
 
 #ifdef NOT_DEFINED_EVER
   // bearing delta waypoint for ordered when not start

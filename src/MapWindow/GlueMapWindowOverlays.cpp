@@ -200,8 +200,10 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
       wp = &tp->GetWaypoint();
     }
   }
-  bool distance_valid = false, altitude_difference_valid = false;
+  bool distance_valid = false, altitude_difference_valid = false,
+      bearing_valid = false;
   fixed distance = fixed(0), altitude_difference = fixed(0);
+  Angle bearing;
   if (wp != nullptr) {
     const MoreData &more_data = Basic();
     // altitude differential
@@ -226,6 +228,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
       const GeoVector vector = Basic().location.DistanceBearing(wp->location);
       distance = vector.distance;
       distance_valid = true;
+      bearing = vector.bearing;
+      bearing_valid = true;
     }
 
   }
@@ -245,6 +249,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                        tp_valid, distance, distance_valid,
                        altitude_difference,
                        altitude_difference_valid,
+                       bearing,
+                       bearing_valid,
                        border_width);
 }
 
