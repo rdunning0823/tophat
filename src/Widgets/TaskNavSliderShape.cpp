@@ -196,16 +196,6 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
   StaticString<100> distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
 
-  // Draw distance to turnpoint
-  if (distance_valid) {
-
-    canvas.Select(medium_font);
-    FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
-    distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
-    canvas.DrawText(rc.right - Layout::FastScale(2) - distance_width,
-                    line_one_y_offset, distance_buffer.c_str());
-  }
-
   // calculate but don't yet draw label "goto" abort, tp#
   switch (task_mode) {
   case TaskType::ORDERED:
@@ -233,13 +223,23 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
   label_width = canvas.CalcTextWidth(buffer.c_str());
   canvas.Select(small_font);
 
-  // draw arrival altitude centered between label and distance.
-  // draw label if room
-  canvas.Select(small_font);
+  // Draw arrival altitude right upper corner
   if (altitude_difference_valid) {
+
+    canvas.Select(small_font);
     FormatRelativeUserAltitude(tp_altitude_difference, height_buffer.buffer(),
                                true);
     height_width = canvas.CalcTextWidth(height_buffer.c_str());
+    canvas.DrawText(rc.right - Layout::FastScale(2) - height_width,
+                    line_one_y_offset, height_buffer.c_str());
+  }
+
+  // draw distance centered between label and altitude.
+  // draw label if room
+  canvas.Select(medium_font);
+  if (distance_valid) {
+    FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
+    distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
     width = distance_width + height_width;
     UPixelScalar offset = rc.left;
     if ((PixelScalar)width < (rc.right - rc.left - label_width -
@@ -249,7 +249,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
       offset = rc.left + label_width +
           (rc.right - rc.left - width - label_width) / 2;
     }
-    canvas.DrawText(offset, line_one_y_offset, height_buffer.c_str());
+    canvas.DrawText(offset, line_one_y_offset, distance_buffer.c_str());
   }
 
 #ifdef NOT_DEFINED_EVER
