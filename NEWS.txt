@@ -2,10 +2,10 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.0.4 Beta TBD
-* Merges all code to XCSoar 6.6.2
+* bearing indicators in Navigation bar
+* rebase to XCSoar 6.6.2
 * IOIO Reconnect
 
-XCSoar 6.6.2 - 2013/06/12
 * map
   - fix misplaced topography labels (#2564)
   - fix keyboard panning with track up (#2908)
@@ -26,8 +26,6 @@ XCSoar 6.6.2 - 2013/06/12
   - fix instant crash (#2922)
 * Altair
   - never override data path (#2509)
-
-XCSoar 6.6.1 - 2013/05/08
 * cross section
   - fix airspace display after display rotation (#2825)
 * user interface
