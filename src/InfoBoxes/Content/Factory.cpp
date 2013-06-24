@@ -293,9 +293,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_AltDiff
   {
-    N_("Next altitude difference"),
+    N_("Next arrival altitude AGL"),
     N_("WP AltD"),
-    N_("Arrival altitude at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used."),
+    N_("Arrival altitude AGL at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used."),
     UpdateInfoBoxNextAltitudeDiff,
     next_waypoint_infobox_panels,
     e_WP_MC0AltDiff, // WP MC0 AltD
@@ -1183,7 +1183,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_WP_H, // WP AltA
     e_WP_AltDiff, // WP AltD
-    Category::DEPRECATED,
+    Category::STANDARD,
   },
 
   // e_HeadWind
@@ -1260,7 +1260,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentWindArrow>::Create,
     WIND_ARROW,
     WIND_ARROW,
-    Category::DEPRECATED,
+    Category::STANDARD,
   },
 
   {
