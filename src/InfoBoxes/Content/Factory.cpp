@@ -438,8 +438,8 @@ static constexpr MetaData meta_data[] = {
 
   // e_WindSpeed_Est
   {
-    N_("Wind speed"),
-    N_("Wind V"),
+    N_("Wind speed and bearing"),
+    N_("Wind"),
     N_("Wind speed estimated by XCSoar. Manual adjustment is possible with the connected InfoBox dialogue. Pressing the up/down cursor keys to cycle through settings, adjust the values with left/right cursor keys."),
     IBFHelper<InfoBoxContentWindSpeed>::Create,
     e_WindBearing_Est, // Wind B
