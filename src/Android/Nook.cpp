@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Android/Nook.hpp"
 #include <stdlib.h>
+#include <assert.h>
 
 static char cmd_sleep[] = "sleep 0.5";
 static char cmd_host[] = "su -c 'echo host > /sys/devices/platform/musb_hdrc/mode'";
@@ -34,6 +35,7 @@ static char cmd_fast_mode_exit[] = "echo 0 > /sys/class/graphics/fb0/fmode";
 static char cmd_epd_refresh_0[] = " echo 0 > /sys/class/graphics/fb0/epd_refresh";
 static char cmd_epd_refresh_1[] = " echo 1 > /sys/class/graphics/fb0/epd_refresh";
 static char cmd_set_charge_500[] = "su -c 'echo 500000 > /sys/class/regulator/regulator.5/device/force_current'";
+static char cmd_set_charge_100[] = "su -c 'echo 100000 > /sys/class/regulator/regulator.5/device/force_current'";
 
 void
 Nook::EnterFastMode()
@@ -70,6 +72,68 @@ void
 Nook::SetCharge500()
 {
   system(cmd_set_charge_500);
+}
+
+void
+Nook::SetCharge100()
+{
+  system(cmd_set_charge_100);
+}
+
+void
+Nook::BatteryController::Initialise(unsigned value) {
+  assert(!initialised);
+
+  initialised = true;
+  upper_battery_threshhold = 99;
+  last_charge_percent = value;
+  if (value >= GetUpperChargeThreshhold())
+    SetDischarging();
+  else
+    SetCharging();
+}
+
+void
+Nook::BatteryController::DetectIfActuallyCharging(unsigned value)
+{
+  if (value > last_charge_percent)
+    last_charge_rate = 500;
+  else if (value < last_charge_percent)
+    last_charge_rate = 100;
+}
+
+void
+Nook::BatteryController::ProcessChargeRate(unsigned value)
+{
+  assert(initialised);
+
+  DetectIfActuallyCharging(value);
+
+  if (IsCharging()) {
+    if (value >= GetUpperChargeThreshhold())
+      SetDischarging();
+  } else {
+    if (value <= GetLowerChargeThreshhold())
+      SetCharging();
+  }
+}
+
+void
+Nook::BatteryController::SetCharging()
+{
+  if(last_charge_rate != 500) {
+    last_charge_rate = 500;
+    Nook::SetCharge500();
+  }
+}
+
+void
+Nook::BatteryController::SetDischarging()
+{
+  if(last_charge_rate != 100) {
+    last_charge_rate = 100;
+    Nook::SetCharge100();
+  }
 }
 
 const char*

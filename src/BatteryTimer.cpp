@@ -28,6 +28,9 @@ Copyright_License {
 #include "Simulator.hpp"
 #include "Language/Language.hpp"
 #include "Message.hpp"
+#ifdef ANDROID
+#include "Asset.hpp"
+#endif
 
 void
 BatteryTimer::Process()
@@ -64,5 +67,15 @@ BatteryTimer::Process()
       }
     }
   }
+#ifdef ANDROID
+  else {
+    if (IsNookSimpleTouch()) {
+      if (!nook_battery_controller.IsInitialised())
+        nook_battery_controller.Initialise(Power::Battery::RemainingPercent);
+      else
+        nook_battery_controller.ProcessChargeRate(Power::Battery::RemainingPercent);
+    }
+  }
+#endif
 #endif /* HAVE_BATTERY */
 }
