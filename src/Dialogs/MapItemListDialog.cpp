@@ -220,6 +220,7 @@ protected:
     if (list.size() == 0) {
       details_button->SetEnabled(false);
       goto_button->SetEnabled(false);
+      ack_button->SetEnabled(false);
       return;
     }
     if (CanDragItem(current))
