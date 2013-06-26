@@ -106,19 +106,20 @@
      transform="translate(0,1)">
     <text
        xml:space="preserve"
-       style="font-size:15.14895725px;font-style:normal;font-weight:normal;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="71.427444"
-       y="12.071815"
+       style="font-size:15.14895725px;font-style:normal;font-weight:normal;line-height:125%;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="70.7267"
+       y="12.264181"
        id="versionno"
        transform="scale(1.0881894,0.91895768)"
        inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
-       inkscape:label="versionno"><tspan
+       inkscape:label="versionno"
+       sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan9395-4-7-2"
-         x="71.427444"
-         y="12.071815"
-         style="font-size:17.96233749px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ff0000;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">1.0</tspan></text>
+         x="70.7267"
+         y="12.264181"
+         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">1.0</tspan></text>
   </g>
 </svg>
