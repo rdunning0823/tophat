@@ -34,17 +34,29 @@ Copyright_License {
 static constexpr TCHAR keyboard_letters[] =
   _T("1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
+KeyboardBaseControl::KeyboardBaseControl(ContainerWindow &parent,
+                                         const DialogLook &_look,
+                                         PixelRect rc,
+                                         OnCharacterCallback_t _on_character,
+                                         const WindowStyle _style,
+                                         const Font &_button_font)
+  :look(_look),
+   on_character(_on_character),
+   num_buttons(0),
+   button_font(_button_font)
+{
+  Create(parent, rc, _style);
+}
+
 KeyboardControl::KeyboardControl(ContainerWindow &parent,
                                  const DialogLook &_look,
                                  PixelRect rc,
                                  OnCharacterCallback_t _on_character,
                                  const WindowStyle _style)
-  :look(_look),
-   on_character(_on_character),
-   num_buttons(0)
+  :KeyboardBaseControl(parent, _look, rc, _on_character, _style,
+                       *_look.button.font)
 {
-  Create(parent, rc, _style);
-
+  OnResize(PixelSize { rc.right - rc.left, rc.bottom - rc.top });
   TCHAR caption[] = _T(" ");
 
   for (const TCHAR *i = keyboard_letters; !StringIsEmpty(i); ++i) {
@@ -90,23 +102,15 @@ KeyboardControl::FindButton(TCHAR ch)
  * @param top     Number of pixels from the top (in screen pixels)
  */
 void
-KeyboardControl::MoveButton(TCHAR ch, PixelScalar left, PixelScalar top)
+KeyboardBaseControl::MoveButton(TCHAR ch, PixelScalar left, PixelScalar top)
 {
   ButtonWindow *kb = FindButton(ch);
   if (kb)
     kb->Move(left, top);
 }
 
-/**
- * Resizes the button to specified width and height values according to display pixels!
- *
- *
- * @param ch
- * @param width   Width measured in display pixels!
- * @param height  Height measured in display pixels!
- */
 void
-KeyboardControl::ResizeButton(TCHAR ch,
+KeyboardBaseControl::ResizeButton(TCHAR ch,
                               UPixelScalar width, UPixelScalar height)
 {
   ButtonWindow *kb = FindButton(ch);
@@ -115,14 +119,14 @@ KeyboardControl::ResizeButton(TCHAR ch,
 }
 
 void
-KeyboardControl::ResizeButtons()
+KeyboardBaseControl::ResizeButtons()
 {
   for (unsigned i = 0; i < num_buttons; ++i)
     buttons[i].Resize(button_width, button_height);
 }
 
 void
-KeyboardControl::MoveButtonsToRow(const TCHAR* buttons, int row,
+KeyboardBaseControl::MoveButtonsToRow(const TCHAR* buttons, int row,
                                   PixelScalar offset)
 {
   if (StringIsEmpty(buttons))
@@ -160,7 +164,7 @@ KeyboardControl::MoveButtons()
 }
 
 void
-KeyboardControl::OnPaint(Canvas &canvas)
+KeyboardBaseControl::OnPaint(Canvas &canvas)
 {
   canvas.Clear(look.background_color);
 
@@ -168,7 +172,7 @@ KeyboardControl::OnPaint(Canvas &canvas)
 }
 
 bool
-KeyboardControl::OnCommand(unsigned id, unsigned code)
+KeyboardBaseControl::OnCommand(unsigned id, unsigned code)
 {
   if (id >= 0x20 && on_character != NULL) {
     on_character((TCHAR)id);
@@ -188,7 +192,7 @@ KeyboardControl::OnResize(PixelSize new_size)
 }
 
 void
-KeyboardControl::AddButton(const TCHAR *caption)
+KeyboardBaseControl::AddButton(const TCHAR *caption)
 {
   assert(num_buttons < MAX_BUTTONS);
 
@@ -202,5 +206,5 @@ KeyboardControl::AddButton(const TCHAR *caption)
 
   ButtonWindow *button = &buttons[num_buttons++];
   button->Create(*this, caption, (unsigned)caption[0], rc);
-  button->SetFont(*look.button.font);
+  button->SetFont(button_font);
 }

@@ -26,6 +26,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "DataField/Base.hpp"
 #include "DataField/String.hpp"
+#include "DataField/Float.hpp"
 #include "DataField/Prefix.hpp"
 #include "DataField/RoughTime.hpp"
 #include "DataField/GeoPoint.hpp"
@@ -204,6 +205,19 @@ WndProperty::BeginEditing()
     df.ModifyValue(value);
     RefreshDisplay();
     return true;
+
+  } else if (mDataField != NULL &&
+             mDataField->GetType() == DataField::Type::REAL) {
+    DataFieldFloat &df = *(DataFieldFloat *)mDataField;
+    fixed value = df.GetAsFixed();
+    if (!TouchNumericEntry(value, GetCaption()), false)
+      return true;
+    df.SetAsFloat(value);
+    RefreshDisplay();
+    return true;
+
+
+
   } else if (CanEditInPlace()) {
     // TODO: implement
     return true;

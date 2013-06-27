@@ -25,6 +25,7 @@ Copyright_License {
 #define DIALOGS_TEXT_ENTRY_HPP
 
 #include "Util/StaticString.hpp"
+#include "Math/fixed.hpp"
 
 #include <functional>
 
@@ -55,5 +56,15 @@ bool
 TouchTextEntry(TCHAR *text, size_t size,
                const TCHAR *caption=nullptr,
                AllowedCharacters ac=AllowedCharacters());
+
+/**
+ * show a numeric keypad with Help if available
+ * @param reference containing value before and after edit
+ * @param optional character filter
+ */
+bool
+TouchNumericEntry(fixed &value,
+                  const TCHAR *caption,
+                  AllowedCharacters accb=AllowedCharacters());
 
 #endif

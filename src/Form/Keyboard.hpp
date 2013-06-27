@@ -31,18 +31,18 @@ Copyright_License {
 
 struct DialogLook;
 
-class KeyboardControl : public ContainerWindow {
+class KeyboardBaseControl : public ContainerWindow {
 public:
   typedef void (*OnCharacterCallback_t)(TCHAR key);
 
 protected:
-  enum {
-    MAX_BUTTONS = 40,
-  };
-
   const DialogLook &look;
 
   OnCharacterCallback_t on_character;
+
+  enum {
+    MAX_BUTTONS = 40,
+  };
 
   UPixelScalar button_width;
   UPixelScalar button_height;
@@ -50,6 +50,55 @@ protected:
   unsigned num_buttons;
   ButtonWindow buttons[MAX_BUTTONS];
   TCHAR button_values[MAX_BUTTONS];
+
+  const Font &button_font;
+
+public:
+
+  KeyboardBaseControl(ContainerWindow &parent,
+                      const DialogLook &_look,
+                      PixelRect rc,
+                      OnCharacterCallback_t _on_character,
+                      const WindowStyle _style,
+                      const Font &_button_font);
+
+  /**
+   * Show only the buttons representing the specified character list.
+   */
+  virtual void SetAllowedCharacters(const TCHAR *allowed) {};
+
+  void SetOnCharacterCallback(OnCharacterCallback_t _on_character) {
+    on_character = _on_character;
+  }
+
+protected:
+  virtual void OnPaint(Canvas &canvas) override;
+  virtual bool OnCommand(unsigned id, unsigned code) override;
+
+  void AddButton(const TCHAR *caption);
+
+  /**
+   * Resizes the button to specified width and height values according to display pixels!
+   *
+   *
+   * @param ch
+   * @param width   Width measured in display pixels!
+   * @param height  Height measured in display pixels!
+   */
+  void MoveButton(TCHAR ch, PixelScalar left, PixelScalar top);
+  void ResizeButton(TCHAR ch, UPixelScalar width, UPixelScalar height);
+  void ResizeButtons();
+  void SetButtonsSize();
+  void MoveButtonsToRow(const TCHAR *buttons, int row,
+                        PixelScalar offset_left = 0);
+
+private:
+  gcc_pure
+  virtual ButtonWindow *FindButton(TCHAR ch) = 0;
+
+};
+
+class KeyboardControl : public KeyboardBaseControl {
 
 public:
   KeyboardControl(ContainerWindow &parent, const DialogLook &look,
@@ -60,35 +109,21 @@ public:
   /**
    * Show only the buttons representing the specified character list.
    */
-  void SetAllowedCharacters(const TCHAR *allowed);
-
-  void SetOnCharacterCallback(OnCharacterCallback_t _on_character) {
-    on_character = _on_character;
-  }
+  virtual void SetAllowedCharacters(const TCHAR *allowed) override;
 
 protected:
-  virtual void OnPaint(Canvas &canvas) override;
-  virtual bool OnCommand(unsigned id, unsigned code) override;
   virtual void OnResize(PixelSize new_size) override;
 
 private:
   gcc_pure
-  ButtonWindow *FindButton(TCHAR ch);
+  virtual ButtonWindow *FindButton(TCHAR ch);
 
-  void MoveButton(TCHAR ch, PixelScalar left, PixelScalar top);
-  void ResizeButton(TCHAR ch, UPixelScalar width, UPixelScalar height);
-  void ResizeButtons();
-  void SetButtonsSize();
-  void MoveButtonsToRow(const TCHAR *buttons, int row,
-                        PixelScalar offset_left = 0);
   void MoveButtons();
 
   gcc_pure
   bool IsLandscape() const {
     return GetWidth() >= GetHeight();
   }
-
-  void AddButton(const TCHAR *caption);
 };
 
 #endif

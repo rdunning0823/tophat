@@ -25,10 +25,12 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
 #include "Form/Keyboard.hpp"
+#include "Form/KeyboardNumeric.hpp"
 #include "Form/Edit.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
 #include "Util/StringUtil.hpp"
+#include "Util/NumberParser.hpp"
 #include "UIGlobals.hpp"
 #include "Language/Language.hpp"
 
@@ -36,7 +38,7 @@ Copyright_License {
 #include <assert.h>
 
 static WndProperty *editor;
-static KeyboardControl *kb = NULL;
+static KeyboardBaseControl *kb = NULL;
 
 static AllowedCharacters AllowedCharactersCallback;
 
@@ -94,6 +96,13 @@ static void
 OnCharacter(TCHAR character)
 {
   DoCharacter(character);
+}
+
+static void
+OnCharacterNumeric(TCHAR character)
+{
+  if (character != ' ')
+    DoCharacter(character);
 }
 
 static bool
@@ -224,7 +233,7 @@ TouchTextEntry(TCHAR *text, size_t width,
                               rc.right - padding,
                               keyboard_bottom },
                            OnCharacter);
-  kb = &keyboard;
+  kb = (KeyboardBaseControl*)&keyboard;
 
   WndButton backspace_button(client_area, look, _T("<-"),
                              { backspace_left, padding, rc.right - padding,
@@ -246,6 +255,112 @@ TouchTextEntry(TCHAR *text, size_t width,
 
   if (result) {
     CopyString(text, edittext, width);
+  }
+
+  return result;
+}
+
+bool
+TouchNumericEntry(fixed &value,
+                  const TCHAR *caption,
+                  AllowedCharacters accb)
+{
+  StaticString<12> buffer;
+  buffer.Format(_T("%.1f"), (double)value);
+
+  const TCHAR zero = '0';
+  const TCHAR point = '.';
+
+  // remove trailing zeros
+  unsigned decimal_location = 0;
+  for (unsigned i = 0; i < buffer.length(); ++i)
+    if (buffer[i] == point) {
+      decimal_location = i;
+      break;
+    }
+  for (unsigned i = buffer.length(); i > decimal_location; --i)
+    if (buffer[i] == zero)
+      buffer.Truncate(i - 1);
+
+  max_width = MAX_TEXTENTRY;
+
+  const DialogLook &look = UIGlobals::GetDialogLook();
+  WndForm form(look);
+  form.Create(UIGlobals::GetMainWindow(), caption);
+  form.SetKeyDownFunction(FormKeyDown);
+  form.SetCharacterFunction(FormCharacter);
+
+  ContainerWindow &client_area = form.GetClientAreaWindow();
+  const PixelRect rc = client_area.GetClientRect();
+
+  const PixelScalar client_height = rc.bottom - rc.top;
+
+  const PixelScalar padding = Layout::Scale(2);
+
+  const PixelScalar button_height = (client_height - padding * 2) / 6;
+  const PixelScalar keyboard_top = rc.top + padding + button_height;
+  const PixelScalar keyboard_bottom = rc.bottom - button_height - padding;
+
+  const PixelScalar backspace_width = (rc.right - rc.left) / 4;
+  const PixelScalar backspace_left = rc.right - padding - backspace_width;
+
+
+  WndProperty _editor(client_area, look, _T(""),
+                      { 0, padding, backspace_left - padding, rc.top + button_height },
+                      0, WindowStyle());
+  _editor.SetReadOnly();
+  editor = &_editor;
+
+  ButtonWindowStyle button_style;
+  button_style.TabStop();
+
+  PixelScalar button_width = (rc.right - rc.left) / 3;
+  WndButton ok_button(client_area, look, _("OK"),
+                      { 0, rc.top + 5 * button_height, button_width,
+                        rc.top + 6 * button_height},
+                      button_style, form, mrOK);
+
+  WndButton cancel_button(client_area, look, _("Cancel"),
+                          { button_width,
+                            rc.top + 5 * button_height, 2 * button_width,
+                            rc.top + 6 * button_height},
+                          button_style, form, mrCancel);
+
+  WndButton cclear_button(client_area, look, _("Clear"),
+                          { button_width * 2,
+                            rc.top + 5 * button_height, 3 * button_width,
+                            rc.top + 6 * button_height},
+                          button_style, ClearText);
+
+  KeyboardNumericControl keyboard(client_area, look,
+                                  { padding, keyboard_top,
+                                    rc.right - padding,
+                                    keyboard_bottom },
+                                  OnCharacterNumeric);
+  kb = (KeyboardBaseControl*)&keyboard;
+
+  WndButton backspace_button(client_area, look, _T("X"),
+                             { backspace_left, padding, rc.right - padding,
+                               rc.top + button_height },
+                             button_style, OnBackspace);
+
+  AllowedCharactersCallback = nullptr;
+
+  ClearText();
+
+  if (buffer.length() == 1 && buffer[0u] == zero)
+    buffer.clear();
+
+  if (!buffer.empty()) {
+    CopyString(edittext, buffer.c_str(), max_width);
+    cursor = buffer.length();
+  }
+
+  UpdateTextboxProp();
+  bool result = form.ShowModal() == mrOK;
+
+  if (result) {
+    value = fixed(ParseDouble(edittext));
   }
 
   return result;
