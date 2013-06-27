@@ -94,26 +94,17 @@ TaskManagerDialogUs::OnAction(int id)
   else if (id == FLY) {
     CommitTaskChanges();
     SetModalResult(mrOK);
-  }
 
-  else if (id == REVERT) {
-    UpdateTaskDefaults(*active_task);
-    SetModalResult(mrOK);
-  }
-}
-
-void
-TaskManagerDialogUs::UpdateButtons()
-{
-  revert_button->SetVisible(task_modified);
+  } else if (id == BACK)
+    SetModalResult(mrCancel);
 }
 
 void
 TaskManagerDialogUs::Unprepare()
 {
   delete fly_button;
-  delete revert_button;
   delete save_as_button;
+  delete back_button;
   delete task_summary;
 }
 
@@ -167,20 +158,18 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              rc_fly_button,
                              button_style, *this, FLY);
 
-  revert_button = new WndButton(GetClientAreaWindow(), look, _T("Revert"),
-                             rc_revert_button,
-                             button_style, *this, REVERT);
-
   save_as_button = new WndButton(GetClientAreaWindow(), look, _T("Save as"),
                              rc_save_as_button,
                              button_style, *this, SAVE_AS);
+
+  back_button = new WndButton(GetClientAreaWindow(), look, _T("Back"),
+                             rc_back_button,
+                             button_style, *this, BACK);
 
   WindowStyle style;
   task_view.Create(GetClientAreaWindow(),rc_task_view, style);
   task_view.SetFullScreenRect(GetClientRect());
   task_view.SetPartialScreenRect(rc_task_view);
-
-  UpdateButtons();
 }
 
 void
@@ -195,21 +184,20 @@ TaskManagerDialogUs::SetRectangles(const PixelRect &rc_outer)
   UPixelScalar button_height = Layout::Scale(35);
   UPixelScalar button_width = (rc.right - rc.left) / 3;
 
-  rc_task_view = rc_fly_button = rc_revert_button = rc_save_as_button =
-      rc_task_summary = rc;
+  rc_task_view = rc_fly_button = rc_save_as_button =
+      rc_task_summary = rc_back_button = rc;
 
-  rc_fly_button.top = rc_revert_button.top = rc_save_as_button.top =
+  rc_fly_button.top = rc_back_button.top = rc_save_as_button.top =
       rc.bottom - button_height;
 
+  rc_save_as_button.left = button_width;
+  rc_back_button.left = button_width * 2;
+
   rc_fly_button.right = rc_fly_button.left + button_width;
-
-  rc_save_as_button.left = rc_fly_button.right + 1;
   rc_save_as_button.right = rc_save_as_button.left + button_width;
+  rc_back_button.right = rc_back_button.left + button_width;
 
-  rc_revert_button.left = rc_save_as_button.right + 1;
-  rc_revert_button.right = rc_revert_button.left + button_width;
-
-  rc_task_summary.bottom = rc_revert_button.top - 1;
+  rc_task_summary.bottom = rc_fly_button.top - 1;
   rc_task_summary.top = rc_task_summary.bottom - 2 * button_height;
 
   UPixelScalar task_view_width = std::min(rc_task_summary.top - rc.top,
@@ -416,26 +404,32 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
 
   const DialogLook &look = UIGlobals::GetDialogLook();
 
-  TaskEditorReturn task_editor_return = dlgTaskPointUsShowModal(parent, &active_task, 0);
+  bool editing = true;
+  bool task_modified = false;
+  while (editing) {
 
-  if (task_editor_return == TaskEditorReturn::TASK_REVERT) {
-    delete active_task;
-    return;
+    TaskEditorReturn task_editor_return = dlgTaskPointUsShowModal(parent, &active_task, 0);
+
+    // invalid task
+    if (task_editor_return == TaskEditorReturn::TASK_REVERT) {
+      delete active_task;
+      return;
+    }
+
+    task_modified |= task_editor_return == TaskEditorReturn::TASK_MODIFIED;
+    bool changed;
+    ContainerWindow &w = UIGlobals::GetMainWindow();
+    TaskManagerDialogUs *instance;
+    instance = new TaskManagerDialogUs(look, &active_task, task_modified);
+
+    instance->Initialise(w, w.GetClientRect());
+    instance->Prepare(w, w.GetClientRect());
+    editing = instance->ShowModal() == mrCancel;
+    instance->Save(changed);
+    instance->Hide();
+    instance->Unprepare();
+    delete instance;
   }
-
-  bool task_modified = task_editor_return == TaskEditorReturn::TASK_MODIFIED;
-  bool changed;
-  ContainerWindow &w = UIGlobals::GetMainWindow();
-  TaskManagerDialogUs *instance;
-  instance = new TaskManagerDialogUs(look, &active_task, task_modified);
-
-  instance->Initialise(w, w.GetClientRect());
-  instance->Prepare(w, w.GetClientRect());
-  instance->ShowModal();
-  instance->Save(changed);
-  instance->Hide();
-  instance->Unprepare();
-  delete instance;
 
   delete active_task;
 }

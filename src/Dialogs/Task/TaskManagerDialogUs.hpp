@@ -38,9 +38,9 @@ struct DialogLook;
 
 enum Controls {
   TASKVIEW,
-  REVERT,
   SAVE_AS,
   FLY,
+  BACK,
 };
 
 
@@ -86,10 +86,10 @@ protected:
   bool fullscreen;
 
   PixelRect rc_task_view;
-  PixelRect rc_fly_button, rc_revert_button, rc_save_as_button;
+  PixelRect rc_fly_button, rc_save_as_button, rc_back_button;
   PixelRect rc_task_summary;
 
-  WndButton *fly_button, *revert_button, *save_as_button;
+  WndButton *fly_button, *save_as_button, *back_button;
   WndFrame *task_summary;
 
 public:
