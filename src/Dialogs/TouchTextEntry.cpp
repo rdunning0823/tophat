@@ -38,6 +38,7 @@ Copyright_License {
 #include <assert.h>
 
 static WndProperty *editor;
+static WndProperty *the_property;
 static KeyboardBaseControl *kb = NULL;
 
 static AllowedCharacters AllowedCharactersCallback;
@@ -144,6 +145,14 @@ ClearText()
   edittext[0] = 0;
   UpdateTextboxProp();
 }
+
+static void
+ShowHelp()
+{
+  assert(the_property->HasHelp());
+  the_property->OnHelp();
+}
+
 
 bool
 TouchTextEntry(TCHAR *text, size_t width,
@@ -263,8 +272,11 @@ TouchTextEntry(TCHAR *text, size_t width,
 bool
 TouchNumericEntry(fixed &value,
                   const TCHAR *caption,
+                  WndProperty &_the_property,
                   AllowedCharacters accb)
 {
+  the_property = &_the_property;
+
   StaticString<12> buffer;
   buffer.Format(_T("%.1f"), (double)value);
 
@@ -326,11 +338,20 @@ TouchNumericEntry(fixed &value,
                             rc.top + 6 * button_height},
                           button_style, form, mrCancel);
 
-  WndButton cclear_button(client_area, look, _("Clear"),
+  WndButton help_button(client_area, look, _("Help"),
                           { button_width * 2,
                             rc.top + 5 * button_height, 3 * button_width,
                             rc.top + 6 * button_height},
-                          button_style, ClearText);
+                          button_style, ShowHelp);
+
+  WndButton clear_button(client_area, look, _("Clear"),
+                         { button_width * 2,
+                           rc.top + 5 * button_height, 3 * button_width,
+                           rc.top + 6 * button_height},
+                         button_style, ClearText);
+
+  help_button.SetVisible(the_property->HasHelp());
+  clear_button.SetVisible(!the_property->HasHelp());
 
   KeyboardNumericControl keyboard(client_area, look,
                                   { padding, keyboard_top,
