@@ -213,15 +213,15 @@ TaskManagerDialogUs::TaskView::TaskView(OrderedTask **_ordered_task_pointer)
 bool
 TaskManagerDialogUs::TaskView::OnMouseUp(PixelScalar x, PixelScalar y)
 {
-   if (!fullscreen) {
-     Move(rc_full_screen);
-   } else {
-     Move(rc_partial_screen);
-   }
-   ShowOnTop();
-   fullscreen = !fullscreen;
+  if (!fullscreen) {
+   Move(rc_full_screen);
+  } else {
+   Move(rc_partial_screen);
+  }
+  ShowOnTop();
+  fullscreen = !fullscreen;
 
-   return true;
+  return true;
 }
 
 void
