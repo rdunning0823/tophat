@@ -53,6 +53,9 @@ class WndProperty : public WindowControl {
 
   bool dragging, pressed;
 
+  /** optional caption used while editing */
+  StaticString<254> editing_caption;
+
 public:
   /**
    * Constructor of the WndProperty
@@ -91,6 +94,20 @@ public:
   bool IsReadOnly() const {
     return read_only;
   }
+
+  /**
+   * sets the optional caption that is used for editing
+   */
+  void SetEditingCaption(const TCHAR *_editing_caption) {
+    editing_caption = _editing_caption;
+  }
+
+  /**
+   * returns the optional caption used only while editing,
+   * or if that is empty, returns the regular caption
+   */
+  gcc_pure
+  const TCHAR * GetEditingCaption();
 
   /**
    * Starts  interactively  editing  the  value.   If  a  ComboBox  is

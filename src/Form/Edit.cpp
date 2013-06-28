@@ -141,7 +141,8 @@ WndProperty::WndProperty(ContainerWindow &parent, const DialogLook &_look,
    caption_width(CaptionWidth),
    mDataField(NULL),
    read_only(false),
-   dragging(false), pressed(false)
+   dragging(false), pressed(false),
+   editing_caption(caption)
 {
   caption = Caption;
 
@@ -189,7 +190,7 @@ WndProperty::BeginEditing()
              mDataField->GetType() == DataField::Type::ROUGH_TIME) {
     RoughTimeDataField &df = *(RoughTimeDataField *)mDataField;
     RoughTime value = df.GetValue();
-    if (!TimeEntryDialog(GetCaption(), value, df.GetTimeZone(), true))
+    if (!TimeEntryDialog(GetEditingCaption(), value, df.GetTimeZone(), true))
       return true;
 
     df.ModifyValue(value);
@@ -199,7 +200,7 @@ WndProperty::BeginEditing()
              mDataField->GetType() == DataField::Type::GEOPOINT) {
     GeoPointDataField &df = *(GeoPointDataField *)mDataField;
     GeoPoint value = df.GetValue();
-    if (!GeoPointEntryDialog(GetCaption(), value, false))
+    if (!GeoPointEntryDialog(GetEditingCaption(), value, false))
       return true;
 
     df.ModifyValue(value);
@@ -210,7 +211,7 @@ WndProperty::BeginEditing()
              mDataField->GetType() == DataField::Type::REAL) {
     DataFieldFloat &df = *(DataFieldFloat *)mDataField;
     fixed value = df.GetAsFixed();
-    if (!TouchNumericEntry(value, GetCaption()), false)
+    if (!TouchNumericEntry(value, GetEditingCaption()), false)
       return true;
     df.SetAsFloat(value);
     RefreshDisplay();
@@ -232,7 +233,7 @@ WndProperty::BeginEditing()
     if (mDataField->GetType() == DataField::Type::PREFIX)
       acf = ((PrefixDataField *)mDataField)->GetAllowedCharactersFunction();
 
-    if (!TextEntryDialog(buffer, GetCaption(), acf))
+    if (!TextEntryDialog(buffer, GetEditingCaption(), acf))
       return true;
 
     mDataField->SetAsString(buffer);
@@ -469,6 +470,15 @@ WndProperty::RefreshDisplay()
   SetText(HasFocus() && CanEditInPlace()
           ? mDataField->GetAsString()
           : mDataField->GetAsDisplayString());
+}
+
+const TCHAR *
+WndProperty::GetEditingCaption()
+{
+  if (editing_caption.empty())
+    return GetCaption();
+  else
+    return editing_caption.c_str();
 }
 
 void
