@@ -32,15 +32,18 @@ Copyright_License {
 #include <stdlib.h>
 #include <assert.h>
 
+#include "LogFile.hpp" //debug
 
 MapWidgetOverlays::~MapWidgetOverlays()
 {
    for (const auto i : widget_list) {
-     Widget *widget = (Widget*)i;
-     widget->Leave();
-     widget->Hide();
-     widget->Unprepare();
-     delete widget;
+     MapOverlayWidget *map_overlay_widget = (MapOverlayWidget*)i;
+     map_overlay_widget->Leave();
+     if (map_overlay_widget->IsVisible())
+       map_overlay_widget->Hide();
+
+     map_overlay_widget->Unprepare();
+     delete map_overlay_widget;
    }
 }
 

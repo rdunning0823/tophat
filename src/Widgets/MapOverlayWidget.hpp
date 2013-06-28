@@ -39,7 +39,14 @@ private:
 public:
   MapOverlayWidget() {};
 
+  virtual bool IsDefined() {
+    return GetWindow()->IsDefined();
+  }
+
   virtual bool IsVisible() {
+    if (!IsDefined())
+      return false;
+
     return GetWindow()->IsVisible();
   }
 
