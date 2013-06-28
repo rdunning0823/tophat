@@ -29,6 +29,7 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #include "Form/Form.hpp"
 #include "Form/Util.hpp"
+#include "Form/Edit.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Button.hpp"
@@ -92,6 +93,17 @@ public:
 
   /* virtual methods from ListCursorHandler */
   virtual void OnCursorMoved(unsigned index) override;
+
+  /**
+   * updates the edit captions of the OZ WndProperty controls
+   */
+  void RefreshPropertyEditCaptions(unsigned i);
+private:
+  /**
+   * updates the edit caption of a single property
+   */
+  void RefreshPropertyEditCaption(const TCHAR* property_name,
+                                  const TCHAR *waypoint_name);
 };
 
 /**
@@ -533,6 +545,36 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(nullptr)
 };
 
+void
+TaskPointUsDialog::RefreshPropertyEditCaption(const TCHAR* property_name,
+                                              const TCHAR *waypoint_name)
+{
+  WndProperty *wp;
+  wp = (WndProperty*)wf->FindByName(property_name);
+  assert(wp != nullptr);
+
+  StaticString<255> edit_caption;
+  edit_caption.Format(_T("%s: %s"), wp->GetCaption(), waypoint_name);
+
+  wp->SetEditingCaption(edit_caption.c_str());
+}
+
+void
+TaskPointUsDialog::RefreshPropertyEditCaptions(unsigned i)
+{
+  assert(ordered_task != nullptr);
+  assert(i < ordered_task->TaskSize());
+
+  StaticString<255> waypoint_name;
+  waypoint_name = ordered_task->GetPoint(i).GetWaypoint().name.c_str();
+
+  RefreshPropertyEditCaption(_T("prpOZLineLength"), waypoint_name.c_str());
+  RefreshPropertyEditCaption(_T("prpOZCylinderRadius"), waypoint_name.c_str());
+  RefreshPropertyEditCaption(_T("prpOZSectorRadius"), waypoint_name.c_str());
+  RefreshPropertyEditCaption(_T("prpOZSectorStartRadial"), waypoint_name.c_str());
+  RefreshPropertyEditCaption(_T("prpOZSectorFinishRadial"), waypoint_name.c_str());
+  RefreshPropertyEditCaption(_T("prpOZSectorInnerRadius"), waypoint_name.c_str());
+}
 
 void
 TaskPointUsDialog::OnCursorMoved(unsigned i)
@@ -542,6 +584,7 @@ TaskPointUsDialog::OnCursorMoved(unsigned i)
 
   active_index = i;
   RefreshView();
+  RefreshPropertyEditCaptions(i);
 }
 
 void
@@ -619,6 +662,9 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
 
   wf->SetCaption(OrderedTaskFactoryName(xfac));
   RefreshView();
+  if (ordered_task->TaskSize() > 0)
+    dialog2.RefreshPropertyEditCaptions(0);
+
   wf->ShowModal();
 
   delete wf;
