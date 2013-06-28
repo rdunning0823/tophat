@@ -211,7 +211,7 @@ WndProperty::BeginEditing()
              mDataField->GetType() == DataField::Type::REAL) {
     DataFieldFloat &df = *(DataFieldFloat *)mDataField;
     fixed value = df.GetAsFixed();
-    if (!TouchNumericEntry(value, GetEditingCaption()), false)
+    if (!TouchNumericEntry(value, GetEditingCaption(), *this), false)
       return true;
     df.SetAsFloat(value);
     RefreshDisplay();

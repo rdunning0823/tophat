@@ -28,10 +28,12 @@ Copyright_License {
 #include "Math/fixed.hpp"
 
 #include <functional>
-
 #include <tchar.h>
 
+class WndProperty;
+
 typedef std::function<const TCHAR *(const TCHAR *)> AllowedCharacters;
+typedef void (*HelpCallback)();
 
 bool
 TextEntryDialog(TCHAR *text, size_t size,
@@ -60,11 +62,13 @@ TouchTextEntry(TCHAR *text, size_t size,
 /**
  * show a numeric keypad with Help if available
  * @param reference containing value before and after edit
+ * @param the_property being edited
  * @param optional character filter
  */
 bool
 TouchNumericEntry(fixed &value,
                   const TCHAR *caption,
+                  WndProperty &the_property,
                   AllowedCharacters accb=AllowedCharacters());
 
 #endif
