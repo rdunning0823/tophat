@@ -1,7 +1,14 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 1.0.4 Beta TBD
+TopHat 1.0.5 Beta 6/28/2013
+* Task manager: 
+ - added numeric keypad for turnpoint radius entry
+ - replaced "Revert" button with "Back" button
+* Added Wind arrow Infobox
+* Added battery manager for Nook
+
+TopHat 1.0.4 Beta
 * bearing indicators in Navigation bar
 * rebase to XCSoar 6.6.2
 * IOIO Reconnect
