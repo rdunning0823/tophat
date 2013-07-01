@@ -58,6 +58,10 @@ class BatteryController
   bool initialised;
 
 public:
+
+  BatteryController()
+    :last_charge_rate(0), initialised(false) {};
+
   void ProcessChargeRate(unsigned value);
 
   void Initialise(unsigned value);
