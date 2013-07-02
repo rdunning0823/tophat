@@ -70,6 +70,10 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #endif
 
+#ifdef ANDROID
+#include "Dialogs/Message.hpp"
+#endif
+
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Cache.hpp"
 #endif
@@ -955,6 +959,7 @@ MainWindow::KillBottomWidget()
     bottom_widget->Hide();
   bottom_widget->Unprepare();
   delete bottom_widget;
+  bottom_widget = nullptr;
 }
 
 void
