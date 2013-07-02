@@ -39,35 +39,19 @@ Copyright_License {
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
 #include "InfoBoxes/Panel/Home.hpp"
+#include "InfoBoxes/Panel/NextWaypoint.hpp"
+
 
 #include <tchar.h>
 #include <stdio.h>
 
-static void
-ShowNextWaypointDetails()
-{
-  if (protected_task_manager == nullptr)
-    return;
-
-  const Waypoint *wp = protected_task_manager->GetActiveWaypoint();
-  if (wp == nullptr)
-    return;
-
-  dlgWaypointDetailsShowModal(*wp);
-}
-
-static Widget *
-LoadNextWaypointDetailsPanel(unsigned id)
-{
-  return new CallbackWidget(ShowNextWaypointDetails);
-}
 
 #ifdef __clang__
 /* gcc gives "redeclaration differs in 'constexpr'" */
 constexpr
 #endif
 const InfoBoxPanel next_waypoint_infobox_panels[] = {
-  { N_("Details"), LoadNextWaypointDetailsPanel },
+  { N_("Details"), LoadNextWaypointPanel },
   { nullptr, nullptr }
 };
 

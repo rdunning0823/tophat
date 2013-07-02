@@ -525,6 +525,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/Panel/OnlineContest.cpp \
 	$(SRC)/InfoBoxes/Panel/ATCReference.cpp \
 	$(SRC)/InfoBoxes/Panel/WindSetupInfoBox.cpp \
+	$(SRC)/InfoBoxes/Panel/NextWaypoint.cpp \
 	$(SRC)/Pan.cpp \
 	$(SRC)/Input/InputConfig.cpp \
 	$(SRC)/Input/InputDefaults.cpp \
