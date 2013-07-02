@@ -126,9 +126,11 @@ DeviceConfig::ShouldReopenOnTimeout() const
     return false;
 #endif
 
+  case PortType::IOIOUART:
+    return true;
+
   case PortType::RFCOMM:
   case PortType::RFCOMM_SERVER:
-  case PortType::IOIOUART:
   case PortType::DROIDSOAR_V2:
   case PortType::NUNCHUCK:
   case PortType::I2CPRESSURESENSOR:
