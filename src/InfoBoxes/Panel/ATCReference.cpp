@@ -32,6 +32,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
+#include "InfoBoxes/Panel/Base.hpp"
 
 enum Controls {
   WAYPOINT,
@@ -118,8 +119,16 @@ ATCReferencePanel::OnAction(int id)
   }
 }
 
+
+class ATCReferencePanelFullscreen : public BaseAccessPanel {
+public:
+
+  ATCReferencePanelFullscreen(unsigned _id)
+    :BaseAccessPanel(_id, new ATCReferencePanel()) {}
+};
+
 Widget *
 LoadATCReferencePanel(unsigned id)
 {
-  return new ATCReferencePanel();
+  return new ATCReferencePanelFullscreen(id);
 }
