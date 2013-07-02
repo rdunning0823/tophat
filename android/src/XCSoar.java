@@ -76,6 +76,7 @@ public class XCSoar extends Activity {
 
     if (!Loader.loaded) {
       TextView tv = new TextView(this);
+      tv.setTextSize(20);
       tv.setText("Failed to load the native XCSoar libary.\n" +
                  "Report this problem to us, and include the following information:\n" +
                  "ABI=" + Build.CPU_ABI + "\n" +
@@ -146,8 +147,9 @@ public class XCSoar extends Activity {
     Log.d(TAG, "getExternalStorageState() = " + state);
     if (!Environment.MEDIA_MOUNTED.equals(state)) {
       TextView tv = new TextView(this);
-      tv.setText("External storage is not available (state='" + state
-                 + "').  Please turn off USB storage.");
+      tv.setTextSize(20);
+      tv.setText("SD Card is not available (state='" + state
+                 + "').  \nUnplug your USB cable, then reinsert and restart Top Hat.");
       setContentView(tv);
       return;
     }
