@@ -182,7 +182,11 @@ public:
    * returns true if the kinetic scroll is not moving
    */
   bool IsSteady() {
+#ifndef _WIN32_WCE
     return kinetic.IsSteady();
+#else
+    return true;
+#endif
   }
 
   /**

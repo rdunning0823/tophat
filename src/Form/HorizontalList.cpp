@@ -55,8 +55,11 @@ void
 HorizontalListControl::EnsureVisible(unsigned i)
 {
   assert(i < length);
+
+#ifndef _WIN32_WCE
   if (HasDraggableScreen())
     kinetic_timer.Cancel();
+#endif
 
   SetPixelOriginAndCenter(i * item_height - over_scroll_max);
 }
@@ -202,10 +205,12 @@ HorizontalListControl::ScrollToItem(unsigned i)
     return;
 
   assert(i < length);
+#ifndef _WIN32_WCE
   kinetic_timer.Cancel();
   int offset = GetPixelOrigin() - origin * item_height;
   kinetic.MoveTo(i * item_height + offset);
   kinetic_timer.Schedule(30);
+#endif
 }
 
 /**
@@ -228,8 +233,10 @@ HorizontalListControl::OnMouseUp(PixelScalar x, PixelScalar y)
     drag_end();
 
     if (HasDraggableScreen()) {
+#ifndef _WIN32_WCE
       kinetic.MouseUp(GetPixelOrigin(), (item_height));
       kinetic_timer.Schedule(30);
+#endif
     } else {
       SetCursorIndex(GetCenteredItem());
     }
@@ -257,8 +264,10 @@ HorizontalListControl::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     cursor_down_index = -1;
     int new_origin = drag_y - x;
     SetPixelOrigin(new_origin);
+#ifndef _WIN32_WCE
     if (HasDraggableScreen())
       kinetic.MouseMove(GetPixelOrigin());
+#endif
     if (cursor_handler != nullptr)
       cursor_handler->OnPixelMove();
     return true;
@@ -276,9 +285,10 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
   drag_end();
 
   mouse_down_clock.Update();
+#ifndef _WIN32_WCE
   if (HasDraggableScreen())
     kinetic_timer.Cancel();
-
+#endif
   // if click in ListBox area
   // -> select appropriate item
 
@@ -302,8 +312,10 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
     // If item was not selected before
     // -> select it
   }
+#ifndef _WIN32_WCE
   if (HasDraggableScreen())
     kinetic.MouseDown(GetPixelOrigin());
+#endif
   SetCapture();
 
   return true;
@@ -320,16 +332,19 @@ HorizontalListControl::ScrollAdvance(bool forward)
       (!forward && old_item == 0))
     return false;
 
+#ifndef _WIN32_WCE
   unsigned new_item = old_item + (forward ? 1 : -1);
   int to_location = new_item * GetItemHeight() - over_scroll_max;
   kinetic.MoveTo(to_location);
   kinetic_timer.Schedule(30);
+#endif
   return true;
 }
 
 bool
 HorizontalListControl::OnTimer(WindowTimer &timer)
 {
+#ifndef _WIN32_WCE
   if (timer == kinetic_timer) {
     if (kinetic.IsSteady()) {
       // if already reversed or in MoveTo mode,
@@ -362,6 +377,7 @@ HorizontalListControl::OnTimer(WindowTimer &timer)
 
     return true;
   }
+#endif
 
   return PaintWindow::OnTimer(timer);
 }
