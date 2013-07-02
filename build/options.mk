@@ -25,6 +25,6 @@ endif
 
 # this option must not be used if TESTING=y
 #ifeq ($(NO_HORIZON),y)
-TARGET_CPPFLAGS += -DNO_HORIZON
-WINDRESFLAGS += -DNO_HORIZON
+#TARGET_CPPFLAGS += -DNO_HORIZON
+#WINDRESFLAGS += -DNO_HORIZON
 #endif
