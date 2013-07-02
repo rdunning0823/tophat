@@ -108,7 +108,7 @@ public class XCSoar extends Activity {
                          WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     TextView tv = new TextView(this);
-    tv.setText("Loading XCSoar...");
+    tv.setText("Loading Top Hat...");
     setContentView(tv);
 
     registerReceiver(batteryReceiver,
@@ -124,7 +124,7 @@ public class XCSoar extends Activity {
     stopService(new Intent(this, serviceClass));
 
     TextView tv = new TextView(XCSoar.this);
-    tv.setText("Shutting down XCSoar...");
+    tv.setText("Shutting down Top Hat...");
     setContentView(tv);
 
     Log.d(TAG, "finish()");
