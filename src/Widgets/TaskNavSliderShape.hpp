@@ -157,7 +157,7 @@ public:
    * Draws the text and the outline of the shape
    */
   void DrawText(Canvas &canvas, const PixelRect rc_outer,
-                unsigned idx, bool selected, const char *tp_name,
+                unsigned idx, bool selected, const TCHAR *tp_name,
                 bool has_entered, bool has_exited,
                 TaskType task_mode, unsigned task_size,
                 bool tp_valid, fixed tp_distance, bool distance_valid,

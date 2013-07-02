@@ -147,7 +147,7 @@ public:
   WndButton *AddButton(const TCHAR *caption,
                        ActionListener &listener, int id) {
     WndButton * but = buttons.Add(caption, listener, id);
-    OnResize(PixelSize {GetWidth(), GetHeight()});
+    OnResize(PixelSize {(PixelScalar)GetWidth(), (PixelScalar)GetHeight()});
     return but;
   }
 

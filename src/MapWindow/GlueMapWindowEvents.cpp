@@ -394,9 +394,9 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   if (!IsPanning())
     DrawMainMenuButtonOverlay(canvas);
   DrawZoomButtonOverlays(canvas);
-#endif
   if (!HasDraggableScreen())
     DrawTaskNavSliderShape(canvas);
+#endif
 
 #ifdef ENABLE_OPENGL
   LeaveDrawThread();
@@ -457,7 +457,7 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
 {
   RasterPoint p {x, y};
 
-  if (IsPointInRect(rc_main_menu_button, p)) {
+  if (rc_main_menu_button.IsInside(p)) {
     StaticString<20> menu;
     StaticString<20> menu_1;
     StaticString<20> menu_2;
@@ -484,20 +484,20 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
 
     return true;
   }
-  if (IsPointInRect(rc_zoom_out_button, p)) {
+  if (rc_zoom_out_button.IsInside(p)) {
     InputEvents::eventZoom(_T("-"));
     InputEvents::HideMenu();
     return true;
   }
-  if (IsPointInRect(rc_zoom_in_button, p)) {
+  if (rc_zoom_in_button.IsInside(p)) {
     InputEvents::eventZoom(_T("+"));
     InputEvents::HideMenu();
     return true;
   }
-  if (!HasDraggableScreen() && IsPointInRect(slider_shape.GetInnerRect(), p)) {
+  if (!HasDraggableScreen() && slider_shape.GetInnerRect().IsInside(p)) {
     StaticString<20> menu_ordered(_T("NavOrdered"));
     StaticString<20> menu_goto(_T("NavGoto"));
-    TaskManager::TaskMode task_mode;
+    TaskType task_mode;
     {
       ProtectedTaskManager::Lease task_manager(*protected_task_manager);
       task_mode = task_manager->GetMode();
@@ -506,8 +506,8 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
     if (InputEvents::IsMode(menu_ordered.buffer())
         || InputEvents::IsMode(menu_goto.buffer()))
       InputEvents::HideMenu();
-    else if (task_mode == TaskManager::MODE_GOTO
-        || task_mode == TaskManager::MODE_ABORT)
+    else if (task_mode == TaskType::GOTO
+        || task_mode == TaskType::ABORT)
       InputEvents::setMode(menu_goto.buffer());
     else
       InputEvents::setMode(menu_ordered.buffer());

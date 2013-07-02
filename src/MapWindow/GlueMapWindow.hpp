@@ -247,13 +247,13 @@ private:
    * Todo: remove duplicate code
    */
   void DrawZoomButtonOverlays(Canvas &canvas) const;
-#endif
 
   /**
    * draws the task nav with transparencies if !HasDraggableScreen()
    * this does not support dragging
    */
   void DrawTaskNavSliderShape(Canvas &canvas);
+#endif
 
   void SwitchZoomClimb(bool circling);
 

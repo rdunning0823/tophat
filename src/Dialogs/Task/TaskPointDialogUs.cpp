@@ -37,6 +37,8 @@ Copyright_License {
 #include "Form/Panel.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Screen/Layout.hpp"
+#include "Screen/Font.hpp"
+#include "Screen/Canvas.hpp"
 #include "Components.hpp"
 #include "Dialogs/Task/dlgTaskHelpers.hpp"
 #include "Units/Units.hpp"

@@ -450,7 +450,7 @@ public:
                              bool nullable = true);
 
   WndProperty *AddFileReader(const TCHAR *label, const TCHAR *help,
-                             const TCHAR *registry_key, const TCHAR *filters,
+                             const char *registry_key, const TCHAR *filters,
                              bool nullable,
                              DataFieldListener *listener) {
     WndProperty *control = AddFileReader(label, help, registry_key,

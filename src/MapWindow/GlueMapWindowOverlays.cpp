@@ -162,7 +162,6 @@ GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
                   bitmap_out_size.cx / 2, 0);
 
 }
-#endif
 
 void
 GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
@@ -253,6 +252,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                        bearing_valid,
                        border_width);
 }
+#endif
 
 void
 GlueMapWindow::DrawCrossHairs(Canvas &canvas) const

@@ -29,6 +29,7 @@ Copyright_License {
 #include "Dialogs/Plane/PlaneDialogs.hpp"
 #include "UtilsSettings.hpp"
 #include "Util/StringUtil.hpp"
+#include "Util/ConvertString.hpp"
 #include "Form/Button.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Form.hpp"
@@ -243,6 +244,7 @@ SetupQuick::RefreshForm()
     const TCHAR *driver_name = FindDriverDisplayName(config.driver_name);
 
     text.AppendFormat(_("%s on %s"), driver_name, port_name);
+    text.append(driver_name);
   } else {
     text.append(port_name);
   }
@@ -252,11 +254,17 @@ SetupQuick::RefreshForm()
 
   text.clear();
   text_filename.clear();
-  if (Profile::Get(ProfileKeys::MapFile) != nullptr)
-    text = Profile::Get(ProfileKeys::MapFile);
+  if (Profile::Get(ProfileKeys::MapFile) != nullptr) {
+    UTF8ToWideConverter text2(Profile::Get(ProfileKeys::MapFile));
+    if (text2.IsValid())
+      text = text2;
+  }
 
-  if (text.empty() && Profile::Get(ProfileKeys::WaypointFile) != nullptr)
-    text = Profile::Get(ProfileKeys::WaypointFile);
+  if (text.empty() && Profile::Get(ProfileKeys::WaypointFile) != nullptr) {
+    UTF8ToWideConverter text2(Profile::Get(ProfileKeys::WaypointFile));
+    if (text2.IsValid())
+      text = text2;
+  }
 
   StaticString<15> local_path;
   local_path = _T("%LOCAL_PATH%\\");

@@ -146,7 +146,7 @@ bool
 PlaneListWidget::IsAnyActive()
 {
   for (unsigned i = 0; i < list.size(); i++)
-    if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path))
+    if (Profile::GetPathIsEqual("PlanePath", list[i].path))
       return true;
 
   return false;
@@ -226,7 +226,7 @@ PlaneListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned i)
   canvas.DrawClippedText(rc.left + Layout::FastScale(2),
                          rc.top + Layout::FastScale(2), rc, list[i].name);
 
-  if (Profile::GetPathIsEqual(_T("PlanePath"), list[i].path)) {
+  if (Profile::GetPathIsEqual("PlanePath", list[i].path)) {
     StaticString<256> buffer;
     buffer.Format(_T("** %s **"), _("Active"));
     canvas.DrawClippedText(rc.right - Layout::FastScale(2) -

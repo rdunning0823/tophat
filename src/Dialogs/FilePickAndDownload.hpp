@@ -37,6 +37,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "OS/FileUtil.hpp"
 #include "Net/Features.hpp"
+#include "Form/List.hpp"
 
 #include <windef.h> /* for MAX_PATH */
 
@@ -46,7 +47,6 @@ Copyright_License {
 #include "Event/Timer.hpp"
 #include "Thread/Mutex.hpp"
 #include "Dialogs/ListPicker.hpp"
-#include "Form/List.hpp"
 #include "Form/Button.hpp"
 
 #include <map>

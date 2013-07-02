@@ -44,6 +44,7 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Look/Fonts.hpp"
 #include "Util/StaticString.hpp"
+#include "Util/ConvertString.hpp"
 #include "Task/TaskNationalities.hpp"
 #include "Task/TaskBehaviour.hpp"
 #include "Dialogs/Message.hpp"
@@ -345,8 +346,11 @@ dlgStartupAssistantShowModal(bool conditional)
   if (conditional)
     ShowDialogSetupQuick(true);
 
-  StaticString<32> decline_ver;
-  decline_ver = Profile::Get(ProfileKeys::StartupTipDeclineVersion, _T(""));
+  StaticString<32> decline_ver(_T(""));
+  UTF8ToWideConverter text2(Profile::Get(ProfileKeys::StartupTipDeclineVersion, ""));
+  if (text2.IsValid())
+    decline_ver = text2;
+
   if ((decline_ver == TopHat_ProductToken) && conditional)
     return;
 
