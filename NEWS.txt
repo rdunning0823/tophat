@@ -36,6 +36,8 @@ TopHat 1.0.4 Beta
   - fix instant crash (#2922)
 * Altair
   - never override data path (#2509)
+* Android
+  - faster startup
 * cross section
   - fix airspace display after display rotation (#2825)
 * user interface

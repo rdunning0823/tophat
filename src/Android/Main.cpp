@@ -158,6 +158,13 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   return Startup();
 }
 
+void
+OnLogCatFinished(bool crash_found)
+{
+  if (crash_found)
+    CommonInterface::main_window->SendCrash();
+}
+
 gcc_visibility_default
 JNIEXPORT void JNICALL
 Java_org_tophat_NativeView_runNative(JNIEnv *env, jobject obj)
@@ -166,14 +173,7 @@ Java_org_tophat_NativeView_runNative(JNIEnv *env, jobject obj)
 
   OpenGL::Initialise();
 
-  if (CheckLogCat())
-    ShowMessageBox(_T("How embarassing, we're terribly sorry!\n"
-                      "Please submit a bug report and "
-                      "include the file from the 'crash' directory.\n"
-                      "http://bugs.xcsoar.org/newticket\n"
-                      "After your report, we'll fix it ASAP."),
-                   _T("XCSoar has crashed recently"),
-                   MB_OK|MB_ICONERROR);
+  CheckLogCat(*io_thread);
 
   CommonInterface::main_window->RunEventLoop();
 }
@@ -184,6 +184,8 @@ Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
 {
   if (IsNookSimpleTouch())
     Nook::ExitFastMode();
+
+  StopLogCat();
 
   InitThreadDebug();
 
