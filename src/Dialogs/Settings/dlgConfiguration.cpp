@@ -156,16 +156,6 @@ ConfigPanel::GetExtraButton(unsigned number)
 }
 
 static void
-OnUserLevel(CheckBoxControl &control)
-{
-  const bool expert = control.GetState();
-  CommonInterface::SetUISettings().dialog.expert = expert;
-  Profile::Set(ProfileKeys::UserLevel, expert);
-  dialog->FilterAdvanced(expert);
-  tab_menu->UpdateLayout();
-}
-
-static void
 OnNextClicked()
 {
   tab_menu->NextPage();
@@ -243,7 +233,6 @@ PrepareConfigurationMenu()
 static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnNextClicked),
   DeclareCallBackEntry(OnPrevClicked),
-  DeclareCallBackEntry(OnUserLevel),
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(NULL)
 };
@@ -261,16 +250,13 @@ PrepareConfigurationDialog(const TCHAR *page_name)
 
   dialog->SetKeyDownFunction(FormKeyDown);
 
-  CommonInterface::SetUISettings().dialog.expert = false;
-  bool expert_mode = CommonInterface::GetUISettings().dialog.expert;
-  CheckBox *cb = (CheckBox *)dialog->FindByName(_T("Expert"));
-  cb->SetState(expert_mode);
-  dialog->FilterAdvanced(expert_mode);
-
   PrepareConfigurationMenu();
   int page = tab_menu->FindPage(page_name);
   single_page = (page >= 0);
-  cb->SetVisible(!single_page);
+  bool expert_mode = !single_page;
+  dialog->FilterAdvanced(expert_mode);
+  CommonInterface::SetUISettings().dialog.expert = expert_mode;
+  tab_menu->UpdateLayout();
   if (single_page) {
     assert((unsigned)page < tab_menu->GetNumPages());
     WndButton *b = (WndButton*)dialog->FindByName(_T("cmdPrev"));
