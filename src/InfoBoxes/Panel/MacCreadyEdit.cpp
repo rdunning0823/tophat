@@ -103,6 +103,10 @@ protected:
    */
   WindowTimer dialog_timer;
 
+  /**
+   * Dialog look with large text font
+   */
+  DialogLook big_dialog_look;
 
 public:
   MacCreadyEditPanel(unsigned _id)
@@ -228,29 +232,27 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   big_plus = new WndSymbolButton(GetClientAreaWindow(), dialog_look, _T("^"),
                                  big_plus_rc,
                                  button_style, *this, BigPlus);
-  big_plus->SetFont(Fonts::infobox);
 
   little_plus = new WndSymbolButton(GetClientAreaWindow(), dialog_look,
                                     _T("^"), little_plus_rc,
                                     button_style, *this, LittlePlus);
-  little_plus->SetFont(Fonts::infobox);
 
   big_minus = new WndSymbolButton(GetClientAreaWindow(), dialog_look,
                                   _T("v"), big_minus_rc,
                                   button_style, *this, BigMinus);
-  big_minus->SetFont(Fonts::infobox);
 
   little_minus = new WndSymbolButton(GetClientAreaWindow(), dialog_look,
                                      _T("v"), little_minus_rc,
                                      button_style, *this, LittleMinus);
-  little_minus->SetFont(Fonts::infobox);
 
   WindowStyle style_frame;
-  mc_value = new WndFrame(GetClientAreaWindow(), dialog_look,
+  big_dialog_look.Initialise(Fonts::map_bold, Fonts::infobox, Fonts::map_label,
+                             Fonts::infobox, Fonts::map_bold,
+                             Fonts::map_bold);
+  mc_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
                           value_rc, style_frame);
   mc_value->SetAlignCenter();
   mc_value->SetVAlignCenter();
-  mc_value->SetFont(Fonts::infobox);
 
   PixelRect checkbox_rc;
   checkbox_rc.bottom = content_rc.bottom -
