@@ -21,42 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_INFOBOX_CONTENT_ALTITUDE_HPP
-#define XCSOAR_INFOBOX_CONTENT_ALTITUDE_HPP
+#ifndef XCSOAR_ALTITUDE_SIMULATOR_FULL_SCREEN_PANEL_HPP
+#define XCSOAR_ALTITUDE_SIMULATOR_FULL_SCREEN_PANEL_HPP
 
-#include "InfoBoxes/Content/Base.hpp"
+class Widget;
 
-extern const InfoBoxPanel altitude_infobox_panels[];
-
-class InfoBoxContentAltitude : public InfoBoxContent
-{
-public:
-  virtual const InfoBoxPanel *GetDialogContent() override;
-};
-
-void
-UpdateInfoBoxAltitudeNav(InfoBoxData &data);
-
-class InfoBoxContentAltitudeGPS : public InfoBoxContentAltitude
-{
-public:
-  virtual void Update(InfoBoxData &data) override;
-  virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
-};
-
-class InfoBoxContentAltitudeAGL : public InfoBoxContentAltitude
-{
-public:
-  virtual void Update(InfoBoxData &data) override;
-};
-
-void
-UpdateInfoBoxAltitudeBaro(InfoBoxData &data);
-
-void
-UpdateInfoBoxAltitudeQFE(InfoBoxData &data);
-
-void
-UpdateInfoBoxAltitudeFlightLevel(InfoBoxData &data);
+Widget *
+LoadAltitudeSimulatorFullScreenPanel(unsigned id);
 
 #endif
