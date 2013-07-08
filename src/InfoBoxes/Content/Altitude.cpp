@@ -26,6 +26,7 @@ Copyright_License {
 #include "InfoBoxes/Data.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
 #include "InfoBoxes/Panel/AltitudeSimulatorFullScreen.hpp"
+#include "InfoBoxes/Panel/BarometricPressure.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Units/Units.hpp"
 #include "Interface.hpp"
@@ -53,6 +54,15 @@ constexpr
 #endif
 const InfoBoxPanel altitude_infobox_panels[] = {
   { N_("Simulator"), LoadAltitudeSimulatorFullScreenPanel },
+  { nullptr, nullptr }
+};
+
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel barometric_altitude_infobox_panels[] = {
+  { N_("Simulator"), LoadBarometricPressurePanel },
   { nullptr, nullptr }
 };
 

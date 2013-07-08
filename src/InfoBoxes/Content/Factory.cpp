@@ -530,7 +530,7 @@ static constexpr MetaData meta_data[] = {
     N_("Alt Baro"),
     N_("This is the barometric altitude obtained from a device equipped with a pressure sensor."),
     UpdateInfoBoxAltitudeBaro,
-    altitude_infobox_panels,
+    barometric_altitude_infobox_panels,
     e_H_QFE, // H T/O
     e_H_Terrain, // Terr Elev
     Category::STANDARD,

@@ -112,10 +112,10 @@ UpdateInfoBoxBattery(InfoBoxData &data)
 #endif
 
   if (CommonInterface::Basic().voltage_available) {
-    data.SetValue(_T("%2.1fV"), CommonInterface::Basic().voltage);
+//    data.SetValue(_T("%2.1fV"), CommonInterface::Basic().voltage);
     return;
   } else if (CommonInterface::Basic().battery_level_available) {
-    data.SetValue(_T("%.0f%%"), CommonInterface::Basic().battery_level);
+//    data.SetValue(_T("%.0f%%"), CommonInterface::Basic().battery_level);
     return;
   }
 

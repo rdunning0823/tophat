@@ -516,6 +516,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/InfoBoxManager.cpp \
 	$(SRC)/InfoBoxes/Panel/Base.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeSimulatorFullScreen.cpp \
+	$(SRC)/InfoBoxes/Panel/BarometricPressure.cpp \
 	$(SRC)/InfoBoxes/Panel/Home.cpp \
 	$(SRC)/InfoBoxes/Panel/GrAverage.cpp \
 	$(SRC)/InfoBoxes/Panel/InfoBoxDescription.cpp \

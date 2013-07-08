@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
+extern const InfoBoxPanel barometric_altitude_infobox_panels[];
 extern const InfoBoxPanel altitude_infobox_panels[];
 
 class InfoBoxContentAltitude : public InfoBoxContent
