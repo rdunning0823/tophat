@@ -526,7 +526,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_H_Baro
   {
-    N_("Barometric altitude"),
+    N_("Altitude barometric"),
     N_("Alt Baro"),
     N_("This is the barometric altitude obtained from a device equipped with a pressure sensor."),
     UpdateInfoBoxAltitudeBaro,
