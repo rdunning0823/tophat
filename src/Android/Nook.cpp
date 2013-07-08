@@ -116,6 +116,7 @@ Nook::BatteryController::ProcessChargeRate(unsigned value)
     if (value <= GetLowerChargeThreshhold())
       SetCharging();
   }
+  last_charge_percent = value;
 }
 
 void
