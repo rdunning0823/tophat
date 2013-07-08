@@ -41,9 +41,11 @@
 #include "Language/Language.hpp"
 #include "UIUtil/GestureManager.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Units/Settings.hpp"
 #include "Renderer/UnitSymbolRenderer.hpp"
 #include "Input/InputEvents.hpp"
 #include "Interface.hpp"
+#include "UISettings.hpp"
 #include "Asset.hpp"
 
 /**
@@ -161,19 +163,37 @@ FlarmTrafficControl::OnCreate()
 unsigned
 FlarmTrafficControl::GetZoomDistance(unsigned zoom)
 {
-  switch (zoom) {
-  case 0:
-    return 500;
-  case 1:
-    return 1000;
-  case 3:
-    return 5000;
-  case 4:
-    return 10000;
-  case 2:
-  default:
-    return 2000;
-  }
+  UnitSetting &config = CommonInterface::SetUISettings().units;
+
+  if (config.distance_unit == Unit::NAUTICAL_MILES ||
+      config.distance_unit == Unit::STATUTE_MILES)
+    switch (zoom) {
+    case 0:
+      return (unsigned)Units::ToSysUnit(fixed(0.25), config.distance_unit);
+    case 1:
+      return (unsigned)Units::ToSysUnit(fixed(0.5), config.distance_unit);
+    case 3:
+      return (unsigned)Units::ToSysUnit(fixed(3), config.distance_unit);
+    case 4:
+      return (unsigned)Units::ToSysUnit(fixed(6), config.distance_unit);
+    case 2:
+    default:
+      return (unsigned)Units::ToSysUnit(fixed(2), config.distance_unit);
+    }
+  else
+    switch (zoom) {
+    case 0:
+      return 500;
+    case 1:
+      return 1000;
+    case 3:
+      return 5000;
+    case 4:
+      return 10000;
+    case 2:
+    default:
+      return 2000;
+    }
 }
 
 void
