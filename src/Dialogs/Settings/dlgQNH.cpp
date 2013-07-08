@@ -21,26 +21,21 @@ Copyright_License {
 }
 */
 
-#include "Dialogs/Dialogs.h"
+#include "Dialogs/Settings/dlgQNH.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Protection.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
-#include "Atmosphere/Temperature.hpp"
 #include "Form/DataField/Float.hpp"
-#include "Form/DataField/Listener.hpp"
-#include "UIGlobals.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
-#include "Widget/RowFormWidget.hpp"
 #include "Form/Button.hpp"
 #include "Form/Form.hpp"
 #include "Form/ButtonPanel.hpp"
 #include "Language/Language.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Compiler.h"
-#include "Event/Timer.hpp"
 
 #include <math.h>
 
@@ -53,42 +48,6 @@ enum Actions {
   DUMP = 100,
 };
 
-class QNHPanel
-  : public RowFormWidget, DataFieldListener, private Timer
-{
-  fixed last_altitude;
-
-public:
-  QNHPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook()),
-     last_altitude(-2)
-  {}
-
-  void ShowAltitude(fixed altitude);
-  void RefreshAltitudeControl();
-  void SetQNH(AtmosphericPressure qnh);
-
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual bool Save(bool &changed);
-  virtual void Show(const PixelRect &rc) override {
-    RowFormWidget::Show(rc);
-    Timer::Schedule(500);
-
-    OnTimer();
-  }
-
-  virtual void Hide() override {
-    Timer::Cancel();
-    RowFormWidget::Hide();
-  }
-
-private:
-  /* virtual methods from DataFieldListener */
-  virtual void OnModified(DataField &df);
-
-  /* virtual methods from Timer */
-  virtual void OnTimer() override;
-};
 
 static QNHPanel *instance;
 

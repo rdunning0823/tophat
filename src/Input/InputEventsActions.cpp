@@ -65,6 +65,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Dialogs/dlgAnalysis.hpp"
 #include "Dialogs/FileManager.hpp"
 #include "Dialogs/ReplayDialog.hpp"
+#include "Dialogs/Settings/dlgQNH.hpp"
 #include "Message.hpp"
 #include "Markers/ProtectedMarkers.hpp"
 #include "InfoBoxes/InfoBoxLayout.hpp"

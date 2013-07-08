@@ -46,7 +46,6 @@ void ShowDialogSetupQuick(bool auto_prompt);
  * return true if the "More options" button was clicked
  */
 bool dlgMatItemClickShowModal(const Waypoint &wp);
-void dlgQNHShowModal();
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();
