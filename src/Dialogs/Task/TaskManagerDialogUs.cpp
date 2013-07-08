@@ -425,7 +425,8 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
     instance->Initialise(w, w.GetClientRect());
     instance->Prepare(w, w.GetClientRect());
     editing = instance->ShowModal() == mrCancel;
-    instance->Save(changed);
+    if (!editing)
+      instance->Save(changed);
     instance->Hide();
     instance->Unprepare();
     delete instance;
