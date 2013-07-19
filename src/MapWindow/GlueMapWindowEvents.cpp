@@ -251,6 +251,10 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     if ((abs(drag_start.x - x) + abs(drag_start.y - y)) > Layout::Scale(threshold)) {
       follow_mode = FOLLOW_SELF;
       EnterPan();
+      visible_projection.SetGeoLocation(drag_projection.GetGeoLocation()
+                                        + drag_start_geopoint
+                                        - drag_projection.ScreenToGeo(x, y));
+      QuickRedraw();
     } else
       LeavePan();
 
