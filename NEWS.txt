@@ -1,6 +1,9 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 1.0.7 Beta TBD
+* Add no-online contest option
+
 TopHat 1.0.6 Beta 7/2/2013
 - fixed Nook IOIO battery manager issue
 - fixed IOIO UART reconnect
@@ -39,6 +42,17 @@ TopHat 1.0.4 Beta
 * infoboxes
   - ensure that the unit symbol is visible
   - fix ballast display in vario gauge (#2911)
+  - new content "Speed task last hour"
+  - new content "Next distance (nominal)"
+* tasks
+  - custom "start requires arm" setting (#2782)
+  - new option to disable OLC optimisation
+* waypoint editor
+  - delete waypoint implemented
+  - CUP file support added
+* devices
+  - "debug" button
+
 * tasks
   - update all settings after task type change
 * devices
