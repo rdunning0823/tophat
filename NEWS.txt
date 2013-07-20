@@ -3,6 +3,9 @@ SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.0.7 Beta TBD
 * Add no-online contest option
+* Task Manager: Add "back" button
+* Flarm Traffic: make units friendly for miles
+* Map - smooth dragging of pan 
 * merge XCSoar 6.6.4
   * calculations
    - improve robustness of the zig-zag wind algorithm (#2961)
