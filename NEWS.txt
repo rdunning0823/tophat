@@ -3,6 +3,15 @@ SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.0.7 Beta TBD
 * Add no-online contest option
+* merge XCSoar 6.6.4
+  * calculations
+   - improve robustness of the zig-zag wind algorithm (#2961)
+  * devices
+   - FLARM: work around a Garrecht TRX-1090 firmware bug (#2745, #2749)
+   - LX: faster LXNAV Nano detection over Bluetooth (#2819)
+   - Volkslogger: increase timeout to calculate security (#2910)
+   - fix bogus error message after pressing "Cancel"
+   - show Bluetooth name instead of MAC address in device list
 
 TopHat 1.0.6 Beta 7/2/2013
 - fixed Nook IOIO battery manager issue
@@ -17,7 +26,6 @@ TopHat 1.0.5 Beta 6/28/2013
  - replaced "Revert" button with "Back" button
 * Added Wind arrow Infobox
 * Added battery manager for Nook
-
   - fill FAI triangle areas on Windows
 * devices
   - FLARM: improve task declaration reliability
