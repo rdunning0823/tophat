@@ -173,6 +173,7 @@ DeviceConfig::IsSerial()
     return port_type == PortType::SERIAL;
 }
 
+bool
 DeviceConfig::BluetoothNameStartsWith(const char *prefix) const
 {
 #ifdef ANDROID
