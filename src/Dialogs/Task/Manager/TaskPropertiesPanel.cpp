@@ -234,10 +234,6 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
   Add(_("Task type"), _("Sets the behaviour for the current task."), dfe);
 
-  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
-  TaskBehaviour &tb = settings_computer.task;
-  bool us_rules = tb.contest_nationality == ContestNationalities::AMERICAN;
-
   AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
           0, 36000, 60, 180);
 
@@ -255,14 +251,8 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   StaticString<25> label;
   StaticString<100> help;
-  if (us_rules) {
-    label = _("Start max. height (MSL)");
-    help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
-  }
-  else {
-    label = _("Start max. height");
-    help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
-  }
+  label = _("Start max. height");
+  help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
 
@@ -278,14 +268,8 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           _("Reference used for start max height rule."),
           altitude_reference_list);
 
-  if (us_rules) {
-    label = _("Finish min. height (MSL)");
-    help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
-  }
-  else {
-    label = _("Finish min. height");
-    help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
-  }
+  label = _("Finish min. height");
+  help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
 

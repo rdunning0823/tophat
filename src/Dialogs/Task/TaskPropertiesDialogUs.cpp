@@ -183,10 +183,6 @@ TaskPropertiesPanelUs::OnModified(DataField &df)
 void
 TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
-  TaskBehaviour &tb = settings_computer.task;
-  bool us_rules = tb.contest_nationality == ContestNationalities::AMERICAN;
-
   DataFieldEnum *dfe = new DataFieldEnum(NULL);
   dfe->SetListener(this);
   dfe->EnableItemHelp(true);
@@ -206,25 +202,13 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   StaticString<25> label;
   StaticString<100> help;
-  if (us_rules) {
-    label = _("Start max. height (MSL)");
-    help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
-  }
-  else {
-    label = _("Start max. height");
-    help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
-  }
+  label = _("Start max. height (MSL)");
+  help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
 
-  if (us_rules) {
-    label = _("Finish min. height (MSL)");
-    help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
-  }
-  else {
-    label = _("Finish min. height");
-    help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
-  }
+  label = _("Finish min. height (MSL)");
+  help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
 }
