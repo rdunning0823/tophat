@@ -124,6 +124,7 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
       _("Select the rules used for calculating optimal points for the On-Line Contest. "
           "The implementation  conforms to the official release 2010, Sept.23."),
           contests_list, (unsigned)contest_settings.contest);
+  SetExpertRow(Contests);
 
   AddBoolean(_("Predict Contest"),
              _("If enabled, then the next task point is included in the "
