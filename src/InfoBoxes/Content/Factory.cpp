@@ -170,9 +170,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_HeightAGL
   {
-    N_("Altitude AGL"),
-    N_("Alt AGL"),
-    N_("This is the navigation altitude minus the terrain height obtained from the terrain file. The value is coloured red when the glider is below the terrain safety clearance height."),
+    N_("Height AGL"),
+    N_("H AGL"),
+    N_("This is the navigation altitude minus the terrain elevation obtained from the terrain file. The value is coloured red when the glider is below the terrain safety clearance height."),
     IBFHelper<InfoBoxContentAltitudeAGL>::Create,
     e_H_Terrain, // H GND
     e_HeightGPS, // H GPS
@@ -204,7 +204,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_GR_Instantaneous
   {
-    N_("Glide ratio instantaneous"),
+    N_("GR instantaneous"),
     N_("GR Inst"),
     N_("Instantaneous glide ratio over ground, given by the ground speed divided by the vertical speed (GPS speed) over the last 20 seconds. Negative values indicate climbing cruise. If the vertical speed is close to zero, the displayed value is '---'."),
     UpdateInfoBoxGRInstant,
@@ -293,9 +293,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_AltDiff
   {
-    N_("Next arrival altitude AGL"),
+    N_("Next altitude difference"),
     N_("WP AltD"),
-    N_("Arrival altitude AGL at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used."),
+    N_("Arrival altitude at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used."),
     UpdateInfoBoxNextAltitudeDiff,
     next_waypoint_infobox_panels,
     e_WP_MC0AltDiff, // WP MC0 AltD
@@ -372,9 +372,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_GR_TE
   {
-    N_("Final glide ratio (TE) deprecated"),
+    N_("Final GR (TE) deprecated"),
     N_("---"),
-    N_("Deprecated, there is no TE compensation on glide ratio, you should switch to the \"Final glide ratio\" info box."),
+    N_("Deprecated, there is no TE compensation on GR, you should switch to the \"Final GR\" info box."),
     UpdateInfoBoxFinalGR,
     e_Fin_GR, // Final GR
     e_GR_Cruise, // GR Cruise
@@ -438,8 +438,8 @@ static constexpr MetaData meta_data[] = {
 
   // e_WindSpeed_Est
   {
-    N_("Wind speed and bearing"),
-    N_("Wind"),
+    N_("Wind speed"),
+    N_("Wind V"),
     N_("Wind speed estimated by XCSoar. Manual adjustment is possible with the connected InfoBox dialogue. Pressing the up/down cursor keys to cycle through settings, adjust the values with left/right cursor keys."),
     IBFHelper<InfoBoxContentWindSpeed>::Create,
     e_WindBearing_Est, // Wind B
@@ -460,9 +460,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_AA_Time
   {
-    N_("Task time remaining"),
-    N_("Task T rem"),
-    N_("Task time remaining. Goes red when time remaining has expired."),
+    N_("AAT time"),
+    N_("AAT Time"),
+    N_("Assigned Area Task time remaining. Goes red when time remaining has expired."),
     UpdateInfoBoxTaskAATime,
     e_AA_TimeDiff, // AA dTime
     e_Fin_Distance, // Fin Dis
@@ -526,7 +526,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_H_Baro
   {
-    N_("Altitude barometric"),
+    N_("Barometric altitude"),
     N_("Alt Baro"),
     N_("This is the barometric altitude obtained from a device equipped with a pressure sensor."),
     UpdateInfoBoxAltitudeBaro,
@@ -582,7 +582,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_GR
   {
-    N_("Next glide ratio"),
+    N_("Next GR"),
     N_("WP GR"),
     N_("The required glide ratio over ground to reach the next waypoint, given by the distance to next waypoint divided by the height required to arrive at the safety arrival height."),
     UpdateInfoBoxNextGR,
@@ -616,7 +616,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_Time
   {
-    N_("Task time to go (MacCready)"),
+    N_("Task time to go"),
     N_("Fin ETE"),
     N_("Estimated time required to complete task, assuming performance of ideal MacCready cruise/climb cycle."),
     UpdateInfoBoxFinalETE,
@@ -627,7 +627,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_Time
   {
-    N_("Next time to go (MacCready)"),
+    N_("Next time to go"),
     N_("WP ETE"),
     N_("Estimated time required to reach next waypoint, assuming performance of ideal MacCready cruise/climb cycle."),
     UpdateInfoBoxNextETE,
@@ -728,8 +728,8 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_AA_Distance
   {
-    N_("Task distance remaining"),
-    N_("Task D Rem"),
+    N_("AAT distance around target"),
+    N_("AAT Dtgt"),
     N_("Assigned Area Task distance around target points for remainder of task."),
     UpdateInfoBoxTaskAADistance,
     e_AA_SpeedAvg, // AA Vtgt
@@ -827,9 +827,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_Home_Distance
   {
-    N_("Home distance"),
+    N_("Distance home"),
     N_("Home Dist"),
-    N_("Distance to home waypoint.  User can change the home waypoint by clicking."),
+    N_("Distance to home waypoint (if defined)."),
     IBFHelper<InfoBoxContentHomeDistance>::Create,
     e_OC_Distance, // OLC
     e_AA_SpeedAvg, // AA Vtgt
@@ -849,9 +849,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_AA_TimeDiff
   {
-    N_("Task delta time"),
-    N_("Task dT"),
-    N_("Difference between estimated task time and task minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
+    N_("AAT delta time"),
+    N_("AAT dT"),
+    N_("Difference between estimated task time and AAT minimum time. Coloured red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."),
     UpdateInfoBoxTaskAATimeDelta,
     e_AA_DistanceMax, // AA Dmax
     e_AA_Time, // AA Time
@@ -897,9 +897,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_Fin_GR
   {
-    N_("Final glide ratio"),
+    N_("Final GR"),
     N_("Fin GR"),
-    N_("Geometric gradient to the arrival height above the final waypoint. This is not adjusted for total energy."),
+    N_("The required glide ratio over ground to finish the task, given by the distance to go divided by the height required to arrive at the safety arrival height."),
     UpdateInfoBoxFinalGR,
     e_WP_GR, // Next GR
     e_Fin_GR_TE, // Fin GR
@@ -930,7 +930,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_Alternate_1_GR
   {
-    N_("Alternate 1 glide ratio"),
+    N_("Alternate 1 GR"),
     N_("Altn1 GR"),
     N_("Geometric gradient to the arrival height above the best alternate. This is not adjusted for total energy."),
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
@@ -953,7 +953,7 @@ static constexpr MetaData meta_data[] = {
 
   // e_GR_Avg
   {
-    N_("Glide ratio average"),
+    N_("GR average"),
     N_("GR Avg"),
     N_("The distance made in the configured period of time , divided by the altitude lost since then. Negative values are shown as ^^^ and indicate climbing cruise (height gain). Over 200 of GR the value is shown as +++ . You can configure the period of averaging in the system setup. Suggested values are 60, 90 or 120. Lower values will be closed to GR Inst, and higher values will be closed to GR Cruise. Notice that the distance is NOT the straight line between your old and current position, it's exactly the distance you have made even in a zigzag glide. This value is not calculated while circling."),
     IBFHelper<InfoBoxContentGRAvg>::Create,
