@@ -89,7 +89,7 @@ TaskSummaryShape(OrderedTask* task, TCHAR* text)
       FAIShape = true;
     }
     else
-      _tcscpy(text, _("triangle"));
+      _tcscpy(text, _("non-FAI triangle"));
     break;
 
   default:
@@ -112,7 +112,8 @@ OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
     FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
     FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
 
-    gate_info.Format(_T("\nStart Height: %s %s. Finish Height: %s %s. "),
+    gate_info.Format(_T("\n%s: %s %s. Finish Height: %s %s. "),
+                     N_("Start Height"),
                      start_height.c_str(),
                      (otb.start_constraints.max_height_ref == AltitudeReference::AGL)
                      ? _("AGL") : _("MSL"),
@@ -207,19 +208,19 @@ OrderedTaskPointLabelMapAction(TaskPointType type, const TCHAR *name,
 {
   switch (type) {
   case TaskPointType::START:
-    _stprintf(buffer, _T("Zoom to start: %s"), name);
+    _stprintf(buffer, _T("%s %s: %s"), N_("Zoom to"), N_("Start"), name);
     break;
 
   case TaskPointType::AST:
-    _stprintf(buffer, _T("Zoom to T%d: %s"), index, name);
+    _stprintf(buffer, _T("%s T%d: %s"), N_("Zoom to"), index, name);
     break;
 
   case TaskPointType::AAT:
-    _stprintf(buffer, _T("Drag target %d: %s"), index, name);
+    _stprintf(buffer, _T("%s %d: %s"), N_("Drag target"), index, name);
     break;
 
   case TaskPointType::FINISH:
-    _stprintf(buffer, _T("Zoom to finish:  %s"), name);
+    _stprintf(buffer, _T("%s finish:  %s"), N_("Zoom to"), name);
     break;
 
   default:

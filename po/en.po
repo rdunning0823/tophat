@@ -2324,7 +2324,7 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1025
 #, no-c-format
 msgid "Start Height"
-msgstr ""
+msgstr "Start height"
 
 #: src/InfoBoxes/Content/Factory.cpp:1026
 #, no-c-format
@@ -7684,7 +7684,7 @@ msgstr ""
 
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:90
 msgid "non-FAI triangle"
-msgstr ""
+msgstr "triangle"
 
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:94
 #, c-format
