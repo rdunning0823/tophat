@@ -34,7 +34,7 @@ struct UnitStoreItem
 
 static constexpr UnitStoreItem Presets[] =
 {
-  { N_("European"), {
+  { N_("Metric"), {
     Unit::KILOMETER,
     Unit::METER,
     Unit::DEGREES_CELCIUS,
