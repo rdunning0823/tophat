@@ -133,13 +133,12 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 #ifndef HAVE_NATIVE_GETTEXT
   WndProperty *wp;
   wp = AddEnum(_("Language"),
-               _("The language options selects translations for English texts to other "
-                   "languages. Select English for a native interface or Automatic to localise "
-                   "XCSoar according to the system settings."));
+               _("The text in Top Hat is displayed in the following languages.  "
+                 "Select automatic to select the lanugage based on your "
+                 "device settings"));
   if (wp != NULL) {
     DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
     df.addEnumText(_("Automatic"));
-    df.addEnumText(_T("English"));
 
 #ifdef HAVE_BUILTIN_LANGUAGES
     for (const BuiltinLanguage *l = language_table;
@@ -159,6 +158,8 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     if (!Profile::GetPath(ProfileKeys::LanguageFile, value))
       value[0] = _T('\0');
 
+    // set "none" == ENGLISH t== "1" for legacy systems before we had an
+    // English po file
     if (StringIsEqual(value, _T("none")))
       df.Set(1);
     else if (!StringIsEmpty(value) && !StringIsEqual(value, _T("auto"))) {
@@ -230,10 +231,6 @@ InterfaceConfigPanel::Save(bool &_changed)
     switch (df.GetValue()) {
     case 0:
       new_value = new_base = _T("auto");
-      break;
-
-    case 1:
-      new_value = new_base = _T("none");
       break;
 
     default:

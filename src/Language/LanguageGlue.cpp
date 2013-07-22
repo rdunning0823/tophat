@@ -72,6 +72,7 @@ static MOLoader *mo_loader;
  */
 enum {
   LANG_NULL,
+  LANG_ENGLISH, // English must be 1 for legacy support of "none"
   LANG_CZECH,
   LANG_DANISH,
   LANG_GERMAN,
@@ -101,6 +102,7 @@ enum {
 #endif
 
 const BuiltinLanguage language_table[] = {
+  { LANG_ENGLISH, _T("en.mo"), _T("English") },
   { LANG_CZECH, _T("cs.mo"), _T("Czech") },
   { LANG_DANISH, _T("da.mo"), _T("Danish") },
   { LANG_GERMAN, _T("de.mo"), _T("German") },
@@ -369,10 +371,11 @@ ReadLanguageFile()
 
   TCHAR buffer[MAX_PATH], second_buffer[MAX_PATH];
   const TCHAR *value = Profile::GetPath(ProfileKeys::LanguageFile, buffer)
-    ? buffer : _T("");
+    ? buffer : _T("en.mo");
 
+  // legacy support of "none" before we had English translation file
   if (StringIsEqual(value, _T("none")))
-    return;
+    _tcscpy(buffer, _T("en.mo"));
 
   if (StringIsEmpty(value) || StringIsEqual(value, _T("auto"))) {
     AutoDetectLanguage();
