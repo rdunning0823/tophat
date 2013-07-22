@@ -28,7 +28,6 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
-#include "Engine/Contest/Solvers/Contests.hpp"
 #include "Profile/Profile.hpp"
 #include "Units/UnitsStore.hpp"
 
@@ -37,9 +36,6 @@ enum ControlIndex {
   StartMaxHeightMargin,
   AATTimeMargin,
   ContestNationality,
-  spacer_1,
-  Contests,
-  PREDICT_CONTEST,
 };
 
 class TaskRulesConfigPanel final : public RowFormWidget {
@@ -57,7 +53,6 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
   const TaskBehaviour &task_behaviour = settings_computer.task;
-  const ContestSettings &contest_settings = settings_computer.contest;
 
   RowFormWidget::Prepare(parent, rc);
 
@@ -90,47 +85,6 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   LoadValueEnum(ContestNationality, (unsigned)task_behaviour.contest_nationality);
 
-  AddSpacer();
-
-  SetExpertRow(spacer_1);
-
-  const StaticEnumChoice contests_list[] = {
-    { (unsigned)Contest::NONE, ContestToString(Contest::NONE),
-      N_("Disable OLC Calculations") },
-    { (unsigned)Contest::OLC_FAI, ContestToString(Contest::OLC_FAI),
-      N_("Conforms to FAI triangle rules. Three turns and common start and finish. No leg less than 28% "
-          "of total except for tasks longer than 500km: No leg less than 25% or larger than 45%.") },
-    { (unsigned)Contest::OLC_CLASSIC, ContestToString(Contest::OLC_CLASSIC),
-      N_("Up to seven points including start and finish, finish height must not be lower than "
-          "start height less 1000 meters.") },
-    { (unsigned)Contest::OLC_LEAGUE, ContestToString(Contest::OLC_LEAGUE),
-      N_("The most recent contest with Sprint task rules.") },
-    { (unsigned)Contest::OLC_PLUS, ContestToString(Contest::OLC_PLUS),
-      N_("A combination of Classic and FAI rules. 30% of the FAI score are added to the Classic score.") },
-    { (unsigned)Contest::DMST, ContestToString(Contest::DMST),
-      /* German competition, no translation */
-      _T("Deutsche Meisterschaft im Streckensegelflug.") },
-    { (unsigned)Contest::XCONTEST, ContestToString(Contest::XCONTEST),
-      _T("tbd.") },
-    { (unsigned)Contest::DHV_XC, ContestToString(Contest::DHV_XC),
-      _T("tbd.") },
-    { (unsigned)Contest::SIS_AT, ContestToString(Contest::SIS_AT),
-      _T("tbd.") },
-    { (unsigned)Contest::NET_COUPE, ContestToString(Contest::NET_COUPE),
-      N_("The FFVV NetCoupe \"libre\" competiton.") },
-    { 0 }
-  };
-  AddEnum(_("On-Line Contest"),
-      _("Select the rules used for calculating optimal points for the On-Line Contest. "
-          "The implementation  conforms to the official release 2010, Sept.23."),
-          contests_list, (unsigned)contest_settings.contest);
-  SetExpertRow(Contests);
-
-  AddBoolean(_("Predict Contest"),
-             _("If enabled, then the next task point is included in the "
-               "score calculation, assuming that you will reach it."),
-             contest_settings.predict);
-  SetExpertRow(PREDICT_CONTEST);
 }
 
 
@@ -141,7 +95,6 @@ TaskRulesConfigPanel::Save(bool &_changed)
 
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
   TaskBehaviour &task_behaviour = settings_computer.task;
-  ContestSettings &contest_settings = settings_computer.contest;
 
   changed |= SaveValue(StartMaxSpeedMargin, UnitGroup::HORIZONTAL_SPEED, ProfileKeys::StartMaxSpeedMargin,
                        task_behaviour.start_margins.max_speed_margin);
@@ -195,11 +148,6 @@ TaskRulesConfigPanel::Save(bool &_changed)
                  (int)config.pressure_unit);
   }
   changed |= nat_changed;
-
-  changed |= SaveValueEnum(Contests, ProfileKeys::OLCRules,
-                           contest_settings.contest);
-  changed |= SaveValueEnum(PREDICT_CONTEST, ProfileKeys::PredictContest,
-                           contest_settings.predict);
 
   _changed |= changed;
 

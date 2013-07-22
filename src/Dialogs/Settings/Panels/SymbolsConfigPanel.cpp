@@ -41,7 +41,6 @@ enum ControlIndex {
   TRAIL_DRIFT,
   TRAIL_TYPE,
   TRAIL_WIDTH,
-  SHOW_FAI_TRIANGLE_AREAS,
 };
 
 class SymbolsConfigPanel final
