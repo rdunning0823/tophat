@@ -106,12 +106,12 @@ static constexpr TabMenuControl::PageItem pages[] = {
   {N_("Safety Factors"), 2, CreateSafetyFactorsConfigPanel },
   {N_("Glide Computer"), 2, CreateGlideComputerConfigPanel },
   {N_("Wind"), 2, CreateWindConfigPanel },
-  {N_("Scoring"), 2, CreateScoringConfigPanel },
   {N_("FLARM, Other"), 3, CreateGaugesConfigPanel },
 #ifdef HAVE_PCM_PLAYER
   {N_("Audio Vario"), 3, CreateAudioVarioConfigPanel },
 #endif
-  {N_("Contest"), 4, CreateTaskRulesConfigPanel },
+  {N_("Competition rules"), 4, CreateTaskRulesConfigPanel },
+  {N_("Online contest"), 4, CreateScoringConfigPanel },
   {N_("Language, Input"), 5, CreateInterfaceConfigPanel },
   {N_("Screen Layout"), 5, CreateLayoutConfigPanel },
   {N_("Pages"), 5, CreatePagesConfigPanel },
