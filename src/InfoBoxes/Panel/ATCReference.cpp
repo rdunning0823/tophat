@@ -33,6 +33,8 @@ Copyright_License {
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "InfoBoxes/Panel/Base.hpp"
+#include "Waypoint/WaypointGlue.hpp"
+#include "Protection.hpp"
 
 enum Controls {
   WAYPOINT,
@@ -110,6 +112,12 @@ ATCReferencePanel::OnAction(int id)
     waypoint = ShowWaypointListDialog(CommonInterface::Basic().location);
     if (waypoint != nullptr) {
       location = waypoint->location;
+      CommonInterface::SetComputerSettings().poi.atc_reference = location;
+      {
+        ScopeSuspendAllThreads suspend;
+        WaypointGlue::SaveATCReference(
+            CommonInterface::SetComputerSettings().poi);
+      }
       UpdateValues();
     }
     break;

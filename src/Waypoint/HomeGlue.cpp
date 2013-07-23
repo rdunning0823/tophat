@@ -144,7 +144,13 @@ WaypointGlue::SaveHome(const PlacesOfInterestSettings &poi_settings,
   if (poi_settings.home_elevation_available)
     Profile::Set(ProfileKeys::HomeElevation, poi_settings.home_elevation);
 
-
   Profile::Set(ProfileKeys::TeamcodeRefWaypoint,
                team_code_settings.team_code_reference_waypoint);
+}
+
+void
+WaypointGlue::SaveATCReference(const PlacesOfInterestSettings &poi_settings)
+{
+  if (poi_settings.atc_reference.IsValid())
+    Profile::SetGeoPoint(ProfileKeys::ATCReference, poi_settings.atc_reference);
 }

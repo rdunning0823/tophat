@@ -112,6 +112,8 @@ Profile::Load(PlacesOfInterestSettings &settings)
   Get(ProfileKeys::HomeElevationAvailable, settings.home_elevation_available);
   if (settings.home_elevation_available)
     Get(ProfileKeys::HomeElevation, settings.home_elevation);
+
+  GetGeoPoint(ProfileKeys::ATCReference, settings.atc_reference);
 }
 
 void

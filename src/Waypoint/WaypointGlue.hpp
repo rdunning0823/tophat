@@ -98,6 +98,11 @@ namespace WaypointGlue {
                 const TeamCodeSettings &team_code_settings);
 
   /**
+   * Save the ATC reference location to the profile
+   */
+  void SaveATCReference(const PlacesOfInterestSettings &poi_settings);
+
+  /**
    * Reads the waypoints out of the two waypoint files and appends them to the
    * specified waypoint list
    * @param way_points The waypoint list to fill

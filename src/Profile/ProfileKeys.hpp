@@ -80,6 +80,7 @@ extern const char WarningTime[];
 extern const char AcknowledgementTime[];
 extern const char CircleZoom[];
 extern const char MaxAutoZoomDistance[];
+extern const char ATCReference[];
 extern const char HomeWaypoint[];
 extern const char HomeLocation[];
 extern const char HomeElevation[];
