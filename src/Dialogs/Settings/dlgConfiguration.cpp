@@ -239,6 +239,10 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(NULL)
 };
 
+/**
+ * @page_name: text name of a page to display single page
+ * or empty to show all pages with the menu
+ */
 static void
 PrepareConfigurationDialog(const TCHAR *page_name)
 {
@@ -265,23 +269,25 @@ PrepareConfigurationDialog(const TCHAR *page_name)
     b->SetVisible(false);
     b = (WndButton*)dialog->FindByName(_T("cmdNext"));
     b->SetVisible(false);
-    current_page = (unsigned)page;
-    tab_menu->SetCurrentPage(current_page);
-  } else
+    tab_menu->SetCurrentPage((unsigned)page);
+  } else {
     tab_menu->GotoMenuPage();
-  /* restore last selected menu item */
-  static bool Initialized = false;
-  if (!Initialized)
-    Initialized = true;
-  else
-    tab_menu->SetLastContentPage(current_page);
+
+    /* restore last selected menu item */
+    static bool multi_page_initialized = false;
+    if (!multi_page_initialized)
+      multi_page_initialized = true;
+    else
+      tab_menu->SetLastContentPage((unsigned)current_page);
+  }
 }
 
 static void
 Save()
 {
   /* save page number for next time this dialog is opened */
-  current_page = tab_menu->GetLastContentPage();
+  if (!single_page)
+    current_page = tab_menu->GetLastContentPage();
 
   // TODO enhancement: implement a cancel button that skips all this
   // below after exit.
