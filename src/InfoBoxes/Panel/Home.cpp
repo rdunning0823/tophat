@@ -78,18 +78,10 @@ HomePanel::OnAction(int action_id)
   switch (action_id) {
   case Change:
   {
-    OrderedTask *task;
-    {
-
-      ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-      task = task_manager->Clone(CommonInterface::GetComputerSettings().task);
-      assert (task != nullptr);
-    }
 
     const Waypoint* waypoint =
-      ShowWaypointListDialog(CommonInterface::Basic().location,
-                             task, task->GetActiveIndex());
-    if (waypoint == NULL)
+      ShowWaypointListDialog(CommonInterface::Basic().location);
+    if (waypoint == nullptr)
       return;
 
     ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
