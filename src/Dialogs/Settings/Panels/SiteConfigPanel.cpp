@@ -59,11 +59,15 @@ class SiteConfigPanel final : public RowFormWidget, DataFieldListener {
 private:
   WndButton *buttonWaypoints;
   StaticString<50> download_name;
+  /**
+   * is this a stand-alone widget, or displayed in the dlgConfiguration menu?
+   */
+  bool stand_alone;
 
 public:
-  SiteConfigPanel()
+  SiteConfigPanel(bool _stand_alone)
     :RowFormWidget(UIGlobals::GetDialogLook()), buttonWaypoints(0),
-     download_name(N_("Download from internet")){}
+     download_name(N_("Download from internet")), stand_alone(_stand_alone){}
 
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
@@ -118,23 +122,26 @@ SiteConfigPanel::OnModified(DataField &df)
 void
 SiteConfigPanel::Show(const PixelRect &rc)
 {
-  buttonWaypoints->SetVisible(CommonInterface::SetUISettings().dialog.expert);
+  if (!stand_alone)
+    buttonWaypoints->SetVisible(CommonInterface::SetUISettings().dialog.expert);
   RowFormWidget::Show(rc);
 }
 
 void
 SiteConfigPanel::Hide()
 {
-  buttonWaypoints->SetVisible(false);
+  if (!stand_alone)
+    buttonWaypoints->SetVisible(false);
   RowFormWidget::Hide();
 }
 
 void
 SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  buttonWaypoints = ((WndButton *)ConfigPanel::GetForm().FindByName(_T("cmdWaypoints")));
-  assert (buttonWaypoints);
-  buttonWaypoints->SetOnClickNotify(dlgConfigWaypointsShowModal);
+  if (!stand_alone) {
+    buttonWaypoints = ((WndButton *)ConfigPanel::GetForm().FindByName(_T("cmdWaypoints")));
+    buttonWaypoints->SetOnClickNotify(dlgConfigWaypointsShowModal);
+  }
 
   WndProperty *wp = Add(_T(""), 0, true);
   wp->SetText(GetPrimaryDataPath());
@@ -212,7 +219,14 @@ SiteConfigPanel::Save(bool &_changed)
 }
 
 Widget *
+CreateSiteConfigPanel(bool stand_alone)
+{
+  return new SiteConfigPanel(stand_alone);
+}
+
+
+Widget *
 CreateSiteConfigPanel()
 {
-  return new SiteConfigPanel();
+  return CreateSiteConfigPanel(false);
 }

@@ -30,6 +30,8 @@ Copyright_License {
 #include "UtilsSettings.hpp"
 #include "Util/StringUtil.hpp"
 #include "Util/ConvertString.hpp"
+#include "Dialogs/WidgetDialog.hpp"
+#include "Form/ButtonPanel.hpp"
 #include "Form/Button.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Form.hpp"
@@ -50,6 +52,11 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Task/TaskBehaviour.hpp"
 #include "Units/UnitsStore.hpp"
+#include "Dialogs/Settings/Panels/TaskRulesConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/SiteConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/LoggerConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/SafetyFactorsConfigPanel.hpp"
+#include "UtilsSettings.hpp"
 
 #include <math.h>
 #include <assert.h>
@@ -182,16 +189,50 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_advanced.top = rc_advanced.bottom - height;
 }
 
+static void
+ShowPanel(unsigned page)
+{
+  Widget *widget = nullptr;
+  StaticString<120> title;
+
+  switch (page) {
+  case NATIONALITY:
+    widget = CreateTaskRulesConfigPanel();
+    title = "Nationality";
+    break;
+  case SITE_FILES:
+    widget = CreateSiteConfigPanel(true);
+    title = "Site files";
+    break;
+  case SAFETY:
+    widget = CreateSafetyFactorsConfigPanel();
+    title = "Safety factors";
+    break;
+  case PILOT:
+    widget = CreateLoggerConfigPanel();
+    title = "Pilot";
+    break;
+  case DEVICE:
+  case PLANE:
+  case ADVANCED:
+  case OK:
+    gcc_unreachable();
+    return;
+  }
+
+  assert(widget != nullptr);
+  SystemConfiguration(*widget, title.get());
+}
+
 void
 SetupQuick::OnAction(int id)
 {
   switch(id) {
   case NATIONALITY:
-    SystemConfiguration(N_("Contest"));
-    break;
-
   case SITE_FILES:
-    SystemConfiguration(N_("Site Files"));
+  case SAFETY:
+  case PILOT:
+    ShowPanel(id);
     break;
 
   case PLANE:
@@ -204,18 +245,9 @@ SetupQuick::OnAction(int id)
                    UIGlobals::GetLook().terminal);
     break;
 
-  case SAFETY:
-    SystemConfiguration(N_("Safety Factors"));
-    break;
-
-  case PILOT:
-    SystemConfiguration(N_("Logger"));
-    break;
-
   case ADVANCED:
     SystemConfiguration();
     break;
-
 
   case OK:
       SetModalResult(mrOK);

@@ -26,6 +26,14 @@ Copyright_License {
 
 class Widget;
 
+/**
+ * creates the SiteConfigPanelWidget without links to the
+ * dlgConfiguration form buttons
+ * @stand_alone - is this stand alone
+ */
+Widget *
+CreateSiteConfigPanel(bool stand_alone);
+
 Widget *
 CreateSiteConfigPanel();
 
