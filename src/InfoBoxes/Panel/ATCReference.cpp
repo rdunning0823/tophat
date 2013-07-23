@@ -91,7 +91,7 @@ ATCReferencePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddReadOnly(_("Location"));
   AddSpacer();
 
-  AddButton(_("Relocate"), *this, RELOCATE);
+  AddButton(_("Select waypoint"), *this, RELOCATE);
   AddButton(_("Clear"), *this, CLEAR);
 
   UpdateValues();
