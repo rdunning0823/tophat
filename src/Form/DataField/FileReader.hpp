@@ -76,6 +76,11 @@ private:
   bool postponed_sort;
 
   /**
+   * sort it in reverse order
+   */
+  bool sort_reverse;
+
+  /**
    * Used to store the value while !loaded.
    */
   StaticString<512> postponed_value;
@@ -97,6 +102,13 @@ public:
    * @param OnDataAccess
    */
   DataFieldFileReader(DataAccessCallback OnDataAccess);
+
+  /**
+   * sort it reverse.  Must be called before sort occurs
+   */
+  void SetReverseSort() {
+    sort_reverse = true;
+  }
 
   /** Move the selection up (+1) */
   void Inc();

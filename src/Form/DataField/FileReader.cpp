@@ -91,7 +91,7 @@ DataFieldFileReader::DataFieldFileReader(DataAccessCallback OnDataAccess)
   :DataField(Type::FILE, true, OnDataAccess),
    // Set selection to zero
    mValue(0),
-   loaded(false), postponed_sort(false),
+   loaded(false), postponed_sort(false), sort_reverse(false),
    postponed_value(_T("")), enable_file_download(false) {}
 
 int
@@ -274,6 +274,14 @@ DataFieldFileReader::Dec()
 }
 
 static int _cdecl
+DataFieldFileReaderCompareReverse(const void *elem1, const void *elem2)
+{
+  // Compare by filename
+  return _tcscmp(((const DataFieldFileReader::Item *)elem2)->filename,
+                 ((const DataFieldFileReader::Item *)elem1)->filename);
+}
+
+static int _cdecl
 DataFieldFileReaderCompare(const void *elem1, const void *elem2)
 {
   // Compare by filename
@@ -289,6 +297,10 @@ DataFieldFileReader::Sort()
     return;
   }
 
+  if (sort_reverse)
+    qsort(files.begin(), files.size(), sizeof(Item),
+          DataFieldFileReaderCompareReverse);
+  else
   // Sort the filelist (except for the first (empty) element)
   qsort(files.begin(), files.size(), sizeof(Item), DataFieldFileReaderCompare);
   /* by the way, we're not using std::sort() here, because this

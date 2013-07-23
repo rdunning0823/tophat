@@ -84,6 +84,7 @@ ReplayControlWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                   nullptr,
                   _T("*.nmea\0*.igc\0"),
                   true);
+  ((DataFieldFileReader *)file->GetDataField())->SetReverseSort();
   ((DataFieldFileReader *)file->GetDataField())->Lookup(replay->GetFilename());
   file->RefreshDisplay();
 
