@@ -62,6 +62,14 @@ class ContestManager
   OLCSISAT sis_at;
   NetCoupe net_coupe;
 
+  /**
+   * Stop calculating contest until restart Top Hat
+   * This is a hack because sometimes the calculations seem to become
+   * hugely expensive taking 100% of CPU and causing Top Hat (or xcsoar)
+   * to appear to hang.
+   */
+  bool discontinue_calculations;
+
 public:
   /**
    * Base constructor.

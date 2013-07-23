@@ -22,6 +22,9 @@
 
 #include "ContestManager.hpp"
 #include "Trace/Trace.hpp"
+#include "Time/PeriodClock.hpp"
+#include "LogFile.hpp"
+#include <tchar.h>
 
 ContestManager::ContestManager(const Contest _contest,
                                const Trace &trace_full,
@@ -40,7 +43,8 @@ ContestManager::ContestManager(const Contest _contest,
    dhv_xc_free(trace_full, true),
    dhv_xc_triangle(trace_triangle, predict_triangle, true),
    sis_at(trace_full),
-   net_coupe(trace_full)
+   net_coupe(trace_full),
+   discontinue_calculations(false)
 {
   Reset();
 }
@@ -120,6 +124,13 @@ RunContest(AbstractContest &_contest,
 bool
 ContestManager::UpdateIdle(bool exhaustive)
 {
+  if (discontinue_calculations)
+    return false;
+
+  PeriodClock clock;
+  const unsigned timeout_threshold = 6000;
+  clock.Update();
+
   bool retval = false;
 
   switch (contest) {
@@ -199,6 +210,11 @@ ContestManager::UpdateIdle(bool exhaustive)
     break;
 
   };
+
+  if (clock.Check(timeout_threshold)) {
+    discontinue_calculations = true;
+    LogFormat(_T("Contest Manager aborting because of excessive calculation expense"));
+  }
 
   return retval;
 }
