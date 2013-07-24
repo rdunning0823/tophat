@@ -223,22 +223,32 @@ PlaneListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned i)
 
   canvas.Select(name_font);
 
-  canvas.DrawClippedText(rc.left + Layout::FastScale(2),
-                         rc.top + Layout::FastScale(2), rc, list[i].name);
+  Plane plane;
+  if (PlaneGlue::ReadFile(plane, list[i].path)) {
+    canvas.DrawClippedText(rc.left + Layout::FastScale(2),
+                           rc.top + Layout::FastScale(2), rc,
+                           plane.registration.get());
 
-  if (Profile::GetPathIsEqual("PlanePath", list[i].path)) {
-    StaticString<256> buffer;
-    buffer.Format(_T("** %s **"), _("Active"));
-    canvas.DrawClippedText(rc.right - Layout::FastScale(2) -
-                           canvas.CalcTextSize(buffer).cx,
-                           rc.top + Layout::FastScale(2), rc, buffer);
-  } else
+    if (Profile::GetPathIsEqual("PlanePath", list[i].path)) {
+      StaticString<256> buffer;
+      buffer.Format(_T("** %s **"), _("Active"));
+      canvas.DrawClippedText(rc.right - Layout::FastScale(2) -
+                             canvas.CalcTextSize(buffer).cx,
+                             rc.top + Layout::FastScale(2), rc, buffer);
+    }
 
-  canvas.Select(details_font);
+    canvas.Select(details_font);
 
-  canvas.DrawClippedText(rc.left + Layout::FastScale(2),
-                         rc.top + name_font.GetHeight() + Layout::FastScale(4),
-                         rc, list[i].path);
+    StaticString<125> plane_desc;
+    StaticString<5> slash(_T(" / "));
+    if (plane.type.empty() || plane.competition_id.empty())
+      slash.clear();
+    plane_desc.Format(_T("%s%s%s"), plane.type.get(), slash.get(),
+                      plane.competition_id.get());
+    canvas.DrawClippedText(rc.left + Layout::FastScale(2),
+                           rc.top + name_font.GetHeight() + Layout::FastScale(4),
+                           rc, plane_desc.get());
+  }
 }
 
 static bool
