@@ -276,8 +276,7 @@ SetupQuick::RefreshForm()
   if (config.UsesDriver()) {
     const TCHAR *driver_name = FindDriverDisplayName(config.driver_name);
 
-    text.AppendFormat(_("%s on %s, "), driver_name, port_name);
-    text.append(driver_name);
+    text.AppendFormat(_("%s on %s"), driver_name, port_name);
   } else {
     text.append(port_name);
   }
