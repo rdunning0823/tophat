@@ -199,7 +199,7 @@ static constexpr MetaData meta_data[] = {
     next_waypoint_infobox_panels,
     e_Speed_GPS, // V GND
     e_Horizon,
-    Category::DEPRECATED,
+    Category::STANDARD,
   },
 
   // e_GR_Instantaneous
