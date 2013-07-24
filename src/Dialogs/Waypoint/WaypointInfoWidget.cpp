@@ -122,16 +122,14 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                  basic.nav_altitude,
                                  calculated.GetWindOrZero());
 
-    AddGlideResult(_("Alt. diff. MC current"),
+    fixed mc = settings.polar.glide_polar_task.GetMC();
+    StaticString<10>mc_value;
+    FormatUserVerticalSpeed(mc, mc_value.buffer(), true);
+    buffer.Format(_T("%s %s %s"), _("Arrival altitude"), _("MC"), mc_value.get());
+    AddGlideResult(buffer.get(),
                    MacCready::Solve(settings.task.glide,
                                     settings.polar.glide_polar_task,
                                     glide_state));
-
-    GlidePolar gp0 = settings.polar.glide_polar_task;
-    gp0.SetMC(fixed(0));
-    AddGlideResult(_("Alt. diff. MC 0"),
-                   MacCready::Solve(settings.task.glide,
-                                    gp0, glide_state));
   }
 
   FormatUserAltitude(waypoint.elevation,
@@ -150,7 +148,6 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     AddReadOnly(_("Sunset"), nullptr, buffer);
   }
 
-  StaticString<64> buffer;
   if (FormatGeoPoint(waypoint.location,
                      buffer.buffer(), buffer.MAX_SIZE) != nullptr)
     AddReadOnly(_("Location"), nullptr, buffer);
