@@ -1144,7 +1144,7 @@ msgstr "Next arrival altitude AGL"
 #: src/InfoBoxes/Content/Factory.cpp:280
 #, no-c-format
 msgid "WP AltD"
-msgstr ""
+msgstr "WP AltA"
 
 #: src/InfoBoxes/Content/Factory.cpp:281
 #, no-c-format
@@ -1194,11 +1194,11 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:311
 #, no-c-format
 msgid "Final altitude difference"
-msgstr ""
+msgstr "Final arrival altitude"
 
 #: src/InfoBoxes/Content/Factory.cpp:312
 #, no-c-format
-msgid "Fin AltD"
+msgid "Fin Alt"
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:313
@@ -2418,11 +2418,11 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1085
 #, no-c-format
 msgid "Next MC0 altitude difference"
-msgstr ""
+msgstr "Next MC0 arrival altitude"
 
 #: src/InfoBoxes/Content/Factory.cpp:1086
 #, no-c-format
-msgid "WP MC0 AltD"
+msgid "WP MC0 Alt"
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1087
