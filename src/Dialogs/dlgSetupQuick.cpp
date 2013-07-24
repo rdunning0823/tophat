@@ -40,6 +40,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "SystemSettings.hpp"
 #include "Language/Language.hpp"
+#include "Language/LanguageGlue.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/Look.hpp"
 #include "Look/MapLook.hpp"
@@ -52,7 +53,7 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Task/TaskBehaviour.hpp"
 #include "Units/UnitsStore.hpp"
-#include "Dialogs/Settings/Panels/TaskRulesConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/NationalityConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SiteConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/LoggerConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SafetyFactorsConfigPanel.hpp"
@@ -197,7 +198,7 @@ ShowPanel(unsigned page)
 
   switch (page) {
   case NATIONALITY:
-    widget = CreateTaskRulesConfigPanel();
+    widget = CreateNationalityConfigPanel();
     title = "Nationality";
     break;
   case SITE_FILES:
@@ -318,10 +319,10 @@ SetupQuick::RefreshForm()
   FormatRelativeUserAltitude(task_behaviour.safety_height_arrival, text.buffer(), true);
   safety_text->SetCaption(text.c_str());
 
-  text = ((unsigned)task_behaviour.contest_nationality > 0)
-      ? Units::Store::GetName((unsigned)task_behaviour.contest_nationality - 1)
-      : unconfigured;
-  nationality_text->SetCaption(text.c_str());
+  text.Format(_T("%s / %s"), (GetActiveLanguageName() == nullptr) ? _T("System") : GetActiveLanguageName(),
+              (task_behaviour.contest_nationality == ContestNationalities::FAI) ?
+                  N_("FAI task rules") : N_("US task rules"));
+  nationality_text->SetCaption(text);
 
   const LoggerSettings &logger = settings_computer.logger;
   text = logger.pilot_name;

@@ -240,6 +240,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/Panels/LoggerConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/LoggerInfoConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp \
+	$(SRC)/Dialogs/Settings/Panels/NationalityConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/PagesConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/PolarConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp \

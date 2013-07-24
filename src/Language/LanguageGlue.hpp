@@ -24,10 +24,21 @@ Copyright_License {
 #ifndef XCSOAR_LANGUAGE_GLUE_HPP
 #define XCSOAR_LANGUAGE_GLUE_HPP
 
+#include <tchar.h>
+
 void ReadLanguageFile();
 
 void
 CloseLanguageFile();
+
+/**
+ * returns the name of the active language based
+ * on either the Profile setting, or AutoDetect()
+ *
+ * @return: name of language
+ */
+const TCHAR *
+GetActiveLanguageName();
 
 #if defined(HAVE_POSIX) && !defined(ANDROID)
 
@@ -41,6 +52,7 @@ CloseLanguageFile();
 
 #define HAVE_BUILTIN_LANGUAGES
 
+#endif
 #include <tchar.h>
 
 struct BuiltinLanguage {
@@ -49,8 +61,7 @@ struct BuiltinLanguage {
   const TCHAR *name;
 };
 
-extern const BuiltinLanguage language_table[];
 
-#endif
+extern const BuiltinLanguage language_table[];
 
 #endif

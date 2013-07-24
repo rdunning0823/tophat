@@ -359,6 +359,42 @@ LoadLanguageFile(const TCHAR *path)
 #endif /* !HAVE_NATIVE_GETTEXT */
 }
 
+#ifdef HAVE_BUILTIN_LANGUAGES
+
+gcc_pure
+static unsigned
+FindLanguageIndex(const TCHAR *resource)
+{
+  assert(resource != NULL);
+
+  // Search for supported languages matching the MO file name
+  for (unsigned i = 0; language_table[i].resource != NULL; ++i)
+    if (StringIsEqual(language_table[i].resource, resource))
+      // .. and return the language code
+      return i;
+
+  return 0;
+}
+#endif
+
+const TCHAR *
+GetActiveLanguageName()
+{
+  TCHAR buffer[MAX_PATH];
+  const TCHAR *value = Profile::GetPath(ProfileKeys::LanguageFile, buffer)
+    ? buffer : _T("en.mo");
+
+  if (StringIsEmpty(value) || StringIsEqual(value, _T("auto"))) {
+    value = DetectLanguage();
+  }
+#ifdef HAVE_BUILTIN_LANGUAGES
+  unsigned id = FindLanguageIndex(value);
+  return language_table[id].name;
+#else
+  return nullptr;
+#endif
+}
+
 /**
  * Reads the selected LanguageFile into the cache
  */
