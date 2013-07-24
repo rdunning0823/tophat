@@ -2,10 +2,17 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.0.7 Beta 7/25/2013
-* Add no-online contest option, and prevent from consuming CPU
-* Task Manager: Add "back" button
+* Task Manager: Add "back" button (US rules only)
 * Flarm Traffic: make units friendly for miles
 * Map - smooth dragging of pan 
+* QuickSetup: add nationality for task rules, units and language
+* Plane list: clean up display
+* InfoBoxes:
+ - Add ATC Radial which remembers location
+ - Next Bearing
+  Add no-online contest option, and prevent from consuming CPU
+* Replay - show most recent flights first
+* Add "English" language so we can modify English terms without breaking translations
 * merge XCSoar 6.6.4
   * calculations
    - improve robustness of the zig-zag wind algorithm (#2961)
@@ -15,7 +22,6 @@ TopHat 1.0.7 Beta 7/25/2013
    - Volkslogger: increase timeout to calculate security (#2910)
    - fix bogus error message after pressing "Cancel"
    - show Bluetooth name instead of MAC address in device list
-   - fix Wind calculation bug
 
 TopHat 1.0.6 Beta 7/2/2013
 - fixed Nook IOIO battery manager issue
