@@ -150,6 +150,11 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     AddReadOnly(_("Sunset"), nullptr, buffer);
   }
 
+  StaticString<64> buffer;
+  if (FormatGeoPoint(waypoint.location,
+                     buffer.buffer(), buffer.MAX_SIZE) != nullptr)
+    AddReadOnly(_("Location"), nullptr, buffer);
+
   if (waypoint.radio_frequency.IsDefined() &&
       waypoint.radio_frequency.Format(buffer.buffer(),
                                       buffer.MAX_SIZE) != nullptr) {
