@@ -21,32 +21,26 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_UTILS_SETTINGS_HPP
-#define XCSOAR_UTILS_SETTINGS_HPP
+#include "Dialogs/Dialogs.h"
+#include "UtilsSettings.hpp"
+#include "Widget/Widget.hpp"
+#include "Dialogs/WidgetDialog.hpp"
+#include "Form/ButtonPanel.hpp"
+#include "UIGlobals.hpp"
+#include "Interface.hpp"
+#include "Language/Language.hpp"
 
-#include <tchar.h>
-
-class Widget;
-
-// changed only in config or by user interface
-// used in settings dialog
-extern bool DevicePortChanged;
-extern bool AirspaceFileChanged;
-extern bool WaypointFileChanged;
-extern bool AirfieldFileChanged;
-extern bool InputFileChanged;
-extern bool MapFileChanged;
-extern bool LanguageChanged;
-extern bool require_restart;
-
-/**
- * show the system information pages
- * @param page_name.  Show only a single page or "" = all pages.
- */
-void
-SystemConfiguration(const TCHAR *page_name = _T(""));
 
 void
-SystemConfiguration(Widget &widget, const TCHAR *caption);
+dlgConfigurationSingle(Widget &widget, const TCHAR *caption)
+{
+  ButtonPanel::ButtonPanelPosition position = ButtonPanel::ButtonPanelPosition::Bottom;
 
-#endif
+  WidgetDialog dialog(UIGlobals::GetDialogLook());
+  dialog.CreateFull(UIGlobals::GetMainWindow(),_(caption), &widget,
+                nullptr, 0, position);
+  CommonInterface::SetUISettings().dialog.expert = false;
+  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddButton(_("Cancel"), mrCancel);
+  dialog.ShowModal();
+}

@@ -184,6 +184,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/TaskStatusDialog.cpp \
 	$(SRC)/Dialogs/Settings/dlgBasicSettings.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfiguration.cpp \
+	$(SRC)/Dialogs/Settings/dlgConfigurationSingle.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigFonts.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigInfoboxes.cpp \
 	$(SRC)/Dialogs/Settings/dlgQNH.cpp \

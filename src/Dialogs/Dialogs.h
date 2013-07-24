@@ -29,6 +29,7 @@ Copyright_License {
 
 class SingleWindow;
 class Waypoint;
+class Widget;
 
 void dlgBasicSettingsShowModal();
 
@@ -51,6 +52,13 @@ void dlgBrightnessShowModal();
 void dlgChecklistShowModal();
 void dlgConfigurationShowModal(const TCHAR *page_name = _T(""));
 void dlgConfigFontsShowModal();
+
+/**
+ * shows a single configuration panel
+ * Does not do preparation or leaving for settings.
+ * Should be called from SystemConfiguration() to do prep work
+ */
+void dlgConfigurationSingle(Widget &widget, const TCHAR *caption);
 
 /**
  * @return true on success, false if the user has pressed the "Quit"

@@ -224,6 +224,16 @@ SettingsLeave(const UISettings &old_ui_settings)
 }
 
 void
+SystemConfiguration(Widget &widget, const TCHAR *caption)
+{
+  const UISettings old_ui_settings = CommonInterface::GetUISettings();
+
+  SettingsEnter();
+  dlgConfigurationSingle(widget, caption);
+  SettingsLeave(old_ui_settings);
+}
+
+void
 SystemConfiguration(const TCHAR *page_name)
 {
   const UISettings old_ui_settings = CommonInterface::GetUISettings();
