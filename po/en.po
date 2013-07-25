@@ -1194,11 +1194,11 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:311
 #, no-c-format
 msgid "Final altitude difference"
-msgstr "Final arrival altitude"
+msgstr "Final arrival altitude AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:312
 #, no-c-format
-msgid "Fin Alt"
+msgid "Fin AltA"
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:313
@@ -2418,7 +2418,7 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1085
 #, no-c-format
 msgid "Next MC0 altitude difference"
-msgstr "Next MC0 arrival altitude"
+msgstr "Next MC0 arrival altitude AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:1086
 #, no-c-format
