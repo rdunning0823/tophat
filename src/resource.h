@@ -158,4 +158,12 @@
 #define IDB_SEARCH_HD                  5504
 #define IDB_SEARCH_CHECKED              505
 #define IDB_SEARCH_CHECKED_HD          5505
+#define IDB_BEARING_LEFT_ONE            506
+#define IDB_BEARING_LEFT_ONE_HD        5506
+#define IDB_BEARING_LEFT_TWO            507
+#define IDB_BEARING_LEFT_TWO_HD        5507
+#define IDB_BEARING_RIGHT_ONE           508
+#define IDB_BEARING_RIGHT_ONE_HD       5508
+#define IDB_BEARING_RIGHT_TWO           509
+#define IDB_BEARING_RIGHT_TWO_HD       5509
 

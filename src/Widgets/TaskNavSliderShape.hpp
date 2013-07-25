@@ -167,6 +167,12 @@ public:
                 bool bearing_valid,
                 unsigned border_width);
 
+  /**
+   * returns the correct bearing bitmap based on the angle
+   * or nullptr if really small bearing
+   */
+  const Bitmap *GetBearingBitmap(const Angle &bearing);
+
 #ifdef _WIN32
   /**
    * clears background adjacent to slider.

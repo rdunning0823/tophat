@@ -4,7 +4,9 @@ SUMMARY OF NEW FEATURES AND CHANGES
 TopHat 1.0.7 Beta 7/25/2013
 * Task Manager: Add "back" button (US rules only)
 * Flarm Traffic: make units friendly for miles
-* Map - smooth dragging of pan 
+* Map 
+ - smooth dragging of pan 
+ - draw bearing images instead of chevrons on TaskNav bar 
 * QuickSetup: add nationality for task rules, units and language
 * Plane list: clean up display
 * InfoBoxes:

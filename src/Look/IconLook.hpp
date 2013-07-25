@@ -48,6 +48,10 @@ struct IconLook {
   Bitmap hBmpSearchChecked;
   Bitmap hBmpZoomOutButton;
   Bitmap hBmpZoomInButton;
+  Bitmap hBmpBearingLeftOne;
+  Bitmap hBmpBearingLeftTwo;
+  Bitmap hBmpBearingRightOne;
+  Bitmap hBmpBearingRightTwo;
 
   void Initialise();
 };

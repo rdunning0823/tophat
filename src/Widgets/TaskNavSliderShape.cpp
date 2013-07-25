@@ -101,6 +101,25 @@ SliderShape::PaintBackground(Canvas &canvas, unsigned idx,
 }
 #endif
 
+const Bitmap *
+SliderShape::GetBearingBitmap(const Angle &bearing)
+{
+  const IconLook &icon_look = UIGlobals::GetIconLook();
+  if (bearing.AsDelta().Degrees() > fixed(10))
+    return &icon_look.hBmpBearingRightTwo;
+
+  else if (bearing.AsDelta().Degrees() < fixed(-10))
+    return &icon_look.hBmpBearingLeftTwo;
+
+  else if (bearing.AsDelta().Degrees() > fixed(2))
+    return &icon_look.hBmpBearingRightOne;
+
+  else if (bearing.AsDelta().Degrees() < fixed(-2))
+    return &icon_look.hBmpBearingLeftOne;
+
+  return nullptr;
+}
+
 void
 SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
                       unsigned idx, bool selected, const TCHAR *tp_name,
@@ -197,7 +216,6 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
   UPixelScalar height_width = 0u;
   StaticString<100> distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
-  StaticString<5> bearing_chevrons_buffer(_T(""));
 
   // calculate but don't yet draw label "goto" abort, tp#
   switch (task_mode) {
@@ -223,8 +241,8 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
 
     break;
   }
-  label_width = canvas.CalcTextWidth(buffer.c_str());
   canvas.Select(small_font);
+  label_width = canvas.CalcTextWidth(buffer.c_str());
 
   // Draw arrival altitude right upper corner
   if (altitude_difference_valid) {
@@ -251,45 +269,52 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
     bearing = delta_bearing;
   }
 
-  if (do_bearing) {
-    if (bearing.AsDelta().Degrees() > fixed(10))
-      bearing_chevrons_buffer = _T(">>");
-    else if (bearing.AsDelta().Degrees() < fixed(-10))
-      bearing_chevrons_buffer = _T("<<");
-    else if (bearing.AsDelta().Degrees() > fixed(3))
-      bearing_chevrons_buffer = _T(">");
-    else if (bearing.AsDelta().Degrees() < fixed(-3))
-      bearing_chevrons_buffer = _T("<");
-  }
+  const Bitmap *bmp_bearing = do_bearing ? GetBearingBitmap(bearing) : nullptr;
 
   // draw distance and bearing chevrons centered between label and altitude.
   // draw label if room
-  canvas.Select(medium_font);
   if (distance_valid) {
-    StaticString<100> distance_bearing_buffer(_T(""));
     FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
-    if (do_bearing) {
-      if (bearing.AsDelta().Degrees() > fixed(0))
-        distance_bearing_buffer.Format(_T("%s %s"), distance_buffer.c_str(),
-                                       bearing_chevrons_buffer.c_str());
-      else
-        distance_bearing_buffer.Format(_T("%s %s"),
-                                       bearing_chevrons_buffer.c_str(),
-                                       distance_buffer.c_str());
-    } else
-      distance_bearing_buffer = distance_buffer;
+    canvas.Select(medium_font);
+    distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
-    distance_width = canvas.CalcTextWidth(distance_bearing_buffer.c_str());
-    width = distance_width + height_width;
+    PixelSize bmp_bearing_size = {0, 0};
+    if (bmp_bearing != nullptr)
+      bmp_bearing_size = bmp_bearing->GetSize();
+    UPixelScalar bearing_width = bmp_bearing_size.cx / 2;
+
     UPixelScalar offset = rc.left;
-    if ((PixelScalar)width < (rc.right - rc.left - label_width -
-        Layout::FastScale(15))) {
+    if ((PixelScalar)(distance_width + bearing_width + height_width) <
+        (rc.right - rc.left - label_width - Layout::FastScale(15))) {
+      canvas.Select(small_font);
       canvas.DrawText(rc.left + Layout::FastScale(2),
                       line_one_y_offset, buffer.c_str());
       offset = rc.left + label_width +
-          (rc.right - rc.left - width - label_width) / 2;
+          (rc.right - rc.left - distance_width - bearing_width - height_width
+              - label_width) / 2;
+
     }
-    canvas.DrawText(offset, line_one_y_offset, distance_bearing_buffer.c_str());
+
+    if (bmp_bearing != nullptr) { // show bearing arrow on left or right of distance
+
+      UPixelScalar bearing_offset_y = std::max((UPixelScalar)0,
+          (UPixelScalar)((medium_font.GetHeight() - bmp_bearing_size.cy) / 2));
+
+      UPixelScalar bearing_offset = (bearing.AsDelta().Degrees() < fixed(0)) ?
+          offset : offset + distance_width;
+
+      offset += (bearing.AsDelta().Degrees() < fixed(0)) ?
+          bmp_bearing_size.cx / 2 : 0;
+
+      canvas.CopyAnd(bearing_offset,
+                     line_one_y_offset + bearing_offset_y,
+                     bmp_bearing_size.cx / 2,
+                     bmp_bearing_size.cy,
+                     *bmp_bearing,
+                     bmp_bearing_size.cx / 2, 0);
+    }
+    canvas.Select(medium_font);
+    canvas.DrawText(offset, line_one_y_offset, distance_buffer.c_str());
   }
 
 
