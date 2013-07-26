@@ -26,6 +26,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "Form/Button.hpp"
 #include "Form/Frame.hpp"
+#include "Form/Form.hpp"
 #include "Waypoint/WaypointGlue.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Screen/Layout.hpp"
@@ -39,6 +40,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Computer/Settings.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
+#include "Message.hpp"
 
 
 enum ControlIndex {
@@ -95,6 +97,11 @@ HomePanel::OnAction(int action_id)
                             device_blackboard, false);
       WaypointGlue::SaveHome(settings_computer.poi, settings_computer.team_code);
     }
+    SetModalResult(mrOK);
+    StaticString<255> message;
+    message.Format(_T("%s %s: %s"), _("Home"), _("set to"),
+                   waypoint->name.c_str());
+    Message::AddMessage(message.c_str());
     break;
   }
   default:
