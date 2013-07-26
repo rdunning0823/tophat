@@ -40,7 +40,7 @@ class WndFrame;
  * It also calculates the "content_rc"  (below the header) where derived
  * classes may display controls related to the InfoBox
  */
-class BaseAccessPanel : public NullWidget, protected WndForm
+class BaseAccessPanel : public NullWidget, public WndForm
 {
 protected:
   unsigned id;

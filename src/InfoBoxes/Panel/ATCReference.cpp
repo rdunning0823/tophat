@@ -25,6 +25,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Form/ActionListener.hpp"
+#include "Form/Form.hpp"
 #include "UIGlobals.hpp"
 #include "Language/Language.hpp"
 #include "Formatter/GeoPointFormatter.hpp"
@@ -35,6 +36,7 @@ Copyright_License {
 #include "InfoBoxes/Panel/Base.hpp"
 #include "Waypoint/WaypointGlue.hpp"
 #include "Protection.hpp"
+#include "Message.hpp"
 
 enum Controls {
   WAYPOINT,
@@ -45,11 +47,19 @@ enum Controls {
 };
 
 class ATCReferencePanel : public RowFormWidget, ActionListener {
+protected:
+  WndForm *form;
+
 public:
   ATCReferencePanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
   void UpdateValues();
+
+  void SetForm(WndForm *_form) {
+    assert(_form != nullptr);
+    form = _form;
+  }
 
   /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent,
@@ -118,7 +128,11 @@ ATCReferencePanel::OnAction(int id)
         WaypointGlue::SaveATCReference(
             CommonInterface::SetComputerSettings().poi);
       }
-      UpdateValues();
+      StaticString<255> message;
+      message.Format(_T("%s %s: %s"), _("ATC radial"), _("set to"),
+                     waypoint->name.c_str());
+      Message::AddMessage(message.c_str());
+      form->SetModalResult(mrOK);
     }
     break;
 
@@ -133,12 +147,19 @@ ATCReferencePanel::OnAction(int id)
 class ATCReferencePanelFullscreen : public BaseAccessPanel {
 public:
 
-  ATCReferencePanelFullscreen(unsigned _id)
-    :BaseAccessPanel(_id, new ATCReferencePanel()) {}
+  ATCReferencePanelFullscreen(unsigned _id, ATCReferencePanel *atc_reference_panel)
+    :BaseAccessPanel(_id, atc_reference_panel) {}
 };
 
 Widget *
 LoadATCReferencePanel(unsigned id)
 {
-  return new ATCReferencePanelFullscreen(id);
+  ATCReferencePanel *atc_reference_panel = new ATCReferencePanel();
+
+  ATCReferencePanelFullscreen * atc_reference_panel_full_screen =
+      new ATCReferencePanelFullscreen(id, atc_reference_panel);
+
+  /* so it can call SetModelResult() */
+  atc_reference_panel->SetForm(atc_reference_panel_full_screen);
+  return atc_reference_panel_full_screen;
 }
