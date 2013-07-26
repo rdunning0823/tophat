@@ -54,6 +54,9 @@ Copyright_License {
 #include "NMEA/Derived.hpp"
 #include "Engine/Route/ReachResult.hpp"
 #include "Look/Fonts.hpp"
+#include "Look/TaskLook.hpp"
+#include "Look/MapLook.hpp"
+#include "UIGlobals.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -143,6 +146,7 @@ class WaypointVisitorMap:
   const WaypointRendererSettings &settings;
   const WaypointLook &look;
   const TaskBehaviour &task_behaviour;
+  const TaskLook &task_look;
   const MoreData &basic;
   /**
    * is the ordered task a MAT
@@ -172,6 +176,7 @@ public:
                      const MoreData &_basic)
     :projection(_projection),
      settings(_settings), look(_look), task_behaviour(_task_behaviour),
+     task_look(UIGlobals::GetMapLook().task),
      basic(_basic),
      is_mat(false),
      task_valid(false),
@@ -293,6 +298,19 @@ protected:
     _stprintf(buffer + length, _T("%d%s"), uah_glide, sAltUnit);
   }
 
+  /**
+   * draw a 1-mile circle around the waypoint
+   */
+  void
+  DrawMatTaskpointOz(Canvas &canvas, const VisibleWaypoint &vwp)
+  {
+    canvas.Select(task_look.oz_active_pen);
+    canvas.SelectHollowBrush();
+    RasterPoint p_center = projection.GeoToScreen(vwp.waypoint->location);
+    canvas.DrawCircle(p_center.x, p_center.y,
+                  projection.GeoToScreenDistance(fixed(1609)));
+  }
+
   void
   DrawWaypoint(Canvas &canvas, const VisibleWaypoint &vwp)
   {
@@ -302,6 +320,10 @@ protected:
     vwp.DrawSymbol(settings, look, canvas,
                    projection.GetMapScale() > fixed(4000),
                    projection.GetScreenAngle());
+
+    if (is_mat & vwp.in_task) {
+      DrawMatTaskpointOz(canvas, vwp);
+    }
 
     // Determine whether to draw the waypoint label or not
     switch (settings.label_selection) {

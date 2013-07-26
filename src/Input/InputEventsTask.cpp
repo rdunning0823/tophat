@@ -289,7 +289,6 @@ InputEvents::eventTaskLoad(const TCHAR *misc)
         way_points.Optimise();
       }
 
-      task->FillMatPoints(way_points);
       protected_task_manager->TaskCommit(*task);
       delete task;
     }

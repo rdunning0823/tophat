@@ -400,7 +400,6 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
     return;
 
   OrderedTask *active_task = protected_task_manager->TaskClone();
-  active_task->FillMatPoints(way_points);
 
   const DialogLook &look = UIGlobals::GetDialogLook();
 
