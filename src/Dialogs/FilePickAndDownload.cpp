@@ -43,7 +43,6 @@ Copyright_License {
 #include "Profile/ProfileKeys.hpp"
 #include "Profile/Profile.hpp"
 
-
 #ifdef ANDROID
 #include "Android/NativeView.hpp"
 #include "Android/Main.hpp"
@@ -806,10 +805,11 @@ ShowFilePickAndDownload(AvailableFile &file_filter)
 #endif
 
   const TCHAR *message =
-    _("Internet download is not available on this device.");
+      _("Internet download is not available on this device.  Go to tophatsoaring.org/data%20files");
 #ifdef ANDROID
   if (native_view->GetAPILevel() < 9)
-    message = _("Internet download requires Android 2.3.");
+    message =
+      _("Internet download is not available on this device.  Go to tophatsoaring.org/data%20files");
 #endif
 
   ShowMessageBox(message, _("File Manager"), MB_OK);
