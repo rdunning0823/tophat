@@ -1038,7 +1038,7 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
     e_Barogram, // Barogram
     e_H_QFE, // H T/O
-    Category::DEPRECATED,
+    Category::STANDARD,
   },
 
   // e_Barogram
