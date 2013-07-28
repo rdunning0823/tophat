@@ -30,6 +30,7 @@ Copyright_License {
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
 
+
 gcc_const
 static WindowStyle
 GetDialogStyle()
@@ -94,6 +95,13 @@ WidgetDialog::CreatePreliminary(SingleWindow &parent, const TCHAR *caption)
 }
 
 void
+WidgetDialog::CreatePreliminaryFull(SingleWindow &parent, const TCHAR *caption)
+{
+  auto_size = false;
+  WndForm::Create(parent, parent.GetClientRect(), caption, GetDialogStyle());
+}
+
+void
 WidgetDialog::FinishPreliminary(Widget *_widget)
 {
   assert(IsDefined());
@@ -103,7 +111,8 @@ WidgetDialog::FinishPreliminary(Widget *_widget)
   widget.Set(_widget);
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 
-  AutoSize();
+  if (auto_size)
+    AutoSize();
 }
 
 void

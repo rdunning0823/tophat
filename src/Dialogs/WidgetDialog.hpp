@@ -47,6 +47,8 @@ public:
   class DialogFooter: public PaintWindow
   {
   public:
+    DialogFooter()
+      :height(0){}
     /**
      * A class that listens to the OnPaintFooter() method of the DialogFooter class
      */
@@ -125,6 +127,13 @@ public:
    * Call FinishPreliminary() to resume building the dialog.
    */
   void CreatePreliminary(SingleWindow &parent, const TCHAR *caption);
+
+  /**
+   * Create a dialog, but do not associate it with a #Widget yet.
+   * Use the full screen
+   * Call FinishPreliminary() to resume building the dialog.
+   */
+  void CreatePreliminaryFull(SingleWindow &parent, const TCHAR *caption);
 
   void FinishPreliminary(Widget *widget);
 
