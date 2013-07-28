@@ -49,7 +49,9 @@ enum Controls {
   TASK_TYPE,
   MIN_TIME,
   START_MAX_HEIGHT,
+  START_HEIGHT_REF,
   FINISH_MIN_HEIGHT,
+  FINISH_HEIGHT_REF,
 };
 
 /**
@@ -94,12 +96,25 @@ protected:
    */
   void ReadValues();
 
+  /**
+   * returns true if using US Task rules
+   */
+  bool IsUs();
+
 private:
   /* virtual methods from DataFieldListener */
   virtual void OnModified(DataField &df);
 };
 
 static TaskPropertiesPanelUs *instance;
+
+bool
+TaskPropertiesPanelUs::IsUs()
+{
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &tb = settings_computer.task;
+  return tb.contest_nationality == ContestNationalities::AMERICAN;
+}
 
 void
 TaskPropertiesPanelUs::RefreshView()
@@ -116,9 +131,19 @@ TaskPropertiesPanelUs::RefreshView()
   SetRowVisible(START_MAX_HEIGHT, !fai_start_finish);
   LoadValue(START_MAX_HEIGHT, fixed(p.start_constraints.max_height), UnitGroup::ALTITUDE);
 
+  if (!IsUs()) {
+    SetRowVisible(START_HEIGHT_REF, !fai_start_finish);
+    LoadValueEnum(START_HEIGHT_REF, p.start_constraints.max_height_ref);
+  }
+
   SetRowVisible(FINISH_MIN_HEIGHT, !fai_start_finish);
   LoadValue(FINISH_MIN_HEIGHT, fixed(p.finish_constraints.min_height),
             UnitGroup::ALTITUDE);
+
+  if (!IsUs()) {
+    SetRowVisible(FINISH_HEIGHT_REF, !fai_start_finish);
+    LoadValueEnum(FINISH_HEIGHT_REF, p.finish_constraints.min_height_ref);
+  }
 
   LoadValueEnum(TASK_TYPE, ftype);
 }
@@ -144,7 +169,12 @@ TaskPropertiesPanelUs::ReadValues()
     task_changed = true;
   }
 
-  p.start_constraints.max_height_ref = AltitudeReference::MSL;
+  if (IsUs())
+    p.start_constraints.max_height_ref = AltitudeReference::MSL;
+  else {
+    task_changed |= SaveValueEnum(START_HEIGHT_REF,
+                                  p.start_constraints.max_height_ref);
+  }
 
   unsigned min_height =
     iround(Units::ToSysAltitude(GetValueFloat(FINISH_MIN_HEIGHT)));
@@ -152,7 +182,13 @@ TaskPropertiesPanelUs::ReadValues()
     p.finish_constraints.min_height = min_height;
     task_changed = true;
   }
-  p.finish_constraints.min_height_ref = AltitudeReference::MSL;
+
+  if (IsUs()) {
+    p.finish_constraints.min_height_ref = AltitudeReference::MSL;
+  } else {
+    task_changed |= SaveValueEnum(FINISH_HEIGHT_REF,
+                             p.finish_constraints.min_height_ref);
+  }
 
   p.finish_constraints.fai_finish = IsFai(newtype);
 
@@ -182,6 +218,14 @@ TaskPropertiesPanelUs::OnModified(DataField &df)
 void
 TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
+  static constexpr StaticEnumChoice altitude_reference_list[] = {
+    { (unsigned)AltitudeReference::AGL, N_("AGL"),
+      N_("Reference is the height above the task point."), },
+    { (unsigned)AltitudeReference::MSL, N_("MSL"),
+      N_("Reference is altitude above mean sea level."), },
+    { 0 }
+  };
+
   DataFieldEnum *dfe = new DataFieldEnum(NULL);
   dfe->SetListener(this);
   dfe->EnableItemHelp(true);
@@ -201,15 +245,41 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   StaticString<25> label;
   StaticString<100> help;
-  label = _("Start max. height (MSL)");
-  help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
+  if (IsUs()) {
+    label = _("Start max. height (MSL)");
+    help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
+  } else {
+    label = _("Start max. height");
+    help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
+  }
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
 
-  label = _("Finish min. height (MSL)");
-  help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
+  if (IsUs())
+    RowFormWidget::AddDummy();
+  else {
+    AddEnum(_("Start height ref."),
+            _("Reference used for start max height rule."),
+            altitude_reference_list);
+  }
+
+  if (IsUs()) {
+    label = _("Finish min. height (MSL)");
+    help = _("Minimum height based on finish height reference (MSL) while finishing the task.  Set to 0 for no limit.");
+  } else {
+    label = _("Finish min. height");
+    help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
+  }
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(25), false, fixed(0));
+
+  if (IsUs())
+    RowFormWidget::AddDummy();
+  else {
+    AddEnum(_("Finish height ref."),
+            _("Reference used for finish min height rule."),
+            altitude_reference_list);
+  }
 }
 
 void
