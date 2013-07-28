@@ -360,7 +360,7 @@ TouchNumericEntry(fixed &value,
                                   OnCharacterNumeric);
   kb = (KeyboardBaseControl*)&keyboard;
 
-  WndButton backspace_button(client_area, look, _T("X"),
+  WndButton backspace_button(client_area, look, _T("<"),
                              { backspace_left, padding, rc.right - padding,
                                rc.top + button_height },
                              button_style, OnBackspace);
