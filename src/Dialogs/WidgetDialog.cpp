@@ -91,6 +91,7 @@ void
 WidgetDialog::CreatePreliminary(SingleWindow &parent, const TCHAR *caption)
 {
   auto_size = true;
+  buttons.SetButtonPosition(ButtonPanel::ButtonPanelPosition::Bottom);
   WndForm::Create(parent, parent.GetClientRect(), caption, GetDialogStyle());
 }
 
@@ -98,6 +99,7 @@ void
 WidgetDialog::CreatePreliminaryFull(SingleWindow &parent, const TCHAR *caption)
 {
   auto_size = false;
+  buttons.SetButtonPosition(ButtonPanel::ButtonPanelPosition::Bottom);
   WndForm::Create(parent, parent.GetClientRect(), caption, GetDialogStyle());
 }
 
