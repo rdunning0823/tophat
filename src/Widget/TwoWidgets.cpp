@@ -41,7 +41,7 @@ TwoWidgets::UpdateLayout()
 
 gcc_const
 static int
-CalculateSplit(int top, int bottom, unsigned min_a,
+CalculateSplit(int top, int bottom, unsigned min_a, unsigned max_a,
                unsigned min_b, unsigned max_b)
 {
   assert(bottom >= top);
@@ -54,8 +54,12 @@ CalculateSplit(int top, int bottom, unsigned min_a,
        better solutions for this, but this workaround is good enough
        for fixing the assertion failure in DevicesConfigPanel */
     return (top + bottom) / 2;
+  else if (height >= max_a + max_b)
+    /* more than enough space: align the second Widget below the first widget
+       and give the rest to the first Widget */
+    return top + max_a;
   else if (height >= min_a + max_b)
-    /* more than enough space: align the second Widget at the bottom
+    /* more than enough space for min_a: align the second Widget at the bottom
        and give the rest to the first Widget */
     return bottom - max_b;
   else if (height >= min_a + min_b)
@@ -73,13 +77,14 @@ PixelScalar
 TwoWidgets::CalculateSplit(const PixelRect &rc) const
 {
   const PixelSize min_a = first->GetMinimumSize();
+  const PixelSize max_a = first->GetMaximumSize();
   const PixelSize min_b = second->GetMinimumSize();
   const PixelSize max_b = second->GetMaximumSize();
 
   return vertical
-    ? ::CalculateSplit(rc.top, rc.bottom, min_a.cy,
+    ? ::CalculateSplit(rc.top, rc.bottom, min_a.cy, max_a.cy,
                        min_b.cy, max_b.cy)
-    : ::CalculateSplit(rc.left, rc.right, min_a.cx,
+    : ::CalculateSplit(rc.left, rc.right, min_a.cx, max_a.cx,
                        min_b.cx, max_b.cx);
 }
 
