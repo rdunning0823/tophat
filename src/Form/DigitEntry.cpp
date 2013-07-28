@@ -33,6 +33,7 @@ Copyright_License {
 #include "Time/RoughTime.hpp"
 #include "Math/Angle.hpp"
 #include "Renderer/SymbolRenderer.hpp"
+#include "Screen/Layout.hpp"
 
 #include <algorithm>
 
@@ -67,9 +68,9 @@ DigitEntry::Create(ContainerWindow &parent, const PixelRect &rc,
     digit.value = 0;
   }
 
-  CalculateLayout();
 
   PaintWindow::Create(parent, rc, style);
+  CalculateLayout();
 }
 
 void
@@ -174,8 +175,7 @@ void
 DigitEntry::CalculateLayout()
 {
   const UPixelScalar control_height = Layout::GetMaximumControlHeight();
-  const UPixelScalar padding = Layout::GetTextPadding();
-
+  const UPixelScalar padding = 0;//Layout::GetTextPadding();
   const UPixelScalar min_value_height = control_height * 3 / 2;
 
   PixelSize digit_size = look.text_font->TextSize(_T("8"));
@@ -186,6 +186,22 @@ DigitEntry::CalculateLayout()
   top = control_height;
   bottom = top + digit_size.cy;
 
+  UPixelScalar raw_total_width = 0;
+  for (unsigned i = 0; i < length; ++i) {
+    Column &digit = columns[i];
+
+    PixelScalar value_width = digit.GetWidth() * digit_size.cx;
+    value_width += 2 * padding;
+    if (value_width < (PixelScalar)control_height)
+      value_width = control_height;
+
+    raw_total_width += value_width;
+  }
+  fixed max_width_ratio = fixed(1);
+  if (raw_total_width > GetWidth()) {
+    max_width_ratio = fixed(GetWidth()) / fixed(raw_total_width);
+  }
+
   unsigned last_right = 0;
   for (unsigned i = 0; i < length; ++i) {
     Column &digit = columns[i];
@@ -194,6 +210,8 @@ DigitEntry::CalculateLayout()
     value_width += 2 * padding;
     if (value_width < (PixelScalar)control_height)
       value_width = control_height;
+
+    value_width = (PixelScalar)(fixed(value_width) * max_width_ratio);
 
     digit.left = last_right;
     last_right = digit.right = digit.left + value_width;
