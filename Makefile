@@ -189,6 +189,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/dlgConfigInfoboxes.cpp \
 	$(SRC)/Dialogs/Settings/dlgQNH.cpp \
 	$(SRC)/Dialogs/Settings/FontEdit.cpp \
+	$(SRC)/Dialogs/Settings/dlgSetupQuick.cpp \
 	$(SRC)/Dialogs/Traffic/TrafficList.cpp \
 	$(SRC)/Dialogs/Traffic/FlarmTrafficDetails.cpp \
 	$(SRC)/Dialogs/Traffic/TeamCodeDialog.cpp \
@@ -208,7 +209,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/dlgStartup.cpp \
 	$(SRC)/Dialogs/dlgStartupAssistant.cpp \
 	$(SRC)/Dialogs/dlgMatItemClick.cpp \
-	$(SRC)/Dialogs/dlgSetupQuick.cpp \
 	\
 	$(SRC)/Dialogs/dlgStatus.cpp \
 	$(SRC)/Dialogs/StatusPanels/StatusPanel.cpp \
