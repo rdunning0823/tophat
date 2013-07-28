@@ -29,6 +29,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "Form/DataField/FileReader.hpp"
+#include "Form/ActionListener.hpp"
 #include "LocalPath.hpp"
 #include "UtilsSettings.hpp"
 #include "ConfigPanel.hpp"
@@ -52,10 +53,12 @@ enum ControlIndex {
   WatchedWaypointFile,
   AirspaceFile,
   AdditionalAirspaceFile,
-  AirfieldFile
+  AirfieldFile,
+  EditWaypoints,
 };
 
-class SiteConfigPanel final : public RowFormWidget, DataFieldListener {
+class SiteConfigPanel final : public RowFormWidget, DataFieldListener,
+    public ActionListener {
 private:
   WndButton *buttonWaypoints;
   StaticString<50> download_name;
@@ -78,7 +81,17 @@ public:
 private:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
+
+  /* from ActionListener */
+  virtual void OnAction(int id) override;
 };
+
+void
+SiteConfigPanel::OnAction(int id)
+{
+  if (id == EditWaypoints)
+    dlgConfigWaypointsShowModal();
+}
 
 void
 SiteConfigPanel::OnModified(DataField &df)
@@ -191,6 +204,9 @@ SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                     "information about individual waypoints and airfields."),
                 ProfileKeys::AirfieldFile, _T("*.txt\0"));
   SetExpertRow(AirfieldFile);
+
+  if (stand_alone)
+    AddButton(_("Edit waypoints"), *this, EditWaypoints);
 }
 
 bool
