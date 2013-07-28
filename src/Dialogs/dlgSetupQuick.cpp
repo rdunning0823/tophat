@@ -157,29 +157,31 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_site_files_button = rc_plane_button = rc_device_button
       = rc_safety_button = rc_nationality_button = rc_pilot_button = rc_left;
 
-  rc_nationality_text.top = rc_nationality_button.top = rc_prompt.bottom;
-  rc_site_files_text.top = rc_site_files_button.top = rc_nationality_text.top
-      + height;
+  PixelScalar top1, top2, top3, top4, top5, top6;
+  top1 = rc_prompt.bottom;
+  top2 = top1 + height;
+  top3 = top1 + height * 2;
+  top4 = top1 + height * 3;
+  top5 = top1 + height * 4;
+  top6 = top1 + height * 5;
 
-  rc_plane_text.top = rc_plane_button.top = rc_site_files_text.top + height;
-  rc_device_text.top = rc_device_button.top = rc_plane_text.top + height;
+  rc_nationality_button.top = rc_nationality_text.top = top1;
+  rc_device_button.top = rc_device_text.top = top2;
+  rc_site_files_button.top = rc_site_files_text.top = top3;
+  rc_safety_button.top = rc_safety_text.top = top4;
+  rc_plane_button.top = rc_plane_text.top = top5;
+  rc_pilot_button.top = rc_pilot_text.top = top6;
 
-  rc_safety_text.top = rc_safety_button.top = rc_device_text.top + height;
-  rc_pilot_text.top = rc_pilot_button.top = rc_safety_text.top + height;
-
-  rc_nationality_text.bottom = rc_nationality_button.bottom =
-      rc_nationality_button.top + height;
-
-  rc_site_files_text.bottom = rc_site_files_button.bottom =
+  rc_nationality_button.bottom = rc_nationality_text.bottom =
+      rc_nationality_text.top + height;
+  rc_device_button.bottom = rc_device_text.bottom =
+      rc_device_text.top + height;
+  rc_site_files_button.bottom = rc_site_files_text.bottom =
       rc_site_files_text.top + height;
-  rc_plane_text.bottom = rc_plane_button.bottom =
-      rc_plane_button.top + height;
-  rc_device_text.bottom = rc_device_button.bottom =
-      rc_device_button.top + height;
-  rc_safety_text.bottom = rc_safety_button.bottom =
-      rc_safety_button.top + height;
-  rc_pilot_text.bottom = rc_pilot_button.bottom =
-      rc_pilot_button.top + height;
+  rc_safety_button.bottom = rc_safety_text.bottom =
+      rc_safety_text.top + height;
+  rc_plane_button.bottom = rc_plane_text.bottom = rc_plane_text.top + height;
+  rc_pilot_button.bottom = rc_pilot_text.bottom = rc_pilot_text.top + height;
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
