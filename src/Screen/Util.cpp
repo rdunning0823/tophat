@@ -202,12 +202,5 @@ DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
                             rc.right, rc.bottom,
                             20,
                             20);
-
-  rc.Grow(-1, -1);
-  rc.Offset(0, -1);
-  canvas.DrawRoundRectangle(rc.left, rc.top,
-                            rc.right, rc.bottom,
-                            20,
-                            20);
 }
 #endif /* ENABLE_OPENGL */
