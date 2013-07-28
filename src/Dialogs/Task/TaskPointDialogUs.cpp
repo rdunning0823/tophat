@@ -313,11 +313,7 @@ RefreshView()
 
   button_type->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
 
-  WndFrame* wfrm = nullptr;
-  wfrm = ((WndFrame*)wf->FindByName(_T("lblType")));
-  assert (wfrm != nullptr);
-  wfrm->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
-  wfrm->SetVisible(!button_type->IsVisible());
+
 
   bool edit_disabled = (ordered_task->GetFactoryType() ==
       TaskFactoryType::FAI_GENERAL) ||
@@ -642,12 +638,6 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
   assert(wTaskView != nullptr);
 
   const DialogLook &look = UIGlobals::GetDialogLook();
-
-  WndFrame* wType = (WndFrame*) wf->FindByName(_T("lblType"));
-  assert (wType);
-  wType->SetFont(*look.caption.font);
-  wType->SetAlignCenter();
-  wType->SetVAlignCenter();
 
   TaskPointUsDialog dialog2;
 

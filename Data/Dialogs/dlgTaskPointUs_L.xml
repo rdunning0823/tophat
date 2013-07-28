@@ -12,7 +12,6 @@
     <List Name="List" X="0" Y="39" Width="150" Height="-37"/>
 
     <Panel Name="frmType" X="152" Y="39" Width="167" Height="70" Border="1">
-      <Label Name="lblType" X="2" Y="3" Width="163" Height="35"/>
       <Button Name="butType" X="2" Y="3" Width="163" Height="35" OnClick="OnTypeClicked"/>
 
       <Panel Name="frmOZLine" X="2" Y="41" Width="163" Height="26">

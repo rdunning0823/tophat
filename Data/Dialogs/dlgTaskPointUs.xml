@@ -17,7 +17,6 @@
     </Panel>
 
     <Panel Name="frmType" X="0" Y="38" Width="150" Height="70" Border="1">
-      <Label Name="lblType" Caption="Type" X="2" Y="3" Width="145" Height="35"/>
       <Button Name="butType" Caption="Change Type" X="2" Y="3" Width="145" Height="35" OnClick="OnTypeClicked"/>
 
       <Panel Name="frmOZLine" X="2" Y="41" Width="145" Height="80">
