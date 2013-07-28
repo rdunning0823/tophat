@@ -46,7 +46,7 @@ GeoPointEntryDialog(const TCHAR *caption, GeoPoint &value,
   const DialogLook &look = UIGlobals::GetDialogLook();
 
   WidgetDialog dialog(look);
-  dialog.CreatePreliminary(UIGlobals::GetMainWindow(), caption);
+  dialog.CreatePreliminaryFull(UIGlobals::GetMainWindow(), caption);
 
   ContainerWindow &client_area = dialog.GetClientAreaWindow();
 
