@@ -23,7 +23,6 @@
       <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
     </Panel>
 
-    <Canvas Name="frmTaskView" X="241" Y="116" Width="73" Height="69" Border="1" OnPaint="OnTaskPaint" />
   </Panel>
 
 </Form>

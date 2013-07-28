@@ -54,7 +54,6 @@ Copyright_License {
 #include "Task/Factory/LegalPointSet.hpp"
 #include "Task/TypeStrings.hpp"
 #include "Task/ValidationErrorStrings.hpp"
-#include "Gauge/TaskView.hpp"
 #include "Compiler.h"
 #include "UIGlobals.hpp"
 #include "Look/MapLook.hpp"
@@ -79,7 +78,6 @@ Copyright_License {
 #include <stdio.h>
 
 static WndForm *wf = nullptr;
-static WndFrame* wTaskView = nullptr;
 static DockWindow *dock;
 static ObservationZoneEditWidget *properties_widget;
 ListControl *wTaskPoints;
@@ -306,8 +304,6 @@ RefreshTaskProperties()
 static void
 RefreshView()
 {
-  wTaskView->Invalidate();
-
   wTaskPoints->SetLength(ordered_task->TaskSize());
 
   wTaskPoints->SetCursorIndex(active_index);
@@ -367,30 +363,6 @@ ReadValues()
 {
   return properties_widget == nullptr ||
     properties_widget->Save(task_modified);
-}
-
-static void
-OnTaskPaint(WndOwnerDrawFrame *Sender, Canvas &canvas)
-{
-  if (active_index >= ordered_task->TaskSize())
-    return;
-
-  PixelRect rc = Sender->GetClientRect();
-
-  const OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
-
-#ifdef ENABLE_OPENGL
-  /* enable clipping */
-  GLCanvasScissor scissor(canvas);
-#endif
-
-  const MapLook &look = UIGlobals::GetMapLook();
-  const NMEAInfo &basic = CommonInterface::Basic();
-  PaintTaskPoint(canvas, rc, *ordered_task, tp,
-                 basic.location_available, basic.location,
-                 CommonInterface::GetMapSettings(),
-                 look.task, look.airspace,
-                 terrain, &airspace_database);
 }
 
 static void 
@@ -501,7 +473,6 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnAddClicked),
   DeclareCallBackEntry(OnRelocateClicked),
   DeclareCallBackEntry(OnTypeClicked),
-  DeclareCallBackEntry(OnTaskPaint),
   DeclareCallBackEntry(nullptr)
 };
 
@@ -509,7 +480,6 @@ void
 TPOZListenerUs::OnModified(ObservationZoneEditWidget &widget)
 {
   ReadValues();
-  wTaskView->Invalidate();
 }
 
 void
@@ -573,9 +543,6 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
                   Layout::landscape ? _T("IDR_XML_TASKPOINT_US_L") :
                                       _T("IDR_XML_TASKPOINT_US"));
   assert(wf != nullptr);
-
-  wTaskView = (WndFrame*)wf->FindByName(_T("frmTaskView"));
-  assert(wTaskView != nullptr);
 
   dock = (DockWindow *)wf->FindByName(_T("properties"));
   assert(dock != nullptr);
