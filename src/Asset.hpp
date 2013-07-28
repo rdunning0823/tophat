@@ -237,7 +237,11 @@ constexpr
 static inline bool
 HasTouchScreen()
 {
+#ifdef NDEBUG
+  return true;
+#else
   return IsAndroid() || (IsWindowsCE() && !IsAltair());
+#endif
 }
 
 /**
