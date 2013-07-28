@@ -87,18 +87,6 @@ WidgetDialog::CreateAuto(SingleWindow &parent, const TCHAR *caption,
 }
 
 void
-WidgetDialog::DialogFooter::Create(ContainerWindow &parent,
-                                   Listener *_listener,
-                                   UPixelScalar _height)
-{
-  listener = _listener;
-  height = _height;
-  WindowStyle style;
-  PixelRect rc(0, parent.GetHeight() - height, parent.GetWidth(), parent.GetHeight());
-  PaintWindow::Create(parent, rc, style);
-}
-
-void
 WidgetDialog::CreatePreliminary(SingleWindow &parent, const TCHAR *caption)
 {
   auto_size = true;
@@ -116,6 +104,18 @@ WidgetDialog::FinishPreliminary(Widget *_widget)
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 
   AutoSize();
+}
+
+void
+WidgetDialog::DialogFooter::Create(ContainerWindow &parent,
+                                   Listener *_listener,
+                                   UPixelScalar _height)
+{
+  listener = _listener;
+  height = _height;
+  WindowStyle style;
+  PixelRect rc(0, parent.GetHeight() - height, parent.GetWidth(), parent.GetHeight());
+  PaintWindow::Create(parent, rc, style);
 }
 
 void
