@@ -64,6 +64,12 @@ Copyright_License {
 #include "Util/StaticString.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Widget/DockWindow.hpp"
+#include "Widget/PanelWidget.hpp"
+#include "Widgets/CylinderZoneEditWidget.hpp"
+#include "Widgets/SectorZoneEditWidget.hpp"
+#include "Widgets/LineSectorZoneEditWidget.hpp"
+#include "Widgets/KeyholeZoneEditWidget.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
@@ -74,6 +80,8 @@ Copyright_License {
 
 static WndForm *wf = nullptr;
 static WndFrame* wTaskView = nullptr;
+static DockWindow *dock;
+static ObservationZoneEditWidget *properties_widget;
 ListControl *wTaskPoints;
 static OrderedTask* ordered_task = nullptr;
 static OrderedTask** ordered_task_pointer = nullptr;
@@ -99,14 +107,65 @@ public:
   /**
    * updates the edit captions of the OZ WndProperty controls
    */
-  void RefreshPropertyEditCaptions(unsigned i);
+  //void RefreshPropertyEditCaptions(unsigned i);
 private:
   /**
    * updates the edit caption of a single property
    */
-  void RefreshPropertyEditCaption(const TCHAR* property_name,
-                                  const TCHAR *waypoint_name);
+/*  TODO void RefreshPropertyEditCaption(const TCHAR* property_name,
+                                  const TCHAR *waypoint_name);*/
 };
+
+class TPOZListenerUs : public ObservationZoneEditWidget::Listener {
+public:
+  /* virtual methods from class ObservationZoneEditWidget::Listener */
+  virtual void OnModified(ObservationZoneEditWidget &widget) override;
+};
+
+static TPOZListenerUs listener;
+
+static ObservationZoneEditWidget *
+CreateObservationZoneEditWidget(ObservationZonePoint &oz, bool is_fai_general)
+{
+  switch (oz.GetShape()) {
+  case ObservationZone::Shape::SECTOR:
+  case ObservationZone::Shape::ANNULAR_SECTOR:
+  case ObservationZone::Shape::SYMMETRIC_QUADRANT:
+    return new SectorZoneEditWidget((SectorZone &)oz);
+
+  case ObservationZone::Shape::LINE:
+    return new LineSectorZoneEditWidget((LineSectorZone &)oz, !is_fai_general);
+
+  case ObservationZone::Shape::CYLINDER:
+    return new CylinderZoneEditWidget((CylinderZone &)oz, !is_fai_general);
+
+  case ObservationZone::Shape::CUSTOM_KEYHOLE:
+    return new KeyholeZoneEditWidget((KeyholeZone &)oz);
+
+  case ObservationZone::Shape::FAI_SECTOR:
+  case ObservationZone::Shape::DAEC_KEYHOLE:
+  case ObservationZone::Shape::MAT_CYLINDER:
+  case ObservationZone::Shape::BGAFIXEDCOURSE:
+  case ObservationZone::Shape::BGAENHANCEDOPTION:
+  case ObservationZone::Shape::BGA_START:
+    break;
+  }
+
+  return nullptr;
+}
+
+/**
+ * returns true if we're using US task rules
+ */
+/*
+static bool
+IsUs()
+{
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &tb = settings_computer.task;
+  return tb.contest_nationality == ContestNationalities::AMERICAN;
+}
+*/
 
 /**
  * returns true if task is an FAI type
@@ -162,8 +221,7 @@ OnCloseClicked(gcc_unused WndButton &Sender)
 static void
 EnableSizeEdit(bool enable)
 {
-  SetFormControlEnabled(*wf, _T("prpOZLineLength"), enable);
-  SetFormControlEnabled(*wf, _T("prpOZCylinderRadius"), enable);
+  /** TODO Make readonly property in widget */
 }
 
 /**
@@ -172,8 +230,9 @@ EnableSizeEdit(bool enable)
 static void
 ShowSizeEdit(bool visible)
 {
-  ShowFormControl(*wf, _T("prpOZLineLength"), visible);
-  ShowFormControl(*wf, _T("prpOZCylinderRadius"), visible);
+  return;
+  //TODO
+  //ShowFormControl(*wf, _T("properties"), visible);
 }
 
 static void
@@ -225,11 +284,19 @@ RefreshTaskProperties()
 
   StaticString<50> text_start;
   StaticString<50> text_finish;
-  text_start.Format(_T("%s %s %s"),
-                    _("Start"), _("MSL:"), start_height.c_str());
+  StaticString<5> text_start_height_ref(N_("MSL"));
+  StaticString<5> text_finish_height_ref(N_("MSL"));
+  if (otb.start_constraints.max_height_ref == AltitudeReference::AGL)
+    text_start_height_ref = N_("AGL");
 
-  text_finish.Format(_T("%s %s %s"),
-                     _("Finish"), _("MSL:"), finish_height.c_str());
+  if (otb.finish_constraints.min_height_ref == AltitudeReference::AGL)
+    text_finish_height_ref = N_("AGL");
+
+  text_start.Format(_T("%s %s: %s"),
+                    _("Start"), text_start_height_ref.c_str(), start_height.c_str());
+
+  text_finish.Format(_T("%s %s: %s"),
+                     _("Finish"), text_finish_height_ref.c_str(), finish_height.c_str());
 
   line_2.Format(_T("%s, %s"), text_start.c_str(), text_finish.c_str());
   both_lines.Format(_T("%s\n%s"), line_1.c_str(), line_2.c_str());
@@ -251,55 +318,19 @@ RefreshView()
   if (ordered_task->TaskSize() == 0)
     return;
 
-  ShowFormControl(*wf, _T("frmOZLine"), false);
-  ShowFormControl(*wf, _T("frmOZSector"), false);
-  ShowFormControl(*wf, _T("frmOZCylinder"), false);
-
-  const OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
+  OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
 
   Refreshing = true; // tell onChange routines not to save form!
 
-  const ObservationZonePoint &oz = tp.GetObservationZone();
+  dock->SetWidget(new PanelWidget());
 
-  switch (oz.GetShape()) {
-  case ObservationZone::Shape::SECTOR:
-  case ObservationZone::Shape::ANNULAR_SECTOR:
-    ShowFormControl(*wf, _T("frmOZSector"), true);
-
-    LoadFormProperty(*wf, _T("prpOZSectorRadius"),
-                     UnitGroup::DISTANCE, ((const SectorZone &)oz).GetRadius());
-    LoadFormProperty(*wf, _T("prpOZSectorStartRadial"),
-                     ((const SectorZone &)oz).GetStartRadial().Degrees());
-    LoadFormProperty(*wf, _T("prpOZSectorFinishRadial"),
-                     ((const SectorZone &)oz).GetEndRadial().Degrees());
-
-    if (oz.GetShape() == ObservationZone::Shape::ANNULAR_SECTOR) {
-      LoadFormProperty(*wf, _T("prpOZSectorInnerRadius"),
-                       UnitGroup::DISTANCE, ((const AnnularSectorZone &)oz).GetInnerRadius());
-
-      ShowFormControl(*wf, _T("prpOZSectorInnerRadius"), true);
-    } else
-      ShowFormControl(*wf, _T("prpOZSectorInnerRadius"), false);
-
-    break;
-
-  case ObservationZone::Shape::LINE:
-    ShowFormControl(*wf, _T("frmOZLine"), true);
-
-    LoadFormProperty(*wf, _T("prpOZLineLength"), UnitGroup::DISTANCE,
-                     ((const LineSectorZone &)oz).GetLength());
-    break;
-
-  case ObservationZone::Shape::CYLINDER:
-  case ObservationZone::Shape::MAT_CYLINDER:
-    ShowFormControl(*wf, _T("frmOZCylinder"), true);
-
-    LoadFormProperty(*wf, _T("prpOZCylinderRadius"), UnitGroup::DISTANCE,
-                     ((const CylinderZone &)oz).GetRadius());
-    break;
-
-  default:
-    break;
+  ObservationZonePoint &oz = tp.GetObservationZone();
+  const bool is_fai_general =
+    ordered_task->GetFactoryType() == TaskFactoryType::FAI_GENERAL;
+  properties_widget = CreateObservationZoneEditWidget(oz, is_fai_general);
+  if (properties_widget != nullptr) {
+    properties_widget->SetListener(&listener);
+    dock->SetWidget(properties_widget);
   }
 
   WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
@@ -331,70 +362,11 @@ RefreshView()
   Refreshing = false; // reactivate onChange routines
 }
 
-static void
+static bool
 ReadValues()
 {
-  OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
-  ObservationZonePoint &oz = tp.GetObservationZone();
-
-  switch (oz.GetShape()) {
-  case ObservationZone::Shape::ANNULAR_SECTOR: {
-    fixed radius = Units::ToSysDistance(
-        GetFormValueFixed(*wf, _T("prpOZSectorInnerRadius")));
-
-    if (fabs(radius - ((AnnularSectorZone &)oz).GetInnerRadius()) > fixed(49)) {
-      ((AnnularSectorZone &)oz).SetInnerRadius(radius);
-      task_modified = true;
-    }
-  }
-  case ObservationZone::Shape::SECTOR: {
-    fixed radius =
-      Units::ToSysDistance(GetFormValueFixed(*wf, _T("prpOZSectorRadius")));
-
-    if (fabs(radius - ((SectorZone &)oz).GetRadius()) > fixed(49)) {
-      ((SectorZone &)oz).SetRadius(radius);
-      task_modified = true;
-    }
-
-    fixed start_radial = GetFormValueFixed(*wf, _T("prpOZSectorStartRadial"));
-    if (start_radial != ((SectorZone &)oz).GetStartRadial().Degrees()) {
-      ((SectorZone &)oz).SetStartRadial(Angle::Degrees(start_radial));
-      task_modified = true;
-    }
-
-    fixed finish_radial = GetFormValueFixed(*wf, _T("prpOZSectorFinishRadial"));
-    if (finish_radial != ((SectorZone &)oz).GetEndRadial().Degrees()) {
-      ((SectorZone &)oz).SetEndRadial(Angle::Degrees(finish_radial));
-      task_modified = true;
-    }
-    break;
-  }
-  case ObservationZone::Shape::LINE: {
-    fixed line_length = Units::ToSysDistance(
-        GetFormValueFixed(*wf, _T("prpOZLineLength")));
-
-    if (fabs(line_length - ((LineSectorZone &)oz).GetLength()) > fixed(49)) {
-      ((LineSectorZone &)oz).SetLength(line_length);
-      task_modified = true;
-    }
-    break;
-  }
-
-  case ObservationZone::Shape::MAT_CYLINDER:
-  case ObservationZone::Shape::CYLINDER: {
-    fixed radius = Units::ToSysDistance(
-        GetFormValueFixed(*wf, _T("prpOZCylinderRadius")));
-
-    if (fabs(radius - ((CylinderZone &)oz).GetRadius()) > fixed(49)) {
-      ((CylinderZone &)oz).SetRadius(radius);
-      task_modified = true;
-    }
-    break;
-  }
-
-  default:
-    break;
-  }
+  return properties_widget == nullptr ||
+    properties_widget->Save(task_modified);
 }
 
 static void
@@ -520,15 +492,6 @@ OnTypeClicked(gcc_unused WndButton &Sender)
   }
 }
 
-static void
-OnOZData(gcc_unused DataField *Sender,
-         gcc_unused DataField::DataAccessMode Mode)
-{
-  if (!Refreshing)
-    ReadValues();
-  wTaskView->Invalidate();
-}
-
 static constexpr CallBackTableEntry CallBackTable[] = {
 
   DeclareCallBackEntry(OnTaskPropertiesClicked),
@@ -539,39 +502,14 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(OnRelocateClicked),
   DeclareCallBackEntry(OnTypeClicked),
   DeclareCallBackEntry(OnTaskPaint),
-  DeclareCallBackEntry(OnOZData),
   DeclareCallBackEntry(nullptr)
 };
 
 void
-TaskPointUsDialog::RefreshPropertyEditCaption(const TCHAR* property_name,
-                                              const TCHAR *waypoint_name)
+TPOZListenerUs::OnModified(ObservationZoneEditWidget &widget)
 {
-  WndProperty *wp;
-  wp = (WndProperty*)wf->FindByName(property_name);
-  assert(wp != nullptr);
-
-  StaticString<255> edit_caption;
-  edit_caption.Format(_T("%s: %s"), wp->GetCaption(), waypoint_name);
-
-  wp->SetEditingCaption(edit_caption.c_str());
-}
-
-void
-TaskPointUsDialog::RefreshPropertyEditCaptions(unsigned i)
-{
-  assert(ordered_task != nullptr);
-  assert(i < ordered_task->TaskSize());
-
-  StaticString<255> waypoint_name;
-  waypoint_name = ordered_task->GetPoint(i).GetWaypoint().name.c_str();
-
-  RefreshPropertyEditCaption(_T("prpOZLineLength"), waypoint_name.c_str());
-  RefreshPropertyEditCaption(_T("prpOZCylinderRadius"), waypoint_name.c_str());
-  RefreshPropertyEditCaption(_T("prpOZSectorRadius"), waypoint_name.c_str());
-  RefreshPropertyEditCaption(_T("prpOZSectorStartRadial"), waypoint_name.c_str());
-  RefreshPropertyEditCaption(_T("prpOZSectorFinishRadial"), waypoint_name.c_str());
-  RefreshPropertyEditCaption(_T("prpOZSectorInnerRadius"), waypoint_name.c_str());
+  ReadValues();
+  wTaskView->Invalidate();
 }
 
 void
@@ -582,7 +520,9 @@ TaskPointUsDialog::OnCursorMoved(unsigned i)
 
   active_index = i;
   RefreshView();
-  RefreshPropertyEditCaptions(i);
+/*
+ * TODO
+ *   RefreshPropertyEditCaptions(i);*/
 }
 
 void
@@ -637,6 +577,9 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
   wTaskView = (WndFrame*)wf->FindByName(_T("frmTaskView"));
   assert(wTaskView != nullptr);
 
+  dock = (DockWindow *)wf->FindByName(_T("properties"));
+  assert(dock != nullptr);
+
   const DialogLook &look = UIGlobals::GetDialogLook();
 
   TaskPointUsDialog dialog2;
@@ -654,8 +597,9 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
 
   wf->SetCaption(OrderedTaskFactoryName(xfac));
   RefreshView();
-  if (ordered_task->TaskSize() > 0)
-    dialog2.RefreshPropertyEditCaptions(0);
+/*  TODO
+ * if (ordered_task->TaskSize() > 0)
+    dialog2.RefreshPropertyEditCaptions(0);*/
 
   wf->ShowModal();
 
