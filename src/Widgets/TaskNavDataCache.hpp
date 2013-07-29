@@ -45,7 +45,7 @@ class TaskNavDataCache
 {
 public:
   enum {
-    MAX_TURNPOINTS = 13,
+    MAX_TURNPOINTS = 50,
     CACHE_LATENCY = 1000
   };
 
