@@ -263,7 +263,7 @@ WidgetDialog::OnResize(PixelSize new_size)
   widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 
   if (dialog_footer.IsDefined())
-    dialog_footer.Move(1, new_size.cy - dialog_footer.GetHeight());
+    dialog_footer.Move(1, new_size.cy - dialog_footer.GetHeight() - WndForm::GetTitleHeight());
 }
 
 bool
