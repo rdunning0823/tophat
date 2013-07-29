@@ -27,9 +27,9 @@
 
   <Custom Name="map" Y="71" Height="-35" Border="1" OnCreate="OnCreateMap" />
 
-  <CheckBox Name="chkbOptimized" Caption="Optimized" X="5" Y="-35" Width="110" Height="35" OnClick="OnOptimized" />
+  <CheckBox Name="chkbOptimized" Caption="Optimized" X="130" Y="-35" Width="110" Height="35" OnClick="OnOptimized" />
 
-  <CloseButton X="-120" Y="-35" Height="35"/>
+  <CloseButton X="1" Width="130" Y="-35" Height="35"/>
 
   <SymbolButton Name="btnPrev" Caption="&lt;" X="0" Y="0" Width="27" Height="27" OnClick="OnPrevClicked" />
 </Form>
