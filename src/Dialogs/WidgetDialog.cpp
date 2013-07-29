@@ -288,7 +288,7 @@ DefaultWidgetDialog(SingleWindow &parent, const DialogLook &look,
                     const TCHAR *caption, Widget &widget)
 {
   WidgetDialog dialog(look);
-  dialog.CreateAuto(parent, caption, &widget);
+  dialog.CreateFull(parent, caption, &widget);
   dialog.AddButton(_("OK"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
 

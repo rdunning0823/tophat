@@ -105,7 +105,7 @@ public:
               DialogFooter::Listener *_listener = nullptr,
               UPixelScalar footer_height = 0,
               ButtonPanel::ButtonPanelPosition button_position =
-                                 ButtonPanel::ButtonPanelPosition::Auto);
+                                 ButtonPanel::ButtonPanelPosition::Bottom);
 
   /**
    * Create a full-screen dialog.
