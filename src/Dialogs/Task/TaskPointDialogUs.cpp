@@ -65,8 +65,9 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Widget/DockWindow.hpp"
 #include "Widget/PanelWidget.hpp"
-#include "Widgets/CylinderZoneEditWidget.hpp"
+#include "Widgets/ObservationZoneSummaryWidget.hpp"
 #include "Widgets/SectorZoneEditWidget.hpp"
+#include "Widgets/CylinderZoneEditWidget.hpp"
 #include "Widgets/LineSectorZoneEditWidget.hpp"
 #include "Widgets/KeyholeZoneEditWidget.hpp"
 
@@ -77,9 +78,11 @@ Copyright_License {
 #include <assert.h>
 #include <stdio.h>
 
+
 static WndForm *wf = nullptr;
 static DockWindow *dock;
 static ObservationZoneEditWidget *properties_widget;
+static ObservationZoneSummaryWidget *properties_summary_widget;
 ListControl *wTaskPoints;
 static OrderedTask* ordered_task = nullptr;
 static OrderedTask** ordered_task_pointer = nullptr;
@@ -102,16 +105,6 @@ public:
   /* virtual methods from ListCursorHandler */
   virtual void OnCursorMoved(unsigned index) override;
 
-  /**
-   * updates the edit captions of the OZ WndProperty controls
-   */
-  //void RefreshPropertyEditCaptions(unsigned i);
-private:
-  /**
-   * updates the edit caption of a single property
-   */
-/*  TODO void RefreshPropertyEditCaption(const TCHAR* property_name,
-                                  const TCHAR *waypoint_name);*/
 };
 
 class TPOZListenerUs : public ObservationZoneEditWidget::Listener {
@@ -129,20 +122,22 @@ CreateObservationZoneEditWidget(ObservationZonePoint &oz, bool is_fai_general)
   case ObservationZone::Shape::SECTOR:
   case ObservationZone::Shape::ANNULAR_SECTOR:
   case ObservationZone::Shape::SYMMETRIC_QUADRANT:
-    return new SectorZoneEditWidget((SectorZone &)oz);
+    return new SectorZoneEditWidget((SectorZone &)oz); // 2 to 4 edits
 
   case ObservationZone::Shape::LINE:
-    return new LineSectorZoneEditWidget((LineSectorZone &)oz, !is_fai_general);
+    return new LineSectorZoneEditWidget((LineSectorZone &)oz, !is_fai_general); // 1 edit
 
   case ObservationZone::Shape::CYLINDER:
-    return new CylinderZoneEditWidget((CylinderZone &)oz, !is_fai_general);
+    return new CylinderZoneEditWidget((CylinderZone &)oz, !is_fai_general); // 1 edit
+
+  case ObservationZone::Shape::MAT_CYLINDER:
+    return new CylinderZoneEditWidget((CylinderZone &)oz, false); // 1 edit
 
   case ObservationZone::Shape::CUSTOM_KEYHOLE:
-    return new KeyholeZoneEditWidget((KeyholeZone &)oz);
+    return new KeyholeZoneEditWidget((KeyholeZone &)oz); //  3edits
 
   case ObservationZone::Shape::FAI_SECTOR:
   case ObservationZone::Shape::DAEC_KEYHOLE:
-  case ObservationZone::Shape::MAT_CYLINDER:
   case ObservationZone::Shape::BGAFIXEDCOURSE:
   case ObservationZone::Shape::BGAENHANCEDOPTION:
   case ObservationZone::Shape::BGA_START:
@@ -151,19 +146,6 @@ CreateObservationZoneEditWidget(ObservationZonePoint &oz, bool is_fai_general)
 
   return nullptr;
 }
-
-/**
- * returns true if we're using US task rules
- */
-/*
-static bool
-IsUs()
-{
-  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
-  const TaskBehaviour &tb = settings_computer.task;
-  return tb.contest_nationality == ContestNationalities::AMERICAN;
-}
-*/
 
 /**
  * returns true if task is an FAI type
@@ -210,27 +192,6 @@ OnCloseClicked(gcc_unused WndButton &Sender)
       wf->SetModalResult(mrOK);
     }
   }
-}
-
-/**
- * for FAI tasks, make the zone sizes disabled so the user can't alter them
- * @param enable
- */
-static void
-EnableSizeEdit(bool enable)
-{
-  /** TODO Make readonly property in widget */
-}
-
-/**
- * for AT and MAT tasks, the 1-mile radius is in the description, so hide
- */
-static void
-ShowSizeEdit(bool visible)
-{
-  return;
-  //TODO
-  //ShowFormControl(*wf, _T("properties"), visible);
 }
 
 static void
@@ -324,9 +285,19 @@ RefreshView()
   const bool is_fai_general =
     ordered_task->GetFactoryType() == TaskFactoryType::FAI_GENERAL;
   properties_widget = CreateObservationZoneEditWidget(oz, is_fai_general);
+  properties_summary_widget = nullptr;
   if (properties_widget != nullptr) {
+
+    properties_widget->SetWaypointName(tp.GetWaypoint().name.c_str());
     properties_widget->SetListener(&listener);
-    dock->SetWidget(properties_widget);
+
+    if (properties_widget->IsSummarized()) {
+      properties_summary_widget = new
+          ObservationZoneSummaryWidget(*properties_widget);
+      dock->SetWidget(properties_summary_widget);
+    } else {
+      dock->SetWidget(properties_widget);
+    }
   }
 
   WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
@@ -340,29 +311,16 @@ RefreshView()
 
   button_type->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
 
-
-
-  bool edit_disabled = (ordered_task->GetFactoryType() ==
-      TaskFactoryType::FAI_GENERAL) ||
-      (((ordered_task->GetFactoryType() == TaskFactoryType::MAT) ||
-        (ordered_task->GetFactoryType() == TaskFactoryType::RACING)) &&
-      (active_index != ordered_task->TaskSize() - 1 && active_index != 0));
-
-  EnableSizeEdit(!edit_disabled);
-  bool hidden = ((ordered_task->GetFactoryType() == TaskFactoryType::MAT) ||
-      (ordered_task->GetFactoryType() == TaskFactoryType::RACING)) &&
-      (active_index != ordered_task->TaskSize() - 1 && active_index != 0);
-
-  ShowSizeEdit(!hidden);
-
   Refreshing = false; // reactivate onChange routines
 }
 
-static bool
+static void
 ReadValues()
 {
-  return properties_widget == nullptr ||
+  if (properties_widget != nullptr)
     properties_widget->Save(task_modified);
+  else if (properties_summary_widget != nullptr)
+    properties_summary_widget->Save(task_modified);
 }
 
 static void 
@@ -390,8 +348,8 @@ OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
   RefreshView();
 }
 /**
-+ * shows the task browse dialog, and updates the task as needed
-+ */
+ * shows the task browse dialog, and updates the task as needed
+ */
 static void
 OnBrowseClicked(gcc_unused WndButton &Sender)
 {
@@ -564,9 +522,6 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
 
   wf->SetCaption(OrderedTaskFactoryName(xfac));
   RefreshView();
-/*  TODO
- * if (ordered_task->TaskSize() > 0)
-    dialog2.RefreshPropertyEditCaptions(0);*/
 
   wf->ShowModal();
 

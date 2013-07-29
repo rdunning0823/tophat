@@ -31,8 +31,21 @@
 class SectorZone;
 
 class SectorZoneEditWidget : public ObservationZoneEditWidget {
+
 public:
   SectorZoneEditWidget(SectorZone &_oz);
+
+  /**
+   * returns a summary of the widget's properties
+   */
+  virtual const TCHAR* GetOzSummary();
+
+  /**
+   * Is this widget encapsulated by a summary widget
+   */
+  virtual bool IsSummarized() {
+    return true;
+  }
 
 protected:
   const SectorZone &GetObject() const {

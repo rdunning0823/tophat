@@ -26,6 +26,8 @@
 
 #include "Widget/RowFormWidget.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "Util/StaticString.hpp"
+#include "Util/tstring.hpp"
 
 #include <assert.h>
 
@@ -44,6 +46,17 @@ private:
 
   Listener *listener;
 
+  /**
+   * name of the waypoint
+   */
+  StaticString<255> waypoint_name;
+
+protected:
+  /**
+   * summary text of oz
+   */
+  StaticString<255> oz_summary;
+
 public:
   ObservationZoneEditWidget(ObservationZone &_oz);
 
@@ -52,6 +65,26 @@ public:
     assert(_listener != nullptr);
 
     listener = _listener;
+  }
+
+  /**
+   * return a summary description of the widget's properties
+   */
+  virtual tstring::const_pointer GetOzSummary() = 0;
+
+  virtual void SetWaypointName(const TCHAR *name) {
+    waypoint_name = name;
+  }
+
+  virtual const TCHAR* GetWaypointName() {
+    return waypoint_name.c_str();
+  }
+
+  /**
+   * Is this widget encapsulated by a summary widget
+   */
+  virtual bool IsSummarized() {
+    return false;
   }
 
 protected:

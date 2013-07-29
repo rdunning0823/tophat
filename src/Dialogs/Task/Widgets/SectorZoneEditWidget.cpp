@@ -26,6 +26,8 @@
 #include "Engine/Task/ObservationZones/SymmetricSectorZone.hpp"
 #include "Engine/Task/ObservationZones/AnnularSectorZone.hpp"
 #include "Language/Language.hpp"
+#include "Formatter/UserUnits.hpp"
+#include "Formatter/AngleFormatter.hpp"
 
 enum Controls {
   RADIUS,
@@ -72,6 +74,31 @@ SectorZoneEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
              UnitGroup::DISTANCE, annulus.GetInnerRadius(),
              this);
   }
+}
+
+const TCHAR*
+SectorZoneEditWidget::GetOzSummary()
+{
+  const auto shape = GetObject().GetShape();
+  StaticString<25> r1;
+  FormatUserDistance(GetObject().GetRadius(), r1.buffer(), true, 1);
+  oz_summary = r1;
+
+  if (shape == ObservationZonePoint::Shape::ANNULAR_SECTOR) {
+    StaticString<25>r2;
+    const AnnularSectorZone &annulus = (const AnnularSectorZone &)GetObject();
+    FormatUserDistance(annulus.GetInnerRadius(), r2.buffer(), true, 1);
+    oz_summary.AppendFormat(_T(" / %s"), r2.c_str());
+  }
+
+  if (shape != ObservationZone::Shape::SYMMETRIC_QUADRANT) {
+    StaticString<25>a1;
+    StaticString<25>a2;
+    FormatBearing(a1.buffer(), 25, GetObject().GetStartRadial());
+    FormatBearing(a2.buffer(), 25, GetObject().GetEndRadial());
+    oz_summary.AppendFormat(_T(", %s / %s"), a1.c_str(), a2.c_str());
+  }
+  return oz_summary.c_str();
 }
 
 bool

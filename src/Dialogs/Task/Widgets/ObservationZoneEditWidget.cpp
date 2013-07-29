@@ -24,6 +24,7 @@
 #include "ObservationZoneEditWidget.hpp"
 #include "UIGlobals.hpp"
 
+
 ObservationZoneEditWidget::ObservationZoneEditWidget(ObservationZone &_oz)
   :RowFormWidget(UIGlobals::GetDialogLook()),
    oz(_oz), listener(nullptr) {}

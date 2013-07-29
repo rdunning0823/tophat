@@ -24,6 +24,8 @@
 #include "KeyholeZoneEditWidget.hpp"
 #include "Engine/Task/ObservationZones/KeyholeZone.hpp"
 #include "Language/Language.hpp"
+#include "Formatter/UserUnits.hpp"
+#include "Formatter/AngleFormatter.hpp"
 
 enum Controls {
   RADIUS,
@@ -54,6 +56,25 @@ KeyholeZoneEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddAngle(_("Angle"), nullptr,
            GetObject().GetSectorAngle(), 10, true,
            this);
+}
+
+const TCHAR*
+KeyholeZoneEditWidget::GetOzSummary()
+{
+  StaticString<25> r1;
+  FormatUserDistance(GetObject().GetRadius(), r1.buffer(), true, 1);
+  oz_summary = r1;
+
+  StaticString<25>r2;
+  FormatUserDistance(GetObject().GetInnerRadius(), r2.buffer(), true, 1);
+
+  oz_summary.AppendFormat(_T(" / %s"), r2.c_str());
+
+  StaticString<25>a1;
+  FormatBearing(a1.buffer(), 25, GetObject().GetSectorAngle());
+  oz_summary.AppendFormat(_T(", %s"), a1.c_str());
+
+  return oz_summary.c_str();
 }
 
 bool
