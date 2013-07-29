@@ -462,7 +462,7 @@ TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned Draw
 
   const DialogLook &look = UIGlobals::GetDialogLook();
 
-  const Font &name_font = *look.list.font;
+  const Font &name_font = *look.button.font;
   const Font &text_font = *look.text_font;
 
   const OrderedTaskPoint &tp = ordered_task->GetTaskPoint(DrawListIndex);
