@@ -117,7 +117,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   TCHAR dist[20], alt[20], radio[20];
   FormatUserDistanceSmart(distance, dist, true);
   FormatRelativeUserAltitude(arrival_altitude, alt, true);
-  buffer.Format(_T("%s: %s - %s: %s"), _("Distance"), dist,
+  buffer.Format(_T("%s: %s, %s: %s"), _("Distance"), dist,
                 _("Arrival Alt"), alt);
 
   if (waypoint.radio_frequency.IsDefined()) {
