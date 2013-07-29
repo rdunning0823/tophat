@@ -148,6 +148,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                          rc, info_buffer);
 }
 
+/**
+ * ARRIVAL_ALTITUDE
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const ArrivalAltitudeMapItem &item,
@@ -263,6 +266,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                          rc, buffer);
 }
 
+/**
+ * Your position
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const SelfMapItem &item,
@@ -294,6 +300,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   AircraftRenderer::Draw(canvas, settings, look, item.bearing, pt);
 }
 
+/**
+ * Airspeace
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const AirspaceMapItem &item,
@@ -305,6 +314,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                              renderer_settings);
 }
 
+/**
+ * Waypoint
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const WaypointMapItem &item,
@@ -316,6 +328,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                              dialog_look, look, renderer_settings);
 }
 
+/**
+ * Dropped Marker
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const MarkerMapItem &item, RoughTimeDelta utc_offset,
@@ -365,6 +380,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 }
 #endif
 
+/**
+ * Thermal Source
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const ThermalMapItem &item,
@@ -412,6 +430,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                          rc, buffer);
 }
 
+/**
+ *  Task OZ
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const TaskOZMapItem &item,
@@ -459,6 +480,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           item.tp_type == TaskPointType::AAT);
 }
 
+/**
+ * Flarm Traffic
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const TrafficMapItem &item,
