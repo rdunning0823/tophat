@@ -12,9 +12,9 @@
     <List Name="List" X="0" Y="39" Width="150" Height="-37"/>
 
     <Panel Name="frmType" X="152" Y="39" Width="167" Height="70" Border="1">
-      <Button Name="butType" X="2" Y="3" Width="163" Height="35" OnClick="OnTypeClicked"/>
+      <Button Name="butType" X="2" Y="2" Width="163" Height="30" OnClick="OnTypeClicked"/>
 
-      <Widget Name="properties" X="2" Y="40" Width="163" Height="26"/>
+      <Widget Name="properties" X="2" Y="35" Width="163" Height="29"/>
 
     </Panel>
 
