@@ -2319,7 +2319,7 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1024
 #, no-c-format
 msgid "Time under max. start height"
-msgstr ""
+msgstr "Start - time under max height"
 
 #: src/InfoBoxes/Content/Factory.cpp:1025
 #, no-c-format
@@ -2848,7 +2848,7 @@ msgstr ""
 #: Data/Dialogs/AirspaceList.xml:18 Data/Dialogs/AirspaceList_L.xml:12
 #: Data/Dialogs/WaypointList.xml:12 Data/Dialogs/WaypointList_L.xml:8
 msgid "Direction"
-msgstr ""
+msgstr "Dir"
 
 #: src/InfoBoxes/Panel/WindEdit.cpp:105
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:98
