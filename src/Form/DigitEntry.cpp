@@ -172,16 +172,23 @@ DigitEntry::CreateTime(ContainerWindow &parent, const PixelRect &rc,
 }
 
 void
+DigitEntry::OnResize(PixelSize new_size)
+{
+  PaintWindow::OnResize(new_size);
+  CalculateLayout();
+}
+
+void
 DigitEntry::CalculateLayout()
 {
-  const UPixelScalar control_height = Layout::GetMaximumControlHeight();
-  const UPixelScalar padding = 0;//Layout::GetTextPadding();
-  const UPixelScalar min_value_height = control_height * 3 / 2;
+  const UPixelScalar control_height =
+      std::min((UPixelScalar)(Layout::GetMaximumControlHeight()),
+               (UPixelScalar)(GetHeight() / 3));
 
-  PixelSize digit_size = look.text_font->TextSize(_T("8"));
-  digit_size.cy += 2 * padding;
-  if (digit_size.cy < (PixelScalar)min_value_height)
-    digit_size.cy = min_value_height;
+  const UPixelScalar padding = 0;
+
+  PixelSize digit_size;
+  digit_size.cy = digit_size.cx = control_height;
 
   top = control_height;
   bottom = top + digit_size.cy;
@@ -190,9 +197,9 @@ DigitEntry::CalculateLayout()
   for (unsigned i = 0; i < length; ++i) {
     Column &digit = columns[i];
 
-    PixelScalar value_width = digit.GetWidth() * digit_size.cx;
+    PixelScalar value_width = (PixelScalar)(digit.GetWidth() * fixed(digit_size.cx));
     value_width += 2 * padding;
-    if (value_width < (PixelScalar)control_height)
+    if (value_width < (PixelScalar)control_height / 2)
       value_width = control_height;
 
     raw_total_width += value_width;
@@ -206,13 +213,12 @@ DigitEntry::CalculateLayout()
   for (unsigned i = 0; i < length; ++i) {
     Column &digit = columns[i];
 
-    PixelScalar value_width = digit.GetWidth() * digit_size.cx;
+    PixelScalar value_width = (PixelScalar)(digit.GetWidth() * fixed(digit_size.cx));
     value_width += 2 * padding;
-    if (value_width < (PixelScalar)control_height)
+    if (value_width < (PixelScalar)control_height / 2)
       value_width = control_height;
 
     value_width = (PixelScalar)(fixed(value_width) * max_width_ratio);
-
     digit.left = last_right;
     last_right = digit.right = digit.left + value_width;
   }
@@ -835,7 +841,8 @@ DigitEntry::OnPaint(Canvas &canvas)
   canvas.SetBackgroundTransparent();
   canvas.SetTextColor(look.text_color);
 
-  unsigned control_height = Layout::GetMaximumControlHeight();
+  // top is effectively the height of the digit text box
+  unsigned control_height = top;
 
   PixelRect plus_rc(0, top - control_height, 0, top);
   PixelRect minus_rc(0, bottom, 0, bottom + control_height);

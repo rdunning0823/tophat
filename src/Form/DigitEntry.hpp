@@ -106,9 +106,12 @@ class DigitEntry : public PaintWindow {
      * Returns the number characters that this column can have.
      * Used for calculating the pixel-based width of the column.
      */
-    constexpr unsigned GetWidth() const {
-      return type == Type::UNIT ? 4 :
-             type == Type::HOUR || type == Type::DIGIT19 || type == Type::DIGIT36 ? 2 : 1;
+    constexpr fixed GetWidth() const {
+      return type == Type::UNIT ? fixed(4) :
+             type == Type::HOUR || type == Type::DIGIT19 ||
+             type == Type::DIGIT36 ? fixed(1) :
+             type == Type::APOSTROPHE || type == Type::DEGREES ?
+             fixed(0.5) : fixed(1);
     }
   };
 
@@ -272,6 +275,7 @@ protected:
   virtual bool OnKeyCheck(unsigned key_code) const override;
   virtual bool OnKeyDown(unsigned key_code) override;
   virtual void OnPaint(Canvas &canvas) override;
+  virtual void OnResize(PixelSize new_size) override;
 };
 
 #endif
