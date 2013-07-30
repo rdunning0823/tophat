@@ -656,7 +656,7 @@ msgstr ""
 #: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:18 Data/Dialogs/dlgTarget.xml:18
 #: Data/Dialogs/dlgTarget_L.xml:11
 msgid "Distance"
-msgstr ""
+msgstr "Dist"
 
 #: src/Gauge/BigTrafficWidget.cpp:425 src/Gauge/BigTrafficWidget.cpp:428
 msgid "Rel. Alt."
