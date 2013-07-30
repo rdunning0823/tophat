@@ -767,7 +767,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxSpeed,
     e_Horizon,
     e_WP_BearingDiff, // Bearing Diff
-    Category::DEPRECATED,
+    Category::STANDARD,
   },
 
   // e_Team_Code
