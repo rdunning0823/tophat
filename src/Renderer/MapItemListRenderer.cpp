@@ -237,7 +237,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   buffer += _("Arrival Alt");
 
   // Draw title row
-  canvas.Select(name_font);
+  canvas.Select(text_font);
   canvas.DrawClippedText(left, rc.top + text_padding, rc, buffer);
 
   // Format comment row
@@ -260,7 +260,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   // Draw comment row
 
-  canvas.Select(text_font);
+  canvas.Select(name_font);
   canvas.DrawClippedText(left,
                          rc.top + name_font.GetHeight() + 2 * text_padding,
                          rc, buffer);
