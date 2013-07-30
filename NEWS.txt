@@ -2,8 +2,12 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.0.7 Beta 7/25/2013
-* Task Manager: Add "back" button (US rules only)
+* Task Manager:
+ - Add Back button
+ - Support for FAI and US rules
 * Flarm Traffic: make units friendly for miles
+* Alternates InfoBox fullscreen look
+* Map list - fixed truncated text
 * Map 
  - smooth dragging of pan 
  - draw bearing images instead of chevrons on TaskNav bar 
@@ -15,6 +19,7 @@ TopHat 1.0.7 Beta 7/25/2013
   Add no-online contest option, and prevent from consuming CPU
 * Replay - show most recent flights first
 * Add "English" language so we can modify English terms without breaking translations
+ - fixed many terms
 * merge XCSoar 6.6.4
   * calculations
    - improve robustness of the zig-zag wind algorithm (#2961)
