@@ -197,8 +197,8 @@ FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,
   canvas.DrawPolygon(GlideBar, 6);
 
   // draw clipping arrow
-  if ((altitude_difference <= -468 ) || (altitude_difference >= 468))
-    canvas.DrawPolygon(clipping_arrow, 6);
+//  if ((altitude_difference <= -468 ) || (altitude_difference >= 468))
+//    canvas.DrawPolygon(clipping_arrow, 6);
 
   // draw glide bar at mc 0
   if (altitude_difference0 <= 0 && final_glide_bar_mc0_enabled) {
