@@ -3134,7 +3134,7 @@ msgstr ""
 
 #: src/Renderer/MapItemListRenderer.cpp:279
 msgid "Your Position"
-msgstr ""
+msgstr "Your position"
 
 #: src/Renderer/MapItemListRenderer.cpp:338
 msgid "Marker"
