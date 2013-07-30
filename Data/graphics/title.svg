@@ -13,8 +13,8 @@
    height="15"
    id="svg3040"
    version="1.1"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="title_red.svg">
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="title.svg">
   <defs
      id="defs3042">
     <inkscape:perspective
@@ -59,10 +59,10 @@
      inkscape:document-units="px"
      inkscape:current-layer="layer4"
      showgrid="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="848"
-     inkscape:window-x="1272"
-     inkscape:window-y="-8"
+     inkscape:window-width="1600"
+     inkscape:window-height="787"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata3045">
@@ -72,7 +72,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -119,6 +119,6 @@
          id="tspan9395-4-7-2"
          x="75.117584"
          y="11.463054"
-         style="font-size:17.06489754px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">1.0</tspan></text>
+         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">1.1</tspan></text>
   </g>
 </svg>
