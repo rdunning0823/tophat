@@ -234,7 +234,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     buffer.clear();
   }
 
-  buffer += _("Arrival altitude");
+  buffer += _("Arrival Alt");
 
   // Draw title row
   canvas.Select(name_font);

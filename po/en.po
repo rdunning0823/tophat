@@ -3179,7 +3179,7 @@ msgstr ""
 
 #: src/Renderer/WaypointListRenderer.cpp:121
 msgid "Arrival Alt"
-msgstr ""
+msgstr "Arrival alt"
 
 #: src/MapWindow/GlueMapWindowItems.cpp:101
 msgid "There is nothing interesting near this location."
