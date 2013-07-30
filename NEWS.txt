@@ -1,7 +1,7 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 1.0.7 Beta 7/31/2013
+TopHat 1.1.7 Beta 7/31/2013
 * Task Manager:
  - Add Back button
  - Support for FAI and US rules
