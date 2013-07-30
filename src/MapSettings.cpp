@@ -62,8 +62,8 @@ MapSettings::SetDefaults()
   show_flarm_on_map = true;
   show_flarm_alarm_level = true;
   show_thermal_profile = true;
-  final_glide_bar_mc0_enabled = true;
-  final_glide_bar_display_mode = FinalGlideBarDisplayMode::OFF;
+  final_glide_bar_mc0_enabled = false;
+  final_glide_bar_display_mode = FinalGlideBarDisplayMode::ON;
   vario_bar_enabled = false;
   show_fai_triangle_areas = false;
 

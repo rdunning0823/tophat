@@ -97,23 +97,8 @@ GaugesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Thermal band"),
              _("This enables the display of the thermal profile (climb band) display on the map."),
              map_settings.show_thermal_profile);
-
-  AddEnum(_("Final glide bar"),
-          _("If set to \"On\" the final glide will always be shown, if set to \"Auto\" it will be shown when approaching the final glide possibility."),
-          final_glide_bar_display_mode_list,
-          (unsigned)map_settings.final_glide_bar_display_mode,
-          this);
-  SetExpertRow(FinalGlideBarDisplayModeControl);
-
-  AddBoolean(_("Final glide bar MC0"),
-             _("If set to ON the final glide bar will show a second arrow indicating the required height "
-                 "to reach the final waypoint at MC zero."),
-             map_settings.final_glide_bar_mc0_enabled);
-  SetExpertRow(EnableFinalGlideBarMC0);
-
-  SetRowVisible(EnableFinalGlideBarMC0,
-                map_settings.final_glide_bar_display_mode !=
-                  FinalGlideBarDisplayMode::OFF);
+  AddDummy();
+  AddDummy();
 
   AddBoolean(_("Vario bar"),
              _("If set to ON the vario bar will be shown"),
@@ -141,13 +126,6 @@ GaugesConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(EnableThermalProfile, ProfileKeys::EnableThermalProfile,
                        map_settings.show_thermal_profile);
-
-  changed |= SaveValueEnum(FinalGlideBarDisplayModeControl,
-                           ProfileKeys::FinalGlideBarDisplayMode,
-                           map_settings.final_glide_bar_display_mode);
-
-  changed |= SaveValue(EnableFinalGlideBarMC0, ProfileKeys::EnableFinalGlideBarMC0,
-                       map_settings.final_glide_bar_mc0_enabled);
 
   changed |= SaveValue(EnableVarioBar, ProfileKeys::EnableVarioBar,
                        map_settings.vario_bar_enabled);

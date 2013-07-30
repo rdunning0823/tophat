@@ -11,6 +11,7 @@ TopHat 1.1.7 Beta 7/31/2013
 * Map 
  - smooth dragging of pan 
  - draw bearing images instead of chevrons on TaskNav bar 
+ - Simplify final glide bar
 * QuickSetup: add nationality for task rules, units and language
 * Plane list: clean up display
 * InfoBoxes:
