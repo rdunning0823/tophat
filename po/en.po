@@ -3101,7 +3101,7 @@ msgstr ""
 #: src/Renderer/WaypointListRenderer.cpp:56
 #: src/Dialogs/Waypoint/WaypointInfoWidget.cpp:141
 msgid "Elevation"
-msgstr ""
+msgstr "Elev"
 
 #: src/Renderer/MapItemListRenderer.cpp:213
 #: src/Renderer/MapItemListRenderer.cpp:238
