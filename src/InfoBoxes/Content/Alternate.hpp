@@ -26,7 +26,7 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
-class InfoBoxContentAlternateName : public InfoBoxContentTabbed
+class InfoBoxContentAlternateName : public InfoBoxContent
 {
 public:
   InfoBoxContentAlternateName(const unsigned _index)
@@ -39,7 +39,7 @@ private:
   unsigned index;
 };
 
-class InfoBoxContentAlternateGR : public InfoBoxContentTabbed
+class InfoBoxContentAlternateGR : public InfoBoxContent
 {
 public:
   InfoBoxContentAlternateGR(const unsigned _index)

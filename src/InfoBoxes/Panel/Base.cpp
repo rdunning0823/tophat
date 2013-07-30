@@ -260,6 +260,18 @@ RatchetListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
 }
 
 void
+TwoCommandButtonListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  const UPixelScalar height = GetFooterHeight();
+  list_rc = left_button_rc = right_button_rc = rc;
+
+  left_button_rc.top = right_button_rc.top = rc.bottom - height;
+  left_button_rc.right = right_button_rc.left = (rc.right - rc.left) / 2;
+
+  list_rc.bottom = rc.bottom - height;
+}
+
+void
 TwoButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   upper_rc = rc;

@@ -34,7 +34,7 @@ class WidgetDialog;
 class Canvas;
 struct DialogLook;
 
-class AlternatesListWidget final
+class AlternatesListWidget
   : public ListWidget, private ActionListener {
   enum Buttons {
     SETTINGS,

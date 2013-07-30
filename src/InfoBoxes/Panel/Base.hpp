@@ -211,6 +211,36 @@ protected:
 };
 
 /**
+ * A layout with a list and two command buttons under it;
+ * E.g. For alternates list with "Goto" and "Details" below.
+ */
+class TwoCommandButtonListLayout {
+protected:
+  /**
+   * left button below the list
+   */
+  PixelRect left_button_rc;
+
+  /**
+   * right button below the list.
+   */
+  PixelRect right_button_rc;
+
+  /**
+   * The list is in the upper area
+   */
+  PixelRect list_rc;
+
+protected:
+  /*
+   * Sizes the rectangles for the layout in the center
+   * of the rc
+   * @param parent_rc The rc of the parent window's usable area
+   */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+};
+
+/**
  *  Base class that sizes the rectangles needed to layout
  *  two buttons or frames of button size in the middle of the
  *  box, full width.

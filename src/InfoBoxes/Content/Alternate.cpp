@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Alternate.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
+#include "InfoBoxes/Panel/AlternateFullScreen.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
@@ -36,15 +37,10 @@ Copyright_License {
 #include <stdio.h>
 #include <tchar.h>
 
-static Widget *
-LoadAlternatesPanel(unsigned id)
-{
-  return new CallbackWidget(dlgAlternatesListShowModal);
-}
 
 static constexpr
 InfoBoxPanel alternate_infobox_panels[] = {
-  { N_("Alternates"), LoadAlternatesPanel },
+  { N_("Alternates"), LoadAlternatesPanelFullScreen },
   { nullptr, nullptr }
 };
 
