@@ -347,7 +347,9 @@ static void UpdateTaskDefaults(OrderedTask &task)
 void
 TaskManagerDialogUs::SaveTask()
 {
-  active_task->GetFactory().CheckAddFinish();
+  active_task->ScanStartFinish();
+  if (active_task->GetFactory().CheckAddFinish())
+    active_task->ScanStartFinish();
 
   if (active_task->CheckTask()) {
     if (!OrderedTaskSave(*active_task))
@@ -368,7 +370,8 @@ TaskManagerDialogUs::CommitTaskChanges()
 
   // Assume that CheckGeometry() has been called since last change to task
   active_task->ScanStartFinish();
-  active_task->GetFactory().CheckAddFinish();
+  if (active_task->GetFactory().CheckAddFinish())
+    active_task->ScanStartFinish();
 
   if (!active_task->TaskSize() || active_task->CheckTask()) {
 
