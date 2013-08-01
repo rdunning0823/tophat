@@ -708,8 +708,7 @@ FlarmTrafficWindow::OnPaint(Canvas &canvas)
 {
 #ifdef ENABLE_OPENGL
   if (small) {
-    GLEnable blend(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     canvas.SelectBlackPen();
     canvas.Select(Brush(look.background_color.WithAlpha(0xd0)));

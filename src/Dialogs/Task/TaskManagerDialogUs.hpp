@@ -44,7 +44,7 @@ enum Controls {
 };
 
 
-void TaskManagerDialogUsShowModal(SingleWindow &parent);
+void TaskManagerDialogUsShowModal();
 
 class TaskManagerDialogUs : public NullWidget, public WndForm
 {

@@ -28,6 +28,7 @@ Copyright_License {
 #include "K6BtPort.hpp"
 #include "Profile/DeviceConfig.hpp"
 #include "Android/Nook.hpp"
+#include "Device/Config.hpp"
 #include "LogFile.hpp"
 
 #ifdef _WIN32_WCE

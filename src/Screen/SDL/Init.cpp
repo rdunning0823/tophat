@@ -24,6 +24,9 @@ Copyright_License {
 #include "Screen/Init.hpp"
 #include "Screen/Debug.hpp"
 #include "Screen/Font.hpp"
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
+#include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Init.hpp"
@@ -31,8 +34,6 @@ Copyright_License {
 
 #ifdef USE_FREETYPE
 #include "Screen/FreeType/Init.hpp"
-#else
-#include <SDL_ttf.h>
 #endif
 
 #include <SDL.h>
@@ -42,10 +43,17 @@ Copyright_License {
 
 ScreenGlobalInit::ScreenGlobalInit()
 {
-  if (::SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER) != 0) {
+  Uint32 flags = SDL_INIT_VIDEO;
+  if (!IsKobo())
+    flags |= SDL_INIT_AUDIO;
+
+  if (::SDL_Init(flags) != 0) {
     fprintf(stderr, "SDL_Init() has failed: %s\n", ::SDL_GetError());
     exit(EXIT_FAILURE);
   }
+
+  if (HasTouchScreen())
+    SDL_ShowCursor (SDL_FALSE);
 
   ::SDL_EnableKeyRepeat(250, 50);
   ::SDL_EnableUNICODE(true);
@@ -59,28 +67,26 @@ ScreenGlobalInit::ScreenGlobalInit()
 
 #ifdef USE_FREETYPE
   FreeType::Initialise();
-#else
-  if (::TTF_Init() != 0) {
-    fprintf(stderr, "TTF_Init() has failed\n");
-    exit(EXIT_FAILURE);
-  }
 #endif
 
   Font::Initialise();
+
+  event_queue = new EventQueue();
 
   ScreenInitialized();
 }
 
 ScreenGlobalInit::~ScreenGlobalInit()
 {
+  delete event_queue;
+  event_queue = nullptr;
+
 #ifdef ENABLE_OPENGL
   OpenGL::Deinitialise();
 #endif
 
 #ifdef USE_FREETYPE
   FreeType::Deinitialise();
-#else
-  ::TTF_Quit();
 #endif
 
   ::SDL_Quit();

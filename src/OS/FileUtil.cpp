@@ -30,6 +30,7 @@ Copyright_License {
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 #ifdef HAVE_POSIX
 #include <dirent.h>
@@ -387,4 +388,76 @@ File::Touch(const TCHAR *path)
 
   return result;
 #endif
+}
+
+bool
+File::ReadString(const TCHAR *path, char *buffer, size_t size)
+{
+  assert(path != nullptr);
+  assert(buffer != nullptr);
+  assert(size > 0);
+
+  int flags = O_RDONLY;
+#ifdef O_NOCTTY
+  flags |= O_NOCTTY;
+#endif
+#ifdef O_CLOEXEC
+  flags |= O_CLOEXEC;
+#endif
+
+  int fd = _topen(path, flags);
+  if (fd < 0)
+    return false;
+
+  ssize_t nbytes = read(fd, buffer, size - 1);
+  close(fd);
+  if (nbytes < 0)
+    return false;
+
+  buffer[nbytes] = '\0';
+  return true;
+}
+
+bool
+File::WriteExisting(const TCHAR *path, const char *value)
+{
+  assert(path != nullptr);
+  assert(value != nullptr);
+
+  int flags = O_WRONLY;
+#ifdef O_NOCTTY
+  flags |= O_NOCTTY;
+#endif
+#ifdef O_CLOEXEC
+  flags |= O_CLOEXEC;
+#endif
+
+  int fd = _topen(path, flags);
+  if (fd < 0)
+    return false;
+
+  const size_t length = strlen(value);
+  ssize_t nbytes = write(fd, value, length);
+  return close(fd) == 0 && nbytes == (ssize_t)length;
+}
+
+bool
+File::CreateExclusive(const TCHAR *path)
+{
+  assert(path != nullptr);
+
+  int flags = O_WRONLY | O_CREAT | O_EXCL;
+#ifdef O_NOCTTY
+  flags |= O_NOCTTY;
+#endif
+#ifdef O_CLOEXEC
+  flags |= O_CLOEXEC;
+#endif
+
+  int fd = _topen(path, flags, 0666);
+  if (fd < 0)
+    return false;
+
+  close(fd);
+  return true;
 }

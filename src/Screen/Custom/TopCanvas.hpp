@@ -24,13 +24,35 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_TOP_CANVAS_HPP
 #define XCSOAR_SCREEN_TOP_CANVAS_HPP
 
+#include "Compiler.h"
+
+#ifdef USE_MEMORY_CANVAS
+#include "Screen/Memory/PixelTraits.hpp"
+#include "Screen/Memory/Buffer.hpp"
+#else
 #include "Screen/Canvas.hpp"
+#endif
 
 #ifdef USE_EGL
 #include "Screen/EGL/System.hpp"
 #endif
 
-class TopCanvas : public Canvas {
+#ifdef DITHER
+#include "../Memory/Dither.hpp"
+#endif
+
+#include <stdint.h>
+
+struct SDL_Surface;
+class Canvas;
+struct PixelSize;
+struct PixelRect;
+
+class TopCanvas
+#ifndef USE_MEMORY_CANVAS
+  : public Canvas
+#endif
+{
 #ifdef USE_EGL
 #ifdef USE_X11
   X11Window x_window;
@@ -40,6 +62,8 @@ class TopCanvas : public Canvas {
   DISPMANX_UPDATE_HANDLE_T vc_update;
   DISPMANX_ELEMENT_HANDLE_T vc_element;
   EGL_DISPMANX_WINDOW_T vc_window;
+#elif defined(HAVE_MALI)
+  struct mali_native_window mali_native_window;
 #endif
 
   EGLDisplay display;
@@ -47,13 +71,84 @@ class TopCanvas : public Canvas {
   EGLSurface surface;
 #endif
 
+#ifdef USE_MEMORY_CANVAS
+#ifdef ENABLE_SDL
+  SDL_Surface *surface;
+#endif
+
+#ifdef GREYSCALE
+  WritableImageBuffer<GreyscalePixelTraits> buffer;
+
+#ifdef DITHER
+  Dither dither;
+#endif
+#else
+
+  WritableImageBuffer<BGRAPixelTraits> buffer;
+
+#endif
+#endif
+
+#ifdef USE_FB
+  int fd;
+
+  void *map;
+  unsigned map_pitch, map_bpp;
+
+  uint32_t epd_update_marker;
+#endif
+
 public:
-#ifdef USE_EGL
+#ifdef USE_FB
+  TopCanvas():fd(-1), map(nullptr) {}
+#endif
+
+#if defined(USE_FB) || defined(USE_VFB)
+  ~TopCanvas() {
+    Destroy();
+  }
+#elif defined(USE_EGL) || (defined(USE_MEMORY_CANVAS) && defined(GREYSCALE))
   ~TopCanvas();
+#endif
+
+  void Destroy();
+
+#ifdef USE_MEMORY_CANVAS
+  bool IsDefined() const {
+#ifdef ENABLE_SDL
+    return surface != nullptr;
+#elif defined(USE_VFB)
+    return true;
+#else
+    return fd >= 0;
+#endif
+  }
+
+  gcc_pure
+  PixelRect GetRect() const;
 #endif
 
   void Create(PixelSize new_size,
               bool full_screen, bool resizable);
+
+#ifdef USE_FB
+  /**
+   * Check if the screen has been resized.
+   *
+   * @return true if the screen has been resized
+   */
+  bool CheckResize();
+
+  gcc_pure
+  unsigned GetWidth() const {
+    return buffer.width;
+  }
+
+  gcc_pure
+  unsigned GetHeight() const {
+    return buffer.height;
+  }
+#endif
 
 #ifdef ENABLE_OPENGL
   /**
@@ -70,7 +165,19 @@ public:
   void Fullscreen();
 #endif
 
+#ifdef USE_MEMORY_CANVAS
+  Canvas Lock();
+  void Unlock();
+#endif
+
   void Flip();
+
+#ifdef KOBO
+  /**
+   * Wait until the screen update is complete.
+   */
+  void Wait();
+#endif
 };
 
 #endif

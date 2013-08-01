@@ -37,20 +37,17 @@ class Pen;
 struct Color;
 
 bool
-Segment(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
+Segment(Canvas &canvas, int x, int y, unsigned radius,
         Angle start, Angle end, bool horizon=false);
 
 bool
-Annulus(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
-        Angle start, Angle end, UPixelScalar inner_radius);
+Annulus(Canvas &canvas, int x, int y, unsigned radius,
+        Angle start, Angle end, unsigned inner_radius);
 
 bool
-KeyHole(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
-        Angle start, Angle end, UPixelScalar inner_radius);
+KeyHole(Canvas &canvas, int x, int y, unsigned radius,
+        Angle start, Angle end, unsigned inner_radius);
 
-void
-RoundRect(Canvas &canvas, PixelScalar left, PixelScalar top,
-          PixelScalar right, PixelScalar bottom, UPixelScalar radius);
 #ifdef ENABLE_OPENGL
 /**
  * draws fancy button
@@ -59,5 +56,8 @@ void DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
                      const Pen &light_border_pen, Color background_color,
                      bool focused, bool pressed, bool transparent);
 #endif
+void
+RoundRect(Canvas &canvas, int left, int top,
+          int right, int bottom, unsigned radius);
 
 #endif

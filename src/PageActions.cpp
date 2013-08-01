@@ -177,17 +177,89 @@ PageActions::Prev()
   RestoreMapZoom();
 }
 
-void
-PageActions::LoadLayout(const PageLayout &layout)
+static void
+LoadMain(PageLayout::Main main)
+{
+  switch (main) {
+  case PageLayout::Main::MAP:
+    CommonInterface::main_window->ActivateMap();
+    break;
+
+  case PageLayout::Main::FLARM_RADAR:
+    UIActions::ShowTrafficRadar();
+    break;
+
+  case PageLayout::Main::THERMAL_ASSISTANT:
+    UIActions::ShowThermalAssistant();
+    break;
+
+  case PageLayout::Main::HORIZON:
+    UIActions::ShowHorizon();
+    break;
+
+  case PageLayout::Main::MAX:
+    gcc_unreachable();
+  }
+}
+
+static void
+LoadBottom(PageLayout::Bottom bottom)
+{
+  switch (bottom) {
+  case PageLayout::Bottom::NOTHING:
+    CommonInterface::main_window->SetBottomWidget(nullptr);
+    break;
+
+  case PageLayout::Bottom::CROSS_SECTION:
+    CommonInterface::main_window->SetBottomWidget(new CrossSectionWidget());
+    break;
+
+  case PageLayout::Bottom::CUSTOM:
+    /* don't touch */
+    break;
+
+  case PageLayout::Bottom::MAX:
+    gcc_unreachable();
+  }
+}
+
+static void
+LoadInfoBoxes(const PageLayout::InfoBoxConfig &config)
 {
   UIState &ui_state = CommonInterface::SetUIState();
 
+  if (!config.enabled) {
+    CommonInterface::main_window->SetFullScreen(true);
+    ui_state.auxiliary_enabled = false;
+  } else {
+    if (!config.auto_switch && config.panel < InfoBoxSettings::MAX_PANELS) {
+      CommonInterface::main_window->SetFullScreen(false);
+      ui_state.auxiliary_enabled = true;
+      ui_state.auxiliary_index = config.panel;
+    }
+    else {
+      CommonInterface::main_window->SetFullScreen(false);
+      ui_state.auxiliary_enabled = false;
+    }
+  }
+}
+
+void
+PageActions::LoadLayout(const PageLayout &layout)
+{
   if (!layout.valid)
     return;
 
   DisablePan();
 
+  LoadInfoBoxes(layout.infobox_config);
+
+  if (layout.main == PageLayout::Main::MAP) {
+    LoadBottom(layout.bottom);
+  }
+
   // don't allow IBs w/ Flarm
+  UIState &ui_state = CommonInterface::SetUIState();
   if (!layout.infobox_config.enabled ||
       layout.main == PageLayout::Main::FLARM_RADAR) {
     CommonInterface::main_window->SetFullScreen(true);
@@ -204,40 +276,7 @@ PageActions::LoadLayout(const PageLayout &layout)
       ui_state.auxiliary_enabled = false;
     }
   }
-
-  // only allow bottom widget if MAP is displayed
-  if (layout.main == PageLayout::Main::MAP) {
-    switch (layout.bottom) {
-    case PageLayout::Bottom::NOTHING:
-      CommonInterface::main_window->SetBottomWidget(nullptr);
-      break;
-
-    case PageLayout::Bottom::CROSS_SECTION:
-      CommonInterface::main_window->SetBottomWidget(new CrossSectionWidget());
-      break;
-    case PageLayout::Bottom::MAX:
-      gcc_unreachable();
-    }
-  } else
-    CommonInterface::main_window->SetBottomWidget(nullptr);
-
-
-  switch (layout.main) {
-  case PageLayout::Main::MAP:
-    CommonInterface::main_window->ActivateMap();
-    break;
-
-  case PageLayout::Main::FLARM_RADAR:
-    UIActions::ShowTrafficRadar();
-    break;
-
-  case PageLayout::Main::THERMAL_ASSISTANT:
-    UIActions::ShowThermalAssistant();
-    break;
-
-  case PageLayout::Main::MAX:
-    gcc_unreachable();
-  }
+  LoadMain(layout.main);
 
   ActionInterface::UpdateDisplayMode();
   ActionInterface::SendUIState();
@@ -271,6 +310,24 @@ void
 PageActions::DeferredRestore()
 {
   CommonInterface::main_window->DeferredRestorePage();
+}
+
+void
+PageActions::RestoreBottom()
+{
+  PageLayout &special_page = CommonInterface::SetUIState().pages.special_page;
+  if (!special_page.IsDefined())
+    return;
+
+  const PageLayout &configured_page = GetConfiguredLayout();
+  if (special_page.bottom == configured_page.bottom)
+    return;
+
+  special_page.bottom = configured_page.bottom;
+  if (special_page == configured_page)
+    special_page.SetUndefined();
+
+  LoadBottom(configured_page.bottom);
 }
 
 GlueMapWindow *
@@ -337,4 +394,16 @@ PageActions::ShowThermalAssistant()
     layout.bottom = PageLayout::Bottom::NOTHING;
     OpenLayout(layout);
   }
+}
+
+void
+PageActions::SetCustomBottom(Widget *widget)
+{
+  assert(widget != nullptr);
+
+  PagesState &state = CommonInterface::SetUIState().pages;
+
+  state.special_page = GetCurrentLayout();
+  state.special_page.bottom = PageLayout::Bottom::CUSTOM;
+  CommonInterface::main_window->SetBottomWidget(widget);
 }

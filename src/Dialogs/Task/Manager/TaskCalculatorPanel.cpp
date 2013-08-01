@@ -28,6 +28,7 @@ Copyright_License {
 #include "ActionInterface.hpp"
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Formatter/TimeFormatter.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Button.hpp"
 #include "Form/DataField/Float.hpp"
@@ -60,12 +61,12 @@ TaskCalculatorPanel::Refresh()
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   StaticString<32> time;
 
-  SetRowVisible(AAT_TIME, common_stats.ordered_has_targets);
+  SetRowVisible(AAT_TIME, task_stats.has_targets);
   FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
   SetText(AAT_TIME, time.c_str());
 
-  SetRowVisible(AAT_ESTIMATED, common_stats.ordered_has_targets);
-  if (common_stats.ordered_has_targets) {
+  SetRowVisible(AAT_ESTIMATED, task_stats.has_targets);
+  if (task_stats.has_targets) {
     FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
     SetText(AAT_ESTIMATED, time.c_str());
   }

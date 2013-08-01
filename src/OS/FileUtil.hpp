@@ -180,6 +180,30 @@ namespace File
    * @return True in case of success, False otherwise
    */
   bool Touch(const TCHAR *path);
+
+  /**
+   * Read data from a file and null-terminate it.
+   *
+   * @param size the size of the buffer, including space for the null
+   * terminator
+   * @return false on error
+   */
+  bool ReadString(const TCHAR *path, char *buffer, size_t size);
+
+  /**
+   * Write a string to an existing file.  It will never create a new
+   * file or truncate the existing file.  This function may be useful
+   * for writing sysfs files.
+   */
+  bool WriteExisting(const TCHAR *path, const char *value);
+
+  /**
+   * Create a file with the given name, and leave it empty.
+   *
+   * @return true on success, false on error or if the file already
+   * exists
+   */
+  bool CreateExclusive(const TCHAR *path);
 }
 
 #endif

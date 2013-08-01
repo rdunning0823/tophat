@@ -32,6 +32,7 @@ Copyright_License {
 #include "Util/StringUtil.hpp"
 #include "Util/Macros.hpp"
 #include "Look/DialogLook.hpp"
+#include "Event/Globals.hpp"
 
 #ifndef USE_GDI
 #include "Screen/Custom/Reference.hpp"
@@ -42,16 +43,14 @@ Copyright_License {
 #endif
 
 #ifdef ANDROID
-#include "Android/Main.hpp"
-#include "Event/Android/Event.hpp"
+#include "Event/Shared/Event.hpp"
 #include "Event/Android/Loop.hpp"
 #elif defined(ENABLE_SDL)
 #include "Event/SDL/Event.hpp"
 #include "Event/SDL/Loop.hpp"
-#elif defined(USE_EGL)
-#include "Event/EGL/Globals.hpp"
-#include "Event/EGL/Event.hpp"
-#include "Event/EGL/Loop.hpp"
+#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#include "Event/Shared/Event.hpp"
+#include "Event/Console/Loop.hpp"
 #elif defined(USE_GDI)
 #include "Event/GDI/Event.hpp"
 #include "Event/GDI/Loop.hpp"
@@ -228,6 +227,16 @@ WndForm::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     if (new_position.top < 0)
       new_position.Offset(0, -new_position.top);
 
+#ifdef USE_MEMORY_CANVAS
+    /* the RasterCanvas class doesn't clip negative window positions
+       properly, therefore we avoid this problem at this stage */
+    if (new_position.left < 0)
+      new_position.left = 0;
+
+    if (new_position.top < 0)
+      new_position.top = 0;
+#endif
+
     Move(new_position.left, new_position.top);
 
     return true;
@@ -390,12 +399,10 @@ WndForm::ShowModal()
   main_window.Refresh();
 #endif
 
-#if defined(ANDROID) || defined(USE_EGL)
+#if defined(ANDROID) || defined(USE_CONSOLE) || defined(ENABLE_SDL) || defined(NON_INTERACTIVE)
   EventLoop loop(*event_queue, main_window);
-#elif defined(ENABLE_SDL)
-  EventLoop loop(main_window);
 #else
-  DialogEventLoop loop(*this);
+  DialogEventLoop loop(*event_queue, *this);
 #endif
   Event event;
 
@@ -418,12 +425,12 @@ WndForm::ShowModal()
     }
 
     if (event.IsKeyDown()) {
-      if (key_down_function &&
+      if (
 #ifdef USE_GDI
           IdentifyDescendant(event.msg.hwnd) &&
 #endif
           !CheckSpecialKey(this, event) &&
-          key_down_function(event.GetKeyCode()))
+          OnAnyKeyDown(event.GetKeyCode()))
         continue;
 
 #ifdef ENABLE_SDL
@@ -472,6 +479,14 @@ WndForm::ShowModal()
         continue;
       }
 #endif
+
+#ifdef USE_LINUX_INPUT
+      if (event.GetKeyCode() == KEY_POWER) {
+        /* the Kobo power button closes the modal dialog */
+        modal_result = mrCancel;
+        continue;
+      }
+#endif
     }
 
     if (event.IsCharacter() && character_function &&
@@ -505,7 +520,7 @@ WndForm::OnPaint(Canvas &canvas)
 #ifdef ENABLE_OPENGL
   if (!IsMaximised() && is_active) {
     /* draw a shade around the current dialog to emphasise it */
-    GLEnable blend(GL_BLEND);
+    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnableClientState(GL_COLOR_ARRAY);
 
     const PixelRect rc = GetClientRect();
@@ -595,8 +610,7 @@ WndForm::OnPaint(Canvas &canvas)
 
   if (dragging) {
 #ifdef ENABLE_OPENGL
-    GLEnable blend(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     canvas.DrawFilledRectangle(0, 0, canvas.GetWidth(), canvas.GetHeight(),
                                COLOR_YELLOW.WithAlpha(80));
 #elif defined(USE_GDI)
@@ -639,8 +653,23 @@ WndForm::ReinitialiseLayout()
     if (GetBottom() > (PixelScalar) main_window.GetHeight())
       top = main_window.GetHeight() - GetHeight();
 
+#ifdef USE_MEMORY_CANVAS
+    /* the RasterCanvas class doesn't clip negative window positions
+       properly, therefore we avoid this problem at this stage */
+    if (left < 0)
+      left = 0;
+    if (top < 0)
+      top = 0;
+#endif
+
     if (left != GetLeft() || top != GetTop())
       Move(left, top);
   }
 }
 #endif
+
+bool
+WndForm::OnAnyKeyDown(unsigned key_code)
+{
+  return key_down_function && key_down_function(key_code);
+}

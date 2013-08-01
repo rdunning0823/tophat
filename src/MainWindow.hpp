@@ -249,6 +249,8 @@ public:
    */
   void SetDefaultFocus();
 
+  void FlushRendererCaches();
+
   /**
    * Trigger a full redraw of the screen.
    */
@@ -390,6 +392,7 @@ protected:
   virtual bool OnKeyDown(unsigned key_code) override;
   virtual bool OnUser(unsigned id) override;
   virtual bool OnTimer(WindowTimer &timer) override;
+  virtual void OnPaint(Canvas &canvas) override;
 
   /* virtual methods from class TopWindow */
   virtual bool OnClose() override;

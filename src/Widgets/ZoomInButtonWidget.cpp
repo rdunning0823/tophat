@@ -33,8 +33,8 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
 #include "UIState.hpp"
-#include "Look/Fonts.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
 #include "Screen/Canvas.hpp"
@@ -65,13 +65,13 @@ ZoomInButtonWidget::Unprepare()
 void
 ZoomInButtonWidget::Show(const PixelRect &rc)
 {
-  GetWindow()->Show();
+  GetWindow().Show();
 }
 
 void
 ZoomInButtonWidget::Hide()
 {
-  GetWindow()->Hide();
+  GetWindow().Hide();
 }
 
 void

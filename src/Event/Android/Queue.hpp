@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_EVENT_ANDROID_QUEUE_HPP
 
 #include "../Shared/TimerQueue.hpp"
-#include "Event.hpp"
+#include "../Shared/Event.hpp"
 #include "Util/NonCopyable.hpp"
 #include "Thread/Mutex.hpp"
 #include "Thread/Cond.hpp"
@@ -37,6 +37,11 @@ class Window;
 class EventQueue : private NonCopyable {
   std::queue<Event> events;
 
+  /**
+   * The current time after the event thread returned from sleeping.
+   */
+  uint64_t now_us;
+
   TimerQueue timers;
 
   Mutex mutex;
@@ -45,13 +50,26 @@ class EventQueue : private NonCopyable {
   bool running;
 
 public:
-  EventQueue():running(true) {}
+  EventQueue();
+
+  /**
+   * Returns the monotonic clock in microseconds.  This method is only
+   * available in the main thread.
+   */
+  gcc_pure
+  uint64_t ClockUS() const {
+    return now_us;
+  }
 
   void Quit() {
     running = false;
   }
 
   void Push(const Event &event);
+
+  void Push(Event::Callback callback, void *ctx) {
+    Push(Event(callback, ctx));
+  }
 
   bool Pop(Event &event);
 
@@ -67,7 +85,7 @@ public:
   void CancelTimer(Timer &timer);
 
 private:
-  bool Generate(Event &event, uint64_t now_us);
+  bool Generate(Event &event);
 };
 
 #endif

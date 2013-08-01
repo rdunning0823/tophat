@@ -40,16 +40,28 @@ struct zzip_dir;
  */
 class TopographyStore : private NonCopyable {
 public:
-  enum {
-    /** maximum number of topography layers */
-    MAXTOPOGRAPHY = 20,
-  };
+  /** maximum number of topography layers */
+  static constexpr unsigned MAXTOPOGRAPHY = 30;
 
 private:
   StaticArray<TopographyFile *, MAXTOPOGRAPHY> files;
 
+  /**
+   * This number is incremented each time this object is modified.
+   */
+  unsigned serial;
+
 public:
+  TopographyStore():serial(0) {}
   ~TopographyStore();
+
+  /**
+   * Returns a serial for the current state.  The serial gets
+   * incremented each time the list of warnings is modified.
+   */
+  unsigned GetSerial() const {
+    return serial;
+  }
 
   unsigned size() const {
     return files.size();

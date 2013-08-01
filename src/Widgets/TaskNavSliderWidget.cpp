@@ -211,7 +211,8 @@ TaskNavSliderWidget::CreateListEmpty(ContainerWindow &parent,
                                                           list_style, 20);
   list->SetHasScrollBar(false);
   list->SetLength(0);
-  list->SetHandler(this);
+  list->SetItemRenderer(this);
+  list->SetCursorHandler(this);
   SetWindow(list);
   return *list;
 }
@@ -261,13 +262,13 @@ TaskNavSliderWidget::Unprepare()
 void
 TaskNavSliderWidget::Show(const PixelRect &rc)
 {
-  GetWindow()->Show();
+  GetWindow().Show();
 }
 
 void
 TaskNavSliderWidget::Hide()
 {
-  GetWindow()->Hide();
+  GetWindow().Hide();
 }
 
 void
@@ -280,7 +281,7 @@ TaskNavSliderWidget::Move(const PixelRect &rc_map)
   GetList().SetOverScrollMax(slider_shape.GetOverScrollWidth());
 
   WindowWidget::Move(rc);
-  GetWindow()->Move(rc);
+  GetWindow().Move(rc);
   GetList().SetItemHeight(slider_shape.GetWidth());
 }
 
@@ -322,6 +323,6 @@ TaskNavSliderWidget::OnPixelMove()
 UPixelScalar
 TaskNavSliderWidget::HeightFromTop()
 {
-  return GetWindow()->IsVisible() ? GetHeight() - Layout::Scale(1) : 0;
+  return GetWindow().IsVisible() ? GetHeight() - Layout::Scale(1) : 0;
 }
 

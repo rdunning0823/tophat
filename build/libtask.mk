@@ -1,6 +1,7 @@
 TASK_SRC_DIR = $(SRC)/Engine/Task
 
 TASK_SOURCES = \
+	$(TASK_SRC_DIR)/Shapes/FAITriangleSettings.cpp \
 	$(TASK_SRC_DIR)/Shapes/FAITriangleRules.cpp \
 	$(TASK_SRC_DIR)/Shapes/FAITriangleArea.cpp \
 	$(TASK_SRC_DIR)/Shapes/FAITriangleTask.cpp \
@@ -10,7 +11,7 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/AbstractTask.cpp \
 	$(TASK_SRC_DIR)/Ordered/StartConstraints.cpp \
 	$(TASK_SRC_DIR)/Ordered/FinishConstraints.cpp \
-	$(TASK_SRC_DIR)/Ordered/OrderedTaskBehaviour.cpp \
+	$(TASK_SRC_DIR)/Ordered/Settings.cpp \
 	$(TASK_SRC_DIR)/Ordered/OrderedTask.cpp \
 	$(TASK_SRC_DIR)/Ordered/TaskAdvance.cpp \
 	$(TASK_SRC_DIR)/Ordered/SmartTaskAdvance.cpp \
@@ -67,11 +68,15 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/Solvers/TaskOptTarget.cpp \
 	$(TASK_SRC_DIR)/Solvers/TaskGlideRequired.cpp \
 	$(TASK_SRC_DIR)/Solvers/TaskSolution.cpp \
-	$(TASK_SRC_DIR)/Stats/DistanceStat.cpp \
+	$(TASK_SRC_DIR)/Computer/ElementStatComputer.cpp \
+	$(TASK_SRC_DIR)/Computer/DistanceStatComputer.cpp \
+	$(TASK_SRC_DIR)/Computer/IncrementalSpeedComputer.cpp \
+	$(TASK_SRC_DIR)/Computer/TaskVarioComputer.cpp \
+	$(TASK_SRC_DIR)/Computer/TaskStatsComputer.cpp \
+	$(TASK_SRC_DIR)/Computer/WindowStatsComputer.cpp \
 	$(TASK_SRC_DIR)/Stats/CommonStats.cpp \
 	$(TASK_SRC_DIR)/Stats/ElementStat.cpp \
 	$(TASK_SRC_DIR)/Stats/TaskStats.cpp \
 	$(TASK_SRC_DIR)/Stats/StartStats.cpp \
-	$(TASK_SRC_DIR)/Stats/TaskVario.cpp
 
 $(eval $(call link-library,libtask,TASK))

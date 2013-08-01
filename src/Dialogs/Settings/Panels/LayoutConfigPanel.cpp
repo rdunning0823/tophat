@@ -25,7 +25,7 @@ Copyright_License {
 #include "Profile/ProfileKeys.hpp"
 #include "Profile/Profile.hpp"
 #include "Form/DataField/Enum.hpp"
-#include "Hardware/Display.hpp"
+#include "Hardware/RotateDisplay.hpp"
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "LogFile.hpp"
@@ -34,11 +34,18 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "UtilsSettings.hpp"
+#include "Asset.hpp"
+
+#ifdef KOBO
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
+#endif
 
 enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
   AppInverseInfoBox,
+  AppInfoBoxColors,
 };
 
 static constexpr StaticEnumChoice display_orientation_list[] = {
@@ -127,6 +134,15 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
              ui_settings.info_boxes.inverse);
   SetExpertRow(AppInverseInfoBox);
+
+  if (HasColors()) {
+    AddBoolean(_("Colored InfoBoxes"),
+               _("If true, certain InfoBoxes will have coloured text.  For example, the active waypoint "
+                 "InfoBox will be blue when the glider is above final glide."),
+               ui_settings.info_boxes.use_colors);
+    SetExpertRow(AppInfoBoxColors);
+  } else
+    AddDummy();
 }
 
 bool
@@ -156,6 +172,11 @@ LayoutConfigPanel::Save(bool &_changed)
   changed |= require_restart |=
     SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
 
+  if (HasColors() &&
+      SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors,
+                ui_settings.info_boxes.use_colors))
+    require_restart = changed = true;
+
   if (orientation_changed) {
     assert(Display::RotateSupported());
 
@@ -165,6 +186,12 @@ LayoutConfigPanel::Save(bool &_changed)
       if (!Display::Rotate(ui_settings.display.orientation))
         LogFormat("Display rotation failed");
     }
+
+#ifdef KOBO
+    event_queue->SetMouseRotation(ui_settings.display.orientation);
+#endif
+
+    CommonInterface::main_window->CheckResize();
   } else if (info_box_geometry_changed)
     CommonInterface::main_window->ReinitialiseLayout();
 

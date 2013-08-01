@@ -25,12 +25,9 @@
 
 #include "AbstractContest.hpp"
 #include "TraceManager.hpp"
-#include "kdtree++/kdtree.hpp"
 #include "Trace/Point.hpp"
 
 #include <map>
-#include <unordered_set>
-#include <vector>
 
 /**
  * Specialisation of AbstractContest for OLC Triangle (triangle) rules
@@ -112,9 +109,12 @@ private:
     }
 
     void removeRange(unsigned first, unsigned last) {
-      for (auto it = closing_pairs.begin(); it != closing_pairs.end(); ++it) {
+      auto it = closing_pairs.begin();
+      while (it != closing_pairs.end()) {
         if (it->first > first && it->second < last)
-          closing_pairs.erase(it);
+          it = closing_pairs.erase(it);
+        else
+          it++;
       }
     }
 
@@ -147,8 +147,6 @@ private:
       return std::max(fabs(lon), fabs(lat));
     }
   };
-
-  KDTree::KDTree<2, TracePointNode> search_point_tree;
 
   /**
    * A bounding box around a range of trace points.

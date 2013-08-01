@@ -64,6 +64,10 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Language/Language.hpp"
 #include "Pan.hpp"
 
+#ifdef KOBO
+#include "Screen/Key.h"
+#endif
+
 #include <algorithm>
 #include <assert.h>
 #include <ctype.h>
@@ -320,6 +324,16 @@ InputEvents::ProcessKey(Mode mode, unsigned key_code)
 
   if (!global_running)
     return false;
+
+#ifdef KOBO
+#ifdef ENABLE_SDL
+  if (key_code == SDLK_POWER)
+    /* the Kobo power button opens the main menu */
+    key_code = KEY_MENU;
+#else
+  // TODO: check the console key code
+#endif
+#endif
 
   // Which key - can be defined locally or at default (fall back to default)
   unsigned event_id = key_to_event(mode, overlay_mode, key_code);

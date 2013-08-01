@@ -64,6 +64,11 @@ class AirspaceWarningManager:
 
   AirspaceWarningList warnings;
 
+  /**
+   * This number is incremented each time this object is modified.
+   */
+  unsigned serial;
+
 public:
   typedef AirspaceWarningList::const_iterator const_iterator;
 
@@ -84,6 +89,14 @@ public:
   }
 
   void SetConfig(const AirspaceWarningConfig &_config);
+
+  /**
+   * Returns a serial for the current state.  The serial gets
+   * incremented each time the list of warnings is modified.
+   */
+  unsigned GetSerial() const {
+    return serial;
+  }
 
   /**
    * Reset warning list and filter (as in new flight)
@@ -158,6 +171,7 @@ public:
    * Clear all warnings
    */
   void clear() {
+    ++serial;
     warnings.clear();
   }
 
@@ -219,6 +233,17 @@ public:
    */
   gcc_pure
   bool GetAckDay(const AbstractAirspace& airspace) const;
+
+  /**
+   * Returns true if this airspace would be warned about,
+   * i.e. trespassing it would not be possible.
+   *
+   * This returns false for airspaces that have been "acknowledged for
+   * day" (see GetAckDay()) or airspaces that are inactive or
+   * airspaces that are not configured for airspace warnings.
+   */
+  gcc_pure
+  bool IsActive(const AbstractAirspace &airspace) const;
 
 private:
   bool UpdateTask(const AircraftState &state, const GlidePolar &glide_polar,

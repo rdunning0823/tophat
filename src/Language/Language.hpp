@@ -24,7 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_LANGUAGE_HPP
 #define XCSOAR_LANGUAGE_HPP
 
-#if defined(HAVE_POSIX) && !defined(ANDROID)
+#if defined(HAVE_POSIX) && !defined(ANDROID) && !defined(KOBO)
+#define USE_LIBINTL
 
 #include <libintl.h>
 

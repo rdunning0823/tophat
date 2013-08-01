@@ -678,7 +678,7 @@ protected:
   PixelRect InitialControlRect(unsigned height) {
     assert(IsDefined());
 
-    PixelRect rc = GetWindow()->GetClientRect();
+    PixelRect rc = GetWindow().GetClientRect();
     rc.bottom = rc.top + height;
     return rc;
   }

@@ -24,16 +24,8 @@ Copyright_License {
 #include "Screen/Window.hpp"
 #include "Screen/ContainerWindow.hpp"
 #include "Screen/Debug.hpp"
-
-#ifdef ANDROID
-#include "Event/Android/Queue.hpp"
-#include "Android/Main.hpp"
-#elif defined(ENABLE_SDL)
-#include "Event/SDL/Queue.hpp"
-#elif defined(USE_EGL)
-#include "Event/EGL/Queue.hpp"
-#include "Event/EGL/Globals.hpp"
-#endif /* ENABLE_SDL */
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Debug.hpp"
@@ -155,11 +147,7 @@ Window::OnDestroy()
     parent = NULL;
   }
 
-#if defined(ANDROID) || defined(USE_EGL)
   event_queue->Purge(*this);
-#else
-  EventQueue::Purge(*this);
-#endif
 #else /* USE_GDI */
   assert(hWnd != NULL);
 

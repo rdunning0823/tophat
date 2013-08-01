@@ -177,7 +177,8 @@ OnlineContestPanel::OnlineContestChart::OnPaint(Canvas &canvas)
   fs.RenderOLC(canvas, GetClientRect(), basic,
                settings, blackboard.GetMapSettings(),
                calculated.contest_stats,
-               glide_computer->GetTraceComputer());
+               glide_computer->GetTraceComputer(),
+               glide_computer->GetRetrospective());
 }
 
 OnlineContestPanel::OnlineContestChart::OnlineContestChart(

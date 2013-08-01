@@ -251,8 +251,6 @@ public:
   void EditTaskPoint(unsigned ItemIndex);
   void OnMakeFinish();
 
-  bool OnKeyDown(unsigned key_code);
-
   /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 
@@ -263,6 +261,7 @@ public:
   virtual void ReClick() override;
   virtual void Show(const PixelRect &rc) override;
   virtual void Hide() override;
+  virtual bool KeyPress(unsigned key_code) override;
 
 protected:
   void RefreshView();
@@ -453,9 +452,9 @@ void
 TaskEditPanel::EditTaskPoint(unsigned ItemIndex)
 {
   if (ItemIndex < ordered_task->TaskSize()) {
-    if (dlgTaskPointShowModal(dialog.GetMainWindow(),
-                              &ordered_task, ItemIndex)) {
+    if (dlgTaskPointShowModal(&ordered_task, ItemIndex)) {
       *task_modified = true;
+      ordered_task->UpdateGeometry();
       RefreshView();
     }
   } else if (!ordered_task->IsFull()) {
@@ -478,12 +477,13 @@ TaskEditPanel::EditTaskPoint(unsigned ItemIndex)
     if (point == NULL)
       return;
 
-    if (factory.Append(*point, true))
+    if (factory.Append(*point, true)) {
       *task_modified = true;
+      ordered_task->UpdateGeometry();
+      RefreshView();
+    }
 
     delete point;
-
-    RefreshView();
   }
 }
 
@@ -502,7 +502,10 @@ TaskEditPanel::OnCursorMoved(unsigned index)
 void
 TaskEditPanel::OnMakeFinish()
 {
-  ordered_task->GetFactory().CheckAddFinish();
+  ordered_task->UpdateStatsGeometry();
+  if (ordered_task->GetFactory().CheckAddFinish())
+    ordered_task->UpdateGeometry();
+
   RefreshView();
 }
 
@@ -519,6 +522,7 @@ TaskEditPanel::MoveUp()
   GetList().SetCursorIndex(index - 1);
   *task_modified = true;
 
+  ordered_task->UpdateGeometry();
   RefreshView();
 }
 
@@ -535,11 +539,12 @@ TaskEditPanel::MoveDown()
   GetList().SetCursorIndex(index + 1);
   *task_modified = true;
 
+  ordered_task->UpdateGeometry();
   RefreshView();
 }
 
 bool
-TaskEditPanel::OnKeyDown(unsigned key_code)
+TaskEditPanel::KeyPress(unsigned key_code)
 {
   switch (key_code){
   case KEY_ESCAPE:
@@ -597,10 +602,6 @@ TaskEditPanel::Show(const PixelRect &rc)
 
   RefreshView();
 
-  dialog.SetKeyDownFunction([this](unsigned key_code){
-      return this->OnKeyDown(key_code);
-    });
-
   ListWidget::Show(rc);
 }
 
@@ -608,7 +609,6 @@ void
 TaskEditPanel::Hide()
 {
   dialog.ResetTaskView();
-  dialog.ClearKeyDownFunction();
 
   ListWidget::Hide();
 }

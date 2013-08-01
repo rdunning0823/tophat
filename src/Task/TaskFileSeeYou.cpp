@@ -38,6 +38,8 @@
 #include "Operation/Operation.hpp"
 #include "Units/System.hpp"
 
+#include <stdlib.h>
+
 struct SeeYouTaskInformation {
   /** True = RT, False = AAT */
   bool wp_dis;
@@ -485,7 +487,7 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
   AbstractTaskFactory& fact = task->GetFactory();
   const TaskFactoryType factType = task->GetFactoryType();
 
-  OrderedTaskBehaviour beh = task->GetOrderedTaskBehaviour();
+  OrderedTaskSettings beh = task->GetOrderedTaskSettings();
   if (factType == TaskFactoryType::AAT) {
     beh.aat_min_time = task_info.task_time;
   }
@@ -494,7 +496,7 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
     beh.start_constraints.max_height = (unsigned)task_info.max_start_altitude;
     beh.start_constraints.max_height_ref = AltitudeReference::MSL;
   }
-  task->SetOrderedTaskBehaviour(beh);
+  task->SetOrderedTaskSettings(beh);
 
   // mark task waypoints.  Skip takeoff and landing point
   for (unsigned i = 0; i < n_waypoints; i++) {

@@ -37,7 +37,7 @@ Copyright_License {
 #include "MainWindow.hpp"
 #include "Interface.hpp"
 #include "Compiler.h"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Screen/Init.hpp"
 #include "Net/Init.hpp"
 #include "UtilsSystem.hpp"
@@ -141,7 +141,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   if (Startup())
     ret = CommonInterface::main_window->RunEventLoop();
 
-  delete CommonInterface::main_window;
+  if (CommonInterface::main_window != nullptr) {
+    CommonInterface::main_window->Destroy();
+    delete CommonInterface::main_window;
+  }
 
   DeinitialiseIOThread();
 

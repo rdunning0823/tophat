@@ -33,7 +33,7 @@ Copyright_License {
 #include "UIState.hpp"
 #include "Look/IconLook.hpp"
 #include "Look/DialogLook.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Layout.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"

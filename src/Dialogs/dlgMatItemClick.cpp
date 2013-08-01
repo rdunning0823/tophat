@@ -42,7 +42,7 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Protection.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "Task/Ordered/OrderedTask.hpp"

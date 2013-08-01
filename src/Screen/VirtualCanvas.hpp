@@ -37,22 +37,23 @@ public:
   VirtualCanvas(PixelSize new_size);
   VirtualCanvas(const Canvas &canvas, PixelSize new_size);
 
-#ifndef ENABLE_OPENGL
-  ~VirtualCanvas();
-#endif
+  ~VirtualCanvas() {
+    Destroy();
+  }
 
   void Create(PixelSize new_size);
 
   void Create(const Canvas &canvas, PixelSize new_size);
-  void Create(const Canvas &canvas);
 
-#ifndef ENABLE_SDL
+  void Create(const Canvas &canvas) {
+    Create(canvas, canvas.GetSize());
+  }
+
   void Destroy();
-#endif
 
-#ifdef ENABLE_SDL
+#ifdef USE_MEMORY_CANVAS
   void Resize(PixelSize new_size) {
-    if (new_size != size)
+    if (new_size != GetSize())
       Create(*this, new_size);
   }
 

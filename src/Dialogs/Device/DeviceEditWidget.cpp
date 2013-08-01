@@ -32,7 +32,6 @@
 #include "Form/DataField/Boolean.hpp"
 #include "Device/Register.hpp"
 #include "Device/Driver.hpp"
-#include "Profile/DeviceConfig.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Interface.hpp"
 
@@ -57,9 +56,6 @@ enum ControlIndex {
   Port, BaudRate, BulkBaudRate, TCPPort, I2CBus, I2CAddr, PressureUsage, Driver,
   SyncFromDevice, SyncToDevice,
   K6Bt,
-#ifndef NDEBUG
-  DumpPort,
-#endif
   IgnoreCheckSum,
 };
 
@@ -412,6 +408,11 @@ DeviceEditWidget::SetConfig(const DeviceConfig &_config)
 {
   config = _config;
 
+  if (config.port_type == DeviceConfig::PortType::DISABLED)
+    /* if the user configures a new device, forget the old "enabled"
+       flag and re-enable the device */
+    config.enabled = true;
+
   WndProperty &port_control = GetControl(Port);
   DataFieldEnum &port_df = *(DataFieldEnum *)port_control.GetDataField();
   SetPort(port_df, config);
@@ -474,16 +475,6 @@ DeviceEditWidget::SetConfig(const DeviceConfig &_config)
       *(DataFieldBoolean *)k6bt_control.GetDataField();
   k6bt_df.Set(config.k6bt);
   k6bt_control.RefreshDisplay();
-
-#ifndef NDEBUG
-
-  WndProperty &dump_port_control = GetControl(DumpPort);
-  DataFieldBoolean &dump_port_df =
-      *(DataFieldBoolean *)dump_port_control.GetDataField();
-  dump_port_df.Set(config.dump_port);
-  dump_port_control.RefreshDisplay();
-
-#endif
 
   WndProperty &ignore_checksum_control = GetControl(IgnoreCheckSum);
   DataFieldBoolean &ignore_checksum_df =
@@ -579,10 +570,6 @@ DeviceEditWidget::UpdateVisibilities()
                 CanSendSettings(GetDataField(Driver)));
   SetRowAvailable(K6Bt, maybe_bluetooth);
 
-#ifndef NDEBUG
-  SetRowVisible(DumpPort, DeviceConfig::UsesPort(type));
-#endif
-
   SetRowVisible(IgnoreCheckSum, DeviceConfig::UsesDriver(type));
 }
 
@@ -670,16 +657,6 @@ DeviceEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _("Enable this if you use a K6Bt to connect the device."),
              config.k6bt, this);
   SetExpertRow(K6Bt);
-
-#ifndef NDEBUG
-
-  AddBoolean(_T("DumpPort"),
-             _("Enable this if you would like to log the communication with "
-               "the device."),
-             config.dump_port, this);
-  SetExpertRow(DumpPort);
-
-#endif
 
   AddBoolean(_("Ignore checksum"),
              _("If your GPS device outputs invalid NMEA checksums, this will "
@@ -797,11 +774,6 @@ DeviceEditWidget::Save(bool &_changed)
 
   if (CommonInterface::Basic().sensor_calibration_available)
     changed = true;
-
-#ifndef NDEBUG
-  if (config.UsesPort())
-    changed |= SaveValue(DumpPort, config.dump_port);
-#endif
 
   _changed |= changed;
   return true;

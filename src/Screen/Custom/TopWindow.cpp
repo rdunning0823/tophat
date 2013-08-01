@@ -23,6 +23,11 @@ Copyright_License {
 
 #include "Screen/TopWindow.hpp"
 #include "Screen/Custom/TopCanvas.hpp"
+#include "Hardware/CPU.hpp"
+
+#ifdef USE_MEMORY_CANVAS
+#include "Screen/Memory/Canvas.hpp"
+#endif
 
 TopWindow::~TopWindow()
 {
@@ -33,11 +38,17 @@ void
 TopWindow::Create(const TCHAR *text, PixelSize size,
                   TopWindowStyle style)
 {
-  invalidated.store(true, std::memory_order_relaxed);
+  invalidated = true;
 
   delete screen;
   screen = new TopCanvas();
   screen->Create(size, style.GetFullScreen(), style.GetResizable());
+
+  if (!screen->IsDefined()) {
+    delete screen;
+    screen = nullptr;
+    return;
+  }
 
   ContainerWindow::Create(NULL, screen->GetRect(), style);
 
@@ -59,7 +70,20 @@ TopWindow::Fullscreen()
 void
 TopWindow::Expose()
 {
+#ifdef HAVE_CPU_FREQUENCY
+  const ScopeLockCPU cpu;
+#endif
+
+#ifdef USE_MEMORY_CANVAS
+  Canvas canvas = screen->Lock();
+  if (canvas.IsDefined()) {
+    OnPaint(canvas);
+    screen->Unlock();
+  }
+#else
   OnPaint(*screen);
+#endif
+
   screen->Flip();
 }
 
@@ -71,8 +95,10 @@ TopWindow::Refresh()
        OpenGL surface - ignore all drawing requests */
     return;
 
-  if (!invalidated.exchange(false, std::memory_order_relaxed))
+  if (!invalidated)
     return;
+
+  invalidated = false;
 
   Expose();
 }

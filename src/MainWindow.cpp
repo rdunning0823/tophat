@@ -34,7 +34,6 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "Menu/ButtonLabel.hpp"
 #include "Screen/Layout.hpp"
-#include "Screen/Blank.hpp"
 #include "Dialogs/Airspace/AirspaceWarningDialog.hpp"
 #include "Audio/Sound.hpp"
 #include "Components.hpp"
@@ -47,7 +46,9 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Widget/Widget.hpp"
 #include "UtilsSystem.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
+#include "Look/CustomFonts.hpp"
+#include "Look/DefaultFonts.hpp"
 #include "Look/Look.hpp"
 #include "Profile/ProfileKeys.hpp"
 #include "Profile/Profile.hpp"
@@ -74,8 +75,8 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #endif
 
-#ifdef ENABLE_OPENGL
-#include "Screen/OpenGL/Cache.hpp"
+#ifdef HAVE_TEXT_CACHE
+#include "Screen/Custom/Cache.hpp"
 #endif
 
 #if !defined(WIN32) && !defined(ANDROID)
@@ -85,6 +86,8 @@ Copyright_License {
 #if !defined(WIN32) && !defined(ANDROID)
 #include <unistd.h> /* for execl() */
 #endif
+
+static constexpr unsigned separator_height = 2;
 
 gcc_pure
 static PixelRect
@@ -119,6 +122,8 @@ GetMapRectAbove(const PixelRect &rc, const PixelRect &bottom_rect)
 {
   PixelRect result = rc;
   result.bottom = bottom_rect.top;
+  if (bottom_rect.top < bottom_rect.bottom)
+    result.bottom -= separator_height;
   return result;
 }
 
@@ -158,9 +163,13 @@ MainWindow::Create(PixelSize size, TopWindowStyle style)
 
 gcc_noreturn
 static void
-NoFontsAvailable()
+FatalError(const TCHAR *msg)
 {
-  const TCHAR *msg = _T("Font initialisation failed");
+#if defined(HAVE_POSIX) && defined(NDEBUG)
+  /* make sure this gets written to stderr in any case; LogFormat()
+     will write to stderr only in debug builds */
+  fprintf(stderr, "%s\n", msg);
+#endif
 
   /* log the error */
   LogFormat(_T("%s"), msg);
@@ -168,11 +177,18 @@ NoFontsAvailable()
   /* now try to get a GUI error message out to the user */
 #ifdef WIN32
   MessageBox(NULL, msg, _T("Top Hat"), MB_ICONEXCLAMATION|MB_OK);
-#elif !defined(ANDROID)
+#elif !defined(ANDROID) && !defined(KOBO)
   execl("/usr/bin/xmessage", "xmessage", msg, NULL);
   execl("/usr/X11/bin/xmessage", "xmessage", msg, NULL);
 #endif
   exit(EXIT_FAILURE);
+}
+
+gcc_noreturn
+static void
+NoFontsAvailable()
+{
+  FatalError(_T("Font initialisation failed"));
 }
 
 void
@@ -189,7 +205,8 @@ MainWindow::Initialise()
   if (look == NULL)
     look = new Look();
 
-  look->Initialise(Fonts::map, Fonts::map_bold, Fonts::map_label);
+  look->Initialise(Fonts::dialog, Fonts::dialog_bold, Fonts::dialog_small,
+                   Fonts::map);
 }
 
 void
@@ -202,8 +219,6 @@ MainWindow::InitialiseConfigured()
   const InfoBoxLayout::Layout ib_layout =
     InfoBoxLayout::Calculate(rc, ui_settings.info_boxes.geometry);
 
-  Fonts::SizeInfoboxFont(ib_layout.control_width);
-
   if (ui_settings.custom_fonts) {
     LogFormat("Load custom fonts");
     if (!Fonts::LoadCustom()) {
@@ -214,15 +229,19 @@ MainWindow::InitialiseConfigured()
       }
     }
 
-#ifdef ENABLE_OPENGL
+#ifdef HAVE_TEXT_CACHE
     /* fonts may have changed, discard all pre-rendered font
        textures */
     TextCache::Flush();
 #endif
   }
 
+  Fonts::SizeInfoboxFont(ib_layout.control_width);
+
   assert(look != NULL);
   look->InitialiseConfigured(CommonInterface::GetUISettings(),
+                             Fonts::dialog, Fonts::dialog_bold,
+                             Fonts::dialog_small,
                              Fonts::map, Fonts::map_bold, Fonts::map_label,
                              Fonts::cdi, Fonts::monospace,
                              Fonts::infobox, Fonts::infobox_small,
@@ -235,7 +254,7 @@ MainWindow::InitialiseConfigured()
   map_rect = ib_layout.remaining;
 
   ButtonLabel::CreateButtonLabels(*this);
-  ButtonLabel::SetFont(Fonts::map_bold);
+  ButtonLabel::SetFont(Fonts::dialog_bold);
 
   ReinitialiseLayout_vario(ib_layout);
 
@@ -506,6 +525,8 @@ void
 MainWindow::BeginShutdown()
 {
   timer.Cancel();
+
+  KillBottomWidget();
 }
 
 void
@@ -529,6 +550,13 @@ MainWindow::SetDefaultFocus()
     map->SetFocus();
   else if (widget == NULL || !widget->SetFocus())
     SetFocus();
+}
+
+void
+MainWindow::FlushRendererCaches()
+{
+  if (map != nullptr)
+    map->FlushCaches();
 }
 
 void
@@ -666,7 +694,9 @@ MainWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 bool
 MainWindow::OnKeyDown(unsigned key_code)
 {
-  return InputEvents::processKey(key_code) ||
+  return (widget != nullptr && widget->KeyPress(key_code)) ||
+    (bottom_widget != nullptr && bottom_widget->KeyPress(key_code)) ||
+    InputEvents::processKey(key_code) ||
     SingleWindow::OnKeyDown(key_code);
 }
 
@@ -798,6 +828,20 @@ bool MainWindow::OnClose() {
     Shutdown();
   }
   return true;
+}
+
+void
+MainWindow::OnPaint(Canvas &canvas)
+{
+  if (bottom_widget != nullptr && map != nullptr) {
+    /* draw a separator between main area and bottom area */
+    PixelRect rc = map->GetPosition();
+    rc.top = rc.bottom;
+    rc.bottom += separator_height;
+    canvas.DrawFilledRectangle(rc, COLOR_BLACK);
+  }
+
+  SingleWindow::OnPaint(canvas);
 }
 
 void

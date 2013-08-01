@@ -42,7 +42,7 @@ Copyright_License {
 #include "Form/CheckBox.hpp"
 #include "Version.hpp"
 #include "Widget/Widget.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Util/StaticString.hpp"
 #include "Util/ConvertString.hpp"
 #include "Task/TaskNationalities.hpp"

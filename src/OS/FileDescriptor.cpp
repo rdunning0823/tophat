@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifdef ANDROID
+#ifdef __BIONIC__
 #include <sys/syscall.h>
 #endif
 
@@ -40,8 +40,20 @@
 #include <poll.h>
 #endif
 
+#if defined(HAVE_EVENTFD) && !defined(__BIONIC__)
+#include <sys/eventfd.h>
+#endif
+
+#if defined(HAVE_SIGNALFD) && !defined(__BIONIC__)
+#include <sys/signalfd.h>
+#endif
+
 #ifndef O_NOCTTY
 #define O_NOCTTY 0
+#endif
+
+#ifndef O_CLOEXEC
+#define O_CLOEXEC 0
 #endif
 
 bool
@@ -56,7 +68,7 @@ FileDescriptor::Open(const char *pathname, int flags)
 bool
 FileDescriptor::OpenReadOnly(const char *pathname)
 {
-  return Open(pathname, O_RDONLY | O_NOCTTY);
+  return Open(pathname, O_RDONLY | O_NOCTTY | O_CLOEXEC);
 }
 
 #ifdef HAVE_POSIX
@@ -64,7 +76,7 @@ FileDescriptor::OpenReadOnly(const char *pathname)
 bool
 FileDescriptor::OpenNonBlocking(const char *pathname)
 {
-  return Open(pathname, O_RDWR | O_NOCTTY | O_NONBLOCK);
+  return Open(pathname, O_RDWR | O_NOCTTY | O_CLOEXEC | O_NONBLOCK);
 }
 
 bool
@@ -74,7 +86,7 @@ FileDescriptor::CreatePipe(FileDescriptor &r, FileDescriptor &w)
 
 #ifdef __linux__
   const int flags = O_CLOEXEC;
-#ifdef ANDROID
+#ifdef __BIONIC__
   /* Bionic provides the pipe2() function only since Android 2.3,
      therefore we must roll our own system call here */
   const int result = syscall(__NR_pipe2, fds, flags);
@@ -100,6 +112,45 @@ FileDescriptor::SetNonBlocking()
 
   int flags = fcntl(fd, F_GETFL);
   fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+}
+
+#endif
+
+#ifdef HAVE_EVENTFD
+
+bool
+FileDescriptor::CreateEventFD(unsigned initval)
+{
+  assert(!IsDefined());
+
+#ifdef __BIONIC__
+  /* Bionic provides the eventfd() function only since Android 2.3,
+     therefore we must roll our own system call here */
+  fd = syscall(__NR_eventfd2, initval, O_NONBLOCK|O_CLOEXEC);
+#else
+  fd = ::eventfd(initval, EFD_NONBLOCK|EFD_CLOEXEC);
+#endif
+  return fd >= 0;
+}
+
+#endif
+
+#ifdef HAVE_SIGNALFD
+
+bool
+FileDescriptor::CreateSignalFD(const sigset_t *mask)
+{
+#ifdef __BIONIC__
+  int new_fd = syscall(__NR_signalfd4, fd, mask, sizeof(*mask),
+                       O_NONBLOCK|O_CLOEXEC);
+#else
+  int new_fd = ::signalfd(fd, mask, SFD_NONBLOCK|SFD_CLOEXEC);
+#endif
+  if (new_fd < 0)
+    return false;
+
+  fd = new_fd;
+  return true;
 }
 
 #endif

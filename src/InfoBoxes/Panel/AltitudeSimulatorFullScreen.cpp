@@ -28,7 +28,7 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Form/Button.hpp"
 #include "Form/Frame.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Screen/Timer.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Units/Units.hpp"

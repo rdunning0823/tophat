@@ -40,14 +40,10 @@ Copyright_License {
 
 struct Event;
 
-#elif defined(USE_EGL)
+#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
 struct Event;
 #elif defined(ENABLE_SDL)
 union SDL_Event;
-#endif
-
-#ifndef USE_GDI
-#include <atomic>
 #endif
 
 #include <tchar.h>
@@ -119,7 +115,7 @@ class TopWindow : public ContainerWindow {
 #ifndef USE_GDI
   TopCanvas *screen;
 
-  std::atomic<bool> invalidated;
+  bool invalidated;
 
 #ifdef ANDROID
   Mutex paused_mutex;
@@ -199,8 +195,17 @@ public:
   void Destroy();
 #endif
 
+  /**
+   * Check if the screen has been resized.
+   */
+#ifdef USE_FB
+  void CheckResize();
+#else
+  void CheckResize() {}
+#endif
+
 #ifndef USE_GDI
-#ifdef ANDROID
+#if defined(ANDROID) || defined(USE_FB) || defined(USE_EGL) || defined(USE_VFB)
   void SetCaption(gcc_unused const TCHAR *caption) {}
 #else
   void SetCaption(const TCHAR *caption);
@@ -273,7 +278,7 @@ public:
 #endif
   }
 
-#if defined(ANDROID) || defined(USE_EGL)
+#if defined(ANDROID) || defined(USE_CONSOLE)
   bool OnEvent(const Event &event);
 #elif defined(ENABLE_SDL)
   bool OnEvent(const SDL_Event &event);
@@ -316,7 +321,11 @@ protected:
 
   virtual bool OnClose();
 
-#ifdef USE_VIDEOCORE
+#ifdef KOBO
+  virtual void OnDestroy() override;
+#endif
+
+#ifdef DRAW_MOUSE_CURSOR
   virtual void OnPaint(Canvas &canvas) override;
 #endif
 

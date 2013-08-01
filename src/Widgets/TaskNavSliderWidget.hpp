@@ -44,7 +44,8 @@ struct InfoBoxLook;
 class TaskStats;
 class ContainerWindow;
 
-class TaskNavSliderWidget : public MapOverlayWidget, protected HorizontalListControl::Handler {
+class TaskNavSliderWidget : public MapOverlayWidget, ListItemRenderer,
+  ListCursorHandler  {
 protected:
 
   SliderShape slider_shape;
@@ -66,11 +67,11 @@ public:
   TaskNavSliderWidget();
 
   const HorizontalListControl &GetList() const {
-    return *(const HorizontalListControl *)GetWindow();
+    return (const HorizontalListControl&)GetWindow();
   }
 
   HorizontalListControl &GetList() {
-    return *(HorizontalListControl *)GetWindow();
+    return (HorizontalListControl &)GetWindow();
   }
 
   unsigned GetHeight() {

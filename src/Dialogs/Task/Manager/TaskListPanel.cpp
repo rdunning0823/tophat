@@ -130,7 +130,7 @@ public:
   virtual void Hide() override;
 
 protected:
-  OrderedTask *get_cursor_task();
+  const OrderedTask *get_cursor_task();
 
   gcc_pure
   const TCHAR *get_cursor_name();
@@ -161,23 +161,19 @@ private:
  * must be valid (2 task points)
  * @return NULL if no valid task at cursor, else pointer to task;
  */
-OrderedTask *
+const OrderedTask *
 TaskListPanel::get_cursor_task()
 {
   const unsigned cursor_index = GetList().GetCursorIndex();
   if (cursor_index >= task_store->Size())
     return NULL;
 
-  OrderedTask *ordered_task = task_store->GetTask(cursor_index,
-                                                  CommonInterface::GetComputerSettings().task);
+  const OrderedTask *ordered_task =
+    task_store->GetTask(cursor_index,
+                        CommonInterface::GetComputerSettings().task);
 
-  if (!ordered_task)
+  if (ordered_task == nullptr || !ordered_task->CheckTask())
     return NULL;
-
-  if (!ordered_task->CheckTask()) {
-    delete ordered_task;
-    ordered_task = NULL;
-  }
 
   return ordered_task;
 }
@@ -238,7 +234,7 @@ TaskListPanel::RefreshView()
   if (dialog != nullptr)
     dialog->InvalidateTaskView();
 
-  OrderedTask* ordered_task = get_cursor_task();
+  const OrderedTask* ordered_task = get_cursor_task();
   if (dialog != nullptr)
     dialog->ShowTaskView(ordered_task);
 

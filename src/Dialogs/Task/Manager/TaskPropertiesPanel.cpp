@@ -39,6 +39,7 @@ Copyright_License {
 enum Controls {
   TASK_TYPE,
   MIN_TIME,
+  START_REQUIRES_ARM,
   START_OPEN_TIME,
   START_CLOSE_TIME,
   START_MAX_SPEED,
@@ -74,7 +75,7 @@ void
 TaskPropertiesPanel::RefreshView()
 {
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
-  const OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
+  const OrderedTaskSettings &p = ordered_task->GetOrderedTaskSettings();
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
   TaskBehaviour &tb = settings_computer.task;
 
@@ -85,6 +86,8 @@ TaskPropertiesPanel::RefreshView()
 
   SetRowVisible(MIN_TIME, aat_types);
   LoadValueTime(MIN_TIME, (int)p.aat_min_time);
+
+  LoadValue(START_REQUIRES_ARM, p.start_constraints.require_arm);
 
   LoadValue(START_OPEN_TIME, p.start_constraints.open_time_span.GetStart());
   LoadValue(START_CLOSE_TIME, p.start_constraints.open_time_span.GetEnd());
@@ -126,7 +129,7 @@ TaskPropertiesPanel::RefreshView()
 void
 TaskPropertiesPanel::ReadValues()
 {
-  OrderedTaskBehaviour p = ordered_task->GetOrderedTaskBehaviour();
+  OrderedTaskSettings p = ordered_task->GetOrderedTaskSettings();
   bool changed = false;
 
   TaskFactoryType newtype = ordered_task->GetFactoryType();
@@ -137,6 +140,9 @@ TaskPropertiesPanel::ReadValues()
     p.aat_min_time = fixed(min_time);
     changed = true;
   }
+
+  if (SaveValue(START_REQUIRES_ARM, p.start_constraints.require_arm))
+    changed = true;
 
   RoughTime new_open = p.start_constraints.open_time_span.GetStart();
   RoughTime new_close = p.start_constraints.open_time_span.GetEnd();
@@ -174,7 +180,7 @@ TaskPropertiesPanel::ReadValues()
                            p.finish_constraints.min_height_ref);
 
   if (changed)
-    ordered_task->SetOrderedTaskBehaviour(p);
+    ordered_task->SetOrderedTaskSettings(p);
 
   *task_changed |= changed;
 }
@@ -182,12 +188,12 @@ TaskPropertiesPanel::ReadValues()
 void
 TaskPropertiesPanel::OnFAIFinishHeightChange(DataFieldBoolean &df)
 {
-  OrderedTaskBehaviour p = ordered_task->GetOrderedTaskBehaviour();
+  OrderedTaskSettings p = ordered_task->GetOrderedTaskSettings();
   bool newvalue = df.GetAsBoolean();
   if (newvalue != p.finish_constraints.fai_finish) {
     p.finish_constraints.fai_finish = p.start_constraints.fai_finish
       = newvalue;
-    ordered_task->SetOrderedTaskBehaviour(p);
+    ordered_task->SetOrderedTaskSettings(p);
 
     *task_changed = true;
     RefreshView();
@@ -235,6 +241,10 @@ TaskPropertiesPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
           0, 36000, 60, 180);
+
+  AddBoolean(_("Arm start manually"),
+             _("Configure whether the start must be armed manually or automatically."),
+             false);
 
   const RoughTimeDelta time_zone =
     CommonInterface::GetComputerSettings().utc_offset;
@@ -312,8 +322,10 @@ bool
 TaskPropertiesPanel::Leave()
 {
   ReadValues();
-  if (orig_taskType != ordered_task->GetFactoryType())
-    ordered_task->GetFactory().MutateTPsToTaskType();
+  if (orig_taskType != ordered_task->GetFactoryType()) {
+    if (ordered_task->GetFactory().MutateTPsToTaskType())
+      ordered_task->UpdateGeometry();
+  }
 
   return true;
 }

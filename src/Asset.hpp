@@ -65,21 +65,6 @@ IsDebug()
 }
 
 /**
- * Returns whether the application is running on an embedded platform.
- * @return True if host hardware is an embedded platform, False otherwise
- */
-constexpr
-static inline bool
-IsEmbedded()
-{
-#if defined(_WIN32_WCE) || defined(ANDROID)
-  return true;
-#else
-  return false;
-#endif
-}
-
-/**
  * Returns whether the application is running on Pocket PC / Windows
  * CE / Windows Mobile.
  */
@@ -167,16 +152,41 @@ IsAndroid()
 }
 
 /**
+ * Returns whether the application is running on a Kobo e-book reader.
+ */
+constexpr
+static inline bool
+IsKobo()
+{
+#ifdef KOBO
+  return true;
+#else
+  return false;
+#endif
+}
+
+/**
  * Returns whether the application is running a device with a gray-scale screen
  */
 static inline bool
 IsGrayScaleScreen()
 {
 #ifdef ANDROID
-  return IsNookSimpleTouch();
+  return IsNookSimpleTouch() || IsKobo();
 #else
   return false;
 #endif
+}
+
+/*
+ * Returns whether the application is running on an embedded platform.
+ * @return True if host hardware is an embedded platform, False otherwise
+ */
+constexpr
+static inline bool
+IsEmbedded()
+{
+  return IsAndroid() || IsWindowsCE() || IsKobo();
 }
 
 /**
@@ -240,7 +250,7 @@ HasTouchScreen()
 #ifdef NDEBUG
   return true;
 #else
-  return IsAndroid() || (IsWindowsCE() && !IsAltair());
+  return IsAndroid() || (IsWindowsCE() && !IsAltair()) || IsKobo();
 #endif
 }
 
@@ -252,7 +262,7 @@ constexpr
 static inline bool
 HasDraggableScreen()
 {
-  return !IsOldWindowsCE();
+  return HasTouchScreen() && !IsOldWindowsCE();
 }
 
 /**
@@ -268,15 +278,79 @@ HasKeyboard()
 }
 
 /**
- * Does this device have a display with colors?
- *
- * XXX not yet implemented!
+ * Does this device have a cursor keys?  These may be used to navigate
+ * in modal dialogs.  Without cursor keys, focused controls do not
+ * need to be highlighted.
  */
 constexpr
 static inline bool
+HasCursorKeys()
+{
+  /* we assume that all Windows (CE) devices have cursor keys; some do
+     not, but that's hard to detect */
+
+  /* TODO: check Configuration.keyboard on Android */
+
+  return !IsKobo() && !IsAndroid();
+}
+
+/**
+ * Does this device have a display with colors?
+ */
+#ifdef ANDROID
+gcc_const
+#else
+constexpr
+#endif
+static inline bool
 HasColors()
 {
+#ifdef ANDROID
+  return !IsNookSimpleTouch();
+#else
+  return !IsKobo();
+#endif
+}
+
+/**
+ * Is dithering black&white used on the display?
+ */
+#ifdef ANDROID
+gcc_const
+#else
+constexpr
+#endif
+static inline bool
+IsDithered()
+{
+#ifdef DITHER
   return true;
+#elif defined(ANDROID)
+  return is_dithered;
+#else
+  return false;
+#endif
+}
+
+/**
+ * Does this device have an electronic paper screen, such as E-Ink?
+ * Such screens need some special cases, because they are very slow
+ * and show ghosting.  Animations shall be disabled when this function
+ * returns true.
+ */
+#ifdef ANDROID
+gcc_const
+#else
+constexpr
+#endif
+static inline bool
+HasEPaper()
+{
+#ifdef ANDROID
+  return IsNookSimpleTouch();
+#else
+  return IsKobo();
+#endif
 }
 
 #endif

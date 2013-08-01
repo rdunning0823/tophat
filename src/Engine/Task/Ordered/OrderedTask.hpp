@@ -80,7 +80,7 @@ private:
 
   TaskFactoryType factory_mode;
   AbstractTaskFactory* active_factory;
-  OrderedTaskBehaviour ordered_behaviour;
+  OrderedTaskSettings ordered_settings;
   SmartTaskAdvance task_advance;
   TaskDijkstraMin *dijkstra_min;
   TaskDijkstraMax *dijkstra_max;
@@ -359,6 +359,11 @@ public:
   void CheckDuplicateWaypoints(Waypoints& waypoints);
 
   /**
+   * Update TaskStats::{task_valid, has_targets, is_mat, has_optional_starts}.
+   */
+  void UpdateStatsGeometry();
+
+  /**
    * Update internal geometric state of task points.
    * Typically called after task geometry or observation zones are modified.
    *
@@ -423,6 +428,7 @@ public:
    * @return True if start and finish found
    */
   bool ScanStartFinish();
+
 private:
 
   fixed ScanDistanceMin(const GeoPoint &ref, bool full);
@@ -530,27 +536,27 @@ public:
   }
 
   /** 
-   * Retrieve (const) the OrderedTaskBehaviour used by this task
+   * Retrieve (const) the #OrderedTaskSettings used by this task
    * 
-   * @return Read-only OrderedTaskBehaviour
+   * @return Read-only #OrderedTaskSettings
    */
-  const OrderedTaskBehaviour &GetOrderedTaskBehaviour() const {
-    return ordered_behaviour;
+  const OrderedTaskSettings &GetOrderedTaskSettings() const {
+    return ordered_settings;
   }
 
   /** 
-   * Copy OrderedTaskBehaviour to this task
+   * Copy #OrderedTaskSettings to this task
    * 
    * @param ob Value to set
    */
-  void SetOrderedTaskBehaviour(const OrderedTaskBehaviour &ob);
+  void SetOrderedTaskSettings(const OrderedTaskSettings &ob);
 
 protected:
   /**
-   * Propagate a change to the OrderedTaskBehaviour to all interested
+   * Propagate a change to the #OrderedTaskSettings to all interested
    * child objects.
    */
-  void PropagateOrderedTaskBehaviour();
+  void PropagateOrderedTaskSettings();
 
 public:
   ConstTaskPointList GetPoints() const {
@@ -671,8 +677,8 @@ protected:
                                const GlidePolar &glide_polar,
                                fixed &value) const override;
   virtual fixed CalcGradient(const AircraftState &state_now) const override;
-  virtual fixed ScanTotalStartTime(const AircraftState &state_now) override;
-  virtual fixed ScanLegStartTime(const AircraftState &state_now) override;
+  virtual fixed ScanTotalStartTime() override;
+  virtual fixed ScanLegStartTime() override;
   virtual fixed ScanDistanceNominal() override;
   virtual fixed ScanDistancePlanned() override;
   virtual fixed ScanDistanceRemaining(const GeoPoint &ref) override;

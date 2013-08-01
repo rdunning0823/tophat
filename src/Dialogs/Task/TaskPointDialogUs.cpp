@@ -219,7 +219,7 @@ RefreshTaskProperties()
   StaticString<255> line_2;
   StaticString<255> both_lines;
 
-  const OrderedTaskBehaviour &otb = ordered_task->GetOrderedTaskBehaviour();
+  const OrderedTaskSettings &otb = ordered_task->GetOrderedTaskSettings();
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   line_1 = OrderedTaskFactoryName(ftype);
 
@@ -488,7 +488,7 @@ TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned Draw
 }
 
 TaskEditorReturn
-dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
+dlgTaskPointUsShowModal(OrderedTask** task_pointer,
                       const unsigned index)
 {
   ordered_task = *task_pointer;
@@ -497,7 +497,7 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
   task_editor_return = TaskEditorReturn::TASK_NOT_MODIFIED;
   active_index = index;
 
-  wf = LoadDialog(CallBackTable, parent,
+  wf = LoadDialog(CallBackTable, UIGlobals::GetMainWindow(),
                   Layout::landscape ? _T("IDR_XML_TASKPOINT_US_L") :
                                       _T("IDR_XML_TASKPOINT_US"));
   assert(wf != nullptr);

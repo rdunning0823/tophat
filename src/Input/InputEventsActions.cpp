@@ -481,7 +481,7 @@ InputEvents::eventSetup(const TCHAR *misc)
   else if (StringIsEqual(misc, _T("QuickSetup")))
     ShowDialogSetupQuick(false);
   else if (StringIsEqual(misc, _T("Task")))
-    dlgTaskManagerShowModal(*CommonInterface::main_window);
+    dlgTaskManagerShowModal();
   else if (StringIsEqual(misc, _T("Airspace")))
     dlgAirspaceShowModal(false);
   else if (StringIsEqual(misc, _T("Weather")))

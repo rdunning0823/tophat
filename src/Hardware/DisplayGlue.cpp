@@ -22,11 +22,16 @@ Copyright_License {
 */
 
 #include "DisplayGlue.hpp"
-#include "Display.hpp"
+#include "RotateDisplay.hpp"
 #include "Operation/VerboseOperationEnvironment.hpp"
 #include "LogFile.hpp"
 #include "Interface.hpp"
 #include "MainWindow.hpp"
+
+#ifdef KOBO
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
+#endif
 
 void
 Display::LoadOrientation(VerboseOperationEnvironment &env)
@@ -38,13 +43,22 @@ Display::LoadOrientation(VerboseOperationEnvironment &env)
 
   DisplaySettings::Orientation orientation =
     CommonInterface::GetUISettings().display.orientation;
+#ifdef KOBO
+  /* on the Kobo, the display orientation must be loaded explicitly
+     (portrait), because the hardware default is landscape */
+#else
   if (orientation == DisplaySettings::Orientation::DEFAULT)
     return;
+#endif
 
   if (!Display::Rotate(orientation)) {
     LogFormat("Display rotation failed");
     return;
   }
+
+#ifdef KOBO
+  event_queue->SetMouseRotation(orientation);
+#endif
 
   LogFormat("Display rotated");
 
@@ -60,10 +74,16 @@ Display::RestoreOrientation()
   if (!Display::RotateSupported())
     return;
 
+#ifndef KOBO
   DisplaySettings::Orientation orientation =
     CommonInterface::GetUISettings().display.orientation;
   if (orientation == DisplaySettings::Orientation::DEFAULT)
     return;
+#endif
 
   Display::RotateRestore();
+
+#ifdef KOBO
+  event_queue->SetMouseRotation(DisplaySettings::Orientation::DEFAULT);
+#endif
 }

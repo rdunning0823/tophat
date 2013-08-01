@@ -115,7 +115,7 @@ BluetoothHelper::list(JNIEnv *env)
 PortBridge *
 BluetoothHelper::connect(JNIEnv *env, const char *address)
 {
-  if (cls == NULL)
+  if (!cls.IsDefined())
     return NULL;
 
   /* call BluetoothHelper.connect() */
@@ -135,7 +135,7 @@ BluetoothHelper::connect(JNIEnv *env, const char *address)
 PortBridge *
 BluetoothHelper::createServer(JNIEnv *env)
 {
-  if (cls == NULL)
+  if (!cls.IsDefined())
     return NULL;
 
   jobject obj = env->CallStaticObjectMethod(cls, createServer_method);

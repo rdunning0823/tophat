@@ -43,6 +43,15 @@ IsValidMapOrientation(unsigned value)
   return false;
 }
 
+static void
+Load(FAITriangleSettings &settings)
+{
+  FAITriangleSettings::Threshold threshold;
+  if (Profile::GetEnum(ProfileKeys::FAITriangleThreshold, threshold) &&
+      unsigned(threshold) < unsigned(FAITriangleSettings::Threshold::MAX))
+    settings.threshold = threshold;
+}
+
 void
 Profile::Load(MapSettings &settings)
 {
@@ -129,6 +138,7 @@ Profile::Load(MapSettings &settings)
 
   Get(ProfileKeys::ShowFAITriangleAreas,
       settings.show_fai_triangle_areas);
+  ::Load(settings.fai_triangle_settings);
 
   Get(ProfileKeys::EnableVarioBar,
       settings.vario_bar_enabled);

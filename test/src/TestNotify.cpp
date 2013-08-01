@@ -22,17 +22,16 @@
 
 #include "Thread/Thread.hpp"
 #include "Event/Notify.hpp"
+#include "Event/Globals.hpp"
 #include "Screen/Init.hpp"
 #include "TestUtil.hpp"
 
 #ifdef ANDROID
 #include "Event/Android/Loop.hpp"
-#include "Event/Android/Event.hpp"
-#include "Android/Main.hpp"
-#elif defined(USE_EGL)
-#include "Event/EGL/Event.hpp"
-#include "Event/EGL/Loop.hpp"
-#include "Event/EGL/Globals.hpp"
+#include "Event/Shared/Event.hpp"
+#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#include "Event/Shared/Event.hpp"
+#include "Event/Console/Loop.hpp"
 #include "Screen/TopWindow.hpp"
 #elif defined(ENABLE_SDL)
 #include "Event/SDL/Event.hpp"
@@ -42,11 +41,27 @@
 #include "Event/GDI/Loop.hpp"
 #endif
 
+#ifdef USE_FB
+#include "Hardware/RotateDisplay.hpp"
+bool
+Display::Rotate(DisplaySettings::Orientation orientation)
+{
+  return false;
+}
+#endif
+
+#ifndef KOBO
+
 #ifdef USE_EGL
 /* avoid TopWindow.cpp from being linked, as it brings some heavy
    dependencies */
 void TopWindow::Refresh() {}
+#endif
+
+#if defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
 bool TopWindow::OnEvent(const Event &event) { return false; }
+#endif
+
 #endif
 
 static bool quit;
@@ -76,11 +91,7 @@ int main(int argc, char **argv)
 
   ScreenGlobalInit screen;
 
-#if defined(ANDROID) || defined(USE_EGL)
   EventLoop loop(*event_queue);
-#else
-  EventLoop loop;
-#endif
   Event event;
 
   TestNotify notify;
@@ -91,6 +102,8 @@ int main(int argc, char **argv)
     loop.Dispatch(event);
 
   ok1(quit);
+
+  thread.Join();
 
   return exit_status();
 }

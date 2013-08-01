@@ -36,8 +36,8 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Compiler.h"
 
-#ifdef ENABLE_OPENGL
-#include "Screen/OpenGL/Cache.hpp"
+#ifdef HAVE_TEXT_CACHE
+#include "Screen/Custom/Cache.hpp"
 #endif
 
 enum ControlIndex {
@@ -122,7 +122,7 @@ FontEditWidget::UpdatePreview()
 
   font.Load(data);
 
-#ifdef ENABLE_OPENGL
+#ifdef HAVE_TEXT_CACHE
   TextCache::Flush();
 #endif
 
@@ -159,7 +159,7 @@ FontEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   LargeTextWindowStyle preview_style;
   preview_style.Border();
   LargeTextWindow *preview = new LargeTextWindow();
-  preview->Create(*(ContainerWindow *)GetWindow(), preview_rc, preview_style);
+  preview->Create((ContainerWindow &)GetWindow(), preview_rc, preview_style);
   Add(preview);
 
   Load();

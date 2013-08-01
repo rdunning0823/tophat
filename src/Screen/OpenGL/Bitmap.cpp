@@ -28,6 +28,16 @@ Copyright_License {
 #include "Texture.hpp"
 #include "Debug.hpp"
 
+void
+Bitmap::EnableInterpolation()
+{
+  interpolation = true;
+  if (texture != nullptr) {
+    texture->Bind();
+    texture->EnableInterpolation();
+  }
+}
+
 bool
 Bitmap::Load(const UncompressedImage &uncompressed, gcc_unused Type type)
 {
@@ -36,8 +46,20 @@ Bitmap::Load(const UncompressedImage &uncompressed, gcc_unused Type type)
   if (texture == nullptr)
     return false;
 
+  if (interpolation)
+    texture->EnableInterpolation();
+
   size = { uncompressed.GetWidth(), uncompressed.GetHeight() };
   return true;
+}
+
+bool
+Bitmap::LoadStretch(unsigned id, unsigned zoom)
+{
+  assert(zoom > 0);
+
+  // XXX
+  return Load(id);
 }
 
 #ifndef ANDROID

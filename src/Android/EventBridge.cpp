@@ -22,9 +22,9 @@ Copyright_License {
 */
 
 #include "org_tophat_EventBridge.h"
-#include "Event/Android/Queue.hpp"
+#include "Event/Queue.hpp"
 #include "Event/Idle.hpp"
-#include "Android/Main.hpp"
+#include "Event/Globals.hpp"
 #include "OS/Clock.hpp"
 #include "Compiler.h"
 

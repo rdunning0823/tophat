@@ -54,7 +54,7 @@ Copyright_License {
  * @return True if FAI shape
  */
 static bool
-TaskSummaryShape(OrderedTask* task, TCHAR* text)
+TaskSummaryShape(const OrderedTask *task, TCHAR *text)
 {
   bool FAIShape = false;
   switch (task->TaskSize()) {
@@ -99,11 +99,11 @@ TaskSummaryShape(OrderedTask* task, TCHAR* text)
   return FAIShape;
 }
 void
-OrderedTaskSummary(OrderedTask* task, TCHAR* text, bool linebreaks)
+OrderedTaskSummary(const OrderedTask *task, TCHAR *text, bool linebreaks)
 {
   StaticString<120> gate_info;
   gate_info.clear();
-  const OrderedTaskBehaviour &otb = task->GetOrderedTaskBehaviour();
+  const OrderedTaskSettings &otb = task->GetOrderedTaskSettings();
 
   if (!otb.finish_constraints.fai_finish) {
     StaticString<25> start_height;

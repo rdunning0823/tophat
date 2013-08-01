@@ -39,8 +39,6 @@ TaskDijkstra::RefreshTask(const OrderedTask &task)
 
   SetStageCount(task_size);
 
-  active_stage = task.GetActiveTaskPointIndex();
-
   for (unsigned stage = 0; stage != num_stages; ++stage)
     boundaries[stage] = &task.GetPointSearchPoints(stage);
 
@@ -72,13 +70,27 @@ TaskDijkstra::AddEdges(const ScanTaskPoint curNode)
     Link(destination, curNode, CalcDistance(curNode, destination));
 }
 
-void 
-TaskDijkstra::AddStartEdges(const SearchPoint &currentLocation)
+void
+TaskDijkstra::AddZeroStartEdges()
 {
-  ScanTaskPoint destination(active_stage, 0);
-  const unsigned dsize = GetStageSize(active_stage);
+  const unsigned stage = 0;
+  ScanTaskPoint destination(stage, 0);
+  const unsigned dsize = GetStageSize(stage);
 
-  for (const ScanTaskPoint end(active_stage, dsize);
+  for (const ScanTaskPoint end(stage, dsize);
+       destination != end; destination.IncrementPointIndex())
+    LinkStart(destination, 0);
+}
+
+void 
+TaskDijkstra::AddStartEdges(unsigned stage, const SearchPoint &currentLocation)
+{
+  assert(currentLocation.IsValid());
+
+  ScanTaskPoint destination(stage, 0);
+  const unsigned dsize = GetStageSize(stage);
+
+  for (const ScanTaskPoint end(stage, dsize);
        destination != end; destination.IncrementPointIndex())
     LinkStart(destination, CalcDistance(destination, currentLocation));
 }

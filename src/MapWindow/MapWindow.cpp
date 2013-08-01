@@ -25,7 +25,7 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Screen/Layout.hpp"
 #include "Topography/TopographyStore.hpp"
-#include "Topography/TopographyRenderer.hpp"
+#include "Topography/CachedTopographyRenderer.hpp"
 #include "Terrain/RasterTerrain.hpp"
 #include "Terrain/RasterWeather.hpp"
 #include "Computer/GlideComputer.hpp"
@@ -101,6 +101,13 @@ MapWindow::SetGlideComputer(GlideComputer *_gc)
                                         : NULL);
 }
 
+void
+MapWindow::FlushCaches()
+{
+  background.Flush();
+  airspace_renderer.Flush();
+}
+
 /**
  * Copies the given basic and calculated info to the MapWindowBlackboard
  * and reads the Settings from the DeviceBlackboard.
@@ -161,7 +168,7 @@ MapWindow::UpdateWeather()
   // always service weather even if it's not used by the map,
   // because it's potentially used by other calculations
 
-  if (weather == NULL)
+  if (weather == NULL || Calculated().date_time_local.IsTimePlausible())
     return false;
 
   QuietOperationEnvironment operation;
@@ -204,7 +211,7 @@ MapWindow::SetTopography(TopographyStore *_topography)
 
   delete topography_renderer;
   topography_renderer = topography != NULL
-    ? new TopographyRenderer(*topography)
+    ? new CachedTopographyRenderer(*topography)
     : NULL;
 }
 

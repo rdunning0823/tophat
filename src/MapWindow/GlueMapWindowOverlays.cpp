@@ -24,7 +24,7 @@ Copyright_License {
 #include "GlueMapWindow.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/TaskLook.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Look/IconLook.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Icon.hpp"
@@ -37,7 +37,6 @@ Copyright_License {
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Engine/Task/Points/TaskWaypoint.hpp"
-#include "Look/Fonts.hpp"
 #include "Screen/UnitSymbol.hpp"
 #include "Terrain/RasterWeather.hpp"
 #include "Formatter/UserUnits.hpp"
@@ -283,10 +282,11 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
   mode.shape = LabelShape::OUTLINED;
   mode.align = TextInBoxMode::Alignment::RIGHT;
 
-  canvas.Select(Fonts::map_bold);
+  const Font &font = *look.overlay_font;
+  canvas.Select(font);
 
   UPixelScalar padding = Layout::FastScale(4);
-  UPixelScalar height = Fonts::map_bold.GetHeight();
+  UPixelScalar height = font.GetHeight();
   PixelScalar y = 0 + padding;
   PixelScalar x = render_projection.GetScreenWidth() - padding;
 
@@ -366,7 +366,8 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc_unadjusted,
   TextInBoxMode mode;
   mode.shape = LabelShape::ROUNDED_BLACK;
 
-  canvas.Select(Fonts::map_bold);
+  const Font &font = *look.overlay_font;
+  canvas.Select(font);
   TextInBox(canvas, txt, x, y, mode, rc, NULL);
 }
 
@@ -530,6 +531,7 @@ GlueMapWindow::DrawVario(Canvas &canvas, const PixelRect &rc) const
   vario_bar_renderer.Draw(canvas, rc, Basic(), Calculated(),
                           GetComputerSettings().polar.glide_polar_task,
                           true); //NOTE: AVG enabled for now, make it configurable ;
+
 }
 
 void
@@ -573,6 +575,12 @@ GlueMapWindow::RenderTrail(Canvas &canvas, const RasterPoint aircraft_pos)
 }
 
 void
+GlueMapWindow::RenderTrackBearing(Canvas &canvas, const RasterPoint aircraft_pos)
+{
+  DrawTrackBearing(canvas, aircraft_pos, InCirclingMode());
+}
+
+void
 GlueMapWindow::DrawThermalBand(Canvas &canvas, const PixelRect &rc) const
 {
   if (Calculated().task_stats.total.solution_remaining.IsOk() &&
@@ -596,7 +604,7 @@ GlueMapWindow::DrawThermalBand(Canvas &canvas, const PixelRect &rc) const
                              tb_rect,
                              GetComputerSettings().task,
                              true,
-                             &task_manager->GetOrderedTask().GetOrderedTaskBehaviour());
+                             &task_manager->GetOrderedTask().GetOrderedTaskSettings());
   } else {
     renderer.DrawThermalBand(Basic(),
                              Calculated(),

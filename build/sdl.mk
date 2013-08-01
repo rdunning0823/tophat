@@ -1,9 +1,11 @@
 ifeq ($(TARGET),ANDROID)
 # Android must use OpenGL
 ENABLE_SDL = n
-# UNIX/Linux defaults to OpenGL, but can use SDL_gfx instead
 else ifeq ($(HAVE_WIN32),y)
 # Windows defaults to GDI
+ENABLE_SDL ?= n
+else ifeq ($(TARGET_IS_KOBO),y)
+# the Kobo uses the frame buffer
 ENABLE_SDL ?= n
 else
 # everything else defaults to SDL
@@ -14,25 +16,9 @@ ifeq ($(ENABLE_SDL),y)
 
 LIBPNG = y
 LIBJPEG = y
+FREETYPE = y
 
-SDL_PKG = sdl
-
-ifeq ($(FREETYPE),n)
-SDL_PKG += SDL_ttf
-endif
-
-ifeq ($(OPENGL),n)
-SDL_PKG += SDL_gfx
-endif
-
-ifeq ($(TARGET_IS_KOBO),y)
-SDL_CPPFLAGS += -isystem $(KOBO)/include/SDL
-SDL_LDADD += $(KOBO)/lib/libpng.a $(KOBO)/lib/libjpeg.a
-SDL_LDADD += $(KOBO)/lib/libSDL_ttf.a $(KOBO)/lib/libfreetype.a
-SDL_LDADD += $(KOBO)/lib/libSDL_gfx.a $(KOBO)/lib/libSDL.a
-else
-$(eval $(call pkg-config-library,SDL,$(SDL_PKG)))
-endif
+$(eval $(call pkg-config-library,SDL,sdl))
 
 SDL_CPPFLAGS += -DENABLE_SDL
 

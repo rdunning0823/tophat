@@ -24,7 +24,7 @@
 #define TASK_BEHAVIOUR_HPP
 
 #include "Task/TaskNationalities.hpp"
-#include "Ordered/OrderedTaskBehaviour.hpp"
+#include "Ordered/Settings.hpp"
 #include "Task/Factory/TaskPointFactoryType.hpp"
 #include "Engine/Route/Config.hpp"
 #include "GlideSolvers/GlideSettings.hpp"
@@ -133,7 +133,7 @@ struct TaskBehaviour {
   SectorDefaults sector_defaults;
 
   /** Defaults for ordered task */
-  OrderedTaskBehaviour ordered_defaults;
+  OrderedTaskSettings ordered_defaults;
 
   /** Whether to maintain a thinned trace of the flight.  This is overridden by enable_olc. */
   bool enable_trace;

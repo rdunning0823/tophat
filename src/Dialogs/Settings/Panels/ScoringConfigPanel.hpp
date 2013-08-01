@@ -29,4 +29,4 @@ class Widget;
 Widget *
 CreateScoringConfigPanel();
 
-#endif /* XCSOAR_SCORING_CONFIG_PANEL_HPP */
+#endif /* TASKRULESCONFIGPANEL_HPP */

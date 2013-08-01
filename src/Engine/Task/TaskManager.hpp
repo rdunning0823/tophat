@@ -428,11 +428,11 @@ public:
   void SetTaskBehaviour(const TaskBehaviour& behaviour);
 
   /** 
-   * Retrieve the OrderedTaskBehaviour used by the OrderedTask
+   * Retrieve the #OrderedTaskSettings used by the OrderedTask
    * 
-   * @return OrderedTaskBehaviour reference
+   * @return #OrderedTaskSettings reference
    */
-  void SetOrderedTaskBehaviour(const OrderedTaskBehaviour &otb);
+  void SetOrderedTaskSettings(const OrderedTaskSettings &otb);
 
   /** 
    * Retrieve task behaviour

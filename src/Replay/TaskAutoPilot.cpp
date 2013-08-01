@@ -26,6 +26,8 @@
 #include "GlideSolvers/GlidePolar.hpp"
 #include "Util/Clamp.hpp"
 
+#include <stdlib.h>
+
 void
 AutopilotParameters::SetIdeal()
 {
@@ -343,8 +345,7 @@ TaskAutoPilot::UpdateComputer(TaskAccessor& task, const AircraftState& state)
 }
 
 bool
-TaskAutoPilot::UpdateAutopilot(TaskAccessor& task, const AircraftState& state,
-                               const AircraftState& state_last)
+TaskAutoPilot::UpdateAutopilot(TaskAccessor &task, const AircraftState &state)
 {
   UpdateMode(task, state);
   return UpdateComputer(task, state);

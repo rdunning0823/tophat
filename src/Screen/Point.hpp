@@ -26,10 +26,12 @@ Copyright_License {
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Point.hpp"
-#elif defined(ENABLE_SDL)
-#include "Screen/SDL/Point.hpp"
-#else
+#elif defined(USE_MEMORY_CANVAS)
+#include "Screen/Memory/Point.hpp"
+#elif defined(USE_GDI)
 #include "Screen/GDI/Point.hpp"
+#else
+#error No Point implementation
 #endif
 
 #include "Compiler.h"
@@ -51,20 +53,6 @@ OverlapsRect(const PixelRect &a, const PixelRect &b)
 {
   return a.left < b.right && b.left <= a.right &&
     a.top <= b.bottom && b.top <= a.bottom;
-}
-
-static inline void
-SetRect(PixelRect &rc, PixelScalar left, PixelScalar top,
-        PixelScalar right, PixelScalar bottom)
-{
-#ifdef USE_GDI
-  SetRect(&rc, left, top, right, bottom);
-#else
-  rc.left = left;
-  rc.top = top;
-  rc.right = right;
-  rc.bottom = bottom;
-#endif
 }
 
 #endif

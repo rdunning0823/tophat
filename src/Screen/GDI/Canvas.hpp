@@ -30,7 +30,6 @@ Copyright_License {
 #include "Screen/Font.hpp"
 #include "Screen/Pen.hpp"
 #include "Screen/Point.hpp"
-#include "Screen/GDI/AlphaBlend.hpp"
 #include "Compiler.h"
 
 #include <assert.h>
@@ -103,13 +102,13 @@ public:
     return size;
   }
 
-  UPixelScalar GetWidth() const {
+  unsigned GetWidth() const {
     assert(IsDefined());
 
     return size.cx;
   }
 
-  UPixelScalar GetHeight() const {
+  unsigned GetHeight() const {
     assert(IsDefined());
 
     return size.cy;
@@ -225,16 +224,14 @@ public:
     ::SetROP2(dc, R2_MASKPEN);
   }
 
-  void Rectangle(PixelScalar left, PixelScalar top,
-                 PixelScalar right, PixelScalar bottom) {
+  void Rectangle(int left, int top, int right, int bottom) {
     assert(IsDefined());
 
     ::Rectangle(dc, left, top, right, bottom);
   }
 
-  void DrawFilledRectangle(PixelScalar left, PixelScalar top,
-                      PixelScalar right, PixelScalar bottom,
-                      const HWColor color) {
+  void DrawFilledRectangle(int left, int top, int right, int bottom,
+                           const HWColor color) {
     PixelRect rc;
     rc.left = left;
     rc.top = top;
@@ -244,9 +241,8 @@ public:
     DrawFilledRectangle(rc, color);
   }
 
-  void DrawFilledRectangle(PixelScalar left, PixelScalar top,
-                      PixelScalar right, PixelScalar bottom,
-                      const Color color) {
+  void DrawFilledRectangle(int left, int top, int right, int bottom,
+                           const Color color) {
     DrawFilledRectangle(left, top, right, bottom, map(color));
   }
 
@@ -269,9 +265,8 @@ public:
     ::FillRect(dc, &rc, brush.Native());
   }
 
-  void DrawFilledRectangle(PixelScalar left, PixelScalar top,
-                      PixelScalar right, PixelScalar bottom,
-                      const Brush &brush) {
+  void DrawFilledRectangle(int left, int top, int right, int bottom,
+                           const Brush &brush) {
     PixelRect rc;
     rc.left = left;
     rc.top = top;
@@ -302,10 +297,9 @@ public:
     ::BitBlt(dc, 0, 0, GetWidth(), GetHeight(), NULL, 0, 0, WHITENESS);
   }
 
-  void DrawRoundRectangle(PixelScalar left, PixelScalar top,
-                       PixelScalar right, PixelScalar bottom,
-                       UPixelScalar ellipse_width,
-                       UPixelScalar ellipse_height) {
+  void DrawRoundRectangle(int left, int top, int right, int bottom,
+                          unsigned ellipse_width,
+                          unsigned ellipse_height) {
     assert(IsDefined());
 
     ::RoundRect(dc, left, top, right, bottom, ellipse_width, ellipse_height);
@@ -333,7 +327,7 @@ public:
     DrawPolygon(points, num_points);
   }
 
-  void DrawLine(PixelScalar ax, PixelScalar ay, PixelScalar bx, PixelScalar by);
+  void DrawLine(int ax, int ay, int bx, int by);
   void DrawLine(const RasterPoint a, const RasterPoint b) {
     DrawLine(a.x, a.y, b.x, b.y);
   }
@@ -342,8 +336,7 @@ public:
     DrawLine(a, b);
   }
 
-  void DrawExactLine(PixelScalar ax, PixelScalar ay,
-                     PixelScalar bx, PixelScalar by) {
+  void DrawExactLine(int ax, int ay, int bx, int by) {
     DrawLine(ax, ay, bx, by);
   }
 
@@ -351,34 +344,30 @@ public:
     DrawLine(a, b);
   }
 
-  void DrawTwoLines(PixelScalar ax, PixelScalar ay,
-                    PixelScalar bx, PixelScalar by,
-                    PixelScalar cx, PixelScalar cy);
+  void DrawTwoLines(int ax, int ay, int bx, int by, int cx, int cy);
   void DrawTwoLines(const RasterPoint a, const RasterPoint b,
                     const RasterPoint c) {
     DrawTwoLines(a.x, a.y, b.x, b.y, c.x, c.y);
   }
 
-  void DrawTwoLinesExact(PixelScalar ax, PixelScalar ay,
-                         PixelScalar bx, PixelScalar by,
-                         PixelScalar cx, PixelScalar cy) {
+  void DrawTwoLinesExact(int ax, int ay, int bx, int by, int cx, int cy) {
     DrawTwoLines(ax, ay, bx, by, cx, cy);
   }
 
-  void DrawCircle(PixelScalar x, PixelScalar y, UPixelScalar radius) {
+  void DrawCircle(int x, int y, unsigned radius) {
     assert(IsDefined());
 
     ::Ellipse(dc, x - radius, y - radius, x + radius, y + radius);
   }
 
-  void DrawSegment(PixelScalar x, PixelScalar y, UPixelScalar radius,
+  void DrawSegment(int x, int y, unsigned radius,
                    Angle start, Angle end, bool horizon = false);
 
-  void DrawAnnulus(PixelScalar x, PixelScalar y, UPixelScalar small_radius,
-                   UPixelScalar big_radius, Angle start, Angle end);
+  void DrawAnnulus(int x, int y, unsigned small_radius,
+                   unsigned big_radius, Angle start, Angle end);
 
-  void DrawKeyhole(PixelScalar x, PixelScalar y, UPixelScalar small_radius,
-                   UPixelScalar big_radius, Angle start, Angle end);
+  void DrawKeyhole(int x, int y, unsigned small_radius,
+                   unsigned big_radius, Angle start, Angle end);
 
   void DrawFocusRectangle(const PixelRect &rc) {
     assert(IsDefined());
@@ -400,28 +389,27 @@ public:
   const PixelSize CalcTextSize(const TCHAR *text) const;
 
   gcc_pure
-  UPixelScalar CalcTextWidth(const TCHAR *text) const {
+  unsigned CalcTextWidth(const TCHAR *text) const {
     return CalcTextSize(text).cx;
   }
 
   gcc_pure
-  UPixelScalar GetFontHeight() const;
+  unsigned GetFontHeight() const;
 
-  void DrawText(PixelScalar x, PixelScalar y, const TCHAR *text);
-  void DrawText(PixelScalar x, PixelScalar y,
+  void DrawText(int x, int y, const TCHAR *text);
+  void DrawText(int x, int y,
                 const TCHAR *text, size_t length);
-  void DrawOpaqueText(PixelScalar x, PixelScalar y, const PixelRect &rc,
-                      const TCHAR *text);
+  void DrawOpaqueText(int x, int y, const PixelRect &rc, const TCHAR *text);
 
-  void DrawClippedText(PixelScalar x, PixelScalar y, const PixelRect &rc,
+  void DrawClippedText(int x, int y, const PixelRect &rc,
                        const TCHAR *text);
-  void DrawClippedText(PixelScalar x, PixelScalar y, UPixelScalar width,
+  void DrawClippedText(int x, int y, unsigned width,
                        const TCHAR *text);
 
   /**
    * Render text, clip it within the bounds of this Canvas.
    */
-  void TextAutoClipped(PixelScalar x, PixelScalar y, const TCHAR *t) {
+  void TextAutoClipped(int x, int y, const TCHAR *t) {
     DrawText(x, y, t);
   }
 
@@ -429,9 +417,8 @@ public:
     ::DrawText(dc, text, -1, rc, format);
   }
 
-  void Copy(PixelScalar dest_x, PixelScalar dest_y,
-            UPixelScalar dest_width, UPixelScalar dest_height,
-            HDC src, PixelScalar src_x, PixelScalar src_y,
+  void Copy(int dest_x, int dest_y, unsigned dest_width, unsigned dest_height,
+            HDC src, int src_x, int src_y,
             DWORD dwRop=SRCCOPY) {
     assert(IsDefined());
     assert(src != NULL);
@@ -440,38 +427,34 @@ public:
              src, src_x, src_y, dwRop);
   }
 
-  void Copy(PixelScalar dest_x, PixelScalar dest_y,
-            UPixelScalar dest_width, UPixelScalar dest_height,
-            const Canvas &src, PixelScalar src_x, PixelScalar src_y) {
+  void Copy(int dest_x, int dest_y, unsigned dest_width, unsigned dest_height,
+            const Canvas &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src.dc, src_x, src_y);
   }
 
-  void Copy(PixelScalar dest_x, PixelScalar dest_y,
-            UPixelScalar dest_width, UPixelScalar dest_height,
-            HBITMAP src, PixelScalar src_x, PixelScalar src_y,
+  void Copy(int dest_x, int dest_y, unsigned dest_width, unsigned dest_height,
+            HBITMAP src, int src_x, int src_y,
             DWORD dwRop=SRCCOPY);
 
-  void Copy(PixelScalar dest_x, PixelScalar dest_y,
-            UPixelScalar dest_width, UPixelScalar dest_height,
-            const Bitmap &src, PixelScalar src_x, PixelScalar src_y,
+  void Copy(int dest_x, int dest_y, unsigned dest_width, unsigned dest_height,
+            const Bitmap &src, int src_x, int src_y,
             DWORD dwRop=SRCCOPY);
 
-  void Copy(const Canvas &src, PixelScalar src_x, PixelScalar src_y);
+  void Copy(const Canvas &src, int src_x, int src_y);
   void Copy(const Canvas &src);
 
   void Copy(const Bitmap &src);
 
   void CopyTransparentWhite(const Canvas &src);
-  void CopyTransparentBlack(const Canvas &src);
-  void StretchTransparent(const Bitmap &src, Color key);
-  void InvertStretchTransparent(const Bitmap &src, Color key);
 
-  void Stretch(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
+  void StretchNot(const Bitmap &src);
+
+  void Stretch(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
                HDC src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height,
+               int src_x, int src_y,
+               unsigned src_width, unsigned src_height,
                DWORD dwRop=SRCCOPY) {
     assert(IsDefined());
     assert(src != NULL);
@@ -481,11 +464,11 @@ public:
                  dwRop);
   }
 
-  void Stretch(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
+  void Stretch(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
                const Canvas &src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height,
+               int src_x, int src_y,
+               unsigned src_width, unsigned src_height,
                DWORD dwRop=SRCCOPY) {
     assert(IsDefined());
     assert(src.IsDefined());
@@ -495,25 +478,25 @@ public:
             dwRop);
   }
 
-  void Stretch(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
+  void Stretch(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
                HBITMAP src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height,
+               int src_x, int src_y,
+               unsigned src_width, unsigned src_height,
                DWORD dwRop=SRCCOPY);
 
-  void Stretch(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
+  void Stretch(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
                const Bitmap &src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height,
+               int src_x, int src_y,
+               unsigned src_width, unsigned src_height,
                DWORD dwRop=SRCCOPY);
 
-  void Stretch(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
+  void Stretch(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
                HDC src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height) {
+               int src_x, int src_y,
+               unsigned src_width, unsigned src_height) {
     assert(IsDefined());
     assert(src != NULL);
 
@@ -523,43 +506,22 @@ public:
   }
 
   void Stretch(const Canvas &src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height);
+               int src_x, int src_y, unsigned src_width, unsigned src_height);
 
   void Stretch(const Canvas &src);
 
   void Stretch(const Bitmap &src,
-               PixelScalar src_x, PixelScalar src_y,
-               UPixelScalar src_width, UPixelScalar src_height) {
+               int src_x, int src_y,
+               unsigned src_width, unsigned src_height) {
     Stretch(0, 0, GetWidth(), GetHeight(),
             src, src_x, src_y, src_width, src_height);
   }
 
-  void Stretch(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
+  void Stretch(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
                const Bitmap &src);
 
   void Stretch(const Bitmap &src);
-
-  void StretchAnd(PixelScalar dest_x, PixelScalar dest_y,
-                  UPixelScalar dest_width, UPixelScalar dest_height,
-                  const Bitmap &src,
-                  PixelScalar src_x, PixelScalar src_y,
-                  UPixelScalar src_width, UPixelScalar src_height) {
-    Stretch(dest_x, dest_y, dest_width, dest_height,
-            src, src_x, src_y, src_width, src_height,
-            SRCAND);
-  }
-
-  void StretchNotOr(PixelScalar dest_x, PixelScalar dest_y,
-                    UPixelScalar dest_width, UPixelScalar dest_height,
-                    const Bitmap &src,
-                    PixelScalar src_x, PixelScalar src_y,
-                    UPixelScalar src_width, UPixelScalar src_height) {
-    Stretch(dest_x, dest_y, dest_width, dest_height,
-            src, src_x, src_y, src_width, src_height,
-            MERGEPAINT);
-  }
 
   /**
    * Stretches a monochrome bitmap (1 bit per pixel), painting the
@@ -570,38 +532,26 @@ public:
    * @param fg_color draw this color instead of "black"
    * @param bg_color draw this color instead of "white"
    */
-  void StretchMono(PixelScalar dest_x, PixelScalar dest_y,
-                   UPixelScalar dest_width, UPixelScalar dest_height,
+  void StretchMono(int dest_x, int dest_y,
+                   unsigned dest_width, unsigned dest_height,
                    const Bitmap &src,
-                   PixelScalar src_x, PixelScalar src_y,
-                   UPixelScalar src_width, UPixelScalar src_height,
+                   int src_x, int src_y,
+                   unsigned src_width, unsigned src_height,
                    Color fg_color, Color bg_color);
 
 #ifdef HAVE_ALPHA_BLEND
-  void AlphaBlend(PixelScalar dest_x, PixelScalar dest_y,
-                  UPixelScalar dest_width, UPixelScalar dest_height,
+  void AlphaBlend(int dest_x, int dest_y,
+                  unsigned dest_width, unsigned dest_height,
                   HDC src,
-                  PixelScalar src_x, PixelScalar src_y,
-                  UPixelScalar src_width, UPixelScalar src_height,
-                  uint8_t alpha) {
-    assert(AlphaBlendAvailable());
+                  int src_x, int src_y,
+                  unsigned src_width, unsigned src_height,
+                  uint8_t alpha);
 
-    BLENDFUNCTION fn;
-    fn.BlendOp = AC_SRC_OVER;
-    fn.BlendFlags = 0;
-    fn.SourceConstantAlpha = alpha;
-    fn.AlphaFormat = 0;
-
-    ::AlphaBlendInvoke(dc, dest_x, dest_y, dest_width, dest_height,
-                       src, src_x, src_y, src_width, src_height,
-                       fn);
-  }
-
-  void AlphaBlend(PixelScalar dest_x, PixelScalar dest_y,
-                  UPixelScalar dest_width, UPixelScalar dest_height,
+  void AlphaBlend(int dest_x, int dest_y,
+                  unsigned dest_width, unsigned dest_height,
                   const Canvas &src,
-                  PixelScalar src_x, PixelScalar src_y,
-                  UPixelScalar src_width, UPixelScalar src_height,
+                  int src_x, int src_y,
+                  unsigned src_width, unsigned src_height,
                   uint8_t alpha) {
     AlphaBlend(dest_x, dest_y, dest_width, dest_height,
                 src.dc, src_x, src_y, src_width, src_height,
@@ -609,9 +559,9 @@ public:
   }
 #endif
 
-  void CopyOr(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
-               const Canvas &src, PixelScalar src_x, PixelScalar src_y) {
+  void CopyOr(int dest_x, int dest_y,
+              unsigned dest_width, unsigned dest_height,
+              const Canvas &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src, src_x, src_y, SRCPAINT);
   }
@@ -620,9 +570,9 @@ public:
     CopyOr(0, 0, GetWidth(), GetHeight(), src, 0, 0);
   }
 
-  void CopyOr(PixelScalar dest_x, PixelScalar dest_y,
-              UPixelScalar dest_width, UPixelScalar dest_height,
-              const Bitmap &src, PixelScalar src_x, PixelScalar src_y) {
+  void CopyOr(int dest_x, int dest_y,
+              unsigned dest_width, unsigned dest_height,
+              const Bitmap &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src, src_x, src_y,
          SRCPAINT);
@@ -632,25 +582,25 @@ public:
    * Merges the colors of the inverted source bitmap with the colors
    * of this Canvas using the "OR" operator.
    */
-  void CopyNotOr(PixelScalar dest_x, PixelScalar dest_y,
-                 UPixelScalar dest_width, UPixelScalar dest_height,
-                 const Bitmap &src, PixelScalar src_x, PixelScalar src_y) {
+  void CopyNotOr(int dest_x, int dest_y,
+                 unsigned dest_width, unsigned dest_height,
+                 const Bitmap &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src, src_x, src_y,
          MERGEPAINT);
   }
 
-  void CopyNot(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
-               const Bitmap &src, PixelScalar src_x, PixelScalar src_y) {
+  void CopyNot(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
+               const Bitmap &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src, src_x, src_y,
          NOTSRCCOPY);
   }
 
-  void CopyAnd(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
-               const Canvas &src, PixelScalar src_x, PixelScalar src_y) {
+  void CopyAnd(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
+               const Canvas &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src.dc, src_x, src_y, SRCAND);
   }
@@ -659,21 +609,21 @@ public:
     CopyAnd(0, 0, GetWidth(), GetHeight(), src, 0, 0);
   }
 
-  void CopyAnd(PixelScalar dest_x, PixelScalar dest_y,
-               UPixelScalar dest_width, UPixelScalar dest_height,
-               const Bitmap &src, PixelScalar src_x, PixelScalar src_y) {
+  void CopyAnd(int dest_x, int dest_y,
+               unsigned dest_width, unsigned dest_height,
+               const Bitmap &src, int src_x, int src_y) {
     Copy(dest_x, dest_y, dest_width, dest_height,
          src, src_x, src_y,
          SRCAND);
   }
 
-  void ScaleCopy(PixelScalar dest_x, PixelScalar dest_y,
+  void ScaleCopy(int dest_x, int dest_y,
                  const Bitmap &src,
-                 PixelScalar src_x, PixelScalar src_y,
-                 UPixelScalar src_width, UPixelScalar src_height);
+                 int src_x, int src_y,
+                 unsigned src_width, unsigned src_height);
 
   gcc_pure
-  HWColor GetPixel(PixelScalar x, PixelScalar y) const {
+  HWColor GetPixel(int x, int y) const {
     return HWColor(::GetPixel(dc, x, y));
   }
 };

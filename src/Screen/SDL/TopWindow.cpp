@@ -24,6 +24,7 @@ Copyright_License {
 #include "Screen/TopWindow.hpp"
 #include "Event/SDL/Event.hpp"
 #include "Event/SDL/Loop.hpp"
+#include "Event/Globals.hpp"
 #include "Screen/Custom/TopCanvas.hpp"
 #include "Util/ConvertString.hpp"
 
@@ -38,19 +39,7 @@ TopWindow::SetCaption(const TCHAR *caption)
 void
 TopWindow::Invalidate()
 {
-  if (invalidated.exchange(true, std::memory_order_relaxed))
-    /* already invalidated, don't send the event twice */
-    return;
-
-  /* wake up the event loop */
-
-  /* note that SDL_NOEVENT is not documented, but since we just want
-     to wake up without actually sending an event, I hope this works
-     on all future SDL versions; if SDL_NOEVENT ever gets remove, I'll
-     have to come up with something else */
-  SDL_Event event;
-  event.type = SDL_NOEVENT;
-  ::SDL_PushEvent(&event);
+  invalidated = true;
 }
 
 bool
@@ -60,8 +49,7 @@ TopWindow::OnEvent(const SDL_Event &event)
     Window *w;
 
   case SDL_VIDEOEXPOSE:
-    invalidated.store(false, std::memory_order_relaxed);
-
+    invalidated = false;
     Expose();
     return true;
 
@@ -127,7 +115,7 @@ TopWindow::RunEventLoop()
 {
   Refresh();
 
-  EventLoop loop(*this);
+  EventLoop loop(*event_queue, *this);
   Event event;
   while (IsDefined() && loop.Get(event))
     loop.Dispatch(event);

@@ -23,21 +23,43 @@ Copyright_License {
 
 #include "Screen/Custom/TopCanvas.hpp"
 #include "Screen/Features.hpp"
+#include "Screen/Point.hpp"
 #include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Init.hpp"
 #include "Screen/OpenGL/Features.hpp"
-#ifdef HAVE_EGL
-#include "Screen/OpenGL/EGL.hpp"
-#include "Screen/OpenGL/Globals.hpp"
+#else
+#include "Screen/Canvas.hpp"
 #endif
+
+#ifdef DITHER
+#include "Screen/Memory/Dither.hpp"
 #endif
 
 #include <SDL_video.h>
 
 #include <assert.h>
 #include <stdio.h>
+
+#if !defined(ENABLE_OPENGL) && defined(GREYSCALE)
+TopCanvas::~TopCanvas()
+{
+  buffer.Free();
+}
+#endif
+
+#ifndef ENABLE_OPENGL
+
+PixelRect
+TopCanvas::GetRect() const
+{
+  assert(IsDefined());
+
+  return { 0, 0, surface->w, surface->h };
+}
+
+#endif
 
 gcc_const
 static Uint32
@@ -95,19 +117,26 @@ TopCanvas::Create(PixelSize new_size,
   OpenGL::SetupViewport(new_size.cx, new_size.cy);
   Canvas::Create(new_size);
 #else
-  Canvas::Create(s);
+  surface = s;
+
+#ifdef GREYSCALE
+  buffer.Allocate(new_size.cx, new_size.cy);
+#endif
 #endif
 }
 
 void
 TopCanvas::OnResize(PixelSize new_size)
 {
-  if (new_size == size)
+#ifdef ENABLE_OPENGL
+  if (new_size == GetSize())
     return;
 
-#ifdef ENABLE_OPENGL
   const SDL_Surface *old = ::SDL_GetVideoSurface();
 #else
+  if (new_size.cx == surface->w && new_size.cy == surface->h)
+    return;
+
   const SDL_Surface *old = surface;
 #endif
   if (old == nullptr)
@@ -122,6 +151,13 @@ TopCanvas::OnResize(PixelSize new_size)
 #ifdef ENABLE_OPENGL
   OpenGL::SetupViewport(new_size.cx, new_size.cy);
   Canvas::Create(new_size);
+#else
+  surface = s;
+
+#ifdef GREYSCALE
+  buffer.Free();
+  buffer.Allocate(new_size.cx, new_size.cy);
+#endif
 #endif
 }
 
@@ -133,21 +169,160 @@ TopCanvas::Fullscreen()
 #endif
 }
 
+#ifdef GREYSCALE
+
+#ifdef DITHER
+
+#else
+
+static uint32_t
+GreyscaleToRGB8(Luminosity8 luminosity)
+{
+  const unsigned value = luminosity.GetLuminosity();
+
+  return value | (value << 8) | (value << 16) | (value << 24);
+}
+
+static void
+CopyGreyscaleToRGB8(uint32_t *gcc_restrict dest,
+                     const Luminosity8 *gcc_restrict src,
+                     unsigned width)
+{
+  for (unsigned i = 0; i < width; ++i)
+    *dest++ = GreyscaleToRGB8(*src++);
+}
+
+static RGB565Color
+GreyscaleToRGB565(Luminosity8 luminosity)
+{
+  const unsigned value = luminosity.GetLuminosity();
+
+  return RGB565Color(value, value, value);
+}
+
+static void
+CopyGreyscaleToRGB565(RGB565Color *gcc_restrict dest,
+                      const Luminosity8 *gcc_restrict src,
+                      unsigned width)
+{
+  for (unsigned i = 0; i < width; ++i)
+    *dest++ = GreyscaleToRGB565(*src++);
+}
+
+#endif
+
+#if defined(__clang__) || GCC_VERSION >= 40800
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
+static void
+CopyFromGreyscale(
+#ifdef DITHER
+                  Dither &dither,
+#endif
+                  SDL_Surface *dest,
+                  ConstImageBuffer<GreyscalePixelTraits> src)
+{
+  assert(dest->format->BytesPerPixel == 4 || dest->format->BytesPerPixel == 2);
+
+  if (SDL_LockSurface(dest) != 0)
+    return;
+
+  const uint8_t *src_pixels = reinterpret_cast<const uint8_t *>(src.data);
+
+  const unsigned width = src.width, height = src.height;
+
+#ifdef DITHER
+
+  dither.DitherGreyscale(src_pixels, src.pitch,
+                         (uint8_t *)dest->pixels,
+                         dest->pitch / dest->format->BytesPerPixel,
+                         width, height);
+  if (dest->format->BytesPerPixel == 4) {
+    const unsigned n_pixels = (dest->pitch / dest->format->BytesPerPixel)
+      * height;
+    int32_t *d = (int32_t *)dest->pixels + n_pixels;
+    const int8_t *end = (int8_t *)dest->pixels;
+    const int8_t *s = end + n_pixels;
+
+    while (s != end)
+      *--d = *--s;
+  }
+
+#else
+
+  uint8_t *dest_pixels = (uint8_t *)dest->pixels;
+  const unsigned src_pitch = src.pitch;
+  const unsigned dest_pitch = dest->pitch;
+
+  if (dest->format->BytesPerPixel == 2) {
+    for (unsigned row = height; row > 0;
+         --row, src_pixels += src_pitch, dest_pixels += dest_pitch)
+      CopyGreyscaleToRGB565((RGB565Color *)dest_pixels,
+                            (const Luminosity8 *)src_pixels, width);
+  } else {
+    for (unsigned row = height; row > 0;
+         --row, src_pixels += src_pitch, dest_pixels += dest_pitch)
+      CopyGreyscaleToRGB8((uint32_t *)dest_pixels,
+                           (const Luminosity8 *)src_pixels, width);
+  }
+
+#endif
+
+  ::SDL_UnlockSurface(dest);
+}
+
+#if defined(__clang__) || GCC_VERSION >= 40800
+#pragma GCC diagnostic pop
+#endif
+
+#endif
+
+#ifndef ENABLE_OPENGL
+
+Canvas
+TopCanvas::Lock()
+{
+#ifndef GREYSCALE
+  if (SDL_LockSurface(surface) != 0)
+    return Canvas();
+
+  WritableImageBuffer<SDLPixelTraits> buffer;
+  buffer.data = (SDLPixelTraits::pointer_type)surface->pixels;
+  buffer.pitch = surface->pitch;
+  buffer.width = surface->w;
+  buffer.height = surface->h;
+#endif
+
+  return Canvas(buffer);
+}
+
+void
+TopCanvas::Unlock()
+{
+#ifndef GREYSCALE
+  SDL_UnlockSurface(surface);
+#endif
+}
+
+#endif
+
 void
 TopCanvas::Flip()
 {
 #ifdef ENABLE_OPENGL
-#ifdef HAVE_EGL
-  if (OpenGL::egl) {
-    /* if native EGL support was detected, we can circumvent the JNI
-       call */
-    EGLSwapBuffers();
-    return;
-  }
-#endif
-
   ::SDL_GL_SwapBuffers();
 #else
+
+#ifdef GREYSCALE
+  CopyFromGreyscale(
+#ifdef DITHER
+                    dither,
+#endif
+                    surface, buffer);
+#endif
+
   ::SDL_Flip(surface);
 #endif
 }

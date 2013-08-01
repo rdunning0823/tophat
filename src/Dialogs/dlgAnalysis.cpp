@@ -188,9 +188,9 @@ ChartControl::OnPaint(Canvas &canvas)
     break;
   case AnalysisPage::THERMAL_BAND:
   {
-    OrderedTaskBehaviour otb;
+    OrderedTaskSettings otb;
     if (protected_task_manager != NULL) {
-      otb = protected_task_manager->GetOrderedTaskBehaviour();
+      otb = protected_task_manager->GetOrderedTaskSettings();
     }
 
     ThermalBandRenderer renderer(thermal_band_look, chart_look);
@@ -236,7 +236,8 @@ ChartControl::OnPaint(Canvas &canvas)
       fs.RenderOLC(canvas, rcgfx, basic,
                    settings_computer, settings_map,
                    calculated.contest_stats,
-                   glide_computer->GetTraceComputer());
+                   glide_computer->GetTraceComputer(),
+		   glide_computer->GetRetrospective());
     }
     break;
   case AnalysisPage::TASK_SPEED:
@@ -413,9 +414,9 @@ NextPage(int Step)
 static void
 OnGesture(const TCHAR* gesture)
 {
-  if (_tcscmp(gesture, _T("L")) == 0)
+  if (_tcscmp(gesture, _T("R")) == 0)
     NextPage(-1);
-  else if (_tcscmp(gesture, _T("R")) == 0)
+  else if (_tcscmp(gesture, _T("L")) == 0)
     NextPage(+1);
 }
 
@@ -519,7 +520,9 @@ OnCalcClicked()
     dlgBasicSettingsShowModal();
 
   if (page == AnalysisPage::CLIMB) {
+    wf->Hide();
     ShowTaskStatusDialog();
+    wf->Show();
   }
 
   if (page == AnalysisPage::WIND)
@@ -532,7 +535,9 @@ OnCalcClicked()
     dlgBasicSettingsShowModal();
 
   if ((page == AnalysisPage::TASK) || (page == AnalysisPage::TASK_SPEED)) {
+    wf->Hide();
     ShowTaskStatusDialog();
+    wf->Show();
   }
 
   if (page == AnalysisPage::AIRSPACE)

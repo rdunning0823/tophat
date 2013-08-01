@@ -737,7 +737,7 @@ DigitEntry::OnPaint(Canvas &canvas)
 {
   assert(cursor < length);
 
-  const bool focused = HasFocus();
+  const bool focused = HasCursorKeys() && HasFocus();
 
   if (HaveClipping())
     canvas.Clear(look.background_color);

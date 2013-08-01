@@ -77,15 +77,20 @@ segment_poly(RasterPoint* pt, const int x, const int y,
   pt[npoly++] = CirclePoint(x, y, radius, iend);
 }
 
+gcc_pure
+static bool
+IsCircleVisible(const Canvas &canvas, int x, int y, unsigned radius)
+{
+  return int(x + radius) >= 0 && unsigned(x) < canvas.GetWidth() + radius &&
+    int(y + radius) >= 0 && unsigned(y) < canvas.GetHeight() + radius;
+}
+
 bool
-Segment(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
+Segment(Canvas &canvas, int x, int y, unsigned radius,
         Angle start, Angle end, bool horizon)
 {
   // dont draw if out of view
-  PixelRect rc, bounds;
-  SetRect(rc, 0, 0, canvas.GetWidth(), canvas.GetHeight());
-  SetRect(bounds, x - radius, y - radius, x + radius, y + radius);
-  if (!OverlapsRect(bounds, rc))
+  if (!IsCircleVisible(canvas, x, y, radius))
     return false;
 
   const int istart = NATIVE_TO_INT(start.Native());
@@ -109,17 +114,13 @@ Segment(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
 
   return true;
 }
-                   
 
 bool
-Annulus(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
-        Angle start, Angle end, UPixelScalar inner_radius)
+Annulus(Canvas &canvas, int x, int y, unsigned radius,
+        Angle start, Angle end, unsigned inner_radius)
 {
   // dont draw if out of view
-  PixelRect rc, bounds;
-  SetRect(rc, 0, 0, canvas.GetWidth(), canvas.GetHeight());
-  SetRect(bounds, x - radius, y - radius, x + radius, y + radius);
-  if (!OverlapsRect(bounds, rc))
+  if (!IsCircleVisible(canvas, x, y, radius))
     return false;
 
   const int istart = NATIVE_TO_INT(start.Native());
@@ -139,14 +140,11 @@ Annulus(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
 }
 
 bool
-KeyHole(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
-        Angle start, Angle end, UPixelScalar inner_radius)
+KeyHole(Canvas &canvas, int x, int y, unsigned radius,
+        Angle start, Angle end, unsigned inner_radius)
 {
   // dont draw if out of view
-  PixelRect rc, bounds;
-  SetRect(rc, 0, 0, canvas.GetWidth(), canvas.GetHeight());
-  SetRect(bounds, x - radius, y - radius, x + radius, y + radius);
-  if (!OverlapsRect(bounds, rc))
+  if (!IsCircleVisible(canvas, x, y, radius))
     return false;
 
   const int istart = NATIVE_TO_INT(start.Native());
@@ -166,8 +164,8 @@ KeyHole(Canvas &canvas, PixelScalar x, PixelScalar y, UPixelScalar radius,
 }
 
 void
-RoundRect(Canvas &canvas, PixelScalar left, PixelScalar top,
-          PixelScalar right, PixelScalar bottom, UPixelScalar radius)
+RoundRect(Canvas &canvas, int left, int top,
+          int right, int bottom, unsigned radius)
 {
   unsigned npoly = 0;
   RasterPoint pt[66*4];

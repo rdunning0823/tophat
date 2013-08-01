@@ -30,7 +30,7 @@ Copyright_License {
 #include "Form/CheckBox.hpp"
 #include "Form/Frame.hpp"
 #include "Screen/Timer.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Units/Units.hpp"
 #include "UIGlobals.hpp"

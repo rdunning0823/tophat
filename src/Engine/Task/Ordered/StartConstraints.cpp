@@ -31,6 +31,7 @@ StartConstraints::SetDefaults()
   max_speed = fixed(0);
   max_height = 0;
   max_height_ref = AltitudeReference::MSL;
+  require_arm = false;
   fai_finish = false;
 }
 

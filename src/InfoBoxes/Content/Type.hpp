@@ -145,6 +145,11 @@ namespace InfoBoxFactory
     ATC_RADIAL,
     HomeAltitudeDiff, /* Altitude difference to reach home waypoint (if defined) */
 
+    TASK_SPEED_HOUR,
+    WP_NOMINAL_DIST, /* The nominal distance to the currently selected waypoint. For AAT tasks, this is the distance to the origin of the AAT sector */
+
+    CIRCLE_DIAMETER,
+
     e_NUM_TYPES /* Last item */
   };
 

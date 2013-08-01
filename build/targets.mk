@@ -2,7 +2,7 @@ TARGETS = PC WIN64 \
 	PPC2000 PPC2003 PPC2003X WM5 WM5X \
 	ALTAIR \
 	UNIX UNIX32 UNIX64 OPT \
-	PI KOBO \
+	PI KOBO NEON \
 	ANDROID ANDROID7 ANDROID7NEON ANDROID86 ANDROIDMIPS \
 	ANDROIDFAT \
 	WINE CYGWIN
@@ -132,7 +132,7 @@ ifeq ($(TARGET),PC)
     TCPREFIX := $(MINGWPATH)
   endif
 
-  ifeq ($(WINHOST),y)
+  ifeq ($(HOST_IS_WIN32),y)
     TCPREFIX :=
   endif
 
@@ -145,7 +145,6 @@ ifeq ($(TARGET),CYGWIN)
   TARGET_ARCH += -march=i586
 
   WINVER = 0x0500
-  WINHOST := y
 
   HAVE_POSIX := y
   HAVE_WIN32 := y
@@ -194,6 +193,7 @@ ifeq ($(TARGET),UNIX)
   ARMV6 = $(HOST_IS_ARMV6)
   ARMV7 = $(HOST_IS_ARMV7)
   NEON = $(HOST_HAS_NEON)
+  TARGET_HAS_MALI = $(HOST_HAS_MALI)
 endif
 
 ifeq ($(TARGET),UNIX32)
@@ -208,7 +208,7 @@ endif
 
 ifeq ($(TARGET),PI)
   override TARGET = UNIX
-  TCPREFIX := arm-linux-gnueabihf-
+  TCPREFIX := arm-unknown-linux-gnueabi-
   PI ?= /opt/pi/root
   TARGET_ARCH += -march=armv6j -mfpu=vfp -mfloat-abi=hard
   TARGET_IS_PI = y
@@ -218,13 +218,21 @@ endif
 
 ifeq ($(TARGET),KOBO)
   # Experimental target for Kobo Mini
-  override TARGET = UNIX
-  TCPREFIX := arm-linux-gnueabihf-
+  override TARGET = NEON
   KOBO ?= /opt/kobo/arm-unknown-linux-gnueabi
-  TARGET_ARCH += -march=armv7-a -mfloat-abi=hard
   TARGET_IS_KOBO = y
+endif
+
+ifeq ($(TARGET),NEON)
+  # Experimental target for generic ARMv7 with NEON
+  override TARGET = UNIX
+  TCPREFIX = arm-unknown-linux-gnueabi-
+  ifeq ($(CLANG),n)
+    TARGET_ARCH += -mcpu=cortex-a8 -mfloat-abi=hard
+  endif
   TARGET_IS_ARM = y
   ARMV7 := y
+  NEON := y
 endif
 
 ifeq ($(TARGET),UNIX)
@@ -238,11 +246,15 @@ ifeq ($(TARGET),UNIX)
   endif
 
   ifeq ($(ARMV7),y)
-    TARGET_ARCH += -march=armv7-a
+    ifeq ($(CLANG),y)
+      TARGET_ARCH += -target armv7-none-linux-gnueabihf -integrated-as
+    else
+      TARGET_ARCH += -march=armv7-a
+    endif
   endif
 
   ifeq ($(NEON),y)
-    TARGET_ARCH += -mfpu=neon -mfpu=vfpv3-d16
+    TARGET_ARCH += -mfpu=neon
   endif
 endif
 
@@ -258,7 +270,7 @@ endif
 ifeq ($(TARGET),ANDROID)
   ANDROID_NDK ?= $(HOME)/opt/android-ndk-r8e
 
-  ANDROID_PLATFORM = android-16
+  ANDROID_PLATFORM = android-17
   ANDROID_SDK_PLATFORM = $(ANDROID_PLATFORM)
 
   # NDK r8b has only android-14
@@ -297,13 +309,21 @@ ifeq ($(TARGET),ANDROID)
 
   ifeq ($(CLANG),y)
     ANDROID_TOOLCHAIN_NAME = llvm-3.2
+
+    # workaround: use libstdc++ 4.6, because 4.7 fails to link with
+    # clang due to missing __atomic_* symbols
+    ANDROID_GCC_VERSION = 4.6
   else
     ANDROID_TOOLCHAIN_NAME = $(ANDROID_GCC_TOOLCHAIN_NAME)
   endif
 
   ifeq ($(HOST_IS_DARWIN),y)
-    ANDROID_HOST_TAG = darwin-x86
-  else ifeq ($(WINHOST),y)
+    ifeq ($(UNAME_M),x86_64)
+      ANDROID_HOST_TAG = darwin-x86_64
+    else
+      ANDROID_HOST_TAG = darwin-x86
+    endif
+  else ifeq ($(HOST_IS_WIN32),y)
     ANDROID_HOST_TAG = windows
   else ifeq ($(UNAME_M),x86_64)
     ANDROID_HOST_TAG = linux-x86_64
@@ -480,6 +500,7 @@ endif
 TARGET_LDFLAGS =
 TARGET_LDLIBS =
 TARGET_LDADD =
+TARGET_STATIC ?= n
 
 ifeq ($(TARGET),PC)
   TARGET_LDFLAGS += -Wl,--major-subsystem-version=5
@@ -500,7 +521,7 @@ ifeq ($(HAVE_WIN32),y)
   else
   ifneq ($(TARGET),CYGWIN)
     # link libstdc++-6.dll statically, so we don't have to distribute it
-    TARGET_LDFLAGS += -static
+    TARGET_STATIC = y
   endif
   endif
 endif
@@ -520,7 +541,7 @@ endif
 
 ifeq ($(TARGET_IS_KOBO),y)
   TARGET_LDFLAGS += -L$(KOBO)/lib
-  TARGET_LDFLAGS += -static
+  TARGET_STATIC = y
 endif
 
 ifeq ($(TARGET),ANDROID)
@@ -559,6 +580,10 @@ ifeq ($(TARGET),ANDROID)
   TARGET_LDLIBS += -lc -lm
   TARGET_LDLIBS += -llog
   TARGET_LDADD += $(ANDROID_GCC_TOOLCHAIN)/lib/gcc/$(ANDROID_ABI4)/$(ANDROID_GCC_VERSION2)/$(ANDROID_ABI_SUBDIR)/libgcc.a
+endif
+
+ifeq ($(TARGET_STATIC),y)
+  TARGET_LDFLAGS += -static
 endif
 
 ######## output files

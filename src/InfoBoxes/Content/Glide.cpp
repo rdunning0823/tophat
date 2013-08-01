@@ -52,7 +52,9 @@ UpdateInfoBoxGRInstant(InfoBoxData &data)
 void
 UpdateInfoBoxGRCruise(InfoBoxData &data)
 {
-  const fixed cruise_gr = CommonInterface::Calculated().cruise_gr;
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  const fixed cruise_gr = calculated.cruise_gr;
 
   if (!::GradientValid(cruise_gr)) {
     data.SetInvalid();
@@ -62,8 +64,10 @@ UpdateInfoBoxGRCruise(InfoBoxData &data)
   // Set Value
   data.SetValueFromGlideRatio(cruise_gr);
 
-  data.SetCommentFromDistance(CommonInterface::Basic().location.Distance(
-      CommonInterface::Calculated().cruise_start_location));
+  if (basic.location_available)
+    data.SetCommentFromDistance(basic.location.Distance(calculated.cruise_start_location));
+  else
+    data.SetCommentInvalid();
 }
 
 #ifdef __clang__

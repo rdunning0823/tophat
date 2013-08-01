@@ -133,7 +133,7 @@ InfoBoxWindow::PaintTitle(Canvas &canvas)
 }
 
 void
-InfoBoxWindow::PaintValue(Canvas &canvas)
+InfoBoxWindow::PaintValue(Canvas &canvas, Color background_color)
 {
   if (data.value.empty())
     return;
@@ -219,7 +219,8 @@ InfoBoxWindow::PaintValue(Canvas &canvas)
 
     unit_symbol->Draw(canvas, x + value_size.cx,
                       y + ascent_height - unit_symbol->GetScreenSize().cy,
-                      look.inverse ? UnitSymbol::INVERSE : UnitSymbol::NORMAL);
+                      background_color,
+                      look.GetValueColor(data.value_color));
   }
 }
 
@@ -270,7 +271,7 @@ InfoBoxWindow::Paint(Canvas &canvas)
 
   PaintTitle(canvas);
   PaintComment(canvas);
-  PaintValue(canvas);
+  PaintValue(canvas, background_color);
 
   if (border_kind != 0) {
     canvas.Select(look.border_pen);
@@ -581,7 +582,7 @@ InfoBoxWindow::OnSetFocus()
 
   // Start the focus-auto-return timer
   // to automatically return focus back to MapWindow if idle
-  focus_timer.Schedule(FOCUS_TIMEOUT_MAX);
+  focus_timer.Schedule(HasCursorKeys() ? FOCUS_TIMEOUT_MAX : 1100);
 
   // Redraw fast to paint the selector
   Invalidate();

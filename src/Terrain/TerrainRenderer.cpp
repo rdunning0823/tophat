@@ -297,21 +297,6 @@ TerrainRenderer::CopyTo(Canvas &canvas, unsigned width, unsigned height) const
                                         width, height);
 }
 
-void
-TerrainRenderer::SetSettings(const TerrainRendererSettings &_settings)
-{
-  if (settings == _settings)
-    return;
-
-  settings = _settings;
-
-#ifdef ENABLE_OPENGL
-  raster_renderer.Invalidate();
-#else
-  compare_projection.Clear();
-#endif
-}
-
 #ifdef ENABLE_OPENGL
 /**
  * Checks if the size difference of any dimension is more than a
@@ -366,6 +351,8 @@ TerrainRenderer::Generate(const WindowProjection &map_projection,
   const bool is_terrain = true;
   const bool do_shading = is_terrain &&
                           settings.slope_shading != SlopeShading::OFF;
+  const bool do_contour = is_terrain &&
+                          settings.contours != Contours::OFF;
 
   const ColorRamp *const color_ramp = &terrain_colors[settings.ramp][0];
   if (color_ramp != last_color_ramp) {
@@ -381,7 +368,8 @@ TerrainRenderer::Generate(const WindowProjection &map_projection,
 
   raster_renderer.GenerateImage(do_shading, height_scale,
                                 settings.contrast, settings.brightness,
-                                sunazimuth);
+                                sunazimuth,
+				do_contour);
 }
 
 /**

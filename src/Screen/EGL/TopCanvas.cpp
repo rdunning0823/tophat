@@ -36,7 +36,16 @@ TopCanvas::Create(PixelSize new_size,
 {
 #ifdef USE_X11
   X11Display *const x_display = XOpenDisplay(nullptr);
+  if (x_display == nullptr) {
+    fprintf(stderr, "XOpenDisplay() failed\n");
+    exit(EXIT_FAILURE);
+  }
+
   const X11Window x_root = DefaultRootWindow(x_display);
+  if (x_root == 0) {
+    fprintf(stderr, "DefaultRootWindow() failed\n");
+    exit(EXIT_FAILURE);
+  }
 
   XSetWindowAttributes swa;
   swa.event_mask = ExposureMask | PointerMotionMask | KeyPressMask;
@@ -46,6 +55,10 @@ TopCanvas::Create(PixelSize new_size,
                            CopyFromParent, InputOutput,
                            CopyFromParent, CWEventMask,
                            &swa);
+  if (x_window == 0) {
+    fprintf(stderr, "XCreateWindow() failed\n");
+    exit(EXIT_FAILURE);
+  }
 
   XMapWindow(x_display, x_window);
   XStoreName(x_display, x_window, "TopHat");
@@ -79,6 +92,11 @@ TopCanvas::Create(PixelSize new_size,
 
   const EGLNativeDisplayType native_display = EGL_DEFAULT_DISPLAY;
   const EGLNativeWindowType native_window = &vc_window;
+#elif defined(HAVE_MALI)
+  const EGLNativeDisplayType native_display = EGL_DEFAULT_DISPLAY;
+  mali_native_window.width = new_size.cx;
+  mali_native_window.height = new_size.cy;
+  struct mali_native_window *native_window = &mali_native_window;
 #endif
 
   display = eglGetDisplay(native_display);
@@ -119,14 +137,23 @@ TopCanvas::Create(PixelSize new_size,
     exit(EXIT_FAILURE);
   }
 
+  GLint egl_width, egl_height;
+  if (!eglQuerySurface(display, surface, EGL_WIDTH, &egl_width) ||
+      !eglQuerySurface(display, surface, EGL_HEIGHT, &egl_height)) {
+    fprintf(stderr, "eglQuerySurface()\n");
+    exit(EXIT_FAILURE);
+  }
+
+  const PixelSize effective_size = { egl_width, egl_height };
+
   context = eglCreateContext(display, chosen_config,
                              EGL_NO_CONTEXT, nullptr);
 
   eglMakeCurrent(display, surface, surface, context);
 
   OpenGL::SetupContext();
-  OpenGL::SetupViewport(new_size.cx, new_size.cy);
-  Canvas::Create(new_size);
+  OpenGL::SetupViewport(effective_size.cx, effective_size.cy);
+  Canvas::Create(effective_size);
 }
 
 TopCanvas::~TopCanvas()

@@ -37,12 +37,23 @@ Copyright_License {
 #include "Pan.hpp"
 #include "Util/Clamp.hpp"
 #include "Asset.hpp"
+#include "Event/Idle.hpp"
 
 #ifdef ENABLE_SDL
 #include <SDL_keyboard.h>
 #endif
 
 #include <algorithm>
+
+void
+GlueMapWindow::OnDestroy()
+{
+#ifdef ENABLE_OPENGL
+  data_timer.Cancel();
+#endif
+
+  MapWindow::OnDestroy();
+}
 
 bool
 GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
@@ -382,7 +393,11 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   EnterDrawThread();
 
   /* update terrain, topography, ... */
-  Idle();
+  if (Idle())
+    /* still dirty: schedule a redraw to load more data */
+    data_timer.Schedule(500);
+  else
+    data_timer.Cancel();
 #endif
 
   MapWindow::OnPaintBuffer(canvas);
@@ -430,6 +445,13 @@ GlueMapWindow::OnTimer(WindowTimer &timer)
     }
 
     return true;
+  } else if (timer == data_timer) {
+    if (!IsUserIdle(2500))
+      /* user is still active; try again later */
+      return true;
+
+    Invalidate();
+    return false;
 #endif
   } else
     return MapWindow::OnTimer(timer);

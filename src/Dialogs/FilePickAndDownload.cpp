@@ -25,7 +25,7 @@ Copyright_License {
 #include "WidgetDialog.hpp"
 #include "Message.hpp"
 #include "Look/DialogLook.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Widget/Widget.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Form.hpp"
@@ -129,7 +129,7 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
   WindowStyle style_frame;
   style_frame.Border();
 
-  status_message = new WndFrame(*(ContainerWindow*)RowFormWidget::GetWindow(), look,
+  status_message = new WndFrame((ContainerWindow&)RowFormWidget::GetWindow(), look,
                                 rc_status,
                                 style_frame);
   RowFormWidget::Add(status_message);

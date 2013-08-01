@@ -37,7 +37,7 @@ Copyright_License {
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Button.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Profile/Profile.hpp"
@@ -274,7 +274,7 @@ static void UpdateTaskDefaults(OrderedTask &task)
   const AbstractTaskFactory& factory = task.GetFactory();
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
   TaskBehaviour &task_behaviour = settings_computer.task;
-  const OrderedTaskBehaviour &otb = task.GetOrderedTaskBehaviour();
+  const OrderedTaskSettings &otb = task.GetOrderedTaskSettings();
 
   unsigned index = 0;
   auto point_type = factory.GetType(task.GetPoint(index));
@@ -394,7 +394,7 @@ TaskManagerDialogUs::CommitTaskChanges()
 }
 
 void
-TaskManagerDialogUsShowModal(SingleWindow &parent)
+TaskManagerDialogUsShowModal()
 {
   if (protected_task_manager == NULL)
     return;
@@ -407,7 +407,7 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
   bool task_modified = false;
   while (editing) {
 
-    TaskEditorReturn task_editor_return = dlgTaskPointUsShowModal(parent, &active_task, 0);
+    TaskEditorReturn task_editor_return = dlgTaskPointUsShowModal(&active_task, 0);
 
     // invalid task
     if (task_editor_return == TaskEditorReturn::TASK_REVERT) {

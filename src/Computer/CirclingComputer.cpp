@@ -28,7 +28,9 @@ Copyright_License {
 #include "Math/LowPassFilter.hpp"
 #include "Util/Clamp.hpp"
 
-static constexpr fixed MIN_TURN_RATE(4);
+#include "LogFile.hpp"
+
+static constexpr Angle MIN_TURN_RATE = Angle::Degrees(4);
 static constexpr fixed CRUISE_CLIMB_SWITCH(15);
 static constexpr fixed CLIMB_CRUISE_SWITCH(10);
 
@@ -54,35 +56,46 @@ CirclingComputer::TurnRate(CirclingInfo &circling_info,
                            const FlyingState &flight)
 {
   if (!basic.time_available || !flight.flying) {
-    circling_info.turn_rate = fixed(0);
-    circling_info.turn_rate_heading = fixed(0);
-    circling_info.turn_rate_smoothed = fixed(0);
+    circling_info.turn_rate = Angle::Zero();
+    circling_info.turn_rate_heading = Angle::Zero();
+    circling_info.turn_rate_smoothed = Angle::Zero();
+    circling_info.turn_rate_heading_smoothed = Angle::Zero();
     return;
   }
 
   const fixed dt = turn_rate_delta_time.Update(basic.time,
                                                fixed_third, fixed(10));
   if (negative(dt)) {
-    circling_info.turn_rate = fixed(0);
-    circling_info.turn_rate_heading = fixed(0);
-    circling_info.turn_rate_smoothed = fixed(0);
+    circling_info.turn_rate = Angle::Zero();
+    circling_info.turn_rate_heading = Angle::Zero();
+    circling_info.turn_rate_smoothed = Angle::Zero();
+    circling_info.turn_rate_heading_smoothed = Angle::Zero();
     return;
   }
 
   if (positive(dt)) {
     circling_info.turn_rate =
-      (basic.track - last_track).AsDelta().Degrees() / dt;
+      (basic.track - last_track).AsDelta() / dt;
     circling_info.turn_rate_heading =
-      (basic.attitude.heading - last_heading).AsDelta().Degrees() / dt;
+      (basic.attitude.heading - last_heading).AsDelta() / dt;
 
     // JMW limit rate to 50 deg per second otherwise a big spike
     // will cause spurious lock on circling for a long time
-    fixed turn_rate = Clamp(circling_info.turn_rate, fixed(-50), fixed(50));
+    Angle turn_rate = Clamp(circling_info.turn_rate,
+                            Angle::Degrees(-50), Angle::Degrees(50));
 
     // Make the turn rate more smooth using the LowPassFilter
-    turn_rate = LowPassFilter(circling_info.turn_rate_smoothed,
-                              turn_rate, fixed(0.3));
-    circling_info.turn_rate_smoothed = turn_rate;
+    fixed smoothed = LowPassFilter(circling_info.turn_rate_smoothed.Native(),
+                                   turn_rate.Native(), fixed(0.3));
+    circling_info.turn_rate_smoothed = Angle::Native(smoothed);
+
+    // Makes smoothing of heading turn rate
+    turn_rate = Clamp(circling_info.turn_rate_heading,
+                      Angle::Degrees(-50), Angle::Degrees(50));
+    // Make the heading turn rate more smooth using the LowPassFilter
+    smoothed = LowPassFilter(circling_info.turn_rate_heading_smoothed.Native(),
+                             turn_rate.Native(), fixed(0.3));
+    circling_info.turn_rate_heading_smoothed = Angle::Native(smoothed);
   }
 
   last_track = basic.track;
@@ -105,7 +118,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     return;
 
   circling_info.turning =
-    fabs(circling_info.turn_rate_smoothed) >= MIN_TURN_RATE;
+    circling_info.turn_rate_smoothed.Absolute() >= MIN_TURN_RATE;
 
   // Force cruise or climb mode if external device says so
   bool force_cruise = false;

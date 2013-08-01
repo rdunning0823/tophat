@@ -30,9 +30,14 @@ Copyright_License {
 #include <windows.h>
 
 struct Event;
+class EventQueue;
 
 class EventLoop : private NonCopyable {
+  EventQueue &queue;
+
 public:
+  EventLoop(EventQueue &_queue):queue(_queue) {}
+
   bool Get(Event &msg);
   void Dispatch(const Event &msg);
 };
@@ -41,7 +46,8 @@ class DialogEventLoop : public EventLoop {
   HWND dialog;
 
 public:
-  DialogEventLoop(HWND _dialog):dialog(_dialog) {}
+  DialogEventLoop(EventQueue &_loop, HWND _dialog)
+    :EventLoop(_loop), dialog(_dialog) {}
 
   void Dispatch(Event &msg);
 };

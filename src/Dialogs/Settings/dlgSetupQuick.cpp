@@ -44,7 +44,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Look/Look.hpp"
 #include "Look/MapLook.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "UIGlobals.hpp"
@@ -243,9 +243,7 @@ SetupQuick::OnAction(int id)
     break;
 
   case DEVICE:
-    ShowDeviceList(UIGlobals::GetMainWindow(),
-                   UIGlobals::GetDialogLook(),
-                   UIGlobals::GetLook().terminal);
+    ShowDeviceList(UIGlobals::GetLook().terminal);
     break;
 
   case ADVANCED:

@@ -60,9 +60,9 @@ GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
 #ifdef ENABLE_OPENGL
   Window *window = new Window();
-  ContainerWindow *panel = (ContainerWindow *)GetWindow();
+  ContainerWindow& panel = (ContainerWindow &)GetWindow();
   const PixelRect rc_blank = InitialControlRect(Layout::Scale(40));
-  window->Create(panel, rc_blank);
+  window->Create(&panel, rc_blank);
   Add(window);
 #else
   AddDummy();

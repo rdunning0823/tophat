@@ -90,6 +90,8 @@ public class XCSoar extends Activity {
     InternalGPS.Initialize();
     NonGPSSensors.Initialize();
 
+    IOIOHelper.onCreateContext(this);
+
     try {
       BluetoothHelper.Initialize();
     } catch (VerifyError e) {
@@ -227,6 +229,8 @@ public class XCSoar extends Activity {
       wakeLock.release();
       wakeLock = null;
     }
+
+    IOIOHelper.onDestroyContext();
 
     super.onDestroy();
     Log.d(TAG, "System.exit()");

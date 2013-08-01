@@ -24,16 +24,15 @@ Copyright_License {
 #ifndef XCSOAR_DIALOGS_TASK_HPP
 #define XCSOAR_DIALOGS_TASK_HPP
 
-class SingleWindow;
 class OrderedTask;
 class WndForm;
 struct DialogLook;
 
 void
-dlgTaskManagerShowModal(SingleWindow &parent);
+dlgTaskManagerShowModal();
 
 bool
-dlgTaskPointShowModal(SingleWindow &parent, OrderedTask** task, const unsigned index);
+dlgTaskPointShowModal(OrderedTask **task, const unsigned index);
 
 /**
  * dialog with task properties needed for American task rules
@@ -51,7 +50,7 @@ bool
 dlgTaskPointType(OrderedTask **task, unsigned index);
 
 bool
-dlgTaskOptionalStarts(SingleWindow &parent, OrderedTask** task);
+dlgTaskOptionalStarts(OrderedTask **task);
 
 /**
  * Shows map display zoomed to target point

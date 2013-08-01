@@ -25,7 +25,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Form/SymbolButton.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
@@ -57,13 +57,13 @@ TaskButtonWidget::Unprepare()
 void
 TaskButtonWidget::Show(const PixelRect &rc)
 {
-  GetWindow()->Show();
+  GetWindow().Show();
 }
 
 void
 TaskButtonWidget::Hide()
 {
-  GetWindow()->Hide();
+  GetWindow().Hide();
 }
 
 void

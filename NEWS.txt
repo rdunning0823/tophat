@@ -1,6 +1,7 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+
 TopHat 1.1.7 Beta 7/31/2013
 * Task Manager:
  - Add Back button
@@ -44,6 +45,7 @@ TopHat 1.0.5 Beta 6/28/2013
  - replaced "Revert" button with "Back" button
 * Added Wind arrow Infobox
 * Added battery manager for Nook
+
   - fill FAI triangle areas on Windows
 * devices
   - FLARM: improve task declaration reliability

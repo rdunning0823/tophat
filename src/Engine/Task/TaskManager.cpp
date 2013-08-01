@@ -73,9 +73,9 @@ TaskManager::SetTaskBehaviour(const TaskBehaviour &behaviour)
 }
 
 void
-TaskManager::SetOrderedTaskBehaviour(const OrderedTaskBehaviour &otb)
+TaskManager::SetOrderedTaskSettings(const OrderedTaskSettings &otb)
 {
-  ordered_task->SetOrderedTaskBehaviour(otb);
+  ordered_task->SetOrderedTaskSettings(otb);
 }
 
 TaskType
@@ -160,10 +160,8 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
   if (ordered_task->TaskSize() > 1) {
     const TaskStats &task_stats = ordered_task->GetStats();
 
-    common_stats.ordered_has_targets = ordered_task->HasTargets();
-
     common_stats.aat_time_remaining =
-      ordered_task->GetOrderedTaskBehaviour().aat_min_time -
+      ordered_task->GetOrderedTaskSettings().aat_min_time -
       task_stats.total.time_elapsed;
 
     if (task_stats.total.remaining.IsDefined() &&
@@ -174,7 +172,7 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
     else
       common_stats.aat_speed_remaining = fixed(-1);
 
-    fixed aat_min_time = ordered_task->GetOrderedTaskBehaviour().aat_min_time;
+    fixed aat_min_time = ordered_task->GetOrderedTaskSettings().aat_min_time;
 
     if (positive(aat_min_time)) {
       common_stats.aat_speed_max = task_stats.distance_max / aat_min_time;
@@ -185,7 +183,7 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
     }
 
     const StartConstraints &start_constraints =
-      ordered_task->GetOrderedTaskBehaviour().start_constraints;
+      ordered_task->GetOrderedTaskSettings().start_constraints;
     common_stats.start_open_time_span = start_constraints.open_time_span;
     const fixed start_max_height =
       fixed(start_constraints.max_height) +
@@ -227,9 +225,6 @@ TaskManager::UpdateCommonStatsTask()
 {
   common_stats.task_type = mode;
 
-  common_stats.ordered_has_optional_starts =
-    ordered_task->GetStats().task_valid && ordered_task->HasOptionalStarts();
-
   if (active_task && active_task->GetStats().task_valid) {
     common_stats.active_has_next = active_task->IsValidTaskPoint(1);
     common_stats.active_has_previous = active_task->IsValidTaskPoint(-1);
@@ -237,13 +232,11 @@ TaskManager::UpdateCommonStatsTask()
                                 !active_task->IsValidTaskPoint(2);
     common_stats.previous_is_first = active_task->IsValidTaskPoint(-1) &&
                                      !active_task->IsValidTaskPoint(-2);
-    common_stats.active_taskpoint_index = this->active_task->GetActiveTaskPointIndex();
   } else {
     common_stats.active_has_next = false;
     common_stats.active_has_previous = false;
     common_stats.next_is_last = false;
     common_stats.previous_is_first = false;
-    common_stats.active_taskpoint_index = 0;
   }
 }
 
@@ -286,13 +279,6 @@ bool
 TaskManager::Update(const AircraftState &state,
                     const AircraftState &state_last)
 {
-  if (!state.location.IsValid()) {
-    /* in case of GPS failure or and during startup (before the first
-       GPS fix), update only the stats */
-    UpdateCommonStats(state);
-    return false;
-  }
-
   /* always update ordered task so even if we are temporarily in a
      different mode, so the task stats are still updated.  Otherwise,
      the task stats would freeze and sampling etc would not be
@@ -302,7 +288,9 @@ TaskManager::Update(const AircraftState &state,
 
   bool retval = false;
 
-  if (state_last.time > state.time)
+  if (!negative(state_last.time) && !negative(state.time) &&
+      state_last.time > state.time)
+    /* time warp */
     Reset();
 
   if (ordered_task->TaskSize() > 1) {

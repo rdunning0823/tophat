@@ -77,9 +77,9 @@ IGCWriter::WriteLine(const char *line)
   if (dest == nullptr)
     return false;
 
-  char *const end = dest + MAX_IGC_BUFF - 1, *p = dest;
+  char *const end = dest + MAX_IGC_BUFF - 1;
 
-  p = CopyIGCString(dest, end, line);
+  char *p = CopyIGCString(dest, end, line);
   *p = '\0';
 
   return CommitLine(dest);
@@ -126,7 +126,7 @@ IGCWriter::WriteHeader(const BrokenDateTime &date_time,
    * HFCCLCOMPETITIONCLASS:FAI
    */
 
-  assert(date_time.Plausible());
+  assert(date_time.IsPlausible());
   assert(logger_id != NULL);
   assert(strlen(logger_id) == 3);
 
@@ -159,7 +159,7 @@ void
 IGCWriter::StartDeclaration(const BrokenDateTime &date_time,
                             const int number_of_turnpoints)
 {
-  assert(date_time.Plausible());
+  assert(date_time.IsPlausible());
 
   // IGC GNSS specification 3.6.1
   char buffer[64];

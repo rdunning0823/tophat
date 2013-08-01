@@ -64,7 +64,7 @@ static MOLoader *mo_loader;
 
 #ifdef HAVE_BUILTIN_LANGUAGES
 
-#ifdef ANDROID
+#ifndef WIN32
 /**
  * Several fake WIN32 constants.  These are not used on Android, but
  * we need them or we have to have a separate version of
@@ -225,7 +225,7 @@ DetectLanguage()
   // Return e.g. "de.mo"
   return language_buffer;
 
-#else /* !ANDROID */
+#elif defined(WIN32)
 
 #if defined(_WIN32_WCE)
   /* the GetUserDefaultUILanguage() prototype is missing on
@@ -256,7 +256,10 @@ DetectLanguage()
   // to a MO file name in the language table
   return FindLanguage(PRIMARYLANGID(lang_id));
 
-#endif /* !ANDROID */
+#else
+
+  return nullptr;
+#endif
 }
 
 static bool

@@ -38,12 +38,9 @@ Copyright_License {
 #include "Util/Macros.hpp"
 #include "Panels/ConfigPanel.hpp"
 #include "Panels/PagesConfigPanel.hpp"
-#include "Panels/PolarConfigPanel.hpp"
 #include "Panels/UnitsConfigPanel.hpp"
 #include "Panels/TimeConfigPanel.hpp"
 #include "Panels/LoggerConfigPanel.hpp"
-#include "Panels/LoggerInfoConfigPanel.hpp"
-#include "Panels/DevicesConfigPanel.hpp"
 #include "Panels/AirspaceConfigPanel.hpp"
 #include "Panels/SiteConfigPanel.hpp"
 #include "Panels/MapDisplayConfigPanel.hpp"
@@ -187,6 +184,9 @@ FormKeyDown(unsigned key_code)
   if (single_page)
     return false;
 
+  if (tab_menu->InvokeKeyPress(key_code))
+    return true;
+
   switch (key_code) {
   case KEY_LEFT:
 #ifdef GNAV
@@ -260,7 +260,6 @@ PrepareConfigurationDialog(const TCHAR *page_name)
   int page = tab_menu->FindPage(page_name);
   single_page = (page >= 0);
   bool expert_mode = !single_page;
-  dialog->FilterAdvanced(expert_mode);
   CommonInterface::SetUISettings().dialog.expert = expert_mode;
   tab_menu->UpdateLayout();
   if (single_page) {

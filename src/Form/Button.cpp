@@ -109,8 +109,8 @@ WndButton::OnKillFocus()
 void
 WndButton::OnPaint(Canvas &canvas)
 {
-  const bool focused = HasFocus();
   const bool pressed = IsDown();
+  const bool focused = HasCursorKeys() ? HasFocus() : pressed;
 
   PixelRect rc = canvas.GetRect();
   renderer.DrawButton(canvas, rc, focused, pressed);
@@ -133,7 +133,9 @@ WndButton::OnPaint(Canvas &canvas)
   canvas.Select(*(look.button.font));
 
 #ifndef USE_GDI
-  canvas.DrawFormattedText(&rc, caption.c_str(), GetTextStyle());
+  unsigned style = GetTextStyle();
+
+  canvas.DrawFormattedText(&rc, caption.c_str(), style);
 #else
   unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
 

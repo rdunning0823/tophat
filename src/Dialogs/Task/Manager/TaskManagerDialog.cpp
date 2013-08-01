@@ -82,6 +82,33 @@ TaskManagerDialog::~TaskManagerDialog()
   delete task;
 }
 
+bool
+TaskManagerDialog::OnAnyKeyDown(unsigned key_code)
+{
+  if (WndForm::OnAnyKeyDown(key_code) ||
+      tab_bar->InvokeKeyPress(key_code))
+    return true;
+
+  switch (key_code) {
+  case KEY_ESCAPE:
+    if (!modified)
+      /* close the dialog immediately if nothing was modified */
+      return false;
+
+    if (tab_bar->GetCurrentPage() != 4) {
+      /* switch to "close" page instead of closing the dialog */
+      tab_bar->SetCurrentPage(4);
+      tab_bar->FocusCurrentWidget();
+      return true;
+    }
+
+    return false;
+
+  default:
+    return false;
+  }
+}
+
 void
 TaskManagerDialog::OnAction(int id)
 {
@@ -296,7 +323,7 @@ static void UpdateTaskDefaults(OrderedTask &task)
   const AbstractTaskFactory& factory = task.GetFactory();
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
   TaskBehaviour &task_behaviour = settings_computer.task;
-  const OrderedTaskBehaviour &otb = task.GetOrderedTaskBehaviour();
+  const OrderedTaskSettings &otb = task.GetOrderedTaskSettings();
 
   unsigned index = 0;
   auto point_type = factory.GetType(task.GetPoint(index));
@@ -368,6 +395,7 @@ TaskManagerDialog::Commit()
   if (!modified)
     return true;
 
+  task->UpdateStatsGeometry();
   modified |= task->GetFactory().CheckAddFinish();
 
   if (!task->TaskSize() || task->CheckTask()) {
@@ -405,18 +433,18 @@ TaskManagerDialog::Revert()
 }
 
 void
-dlgTaskManagerShowModal(SingleWindow &parent)
+dlgTaskManagerShowModal()
 {
   if (protected_task_manager == NULL)
     return;
 
-  TaskManagerDialogUsShowModal(parent);
+  TaskManagerDialogUsShowModal();
   return;
 
   TaskManagerDialog dialog(UIGlobals::GetDialogLook());
   instance = &dialog;
 
-  dialog.Create(parent);
+  dialog.Create(UIGlobals::GetMainWindow());
 
   dialog.ShowModal();
   dialog.Destroy();

@@ -47,7 +47,6 @@ DebugReplayIGC::Next()
       if (memcmp(line, "HFDTE", 5) == 0 &&
           IGCParseDateRecord(line, date)) {
         (BrokenDate &)raw_basic.date_time_utc = date;
-        raw_basic.date_available = true;
         raw_basic.time_available.Clear();
       }
     } else if (line[0] == 'I') {
@@ -69,12 +68,11 @@ DebugReplayIGC::CopyFromFix(const IGCFix &fix)
   if (basic.time_available && basic.date_time_utc.hour >= 23 &&
       fix.time.hour == 0) {
     /* midnight roll-over */
-    ++day;
     raw_basic.date_time_utc.IncrementDay();
   }
 
   basic.clock = basic.time =
-    fixed(day * 24 * 3600 + fix.time.GetSecondOfDay());
+    fixed(fix.time.GetSecondOfDay());
   basic.time_available.Update(basic.clock);
   basic.date_time_utc.hour = fix.time.hour;
   basic.date_time_utc.minute = fix.time.minute;

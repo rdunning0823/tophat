@@ -33,15 +33,17 @@ Copyright_License {
 #include "Android/NativeInputListener.hpp"
 #include "Android/TextUtil.hpp"
 #include "Android/LogCat.hpp"
-#include "Android/Nook.hpp"
 #include "Asset.hpp"
+#include "Android/Product.hpp"
+#include "Android/Nook.hpp"
 #include "Language/Language.hpp"
 #include "LocalPath.hpp"
 #include "LogFile.hpp"
 #include "Version.hpp"
 #include "Screen/Debug.hpp"
-#include "Look/Fonts.hpp"
-#include "Event/Android/Queue.hpp"
+#include "Look/GlobalFonts.hpp"
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
 #include "Screen/OpenGL/Init.hpp"
 #include "Dialogs/Message.hpp"
 #include "Simulator.hpp"
@@ -74,12 +76,11 @@ Copyright_License {
 #endif
 
 #include <assert.h>
+#include <stdlib.h>
 
 Context *context;
 
 NativeView *native_view;
-
-EventQueue *event_queue;
 
 Vibrator *vibrator;
 bool os_haptic_feedback_enabled;
@@ -138,6 +139,7 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   assert(native_view == NULL);
   native_view = new NativeView(env, obj, width, height, xdpi, ydpi,
                                sdk_version, product);
+  is_nook = strcmp(native_view->GetProduct(), "NOOK") == 0;
 
   event_queue = new EventQueue();
 
@@ -146,6 +148,13 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   vibrator = Vibrator::Create(env, *context);
 
   ioio_helper = new IOIOHelper(env);
+
+  if (IsNookSimpleTouch()) {
+    is_dithered = Nook::EnterFastMode();
+
+    /* enable USB host mode if this is a Nook */
+    Nook::InitUsb();
+  }
 
   ScreenInitialized();
   AllowLanguage();
@@ -182,14 +191,19 @@ gcc_visibility_default
 JNIEXPORT void JNICALL
 Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
 {
-  if (IsNookSimpleTouch())
+  if (IsNookSimpleTouch()) {
     Nook::ExitFastMode();
+  }
 
   StopLogCat();
 
   InitThreadDebug();
 
-  delete CommonInterface::main_window;
+  if (CommonInterface::main_window != nullptr) {
+    CommonInterface::main_window->Destroy();
+    delete CommonInterface::main_window;
+    CommonInterface::main_window = nullptr;
+  }
 
   DisallowLanguage();
   Fonts::Deinitialize();
@@ -204,6 +218,7 @@ Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
   delete event_queue;
   event_queue = NULL;
   delete native_view;
+  native_view = nullptr;
 
   TextUtil::Deinitialise(env);
   OpenGL::Deinitialise();
@@ -211,6 +226,7 @@ Java_org_tophat_NativeView_deinitializeNative(JNIEnv *env, jobject obj)
   DeinitialiseDataPath();
 
   delete context;
+  context = nullptr;
 
   BMP085Device::Deinitialise(env);
   NativeBMP085Listener::Deinitialise(env);

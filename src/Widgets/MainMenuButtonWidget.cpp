@@ -34,7 +34,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
-#include "Look/Fonts.hpp"
+#include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
 
 void
@@ -120,13 +120,13 @@ MainMenuButtonWidget::Unprepare()
 void
 MainMenuButtonWidget::Show(const PixelRect &rc)
 {
-  GetWindow()->Show();
+  GetWindow().Show();
 }
 
 void
 MainMenuButtonWidget::Hide()
 {
-  GetWindow()->Hide();
+  GetWindow().Hide();
 }
 
 void
@@ -140,7 +140,7 @@ MainMenuButtonWidget::Move(const PixelRect &rc_map)
   rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
 
   WindowWidget::Move(rc);
-  GetWindow()->Move(rc);
+  GetWindow().Move(rc);
 }
 
 UPixelScalar

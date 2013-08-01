@@ -53,10 +53,10 @@ Copyright_License {
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
 #include "Engine/Route/ReachResult.hpp"
-#include "Look/Fonts.hpp"
 #include "Look/TaskLook.hpp"
 #include "Look/MapLook.hpp"
 #include "UIGlobals.hpp"
+#include "Look/WaypointLook.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -476,12 +476,13 @@ public:
 static void
 MapWaypointLabelRender(Canvas &canvas, UPixelScalar width, UPixelScalar height,
                        LabelBlock &label_block,
-                       WaypointLabelList &labels)
+                       WaypointLabelList &labels,
+                       const WaypointLook &look)
 {
   labels.Sort();
 
   for (const auto &l : labels) {
-    canvas.Select(l.bold ? Fonts::map_bold : Fonts::map);
+    canvas.Select(l.bold ? *look.bold_font : *look.font);
 
     TextInBox(canvas, l.Name, l.Pos.x, l.Pos.y, l.Mode,
               width, height, &label_block);
@@ -506,13 +507,14 @@ WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
   if (task != NULL) {
     ProtectedTaskManager::Lease task_manager(*task);
 
-    v.SetIsMat(task_manager->IsMat());
+    const TaskStats &task_stats = task_manager->GetStats();
+
+    v.SetIsMat(task_stats.is_mat);
 
     // task items come first, this is the only way we know that an item is in task,
     // and we won't add it if it is already there
-    if (task_manager->StatsValid()) {
+    if (task_stats.task_valid)
       v.set_task_valid();
-    }
 
     const AbstractTask *atask = task_manager->GetActiveTask();
     if (atask != NULL)
@@ -529,5 +531,5 @@ WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
   MapWaypointLabelRender(canvas,
                          projection.GetScreenWidth(),
                          projection.GetScreenHeight(),
-                         label_block, v.labels);
+                         label_block, v.labels, look);
 }

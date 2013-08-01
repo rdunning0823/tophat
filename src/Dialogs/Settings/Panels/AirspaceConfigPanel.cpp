@@ -37,7 +37,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "UtilsSettings.hpp"
 
-#ifdef HAVE_ALPHA_BLEND
+#ifdef USE_GDI
 #include "Screen/GDI/AlphaBlend.hpp"
 #endif
 
@@ -47,6 +47,7 @@ enum ControlIndex {
   AltWarningMargin,
   AirspaceWarnings,
   WarningTime,
+  RepetitiveSound,
   AcknowledgeTime,
   UseBlackOutline,
   AirspaceFillMode,
@@ -127,6 +128,7 @@ void
 AirspaceConfigPanel::ShowWarningControls(bool visible)
 {
   SetRowVisible(WarningTime, visible);
+  SetRowVisible(RepetitiveSound, visible);
   SetRowVisible(AcknowledgeTime, visible);
 }
 
@@ -207,6 +209,11 @@ AirspaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           10, 1000, 5, computer.warnings.warning_time);
   SetExpertRow(WarningTime);
 
+  AddBoolean(_("Repetitive sound"),
+             _("Enable/disable repetitive warning sound when airspaces warnings dialog is displayed."),
+             computer.warnings.repetitive_sound, this);
+  SetExpertRow(RepetitiveSound);
+
   AddTime(_("Acknowledge time"),
           _("This is the time period in which an acknowledged airspace warning will not be repeated."),
           10, 1000, 5, computer.warnings.acknowledgement_time);
@@ -222,7 +229,7 @@ AirspaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           as_fill_mode_list, (unsigned)renderer.fill_mode);
   SetExpertRow(AirspaceFillMode);
 
-#if !defined(ENABLE_OPENGL) && defined(HAVE_ALPHA_BLEND)
+#if defined(HAVE_HATCHED_BRUSH) && defined(HAVE_ALPHA_BLEND)
   if (AlphaBlendAvailable()) {
     AddBoolean(_("Airspace transparency"), _("If enabled, then airspaces are filled transparently."),
                renderer.transparency);
@@ -264,6 +271,9 @@ AirspaceConfigPanel::Save(bool &_changed)
     require_restart = true;
   }
 
+  changed |= SaveValue(RepetitiveSound, ProfileKeys::RepetitiveSound,
+                       computer.warnings.repetitive_sound);
+
   if (SaveValue(AcknowledgeTime, ProfileKeys::AcknowledgementTime,
                 computer.warnings.acknowledgement_time)) {
     changed = true;
@@ -274,13 +284,11 @@ AirspaceConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(AirspaceFillMode, ProfileKeys::AirspaceFillMode, renderer.fill_mode);
 
-#ifndef ENABLE_OPENGL
-#ifdef HAVE_ALPHA_BLEND
+#if defined(HAVE_HATCHED_BRUSH) && defined(HAVE_ALPHA_BLEND)
   if (AlphaBlendAvailable())
     changed |= SaveValue(AirspaceTransparency, ProfileKeys::AirspaceTransparency,
                          renderer.transparency);
 #endif
-#endif /* !OpenGL */
 
   _changed |= changed;
 

@@ -26,6 +26,11 @@ Copyright_License {
 
 #include "Screen/Point.hpp"
 
+#ifdef USE_MEMORY_CANVAS
+#include "Screen/Memory/Buffer.hpp"
+#include "Screen/Memory/PixelTraits.hpp"
+#endif
+
 #ifdef ENABLE_OPENGL
 #include "Util/tstring.hpp"
 #include "Screen/OpenGL/Surface.hpp"
@@ -43,10 +48,12 @@ class UncompressedImage;
 
 #ifdef ENABLE_OPENGL
 class GLTexture;
+#elif !defined(USE_GDI)
+#ifdef GREYSCALE
+using BitmapPixelTraits = GreyscalePixelTraits;
+#else
+using BitmapPixelTraits = BGRAPixelTraits;
 #endif
-
-#ifdef ENABLE_SDL
-struct SDL_Surface;
 #endif
 
 /**
@@ -79,21 +86,25 @@ protected:
   tstring pathName;
   GLTexture *texture;
   PixelSize size;
-#elif defined(ENABLE_SDL)
-  SDL_Surface *surface;
+
+  bool interpolation;
+#elif defined(USE_MEMORY_CANVAS)
+  WritableImageBuffer<BitmapPixelTraits> buffer;
 #else
   HBITMAP bitmap;
 #endif
 
 public:
 #ifdef ENABLE_OPENGL
-  Bitmap():id(0), texture(NULL) {}
-  explicit Bitmap(unsigned id):texture(NULL) {
+  Bitmap():id(0), texture(NULL), interpolation(false) {}
+  explicit Bitmap(unsigned id):texture(NULL), interpolation(false) {
     Load(id);
   }
-#elif defined(ENABLE_SDL)
-  Bitmap():surface(NULL) {}
-  explicit Bitmap(unsigned id):surface(NULL) {
+#elif defined(USE_MEMORY_CANVAS)
+  constexpr Bitmap():buffer(WritableImageBuffer<BitmapPixelTraits>::Empty()) {}
+
+  explicit Bitmap(unsigned id)
+    :buffer(WritableImageBuffer<BitmapPixelTraits>::Empty()) {
     Load(id);
   }
 #else
@@ -109,13 +120,12 @@ public:
 
   Bitmap(const Bitmap &other) = delete;
   Bitmap &operator=(const Bitmap &other) = delete;
-
 public:
   bool IsDefined() const {
 #ifdef ENABLE_OPENGL
     return texture != NULL;
-#elif defined(ENABLE_SDL)
-    return surface != NULL;
+#elif defined(USE_MEMORY_CANVAS)
+    return buffer.data != nullptr;
 #else
     return bitmap != NULL;
 #endif
@@ -131,11 +141,13 @@ public:
   }
 #endif
 
-  bool Load(const UncompressedImage &uncompressed, Type type=Type::STANDARD);
-
-#ifdef ENABLE_SDL
-  bool Load(SDL_Surface *_surface, Type type=Type::STANDARD);
+#ifdef ENABLE_OPENGL
+  void EnableInterpolation();
+#else
+  void EnableInterpolation() {}
 #endif
+
+  bool Load(const UncompressedImage &uncompressed, Type type=Type::STANDARD);
 
   bool Load(unsigned id, Type type=Type::STANDARD);
 
@@ -154,9 +166,9 @@ public:
   GLTexture *GetNative() const {
     return texture;
   }
-#elif defined(ENABLE_SDL)
-  SDL_Surface* GetNative() const {
-    return surface;
+#elif defined(USE_MEMORY_CANVAS)
+  ConstImageBuffer<BitmapPixelTraits> GetNative() const {
+    return buffer;
   }
 #else
   HBITMAP GetNative() const {

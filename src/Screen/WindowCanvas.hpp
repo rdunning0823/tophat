@@ -34,12 +34,14 @@ class PaintWindow;
  * #PaintWindow, outside of the PaintWindow::OnPaint().
  */
 class WindowCanvas : public Canvas {
-#ifdef ENABLE_SDL
+#ifdef USE_MEMORY_CANVAS
 public:
-  explicit WindowCanvas(Window &window)
-    :Canvas(::SDL_GetVideoSurface()) {}
+  explicit WindowCanvas(Window &window) {
+    buffer.width = window.GetWidth();
+    buffer.height = window.GetHeight();
+  }
 
-#else /* !ENABLE_SDL */
+#else /* !USE_MEMORY_CANVAS */
 
 protected:
   HWND wnd;
@@ -50,7 +52,7 @@ public:
   ~WindowCanvas() {
     ::ReleaseDC(wnd, dc);
   }
-#endif /* !ENABLE_SDL */
+#endif /* !USE_MEMORY_CANVAS */
 };
 
 #endif

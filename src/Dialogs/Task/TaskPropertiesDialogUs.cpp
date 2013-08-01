@@ -120,7 +120,7 @@ void
 TaskPropertiesPanelUs::RefreshView()
 {
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
-  const OrderedTaskBehaviour &p = ordered_task->GetOrderedTaskBehaviour();
+  const OrderedTaskSettings &p = ordered_task->GetOrderedTaskSettings();
 
   bool aat_types = (ftype == TaskFactoryType::AAT || ftype == TaskFactoryType::MAT);
   bool fai_start_finish = p.finish_constraints.fai_finish;
@@ -151,7 +151,7 @@ TaskPropertiesPanelUs::RefreshView()
 void
 TaskPropertiesPanelUs::ReadValues()
 {
-  OrderedTaskBehaviour p = ordered_task->GetOrderedTaskBehaviour();
+  OrderedTaskSettings p = ordered_task->GetOrderedTaskSettings();
 
   TaskFactoryType newtype = ordered_task->GetFactoryType();
   task_changed |= SaveValueEnum(TASK_TYPE, newtype);
@@ -192,7 +192,7 @@ TaskPropertiesPanelUs::ReadValues()
 
   p.finish_constraints.fai_finish = IsFai(newtype);
 
-  ordered_task->SetOrderedTaskBehaviour(p);
+  ordered_task->SetOrderedTaskSettings(p);
 }
 
 void

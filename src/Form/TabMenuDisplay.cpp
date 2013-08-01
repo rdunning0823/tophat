@@ -218,7 +218,7 @@ TabMenuDisplay::PaintMainMenuItems(Canvas &canvas,
   const TabMenuControl &tb = GetTabMenuBar();
   PaintMainMenuBorder(canvas);
 
-  const bool is_focused = HasFocus();
+  const bool is_focused = !HasCursorKeys() || HasFocus();
 
   unsigned main_menu_index = 0;
   for (auto i = tb.GetMainMenuButtons().begin(),
@@ -277,7 +277,7 @@ TabMenuDisplay::PaintSubMenuItems(Canvas &canvas,
   assert(main_button.first_page_index < tb.GetTabButtons().size());
   assert(main_button.last_page_index < tb.GetTabButtons().size());
 
-  const bool is_focused = HasFocus();
+  const bool is_focused = !HasCursorKeys() || HasFocus();
 
   for (unsigned first_page_index = main_button.first_page_index,
          last_page_index = main_button.last_page_index,
@@ -313,7 +313,7 @@ TabMenuDisplay::OnPaint(Canvas &canvas)
   canvas.Clear(look.background_color);
   canvas.Select(*look.button.font);
 
-  const unsigned caption_style = DT_EXPANDTABS | DT_CENTER | DT_NOCLIP
+  const unsigned caption_style = DT_CENTER | DT_NOCLIP
       | DT_WORDBREAK;
 
   PaintMainMenuItems(canvas, caption_style);

@@ -84,7 +84,6 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     df.addEnumText(Units::Store::GetName(i), i+1);
 
   LoadValueEnum(ContestNationality, (unsigned)task_behaviour.contest_nationality);
-
 }
 
 
@@ -118,32 +117,25 @@ TaskRulesConfigPanel::Save(bool &_changed)
     Profile::Set(ProfileKeys::ContestNationality,
                  (int)task_behaviour.contest_nationality);
 
-//    SaveValueEnum(UnitsSpeed, ProfileKeys::SpeedUnitsValue, config.speed_unit);
     config.wind_speed_unit = config.speed_unit; // Mapping the wind speed to the speed unit
     Profile::Set(ProfileKeys::SpeedUnitsValue,
                  (int)config.speed_unit);
 
-//    SaveValueEnum(UnitsDistance, ProfileKeys::DistanceUnitsValue, config.distance_unit);
     Profile::Set(ProfileKeys::DistanceUnitsValue,
                  (int)config.distance_unit);
 
-//    SaveValueEnum(UnitsLift, ProfileKeys::LiftUnitsValue, config.vertical_speed_unit);
     Profile::Set(ProfileKeys::LiftUnitsValue,
                  (int)config.vertical_speed_unit);
 
-//    SaveValueEnum(UnitsAltitude, ProfileKeys::AltitudeUnitsValue, config.altitude_unit);
     Profile::Set(ProfileKeys::AltitudeUnitsValue,
                  (int)config.altitude_unit);
 
-//    SaveValueEnum(UnitsTemperature, ProfileKeys::TemperatureUnitsValue, config.temperature_unit);
     Profile::Set(ProfileKeys::ContestNationality,
                  (int)task_behaviour.contest_nationality);
 
-//    SaveValueEnum(UnitsTaskSpeed, ProfileKeys::TaskSpeedUnitsValue, config.task_speed_unit);
     Profile::Set(ProfileKeys::TaskSpeedUnitsValue,
                  (int)config.temperature_unit);
 
-//    SaveValueEnum(UnitsPressure, ProfileKeys::PressureUnitsValue, config.pressure_unit);
     Profile::Set(ProfileKeys::PressureUnitsValue,
                  (int)config.pressure_unit);
   }

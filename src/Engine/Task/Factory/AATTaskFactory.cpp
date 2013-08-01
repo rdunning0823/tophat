@@ -22,7 +22,7 @@ Copyright_License {
  */
 
 #include "AATTaskFactory.hpp"
-#include "TaskFactoryConstraints.hpp"
+#include "Constraints.hpp"
 #include "Util/Macros.hpp"
 #include "Task/TaskBehaviour.hpp"
 
