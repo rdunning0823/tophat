@@ -262,7 +262,7 @@ constexpr
 static inline bool
 HasDraggableScreen()
 {
-  return HasTouchScreen() && !IsOldWindowsCE();
+  return !IsOldWindowsCE();
 }
 
 /**
