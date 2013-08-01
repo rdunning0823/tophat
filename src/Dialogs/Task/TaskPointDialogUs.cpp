@@ -170,7 +170,9 @@ CheckAndFixTask()
   if (!task_modified)
     return true;
 
-  task_modified |= ordered_task->GetFactory().CheckAddFinish();
+  ordered_task->ScanStartFinish();
+  if (ordered_task->GetFactory().CheckAddFinish())
+    ordered_task->ScanStartFinish();
 
   return (ordered_task->TaskSize() == 0) || ordered_task->CheckTask();
 }
