@@ -26,6 +26,7 @@ Copyright_License {
 #include "XML/DataNodeXML.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Util/StringUtil.hpp"
+#include "Task/Factory/AbstractTaskFactory.hpp"
 
 #include <memory>
 #include <assert.h>
@@ -52,6 +53,8 @@ TaskFileXCSoar::GetTask(const TaskBehaviour &task_behaviour,
   Deserialiser des(*root, waypoints);
   des.Deserialise(*task);
 
+  task->GetFactory().MutateTPsToTaskType();
+  task->ScanStartFinish();
   // Check if the task is valid
   if (!task->CheckTask()) {
     delete task;

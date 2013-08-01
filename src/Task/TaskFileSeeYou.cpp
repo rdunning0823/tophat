@@ -544,6 +544,8 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
 
     delete pt;
   }
+  fact.MutateTPsToTaskType();
+  task->ScanStartFinish();
   // Check if the task is valid
   if (!task->CheckTask()) {
     delete task;

@@ -132,6 +132,9 @@ TaskFileIGC::GetTask(const TaskBehaviour &task_behaviour,
 
     ++i;
   }
+
+  fact.MutateTPsToTaskType();
+  task->ScanStartFinish();
   // Check if the task is valid
   if (!task->CheckTask()) {
     delete task;
