@@ -366,7 +366,9 @@ TaskManagerDialogUs::CommitTaskChanges()
   if (!task_modified)
     return true;
 
-  task_modified |= active_task->GetFactory().CheckAddFinish();
+  // Assume that CheckGeometry() has been called since last change to task
+  active_task->ScanStartFinish();
+  active_task->GetFactory().CheckAddFinish();
 
   if (!active_task->TaskSize() || active_task->CheckTask()) {
 

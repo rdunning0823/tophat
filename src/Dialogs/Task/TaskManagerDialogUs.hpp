@@ -102,6 +102,8 @@ public:
   /**
    * Validates task and prompts if change or error
    * Commits task if no error
+   * CheckGeometry() Must be called before calling this
+   *   if any turnpoint locations have changed
    * @return True if task manager should close
    *         False if window should remain open
    */
