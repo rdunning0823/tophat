@@ -332,7 +332,7 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
 
   if (!ordered_task->GetFactory().Remove(active_index))
     return;
-
+  ordered_task->UpdateGeometry();
   if (active_index >= ordered_task->TaskSize())
     active_index = std::max(1u, active_index) - 1;
 
@@ -390,6 +390,7 @@ OnAddClicked(gcc_unused WndButton &Sender)
     task_modified = true;
     if (ordered_task->TaskSize() > 1)
       active_index++;
+    ordered_task->UpdateGeometry();
   }
 
   delete point;
@@ -409,6 +410,7 @@ OnRelocateClicked(gcc_unused WndButton &Sender)
     return;
 
   ordered_task->GetFactory().Relocate(active_index, *wp);
+  ordered_task->UpdateGeometry();
   task_modified = true;
   RefreshView();
 }
@@ -419,6 +421,7 @@ OnTypeClicked(gcc_unused WndButton &Sender)
   if (dlgTaskPointType(&ordered_task, active_index)) {
     task_modified = true;
     RefreshView();
+    ordered_task->ScanStartFinish();
   }
 }
 
