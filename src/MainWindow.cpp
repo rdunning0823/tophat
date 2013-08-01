@@ -737,10 +737,11 @@ MainWindow::OnTimer(WindowTimer &_timer)
     map->SetMainMenuButtonRect();
     map->SetZoomButtonsRect();
 #endif
-    if (!HasDraggableScreen())
-      map->SetTaskNavSliderShape();
-    else
-      task_nav_slider_widget->RefreshTask();  battery_timer.Process();
+  if (!HasDraggableScreen())
+    map->SetTaskNavSliderShape();
+  else
+    task_nav_slider_widget->RefreshTask();
+  battery_timer.Process();
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   PixelRect rc = GetClientRect();
