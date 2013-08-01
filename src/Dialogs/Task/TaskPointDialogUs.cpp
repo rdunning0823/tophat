@@ -188,7 +188,7 @@ OnCloseClicked(gcc_unused WndButton &Sender)
         ordered_task->GetFactory().GetValidationErrors()),
       _("Validation Errors"), MB_ICONEXCLAMATION | MB_OK);
 
-    if (ShowMessageBox(_("Task not valid. Changes will be lost.\nContinue?"),
+    if (ShowMessageBox(_("Task not valid. Changes will be lost. Continue?"),
                         _("Task Manager"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK) {
       task_editor_return = TaskEditorReturn::TASK_REVERT;
       wf->SetModalResult(mrOK);
