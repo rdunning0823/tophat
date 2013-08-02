@@ -201,19 +201,19 @@ ShowPanel(unsigned page)
   switch (page) {
   case NATIONALITY:
     widget = CreateNationalityConfigPanel();
-    title = "Nationality";
+    title = _("Nationality");
     break;
   case SITE_FILES:
     widget = CreateSiteConfigPanel(true);
-    title = "Site files";
+    title = _("Site files");
     break;
   case SAFETY:
     widget = CreateSafetyFactorsConfigPanel();
-    title = "Safety factors";
+    title = _("Safety factors");
     break;
   case PILOT:
     widget = CreateLoggerConfigPanel();
-    title = "Pilot";
+    title = _("Pilot");
     break;
   case DEVICE:
   case PLANE:

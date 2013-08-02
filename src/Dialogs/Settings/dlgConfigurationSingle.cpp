@@ -37,7 +37,7 @@ dlgConfigurationSingle(Widget &widget, const TCHAR *caption)
   ButtonPanel::ButtonPanelPosition position = ButtonPanel::ButtonPanelPosition::Bottom;
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
-  dialog.CreateFull(UIGlobals::GetMainWindow(),_(caption), &widget,
+  dialog.CreateFull(UIGlobals::GetMainWindow(), caption, &widget,
                 nullptr, 0, position);
   CommonInterface::SetUISettings().dialog.expert = false;
   dialog.AddButton(_("OK"), mrOK);
