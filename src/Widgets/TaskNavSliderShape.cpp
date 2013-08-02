@@ -285,7 +285,7 @@ SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
 
     UPixelScalar offset = rc.left;
     if ((PixelScalar)(distance_width + bearing_width + height_width) <
-        (rc.right - rc.left - label_width - Layout::FastScale(15))) {
+        (PixelScalar)(rc.right - rc.left - label_width - Layout::FastScale(15))) {
       canvas.Select(small_font);
       canvas.DrawText(rc.left + Layout::FastScale(2),
                       line_one_y_offset, buffer.c_str());

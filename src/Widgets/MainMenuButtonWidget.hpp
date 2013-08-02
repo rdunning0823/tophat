@@ -28,7 +28,8 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
 #include "Look/DialogLook.hpp"
-#include "LogFile.hpp"
+
+#include <tchar.h>
 
 struct IconLook;
 class ContainerWindow;
