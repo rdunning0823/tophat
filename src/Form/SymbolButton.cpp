@@ -32,6 +32,7 @@ Copyright_License {
 #include "Renderer/SymbolRenderer.hpp"
 #include "resource.h"
 #include "Language/Language.hpp"
+
 void
 WndSymbolButton::OnPaint(Canvas &canvas)
 {
@@ -106,8 +107,8 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     canvas.DrawFilledRectangle(rc, Color(color));
 
     //draw search icon
-  } else if (caption == _("Search") || caption == _("SearchChecked")) {
-    Bitmap bmp(caption == _("Search") ?
+  } else if (caption == N_("Search") || caption == N_("SearchChecked")) {
+    Bitmap bmp(caption == N_("Search") ?
         (Layout::scale == 1 ? IDB_SEARCH : IDB_SEARCH_HD) :
         (Layout::scale == 1 ? IDB_SEARCH_CHECKED : IDB_SEARCH_CHECKED_HD));
 
@@ -132,7 +133,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   }
 
   //draw gear for set up icon
-  else if (caption == _("Setup")) {
+  else if (caption == N_("Setup")) {
     Bitmap bmp(Layout::scale == 1 ? IDB_SETTINGS : IDB_SETTINGS_HD);
 
     const PixelSize bitmap_size = bmp.GetSize();
@@ -153,8 +154,8 @@ WndSymbolButton::OnPaint(Canvas &canvas)
                       bmp,
                       bitmap_size.cx / 2, 0);
 
-  } else if (caption == _("More") || caption == _("Less")) {
-    bool up = caption == _("Less");
+  } else if (caption == N_("More") || caption == N_("Less")) {
+    bool up = caption == N_("Less");
     // Draw arrow symbols instead of v and ^
     const Font &font = *look.button.font;
     canvas.Select(font);
