@@ -99,12 +99,7 @@ GaugesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              map_settings.show_thermal_profile);
   AddDummy();
   AddDummy();
-
-  AddBoolean(_("Vario bar"),
-             _("If set to ON the vario bar will be shown"),
-             map_settings.vario_bar_enabled);
-
-  SetExpertRow(EnableVarioBar);
+  AddDummy();
 }
 
 bool
@@ -127,8 +122,6 @@ GaugesConfigPanel::Save(bool &_changed)
   changed |= SaveValue(EnableThermalProfile, ProfileKeys::EnableThermalProfile,
                        map_settings.show_thermal_profile);
 
-  changed |= SaveValue(EnableVarioBar, ProfileKeys::EnableVarioBar,
-                       map_settings.vario_bar_enabled);
   _changed |= changed;
 
   return true;
