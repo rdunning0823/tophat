@@ -130,8 +130,9 @@ Profile::Load(MapSettings &settings)
   Get(ProfileKeys::ShowFAITriangleAreas,
       settings.show_fai_triangle_areas);
 
-  Get(ProfileKeys::EnableVarioBar,
-      settings.vario_bar_enabled);
+  // use default for this property (disabled)
+/*  Get(ProfileKeys::EnableVarioBar,
+      settings.vario_bar_enabled);*/
 
   Load(settings.trail);
   Load(settings.item_list);
