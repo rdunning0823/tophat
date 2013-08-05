@@ -359,7 +359,7 @@ protected:
       bold = true;
       text_mode.move_in_view = true;
     } else if (vwp.in_task) {
-      text_mode.shape = LabelShape::OUTLINED_INVERTED;
+      text_mode.shape = LabelShape::ROUNDED_WHITE;
       bold = true;
     } else if (watchedWaypoint) {
       text_mode.shape = LabelShape::OUTLINED;
