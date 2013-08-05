@@ -35,7 +35,6 @@ Copyright_License {
 enum ControlIndex {
   WaypointLabels,
   WaypointArrivalHeightDisplay,
-  WaypointLabelStyle,
   WaypointLabelSelection,
   AppIndLandable,
   AppUseSWLandablesRendering,
@@ -127,16 +126,6 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
           wp_arrival_list, (unsigned)settings.arrival_height_display);
   SetExpertRow(WaypointArrivalHeightDisplay);
 
-  static constexpr StaticEnumChoice wp_label_list[] = {
-    { (unsigned)LabelShape::ROUNDED_BLACK, N_("Rounded rectangle"), nullptr },
-    { (unsigned)LabelShape::OUTLINED_INVERTED, N_("Outlined"), nullptr },
-    { 0 }
-  };
-
-  AddEnum(_("Label style"), NULL, wp_label_list,
-          (unsigned)settings.landable_render_mode);
-  SetExpertRow(WaypointLabelStyle);
-
   static constexpr StaticEnumChoice wp_selection_list[] = {
     { (unsigned)WaypointRendererSettings::LabelSelection::ALL,
       N_("All"), N_("All waypoint labels will be displayed.") },
@@ -213,9 +202,6 @@ WaypointDisplayConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(WaypointArrivalHeightDisplay, ProfileKeys::WaypointArrivalHeightDisplay,
                            settings.arrival_height_display);
-
-  changed |= SaveValueEnum(WaypointLabelStyle, ProfileKeys::WaypointLabelStyle,
-                           settings.landable_render_mode);
 
   changed |= SaveValueEnum(WaypointLabelSelection, ProfileKeys::WaypointLabelSelection,
                            settings.label_selection);
