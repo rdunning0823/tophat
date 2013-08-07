@@ -33,7 +33,7 @@ TaskLook::Initialise()
   const Color bearing_color = Color(0x3e,0x30,0x5f);
   const Color isoline_color = bearing_color;
 
-  oz_current_pen.Set(Pen::SOLID, Layout::ScalePenWidth(2), task_color);
+  oz_current_pen.Set(Pen::SOLID, Layout::ScalePenWidth(3), task_color);
   oz_active_pen.Set(Pen::SOLID, Layout::ScalePenWidth(1), task_color);
   oz_inactive_pen.Set(Pen::SOLID, Layout::ScalePenWidth(1),
                       DarkColor(task_color));
