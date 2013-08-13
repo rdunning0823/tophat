@@ -28,6 +28,7 @@
 #include "Language/Language.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/AngleFormatter.hpp"
+#include "Util/StaticString.hpp"
 
 enum Controls {
   RADIUS,
@@ -45,34 +46,44 @@ SectorZoneEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ObservationZoneEditWidget::Prepare(parent, rc);
 
   const auto shape = GetObject().GetShape();
+  WndProperty* wp;
+  StaticString<255> edit_label;
 
-  AddFloat(_("Radius"), _("Radius of the OZ sector."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed(0.1), fixed(200), fixed(1), true,
-           UnitGroup::DISTANCE, GetObject().GetRadius(),
-           this);
+  wp = AddFloat(_("Radius"), _("Radius of the OZ sector."),
+                _T("%.1f %s"), _T("%.1f"),
+                fixed(0.1), fixed(200), fixed(1), true,
+                UnitGroup::DISTANCE, GetObject().GetRadius(),
+                this);
+  edit_label.Format(_T("%s: %s"), _("Radius"), GetWaypointName());
+  wp->SetEditingCaption(edit_label.c_str());
 
   if (shape == ObservationZone::Shape::SYMMETRIC_QUADRANT) {
     AddDummy();
     AddDummy();
   } else {
-    AddAngle(_("Start radial"), _("Start radial of the OZ area"),
-             GetObject().GetStartRadial(), 10, true,
-             this);
+    wp = AddAngle(_("Start radial"), _("Start radial of the OZ area"),
+                  GetObject().GetStartRadial(), 10, true,
+                  this);
+    edit_label.Format(_T("%s: %s"), _("Start radial"), GetWaypointName());
+    wp->SetEditingCaption(edit_label.c_str());
 
-    AddAngle(_("Finish radial"), _("Finish radial of the OZ area"),
-             GetObject().GetEndRadial(), 10, true,
-             this);
+    wp = AddAngle(_("Finish radial"), _("Finish radial of the OZ area"),
+                  GetObject().GetEndRadial(), 10, true,
+                  this);
+    edit_label.Format(_T("%s: %s"), _("Finish radial"), GetWaypointName());
+    wp->SetEditingCaption(edit_label.c_str());
   }
 
   if (shape == ObservationZonePoint::Shape::ANNULAR_SECTOR) {
     const AnnularSectorZone &annulus = (const AnnularSectorZone &)GetObject();
 
-    AddFloat(_("Inner radius"), _("Inner radius of the OZ sector."),
-             _T("%.1f %s"), _T("%.1f"),
-             fixed(0.1), fixed(100), fixed(1), true,
-             UnitGroup::DISTANCE, annulus.GetInnerRadius(),
-             this);
+    wp = AddFloat(_("Inner radius"), _("Inner radius of the OZ sector."),
+                  _T("%.1f %s"), _T("%.1f"),
+                  fixed(0.1), fixed(100), fixed(1), true,
+                  UnitGroup::DISTANCE, annulus.GetInnerRadius(),
+                  this);
+    edit_label.Format(_T("%s: %s"), _("Inner radius"), GetWaypointName());
+    wp->SetEditingCaption(edit_label.c_str());
   }
 }
 
