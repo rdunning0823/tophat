@@ -473,7 +473,7 @@ WndProperty::RefreshDisplay()
 }
 
 const TCHAR *
-WndProperty::GetEditingCaption()
+WndProperty::GetEditingCaption() const
 {
   if (editing_caption.empty())
     return GetCaption();
