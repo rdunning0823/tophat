@@ -319,8 +319,8 @@ SetupQuick::RefreshForm()
   safety_text->SetCaption(text.c_str());
 
   text.Format(_T("%s / %s"), (GetActiveLanguageName() == nullptr) ? _T("System") : GetActiveLanguageName(),
-              (task_behaviour.contest_nationality == ContestNationalities::FAI) ?
-                  N_("FAI task rules") : N_("US task rules"));
+              (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) ?
+                  N_("US task rules") : N_("FAI task rules"));
   nationality_text->SetCaption(text);
 
   const LoggerSettings &logger = settings_computer.logger;
