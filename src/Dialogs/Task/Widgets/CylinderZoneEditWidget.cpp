@@ -39,11 +39,13 @@ CylinderZoneEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   ObservationZoneEditWidget::Prepare(parent, rc);
 
-  AddFloat(_("Radius"), _("Radius of the OZ cylinder."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed(0.1), fixed(200), fixed(1), true,
-           UnitGroup::DISTANCE, GetObject().GetRadius(),
-           this);
+  WndProperty* wp;
+  wp = AddFloat(_("Radius"), _("Radius of the OZ cylinder."),
+                _T("%.1f %s"), _T("%.1f"),
+                fixed(0.1), fixed(200), fixed(1), true,
+                UnitGroup::DISTANCE, GetObject().GetRadius(),
+                this);
+  wp->SetEditingCaption(GetWaypointName());
   SetRowEnabled(RADIUS, radius_editable);
 }
 
