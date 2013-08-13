@@ -107,7 +107,7 @@ public:
    * or if that is empty, returns the regular caption
    */
   gcc_pure
-  const TCHAR * GetEditingCaption();
+  const TCHAR * GetEditingCaption() const;
 
   /**
    * Starts  interactively  editing  the  value.   If  a  ComboBox  is
