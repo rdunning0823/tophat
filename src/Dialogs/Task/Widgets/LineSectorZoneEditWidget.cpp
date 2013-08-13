@@ -24,6 +24,7 @@
 #include "LineSectorZoneEditWidget.hpp"
 #include "Engine/Task/ObservationZones/LineSectorZone.hpp"
 #include "Language/Language.hpp"
+#include "Util/StaticString.hpp"
 
 enum Controls {
   LENGTH,
@@ -39,11 +40,13 @@ LineSectorZoneEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   ObservationZoneEditWidget::Prepare(parent, rc);
 
-  AddFloat(_("Gate width"), _("Width of the start/finish gate."),
-           _T("%.1f %s"), _T("%.1f"),
-           fixed(0.1), fixed(200), fixed(1), true,
-           UnitGroup::DISTANCE, GetObject().GetLength(),
-           this);
+  WndProperty* wp;
+  wp = AddFloat(_("Gate width"), _("Width of the start/finish gate."),
+                _T("%.1f %s"), _T("%.1f"),
+                fixed(0.1), fixed(200), fixed(1), true,
+                UnitGroup::DISTANCE, GetObject().GetLength(),
+                this);
+  wp->SetEditingCaption(GetWaypointName());
   SetRowEnabled(LENGTH, length_editable);
 }
 
