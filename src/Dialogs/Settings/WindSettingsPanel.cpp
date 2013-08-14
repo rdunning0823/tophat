@@ -221,7 +221,7 @@ WindSettingsPanel::UpdateVector()
     break;
 
   case DerivedInfo::WindSource::AUTO:
-    source = _("Auto");
+    source = _("Internal");
     break;
 
   case DerivedInfo::WindSource::EXTERNAL:
