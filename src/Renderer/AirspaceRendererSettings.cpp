@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "AirspaceRendererSettings.hpp"
+#include "Asset.hpp"
 
 #include <algorithm>
 
@@ -78,6 +79,10 @@ AirspaceRendererSettings::SetDefaults()
   classes[CTR].SetColors(RGB8_MAGENTA.Darken());
   classes[WAVE].SetColors(RGB8_YELLOW.Darken());
   classes[AATASK].SetColors(RGB8_YELLOW);
+  if (IsGrayScaleScreen())
+    classes[AATASK].SetColors(RGB8_MAGENTA.Darken());
+  else
+    classes[AATASK].SetColors(RGB8_YELLOW);
   classes[CLASSE].SetColors(RGB8_GREEN.Darken());
   classes[CLASSF].SetColors(RGB8_GREEN.Darken());
 }
