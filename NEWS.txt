@@ -1,6 +1,13 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+TopHat 1.1.8 Beta TBD
+* Simplified wind settings screen
+* Draw task OZs with darker lines
+* Make final glide bar label darker
+* Make task point lables black on white
+* Allow long touch to trigger same function as quick touch on map
+* Remove vario bar from right of screen
 TopHat 1.1.7 Beta 7/31/2013
 * Task Manager:
  - Add Back button
