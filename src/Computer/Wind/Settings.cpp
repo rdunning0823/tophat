@@ -26,8 +26,6 @@ Copyright_License {
 void
 WindSettings::SetDefaults()
 {
-  circling_wind = true;
-  zig_zag_wind = true;
-  use_external_wind = true;
+  user_wind_source = UserWindSource::EXTERNAL_WIND_IF_AVAILABLE;
   manual_wind_available.Clear();
 }

@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "WindSettingsPanel.hpp"
+#include "Computer/Wind/Settings.hpp"
 #include "Profile/ProfileKeys.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Float.hpp"
@@ -48,27 +49,21 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const WindSettings &settings = CommonInterface::GetComputerSettings().wind;
   const MapSettings &map_settings = CommonInterface::GetMapSettings();
 
-  static constexpr StaticEnumChoice auto_wind_list[] = {
-    { AUTOWIND_NONE, N_("Manual"),
+  static constexpr StaticEnumChoice wind_source_list[] = {
+    { MANUAL_WIND, N_("Manual"),
       N_("When the algorithm is switched off, the pilot is responsible for setting the wind estimate.") },
-    { AUTOWIND_CIRCLING, N_("Circling"),
+    { INTERNAL_WIND, N_("Internal calculation"),
       N_("Requires only a GPS source.") },
-    { AUTOWIND_ZIGZAG, N_("ZigZag"),
-      N_("Requires GPS and an intelligent vario with airspeed output.") },
-    { AUTOWIND_CIRCLING | AUTOWIND_ZIGZAG, N_("Both"),
-      N_("Use ZigZag and circling.") },
+    { EXTERNAL_WIND_IF_AVAILABLE, N_("Prefer external wind"),
+      N_("If enabled, then the wind vector received from external devices overrides "
+          "Top Hat's internal wind calculation.") },
     { 0 }
   };
 
-  auto_wind = AddEnum(_("Auto wind"),
-                      _("This allows switching on or off the automatic wind algorithm."),
-                      auto_wind_list, settings.GetLegacyAutoWindMode(),  this);
-
-  AddBoolean(_("Prefer external wind"),
-             _("If enabled, then the wind vector received from external devices overrides "
-                 "XCSoar's internal wind calculation."),
-             settings.use_external_wind,
-             this);
+  user_wind_source = AddEnum(_("Wind source"),
+                             _("Select the source of the wind calculation."),
+                             wind_source_list,
+                             (unsigned)settings.GetUserWindSource(),  this);
 
   if (edit_trail_drift)
     AddBoolean(_("Trail drift"),
@@ -117,17 +112,15 @@ WindSettingsPanel::UpdatetManualVisibility()
   if (!edit_manual_wind)
     return;
 
-  assert(auto_wind != nullptr);
+  assert(user_wind_source != nullptr);
 
-  DataFieldEnum *auto_wind_enum = (DataFieldEnum *)
-      auto_wind->GetDataField();
-  bool manual_mode = auto_wind_enum->GetAsInteger() == 0;
+  DataFieldEnum *wind_source_enum = (DataFieldEnum *)
+      user_wind_source->GetDataField();
+  bool manual_mode = wind_source_enum->GetAsInteger()
+      == (unsigned)MANUAL_WIND;
 
-  RowFormWidget::GetControl(ExternalWind).SetVisible(!manual_mode);
-  if (edit_manual_wind) {
-    this->GetControl(Speed).SetVisible(manual_mode);
-    this->GetControl(Direction).SetVisible(manual_mode);
-  }
+  this->GetControl(Speed).SetVisible(manual_mode);
+  this->GetControl(Direction).SetVisible(manual_mode);
 }
 
 void
@@ -159,14 +152,11 @@ WindSettingsPanel::Save(bool &_changed)
 
   bool changed = false;
 
-  unsigned auto_wind_mode = settings.GetLegacyAutoWindMode();
-  if (SaveValueEnum(AutoWind, ProfileKeys::AutoWind, auto_wind_mode)) {
-    settings.SetLegacyAutoWindMode(auto_wind_mode);
+  unsigned source = (unsigned)settings.GetUserWindSource();
+  if (SaveValueEnum(WIND_SOURCE, ProfileKeys::UserWindSource, source)) {
+    settings.SetUserWindSource((UserWindSource)source);
     changed = true;
   }
-
-  changed |= SaveValue(ExternalWind, ProfileKeys::ExternalWind,
-                       settings.use_external_wind);
 
   if (edit_trail_drift)
     changed |= SaveValue(TrailDrift, ProfileKeys::TrailDrift,
@@ -199,10 +189,7 @@ WindSettingsPanel::OnModified(DataField &df)
   const NMEAInfo &basic = CommonInterface::Basic();
   WindSettings &settings = CommonInterface::SetComputerSettings().wind;
 
-  if (&df == &GetDataField(ExternalWind)) {
-    DataFieldBoolean &dfb = (DataFieldBoolean &)df;
-    settings.use_external_wind = dfb.GetAsBoolean();
-  } else if (&df == &GetDataField(Speed) || &df == &GetDataField(Direction)) {
+  if (&df == &GetDataField(Speed) || &df == &GetDataField(Direction)) {
     settings.manual_wind.norm = Units::ToSysWindSpeed(GetValueFloat(Speed));
     settings.manual_wind.bearing = GetValueAngle(Direction);
     settings.manual_wind_available.Update(basic.clock);

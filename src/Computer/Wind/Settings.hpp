@@ -36,38 +36,19 @@ struct Waypoint;
 // control of calculations, these only changed by user interface
 // but are used read-only by calculations
 
-/** AutoWindMode (not in use) */
-enum AutoWindModeBits
-{
-  /** 0: Manual */
-  AUTOWIND_NONE = 0,
-  /** 1: Circling */
-  AUTOWIND_CIRCLING,
-  /** 2: ZigZag */
-  AUTOWIND_ZIGZAG,
-  /** 3: Both */
+enum UserWindSource {
+  MANUAL_WIND = 0,
+  INTERNAL_WIND,
+  EXTERNAL_WIND_IF_AVAILABLE,
 };
 
 /**
  * Wind calculator settings
  */
 struct WindSettings {
-  /**
-   * Use the circling algorithm to calculate the wind?
-   */
-  bool circling_wind;
 
-  /**
-   * Use the EKF algorithm to calculate the wind? (formerly known as
-   * "zig zag")
-   */
-  bool zig_zag_wind;
-
-  /**
-   * If enabled, then the wind vector received from external devices
-   * overrides XCSoar's internal wind calculation.
-   */
-  bool use_external_wind;
+  /* what is the source of the wind being used for calculations right now */
+  UserWindSource user_wind_source;
 
   /**
    * This is the manual wind set by the pilot. Validity is set when
@@ -79,24 +60,19 @@ struct WindSettings {
   void SetDefaults();
 
   bool IsAutoWindEnabled() const {
-    return circling_wind || zig_zag_wind;
+    return user_wind_source != UserWindSource::MANUAL_WIND;
   }
 
-  bool CirclingWindEnabled() const {
-    return circling_wind;
+  bool UseExternalWindIfEnabled() const {
+    return user_wind_source != UserWindSource::EXTERNAL_WIND_IF_AVAILABLE;
   }
 
-  bool ZigZagWindEnabled() const {
-    return zig_zag_wind;
+  UserWindSource GetUserWindSource() const {
+    return user_wind_source;
   }
 
-  unsigned GetLegacyAutoWindMode() const {
-    return (circling_wind ? 0x1 : 0x0) | (zig_zag_wind ? 0x2 : 0x0);
-  }
-
-  void SetLegacyAutoWindMode(unsigned mode) {
-    circling_wind = (mode & 0x1) != 0;
-    zig_zag_wind = (mode & 0x2) != 0;
+  void SetUserWindSource(UserWindSource source) {
+    user_wind_source = source;
   }
 };
 

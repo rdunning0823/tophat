@@ -44,11 +44,9 @@ namespace Profile {
 void
 Profile::Load(WindSettings &settings)
 {
-  unsigned auto_wind_mode = settings.GetLegacyAutoWindMode();
-  if (Get(ProfileKeys::AutoWind, auto_wind_mode))
-    settings.SetLegacyAutoWindMode(auto_wind_mode);
-
-  Get(ProfileKeys::ExternalWind, settings.use_external_wind);
+  unsigned user_wind_source = (unsigned)settings.GetUserWindSource();
+  if (Get(ProfileKeys::UserWindSource, user_wind_source))
+    settings.SetUserWindSource((UserWindSource)user_wind_source);
 }
 
 void

@@ -33,8 +33,7 @@ class WindSettingsPanel final
   : public RowFormWidget, public ActionListener,
     private DataFieldListener, private NullBlackboardListener {
   enum ControlIndex {
-    AutoWind,
-    ExternalWind,
+    WIND_SOURCE,
     TrailDrift,
     SOURCE,
     Speed,
@@ -52,7 +51,7 @@ class WindSettingsPanel final
   /**
    * pointer to the main choice: what type of wind shall we use
    */
-  WndProperty *auto_wind;
+  WndProperty *user_wind_source;
 
 public:
   enum Buttons {
