@@ -155,6 +155,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
   slider_shape.DrawText(canvas, rc_outer,
                         idx, GetList().GetCursorDownIndex() == (int)idx,
+                        idx == waypoint_index,
                         tp.IsValid() ? tp.waypoint->name.c_str() : _T(""),
                         tp.GetHasEntered(), tp.GetHasExited(),
                         task_data_cache.GetTaskMode(),

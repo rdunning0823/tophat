@@ -49,6 +49,12 @@ protected:
   const InfoBoxLook &infobox_look;
 
   /**
+   * height of the bearing icon
+   */
+  PixelSize bearing_icon_size;
+  UPixelScalar bearing_icon_hor_margin;
+
+  /**
    * the y positions relative to the top of the slider for each line of text
    */
   UPixelScalar text_line_one_y;
@@ -58,7 +64,22 @@ protected:
 public:
   SliderShape()
   :dialog_look(UIGlobals::GetDialogLook()),
-   infobox_look(UIGlobals::GetLook().info_box) {};
+   infobox_look(UIGlobals::GetLook().info_box),
+   bearing_icon_hor_margin(0) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const Bitmap *bmp_bearing;
+    bmp_bearing = &icon_look.hBmpBearingRightOne;
+    bearing_icon_size = bmp_bearing->GetSize();
+  };
+
+  /**
+   * Draws bearing symbol
+   * returns direction bearing symbol.
+   *   -1 if to left, +1 if to right
+   *   or 0 if no bearing is drawn
+   */
+  int DrawBearing(Canvas &canvas, const PixelRect &rc_outer,
+                   const Angle &bearing);
 
   UPixelScalar GetWidth() const {
     return points[2].x - points[6].x;
@@ -157,7 +178,8 @@ public:
    * Draws the text and the outline of the shape
    */
   void DrawText(Canvas &canvas, const PixelRect rc_outer,
-                unsigned idx, bool selected, const TCHAR *tp_name,
+                unsigned idx, bool selected, bool is_current_tp,
+                const TCHAR *tp_name,
                 bool has_entered, bool has_exited,
                 TaskType task_mode, unsigned task_size,
                 bool tp_valid, fixed tp_distance, bool distance_valid,
@@ -166,12 +188,6 @@ public:
                 Angle delta_bearing,
                 bool bearing_valid,
                 unsigned border_width);
-
-  /**
-   * returns the correct bearing bitmap based on the angle
-   * or nullptr if really small bearing
-   */
-  const Bitmap *GetBearingBitmap(const Angle &bearing);
 
 #ifdef _WIN32
   /**
