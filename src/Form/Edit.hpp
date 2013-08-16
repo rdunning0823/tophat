@@ -56,6 +56,9 @@ class WndProperty : public WindowControl {
   /** optional caption used while editing */
   StaticString<254> editing_caption;
 
+  /** paints highlight for the text and background */
+  bool highlighted;
+
 public:
   /**
    * Constructor of the WndProperty
@@ -158,6 +161,12 @@ public:
    * @param Value The new text of the Editor Control
    */
   void SetText(const TCHAR *_value);
+
+  /**
+   * sets or clears the pressed and focused attributes
+   * simulating a highlight affect
+   */
+  void SetHighlight(bool value);
 
 private:
   /**

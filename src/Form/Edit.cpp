@@ -142,7 +142,8 @@ WndProperty::WndProperty(ContainerWindow &parent, const DialogLook &_look,
    mDataField(NULL),
    read_only(false),
    dragging(false), pressed(false),
-   editing_caption(caption)
+   editing_caption(caption),
+   highlighted(false)
 {
   caption = Caption;
 
@@ -414,7 +415,7 @@ WndProperty::OnPaint(Canvas &canvas)
   }
 
   Color background_color, text_color;
-  if (pressed) {
+  if (pressed || highlighted) {
     background_color = COLOR_BLACK;
     text_color = COLOR_WHITE;
   } else if (IsEnabled()) {
@@ -492,4 +493,10 @@ WndProperty::SetDataField(DataField *Value)
   UpdateLayout();
 
   RefreshDisplay();
+}
+
+void
+WndProperty::SetHighlight(bool value)
+{
+  highlighted = value;
 }
