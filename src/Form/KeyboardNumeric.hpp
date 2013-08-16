@@ -29,7 +29,9 @@ Copyright_License {
 #include <tchar.h>
 
 struct DialogLook;
-
+/**
+ * a data input screen that looks like a phone numeric keypad
+ */
 class KeyboardNumericControl : public KeyboardBaseControl {
 
 public:
