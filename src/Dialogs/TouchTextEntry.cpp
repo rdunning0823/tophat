@@ -48,6 +48,23 @@ static unsigned int cursor = 0;
 static size_t max_width;
 static TCHAR edittext[MAX_TEXTENTRY];
 
+/**
+ * has the value been edited by the user
+ */
+bool has_been_edited;
+
+static void ClearText();
+
+/**
+ * clears the field and marks the field as having been modified
+ */
+static void
+ClearTextFirstTime()
+{
+  ClearText();
+  has_been_edited = true;
+}
+
 static void
 UpdateAllowedCharacters()
 {
@@ -58,6 +75,7 @@ UpdateAllowedCharacters()
 static void
 UpdateTextboxProp()
 {
+  editor->SetHighlight(!has_been_edited);
   editor->SetText(edittext);
 
   UpdateAllowedCharacters();
@@ -66,6 +84,9 @@ UpdateTextboxProp()
 static bool
 DoBackspace()
 {
+  if (!has_been_edited)
+    ClearTextFirstTime();
+
   if (cursor < 1)
     return false;
 
@@ -84,6 +105,9 @@ OnBackspace()
 static bool
 DoCharacter(TCHAR character)
 {
+  if (!has_been_edited)
+    ClearTextFirstTime();
+
   if (cursor >= max_width - 1)
     return false;
 
@@ -161,6 +185,8 @@ TouchTextEntry(TCHAR *text, size_t width,
 {
   if (width == 0)
     width = MAX_TEXTENTRY;
+
+  has_been_edited = true; // disable clearing of value on first key for alpha
 
   max_width = std::min(MAX_TEXTENTRY, width);
 
@@ -276,6 +302,7 @@ TouchNumericEntry(fixed &value,
                   AllowedCharacters accb)
 {
   the_property = &_the_property;
+  has_been_edited = false;
 
   StaticString<12> buffer;
   buffer.Format(_T("%.1f"), (double)value);
