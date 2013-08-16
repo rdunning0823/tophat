@@ -2,6 +2,8 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.1.8 Beta TBD
+* Clear value when start editing number (e.g. radius)
+* Draw turnpoint bearing chevron in tips of Nav Bar
 * Simplified wind settings screen
 * Draw task OZs with darker lines
 * Make final glide bar label darker
