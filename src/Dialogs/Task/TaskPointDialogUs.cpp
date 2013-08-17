@@ -223,7 +223,10 @@ RefreshTaskProperties()
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   line_1 = OrderedTaskFactoryName(ftype);
 
-  wf->SetCaption(line_1.c_str());
+  if (ordered_task->GetTaskNameIsBlank())
+    wf->SetCaption(line_1.c_str());
+  else
+    wf->SetCaption(ordered_task->GetTaskName());
 
   if (IsFai(ordered_task->GetFactoryType())) {
     button_properties->SetCaption(line_1.c_str());
@@ -518,9 +521,6 @@ dlgTaskPointUsShowModal(SingleWindow &parent, OrderedTask** task_pointer,
     + Layout::Scale(6) + look.text_font->GetHeight();
   wTaskPoints->SetItemHeight(line_height);
 
-  TaskFactoryType xfac = ordered_task->GetFactoryType();
-
-  wf->SetCaption(OrderedTaskFactoryName(xfac));
   RefreshView();
 
   wf->ShowModal();

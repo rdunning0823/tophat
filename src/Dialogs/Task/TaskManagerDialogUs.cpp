@@ -45,6 +45,7 @@ Copyright_License {
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
+#include "Task/TypeStrings.hpp"
 #include "Logger/ExternalLogger.hpp"
 #include "Device/Declaration.hpp"
 #include "Task/ValidationErrorStrings.hpp"
@@ -420,6 +421,12 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
     ContainerWindow &w = UIGlobals::GetMainWindow();
     TaskManagerDialogUs *instance;
     instance = new TaskManagerDialogUs(look, &active_task, task_modified);
+
+    const TaskFactoryType ftype = active_task->GetFactoryType();
+    if (active_task->GetTaskNameIsBlank())
+      instance->SetCaption(OrderedTaskFactoryName(ftype));
+    else
+      instance->SetCaption(active_task->GetTaskName());
 
     instance->Initialise(w, w.GetClientRect());
     instance->Prepare(w, w.GetClientRect());
