@@ -28,9 +28,11 @@
 #include "Task/TaskBehaviour.hpp"
 #include "SmartTaskAdvance.hpp"
 #include "Util/DereferenceIterator.hpp"
+#include "Util/StaticString.hpp"
 
 #include <assert.h>
 #include <vector>
+#include <tchar.h>
 
 class SearchPoint;
 class SearchPointVector;
@@ -85,6 +87,9 @@ private:
   TaskDijkstraMin *dijkstra_min;
   TaskDijkstraMax *dijkstra_max;
 
+  /** name of task */
+  StaticString<40> task_name;
+
 public:
   /** 
    * Constructor.
@@ -118,6 +123,21 @@ public:
    * @param _factory Type of task
    */
   void SetFactory(const TaskFactoryType _factory);
+
+  /**
+   * The name of the task.  No file extension
+   */
+  void SetTaskName(const TCHAR * name) {
+    task_name = name;
+  }
+
+  const TCHAR * GetTaskName() const {
+    return task_name.c_str();
+  }
+
+  bool GetTaskNameIsBlank() const {
+    return task_name.empty();
+  }
 
   /** 
    * Return list of factory types
