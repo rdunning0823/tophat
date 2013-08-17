@@ -236,6 +236,7 @@ void
 Serialiser::Serialise(const OrderedTask &task)
 {
   node.SetAttribute(_T("type"), GetTaskFactoryType(task.GetFactoryType()));
+  node.SetAttribute(_T("name"), task.GetTaskName());
   Serialise(task.GetOrderedTaskBehaviour());
   mode_optional_start = false;
 

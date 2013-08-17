@@ -271,6 +271,7 @@ Deserialiser::Deserialise(OrderedTask &task)
 {
   task.Clear();
   task.SetFactory(GetTaskFactoryType());
+  task.SetTaskName(GetTaskName());
   task.Reset();
 
   OrderedTaskBehaviour beh = task.GetOrderedTaskBehaviour();
@@ -293,6 +294,16 @@ Deserialiser::GetHeightRef(const TCHAR *nodename) const
     return AltitudeReference::MSL;
 
   return AltitudeReference::AGL;
+}
+
+const TCHAR *
+Deserialiser::GetTaskName() const
+{
+  const TCHAR *type = node.GetAttribute(_T("name"));
+  if (type == nullptr)
+    return _T("");
+
+  return type;
 }
 
 TaskFactoryType

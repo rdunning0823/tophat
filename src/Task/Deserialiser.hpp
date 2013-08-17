@@ -104,6 +104,8 @@ protected:
 private:
   AltitudeReference GetHeightRef(const TCHAR *nodename) const;
   TaskFactoryType GetTaskFactoryType() const;
+  const TCHAR *GetTaskName() const;
+
 };
 
 #endif
