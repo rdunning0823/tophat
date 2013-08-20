@@ -46,8 +46,8 @@ class WindSetupInfoBoxPanel: public BaseAccessPanel {
   WindSettingsPanel *wind_settings_panel;
 
 public:
-  WindSetupInfoBoxPanel(unsigned id)
-    :BaseAccessPanel(id, new WindSettingsPanel(true, true, true)) {
+  WindSetupInfoBoxPanel(unsigned id, WindSettingsPanel *wind_settings_panel)
+    :BaseAccessPanel(id, wind_settings_panel) {
   };
   virtual void Hide();
 
@@ -69,5 +69,8 @@ WindSetupInfoBoxPanel::Hide()
 Widget *
 LoadWindSetupInfoBoxPanel(unsigned id)
 {
-  return new WindSetupInfoBoxPanel(id);
+  WindSettingsPanel *inner_widget = new WindSettingsPanel(true, true, true);
+  WindSetupInfoBoxPanel *outer_widget = new WindSetupInfoBoxPanel(id, inner_widget);
+  inner_widget->SetForm(outer_widget);
+  return outer_widget;
 }

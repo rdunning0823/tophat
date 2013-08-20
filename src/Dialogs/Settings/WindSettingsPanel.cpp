@@ -39,7 +39,8 @@ WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind,
   :RowFormWidget(UIGlobals::GetDialogLook()),
    edit_manual_wind(_edit_manual_wind),
    clear_manual_button(_clear_manual_button),
-   edit_trail_drift(_edit_trail_drift) {}
+   edit_trail_drift(_edit_trail_drift),
+   form(nullptr) {}
 
 void
 WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
@@ -182,6 +183,14 @@ void
 WindSettingsPanel::OnModified(DataField &df)
 {
   UpdatetManualVisibility();
+
+  if (&df == &GetDataField(WIND_SOURCE)) {
+    DataFieldEnum *wind_source_enum = (DataFieldEnum *)
+        user_wind_source->GetDataField();
+    if (wind_source_enum->GetAsInteger() != (unsigned)MANUAL_WIND &&
+        form != nullptr)
+      form->SetModalResult(mrOK);
+  }
 
   if (!edit_manual_wind)
     return;
