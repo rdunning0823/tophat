@@ -2,6 +2,9 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 TopHat 1.1.8 Beta TBD
+* Remove decimals from Glide ratios
+* Remember name of task and display in task manager
+* Move Pan off button to lower right corner
 * Clear value when start editing number (e.g. radius)
 * Draw turnpoint bearing chevron in tips of Nav Bar
 * Simplified wind settings screen
