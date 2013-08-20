@@ -26,6 +26,7 @@ Copyright_License {
 #include "Profile/ProfileKeys.hpp"
 #include "Profile/Profile.hpp"
 #include "Form/DataField/Enum.hpp"
+#include "Form/DataField/Listener.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Form/Form.hpp"
@@ -39,13 +40,26 @@ enum ControlIndex {
   AverEffTime,
 };
 
-class GrAverageConfigPanel : public RowFormWidget {
+class GrAverageConfigPanel : public RowFormWidget, private DataFieldListener  {
 public:
   GrAverageConfigPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook()) {}
+    :RowFormWidget(UIGlobals::GetDialogLook()), form(nullptr) {}
+  /**
+   * the parent form
+   */
+  WndForm *form;
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed, bool &require_restart);
+
+  void SetForm(WndForm *_form) {
+    assert(_form != nullptr);
+    form = _form;
+  }
+
+protected:
+  /* methods from DataFieldListener */
+  virtual void OnModified(DataField &df) override;
 };
 
 void
@@ -54,7 +68,6 @@ GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
 
   RowFormWidget::Prepare(parent, rc);
-
 
   assert(IsDefined());
 
@@ -81,7 +94,15 @@ GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("GR average period"),
           _("Number of seconds over which the Average glide ratio is calculated. "
               "Normally for gliders a good value is 90-120 seconds, and for paragliders 15 seconds."),
-          aver_eff_list, settings_computer.average_eff_time);
+          aver_eff_list, settings_computer.average_eff_time, this);
+}
+
+void
+GrAverageConfigPanel::OnModified(DataField &df)
+{
+  assert (form != nullptr);
+  if (&df == &GetDataField(AverEffTime))
+      form->SetModalResult(mrOK);
 }
 
 bool
@@ -103,8 +124,8 @@ GrAverageConfigPanel::Save(bool &_changed, bool &_require_restart)
 class GrAveragePanel : public BaseAccessPanel {
 public:
 
-  GrAveragePanel(unsigned _id)
-    :BaseAccessPanel(_id, new GrAverageConfigPanel()) {}
+  GrAveragePanel(unsigned _id, GrAverageConfigPanel *panel)
+    :BaseAccessPanel(_id, panel) {}
   virtual void Hide();
 };
 
@@ -123,5 +144,8 @@ GrAveragePanel::Hide()
 Widget *
 LoadGrAveragePanel(unsigned id)
 {
-  return new GrAveragePanel(id);
+  GrAverageConfigPanel *inner_panel = new GrAverageConfigPanel();
+  GrAveragePanel *panel = new GrAveragePanel(id, inner_panel);
+  inner_panel->SetForm(panel);
+  return panel;
 }
