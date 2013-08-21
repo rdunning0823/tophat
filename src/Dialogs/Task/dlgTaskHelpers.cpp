@@ -289,7 +289,7 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 }
 
 bool
-OrderedTaskSave(const OrderedTask &task)
+OrderedTaskSave(OrderedTask &task)
 {
   assert(protected_task_manager != NULL);
 
@@ -299,6 +299,7 @@ OrderedTaskSave(const OrderedTask &task)
   if (!TextEntryDialog(fname, 64, _("Enter a task name")))
     return false;
 
+  task.SetTaskName(fname);
   TCHAR path[MAX_PATH];
   LocalPath(path, _T("tasks"));
   Directory::Create(path);

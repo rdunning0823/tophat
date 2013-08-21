@@ -147,6 +147,11 @@ public:
   virtual void OnAction(int id);
 
   /**
+   * sets the caption on the dialog based on the task's name
+   */
+  void SetDialogCaption();
+
+  /**
    * sets up rectangles for layout of screen
    * @param rc. rect of dialog
    */

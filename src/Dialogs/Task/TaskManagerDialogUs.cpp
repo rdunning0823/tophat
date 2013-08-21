@@ -71,6 +71,16 @@ GetDialogStyle()
   return style;
 }
 
+void
+TaskManagerDialogUs::SetDialogCaption()
+{
+  const TaskFactoryType ftype = active_task->GetFactoryType();
+  if (active_task->GetTaskNameIsBlank())
+    SetCaption(OrderedTaskFactoryName(ftype));
+  else
+    SetCaption(active_task->GetTaskName());
+}
+
 TaskManagerDialogUs::TaskManagerDialogUs(const DialogLook &look,
                                          OrderedTask **_active_task_pointer,
                                          bool _task_modified)
@@ -171,6 +181,8 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   task_view.Create(GetClientAreaWindow(),rc_task_view, style);
   task_view.SetFullScreenRect(GetClientRect());
   task_view.SetPartialScreenRect(rc_task_view);
+
+  SetDialogCaption();
 }
 
 void
@@ -351,8 +363,14 @@ TaskManagerDialogUs::SaveTask()
   active_task->GetFactory().CheckAddFinish();
 
   if (active_task->CheckTask()) {
+    StaticString<100>name(active_task->GetTaskName());
+
     if (!OrderedTaskSave(*active_task))
       return;
+
+    SetDialogCaption();
+    if (name != active_task->GetTaskName())
+      task_modified = true;
 
   } else {
     ShowMessageBox(getTaskValidationErrors(
@@ -421,12 +439,6 @@ TaskManagerDialogUsShowModal(SingleWindow &parent)
     ContainerWindow &w = UIGlobals::GetMainWindow();
     TaskManagerDialogUs *instance;
     instance = new TaskManagerDialogUs(look, &active_task, task_modified);
-
-    const TaskFactoryType ftype = active_task->GetFactoryType();
-    if (active_task->GetTaskNameIsBlank())
-      instance->SetCaption(OrderedTaskFactoryName(ftype));
-    else
-      instance->SetCaption(active_task->GetTaskName());
 
     instance->Initialise(w, w.GetClientRect());
     instance->Prepare(w, w.GetClientRect());
