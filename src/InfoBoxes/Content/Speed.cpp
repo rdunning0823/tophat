@@ -43,7 +43,7 @@ InfoBoxContentSpeedGround::Update(InfoBoxData &data)
     return;
   }
 
-  data.SetValueFromSpeed(basic.ground_speed);
+  data.SetValueFromSpeed(basic.ground_speed, false);
 }
 
 bool
