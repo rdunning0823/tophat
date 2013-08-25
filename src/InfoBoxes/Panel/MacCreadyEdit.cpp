@@ -177,6 +177,8 @@ MacCreadyEditPanel::OnAction(int action_id)
   case AutoMc:
     task_behaviour.auto_mc = !task_behaviour.auto_mc;
     Profile::Set(ProfileKeys::AutoMc, task_behaviour.auto_mc);
+    if (task_behaviour.auto_mc)
+      Close();
     break;
   default:
     BaseAccessPanel::OnAction(action_id);
