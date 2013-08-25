@@ -102,16 +102,16 @@ SliderShape::PaintBackground(Canvas &canvas, unsigned idx,
 #endif
 
 void
-SliderShape::DrawText(Canvas &canvas, const PixelRect rc_outer,
-                      unsigned idx, bool selected, bool is_current_tp,
-                      const TCHAR *tp_name, bool has_entered, bool has_exited,
-                      TaskType task_mode, unsigned task_size,
-                      bool tp_valid, fixed tp_distance, bool distance_valid,
-                      fixed tp_altitude_difference,
-                      bool altitude_difference_valid,
-                      Angle delta_bearing,
-                      bool bearing_valid,
-                      unsigned border_width)
+SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
+                  unsigned idx, bool selected, bool is_current_tp,
+                  const TCHAR *tp_name, bool has_entered, bool has_exited,
+                  TaskType task_mode, unsigned task_size,
+                  bool tp_valid, fixed tp_distance, bool distance_valid,
+                  fixed tp_altitude_difference,
+                  bool altitude_difference_valid,
+                  Angle delta_bearing,
+                  bool bearing_valid,
+                  unsigned border_width)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
