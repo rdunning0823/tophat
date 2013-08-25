@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="bearing_left_three.svg">
+   sodipodi:docname="bearing_right_four.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -25,8 +25,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="12.01"
-     inkscape:cx="-5.2477984"
-     inkscape:cy="20.992848"
+     inkscape:cx="-16.903823"
+     inkscape:cy="16.270742"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -65,23 +65,29 @@
      transform="translate(0,-1012.3622)">
     <path
        style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 24.019364,1045.613 c -12.562292,-13.1332 -12.562292,-13.1332 -12.562292,-13.1332 l 13.136287,-12.8622"
+       d="m -7.6402989,1010.8635 c 19.9999989,20 21.4154859,21.4988 21.4154859,21.4988 l -22.4146529,22.4979"
+       id="path3819-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -3.996893,1019.3622 c 12.7,13 12.7,13 12.7,13 l -13,13"
        id="path3819-7"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:6.97831392;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 27.938098,1040.8079 0.08698,-16.1748 -8.015457,7.9209 z"
+       d="m -7.8647695,1024.2083 0.083486,16.1748 7.93153464,-8.0049 z"
        id="path3839"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#ffffff;stroke-width:15;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 0.819216,1014.1461 c 32.380913,0.2823 32.321418,0.3407 32.321418,0.3407"
+       d="m 19.533579,1050.5828 c -32.382075,0.059 -32.323199,0 -32.323199,0"
        id="path2994-2"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#ffffff;stroke-width:15;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m -1.215805,1050.8068 c 32.380913,0.2823 32.321419,0.3406 32.321419,0.3406"
+       d="m 21.182122,1013.9027 c -32.382075,0.059 -32.323199,0 -32.323199,0"
        id="path2994-2-2"
        inkscape:connector-curvature="0" />
   </g>

@@ -47,6 +47,10 @@ IconLook::Initialise()
   hBmpZoomInButton.Load(Layout::scale > 1 ? IDB_ZOOM_IN_BUTTON_HD : IDB_ZOOM_IN_BUTTON);
   hBmpBearingLeftOne.Load(Layout::scale > 1 ? IDB_BEARING_LEFT_ONE_HD : IDB_BEARING_LEFT_ONE);
   hBmpBearingLeftTwo.Load(Layout::scale > 1 ? IDB_BEARING_LEFT_TWO_HD : IDB_BEARING_LEFT_TWO);
+  hBmpBearingLeftThree.Load(Layout::scale > 1 ? IDB_BEARING_LEFT_THREE_HD : IDB_BEARING_LEFT_THREE);
+  hBmpBearingLeftFour.Load(Layout::scale > 1 ? IDB_BEARING_LEFT_FOUR_HD : IDB_BEARING_LEFT_FOUR);
   hBmpBearingRightOne.Load(Layout::scale > 1 ? IDB_BEARING_RIGHT_ONE_HD : IDB_BEARING_RIGHT_ONE);
   hBmpBearingRightTwo.Load(Layout::scale > 1 ? IDB_BEARING_RIGHT_TWO_HD : IDB_BEARING_RIGHT_TWO);
+  hBmpBearingRightThree.Load(Layout::scale > 1 ? IDB_BEARING_RIGHT_THREE_HD : IDB_BEARING_RIGHT_THREE);
+  hBmpBearingRightFour.Load(Layout::scale > 1 ? IDB_BEARING_RIGHT_FOUR_HD : IDB_BEARING_RIGHT_FOUR);
 }

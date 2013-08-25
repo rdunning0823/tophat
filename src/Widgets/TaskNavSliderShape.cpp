@@ -314,24 +314,38 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 int
 SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle &bearing)
 {
+  enum bearing_levels {
+    first = 2,
+    second = 10,
+    third = 20,
+    fourth = 30,
+  };
   const IconLook &icon_look = UIGlobals::GetIconLook();
   const Bitmap *bmp_bearing;
   int direction = 0;
-  if (bearing.AsDelta().Degrees() > fixed(2)) {
-    bmp_bearing = &icon_look.hBmpBearingRightOne;
+  if (bearing.AsDelta().Degrees() > fixed(first)) {
+    if (bearing.AsDelta().Degrees() > fixed(fourth))
+      bmp_bearing = &icon_look.hBmpBearingRightFour;
+    else if (bearing.AsDelta().Degrees() > fixed(third))
+      bmp_bearing = &icon_look.hBmpBearingRightThree;
+    else if (bearing.AsDelta().Degrees() > fixed(second))
+      bmp_bearing = &icon_look.hBmpBearingRightTwo;
+    else
+      bmp_bearing = &icon_look.hBmpBearingRightOne;
     direction = 1;
   }
 
-  if (bearing.AsDelta().Degrees() < fixed(-2)) {
-    bmp_bearing = &icon_look.hBmpBearingLeftOne;
+  if (bearing.AsDelta().Degrees() < fixed(-first)) {
+    if (bearing.AsDelta().Degrees() < fixed(-fourth))
+      bmp_bearing = &icon_look.hBmpBearingLeftFour;
+    else if (bearing.AsDelta().Degrees() < fixed(-third))
+      bmp_bearing = &icon_look.hBmpBearingLeftThree;
+    else if (bearing.AsDelta().Degrees() < fixed(-second))
+      bmp_bearing = &icon_look.hBmpBearingLeftTwo;
+    else
+      bmp_bearing = &icon_look.hBmpBearingLeftOne;
     direction = -1;
   }
-
-  if (bearing.AsDelta().Degrees() > fixed(10))
-    bmp_bearing = &icon_look.hBmpBearingRightTwo;
-
-  if (bearing.AsDelta().Degrees() < fixed(-10))
-    bmp_bearing = &icon_look.hBmpBearingLeftTwo;
 
   if (direction == 0)
     return 0;
