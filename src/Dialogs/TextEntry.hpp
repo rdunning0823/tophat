@@ -63,12 +63,14 @@ TouchTextEntry(TCHAR *text, size_t size,
  * show a numeric keypad with Help if available
  * @param reference containing value before and after edit
  * @param the_property being edited
+ * @param show minus sign
  * @param optional character filter
  */
 bool
 TouchNumericEntry(fixed &value,
                   const TCHAR *caption,
                   WndProperty &the_property,
+                  bool show_minus,
                   AllowedCharacters accb=AllowedCharacters());
 
 #endif

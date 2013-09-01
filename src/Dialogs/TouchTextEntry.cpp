@@ -299,6 +299,7 @@ bool
 TouchNumericEntry(fixed &value,
                   const TCHAR *caption,
                   WndProperty &_the_property,
+                  bool show_minus,
                   AllowedCharacters accb)
 {
   the_property = &_the_property;
@@ -384,7 +385,8 @@ TouchNumericEntry(fixed &value,
                                   { padding, keyboard_top,
                                     rc.right - padding,
                                     keyboard_bottom },
-                                  OnCharacterNumeric);
+                                  OnCharacterNumeric,
+                                  show_minus);
   kb = (KeyboardBaseControl*)&keyboard;
 
   WndButton backspace_button(client_area, look, _T("<"),
