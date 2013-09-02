@@ -48,7 +48,9 @@ struct UISettings {
   /** timeout in quarter seconds of menu button */
   unsigned menu_timeout;
 
+#ifndef GNAV
   bool custom_fonts;
+#endif
 
   /** last startup tip display. 1 is first tip, 0 means never shown */
   unsigned last_startup_tip;

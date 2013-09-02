@@ -25,16 +25,12 @@ Copyright_License {
 #define XCSOAR_FORM_SYMBOLBUTTON_HPP
 
 #include "Form/Button.hpp"
-#include "Screen/Brush.hpp"
-#include "Screen/Features.hpp"
-
-class ActionListener;
 
 /**
  * This class is used for creating buttons with symbols instead of text.
  * It is based on the WndButton class.
  */
-class WndSymbolButton : public WndButton
+class WndSymbolButton final : public WndButton
 {
 protected:
   /**
@@ -51,14 +47,14 @@ public:
    * @param Function The function that should be called
    * when the button is clicked
    */
-  WndSymbolButton(ContainerWindow &Parent, const DialogLook &look,
+  WndSymbolButton(ContainerWindow &Parent, const ButtonLook &look,
                   tstring::const_pointer Caption,
                   const PixelRect &rc, const ButtonWindowStyle style,
                   ClickNotifyCallback Function = NULL)
     :WndButton(Parent, look, Caption, rc,
                style, Function), transparent(false) {}
 
-  WndSymbolButton(ContainerWindow &Parent, const DialogLook &look,
+  WndSymbolButton(ContainerWindow &Parent, const ButtonLook &look,
                   tstring::const_pointer Caption,
                   const PixelRect &rc, const ButtonWindowStyle style,
                   ActionListener &listener, int id)
@@ -71,6 +67,11 @@ public:
   void SetTransparent(bool _transparent) {
     transparent = _transparent;
   }
+
+  WndSymbolButton(const ButtonLook &look)
+    :WndButton(look) {}
+
+  using WndButton::Create;
 
 protected:
   virtual void OnPaint(Canvas &canvas) override;

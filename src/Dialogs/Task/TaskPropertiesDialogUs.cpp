@@ -226,8 +226,7 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { 0 }
   };
 
-  DataFieldEnum *dfe = new DataFieldEnum(NULL);
-  dfe->SetListener(this);
+  DataFieldEnum *dfe = new DataFieldEnum(this);
   dfe->EnableItemHelp(true);
   const std::vector<TaskFactoryType> factory_types =
     ordered_task->GetFactoryTypes();

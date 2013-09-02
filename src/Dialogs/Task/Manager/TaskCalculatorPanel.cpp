@@ -24,6 +24,7 @@ Copyright_License {
 #include "TaskCalculatorPanel.hpp"
 #include "Internal.hpp"
 #include "../TaskDialogs.hpp"
+#include "Widget/TextWidget.hpp"
 #include "Interface.hpp"
 #include "ActionInterface.hpp"
 #include "Units/Units.hpp"

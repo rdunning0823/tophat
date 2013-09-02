@@ -43,7 +43,7 @@ GetDialogStyle()
 
 WidgetDialog::WidgetDialog(const DialogLook &look)
   :WndForm(look),
-   buttons(GetClientAreaWindow(), look),
+   buttons(GetClientAreaWindow(), look.button),
    widget(GetClientAreaWindow()),
    changed(false)
 {
@@ -57,6 +57,7 @@ WidgetDialog::Create(SingleWindow &parent,
                      UPixelScalar _footer_height,
                      ButtonPanel::ButtonPanelPosition button_position)
 {
+  full = false;
   auto_size = false;
   WndForm::Create(parent, rc, caption, GetDialogStyle());
   dialog_footer.Create(GetClientAreaWindow(), _listener, _footer_height);
@@ -74,12 +75,22 @@ WidgetDialog::CreateFull(SingleWindow &parent, const TCHAR *caption,
 {
   Create(parent, caption, parent.GetClientRect(), widget, _listener,
          _footer_height, button_position);
+  full = true;
 }
 
 void
 WidgetDialog::CreateAuto(SingleWindow &parent, const TCHAR *caption,
                          Widget *_widget)
 {
+  CreateFull(parent, caption, _widget);
+  return;
+}
+
+void
+WidgetDialog::CreatePopup(SingleWindow &parent, const TCHAR *caption,
+                         Widget *_widget)
+{
+  full = false;
   auto_size = true;
   WndForm::Create(parent, caption, GetDialogStyle());
   dialog_footer.Create(GetClientAreaWindow(), nullptr, 0);
@@ -90,6 +101,7 @@ WidgetDialog::CreateAuto(SingleWindow &parent, const TCHAR *caption,
 void
 WidgetDialog::CreatePreliminary(SingleWindow &parent, const TCHAR *caption)
 {
+  full = false;
   auto_size = true;
   buttons.SetButtonPosition(ButtonPanel::ButtonPanelPosition::Bottom);
   WndForm::Create(parent, parent.GetClientRect(), caption, GetDialogStyle());
@@ -264,6 +276,23 @@ WidgetDialog::OnResize(PixelSize new_size)
 
   if (dialog_footer.IsDefined())
     dialog_footer.Move(1, new_size.cy - dialog_footer.GetHeight() - WndForm::GetTitleHeight());
+}
+
+void
+WidgetDialog::ReinitialiseLayout(const PixelRect &parent_rc)
+{
+  if (full)
+    /* make it full-screen again on the resized main window */
+    Move(parent_rc);
+  else
+    WndForm::ReinitialiseLayout(parent_rc);
+}
+
+void
+WidgetDialog::SetDefaultFocus()
+{
+  if (!widget.SetFocus())
+    WndForm::SetDefaultFocus();
 }
 
 bool

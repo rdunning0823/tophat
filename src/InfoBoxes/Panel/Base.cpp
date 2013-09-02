@@ -150,7 +150,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   close_button_rc.left += Layout::Scale(2);
   close_button_rc.right -= Layout::Scale(2);
 
-  close_button = new WndButton(GetClientAreaWindow(), look,
+  close_button = new WndButton(GetClientAreaWindow(), look.button,
                                _("Close"), close_button_rc,
                                button_style,
                                *this, CloseButton);
@@ -159,7 +159,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   PixelRect setup_button_rc = base_rc;
   setup_button_rc.left = setup_button_rc.right - setup_button_width;
   setup_button_rc.bottom = setup_button_rc.top + GetHeaderHeight();
-  setup_button = new WndSymbolButton(GetClientAreaWindow(), look,
+  setup_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
                                      _("Setup"), setup_button_rc,
                                      button_style,
                                      *this, SetUp);

@@ -300,19 +300,19 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           style_frame);
   tip_text->SetFont(Fonts::infobox_small);
 
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  close = new WndButton(GetClientAreaWindow(), dialog_look, _T("Close"),
+  close = new WndButton(GetClientAreaWindow(), button_look, _T("Close"),
                         rc_close,
                         button_style, *this, CloseDialogClick);
 
-  next_tip = new WndButton(GetClientAreaWindow(), dialog_look, _T("Next Tip"),
+  next_tip = new WndButton(GetClientAreaWindow(), button_look, _T("Next Tip"),
                            rc_next_tip,
                            button_style, *this, NextTipClick);
 
-  prev_tip = new WndButton(GetClientAreaWindow(), dialog_look, _T("Previous Tip"),
+  prev_tip = new WndButton(GetClientAreaWindow(), button_look, _T("Previous Tip"),
                            rc_prev_tip,
                            button_style, *this, PrevTipClick);
 

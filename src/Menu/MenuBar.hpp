@@ -45,7 +45,7 @@ protected:
     unsigned event;
 
   public:
-    Button(ContainerWindow &parent, const DialogLook &look,
+    Button(ContainerWindow &parent, const ButtonLook &look,
            const TCHAR *Caption,
            const PixelRect &rc, const ButtonWindowStyle style)
     :WndSymbolButton(parent, look,

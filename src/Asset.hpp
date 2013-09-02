@@ -307,6 +307,8 @@ HasColors()
 {
 #ifdef ANDROID
   return !IsNookSimpleTouch();
+#elif defined(GREYSCALE)
+  return false;
 #else
   return !IsKobo();
 #endif
@@ -315,7 +317,7 @@ HasColors()
 /**
  * Is dithering black&white used on the display?
  */
-#ifdef ANDROID
+#if defined(ANDROID) && defined(__arm__)
 gcc_const
 #else
 constexpr
@@ -325,7 +327,7 @@ IsDithered()
 {
 #ifdef DITHER
   return true;
-#elif defined(ANDROID)
+#elif defined(ANDROID) && defined(__arm__)
   return is_dithered;
 #else
   return false;
@@ -338,7 +340,7 @@ IsDithered()
  * and show ghosting.  Animations shall be disabled when this function
  * returns true.
  */
-#ifdef ANDROID
+#if defined(ANDROID) && defined(__arm__)
 gcc_const
 #else
 constexpr
@@ -346,7 +348,7 @@ constexpr
 static inline bool
 HasEPaper()
 {
-#ifdef ANDROID
+#if defined(ANDROID) && defined(__arm__)
   return IsNookSimpleTouch();
 #else
   return IsKobo();

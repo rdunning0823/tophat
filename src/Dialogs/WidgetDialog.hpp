@@ -93,6 +93,8 @@ public:
 
   ManagedWidget widget;
 
+  bool full;
+
   bool auto_size;
 
   bool changed;
@@ -117,10 +119,18 @@ public:
                                      ButtonPanel::ButtonPanelPosition::Bottom);
 
   /**
+   * Alias for CreateFull() that only takes the required arguments
+   * This hooks XCSoar so all CreateAuto windows are displayed as full screen
+   * for usability.
+   * Use CreatePopup() to make a dialog with the minimal size
+   */
+  void CreateAuto(SingleWindow &parent, const TCHAR *caption, Widget *widget);
+
+  /**
    * Create a dialog with an automatic size (by
    * Widget::GetMinimumSize() and Widget::GetMaximumSize()).
    */
-  void CreateAuto(SingleWindow &parent, const TCHAR *caption, Widget *widget);
+  void CreatePopup(SingleWindow &parent, const TCHAR *caption, Widget *widget);
 
   /**
    * Create a dialog, but do not associate it with a #Widget yet.
@@ -164,6 +174,11 @@ public:
     return AddButton(caption, *this, modal_result);
   }
 
+  WndButton *AddSymbolButton(const TCHAR *caption,
+                             ActionListener &listener, int id) {
+    return buttons.AddSymbol(caption, listener, id);
+  }
+
   void AddButtonKey(unsigned key_code) {
     return buttons.AddKey(key_code);
   }
@@ -198,6 +213,8 @@ protected:
   virtual void OnResize(PixelSize new_size) override;
 
   /* virtual methods from class WndForm */
+  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
+  virtual void SetDefaultFocus() override;
   virtual bool OnAnyKeyDown(unsigned key_code) override;
 };
 

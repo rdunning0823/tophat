@@ -26,6 +26,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Input/InputEvents.hpp"
 #include "UIGlobals.hpp"
+#include "Look/DialogLook.hpp"
 
 #include <assert.h>
 
@@ -187,7 +188,7 @@ MenuBar::MenuBar(ContainerWindow &parent)
   style.Hide();
   style.Border();
   style.multiline();
-  const DialogLook &look = UIGlobals::GetDialogLook();
+  const ButtonLook &look = UIGlobals::GetDialogLook().button;
 
   for (unsigned i = 0; i < MAX_BUTTONS; ++i) {
     PixelRect button_rc = GetButtonPosition(i, rc);

@@ -27,7 +27,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include <tchar.h>
 
-struct DialogLook;
+struct ButtonLook;
 struct IconLook;
 class ContainerWindow;
 struct PixelRect;
@@ -43,15 +43,16 @@ public:
   bool zoom_in;
 
   const IconLook &icon_look;
+  const ButtonLook &button_look;
 
-  ZoomButton(ContainerWindow &parent, const DialogLook &dialog_look,
+  ZoomButton(ContainerWindow &parent, const ButtonLook &_button_look,
              const IconLook &_icon_look,
              const PixelRect &rc,
              ButtonWindowStyle style,
              bool _zoom_in,
              ActionListener &listener, int id)
-  :WndButton(parent, dialog_look, _T(""), rc, style, listener, id),
-  zoom_in(_zoom_in), icon_look(_icon_look) {};
+  :WndButton(parent, _button_look, _T(""), rc, style, listener, id),
+  zoom_in(_zoom_in), icon_look(_icon_look), button_look(_button_look) {};
 
   /**
    * The OnPaint event is called when the button needs to be drawn

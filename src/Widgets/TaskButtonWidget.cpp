@@ -36,13 +36,14 @@ void
 TaskButtonWidget::Prepare(ContainerWindow &parent,
                           const PixelRect &rc)
 {
-  white_look.Initialise(Fonts::map_bold, Fonts::map, Fonts::map_label,
-                        Fonts::map_bold, Fonts::map_bold, Fonts::map_bold);
+  white_look.Initialise(Fonts::map_bold);
+/*
   white_look.SetBackgroundColor(COLOR_WHITE);
   white_look.button.standard.background_color = COLOR_WHITE;
   white_look.button.focused.background_color = COLOR_WHITE;
   white_look.button.focused.foreground_color = COLOR_BLACK;
   white_look.button.focused.foreground_brush.Set(COLOR_BLACK);
+*/
   CreateButton(parent, white_look, rc);
   Move(rc);
 }
@@ -74,13 +75,13 @@ TaskButtonWidget::Move(const PixelRect &rc)
 
 WndSymbolButton &
 TaskButtonWidget::CreateButton(ContainerWindow &parent,
-                               const DialogLook &dialog_look,
+                               const ButtonLook &button_look,
                                const PixelRect &rc_map)
 {
   ButtonWindowStyle button_style;
   button_style.multiline();
 
-  WndSymbolButton *button = new WndSymbolButton(parent, dialog_look, caption,
+  WndSymbolButton *button = new WndSymbolButton(parent, button_look, caption,
                                                 rc_map, button_style, *this, 0);
 
   SetWindow(button);

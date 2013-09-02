@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "ZoomInButtonWidget.hpp"
 #include "UIGlobals.hpp"
-#include "Look/DialogLook.hpp"
+#include "Look/ButtonLook.hpp"
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
@@ -43,11 +43,10 @@ void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
                             const PixelRect &rc)
 {
-  white_look.Initialise(Fonts::map_bold, Fonts::map, Fonts::map_label,
-                        Fonts::map_bold, Fonts::map_bold, Fonts::map_bold);
-  white_look.SetBackgroundColor(COLOR_WHITE);
+  white_look.Initialise(Fonts::map_bold);
+/*  white_look.SetBackgroundColor(COLOR_WHITE);
   white_look.button.standard.background_color = COLOR_WHITE;
-  white_look.button.focused.background_color = COLOR_WHITE;
+  white_look.button.focused.background_color = COLOR_WHITE;*/
 
   button_size_raw.cx = button_size_raw.cy = Fonts::map_bold.GetHeight();
 
@@ -137,14 +136,14 @@ ZoomInButtonWidget::HeightFromBottomLeft()
 
 ZoomButton &
 ZoomInButtonWidget::CreateButton(ContainerWindow &parent,
-                                 const DialogLook &dialog_look,
+                                 const ButtonLook &button_look,
                                  const IconLook &icon_look,
                                  const PixelRect &rc_map)
 {
   ButtonWindowStyle button_style;
   button_style.multiline();
 
-  ZoomButton *button = new ZoomButton(parent, dialog_look, icon_look, rc_map,
+  ZoomButton *button = new ZoomButton(parent, button_look, icon_look, rc_map,
                                       button_style, true, *this, 0);
   SetWindow(button);
   return *button;

@@ -22,20 +22,22 @@ Copyright_License {
 */
 
 #include "Form/SymbolButton.hpp"
-#include "Form/Control.hpp"
 #include "Formatter/HexColor.hpp"
 #include "Look/DialogLook.hpp"
 #include "Screen/Canvas.hpp"
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
-#include "Screen/Layout.hpp"
 #include "Renderer/SymbolRenderer.hpp"
 #include "resource.h"
 #include "Language/Language.hpp"
+#include "Asset.hpp"
+#include "Screen/Layout.hpp"
 
 void
 WndSymbolButton::OnPaint(Canvas &canvas)
 {
+  const ButtonLook &look = renderer.GetLook();
+
   const bool pressed = IsDown();
   const bool focused = HasCursorKeys() ? HasFocus() : pressed;
 
@@ -50,11 +52,11 @@ WndSymbolButton::OnPaint(Canvas &canvas)
 
   canvas.SelectNullPen();
   if (!IsEnabled())
-    canvas.Select(look.button.disabled.brush);
+    canvas.Select(look.disabled.brush);
   else if (focused)
-    canvas.Select(look.button.focused.foreground_brush);
+    canvas.Select(look.focused.foreground_brush);
   else
-    canvas.Select(look.button.standard.foreground_brush);
+    canvas.Select(look.standard.foreground_brush);
 
   const char ch = (char)caption[0];
 
@@ -157,7 +159,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   } else if (caption == N_("More") || caption == N_("Less")) {
     bool up = caption == N_("Less");
     // Draw arrow symbols instead of v and ^
-    const Font &font = *look.button.font;
+    const Font &font = *look.font;
     canvas.Select(font);
     canvas.SetBackgroundTransparent();
     PixelSize text_size = font.TextSize(caption.c_str());

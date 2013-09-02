@@ -39,6 +39,7 @@ Copyright_License {
 #include "Util/StaticString.hpp"
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Look/Look.hpp"
+#include "Look/DialogLook.hpp"
 #include "Screen/Canvas.hpp"
 #include "Profile/Profile.hpp"
 #include "ActionInterface.hpp"
@@ -225,23 +226,24 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
 
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  big_plus = new WndSymbolButton(GetClientAreaWindow(), dialog_look, _T("^"),
+  big_plus = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("^"),
                                  big_plus_rc,
                                  button_style, *this, BigPlus);
 
-  little_plus = new WndSymbolButton(GetClientAreaWindow(), dialog_look,
+  little_plus = new WndSymbolButton(GetClientAreaWindow(), button_look,
                                     _T("^"), little_plus_rc,
                                     button_style, *this, LittlePlus);
 
-  big_minus = new WndSymbolButton(GetClientAreaWindow(), dialog_look,
+  big_minus = new WndSymbolButton(GetClientAreaWindow(), button_look,
                                   _T("v"), big_minus_rc,
                                   button_style, *this, BigMinus);
 
-  little_minus = new WndSymbolButton(GetClientAreaWindow(), dialog_look,
+  little_minus = new WndSymbolButton(GetClientAreaWindow(), button_look,
                                      _T("v"), little_minus_rc,
                                      button_style, *this, LittleMinus);
 

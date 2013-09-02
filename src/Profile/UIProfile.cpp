@@ -71,6 +71,7 @@ Profile::Load(DialogSettings &settings)
 {
 //  use default tab style
 //  GetEnum(ProfileKeys::AppDialogTabStyle, settings.tab_style);
+  GetEnum(ProfileKeys::AppTextInputStyle, settings.text_input_style);
   Get(ProfileKeys::UserLevel, settings.expert);
 }
 
@@ -111,11 +112,13 @@ Profile::Load(UISettings &settings)
 
   Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
+#ifndef GNAV
   Get(ProfileKeys::UseCustomFonts, settings.custom_fonts);
+#endif
 
   Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);
 
-  // hard code to default value
+//  hard code to default value
 //  GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
 
   GetEnum(ProfileKeys::HapticFeedback, settings.haptic_feedback);

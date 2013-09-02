@@ -28,7 +28,7 @@ Copyright_License {
 #include "Widgets/ZoomButton.hpp"
 #include "Form/ActionListener.hpp"
 #include "Projection/MapWindowProjection.hpp"
-#include "Look/DialogLook.hpp"
+#include "Look/ButtonLook.hpp"
 
 struct IconLook;
 class ContainerWindow;
@@ -45,9 +45,9 @@ protected:
   PixelSize button_size_raw;
 
   /**
-   * a customized copy of dialog_look
+   * a customized copy of button_look
    */
-  DialogLook white_look;
+  ButtonLook white_look;
 
 
 
@@ -75,7 +75,7 @@ public:
   UPixelScalar GetHeight() const;
 
   ZoomButton& CreateButton(ContainerWindow &parent,
-                           const DialogLook &dialog_look,
+                           const ButtonLook &button_look,
                            const IconLook &icon_look,
                            const PixelRect &rc_map);
 

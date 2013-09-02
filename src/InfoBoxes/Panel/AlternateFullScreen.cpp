@@ -36,6 +36,7 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Interface.hpp"
 #include "Look/MapLook.hpp"
+#include "Look/DialogLook.hpp"
 #include "Renderer/WaypointListRenderer.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
@@ -176,6 +177,7 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   TwoCommandButtonListLayout::Prepare(parent, content_rc);
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
 
   WindowStyle style;
   style.ControlParent();
@@ -188,11 +190,11 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  goto_button = new WndButton(GetClientAreaWindow(), dialog_look, _T("Goto"),
+  goto_button = new WndButton(GetClientAreaWindow(), button_look, _T("Goto"),
                               left_button_rc,
                               button_style, *this, Goto);
 
-  details_button = new WndButton(GetClientAreaWindow(), dialog_look, _T("Details"),
+  details_button = new WndButton(GetClientAreaWindow(), button_look, _T("Details"),
                                  right_button_rc,
                                  button_style, *this, Details);
   dialog_timer.Schedule(1000);

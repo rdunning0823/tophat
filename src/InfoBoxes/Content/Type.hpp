@@ -150,6 +150,8 @@ namespace InfoBoxFactory
 
     CIRCLE_DIAMETER,
 
+    TAKEOFF_DISTANCE,
+
     e_NUM_TYPES /* Last item */
   };
 

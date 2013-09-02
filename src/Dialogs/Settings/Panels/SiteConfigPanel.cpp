@@ -135,8 +135,11 @@ SiteConfigPanel::OnModified(DataField &df)
 void
 SiteConfigPanel::Show(const PixelRect &rc)
 {
-  if (!stand_alone)
+  if (!stand_alone) {
     buttonWaypoints->SetVisible(CommonInterface::SetUISettings().dialog.expert);
+    buttonWaypoints->SetText(_("Waypts."));
+    buttonWaypoints->SetOnClickNotify(dlgConfigWaypointsShowModal);
+  }
   RowFormWidget::Show(rc);
 }
 
@@ -152,8 +155,8 @@ void
 SiteConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   if (!stand_alone) {
-    buttonWaypoints = ((WndButton *)ConfigPanel::GetForm().FindByName(_T("cmdWaypoints")));
-    buttonWaypoints->SetOnClickNotify(dlgConfigWaypointsShowModal);
+    buttonWaypoints = ConfigPanel::GetExtraButton(1);
+    assert(buttonWaypoints);
   }
 
   WndProperty *wp = Add(_T(""), 0, true);

@@ -48,11 +48,9 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/dlgBasicSettings.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfiguration.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigurationSingle.cpp \
-	$(SRC)/Dialogs/Settings/dlgConfigFonts.cpp \
-	$(SRC)/Dialogs/Settings/dlgConfigInfoboxes.cpp \
 	$(SRC)/Dialogs/Settings/dlgQNH.cpp \
-	$(SRC)/Dialogs/Settings/FontEdit.cpp \
 	$(SRC)/Dialogs/Settings/dlgSetupQuick.cpp \
+	$(SRC)/Dialogs/Settings/dlgConfigInfoboxes.cpp \
 	$(SRC)/Dialogs/Traffic/TrafficList.cpp \
 	$(SRC)/Dialogs/Traffic/FlarmTrafficDetails.cpp \
 	$(SRC)/Dialogs/Traffic/TeamCodeDialog.cpp \
@@ -63,6 +61,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Plane/PlaneDetailsDialog.cpp \
 	$(SRC)/Dialogs/Plane/PlanePolarDialog.cpp \
 	$(SRC)/Dialogs/Plane/PolarShapeEditWidget.cpp \
+	$(SRC)/Dialogs/DataField.cpp \
 	$(SRC)/Dialogs/ComboPicker.cpp \
 	$(SRC)/Dialogs/FilePicker.cpp \
 	$(SRC)/Dialogs/HelpDialog.cpp \
@@ -632,7 +631,6 @@ XCSOAR_SOURCES := \
 	$(SRC)/Look/GlobalFonts.cpp \
 	$(SRC)/Look/AutoFont.cpp \
 	$(SRC)/Look/DefaultFonts.cpp \
-	$(SRC)/Look/CustomFonts.cpp \
 	$(SRC)/Look/Look.cpp \
 	$(SRC)/Look/DialogLook.cpp \
 	$(SRC)/Look/ButtonLook.cpp \
@@ -706,6 +704,7 @@ XCSOAR_SOURCES := \
 	$(DIALOG_SOURCES) \
 	\
 	$(SRC)/Monitor/TaskAdvanceMonitor.cpp \
+	$(SRC)/Monitor/MatTaskMonitor.cpp \
 	$(SRC)/Monitor/AllMonitors.cpp \
 	\
 	$(SRC)/Hardware/Battery.cpp
@@ -766,6 +765,11 @@ endif
 
 ifeq ($(TARGET),ALTAIR)
 XCSOAR_SOURCES += $(SRC)/Hardware/AltairControl.cpp
+else
+XCSOAR_SOURCES += \
+	$(SRC)/Look/CustomFonts.cpp \
+	$(SRC)/Dialogs/Settings/dlgConfigFonts.cpp \
+	$(SRC)/Dialogs/Settings/FontEdit.cpp
 endif
 
 ifeq ($(HAVE_HTTP),y)

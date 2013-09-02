@@ -28,6 +28,7 @@ Copyright_License {
 #include "Widget/ActionWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
+#include "Look/DialogLook.hpp"
 #include "StatusPanels/FlightStatusPanel.hpp"
 #include "StatusPanels/RulesStatusPanel.hpp"
 #include "StatusPanels/SystemStatusPanel.hpp"
@@ -63,7 +64,7 @@ dlgStatusShowModal(int start_page)
 
   const PixelRect rc = form.GetClientAreaWindow().GetClientRect();
 
-  PixelRect tab_rc;
+  PixelRect close_rc, tab_rc;
 
   if (Layout::landscape) {
     const unsigned tab_width = Layout::Scale(80);
@@ -73,14 +74,23 @@ dlgStatusShowModal(int start_page)
     tab_rc.right = tab_width;
     tab_rc.bottom = rc.bottom;
   } else {
+    /** close button only shown in portrait mode, use tab in landscape */
+    close_rc = rc;
+    close_rc.top = close_rc.bottom - Layout::Scale(25);
+
     tab_rc.left = Layout::Scale(55);
     tab_rc.top = 0;
     tab_rc.right = rc.right;
-    tab_rc.bottom = Layout::Scale(76);
+    tab_rc.bottom = rc.bottom;
   }
 
   ButtonWindowStyle button_style;
   button_style.TabStop();
+
+  if (!Layout::landscape)
+    WndButton close_button(form.GetClientAreaWindow(), look.button,
+                           _("Close"), close_rc, button_style,
+                           form, mrOK);
 
   ButtonWindowStyle tab_style;
   tab_style.ControlParent();
@@ -121,9 +131,10 @@ dlgStatusShowModal(int start_page)
   Widget *times_panel = new TimesStatusPanel(look);
   tab_bar.AddTab(times_panel, _("Times"), TimesIcon);
 
-  Widget *wClose = new ActionWidget(form, mrOK);
-  tab_bar.AddTab(wClose, _("Close"));
-
+  if (!Layout::landscape) {
+    Widget *wClose = new ActionWidget(form, mrOK);
+    tab_bar.AddTab(wClose, _("Close"));
+  }
 
   /* restore previous page */
 

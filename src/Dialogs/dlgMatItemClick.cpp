@@ -475,26 +475,26 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     break;
   }
 
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 
   if (modified_task.mat_mode == MAT_DELETE) {
-    delete_button = new WndButton(GetClientAreaWindow(), dialog_look,
+    delete_button = new WndButton(GetClientAreaWindow(), button_look,
                                   delete_text.c_str(),
                                   rc_delete,
                                   button_style, *this, DeletePointClick);
     AddDestruct(delete_button);
   } else {
-    add_button = new WndButton(GetClientAreaWindow(), dialog_look,
+    add_button = new WndButton(GetClientAreaWindow(), button_look,
                                add_base_text.c_str(),
                                rc_add,
                                button_style, *this, AddPointClick);
     AddDestruct(add_button);
 
     if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
-      replace_button = new WndButton(GetClientAreaWindow(), dialog_look,
+      replace_button = new WndButton(GetClientAreaWindow(), button_look,
                                      replace_text.c_str(),
                                      rc_replace,
                                      button_style, *this, ReplacePointClick);
@@ -502,12 +502,12 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     }
   }
 
-  more = new WndButton(GetClientAreaWindow(), dialog_look, _T("More"),
+  more = new WndButton(GetClientAreaWindow(), button_look, _T("More"),
                        rc_more,
                        button_style, *this, MoreClick);
   AddDestruct(more);
 
-  cancel = new WndButton(GetClientAreaWindow(), dialog_look, _T("Cancel"),
+  cancel = new WndButton(GetClientAreaWindow(), button_look, _T("Cancel"),
                          rc_cancel,
                          button_style, *this, CancelClick);
   AddDestruct(cancel);

@@ -158,7 +158,7 @@ public:
     style.Hide();
     style.TabStop();
 
-    const DialogLook &look = UIGlobals::GetDialogLook();
+    const ButtonLook &look = UIGlobals::GetDialogLook().button;
 
     const Layout layout = CalculateLayout(rc);
     edit_button = new WndButton(parent, look, _("Edit Point"),
@@ -360,18 +360,19 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
 {
   assert(DrawListIndex <= ordered_task->TaskSize());
 
+  const unsigned padding = Layout::GetTextPadding();
   const PixelScalar line_height = rc.bottom - rc.top;
 
   TCHAR buffer[120];
 
   const Font &name_font = *dialog.GetLook().list.font_bold;
-  const Font &text_font = *dialog.GetLook().text_font;
+  const Font &small_font = *dialog.GetLook().small_font;
 
   // Draw "Add turnpoint" label
   if (DrawListIndex == ordered_task->TaskSize()) {
     canvas.Select(name_font);
     _stprintf(buffer, _T("  (%s)"), _("Add Turnpoint"));
-    canvas.DrawText(rc.left + line_height + Layout::FastScale(2),
+    canvas.DrawText(rc.left + line_height + padding,
                     rc.top + line_height / 2 - name_font.GetHeight() / 2,
                     buffer);
     return;
@@ -398,31 +399,31 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
 
   // Use small font for details
-  canvas.Select(text_font);
+  canvas.Select(small_font);
 
   UPixelScalar leg_info_width = 0;
   if (show_leg_info) {
     // Draw leg distance
     FormatUserDistanceSmart(leg.distance, buffer, true);
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer);
-    canvas.DrawText(rc.right - Layout::FastScale(2) - width,
-                    rc.top + Layout::FastScale(2) +
-                    (name_font.GetHeight() - text_font.GetHeight()) / 2,
+    canvas.DrawText(rc.right - padding - width,
+                    rc.top + padding +
+                    (name_font.GetHeight() - small_font.GetHeight()) / 2,
                     buffer);
 
     // Draw leg bearing
     FormatBearing(buffer, ARRAY_SIZE(buffer), leg.bearing);
     width = canvas.CalcTextWidth(buffer);
-    canvas.DrawText(rc.right - Layout::FastScale(2) - width, top2, buffer);
+    canvas.DrawText(rc.right - padding - width, top2, buffer);
 
     if (width > leg_info_width)
       leg_info_width = width;
 
-    leg_info_width += Layout::FastScale(2);
+    leg_info_width += padding;
   }
 
   // Draw details line
-  PixelScalar left = rc.left + line_height + Layout::FastScale(2);
+  PixelScalar left = rc.left + line_height + padding;
   OrderedTaskPointRadiusLabel(tp.GetObservationZone(), buffer);
   if (!StringIsEmpty(buffer))
     canvas.DrawClippedText(left, top2, rc.right - leg_info_width - left,
@@ -432,7 +433,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   canvas.Select(name_font);
   OrderedTaskPointLabel(tp.GetType(), tp.GetWaypoint().name.c_str(),
                         DrawListIndex, buffer);
-  canvas.DrawClippedText(left, rc.top + Layout::FastScale(2),
+  canvas.DrawClippedText(left, rc.top + padding,
                          rc.right - leg_info_width - left, buffer);
 }
 

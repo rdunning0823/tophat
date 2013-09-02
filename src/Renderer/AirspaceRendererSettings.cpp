@@ -78,11 +78,7 @@ AirspaceRendererSettings::SetDefaults()
   classes[CLASSD].SetColors(RGB8_BLUE);
   classes[CTR].SetColors(RGB8_MAGENTA.Darken());
   classes[WAVE].SetColors(RGB8_YELLOW.Darken());
-  classes[AATASK].SetColors(RGB8_YELLOW);
-  if (IsGrayScaleScreen())
-    classes[AATASK].SetColors(RGB8_MAGENTA.Darken());
-  else
-    classes[AATASK].SetColors(RGB8_YELLOW);
+  classes[AATASK].SetColors(HasColors() ? RGB8_YELLOW : RGB8_MAGENTA.Darken());
   classes[CLASSE].SetColors(RGB8_GREEN.Darken());
   classes[CLASSF].SetColors(RGB8_GREEN.Darken());
 }

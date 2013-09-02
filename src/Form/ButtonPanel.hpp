@@ -37,7 +37,7 @@ public:
   };
 
   ContainerWindow &parent;
-  const DialogLook &look;
+  const ButtonLook &look;
   ButtonWindowStyle style;
 
   StaticArray<WndButton *, 8u> buttons;
@@ -52,7 +52,8 @@ public:
    */
   ButtonPanelPosition position;
 
-  ButtonPanel(ContainerWindow &parent, const DialogLook &look,
+public:
+  ButtonPanel(ContainerWindow &parent, const ButtonLook &look,
               ButtonPanelPosition position = Auto);
   ~ButtonPanel();
 

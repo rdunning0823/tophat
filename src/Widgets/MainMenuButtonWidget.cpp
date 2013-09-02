@@ -57,9 +57,9 @@ MainMenuButton::OnPaint(Canvas &canvas)
 
   canvas.SelectNullPen();
   if (!IsEnabled())
-    canvas.Select(look.button.disabled.brush);
+    canvas.Select(button_look.disabled.brush);
   else
-    canvas.Select(look.button.standard.foreground_brush);
+    canvas.Select(button_look.standard.foreground_brush);
   const Bitmap *bmp = &icon_look.hBmpMenuButton;
   const PixelSize bitmap_size = bmp->GetSize();
   const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
@@ -95,12 +95,7 @@ MainMenuButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
-  white_look.Initialise(Fonts::map_bold, Fonts::map, Fonts::map_label,
-                        Fonts::map_bold, Fonts::map_bold, Fonts::map_bold);
-
-  white_look.SetBackgroundColor(COLOR_WHITE);
-  white_look.button.standard.background_color = COLOR_WHITE;
-  white_look.button.focused.background_color = COLOR_WHITE;
+  white_look.Initialise(Fonts::map_bold);
 
   const IconLook &icons = UIGlobals::GetIconLook();
   const Bitmap *bmp = &icons.hBmpMenuButton;
@@ -163,7 +158,7 @@ MainMenuButtonWidget::OnAction(int id)
 
 MainMenuButton &
 MainMenuButtonWidget::CreateButton(ContainerWindow &parent,
-                                   const DialogLook &dialog_look,
+                                   const ButtonLook &button_look,
                                    const IconLook &icon_look,
                                    const PixelRect &rc_map)
 {
@@ -171,7 +166,7 @@ MainMenuButtonWidget::CreateButton(ContainerWindow &parent,
   button_style.multiline();
 
   MainMenuButton *button =
-    new MainMenuButton(parent, dialog_look, icon_look, _T(""), // TODO replace "" with NULL
+    new MainMenuButton(parent, button_look, icon_look, _T(""), // TODO replace "" with NULL
                        rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;

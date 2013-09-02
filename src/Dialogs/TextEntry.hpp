@@ -61,14 +61,15 @@ TouchTextEntry(TCHAR *text, size_t size,
 
 /**
  * show a numeric keypad with Help if available
- * @param reference containing value before and after edit
- * @param the_property being edited
+ * @param value containing value before and after edit
+ * @param caption caption of field for editing
+ * @param help text or nullptr if no help text
  * @param optional character filter
  */
 bool
 TouchNumericEntry(fixed &value,
                   const TCHAR *caption,
-                  WndProperty &the_property,
+                  const TCHAR *help_text,
                   AllowedCharacters accb=AllowedCharacters());
 
 #endif

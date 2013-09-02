@@ -32,10 +32,6 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 
-#include <assert.h>
-
-static WndProperty *wComboPopupWndProperty;
-static DataField *ComboPopupDataField;
 static const ComboList *ComboListPopup;
 
 class ComboPickerSupport : public ListItemRenderer {
@@ -68,7 +64,7 @@ OnItemHelp(unsigned i)
 int
 ComboPicker(const TCHAR *caption,
             const ComboList &combo_list,
-            ListHelpCallback_t help_callback,
+            const TCHAR *help_text,
             bool enable_item_help)
 {
   ComboListPopup = &combo_list;
@@ -90,115 +86,39 @@ ComboPicker(const TCHAR *caption,
                     combo_list.ComboPopupItemSavedIndex,
                     row_height,
                     support, false,
-                    help_callback,
+                    help_text,
                     enable_item_help ? OnItemHelp : NULL);
 }
 
-static void
-OnHelpClicked(unsigned i)
+bool
+ComboPicker(const TCHAR *caption, DataField &df,
+            const TCHAR *help_text)
 {
-  if (i < ComboListPopup->size()) {
-    const ComboList::Item &item = (*ComboListPopup)[i];
-    ComboPopupDataField->SetFromCombo(item.DataFieldIndex,
-                                      item.StringValue);
-  }
+  StaticString<256> buffer;
+  const TCHAR *reference = nullptr;
 
-  wComboPopupWndProperty->OnHelp();
-}
+  while (true) {
+    const ComboList combo_list = df.CreateComboList(reference);
+    ComboListPopup = &combo_list;
 
-static int
-ComboPicker(const WndProperty &control,
-            const ComboList &combo_list, bool EnableItemHelp)
-{
-  return ComboPicker(control.GetEditingCaption(), combo_list,
-                     control.HasHelp() ? OnHelpClicked : nullptr,
-                     EnableItemHelp);
-}
+    int idx = ComboPicker(caption, combo_list, help_text,
+                          df.GetItemHelpEnabled());
+    if (idx < 0)
+      return false;
 
-int
-dlgComboPicker(WndProperty *theProperty)
-{
-  static bool bInComboPicker = false;
-  bool bInitialPage = true;
-  // used to exit loop (optionally reruns combo with
-  // lower/higher index of items for int/float
-  bool bOpenCombo = true;
+    const ComboList::Item &item = combo_list[idx];
 
-  /**
-   * non-static pointer to datafield.
-   * used during closing of picker so that dlgComboPicker can be
-   * recursively called by OnModified()
-   */
-  DataField *non_static_datafield;
-
-  // prevents multiple instances
-  if (bInComboPicker)
-    return 0;
-
-  bInComboPicker = true;
-
-  TCHAR sSavedInitialValue[100];
-  int iSavedInitialDataIndex = -1;
-
-  while (bOpenCombo) {
-    assert(theProperty != NULL);
-    wComboPopupWndProperty = theProperty;
-
-    non_static_datafield = ComboPopupDataField =
-        wComboPopupWndProperty->GetDataField();
-    assert(ComboPopupDataField != NULL);
-
-    ComboListPopup = ComboPopupDataField->CreateComboList();
-    if (bInitialPage) { // save values for "Cancel" from first page only
-      bInitialPage = false;
-      iSavedInitialDataIndex =
-        (*ComboListPopup)[ComboListPopup->ComboPopupItemSavedIndex]
-        .DataFieldIndex;
-      ComboPopupDataField->CopyString(sSavedInitialValue, false);
-    }
-
-    int idx = ComboPicker(*theProperty, *ComboListPopup, ComboPopupDataField->GetItemHelpEnabled());
-
-    bOpenCombo = false; //tell  combo to exit loop after close
-
-    if (idx >= 0 && (unsigned)idx < ComboListPopup->size()) {
-      const ComboList::Item *item = &(*ComboListPopup)[idx];
-
-      // OK/Select
-      if (item->DataFieldIndex == ComboList::Item::NEXT_PAGE) {
-        // we're last in list and the want more past end of list so select last real list item and reopen
-        ComboPopupDataField->SetDetachGUI(true);
-        // we'll reopen, so don't call xcsoar data changed routine yet
-        item = &(*ComboListPopup)[idx - 1];
-        bOpenCombo = true; // reopen combo with new selected index at center
-      } else if (item->DataFieldIndex == ComboList::Item::PREVIOUS_PAGE) {
-        // same as above but lower items needed
-        ComboPopupDataField->SetDetachGUI(true);
-        item = &(*ComboListPopup)[idx + 1];
-        bOpenCombo = true;
-      }
-      const ComboList::Item item_temp(item->DataFieldIndex,
-                                      item->StringValue, item->StringValue);
-
-      if (!bOpenCombo) {
-        delete ComboListPopup;
-        bInComboPicker = false; // nothing below this line can use statics!
-      }
-      non_static_datafield->SetFromCombo(item_temp.DataFieldIndex,
-                                         item_temp.StringValue);
+    // OK/Select
+    if (item.DataFieldIndex == ComboList::Item::NEXT_PAGE) {
+      // we're last in list and the want more past end of list so select last real list item and reopen
+      // we'll reopen, so don't call xcsoar data changed routine yet
+      reference = buffer = combo_list[idx - 1].StringValue;
+    } else if (item.DataFieldIndex == ComboList::Item::PREVIOUS_PAGE) {
+      // same as above but lower items needed
+      reference = buffer = combo_list[idx + 1].StringValue;
     } else {
-      // Cancel
-      // if we've detached the GUI during the load, then there is nothing to do here
-      delete ComboListPopup;
-      bInComboPicker = false; // nothing below this line can use statics!
-      assert(iSavedInitialDataIndex >= 0);
-      if (iSavedInitialDataIndex >= 0)
-        // saved from first page if multiple were used
-        non_static_datafield->SetFromCombo(iSavedInitialDataIndex,
-                                           sSavedInitialValue);
+      df.SetFromCombo(item.DataFieldIndex, item.StringValue);
+      return true;
     }
-    theProperty->RefreshDisplay();
   } // loop reopen combo if <<More>>  or <<Less>> picked
-
-  return 1;
 }

@@ -383,44 +383,44 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           prompt->SetVAlignCenter();
   }
 
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 
-  nationality_button = new WndButton(GetClientAreaWindow(), dialog_look,
+  nationality_button = new WndButton(GetClientAreaWindow(), button_look,
                                 _T("Nationality"),
                                 rc_nationality_button,
                                 button_style, *this, NATIONALITY);
 
-  site_files_button = new WndButton(GetClientAreaWindow(), dialog_look,
+  site_files_button = new WndButton(GetClientAreaWindow(), button_look,
                                     _T("Site files"),
                                     rc_site_files_button,
                                     button_style, *this, SITE_FILES);
 
-  plane_button = new WndButton(GetClientAreaWindow(), dialog_look, _T("Plane"),
+  plane_button = new WndButton(GetClientAreaWindow(), button_look, _T("Plane"),
                                rc_plane_button,
                                button_style, *this, PLANE);
 
-  device_button = new WndButton(GetClientAreaWindow(), dialog_look,
+  device_button = new WndButton(GetClientAreaWindow(), button_look,
                                 _T("Device"),
                                 rc_device_button,
                                 button_style, *this, DEVICE);
 
-  safety_button = new WndButton(GetClientAreaWindow(), dialog_look,
+  safety_button = new WndButton(GetClientAreaWindow(), button_look,
                                 _T("Safety heights"),
                                 rc_safety_button,
                                 button_style, *this, SAFETY);
 
-  pilot_button = new WndButton(GetClientAreaWindow(), dialog_look,
+  pilot_button = new WndButton(GetClientAreaWindow(), button_look,
                                _T("Pilot"),
                                rc_pilot_button,
                                button_style, *this, PILOT);
-  ok = new WndButton(GetClientAreaWindow(), dialog_look, _("Close"),
+  ok = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
                      rc_ok,
                      button_style, *this, OK);
 
-  advanced = new WndButton(GetClientAreaWindow(), dialog_look, _T("Advanced"),
+  advanced = new WndButton(GetClientAreaWindow(), button_look, _T("Advanced"),
                            rc_advanced,
                            button_style, *this, ADVANCED);
 

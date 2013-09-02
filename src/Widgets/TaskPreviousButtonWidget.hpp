@@ -44,7 +44,7 @@ public:
   virtual void Move(const PixelRect &rc);
 
   WndSymbolButton& CreateButton(ContainerWindow &parent,
-                                const DialogLook &dialog_look,
+                                const ButtonLook &button_look,
                                 const PixelRect &rc_map);
 
   /**

@@ -22,24 +22,26 @@ Copyright_License {
 */
 
 #include "Dialogs/TextEntry.hpp"
+#include "Look/DialogLook.hpp"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
-#include "Form/Keyboard.hpp"
-#include "Form/KeyboardNumeric.hpp"
 #include "Form/Edit.hpp"
+#include "Widget/KeyboardWidget.hpp"
+#include "Widget/KeyboardNumericWidget.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
 #include "Util/StringUtil.hpp"
 #include "Util/NumberParser.hpp"
 #include "UIGlobals.hpp"
 #include "Language/Language.hpp"
+#include "Dialogs/HelpDialog.hpp"
 
 #include <algorithm>
 #include <assert.h>
 
 static WndProperty *editor;
-static WndProperty *the_property;
-static KeyboardBaseControl *kb = NULL;
+static KeyboardWidget *kb = nullptr;
+static KeyboardNumericWidget *knb = nullptr;
 
 static AllowedCharacters AllowedCharactersCallback;
 
@@ -47,12 +49,16 @@ static constexpr size_t MAX_TEXTENTRY = 40;
 static unsigned int cursor = 0;
 static size_t max_width;
 static TCHAR edittext[MAX_TEXTENTRY];
+static const TCHAR* caption;
+static const TCHAR* help_text;
 
 static void
 UpdateAllowedCharacters()
 {
-  if (AllowedCharactersCallback)
+  if (AllowedCharactersCallback && kb != nullptr)
     kb->SetAllowedCharacters(AllowedCharactersCallback(edittext));
+  else if (AllowedCharactersCallback && knb != nullptr)
+    knb->SetAllowedCharacters(AllowedCharactersCallback(edittext));
 }
 
 static void
@@ -91,19 +97,6 @@ DoCharacter(TCHAR character)
   edittext[cursor] = 0;
   UpdateTextboxProp();
   return true;
-}
-
-static void
-OnCharacter(TCHAR character)
-{
-  DoCharacter(character);
-}
-
-static void
-OnCharacterNumeric(TCHAR character)
-{
-  if (character != ' ')
-    DoCharacter(character);
 }
 
 static bool
@@ -149,10 +142,8 @@ ClearText()
 static void
 ShowHelp()
 {
-  assert(the_property->HasHelp());
-  the_property->OnHelp();
+  HelpDialog(caption, help_text);
 }
-
 
 bool
 TouchTextEntry(TCHAR *text, size_t width,
@@ -223,28 +214,35 @@ TouchTextEntry(TCHAR *text, size_t width,
   ButtonWindowStyle button_style;
   button_style.TabStop();
 
-  WndButton ok_button(client_area, look, _("OK"),
+  WndButton ok_button(client_area, look.button, _("OK"),
                       { ok_left, button_top, ok_right, button_bottom },
                       button_style, form, mrOK);
 
-  WndButton cancel_button(client_area, look, _("Cancel"),
+  WndButton cancel_button(client_area, look.button, _("Cancel"),
                           { cancel_left, button_top,
                               cancel_right, button_bottom },
                           button_style, form, mrCancel);
 
-  WndButton clear_button(client_area, look, _("Clear"),
+  WndButton clear_button(client_area, look.button, _("Clear"),
                          { clear_left, button_top,
                              clear_right, button_bottom },
                          button_style, ClearText);
 
-  KeyboardControl keyboard(client_area, look,
-                           { padding, keyboard_top,
-                              rc.right - padding,
-                              keyboard_bottom },
-                           OnCharacter);
-  kb = (KeyboardBaseControl*)&keyboard;
+  KeyboardWidget keyboard(look.button, FormCharacter, !accb);
 
-  WndButton backspace_button(client_area, look, _T("<-"),
+  const PixelRect keyboard_rc = {
+    padding, keyboard_top,
+    rc.right - padding, keyboard_bottom
+  };
+
+  keyboard.Initialise(client_area, keyboard_rc);
+  keyboard.Prepare(client_area, keyboard_rc);
+  keyboard.Show(keyboard_rc);
+
+  kb = &keyboard;
+  knb = nullptr;
+
+  WndButton backspace_button(client_area, look.button, _T("<-"),
                              { backspace_left, padding, rc.right - padding,
                                  editor_bottom },
                              button_style, OnBackspace);
@@ -262,6 +260,9 @@ TouchTextEntry(TCHAR *text, size_t width,
   UpdateTextboxProp();
   bool result = form.ShowModal() == mrOK;
 
+  keyboard.Hide();
+  keyboard.Unprepare();
+
   if (result) {
     CopyString(text, edittext, width);
   }
@@ -271,11 +272,12 @@ TouchTextEntry(TCHAR *text, size_t width,
 
 bool
 TouchNumericEntry(fixed &value,
-                  const TCHAR *caption,
-                  WndProperty &_the_property,
+                  const TCHAR *_caption,
+                  const TCHAR *_help_text,
                   AllowedCharacters accb)
 {
-  the_property = &_the_property;
+  caption = _caption;
+  help_text = _help_text;
 
   StaticString<12> buffer;
   buffer.Format(_T("%.1f"), (double)value);
@@ -308,13 +310,13 @@ TouchNumericEntry(fixed &value,
   const PixelScalar client_height = rc.bottom - rc.top;
 
   const PixelScalar padding = Layout::Scale(2);
-
-  const PixelScalar button_height = (client_height - padding * 2) / 6;
-  const PixelScalar keyboard_top = rc.top + padding + button_height;
-  const PixelScalar keyboard_bottom = rc.bottom - button_height - padding;
-
   const PixelScalar backspace_width = (rc.right - rc.left) / 4;
   const PixelScalar backspace_left = rc.right - padding - backspace_width;
+
+  const PixelScalar button_height = (client_height - padding * 2) / 6;
+
+  const PixelScalar keyboard_top = rc.top + padding + button_height;
+  const PixelScalar keyboard_bottom = rc.bottom - button_height - padding;
 
 
   WndProperty _editor(client_area, look, _T(""),
@@ -327,45 +329,52 @@ TouchNumericEntry(fixed &value,
   button_style.TabStop();
 
   PixelScalar button_width = (rc.right - rc.left) / 3;
-  WndButton ok_button(client_area, look, _("OK"),
+  WndButton ok_button(client_area, look.button, _("OK"),
                       { 0, rc.top + 5 * button_height, button_width,
                         rc.top + 6 * button_height},
                       button_style, form, mrOK);
 
-  WndButton cancel_button(client_area, look, _("Cancel"),
+  WndButton cancel_button(client_area, look.button, _("Cancel"),
                           { button_width,
                             rc.top + 5 * button_height, 2 * button_width,
                             rc.top + 6 * button_height},
                           button_style, form, mrCancel);
 
-  WndButton help_button(client_area, look, _("Help"),
+  WndButton help_button(client_area, look.button, _("Help"),
                           { button_width * 2,
                             rc.top + 5 * button_height, 3 * button_width,
                             rc.top + 6 * button_height},
                           button_style, ShowHelp);
 
-  WndButton clear_button(client_area, look, _("Clear"),
+  WndButton clear_button(client_area, look.button, _("Clear"),
                          { button_width * 2,
                            rc.top + 5 * button_height, 3 * button_width,
                            rc.top + 6 * button_height},
                          button_style, ClearText);
 
-  help_button.SetVisible(the_property->HasHelp());
-  clear_button.SetVisible(!the_property->HasHelp());
+  help_button.SetVisible(help_text != nullptr);
+  clear_button.SetVisible(help_text == nullptr);
 
-  KeyboardNumericControl keyboard(client_area, look,
-                                  { padding, keyboard_top,
-                                    rc.right - padding,
-                                    keyboard_bottom },
-                                  OnCharacterNumeric);
-  kb = (KeyboardBaseControl*)&keyboard;
+  KeyboardNumericWidget keyboard(look.button, FormCharacter);
 
-  WndButton backspace_button(client_area, look, _T("<"),
+  const PixelRect keyboard_rc = {
+    padding, keyboard_top,
+    rc.right - padding, keyboard_bottom
+  };
+
+  keyboard.Initialise(client_area, keyboard_rc);
+  keyboard.Prepare(client_area, keyboard_rc);
+  keyboard.Show(keyboard_rc);
+
+  kb = nullptr;
+  knb = &keyboard;
+
+  WndButton backspace_button(client_area, look.button, _T("<-"),
                              { backspace_left, padding, rc.right - padding,
                                rc.top + button_height },
                              button_style, OnBackspace);
 
-  AllowedCharactersCallback = nullptr;
+  AllowedCharactersCallback = accb;
 
   ClearText();
 

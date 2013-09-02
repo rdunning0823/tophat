@@ -47,9 +47,9 @@ ZoomButton::OnPaint(Canvas &canvas)
 
   canvas.SelectNullPen();
   if (!IsEnabled())
-    canvas.Select(look.button.disabled.brush);
+    canvas.Select(button_look.disabled.brush);
   else
-    canvas.Select(look.button.standard.foreground_brush);
+    canvas.Select(button_look.standard.foreground_brush);
   const Bitmap *bmp = zoom_in ? &icon_look.hBmpZoomInButton : &icon_look.hBmpZoomOutButton;
   const PixelSize bitmap_size = bmp->GetSize();
   const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;

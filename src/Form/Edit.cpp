@@ -35,11 +35,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
 #include "Screen/Features.hpp"
-#include "Dialogs/ComboPicker.hpp"
-#include "Dialogs/TextEntry.hpp"
-#include "Dialogs/TimeEntry.hpp"
-#include "Dialogs/GeoPointEntry.hpp"
-#include "resource.h"
+#include "Dialogs/DataField.hpp"
 
 #include <assert.h>
 
@@ -161,7 +157,7 @@ WndProperty::~WndProperty()
 UPixelScalar
 WndProperty::GetRecommendedCaptionWidth() const
 {
-  return look.text_font->TextSize(caption).cx + Layout::FastScale(3);
+  return look.text_font->TextSize(caption).cx + Layout::GetTextPadding();
 }
 
 void
@@ -181,63 +177,15 @@ WndProperty::BeginEditing()
     /* this would display xml file help on a read-only wndproperty if
        it exists */
     return OnHelp();
-  } else if (mDataField != NULL && mDataField->supports_combolist) {
-    /* if this asserton fails, then there no valid root window could
-       be found - maybe it didn't register its wndproc? */
-    dlgComboPicker(this);
-    return true;
-  } else if (mDataField != NULL &&
-             mDataField->GetType() == DataField::Type::ROUGH_TIME) {
-    RoughTimeDataField &df = *(RoughTimeDataField *)mDataField;
-    RoughTime value = df.GetValue();
-    if (!TimeEntryDialog(GetEditingCaption(), value, df.GetTimeZone(), true))
-      return true;
+  } else if (mDataField != NULL) {
+    if (!EditDataFieldDialog(GetEditingCaption(), *mDataField, GetHelpText()))
+      return false;
 
-    df.ModifyValue(value);
     RefreshDisplay();
     return true;
-  } else if (mDataField != NULL &&
-             mDataField->GetType() == DataField::Type::GEOPOINT) {
-    GeoPointDataField &df = *(GeoPointDataField *)mDataField;
-    GeoPoint value = df.GetValue();
-    if (!GeoPointEntryDialog(GetEditingCaption(), value, false))
-      return true;
-
-    df.ModifyValue(value);
-    RefreshDisplay();
-    return true;
-
-  } else if (mDataField != NULL &&
-             mDataField->GetType() == DataField::Type::REAL) {
-    DataFieldFloat &df = *(DataFieldFloat *)mDataField;
-    fixed value = df.GetAsFixed();
-    if (!TouchNumericEntry(value, GetEditingCaption(), *this), false)
-      return true;
-    df.SetAsFloat(value);
-    RefreshDisplay();
-    return true;
-
-
 
   } else if (CanEditInPlace()) {
     // TODO: implement
-    return true;
-  } else if (mDataField != NULL) {
-    const TCHAR *value = mDataField->GetAsString();
-    if (value == NULL)
-      return false;
-
-    StaticString<EDITSTRINGSIZE> buffer(value);
-
-    PrefixDataField::AllowedCharactersFunction acf;
-    if (mDataField->GetType() == DataField::Type::PREFIX)
-      acf = ((PrefixDataField *)mDataField)->GetAllowedCharactersFunction();
-
-    if (!TextEntryDialog(buffer, GetEditingCaption(), acf))
-      return true;
-
-    mDataField->SetAsString(buffer);
-    RefreshDisplay();
     return true;
   } else
     return false;
@@ -256,9 +204,10 @@ WndProperty::UpdateLayout()
     edit_rc.right -= (DEFAULTBORDERPENWIDTH + 1);
     edit_rc.bottom -= (DEFAULTBORDERPENWIDTH + 1);
   } else {
+    const unsigned caption_height = look.text_font->GetHeight();
+
     edit_rc.left += (DEFAULTBORDERPENWIDTH + 1);
-    edit_rc.top = (edit_rc.top + edit_rc.bottom) / 2
-      - 2 * (DEFAULTBORDERPENWIDTH + 1);
+    edit_rc.top = DEFAULTBORDERPENWIDTH + caption_height;
     edit_rc.right -= (DEFAULTBORDERPENWIDTH + 1);
     edit_rc.bottom -= (DEFAULTBORDERPENWIDTH + 1);
   }
@@ -399,7 +348,7 @@ WndProperty::OnPaint(Canvas &canvas)
       org.x = edit_rc.left;
       org.y = edit_rc.top - tsize.cy;
     } else {
-      org.x = caption_width - tsize.cx - Layout::FastScale(3);
+      org.x = caption_width - tsize.cx;
       org.y = (GetHeight() - tsize.cy) / 2;
     }
 

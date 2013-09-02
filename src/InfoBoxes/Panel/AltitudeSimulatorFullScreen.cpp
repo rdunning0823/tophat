@@ -108,6 +108,11 @@ protected:
    */
   DialogLook big_dialog_look;
 
+  /**
+   * ButtonLook with large font
+   */
+  ButtonLook big_button_look;
+
 public:
   AltitudeSimulatorFullScreenPanel(unsigned id)
     :BaseAccessPanel(id), dialog_timer(*this) {}
@@ -207,25 +212,27 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
 
+  big_button_look.Initialise(Fonts::map_bold);
+
   big_dialog_look.Initialise(Fonts::map_bold, Fonts::infobox, Fonts::map_label,
                              Fonts::infobox, Fonts::map_bold,
                              Fonts::map_bold);
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  big_plus = new WndButton(GetClientAreaWindow(), big_dialog_look, _T("+100"),
+  big_plus = new WndButton(GetClientAreaWindow(), big_button_look, _T("+100"),
                            big_plus_rc,
                            button_style, *this, BigPlus);
 
-  little_plus = new WndButton(GetClientAreaWindow(), big_dialog_look,
+  little_plus = new WndButton(GetClientAreaWindow(), big_button_look,
                               _T("+10"), little_plus_rc,
                               button_style, *this, LittlePlus);
 
-  big_minus = new WndButton(GetClientAreaWindow(), big_dialog_look,
+  big_minus = new WndButton(GetClientAreaWindow(), big_button_look,
                             _T("-100"), big_minus_rc,
                             button_style, *this, BigMinus);
 
-  little_minus = new WndButton(GetClientAreaWindow(), big_dialog_look,
+  little_minus = new WndButton(GetClientAreaWindow(), big_button_look,
                                _T("-10"), little_minus_rc,
                                button_style, *this, LittleMinus);
 

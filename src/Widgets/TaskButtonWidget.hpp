@@ -28,9 +28,10 @@ Copyright_License {
 #include "Form/ActionListener.hpp"
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
-#include "Look/DialogLook.hpp"
-#include "Look/InfoBoxLook.hpp"
+#include "Look/ButtonLook.hpp"
 #include "Widgets/TaskNavSliderShape.hpp"
+
+#include <tchar.h>
 
 class ContainerWindow;
 struct PixelRect;
@@ -50,18 +51,15 @@ protected:
   WndSymbolButton * button;
 
   /**
-   * a customized copy of dialog_look
+   * a customized copy of button_look
    */
-  DialogLook white_look;
+  ButtonLook white_look;
 
   /**
    * height and width of button
    */
   UPixelScalar height;
   UPixelScalar width;
-
-  const DialogLook &dialog_look;
-  const InfoBoxLook &infobox_look;
 
   /**
    * the caption of the widget e.g. < or >
@@ -72,9 +70,7 @@ protected:
 
 public:
   TaskButtonWidget(const TCHAR *_caption)
-  : dialog_look(UIGlobals::GetDialogLook()),
-    infobox_look(UIGlobals::GetLook().info_box),
-    caption(_caption) {};
+    :caption(_caption) {};
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
@@ -83,7 +79,7 @@ public:
   virtual void Move(const PixelRect &rc);
 
   WndSymbolButton& CreateButton(ContainerWindow &parent,
-                                const DialogLook &dialog_look,
+                                const ButtonLook &button_look,
                                 const PixelRect &rc_map);
 
   /**

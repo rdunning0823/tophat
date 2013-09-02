@@ -24,6 +24,7 @@ Copyright_License {
 #include "WindSettingsPanel.hpp"
 #include "Computer/Wind/Settings.hpp"
 #include "Profile/ProfileKeys.hpp"
+#include "Form/Button.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Form/DataField/Angle.hpp"

@@ -27,7 +27,7 @@ Copyright_License {
 #include "Widgets/MapOverlayWidget.hpp"
 #include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
-#include "Look/DialogLook.hpp"
+#include "Look/ButtonLook.hpp"
 
 #include <tchar.h>
 
@@ -38,16 +38,17 @@ struct PixelRect;
 class MainMenuButton : public WndButton {
 protected:
   const IconLook &icon_look;
+  const ButtonLook &button_look;
 
 public:
 
-  MainMenuButton(ContainerWindow &parent, const DialogLook &dialog_look,
+  MainMenuButton(ContainerWindow &parent, const ButtonLook &_button_look,
                  const IconLook &_icon_look,
                  const TCHAR *caption, const PixelRect &rc,
                  ButtonWindowStyle style,
                  ActionListener& listener, int id)
-  :WndButton(parent, dialog_look, caption, rc, style, listener, id),
-   icon_look(_icon_look) {}
+  :WndButton(parent, _button_look, caption, rc, style, listener, id),
+   icon_look(_icon_look), button_look(_button_look) {}
 
   /**
    * The OnPaint event is called when the button needs to be drawn
@@ -64,9 +65,9 @@ protected:
   PixelSize bitmap_size_raw;
 
   /**
-   * a customized copy of dialog_look
+   * a customized copy of button_look
    */
-  DialogLook white_look;
+  ButtonLook white_look;
 
 public:
 
@@ -85,7 +86,7 @@ public:
   virtual void Hide();
   virtual void Move(const PixelRect &rc);
   MainMenuButton& CreateButton(ContainerWindow &parent,
-                               const DialogLook &dialog_look,
+                               const ButtonLook &button_look,
                                const IconLook &icon_look,
                                const PixelRect &rc);
 

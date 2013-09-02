@@ -41,6 +41,7 @@ Copyright_License {
 #include "Computer/Settings.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Message.hpp"
+#include "Look/DialogLook.hpp"
 
 
 enum ControlIndex {
@@ -144,7 +145,8 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  change = new WndButton(GetClientAreaWindow(), dialog_look, _("Select waypoint"),
+  change = new WndButton(GetClientAreaWindow(), dialog_look.button,
+                         _("Select waypoint"),
                          lower_rc, button_style, *this, Change);
 
   WindowStyle style_frame;

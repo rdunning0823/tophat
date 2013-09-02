@@ -35,6 +35,10 @@ class ButtonRenderer
 public:
   ButtonRenderer(const ButtonLook &_look):look(_look) {}
 
+  const ButtonLook &GetLook() const {
+    return look;
+  }
+
   /**
    * @parm transparent. if True, the background is not drawn
    * so the button is transparent

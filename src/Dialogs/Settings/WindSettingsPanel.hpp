@@ -29,6 +29,8 @@ Copyright_License {
 #include "Form/DataField/Listener.hpp"
 #include "Blackboard/BlackboardListener.hpp"
 
+class WndButton;
+
 class WindSettingsPanel final
   : public RowFormWidget, public ActionListener,
     private DataFieldListener, private NullBlackboardListener {
