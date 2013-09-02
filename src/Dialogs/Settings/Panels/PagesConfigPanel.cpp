@@ -54,6 +54,7 @@ public:
 
 private:
   enum Controls {
+    MAIN,
     INFO_BOX_PANEL,
     BOTTOM,
   };
@@ -159,6 +160,19 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const InfoBoxSettings &info_box_settings =
     CommonInterface::GetUISettings().info_boxes;
 
+  static constexpr StaticEnumChoice main_list[] = {
+    { (unsigned)PageLayout::Main::MAP, N_("Map") },
+    { (unsigned)PageLayout::Main::FLARM_RADAR, N_("FLARM radar") },
+    { (unsigned)PageLayout::Main::THERMAL_ASSISTANT, N_("Thermal assistant") },
+    { (unsigned)PageLayout::Main::HORIZON, N_("Horizon") },
+    { 0 }
+  };
+  AddEnum(_("Main area"),
+          _("Specifies what should be displayed in the main area."),
+          main_list,
+          (unsigned)PageLayout::Main::MAP, this);
+
+
   static constexpr StaticEnumChoice ib_list[] = {
     { IBP_AUTO, N_("Auto") },
     { IBP_NONE, N_("None") },
@@ -189,6 +203,7 @@ PageLayoutEditWidget::SetValue(const PageLayout &_value)
 {
   value = _value;
 
+  LoadValueEnum(MAIN, value.main);
   LoadValueEnum(BOTTOM, value.bottom);
 
   unsigned ib = IBP_NONE;
@@ -208,7 +223,11 @@ PageLayoutEditWidget::SetValue(const PageLayout &_value)
 void
 PageLayoutEditWidget::OnModified(DataField &df)
 {
-  if (&df == &GetDataField(INFO_BOX_PANEL)) {
+  if (&df == &GetDataField(MAIN)) {
+    const DataFieldEnum &dfe = (const DataFieldEnum &)df;
+    value.main = (PageLayout::Main)dfe.GetValue();
+  } else if (&df == &GetDataField(INFO_BOX_PANEL)) {
+
     const DataFieldEnum &dfe = (const DataFieldEnum &)df;
     const unsigned ibp = dfe.GetValue();
     if (ibp == IBP_AUTO) {
@@ -292,7 +311,27 @@ PageListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned idx)
 
   StaticString<64> buffer;
 
-  buffer = _("Map");
+  switch (value.main) {
+  case PageLayout::Main::MAP:
+    buffer = _("Map");
+    break;
+
+  case PageLayout::Main::FLARM_RADAR:
+    buffer = _("FLARM radar");
+    break;
+
+  case PageLayout::Main::THERMAL_ASSISTANT:
+    buffer = _("Thermal assistant");
+    break;
+
+  case PageLayout::Main::HORIZON:
+    buffer = _("Horizon");
+    break;
+
+  case PageLayout::Main::MAX:
+    gcc_unreachable();
+  }
+
 
   if (value.infobox_config.enabled) {
     buffer.AppendFormat(_T(", %s"), _("InfoBoxes"));
