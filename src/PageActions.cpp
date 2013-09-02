@@ -253,29 +253,7 @@ PageActions::LoadLayout(const PageLayout &layout)
   DisablePan();
 
   LoadInfoBoxes(layout.infobox_config);
-
-  if (layout.main == PageLayout::Main::MAP) {
-    LoadBottom(layout.bottom);
-  }
-
-  // don't allow IBs w/ Flarm
-  UIState &ui_state = CommonInterface::SetUIState();
-  if (!layout.infobox_config.enabled ||
-      layout.main == PageLayout::Main::FLARM_RADAR) {
-    CommonInterface::main_window->SetFullScreen(true);
-    ui_state.auxiliary_enabled = false;
-  } else {
-    if (!layout.infobox_config.auto_switch &&
-        layout.infobox_config.panel < InfoBoxSettings::MAX_PANELS) {
-      CommonInterface::main_window->SetFullScreen(false);
-      ui_state.auxiliary_enabled = true;
-      ui_state.auxiliary_index = layout.infobox_config.panel;
-    }
-    else {
-      CommonInterface::main_window->SetFullScreen(false);
-      ui_state.auxiliary_enabled = false;
-    }
-  }
+  LoadBottom(layout.bottom);
   LoadMain(layout.main);
 
   ActionInterface::UpdateDisplayMode();
