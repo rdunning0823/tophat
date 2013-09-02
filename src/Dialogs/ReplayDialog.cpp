@@ -151,7 +151,7 @@ ShowReplayDialog()
   const DialogLook &look = UIGlobals::GetDialogLook();
   ReplayControlWidget *widget = new ReplayControlWidget(look);
   WidgetDialog dialog(look);
-  dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Replay"), widget);
+  dialog.CreatePopup(UIGlobals::GetMainWindow(), _("Replay"), widget);
   dialog.AddButton(_("Close"), mrOK);
   widget->CreateButtons(dialog);
 
