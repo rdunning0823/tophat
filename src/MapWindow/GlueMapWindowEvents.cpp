@@ -68,6 +68,14 @@ GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
   case DRAG_NONE:
     break;
   case DRAG_GESTURE:
+    gestures.Update(x, y);
+
+    /* invoke PaintWindow's Invalidate() implementation instead of
+       DoubleBufferWindow's in order to reuse the buffered map */
+    PaintWindow::Invalidate();
+    return true;
+  case DRAG_NON_GESTURE:
+
     if ((abs(drag_start.x - x) + abs(drag_start.y - y)) < Layout::Scale(threshold)
         && follow_mode != FOLLOW_PAN)
       break;
@@ -174,7 +182,12 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
                         Layout::Scale(30)) != 1)
         drag_mode = DRAG_SIMULATOR;
   if (drag_mode == DRAG_NONE ) {
-    drag_mode = DRAG_GESTURE;
+    if (gesture_zone.InZone(GetClientRect(), {x, y} )) {
+      gestures.Start(x, y, Layout::Scale(20));
+      drag_mode = DRAG_GESTURE;
+    } else {
+      drag_mode = DRAG_NON_GESTURE;
+    }
   }
 
   if (drag_mode != DRAG_NONE)
@@ -254,6 +267,13 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     break;
 
   case DRAG_GESTURE:
+  {
+    const TCHAR* gesture = gestures.Finish();
+    if (gesture && OnMouseGesture(gesture))
+      return true;
+    break;
+  }
+  case DRAG_NON_GESTURE:
   {
     /* allow a bigger threshold on touch screens */
     const int threshold = IsEmbedded() ? 50 : 10;
@@ -379,6 +399,11 @@ GlueMapWindow::OnPaint(Canvas &canvas)
 
 
   DrawGesture(canvas);
+  if (!IsPanning()) {
+    const TerrainRendererSettings &terrain = settings_map.terrain;
+    bool terrain_enabled = terrain.enable;
+    gesture_zone.DrawZone(canvas, GetClientRect(), terrain_enabled);
+  }
 }
 
 void
@@ -409,6 +434,7 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   DrawZoomButtonOverlays(canvas);
   if (!HasDraggableScreen())
     DrawTaskNavSliderShape(canvas);
+
 #endif
 
 #ifdef ENABLE_OPENGL

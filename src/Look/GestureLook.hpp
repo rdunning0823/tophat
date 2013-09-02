@@ -31,6 +31,7 @@ struct GestureLook
 {
   Color color, invalid_color;
   Pen pen, invalid_pen;
+  Pen zone_pen, zone_pen_thick;
 
   void Initialise();
 };

@@ -34,6 +34,7 @@ Copyright_License {
 #include "Screen/Timer.hpp"
 #include "Screen/Features.hpp"
 #include "Widgets/TaskNavSliderShape.hpp"
+#include "UIUtil/GestureZone.hpp"
 
 #include <array>
 
@@ -88,6 +89,17 @@ class GlueMapWindow : public MapWindow {
 #endif
 
     DRAG_PAN,
+
+    /**
+     * when a drag is initiated by does not start within the
+     * Gesture zone
+     */
+    DRAG_NON_GESTURE,
+
+    /**
+     * when a drag is initiated that starts within the
+     * Gesture zone
+     */
     DRAG_GESTURE,
     DRAG_SIMULATOR,
   } drag_mode;
@@ -95,6 +107,7 @@ class GlueMapWindow : public MapWindow {
   GeoPoint drag_start_geopoint;
   RasterPoint drag_start;
   TrackingGestureManager gestures;
+  GestureZone gesture_zone;
   bool ignore_single_click;
 
 #ifdef ENABLE_OPENGL

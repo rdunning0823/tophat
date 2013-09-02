@@ -480,6 +480,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/MapWindow/TargetMapWindowDrag.cpp \
 	$(SRC)/MapWindow/MapWidgetOverlays.cpp \
 	$(SRC)/UIUtil/GestureManager.cpp \
+	$(SRC)/UIUtil/GestureZone.cpp \
 	$(SRC)/UIUtil/TrackingGestureManager.cpp \
 	$(SRC)/DrawThread.cpp \
 	\

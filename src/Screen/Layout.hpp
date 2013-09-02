@@ -67,6 +67,11 @@ namespace Layout
   void Initialize(PixelSize screen_size);
 
   /**
+   * dots per inch X
+   */
+  unsigned GetXDPI();
+
+  /**
    * Is scaling supported by this platform?
    */
   gcc_const

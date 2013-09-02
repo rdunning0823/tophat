@@ -39,6 +39,12 @@ namespace Layout
   UPixelScalar hit_radius = 10;
 }
 
+unsigned
+Layout::GetXDPI()
+{
+  return Display::GetXDPI();
+}
+
 void
 Layout::Initialize(PixelSize new_size)
 {
@@ -50,7 +56,7 @@ Layout::Initialize(PixelSize new_size)
   if (!ScaleSupported())
     return;
 
-  const unsigned x_dpi = Display::GetXDPI();
+  const unsigned x_dpi = GetXDPI();
 
   unsigned minsize = std::min(width, height);
   // always start w/ shortest dimension

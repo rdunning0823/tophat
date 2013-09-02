@@ -30,7 +30,10 @@ GestureLook::Initialise()
   color = COLOR_RED;
   pen.Set(Layout::ScalePenWidth(5), color);
 
-  invalid_color = LightColor(color);
+  invalid_color = COLOR_BLUE;
   invalid_pen.Set(Layout::ScalePenWidth(5), invalid_color);
+
+  zone_pen.Set(zone_pen.DASH, Layout::ScalePenWidth(1), COLOR_DARK_GRAY);
+  zone_pen_thick.Set(zone_pen.DASH, Layout::ScalePenWidth(2), COLOR_GRAY);
 }
 
