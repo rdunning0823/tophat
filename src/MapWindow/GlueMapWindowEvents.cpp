@@ -208,7 +208,6 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 
 #ifdef HAVE_MULTI_TOUCH
   case DRAG_MULTI_TOUCH_PAN:
-    follow_mode = FOLLOW_SELF;
     ::PanTo(visible_projection.GetGeoScreenCenter());
     return true;
 #endif
@@ -259,7 +258,6 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     /* allow a bigger threshold on touch screens */
     const int threshold = IsEmbedded() ? 50 : 10;
     if ((abs(drag_start.x - x) + abs(drag_start.y - y)) > Layout::Scale(threshold)) {
-      follow_mode = FOLLOW_SELF;
       ::PanTo(visible_projection.GetGeoScreenCenter());
     } else
       LeavePan();
