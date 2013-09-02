@@ -101,14 +101,14 @@ PixelSize
 PolarShapeEditWidget::GetMinimumSize() const
 {
   return { Layout::Scale(200),
-      PixelScalar(Layout::GetMinimumControlHeight()) };
+      PixelScalar(Layout::GetMinimumControlHeight() * 2) };
 }
 
 PixelSize
 PolarShapeEditWidget::GetMaximumSize() const
 {
   return { Layout::Scale(400),
-      PixelScalar(Layout::GetMaximumControlHeight()) };
+      PixelScalar(Layout::GetMaximumControlHeight() * 2) };
 }
 
 void

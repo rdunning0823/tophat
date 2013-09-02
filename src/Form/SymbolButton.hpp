@@ -30,7 +30,7 @@ Copyright_License {
  * This class is used for creating buttons with symbols instead of text.
  * It is based on the WndButton class.
  */
-class WndSymbolButton final : public WndButton
+class WndSymbolButton : public WndButton
 {
 protected:
   /**
