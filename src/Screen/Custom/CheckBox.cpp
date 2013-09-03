@@ -192,7 +192,8 @@ CheckBox::OnPaint(Canvas &canvas)
   }
 
   canvas.SetTextColor(IsEnabled()
-                      ? (HasFocus() ? COLOR_WHITE : COLOR_BLACK)
+                      ? ((HasFocus() && HasCursorKeys())
+                          ? COLOR_WHITE : COLOR_BLACK)
                       : COLOR_GRAY);
   canvas.SetBackgroundTransparent();
   canvas.DrawText(canvas.GetHeight() + 2, 2, text.c_str());
