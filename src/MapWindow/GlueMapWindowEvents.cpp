@@ -176,12 +176,12 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
     break;
   }
 
-  if (CommonInterface::Basic().gps.simulator && drag_mode == DRAG_NONE)
-    if (compare_squared(visible_projection.GetScreenOrigin().x - x,
+  if (CommonInterface::Basic().gps.simulator && drag_mode == DRAG_NONE &&
+      compare_squared(visible_projection.GetScreenOrigin().x - x,
                         visible_projection.GetScreenOrigin().y - y,
                         Layout::Scale(30)) != 1)
         drag_mode = DRAG_SIMULATOR;
-  if (drag_mode == DRAG_NONE ) {
+  else if (drag_mode == DRAG_NONE ) {
     if (gesture_zone.InZone(GetClientRect(), {x, y} )) {
       gestures.Start(x, y, Layout::Scale(20));
       drag_mode = DRAG_GESTURE;
