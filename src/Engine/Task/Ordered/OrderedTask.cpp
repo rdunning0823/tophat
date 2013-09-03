@@ -59,6 +59,7 @@ OrderedTask::OrderedTask(const TaskBehaviour &tb)
 {
   active_factory = CreateTaskFactory(factory_mode, *this, task_behaviour);
   active_factory->UpdateOrderedTaskSettings(ordered_settings);
+  task_name.clear();
 }
 
 OrderedTask::~OrderedTask()
@@ -1177,6 +1178,7 @@ OrderedTask*
 OrderedTask::Clone(const TaskBehaviour &tb) const
 {
   OrderedTask* new_task = new OrderedTask(tb);
+  new_task->SetTaskName(GetTaskName());
 
   new_task->ordered_settings = ordered_settings;
 
@@ -1226,6 +1228,7 @@ OrderedTask::Commit(const OrderedTask& that)
 
   // change mode to that one 
   SetFactory(that.factory_mode);
+  SetTaskName(that.GetTaskName());
 
   // copy across behaviour
   SetOrderedTaskSettings(that.ordered_settings);

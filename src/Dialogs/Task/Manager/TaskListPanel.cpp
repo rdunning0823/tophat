@@ -250,6 +250,8 @@ TaskListPanel::RefreshView()
     two_widgets->UpdateLayout();
 }
 
+static void CleanName(TCHAR *p);
+
 void
 TaskListPanel::LoadTask()
 {
@@ -269,6 +271,14 @@ TaskListPanel::LoadTask()
   OrderedTask* temptask = orig->Clone(CommonInterface::GetComputerSettings().task);
   delete *active_task;
   *active_task = temptask;
+  if ((*active_task)->GetTaskNameIsBlank()) {
+    StaticString<100>name;
+    name = get_cursor_name();
+
+    CleanName(name.buffer());
+    (*active_task)->SetTaskName(name.c_str());
+  }
+
   RefreshView();
   *task_modified = true;
 
@@ -320,6 +330,31 @@ ClearSuffix(TCHAR *p, const TCHAR *suffix)
 
   *q = _T('\0');
   return true;
+}
+
+/**
+ * removes suffix
+ * If .cup, then removes file name returns task
+ * name within .cup file.
+ */
+static void
+CleanName(TCHAR *p)
+{
+  if (StringLength(p) < 4)
+    return;
+
+  const TCHAR * name = StringFind(p, _T(": "));
+  if (name != nullptr) {
+    if (StringLength(name) < 3) {
+      return;
+    }
+
+    CopyString(p, name + 2, StringLength(name));
+    return;
+  }
+  ClearSuffix(p, _T(".tsk"));
+  ClearSuffix(p, _T(".igc"));
+  ClearSuffix(p, _T(".cup"));
 }
 
 void

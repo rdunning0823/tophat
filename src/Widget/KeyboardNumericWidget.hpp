@@ -50,10 +50,16 @@ protected:
   unsigned num_buttons;
   CharacterButton buttons[MAX_BUTTONS];
 
+  /**
+   * show the minus sign
+   */
+  bool show_minus;
+
 public:
   KeyboardNumericWidget(const ButtonLook &_look,
-                        OnCharacterCallback_t _on_character)
-    :look(_look), on_character(_on_character), num_buttons(0) {}
+                        OnCharacterCallback_t _on_character, bool _show_minus)
+    :look(_look), on_character(_on_character), num_buttons(0),
+     show_minus(_show_minus) {}
 
   /**
    * Show only the buttons representing the specified character list.

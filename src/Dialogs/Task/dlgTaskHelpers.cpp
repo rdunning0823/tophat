@@ -42,6 +42,7 @@ Copyright_License {
 #include "OS/FileUtil.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/TimeFormatter.hpp"
+#include "Util/StringUtil.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -288,14 +289,17 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 }
 
 bool
-OrderedTaskSave(const OrderedTask &task)
+OrderedTaskSave(OrderedTask &task)
 {
   assert(protected_task_manager != NULL);
 
   TCHAR fname[69] = _T("");
+  CopyString(fname, task.GetTaskName(), StringLength(task.GetTaskName()) + 1);
+
   if (!TextEntryDialog(fname, 64, _("Enter a task name")))
     return false;
 
+  task.SetTaskName(fname);
   TCHAR path[MAX_PATH];
   LocalPath(path, _T("tasks"));
   Directory::Create(path);

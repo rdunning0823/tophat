@@ -78,6 +78,10 @@ public:
     mMin = v;
   }
 
+  fixed GetMin() {
+    return mMin;
+  }
+
   void SetMax(fixed v) {
     mMax = v;
   }

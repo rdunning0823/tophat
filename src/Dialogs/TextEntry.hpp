@@ -64,12 +64,14 @@ TouchTextEntry(TCHAR *text, size_t size,
  * @param value containing value before and after edit
  * @param caption caption of field for editing
  * @param help text or nullptr if no help text
+ * @param show minus sign
  * @param optional character filter
  */
 bool
 TouchNumericEntry(fixed &value,
                   const TCHAR *caption,
                   const TCHAR *help_text,
+                  bool show_minus,
                   AllowedCharacters accb=AllowedCharacters());
 
 #endif

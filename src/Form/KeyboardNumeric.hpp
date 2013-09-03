@@ -29,13 +29,21 @@ Copyright_License {
 #include <tchar.h>
 
 struct DialogLook;
-
+/**
+ * a data input screen that looks like a phone numeric keypad
+ */
 class KeyboardNumericControl : public KeyboardBaseControl {
+protected:
+  /**
+   * show the "-" sign
+   */
+  bool show_minus;
 
 public:
   KeyboardNumericControl(ContainerWindow &parent, const DialogLook &look,
                          PixelRect rc,
                          OnCharacterCallback_t on_character,
+                         bool show_minus,
                          const WindowStyle _style = WindowStyle());
 
   /**
@@ -53,7 +61,7 @@ private:
   void MoveButton(TCHAR ch, PixelScalar left, PixelScalar top);
 
   /**
-   *  moves the buttons 0-9 and "." to the current screen size
+   *  moves the buttons 0-9, "." and optionally "-" to the current screen size
    */
   void MoveButtons();
 };

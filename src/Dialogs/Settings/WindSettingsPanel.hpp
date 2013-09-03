@@ -28,6 +28,7 @@ Copyright_License {
 #include "Form/ActionListener.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "Blackboard/BlackboardListener.hpp"
+#include "Form/Form.hpp"
 
 class WndButton;
 
@@ -55,6 +56,11 @@ class WindSettingsPanel final
    */
   WndProperty *user_wind_source;
 
+  /**
+   * the parent form containing the widget
+   */
+  WndForm *form;
+
 public:
   enum Buttons {
     /**
@@ -75,6 +81,11 @@ public:
   virtual bool Save(bool &changed) override;
   virtual void Show(const PixelRect &rc) override;
   virtual void Hide() override;
+
+  void SetForm(WndForm *_form) {
+    assert(_form != nullptr);
+    form = _form;
+  }
 
   /* virtual methods from ActionListener */
   virtual void OnAction(int id) override;

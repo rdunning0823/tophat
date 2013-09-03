@@ -34,7 +34,7 @@ Copyright_License {
 #include <string.h>
 
 static constexpr TCHAR keyboard_letters[] =
-  _T("1234567890. ");
+  _T("1234567890.-");
 
 void
 KeyboardNumericWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
@@ -153,7 +153,10 @@ KeyboardNumericWidget::MoveButtons(const PixelRect &rc)
   MoveButtonsToRow(rc, _T("789"), 0);
   MoveButtonsToRow(rc, _T("456"), 1);
   MoveButtonsToRow(rc, _T("123"), 2);
-  MoveButtonsToRow(rc, _T(".0 "), 3);
+  if (show_minus)
+    MoveButtonsToRow(rc, _T(".0-"), 3);
+  else
+    MoveButtonsToRow(rc, _T(".0 "), 3);
 }
 
 void

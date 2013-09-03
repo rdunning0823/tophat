@@ -56,7 +56,7 @@ OrderedTaskPointLabelMapAction(TaskPointType type, const TCHAR *name,
 void OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* radius);
 
 bool
-OrderedTaskSave(const OrderedTask &task);
+OrderedTaskSave(OrderedTask &task);
 
 #endif
 

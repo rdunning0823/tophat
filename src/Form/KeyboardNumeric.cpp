@@ -36,16 +36,18 @@ Copyright_License {
 #include <string.h>
 
 static constexpr TCHAR keyboard_letters[] =
- _T("789456123.0 ");
+ _T("789456123.0-");
 
 KeyboardNumericControl::KeyboardNumericControl(ContainerWindow &parent,
                                                const DialogLook &_look,
                                                PixelRect rc,
                                                OnCharacterCallback_t
                                                _on_character,
+                                               bool _show_minus,
                                                const WindowStyle _style)
   :KeyboardBaseControl(parent, _look, rc, _on_character, _style,
-                       *UIGlobals::GetLook().info_box.value.font)
+                       *UIGlobals::GetLook().info_box.value.font),
+                       show_minus(_show_minus)
 {
   OnResize(PixelSize { rc.right - rc.left, rc.bottom - rc.top });
   TCHAR caption[] = _T(" ");
@@ -82,7 +84,10 @@ KeyboardNumericControl::MoveButtons()
   MoveButtonsToRow(_T("789"), 0);
   MoveButtonsToRow(_T("456"), 1);
   MoveButtonsToRow(_T("123"), 2);
-  MoveButtonsToRow(_T(".0 "), 3);
+  if (show_minus)
+    MoveButtonsToRow(_T(".0-"), 3);
+  else
+    MoveButtonsToRow(_T(".0 "), 3);
 }
 
 void

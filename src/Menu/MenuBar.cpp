@@ -37,6 +37,11 @@ Copyright_License {
  * 26 is the "Cancel" position, and is bottom left
  * for portrait, Bottom right for Landscape
  * 27 is "More/Less" and located next to the Cancel button
+ * 28 is on the Bottom right
+ *
+ * @param i. index of buttons 16-31
+ * @param rc.  rc of screen
+ * @return rc of button
  */
 gcc_pure
 static PixelRect
@@ -76,6 +81,11 @@ GetButtonPositionFixed(unsigned i, PixelRect rc)
       else
         rc.left += hwidth;
       rc.top = 5 * hheight;
+
+      // lower right
+    } else if (i == 13) {
+      rc.left = rc.right - hwidth;
+      rc.top = rc.bottom - hheight;
 
     } else {
       rc.top += ((i - 1) % 5) * hheight;

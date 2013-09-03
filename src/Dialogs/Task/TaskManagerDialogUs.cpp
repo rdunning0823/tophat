@@ -45,6 +45,7 @@ Copyright_License {
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
+#include "Task/TypeStrings.hpp"
 #include "Logger/ExternalLogger.hpp"
 #include "Device/Declaration.hpp"
 #include "Task/ValidationErrorStrings.hpp"
@@ -68,6 +69,16 @@ GetDialogStyle()
   style.Hide();
   style.ControlParent();
   return style;
+}
+
+void
+TaskManagerDialogUs::SetDialogCaption()
+{
+  const TaskFactoryType ftype = active_task->GetFactoryType();
+  if (active_task->GetTaskNameIsBlank())
+    SetCaption(OrderedTaskFactoryName(ftype));
+  else
+    SetCaption(active_task->GetTaskName());
 }
 
 TaskManagerDialogUs::TaskManagerDialogUs(const DialogLook &look,
@@ -171,6 +182,8 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   task_view.Create(GetClientAreaWindow(),rc_task_view, style);
   task_view.SetFullScreenRect(GetClientRect());
   task_view.SetPartialScreenRect(rc_task_view);
+
+  SetDialogCaption();
 }
 
 void
@@ -353,8 +366,14 @@ TaskManagerDialogUs::SaveTask()
     active_task->ScanStartFinish();
 
   if (active_task->CheckTask()) {
+    StaticString<100>name(active_task->GetTaskName());
+
     if (!OrderedTaskSave(*active_task))
       return;
+
+    SetDialogCaption();
+    if (name != active_task->GetTaskName())
+      task_modified = true;
 
   } else {
     ShowMessageBox(getTaskValidationErrors(

@@ -58,7 +58,8 @@ EditDataFieldDialog(const TCHAR *caption, DataField &df,
   } else if (df.GetType() == DataField::Type::REAL) {
     DataFieldFloat &dff = (DataFieldFloat &)df;
     fixed value = dff.GetAsFixed();
-    if (!TouchNumericEntry(value, caption, help_text), false)
+    if (!TouchNumericEntry(value, caption, help_text, dff.GetMin() < fixed(0)),
+        false)
       return true;
     dff.SetAsFloat(value);
     return true;
