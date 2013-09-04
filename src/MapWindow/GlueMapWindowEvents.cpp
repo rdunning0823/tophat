@@ -123,7 +123,6 @@ IsCtrlKeyPressed()
 bool
 GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
-
 #ifndef ENABLE_OPENGL
   if (ButtonOverlaysOnMouseDown(x, y))
     return true;
@@ -460,6 +459,10 @@ GlueMapWindow::OnTimer(WindowTimer &timer)
     map_item_timer.Cancel();
     if (!InputEvents::IsDefault() && !IsPanning()) {
       InputEvents::HideMenu();
+      return true;
+    }
+    if (gesture_zone.IsHelpVisible()) {
+      gesture_zone.ClearZoneHelp();
       return true;
     }
     ShowMapItems(drag_start_geopoint, false);
