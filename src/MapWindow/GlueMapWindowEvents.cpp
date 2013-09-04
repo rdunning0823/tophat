@@ -403,6 +403,11 @@ GlueMapWindow::OnPaint(Canvas &canvas)
 
   DrawGesture(canvas);
   if (!IsPanning()) {
+    UISettings &ui_settings = CommonInterface::SetUISettings();
+    if (ui_settings.restart_gesture_help) {
+      gesture_zone.RestartZoneHelp();
+      ui_settings.restart_gesture_help = false;
+    }
     const TerrainRendererSettings &terrain = settings_map.terrain;
     bool terrain_enabled = terrain.enable;
     gesture_zone.DrawZone(canvas, GetClientRect(), terrain_enabled);

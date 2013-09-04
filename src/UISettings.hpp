@@ -55,6 +55,11 @@ struct UISettings {
   /** last startup tip display. 1 is first tip, 0 means never shown */
   unsigned last_startup_tip;
 
+  /**
+   * if true, gesture zone help timer will be reset to draw next time
+   */
+  bool restart_gesture_help;
+
   /** Show ThermalAssistant if circling */
   bool enable_thermal_assistant_gauge;
 

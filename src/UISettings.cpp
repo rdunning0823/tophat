@@ -36,6 +36,8 @@ UISettings::SetDefaults()
 
   enable_thermal_assistant_gauge = false;
 
+  restart_gesture_help = true;
+
   popup_message_position = PopupMessagePosition::CENTER;
 
   haptic_feedback = HapticFeedback::DEFAULT;
