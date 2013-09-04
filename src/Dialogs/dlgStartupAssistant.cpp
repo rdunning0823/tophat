@@ -313,6 +313,8 @@ StartupAssistant::Save(bool &changed)
   Profile::Set(ProfileKeys::StartupTipDeclineVersion,
                declined ? TopHat_ProductToken : _T(""));
 
+  ui_settings.restart_gesture_help =  true;
+
   Profile::Save();
   return true;
 }
