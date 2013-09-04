@@ -32,8 +32,11 @@
 
 #include "Screen/Canvas.hpp"
 #include "Screen/Point.hpp"
+#include "Time/PeriodClock.hpp"
 
 #include <tchar.h>
+
+struct GestureLook;
 
 /**
  * A class the defines a valid area of the screen where gestures can be started
@@ -44,9 +47,28 @@ class GestureZone
 public:
   PixelScalar x_zone_width;
 
+  /** timer used to show help at startup */
+  PeriodClock clock_since_start;
+
+  /** is this not the first time we're displaying the zone */
+  bool draw_initialized;
+
+  /** how many ms after startup do we display the gesture help? */
+  unsigned help_duration;
+
+  const GestureLook &gesture_look;
+
   GestureZone();
+
   /**
-   * draws outline of the gesture zone
+   * check if initialized, and initialized if not
+   */
+  void CheckInitialize();
+
+  /**
+   * draws outline of the gesture zone and calls CheckInitialize()
+   * @param rc rc of map minus any overlay areas on top or bottom
+   * @param terrain_enabled is the terrain being displayed
    */
   virtual void DrawZone(Canvas &canvas, PixelRect rc, bool terrain_enabled);
 
@@ -54,5 +76,26 @@ public:
    * return true if p is in the gesture zone
    */
   virtual bool InZone(PixelRect rc_map, RasterPoint p);
+
+  /**
+   * restarts gesture help animation so it's drawn when zone is drawn
+   */
+  virtual void RestartZoneHelp();
+
+  /**
+   * Stops showing gesture help when the zone is drawn
+   */
+  virtual void ClearZoneHelp();
+protected:
+  /**
+   * draws zone help and calls CheckInitialize()
+   */
+  virtual void DrawZoneHelp(Canvas &canvas, PixelRect rc);
+
+  /**
+   * returns the rect that outlines where the zone borders are drawn
+   */
+  PixelRect GetZoneRect(PixelRect rc_map);
+
 };
 #endif
