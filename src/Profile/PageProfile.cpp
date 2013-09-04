@@ -73,9 +73,11 @@ Load(PageLayout &_pl, const unsigned page)
   if (!Profile::GetEnum(profileKey, pl.bottom) ||
       unsigned(pl.bottom) >= unsigned(PageLayout::Bottom::MAX))
     pl.bottom = PageLayout::Bottom::NOTHING;
+  strcpy(profileKey + prefixLen, "Main");
+  if (!Profile::GetEnum(profileKey, pl.main) ||
+      unsigned(pl.main) >= unsigned(PageLayout::Main::MAX))
+    pl.main = PageLayout::Main::MAP;
 
-  // only support MAP
-  pl.main = PageLayout::Main::MAP;
 
   _pl = pl;
 }
