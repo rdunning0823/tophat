@@ -36,6 +36,7 @@ Copyright_License {
 #include "Look/Look.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
+#include "Interface.hpp"
 
 void
 MainMenuButton::OnPaint(Canvas &canvas)
@@ -153,6 +154,8 @@ MainMenuButtonWidget::GetHeight() const
 void
 MainMenuButtonWidget::OnAction(int id)
 {
+  UISettings &ui_settings = CommonInterface::SetUISettings();
+  ui_settings.clear_gesture_help = true;
   TophatMenu::RotateMenu();
 }
 

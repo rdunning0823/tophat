@@ -37,6 +37,7 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
 #include "Screen/Canvas.hpp"
+#include "Interface.hpp"
 
 void
 ZoomOutButtonWidget::Prepare(ContainerWindow &parent,
@@ -108,6 +109,8 @@ ZoomOutButtonWidget::GetHeight() const
 void
 ZoomOutButtonWidget::OnAction(int id)
 {
+  UISettings &ui_settings = CommonInterface::SetUISettings();
+  ui_settings.clear_gesture_help = true;
   InputEvents::eventZoom(_T("-"));
   InputEvents::HideMenu();
 }

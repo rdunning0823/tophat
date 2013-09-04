@@ -38,6 +38,7 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
 #include "Screen/Canvas.hpp"
+#include "Interface.hpp"
 
 void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
@@ -109,6 +110,8 @@ ZoomInButtonWidget::GetHeight() const
 void
 ZoomInButtonWidget::OnAction(int id)
 {
+  UISettings &ui_settings = CommonInterface::SetUISettings();
+  ui_settings.clear_gesture_help = true;
   InputEvents::eventZoom(_T("+"));
   InputEvents::HideMenu();
 }
