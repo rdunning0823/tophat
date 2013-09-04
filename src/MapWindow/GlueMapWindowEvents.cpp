@@ -407,6 +407,9 @@ GlueMapWindow::OnPaint(Canvas &canvas)
     if (ui_settings.restart_gesture_help) {
       gesture_zone.RestartZoneHelp();
       ui_settings.restart_gesture_help = false;
+    } else if (ui_settings.clear_gesture_help) {
+      gesture_zone.ClearZoneHelp();
+      ui_settings.clear_gesture_help = false;
     }
     const TerrainRendererSettings &terrain = settings_map.terrain;
     bool terrain_enabled = terrain.enable;

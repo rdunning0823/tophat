@@ -37,6 +37,7 @@ UISettings::SetDefaults()
   enable_thermal_assistant_gauge = false;
 
   restart_gesture_help = true;
+  clear_gesture_help = false;
 
   popup_message_position = PopupMessagePosition::CENTER;
 

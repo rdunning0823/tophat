@@ -60,6 +60,11 @@ struct UISettings {
    */
   bool restart_gesture_help;
 
+  /**
+   * if true, gesture zone help timer will be cleared to not draw next time
+   */
+  bool clear_gesture_help;
+
   /** Show ThermalAssistant if circling */
   bool enable_thermal_assistant_gauge;
 
