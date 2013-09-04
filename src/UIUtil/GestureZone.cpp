@@ -172,13 +172,20 @@ GestureZone::DrawZoneHelp(Canvas &canvas, PixelRect rc)
   }
 }
 
+bool
+GestureZone::IsHelpVisible()
+{
+  CheckInitialize();
+  return !clock_since_start.Check(help_duration);
+}
+
 void
 GestureZone::DrawZone(Canvas &canvas, PixelRect rc_map, bool terrain_enabled)
 {
   CheckInitialize();
   PixelRect rc = GetZoneRect(rc_map);
 
-  bool show_help = !clock_since_start.Check(help_duration);
+  bool show_help = IsHelpVisible();
 
   canvas.Select(false ? gesture_look.pen :
       gesture_look.zone_pen);

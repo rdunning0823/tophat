@@ -86,6 +86,12 @@ public:
    * Stops showing gesture help when the zone is drawn
    */
   virtual void ClearZoneHelp();
+
+  /**
+   * is the help animation currently being displayed
+   */
+  bool IsHelpVisible();
+
 protected:
   /**
    * draws zone help and calls CheckInitialize()
