@@ -49,11 +49,15 @@ struct TextInBoxMode {
   Alignment align;
   VerticalPosition vertical_position;
   bool move_in_view;
+  /**
+   * force opaque background
+   */
+  bool opaque;
 
   constexpr TextInBoxMode()
     :shape(LabelShape::SIMPLE), align(Alignment::LEFT),
      vertical_position(VerticalPosition::BELOW),
-     move_in_view(false) {}
+     move_in_view(false), opaque(false) {}
 };
 
 bool

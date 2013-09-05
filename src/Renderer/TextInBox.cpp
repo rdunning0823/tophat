@@ -134,8 +134,11 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
 
     {
 #ifdef ENABLE_OPENGL
-      const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      canvas.Select(Brush(COLOR_WHITE.WithAlpha(0xa0)));
+        const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        if (!mode.opaque)
+          canvas.Select(Brush(COLOR_WHITE.WithAlpha(0xa0)));
+        else
+          canvas.SelectWhiteBrush();
 #else
       canvas.SelectWhiteBrush();
 #endif
