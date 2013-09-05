@@ -58,6 +58,9 @@ GlueMapWindow::OnDestroy()
 bool
 GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 {
+  if (drag_mode == DRAG_NONE && HasTouchScreen())
+    OnMouseDown(x, y);
+
   /* allow a bigger threshold on touch screens */
   const unsigned threshold = Layout::Scale(IsEmbedded() ? 20 : 10);
   if (drag_mode != DRAG_NONE && arm_mapitem_list &&

@@ -546,7 +546,7 @@ InfoBoxWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
   if (dragging) {
     SetPressed(IsInside(x, y));
     if (!pressed)
-      dialog_timer.Cancel();
+      OnCancelMode();
     return true;
   }
 
