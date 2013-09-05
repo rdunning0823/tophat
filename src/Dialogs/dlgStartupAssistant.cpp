@@ -130,11 +130,6 @@ public:
   virtual void Move(const PixelRect &rc);
 
   /**
-   * returns on full screen less height of the NavSliderWidget
-   */
-  virtual PixelRect GetSize(const PixelRect &rc);
-
-  /**
    * returns height of TaskNavSlider bar
    */
   UPixelScalar GetNavSliderHeight();
@@ -174,25 +169,6 @@ StartupAssistant::GetNavSliderHeight()
   UPixelScalar small_font_height = UIGlobals::GetDialogLook().list.font->GetHeight();
 
   return large_font_height + 2 * small_font_height - Layout::Scale(9);
-}
-
-PixelRect
-StartupAssistant::GetSize(const PixelRect &rc)
-{
-  UPixelScalar nav_slider_height = GetNavSliderHeight();
-
-  PixelRect rc_form = rc;
-  rc_form.left += Layout::landscape ? nav_slider_height / 2 :
-      Layout::Scale(3);
-  rc_form.right -= Layout::landscape ? nav_slider_height / 2 :
-      Layout::Scale(3);
-  rc_form.top = nav_slider_height + Layout::Scale(3);
-
-  UPixelScalar height = std::min(rc.bottom - rc_form.top,
-                            (PixelScalar)nav_slider_height * 6);
-  rc_form.bottom = rc_form.top + height;
-
-  return rc_form;
 }
 
 void
@@ -249,7 +225,7 @@ StartupAssistant::SetRectangles(const PixelRect &rc_outer)
   PixelRect rc;
   rc.left = rc.top = Layout::Scale(2);
   rc.right = rc_outer.right - rc_outer.left - Layout::Scale(2);
-  rc.bottom = rc_outer.bottom - rc_outer.top - Layout::Scale(2);
+  rc.bottom = rc_outer.bottom - rc_outer.top - Layout::Scale(2) - WndForm::GetTitleHeight();
 
   UPixelScalar button_height = std::min(GetNavSliderHeight(),
                                         UPixelScalar(rc.bottom / 5));
@@ -271,7 +247,8 @@ StartupAssistant::SetRectangles(const PixelRect &rc_outer)
       Layout::landscape ? 3 : 2;*/
 
   rc_tip_text.bottom = rc_chkb_decline.top - 1 - Layout::Scale(2);
-  rc_tip_text.top = rc.top + Layout::Scale(2);
+  rc_tip_text.top = Layout::landscape ? rc.top + Layout::Scale(2) :
+      (rc_chkb_decline.top - rc.top) / 2;
   rc_tip_text.left += Layout::Scale(2);
   rc_tip_text.right -= Layout::Scale(2);
 }
@@ -288,10 +265,11 @@ StartupAssistant::Unprepare()
 void
 StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  const PixelRect rc_form = GetSize(rc);
+  const PixelRect rc_form = rc;
   NullWidget::Prepare(parent, rc_form);
   WndForm::Move(rc_form);
 
+  SetCaption(_("Top Hat Tips"));
   SetRectangles(rc_form);
 
   WindowStyle style_frame;
@@ -323,7 +301,6 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                      _("Don't show tips at startup"),
                                      rc_chkb_decline, checkbox_style,
                                      this, DeclineCheckboxClick);
-
   SetTip(true);
 }
 
@@ -356,8 +333,8 @@ dlgStartupAssistantShowModal(bool conditional)
 
   ContainerWindow &w = UIGlobals::GetMainWindow();
   StartupAssistant *instance = new StartupAssistant();
-  instance->Initialise(w, instance->GetSize(w.GetClientRect()));
-  instance->Prepare(w, instance->GetSize(w.GetClientRect()));
+  instance->Initialise(w, w.GetClientRect());
+  instance->Prepare(w, w.GetClientRect());
   instance->ShowModal();
   instance->Hide();
   instance->Unprepare();
