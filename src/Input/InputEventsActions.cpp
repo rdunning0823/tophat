@@ -175,7 +175,6 @@ InputEvents::eventScreenModes(const TCHAR *misc)
     pl->MakeTitle(info_box_settings, buffer.buffer(), true);
 
     PageActions::Next();
-    Message::AddMessage(_("Screen switch:"), buffer.c_str());
   }
 
 
