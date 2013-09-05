@@ -259,15 +259,16 @@ GlueMapWindow::DrawCrossHairs(Canvas &canvas) const
   if (!render_projection.IsValid())
     return;
 
-  Pen dash_pen(Pen::DASH, 1, COLOR_DARK_GRAY);
-  canvas.Select(dash_pen);
+  Pen pen(Layout::Scale(2), COLOR_BLACK);
+  canvas.Select(pen);
 
   const RasterPoint center = render_projection.GetScreenOrigin();
+  const PixelScalar length = Layout::Scale(20);
 
-  canvas.DrawLine(center.x + 20, center.y,
-              center.x - 20, center.y);
-  canvas.DrawLine(center.x, center.y + 20,
-              center.x, center.y - 20);
+  canvas.DrawLine(center.x + length, center.y,
+              center.x - length, center.y);
+  canvas.DrawLine(center.x, center.y + length,
+              center.x, center.y - length);
 }
 
 void
