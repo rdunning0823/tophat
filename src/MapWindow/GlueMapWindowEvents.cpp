@@ -181,9 +181,9 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
   if (CommonInterface::Basic().gps.simulator && drag_mode == DRAG_NONE &&
       compare_squared(visible_projection.GetScreenOrigin().x - x,
                         visible_projection.GetScreenOrigin().y - y,
-                        Layout::Scale(30)) != 1)
+                        Layout::Scale(30)) != 1) {
         drag_mode = DRAG_SIMULATOR;
-  else if (drag_mode == DRAG_NONE ) {
+  } else if (drag_mode == DRAG_NONE ) {
     if (gesture_zone.InZone(GetClientRect(), {x, y} )) {
       gestures.Start(x, y, Layout::Scale(20));
       drag_mode = DRAG_GESTURE;
@@ -262,7 +262,7 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
       device_blackboard->SetTrack(new_bearing);
       // change bearing without changing speed if direction change > 30
       // 20080815 JMW prevent dragging to stop glider
-
+      gesture_zone.ClearZoneHelp();
       return true;
     }
 
@@ -271,8 +271,11 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
   case DRAG_GESTURE:
   {
     const TCHAR* gesture = gestures.Finish();
-    if (gesture && OnMouseGesture(gesture))
+    if (gesture && OnMouseGesture(gesture)) {
+      if (gesture_zone.IsHelpVisible())
+        gesture_zone.ClearZoneHelp();
       return true;
+    }
     break;
   }
   case DRAG_NON_GESTURE:
@@ -281,6 +284,7 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     const int threshold = IsEmbedded() ? 50 : 10;
     if ((abs(drag_start.x - x) + abs(drag_start.y - y)) > Layout::Scale(threshold)) {
       ::PanTo(visible_projection.GetGeoScreenCenter());
+      gesture_zone.ClearZoneHelp();
     } else
       LeavePan();
 
