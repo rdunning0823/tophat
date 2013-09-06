@@ -132,7 +132,6 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   InitialiseDataPath();
 
   LogFormat(_T("Starting %s %s"), TopHat_ProductToken, XCSoar_ProductToken);
-
   OpenGL::Initialise();
   TextUtil::Initialise(env);
 
@@ -150,15 +149,6 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   vibrator = Vibrator::Create(env, *context);
 
   ioio_helper = new IOIOHelper(env);
-
-#ifdef __arm__
-  if (IsNookSimpleTouch()) {
-    is_dithered = Nook::EnterFastMode();
-
-    /* enable USB host mode if this is a Nook */
-    Nook::InitUsb();
-  }
-#endif
 
   ScreenInitialized();
   AllowLanguage();
