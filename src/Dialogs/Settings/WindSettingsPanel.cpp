@@ -39,7 +39,7 @@ WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind,
                                      bool _edit_trail_drift)
   :RowFormWidget(UIGlobals::GetDialogLook()),
    edit_manual_wind(_edit_manual_wind),
-   clear_manual_button(_clear_manual_button),
+   clear_manual_button(false),
    edit_trail_drift(_edit_trail_drift),
    form(nullptr) {}
 
