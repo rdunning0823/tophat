@@ -43,7 +43,7 @@ class FlyingComputer {
   /**
    * Tracks the duration the aircraft has been stationary.
    */
-  StateClock<60, 5> stationary_clock;
+  StateClock<121, 5> stationary_clock;
 
   /**
    * Tracks the duration the aircraft has been moving.
