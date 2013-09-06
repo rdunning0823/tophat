@@ -62,9 +62,6 @@ Nook::InitUsb()
   system(cmd_host);
   Sleep(500);
 
-  system(cmd_host);
-  Sleep(500);
-
   system(cmd_usb_rw);
 }
 
