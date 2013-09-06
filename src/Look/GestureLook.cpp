@@ -24,6 +24,8 @@ Copyright_License {
 #include "GestureLook.hpp"
 #include "Screen/Layout.hpp"
 
+#include "resource.h"
+
 void
 GestureLook::Initialise()
 {
@@ -35,5 +37,6 @@ GestureLook::Initialise()
 
   zone_pen.Set(zone_pen.DASH, Layout::ScalePenWidth(1), COLOR_DARK_GRAY);
   zone_pen_thick.Set(zone_pen.DASH, Layout::ScalePenWidth(2), COLOR_GRAY);
+  hBmpHandPointer.Load(Layout::scale > 1 ? IDB_HAND_POINTER_HD : IDB_HAND_POINTER);
 }
 

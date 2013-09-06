@@ -126,6 +126,8 @@ BITMAP_ICON(IDB_BEARING_RIGHT_THREE, "bearing_right_three")
 BITMAP_ICON(IDB_BEARING_RIGHT_THREE_HD, "bearing_right_three_160")
 BITMAP_ICON(IDB_BEARING_RIGHT_FOUR, "bearing_right_four")
 BITMAP_ICON(IDB_BEARING_RIGHT_FOUR_HD, "bearing_right_four_160")
+BITMAP_ICON(IDB_HAND_POINTER, "hand_pointer")
+BITMAP_ICON(IDB_HAND_POINTER_HD, "hand_pointer_160")
 
 
 #ifdef EYE_CANDY

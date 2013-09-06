@@ -26,12 +26,14 @@ Copyright_License {
 
 #include "Screen/Color.hpp"
 #include "Screen/Pen.hpp"
+#include "Screen/Bitmap.hpp"
 
 struct GestureLook
 {
   Color color, invalid_color;
   Pen pen, invalid_pen;
   Pen zone_pen, zone_pen_thick;
+  Bitmap hBmpHandPointer;
 
   void Initialise();
 };
