@@ -120,8 +120,6 @@ public:
              _T(""), GetDialogStyle())
   {}
 
-  void OnTimer();
-
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
   virtual bool Save(bool &changed);
@@ -212,11 +210,6 @@ StartupAssistant::OnAction(int id)
     Save(changed);
     SetModalResult(mrOK);
   }
-}
-
-void
-StartupAssistant::OnTimer()
-{
 }
 
 void
