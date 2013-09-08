@@ -54,8 +54,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Units/Units.hpp"
 #include "Waypoint/Waypoint.hpp"
-#include "Event/Timer.hpp"
-
+#include "Screen/Timer.hpp"
 
 #include <math.h>
 #include <assert.h>
@@ -136,8 +135,14 @@ GetDialogStyle()
 }
 
 
-class MatClickPanel : public NullWidget, public WndForm, private Timer
+class MatClickPanel : public NullWidget, public WndForm
 {
+protected:
+  /**
+   * This timer updates the alternates list
+   */
+  WindowTimer dialog_timer;
+
 public:
   enum ReturnState {
     /**
@@ -168,12 +173,6 @@ private:
   };
 
   const Waypoint &wp_clicked;
-
-  /**
-   * is the next waypoint in the task
-   * (after which we normally insert) the finish?
-   */
-  bool next_is_finish;
 
   /**
    * name of current wp in current task
@@ -210,6 +209,7 @@ public:
            UIGlobals::GetMainWindow().GetClientRect(),
            _modified_task.GetCaption(),
            GetDialogStyle()),
+   dialog_timer(*this),
    wp_clicked(_wp_clicked),
    current_wp_name(_modified_task.IsValid() ?
        _modified_task.index_wp_name : wp_clicked.name.c_str()),
@@ -221,7 +221,7 @@ public:
 
   void RefreshFormForAdd();
 
-  virtual void OnTimer();
+  virtual bool OnTimer(WindowTimer &timer);
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
@@ -390,8 +390,8 @@ MatClickPanel::RefreshFormForAdd()
 {
   assert (modified_task.mat_mode != MAT_DELETE);
 
-  if (!Timer::IsActive())
-    Timer::Schedule(1000);
+  if (!dialog_timer.IsActive())
+    dialog_timer.Schedule(1000);
 
   StaticString<20> time_remaining;
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
@@ -429,11 +429,14 @@ MatClickPanel::RefreshFormForAdd()
   add_button->SetCaption(prompt.c_str());
 }
 
-void
-MatClickPanel::OnTimer()
+bool
+MatClickPanel::OnTimer(WindowTimer &timer)
 {
-  if (modified_task.mat_mode != MAT_DELETE)
+  if (timer == dialog_timer && modified_task.mat_mode != MAT_DELETE) {
     RefreshFormForAdd();
+    return true;
+  }
+  return WndForm::OnTimer(timer);
 }
 
 void
@@ -514,12 +517,14 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   if (modified_task.mat_mode != MAT_DELETE)
     RefreshFormForAdd();
+
+  dialog_timer.Schedule(1000);
 }
 
 void
 MatClickPanel::Unprepare()
 {
-  Timer::Cancel();
+  dialog_timer.Cancel();
 }
 
 /**
