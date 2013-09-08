@@ -30,12 +30,13 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
 #include <assert.h>
+#include <stdint.h>
 
 struct DialogLook;
 struct InfoBoxLook;
 class Font;
 class Canvas;
-enum TaskType;
+enum class TaskType : uint8_t;
 
 class SliderShape {
 private:
