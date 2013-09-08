@@ -342,7 +342,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WndForm::Move(rc_form);
 
   SetRectangles(rc_form);
-  StaticString<20> label_text;
 
   WindowStyle style_frame;
 
