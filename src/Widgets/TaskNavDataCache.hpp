@@ -136,7 +136,6 @@ public:
 private:
   const ComputerSettings &settings;
   const NMEAInfo &basic;
-  const TaskStats &task_stats;
 
 protected:
   tp_info tps[MAX_TURNPOINTS];
