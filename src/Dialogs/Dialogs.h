@@ -28,7 +28,7 @@ Copyright_License {
 
 
 class SingleWindow;
-class Waypoint;
+struct Waypoint;
 class Widget;
 
 void dlgBasicSettingsShowModal();
