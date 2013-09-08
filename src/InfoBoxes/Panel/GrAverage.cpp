@@ -50,7 +50,7 @@ public:
   WndForm *form;
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual bool Save(bool &changed, bool &require_restart);
+  virtual bool Save(bool &changed);
 
   void SetForm(WndForm *_form) {
     assert(_form != nullptr);
@@ -106,17 +106,16 @@ GrAverageConfigPanel::OnModified(DataField &df)
 }
 
 bool
-GrAverageConfigPanel::Save(bool &_changed, bool &_require_restart)
+GrAverageConfigPanel::Save(bool &_changed)
 {
-  bool changed = false, require_restart = false;
+  bool changed = false;
 
   ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
 
-  changed |= require_restart |=
+  changed |=
       SaveValueEnum(AverEffTime, ProfileKeys::AverEffTime, settings_computer.average_eff_time);
 
   _changed |= changed;
-  _require_restart |= require_restart;
 
   return true;
 }
@@ -135,8 +134,8 @@ GrAveragePanel::Hide()
   GrAverageConfigPanel *gr_average_config_panel =
       (GrAverageConfigPanel *)managed_widget.Get();
   assert(gr_average_config_panel);
-  bool changed, restart_required;
-  gr_average_config_panel->Save(changed, restart_required);
+  bool changed;
+  gr_average_config_panel->Save(changed);
 
   BaseAccessPanel::Hide();
 }
