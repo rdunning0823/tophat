@@ -73,8 +73,6 @@ private:
   /** Precalculated final position of the kinetic movement */
   int end;
 
-  int start;
-
   /** Speed at the end of the manual movement */
   fixed v;
 
