@@ -120,6 +120,9 @@ private:
 
   BatteryTimer battery_timer;
 
+  /**
+   * need to rename this.  Really map/main widget rect/map + bottom widget recr
+   */
   PixelRect map_rect;
   bool FullScreen;
 
