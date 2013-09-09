@@ -34,7 +34,7 @@ Copyright_License {
 
 class Canvas;
 class Pen;
-struct Color;
+class Color;
 
 bool
 Segment(Canvas &canvas, int x, int y, unsigned radius,
