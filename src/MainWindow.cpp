@@ -424,7 +424,6 @@ MainWindow::ReinitialiseLayout()
                                    map != NULL);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
-  widget_overlays.Move(rc_current);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
 #ifdef ENABLE_OPENGL
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
