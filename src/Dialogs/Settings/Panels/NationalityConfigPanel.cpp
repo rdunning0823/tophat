@@ -92,8 +92,8 @@ public:
 #endif
 
 static constexpr StaticEnumChoice  task_rules_types[] = {
-  { (unsigned)ContestNationalities::FAI, N_("FAI rules"), N_("Use FAI rules for flying tasks.") },
-  { (unsigned)ContestNationalities::AMERICAN, N_("US rules"), N_("Use US rules for flying tasks.") },
+  { (unsigned)ContestNationalities::FAI, N_("FAI rules"), N_("Use FAI contest rules for flying contests.") },
+  { (unsigned)ContestNationalities::AMERICAN, N_("US rules"), N_("Use US contest rules for flying contests.") },
   { 0 }
 };
 
@@ -153,11 +153,9 @@ NationalityConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
 
   AddEnum(_("Task rules"),
-          _("Fly tasks with US rules or with FAI rules"),
+          _("Fly contest with US contest rules or with FAI contest rules"),
           task_rules_types,
           (unsigned)task_behaviour.contest_nationality);
-
-
 
   wp = AddEnum(_("Units"), _("Your nationality's units."), this);
   DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
