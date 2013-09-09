@@ -29,7 +29,6 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Profile/Profile.hpp"
-#include "Units/UnitsStore.hpp"
 
 enum ControlIndex {
   StartMaxSpeedMargin,
@@ -46,6 +45,12 @@ public:
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
+};
+
+static constexpr StaticEnumChoice  task_rules_types[] = {
+  { (unsigned)ContestNationalities::FAI, N_("FAI rules"), N_("Use FAI rules for flying tasks.") },
+  { (unsigned)ContestNationalities::AMERICAN, N_("US rules"), N_("Use US rules for flying tasks.") },
+  { 0 }
 };
 
 void
@@ -74,18 +79,11 @@ TaskRulesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           0, 30 * 60, 60, (unsigned)task_behaviour.optimise_targets_margin);
   SetExpertRow(AATTimeMargin);
 
-  WndProperty *wp = AddEnum(_("Nationality"), N_("If a specific nation is selected, then building a task is simplified to show only appropriate options.  Sets the appropriate system units also."));
-  DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
-  df.EnableItemHelp(true);
-
-  unsigned len = Units::Store::Count();
-  df.addEnumText(_("Unknown"), (unsigned)0, _("Unknown nationality"));
-  for (unsigned i = 0; i < len; i++)
-    df.addEnumText(Units::Store::GetName(i), i+1);
-
-  LoadValueEnum(ContestNationality, (unsigned)task_behaviour.contest_nationality);
+  AddEnum(_("Task rules"),
+          _("Fly tasks with US rules or with FAI rules"),
+          task_rules_types,
+          (unsigned)task_behaviour.contest_nationality);
 }
-
 
 bool
 TaskRulesConfigPanel::Save(bool &_changed)
@@ -101,45 +99,8 @@ TaskRulesConfigPanel::Save(bool &_changed)
   changed |= SaveValue(StartMaxHeightMargin, UnitGroup::ALTITUDE, ProfileKeys::StartMaxHeightMargin,
                        task_behaviour.start_margins.max_height_margin);
 
-  bool nat_changed = SaveValueEnum(ContestNationality, ProfileKeys::ContestNationality,
-                                   task_behaviour.contest_nationality);
-  if (nat_changed) {
-    // use british (0th index) if unknown
-    unsigned the_unit = (task_behaviour.contest_nationality > 0)
-        ? task_behaviour.contest_nationality - 1 : 0;
-    UnitSetting units = Units::Store::Read(the_unit);
-    UnitSetting &config = CommonInterface::SetUISettings().units;
-    config = units;
-
-    /* the Units settings affect how other form values are read and translated
-     * so changes to Units settings should be processed after all other form settings
-     */
-    Profile::Set(ProfileKeys::ContestNationality,
-                 (int)task_behaviour.contest_nationality);
-
-    config.wind_speed_unit = config.speed_unit; // Mapping the wind speed to the speed unit
-    Profile::Set(ProfileKeys::SpeedUnitsValue,
-                 (int)config.speed_unit);
-
-    Profile::Set(ProfileKeys::DistanceUnitsValue,
-                 (int)config.distance_unit);
-
-    Profile::Set(ProfileKeys::LiftUnitsValue,
-                 (int)config.vertical_speed_unit);
-
-    Profile::Set(ProfileKeys::AltitudeUnitsValue,
-                 (int)config.altitude_unit);
-
-    Profile::Set(ProfileKeys::ContestNationality,
-                 (int)task_behaviour.contest_nationality);
-
-    Profile::Set(ProfileKeys::TaskSpeedUnitsValue,
-                 (int)config.temperature_unit);
-
-    Profile::Set(ProfileKeys::PressureUnitsValue,
-                 (int)config.pressure_unit);
-  }
-  changed |= nat_changed;
+  changed |= SaveValueEnum(ContestNationality, ProfileKeys::ContestNationality,
+                           task_behaviour.contest_nationality);
 
   _changed |= changed;
 
