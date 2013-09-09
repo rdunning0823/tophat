@@ -87,10 +87,9 @@ dlgStatusShowModal(int start_page)
   ButtonWindowStyle button_style;
   button_style.TabStop();
 
-  if (!Layout::landscape)
-    WndButton close_button(form.GetClientAreaWindow(), look.button,
-                           _("Close"), close_rc, button_style,
-                           form, mrOK);
+  WndButton close_button(form.GetClientAreaWindow(), look.button,
+                         _("Close"), close_rc, button_style,
+                         form, mrOK);
 
   ButtonWindowStyle tab_style;
   tab_style.ControlParent();
@@ -130,11 +129,6 @@ dlgStatusShowModal(int start_page)
 
   Widget *times_panel = new TimesStatusPanel(look);
   tab_bar.AddTab(times_panel, _("Times"), TimesIcon);
-
-  if (!Layout::landscape) {
-    Widget *wClose = new ActionWidget(form, mrOK);
-    tab_bar.AddTab(wClose, _("Close"));
-  }
 
   /* restore previous page */
 
