@@ -29,6 +29,16 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Asset.hpp"
 
+bool
+ZoomButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
+{
+  if (IsInside(x, y))
+    return WndButton::OnMouseMove(x, y, keys);
+  else
+    OnCancelMode();
+  return true;
+}
+
 void
 ZoomButton::OnPaint(Canvas &canvas)
 {
