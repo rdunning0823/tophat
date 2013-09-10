@@ -78,6 +78,12 @@ public:
 private:
   /* virtual methods from class DataFieldListener */
   virtual void OnModified(DataField &df) override;
+
+  /**
+   * Don't show bottom section option unless main area is map
+   * Don't show Infoboxes unless Map or TA
+   */
+  void UpdateVisibility();
 };
 
 class PageListWidget
@@ -154,6 +160,33 @@ private:
   virtual void OnAction(int id) override;
 };
 
+/**
+ * sync with UpdateVisibility()
+ * so items not shown are saved as "NOTHING" for false
+ */
+static void
+EnforceLayoutConstraints(PageLayout &page_layout)
+{
+  if (page_layout.main != PageLayout::Main::MAP)
+    page_layout.bottom = PageLayout::Bottom::NOTHING;
+
+  if (page_layout.main != PageLayout::Main::MAP &&
+      page_layout.main != PageLayout::Main::THERMAL_ASSISTANT)
+    page_layout.infobox_config.enabled = false;
+}
+
+void
+PageLayoutEditWidget::UpdateVisibility()
+{
+  bool show_bottom = value.main == PageLayout::Main::MAP;
+  RowFormWidget::SetRowVisible(BOTTOM, show_bottom);
+
+
+  bool show_infoboxes = value.main == PageLayout::Main::MAP ||
+      value.main == PageLayout::Main::THERMAL_ASSISTANT;
+  RowFormWidget::SetRowVisible(INFO_BOX_PANEL, show_infoboxes);
+}
+
 void
 PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
@@ -202,6 +235,8 @@ void
 PageLayoutEditWidget::SetValue(const PageLayout &_value)
 {
   value = _value;
+  EnforceLayoutConstraints(value);
+  UpdateVisibility();
 
   LoadValueEnum(MAIN, value.main);
   LoadValueEnum(BOTTOM, value.bottom);
@@ -248,6 +283,7 @@ PageLayoutEditWidget::OnModified(DataField &df)
     gcc_unreachable();
   }
 
+  UpdateVisibility();
   listener.OnModified(value);
 }
 
@@ -284,6 +320,7 @@ PageListWidget::Save(bool &_changed)
   PageSettings &_settings = CommonInterface::SetUISettings().pages;
   for (unsigned int i = 0; i < PageSettings::MAX_PAGES; ++i) {
     PageLayout &dest = _settings.pages[i];
+    EnforceLayoutConstraints(settings.pages[i]);
     const PageLayout &src = settings.pages[i];
     if (src != dest) {
       Profile::Save(src, i);
