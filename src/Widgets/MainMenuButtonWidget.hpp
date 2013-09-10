@@ -55,6 +55,12 @@ public:
    * (derived from PaintWindow)
    */
   virtual void OnPaint(Canvas &canvas);
+
+  /**
+   * handles on mouse move, and if dragged off button face, cancels drag
+   * This allows background object to accept capture at this time
+   */
+  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
 };
 
 class MainMenuButtonWidget : public MapOverlayWidget, protected ActionListener {

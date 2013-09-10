@@ -38,6 +38,16 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 
+bool
+MainMenuButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
+{
+  if (IsInside(x, y))
+    return WndButton::OnMouseMove(x, y, keys);
+  else
+    OnCancelMode();
+  return true;
+}
+
 void
 MainMenuButton::OnPaint(Canvas &canvas)
 {
