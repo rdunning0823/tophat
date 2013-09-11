@@ -1052,7 +1052,10 @@ msgid ""
 "Ground speed measured by the GPS. If this InfoBox is active in simulation "
 "mode, pressing the up and down arrows adjusts the speed, and left and right "
 "turn the glider."
-msgstr ""
+msgstr 
+"Ground speed measured by the GPS. If this infobox is active in simulation "
+"mode, pressing the up and down arrows adjusts the speed, and left and right "
+"turn the glider."
 
 #: src/InfoBoxes/Content/Factory.cpp:228
 #, no-c-format
@@ -1117,7 +1120,11 @@ msgid ""
 "The current MacCready setting and the current MacCready mode (manual or "
 "auto). (Touch-screen/PC only) Also used to adjust the MacCready setting if "
 "the InfoBox is active, by using the up/down cursor keys."
-msgstr ""
+msgstr 
+"The current MacCready setting and the current MacCready mode (manual or "
+"auto). (Touch-screen/PC only) Also used to adjust the MacCready setting if "
+"the infobox is active, by using the up/down cursor keys."
+
 
 #: src/InfoBoxes/Content/Factory.cpp:268
 #, no-c-format
@@ -1189,7 +1196,12 @@ msgid ""
 "using the up/down cursor keys selects the next/previous waypoint in the "
 "task. (Touch-screen/PC only) Pressing the enter cursor key brings up the "
 "waypoint details."
-msgstr ""
+msgstr 
+"The name of the currently selected turn point. When this infobox is active, "
+"using the up/down cursor keys selects the next/previous waypoint in the "
+"task. (Touch-screen/PC only) Pressing the enter cursor key brings up the "
+"waypoint details."
+
 
 #: src/InfoBoxes/Content/Factory.cpp:311
 #, no-c-format
@@ -1316,7 +1328,10 @@ msgid ""
 "Magnetic track reported by the GPS. (Touch-screen/PC only) If this InfoBox "
 "is active in simulation mode, pressing the up and down  arrows adjusts the "
 "track."
-msgstr ""
+msgstr 
+"Magnetic track reported by the GPS. (Touch-screen/PC only) If this infobox "
+"is active in simulation mode, pressing the up and down  arrows adjusts the "
+"track."
 
 #: src/InfoBoxes/Content/Factory.cpp:403
 #, no-c-format
@@ -1337,7 +1352,10 @@ msgid ""
 "Wind speed estimated by XCSoar. Manual adjustment is possible with the "
 "connected InfoBox dialogue. Pressing the up/down cursor keys to cycle "
 "through settings, adjust the values with left/right cursor keys."
-msgstr ""
+msgstr 
+"Wind speed estimated by XCSoar. Manual adjustment is possible with the "
+"connected infobox dialogue. Pressing the up/down cursor keys to cycle "
+"through settings, adjust the values with left/right cursor keys."
 
 #: src/InfoBoxes/Content/Factory.cpp:422
 #, no-c-format
@@ -1355,7 +1373,10 @@ msgid ""
 "Wind bearing estimated by XCSoar. Manual adjustment is possible with the "
 "connected InfoBox dialogue. Pressing the up/down cursor keys to cycle "
 "through settings, adjust the values with left/right cursor keys."
-msgstr ""
+msgstr
+"Wind bearing estimated by XCSoar. Manual adjustment is possible with the "
+"connected infobox dialogue. Pressing the up/down cursor keys to cycle "
+"through settings, adjust the values with left/right cursor keys."
 
 #: src/InfoBoxes/Content/Factory.cpp:433
 #, no-c-format
@@ -1635,6 +1656,13 @@ msgid ""
 "the current load factor (if an accelerometer is connected). When Block mode "
 "speed to fly is selected, this InfoBox displays the MacCready speed."
 msgstr ""
+"The instantaneous MacCready speed-to-fly, making use of netto vario "
+"calculations to determine dolphin cruise speed in the glider's current "
+"bearing. In cruise flight mode, this speed-to-fly is calculated for "
+"maintaining altitude. In final glide mode, this speed-to-fly is calculated "
+"for descent. In climb mode, this switches to the speed for minimum sink at "
+"the current load factor (if an accelerometer is connected). When Block mode "
+"speed to fly is selected, this infobox displays the MacCready speed."
 
 #: src/InfoBoxes/Content/Factory.cpp:606
 #, no-c-format
@@ -2781,7 +2809,7 @@ msgstr ""
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:227
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:354
 msgid "InfoBox"
-msgstr ""
+msgstr "Infobox"
 
 #: src/InfoBoxes/InfoBoxManager.cpp:273
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:231
@@ -2909,11 +2937,11 @@ msgstr ""
 
 #: src/Input/InputEventsActions.cpp:162
 msgid "Auxiliary InfoBoxes"
-msgstr ""
+msgstr "Auxiliary infoboxes"
 
 #: src/Input/InputEventsActions.cpp:164
 msgid "Default InfoBoxes"
-msgstr ""
+msgstr "Default infoboxes"
 
 #: src/Input/InputEventsActions.cpp:269
 msgid "No active waypoint!"
@@ -3081,7 +3109,7 @@ msgstr ""
 
 #: src/PageSettings.cpp:58
 msgid "Map and InfoBoxes"
-msgstr ""
+msgstr "Map and infoboxes"
 
 #: src/PageSettings.cpp:78
 msgid "Info Hide"
@@ -4390,7 +4418,7 @@ msgstr ""
 #: src/Dialogs/Settings/dlgConfiguration.cpp:119
 #, fuzzy, no-c-format
 msgid "InfoBox Sets"
-msgstr ""
+msgstr "Infobox Sets"
 
 #: src/Dialogs/Settings/dlgConfiguration.cpp:121
 #: src/Dialogs/Plane/PlanePolarDialog.cpp:72
@@ -4433,17 +4461,17 @@ msgstr ""
 #: src/Dialogs/Settings/dlgConfigFonts.cpp:212
 #, no-c-format
 msgid "InfoBox titles"
-msgstr ""
+msgstr "Infobox titles"
 
 #: src/Dialogs/Settings/dlgConfigFonts.cpp:213
 #, no-c-format
 msgid "InfoBox values, normal"
-msgstr ""
+msgstr "Infobox values, normal"
 
 #: src/Dialogs/Settings/dlgConfigFonts.cpp:215
 #, no-c-format
 msgid "InfoBox values, small"
-msgstr ""
+msgstr "InfbBox values, small"
 
 #: src/Dialogs/Settings/dlgConfigFonts.cpp:218
 #, no-c-format
@@ -4474,7 +4502,7 @@ msgstr ""
 
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:114
 msgid "InfoBox paste"
-msgstr ""
+msgstr "Infobox paste"
 
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:203
 #: Data/Dialogs/dlgPlanePolar.xml:6 Data/Dialogs/dlgPlanePolar_L.xml:6
@@ -4731,7 +4759,7 @@ msgstr ""
 
 #: src/Dialogs/dlgInfoBoxAccess.cpp:108 src/Dialogs/dlgInfoBoxAccess.cpp:123
 msgid "Switch InfoBox"
-msgstr ""
+msgstr "Switch Infobox"
 
 #: src/Dialogs/ReplayDialog.cpp:82
 msgid "File"
@@ -5509,6 +5537,8 @@ msgid ""
 "Controls whether the \"final glide\" InfoBox mode should be used on \"auto\" "
 "pages."
 msgstr ""
+"Controls whether the \"final glide\"infobox mode should be used on \"auto\" "
+"pages."
 
 #: src/Dialogs/Settings/Panels/InterfaceConfigPanel.cpp:76
 msgid "Fonts"
@@ -5820,7 +5850,7 @@ msgstr ""
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:150
 #, no-c-format
 msgid "Draws boxes around each InfoBox."
-msgstr ""
+msgstr "Draws boxes around each infobox."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:152
 #, no-c-format
@@ -5830,7 +5860,7 @@ msgstr ""
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:152
 #, no-c-format
 msgid "Draws a tab at the top of the InfoBox across the title."
-msgstr ""
+msgstr "Draws a tab at the top of the infobox across the title."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:154
 #, fuzzy, no-c-format
@@ -5852,13 +5882,15 @@ msgstr ""
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:183
 msgid "InfoBox geometry"
-msgstr ""
+msgstr "Infobox layout"
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:184
 msgid ""
 "A list of possible InfoBox layouts. Do some trials to find the best for your "
 "screen size."
-msgstr ""
+msgstr 
+"A list of possible infobox layouts. Do some trials to find the best for your "
+"screen size."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:187
 msgid "FLARM display"
@@ -5886,24 +5918,27 @@ msgstr ""
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:204
 msgid "Inverse InfoBoxes"
-msgstr ""
+msgstr "Inverse infoboxes"
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:204
 msgid "If true, the InfoBoxes are white on black, otherwise black on white."
-msgstr ""
+msgstr "If true, the infoboxes are white on black, otherwise black on white."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:208
 msgid "Colored InfoBoxes"
-msgstr ""
+msgstr "Colored infoboxes"
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:209
 msgid ""
 "If true, certain InfoBoxes will have coloured text.  For example, the active "
 "waypoint InfoBox will be blue when the glider is above final glide."
-msgstr ""
+msgstr 
+"If true, certain infoboxes will have coloured text.  For example, the active "
+"waypoint infobox will be blue when the glider is above final glide."
+
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:214
-msgid "InfoBox border"
+msgid "Infobox border"
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/LoggerConfigPanel.cpp:54
@@ -6127,10 +6162,10 @@ msgstr ""
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:329
 #, fuzzy
 msgid "InfoBoxes"
-msgstr ""
+msgstr "Infoboxes"
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:181
-msgid "Specifies which InfoBoxes should be displayed on this page."
+msgid "Specifies which infoboxes should be displayed on this page."
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:188
@@ -8804,7 +8839,7 @@ msgstr ""
 #~ msgid ""
 #~ "Wind speed estimated by XCSoar. (Touch-screen/PC only) Manual adjustment "
 #~ "is possible by pressing the up/down cursor keys to adjust magnitude and "
-#~ "left/right cursor keys to adjust bearing when the InfoBox is active. "
+#~ "left/right cursor keys to adjust bearing when the infobox is active. "
 #~ "Pressing the enter cursor key saves the wind value as the initial value "
 #~ "when XCSoar next starts."
 #~ msgstr ""
