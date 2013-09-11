@@ -57,6 +57,7 @@ Copyright_License {
 #include "Dialogs/Settings/Panels/SiteConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/LoggerConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SafetyFactorsConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/LayoutConfigPanel.hpp"
 #include "UtilsSettings.hpp"
 
 #include <math.h>
@@ -69,6 +70,7 @@ Copyright_License {
     PLANE,
     SAFETY,
     PILOT,
+    SCREENS,
     ADVANCED,
     OK,
   };
@@ -86,31 +88,24 @@ GetDialogStyle()
 class SetupQuick : public NullWidget, public WndForm
 {
 private:
-  PixelRect rc_prompt;
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
   PixelRect rc_safety_text, rc_nationality_text, rc_pilot_text;
   PixelRect rc_safety_button, rc_nationality_button, rc_pilot_button;
   PixelRect rc_ok, rc_advanced;
 
-  WndFrame *prompt;
   WndFrame *site_files_text, *plane_text, *device_text;
   WndFrame *safety_text, *nationality_text, *pilot_text;
   WndButton *site_files_button, *plane_button, *device_button;
   WndButton *safety_button, *nationality_button, *pilot_button;
   WndButton *ok, *advanced;
 
-  /**
-   *   do we explain that there is missing data?
-   */
-  bool auto_prompt;
-
 public:
-  SetupQuick(bool _auto_prompt)
+  SetupQuick()
     : WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
               UIGlobals::GetMainWindow().GetClientRect(),
               _("Set up Top Hat"),
-              GetDialogStyle()), auto_prompt(_auto_prompt) {}
+              GetDialogStyle()) {}
 
   void RefreshForm();
 
@@ -144,9 +139,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   PixelRect rc_left = rc;
   PixelRect rc_right = rc;
 
-  rc_prompt = rc;
-  rc_prompt.bottom = auto_prompt ? rc_prompt.top + height + Layout::Scale(5) : rc.top;
-
   rc_left.left += Layout::Scale(2);
   rc_right.right -= Layout::Scale(2);
   rc_left.right = PixelScalar (fixed(rc.right + rc.left) / fixed(2.5));
@@ -158,7 +150,7 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       = rc_safety_button = rc_nationality_button = rc_pilot_button = rc_left;
 
   PixelScalar top1, top2, top3, top4, top5, top6;
-  top1 = rc_prompt.bottom;
+  top1 = rc.top;
   top2 = top1 + height;
   top3 = top1 + height * 2;
   top4 = top1 + height * 3;
@@ -328,10 +320,6 @@ SetupQuick::RefreshForm()
   if (text.empty())
     text = unconfigured;
   pilot_text->SetCaption(text.c_str());
-
-  if (auto_prompt) {
-    prompt->SetCaption(_("Please configure Top Hat using the buttons below."));
-  }
 }
 
 void
@@ -374,13 +362,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                             rc_pilot_text,
                             style_frame);
                             pilot_text->SetVAlignCenter();
-
-  if (auto_prompt) {
-    prompt = new WndFrame(GetClientAreaWindow(), look,
-                          rc_prompt,
-                          style_frame);
-                          prompt->SetVAlignCenter();
-  }
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   ButtonWindowStyle button_style;
@@ -443,16 +424,14 @@ SetupQuick::Unprepare()
   delete pilot_button;
   delete ok;
   delete advanced;
-  if (auto_prompt)
-     delete prompt;
 }
 
 void
-ShowDialogSetupQuick(bool auto_prompt)
+ShowDialogSetupQuick()
 {
   // add point to task
   ContainerWindow &w = UIGlobals::GetMainWindow();
-  instance = new SetupQuick(auto_prompt);
+  instance = new SetupQuick();
   instance->Initialise(w, w.GetClientRect());
   instance->Prepare(w, w.GetClientRect());
 

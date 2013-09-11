@@ -316,7 +316,7 @@ void
 dlgStartupAssistantShowModal(bool conditional)
 {
   if (conditional)
-    ShowDialogSetupQuick(true);
+    ShowDialogSetupQuick();
 
   StaticString<32> decline_ver(_T(""));
   UTF8ToWideConverter text2(Profile::Get(ProfileKeys::StartupTipDeclineVersion, ""));

@@ -35,9 +35,8 @@ void dlgBasicSettingsShowModal();
 
 /**
  * Allows setting up of the critical items for Top Hat
- * @param auto_prompt.  do we explain that there is missing data?
  */
-void ShowDialogSetupQuick(bool auto_prompt);
+void ShowDialogSetupQuick();
 
 /**
  * displays a popup describing the "what if" task stats if the
