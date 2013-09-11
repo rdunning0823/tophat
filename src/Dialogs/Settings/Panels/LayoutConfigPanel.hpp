@@ -27,6 +27,10 @@ Copyright_License {
 class Widget;
 
 Widget *
+CreateLayoutConfigPanel(bool quick_setup);
+
+Widget *
 CreateLayoutConfigPanel();
+
 
 #endif /* LAYOUTCONFIGPANEL_HPP */

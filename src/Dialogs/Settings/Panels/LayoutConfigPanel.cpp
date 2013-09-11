@@ -35,6 +35,10 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "UtilsSettings.hpp"
 #include "Asset.hpp"
+#include "Form/ActionListener.hpp"
+#include "UtilsSettings.hpp"
+#include "Dialogs/Settings/Panels/PagesConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/InfoBoxesConfigPanel.hpp"
 
 #ifdef KOBO
 #include "Event/Globals.hpp"
@@ -46,6 +50,8 @@ enum ControlIndex {
   AppInfoBoxGeom,
   AppInverseInfoBox,
   AppInfoBoxColors,
+  CustomizeScreens,
+  CustomizeInfoBoxes,
 };
 
 static constexpr StaticEnumChoice display_orientation_list[] = {
@@ -92,15 +98,42 @@ static constexpr StaticEnumChoice info_box_geometry_list[] = {
   { 0 }
 };
 
-class LayoutConfigPanel final : public RowFormWidget {
+class LayoutConfigPanel final : public RowFormWidget, public ActionListener {
+  /**
+   * are we displaying this via the quick setup screen?
+   */
+  bool quick_setup;
 public:
-  LayoutConfigPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook()) {}
+  LayoutConfigPanel(bool _quick_setup)
+    :RowFormWidget(UIGlobals::GetDialogLook()), quick_setup(_quick_setup) {}
 
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
+
+  /** from ActionListener */
+  virtual void OnAction(int id);
 };
+
+void
+LayoutConfigPanel::OnAction(int id)
+{
+  Widget *widget = nullptr;
+  StaticString<120> title;
+
+  switch (id) {
+  case CustomizeScreens:
+    widget = CreatePagesConfigPanel();
+    title = _("Set up screens");
+    break;
+  case CustomizeInfoBoxes:
+    widget = CreateInfoBoxesConfigPanel();
+    title = _("Set up infoboxes");
+    break;
+  }
+  assert(widget != nullptr);
+  SystemConfiguration(*widget, title.get());
+}
 
 void
 LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
@@ -119,11 +152,14 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
 
-  AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
-             ui_settings.info_boxes.inverse);
-  SetExpertRow(AppInverseInfoBox);
+  if (!quick_setup) {
+    AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
+               ui_settings.info_boxes.inverse);
+    SetExpertRow(AppInverseInfoBox);
+  } else
+    AddDummy();
 
-  if (HasColors()) {
+  if (HasColors() && !quick_setup) {
     AddBoolean(_("Colored InfoBoxes"),
                _("If true, certain InfoBoxes will have coloured text.  For example, the active waypoint "
                  "InfoBox will be blue when the glider is above final glide."),
@@ -131,6 +167,15 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     SetExpertRow(AppInfoBoxColors);
   } else
     AddDummy();
+
+  if (quick_setup) {
+    AddButton(_("Custom screens"), *this, CustomizeScreens);
+    AddButton(_("Custom infobox sets"), *this, CustomizeInfoBoxes);
+
+  } else {
+    AddDummy();
+    AddDummy();
+  }
 }
 
 bool
@@ -157,10 +202,11 @@ LayoutConfigPanel::Save(bool &_changed)
 
   changed |= info_box_geometry_changed;
 
-  changed |= require_restart |=
-    SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
+  if (!quick_setup)
+    changed |= require_restart |=
+      SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
 
-  if (HasColors() &&
+  if (HasColors() && !quick_setup &&
       SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors,
                 ui_settings.info_boxes.use_colors))
     require_restart = changed = true;
@@ -191,5 +237,11 @@ LayoutConfigPanel::Save(bool &_changed)
 Widget *
 CreateLayoutConfigPanel()
 {
-  return new LayoutConfigPanel();
+  return CreateLayoutConfigPanel(false);
+}
+
+Widget *
+CreateLayoutConfigPanel(bool quick_setup)
+{
+  return new LayoutConfigPanel(quick_setup);
 }
