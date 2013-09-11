@@ -39,6 +39,17 @@ GestureZone::GestureZone()
   :x_zone_width(Layout::GetXDPI() / 2), draw_initialized(false),
    help_duration(15000), gesture_look(UIGlobals::GetLook().gesture) {}
 
+void
+GestureZone::SetZoneWidth(PixelRect rc_map)
+{
+  unsigned screen_width = rc_map.GetSize().cx;
+  /**
+   * use 1/2 inch min up to 1 inch, but not more than 1/4 the width of the screen
+   */
+  x_zone_width = std::max(Layout::GetXDPI() / 2,
+                          std::min(Layout::GetXDPI(), screen_width / 4));
+}
+
 bool
 GestureZone::InZone(PixelRect map_rc, RasterPoint p)
 {
@@ -72,13 +83,12 @@ PixelRect
 GestureZone::GetZoneRect(PixelRect rc_map)
 {
   PixelRect rc = rc_map;
-  rc.Grow(-1 * x_zone_width, -2 * x_zone_width);
-  rc.bottom -= x_zone_width / 2;
+  bool landscape = rc.GetSize().cx > rc.GetSize().cy;
 
-  if (rc.GetSize().cy < x_zone_width) {
-    rc.bottom += x_zone_width / 2;
-    rc.top -= x_zone_width / 2;
-  }
+  rc.Grow(-1 * x_zone_width, -1 * x_zone_width);
+  if (!landscape)
+    rc.bottom -= x_zone_width / 2;
+
   return rc;
 }
 
@@ -183,6 +193,7 @@ void
 GestureZone::DrawZone(Canvas &canvas, PixelRect rc_map, bool terrain_enabled)
 {
   CheckInitialize();
+  SetZoneWidth(rc_map);
   PixelRect rc = GetZoneRect(rc_map);
 
   bool show_help = IsHelpVisible();

@@ -73,6 +73,11 @@ public:
   virtual void DrawZone(Canvas &canvas, PixelRect rc, bool terrain_enabled);
 
   /**
+   * sets x_zone_width based on the map size
+   */
+  virtual void SetZoneWidth(PixelRect rc_map);
+
+  /**
    * return true if p is in the gesture zone
    */
   virtual bool InZone(PixelRect rc_map, RasterPoint p);
