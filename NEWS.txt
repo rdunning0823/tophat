@@ -1,7 +1,12 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 2.0 TBD
+TopHat 1.2.1 beta TBD
+* User testing of "multiple screens"
+  - swipe zones on left and right
+  - QuickSetup access to screen and infobox customization
+  - Wind settings.  Remove Clear button and Source box
+
 * Merge XCSoar 6.7 code
 * user interface
   - resizable main window
@@ -84,6 +89,12 @@ TopHat 2.0 TBD
   - Volkslogger: increase timeout to calculate security (#2910)
   - fix bogus error message after pressing "Cancel"
   - show Bluetooth name instead of MAC address in device list
+
+TopHat 1.2 9/12/2013
+* fix Change "Fly" button to "Close" in task manager
+* make pan cross hairs more visible
+* Fix auto flight download from logger on landing
+* Make compass & wind arrow darker for eInk
 
 TopHat 1.1.8 Beta 8/22/2013
 * Remember name of task and display in task manager
