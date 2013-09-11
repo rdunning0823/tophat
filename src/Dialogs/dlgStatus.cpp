@@ -25,7 +25,6 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
 #include "Form/TabBar.hpp"
-#include "Widget/ActionWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "Look/DialogLook.hpp"
@@ -68,20 +67,28 @@ dlgStatusShowModal(int start_page)
 
   if (Layout::landscape) {
     const unsigned tab_width = Layout::Scale(80);
+    unsigned button_height = (rc.bottom - rc.top) / 5;
+    close_rc.left = 0;
+    close_rc.top = rc.bottom - button_height;
+    close_rc.right = tab_width;
+    close_rc.bottom = rc.bottom;
 
     tab_rc.left = 0;
-    tab_rc.top = 0;
+    tab_rc.top = rc.top;
     tab_rc.right = tab_width;
-    tab_rc.bottom = rc.bottom;
+    tab_rc.bottom = close_rc.top;
   } else {
-    /** close button only shown in portrait mode, use tab in landscape */
-    close_rc = rc;
-    close_rc.top = close_rc.bottom - Layout::Scale(25);
+    const unsigned tab_height = Layout::Scale(76);
+    unsigned button_width = (rc.right - rc.left) / 5;
+    close_rc.left = 0;
+    close_rc.bottom = rc.bottom;
+    close_rc.top = rc.bottom - tab_height;
+    close_rc.right = button_width;
 
-    tab_rc.left = Layout::Scale(55);
-    tab_rc.top = 0;
+    tab_rc.left = close_rc.right;
+    tab_rc.top = close_rc.top;
     tab_rc.right = rc.right;
-    tab_rc.bottom = rc.bottom;
+    tab_rc.bottom = close_rc.bottom;
   }
 
   ButtonWindowStyle button_style;
