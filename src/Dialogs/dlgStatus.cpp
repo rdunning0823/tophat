@@ -102,7 +102,7 @@ dlgStatusShowModal(int start_page)
   tab_style.ControlParent();
 
   TabBarControl tab_bar(form.GetClientAreaWindow(), look, tab_rc,
-                        tab_style, Layout::landscape);
+                        tab_style, Layout::landscape, !Layout::landscape);
   tab_bar.SetPageFlippedCallback([&form, &tab_bar]() {
       SetTitle(form, tab_bar);
     });
