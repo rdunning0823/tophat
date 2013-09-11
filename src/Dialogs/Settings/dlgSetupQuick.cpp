@@ -91,13 +91,12 @@ private:
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
   PixelRect rc_safety_text, rc_nationality_text, rc_pilot_text;
-  PixelRect rc_screens_text;
   PixelRect rc_safety_button, rc_nationality_button, rc_pilot_button;
   PixelRect rc_screens_button;
   PixelRect rc_ok, rc_advanced;
 
   WndFrame *site_files_text, *plane_text, *device_text;
-  WndFrame *safety_text, *nationality_text, *pilot_text, *screens_text;
+  WndFrame *safety_text, *nationality_text, *pilot_text;
   WndButton *site_files_button, *plane_button, *device_button;
   WndButton *safety_button, *nationality_button, *pilot_button;
   WndButton *screens_button;
@@ -148,19 +147,17 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_right.left = rc_left.right + Layout::Scale(1);
 
   rc_site_files_text = rc_plane_text = rc_device_text = rc_safety_text
-      = rc_nationality_text = rc_pilot_text = rc_screens_text = rc_right;
+      = rc_nationality_text = rc_pilot_text = rc_right;
   rc_site_files_button = rc_plane_button = rc_device_button
-      = rc_safety_button = rc_nationality_button = rc_pilot_button
-      = rc_screens_button = rc_left;
+      = rc_safety_button = rc_nationality_button = rc_pilot_button = rc_left;
 
-  PixelScalar top1, top2, top3, top4, top5, top6, top7;
+  PixelScalar top1, top2, top3, top4, top5, top6;
   top1 = rc.top;
   top2 = top1 + height;
   top3 = top1 + height * 2;
   top4 = top1 + height * 3;
   top5 = top1 + height * 4;
   top6 = top1 + height * 5;
-  top7 = top1 + height * 6;
 
   rc_nationality_button.top = rc_nationality_text.top = top1;
   rc_device_button.top = rc_device_text.top = top2;
@@ -168,7 +165,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_safety_button.top = rc_safety_text.top = top4;
   rc_plane_button.top = rc_plane_text.top = top5;
   rc_pilot_button.top = rc_pilot_text.top = top6;
-  rc_screens_button.top = rc_screens_text.top = top7;
 
   rc_nationality_button.bottom = rc_nationality_text.bottom =
       rc_nationality_text.top + height;
@@ -180,8 +176,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       rc_safety_text.top + height;
   rc_plane_button.bottom = rc_plane_text.bottom = rc_plane_text.top + height;
   rc_pilot_button.bottom = rc_pilot_text.bottom = rc_pilot_text.top + height;
-  rc_screens_button.bottom = rc_screens_text.bottom =
-      rc_screens_text.top + height;
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
@@ -190,6 +184,8 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_advanced.left = rc_advanced.right - Layout::Scale(80);
   rc_advanced.bottom = rc_ok.top - 1;
   rc_advanced.top = rc_advanced.bottom - height;
+  rc_screens_button = rc_advanced;
+  rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
 }
 
 static void
@@ -333,8 +329,6 @@ SetupQuick::RefreshForm()
   if (text.empty())
     text = unconfigured;
   pilot_text->SetCaption(text.c_str());
-
-  screens_text->SetCaption(_(""));
 }
 
 void
@@ -377,11 +371,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                             rc_pilot_text,
                             style_frame);
                             pilot_text->SetVAlignCenter();
-
-  screens_text = new WndFrame(GetClientAreaWindow(), look,
-                              rc_screens_text,
-                              style_frame);
-                              screens_text->SetVAlignCenter();
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   ButtonWindowStyle button_style;
