@@ -24,6 +24,8 @@ Copyright_License {
 #include "BigThermalAssistantWindow.hpp"
 #include "Input/InputEvents.hpp"
 #include "Screen/Layout.hpp"
+#include "Asset.hpp"
+#include "LogFile.hpp" //debug
 
 bool
 BigThermalAssistantWindow::OnMouseDouble(PixelScalar x, PixelScalar y)
@@ -64,6 +66,9 @@ bool
 BigThermalAssistantWindow::OnMouseMove(PixelScalar x, PixelScalar y,
                                        gcc_unused unsigned keys)
 {
+  if (!dragging && HasTouchScreen())
+    OnMouseDown(x, y);
+
   if (dragging)
     gestures.Update(x, y);
 
