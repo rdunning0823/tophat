@@ -121,7 +121,7 @@ Profile::Load(InfoBoxSettings &settings)
   }
 
   Get(ProfileKeys::AppInverseInfoBox, settings.inverse);
-  settings.use_colors = !IsGrayScaleScreen();
+  settings.use_colors = HasColors();
 
   GetV60InfoBoxManagerConfig(settings);
   char profileKey[32];

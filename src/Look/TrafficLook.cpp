@@ -29,7 +29,7 @@ Copyright_License {
 void
 TrafficLook::Initialise(const Font &_font)
 {
-  if(!IsGrayScaleScreen()) {
+  if(HasColors()) {
     safe_color = Color(0xfe,0x84,0x38);
     warning_color = Color(0xfe,0x84,0x38);
     alarm_color = COLOR_BLACK;

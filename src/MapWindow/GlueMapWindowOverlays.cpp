@@ -111,7 +111,7 @@ GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
   const Bitmap *bmp = &icons.hBmpMenuButton;
   const PixelSize bitmap_size = bmp->GetSize();
 
-  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
+  UPixelScalar pen_width = !HasColors() ? 2 : 1;
   canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
   DrawRect(canvas, rc_main_menu_button);
 
@@ -134,7 +134,7 @@ void
 GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
 {
 
-  UPixelScalar pen_width = IsGrayScaleScreen() ? 2 : 1;
+  UPixelScalar pen_width = !HasColors() ? 2 : 1;
   canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
   DrawRect(canvas, rc_zoom_out_button);
   DrawRect(canvas, rc_zoom_in_button);

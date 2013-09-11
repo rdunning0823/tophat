@@ -165,19 +165,6 @@ IsKobo()
 #endif
 }
 
-/**
- * Returns whether the application is running a device with a gray-scale screen
- */
-static inline bool
-IsGrayScaleScreen()
-{
-#ifdef ANDROID
-  return IsNookSimpleTouch() || IsKobo();
-#else
-  return false;
-#endif
-}
-
 /*
  * Returns whether the application is running on an embedded platform.
  * @return True if host hardware is an embedded platform, False otherwise
