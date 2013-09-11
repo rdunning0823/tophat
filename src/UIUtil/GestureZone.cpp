@@ -107,7 +107,6 @@ GestureZone::DrawZoneHelp(Canvas &canvas, PixelRect rc)
   const TCHAR *message1 = N_("Swipe from edge");
   const TCHAR *message2 = N_("to switch screens");
 
-  //const PixelSize ts_space = canvas.CalcTextSize(_T(" "));
   const PixelSize ts1 = canvas.CalcTextSize(message1);
   const PixelSize ts2 = canvas.CalcTextSize(message2);
   int y_arrow = y_middle - arrow_tip * 0.7;
@@ -130,56 +129,25 @@ GestureZone::DrawZoneHelp(Canvas &canvas, PixelRect rc)
             y_arrow - 2 * ts1.cy - Layout::GetTextPadding(), style, rc);
   TextInBox(canvas, message2, rc.left + (rc.GetSize().cx - ts2.cx) / 2,
             y_arrow - ts2.cy - Layout::GetTextPadding(), style, rc);
-  //    canvas.Select(Brush(COLOR_RED));
 
   // moving to right
   int x_tip = rc.left - x_zone_width / 2 + length;
   int x_base = rc.left - x_zone_width / 2;
-  const unsigned diameter = 0;//Layout::Scale(5);
-  if (true || length_ratio <= mod / 2) {
 
-    canvas.DrawLine( {rc.left - 1, rc.top },
-                     {rc.left - 1, rc.bottom });
+  canvas.DrawLine( {rc.left - 1, rc.top },
+                   {rc.left - 1, rc.bottom });
 
-
-    canvas.Select(gesture_look.pen);
-    canvas.DrawLine( {x_base, y_arrow },
-                     {x_tip, y_arrow });
-//    canvas.DrawCircle(x_tip, y_arrow, Layout::Scale(5));
-    canvas.CopyOr(x_tip - 0.2 * bmp_hand_size.cx, y_arrow + diameter / 2,
-                  bmp_hand_size.cx / 2, bmp_hand_size.cy,
-                  *bmp_hand,
-                  0, 0);
-    canvas.CopyAnd(x_tip - 0.2 * bmp_hand_size.cx, y_arrow + diameter / 2,
-                   bmp_hand_size.cx / 2, bmp_hand_size.cy,
-                   *bmp_hand,
-                   bmp_hand_size.cx / 2, 0);
-/*    TextInBox(canvas, message, 0,
-              y_arrow + diameter + bmp_hand_size.cy,
-              style, rc);*/
-  } else {
-    // moving to left
-    canvas.Select(gesture_look.pen);
-    canvas.DrawLine( {rc.right, rc.top },
-                     {rc.right, rc.bottom });
-
-    x_tip = rc.right - x_zone_width - length + length_max;
-    x_base = rc.right + x_zone_width / 2;
-    canvas.DrawLine( {x_base, y_arrow },
-                     {x_tip, y_arrow } );
-//    canvas.DrawCircle(x_tip, y_arrow, Layout::Scale(5));
-    canvas.CopyOr(x_tip - 0.2 * bmp_hand_size.cx, y_arrow + diameter / 2,
-                  bmp_hand_size.cx / 2, bmp_hand_size.cy,
-                  *bmp_hand,
-                  0, 0);
-    canvas.CopyAnd(x_tip - 0.2 * bmp_hand_size.cx, y_arrow + diameter / 2,
-                   bmp_hand_size.cx / 2, bmp_hand_size.cy,
-                   *bmp_hand,
-                   bmp_hand_size.cx / 2, 0);
-/*    TextInBox(canvas, message,
-              rc.right + x_zone_width - ts.cx,
-              y_arrow + diameter + bmp_hand_size.cy, style, rc);*/
-  }
+  canvas.Select(gesture_look.pen);
+  canvas.DrawLine( {x_base, y_arrow },
+                   {x_tip, y_arrow });
+  canvas.CopyOr(x_tip - 0.2 * bmp_hand_size.cx, y_arrow,
+                bmp_hand_size.cx / 2, bmp_hand_size.cy,
+                *bmp_hand,
+                0, 0);
+  canvas.CopyAnd(x_tip - 0.2 * bmp_hand_size.cx, y_arrow,
+                 bmp_hand_size.cx / 2, bmp_hand_size.cy,
+                 *bmp_hand,
+                 bmp_hand_size.cx / 2, 0);
 }
 
 bool
