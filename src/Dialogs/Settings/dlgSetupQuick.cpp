@@ -407,7 +407,7 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                button_style, *this, PILOT);
 
   screens_button = new WndButton(GetClientAreaWindow(), button_look,
-                                 N_("Custom screens"),
+                                 N_("Screens"),
                                  rc_screens_button,
                                  button_style, *this, SCREENS);
 
