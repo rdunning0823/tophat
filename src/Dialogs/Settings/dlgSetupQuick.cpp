@@ -91,13 +91,16 @@ private:
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
   PixelRect rc_safety_text, rc_nationality_text, rc_pilot_text;
+  PixelRect rc_screens_text;
   PixelRect rc_safety_button, rc_nationality_button, rc_pilot_button;
+  PixelRect rc_screens_button;
   PixelRect rc_ok, rc_advanced;
 
   WndFrame *site_files_text, *plane_text, *device_text;
-  WndFrame *safety_text, *nationality_text, *pilot_text;
+  WndFrame *safety_text, *nationality_text, *pilot_text, *screens_text;
   WndButton *site_files_button, *plane_button, *device_button;
   WndButton *safety_button, *nationality_button, *pilot_button;
+  WndButton *screens_button;
   WndButton *ok, *advanced;
 
 public:
@@ -145,17 +148,19 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_right.left = rc_left.right + Layout::Scale(1);
 
   rc_site_files_text = rc_plane_text = rc_device_text = rc_safety_text
-      = rc_nationality_text = rc_pilot_text = rc_right;
+      = rc_nationality_text = rc_pilot_text = rc_screens_text = rc_right;
   rc_site_files_button = rc_plane_button = rc_device_button
-      = rc_safety_button = rc_nationality_button = rc_pilot_button = rc_left;
+      = rc_safety_button = rc_nationality_button = rc_pilot_button
+      = rc_screens_button = rc_left;
 
-  PixelScalar top1, top2, top3, top4, top5, top6;
+  PixelScalar top1, top2, top3, top4, top5, top6, top7;
   top1 = rc.top;
   top2 = top1 + height;
   top3 = top1 + height * 2;
   top4 = top1 + height * 3;
   top5 = top1 + height * 4;
   top6 = top1 + height * 5;
+  top7 = top1 + height * 6;
 
   rc_nationality_button.top = rc_nationality_text.top = top1;
   rc_device_button.top = rc_device_text.top = top2;
@@ -163,6 +168,7 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_safety_button.top = rc_safety_text.top = top4;
   rc_plane_button.top = rc_plane_text.top = top5;
   rc_pilot_button.top = rc_pilot_text.top = top6;
+  rc_screens_button.top = rc_screens_text.top = top7;
 
   rc_nationality_button.bottom = rc_nationality_text.bottom =
       rc_nationality_text.top + height;
@@ -174,6 +180,8 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       rc_safety_text.top + height;
   rc_plane_button.bottom = rc_plane_text.bottom = rc_plane_text.top + height;
   rc_pilot_button.bottom = rc_pilot_text.bottom = rc_pilot_text.top + height;
+  rc_screens_button.bottom = rc_screens_text.bottom =
+      rc_screens_text.top + height;
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
@@ -207,6 +215,10 @@ ShowPanel(unsigned page)
     widget = CreateLoggerConfigPanel();
     title = _("Pilot");
     break;
+  case SCREENS:
+    widget = CreateLayoutConfigPanel(true);
+    title = _("Custom screens");
+    break;
   case DEVICE:
   case PLANE:
   case ADVANCED:
@@ -227,6 +239,7 @@ SetupQuick::OnAction(int id)
   case SITE_FILES:
   case SAFETY:
   case PILOT:
+  case SCREENS:
     ShowPanel(id);
     break;
 
@@ -320,6 +333,8 @@ SetupQuick::RefreshForm()
   if (text.empty())
     text = unconfigured;
   pilot_text->SetCaption(text.c_str());
+
+  screens_text->SetCaption(_(""));
 }
 
 void
@@ -363,6 +378,11 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                             style_frame);
                             pilot_text->SetVAlignCenter();
 
+  screens_text = new WndFrame(GetClientAreaWindow(), look,
+                              rc_screens_text,
+                              style_frame);
+                              screens_text->SetVAlignCenter();
+
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   ButtonWindowStyle button_style;
   button_style.TabStop();
@@ -396,6 +416,12 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                _T("Pilot"),
                                rc_pilot_button,
                                button_style, *this, PILOT);
+
+  screens_button = new WndButton(GetClientAreaWindow(), button_look,
+                                 _T("Custom screens"),
+                                 rc_screens_button,
+                                 button_style, *this, SCREENS);
+
   ok = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
                      rc_ok,
                      button_style, *this, OK);
@@ -422,6 +448,7 @@ SetupQuick::Unprepare()
   delete device_button;
   delete safety_button;
   delete pilot_button;
+  delete screens_button;
   delete ok;
   delete advanced;
 }
