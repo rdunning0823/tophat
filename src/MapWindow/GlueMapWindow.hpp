@@ -107,6 +107,10 @@ class GlueMapWindow : public MapWindow {
   GeoPoint drag_start_geopoint;
   RasterPoint drag_start;
   TrackingGestureManager gestures;
+
+  /**
+   * the area where it is valid to start a gesture
+   */
   GestureZone gesture_zone;
   bool ignore_single_click;
 
