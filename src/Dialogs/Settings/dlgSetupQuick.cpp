@@ -268,7 +268,7 @@ SetupQuick::RefreshForm()
 {
   StaticString<255> text;
   StaticString<255> text_filename;
-  const TCHAR unconfigured[] = _T("*** Not configured ***");
+  const TCHAR unconfigured[] = N_("*** Not configured ***");
 
   const DeviceConfig &config =
     CommonInterface::SetSystemSettings().devices[0];
@@ -323,7 +323,7 @@ SetupQuick::RefreshForm()
   FormatRelativeUserAltitude(task_behaviour.safety_height_arrival, text.buffer(), true);
   safety_text->SetCaption(text.c_str());
 
-  text.Format(_T("%s / %s"), (GetActiveLanguageName() == nullptr) ? _T("System") : GetActiveLanguageName(),
+  text.Format(_T("%s / %s"), (GetActiveLanguageName() == nullptr) ? N_("System") : GetActiveLanguageName(),
               (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) ?
                   N_("US task rules") : N_("FAI task rules"));
   nationality_text->SetCaption(text);
@@ -389,36 +389,36 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
   button_style.multiline();
 
   nationality_button = new WndButton(GetClientAreaWindow(), button_look,
-                                _T("Nationality"),
+                                N_("Nationality"),
                                 rc_nationality_button,
                                 button_style, *this, NATIONALITY);
 
   site_files_button = new WndButton(GetClientAreaWindow(), button_look,
-                                    _T("Site files"),
+                                    N_("Site files"),
                                     rc_site_files_button,
                                     button_style, *this, SITE_FILES);
 
-  plane_button = new WndButton(GetClientAreaWindow(), button_look, _T("Plane"),
+  plane_button = new WndButton(GetClientAreaWindow(), button_look, N_("Plane"),
                                rc_plane_button,
                                button_style, *this, PLANE);
 
   device_button = new WndButton(GetClientAreaWindow(), button_look,
-                                _T("Device"),
+                                N_("Device"),
                                 rc_device_button,
                                 button_style, *this, DEVICE);
 
   safety_button = new WndButton(GetClientAreaWindow(), button_look,
-                                _T("Safety heights"),
+                                N_("Safety heights"),
                                 rc_safety_button,
                                 button_style, *this, SAFETY);
 
   pilot_button = new WndButton(GetClientAreaWindow(), button_look,
-                               _T("Pilot"),
+                               N_("Pilot"),
                                rc_pilot_button,
                                button_style, *this, PILOT);
 
   screens_button = new WndButton(GetClientAreaWindow(), button_look,
-                                 _T("Custom screens"),
+                                 N_("Custom screens"),
                                  rc_screens_button,
                                  button_style, *this, SCREENS);
 
@@ -426,7 +426,7 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                      rc_ok,
                      button_style, *this, OK);
 
-  advanced = new WndButton(GetClientAreaWindow(), button_look, _T("Advanced"),
+  advanced = new WndButton(GetClientAreaWindow(), button_look, N_("Advanced"),
                            rc_advanced,
                            button_style, *this, ADVANCED);
 
