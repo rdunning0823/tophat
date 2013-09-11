@@ -118,7 +118,7 @@ GestureZone::DrawZoneHelp(Canvas &canvas, PixelRect rc)
 
   const unsigned mod = 12;
   unsigned length_ratio = (clock_since_start.Elapsed() / 250) % mod;
-  unsigned length_max = x_zone_width * 3;
+  unsigned length_max = x_zone_width * 2;
   unsigned length = (length_max * length_ratio) / mod ;
 
 
