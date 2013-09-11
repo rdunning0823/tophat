@@ -32,18 +32,27 @@ Copyright_License {
 
 TabBarControl::TabBarControl(ContainerWindow &_parent, const DialogLook &look,
                              PixelRect tab_rc,
-                             const WindowStyle style, bool vertical)
+                             const WindowStyle style, bool vertical,
+                             bool reverse_side)
   :tab_display(NULL)
 {
   Create(_parent, _parent.GetClientRect(), style);
 
-  tab_display = new TabDisplay(*this, look, *this, tab_rc, vertical);
+  tab_display = new TabDisplay(*this, look, *this, tab_rc, vertical,
+                               reverse_side);
 
   PixelRect rc = GetClientRect();
-  if (vertical)
-    rc.left = tab_rc.right;
-  else
-    rc.top = tab_rc.bottom;
+  if (vertical) {
+    if (reverse_side) //tabs on right
+      rc.right = tab_rc.left;
+    else
+      rc.left = tab_rc.right;
+  } else {
+    if (reverse_side) // tabs on bottom
+      rc.bottom = tab_rc.top;
+    else
+      rc.top = tab_rc.bottom;
+  }
 
   pager.Move(rc);
 }
@@ -190,10 +199,19 @@ TabBarControl::OnResize(PixelSize new_size)
   if (tab_display != nullptr) {
     const PixelRect tab_rc = tab_display->GetPosition();
     PixelRect rc = GetClientRect();
-    if (tab_display->IsVertical())
-      rc.left = tab_rc.right;
-    else
-      rc.top = tab_rc.bottom;
+    if (tab_display->IsVertical()) {
+      if (tab_display->IsReverseSide())
+        rc.right = tab_rc.left;
+      else
+        rc.left = tab_rc.right;
+    } else {
+      if (tab_display->IsReverseSide())
+        rc.bottom = tab_rc.top;
+      else
+        rc.top = tab_rc.bottom;
+    }
+
+
 
     pager.Move(rc);
   }

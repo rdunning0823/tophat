@@ -58,12 +58,13 @@ public:
    * Constructor used for stand-alone TabBarControl
    * @param parent
    * @param style
+   * @param reverse_side if true puts tab bar on bottom or right of screen
    * @return
    */
   TabBarControl(ContainerWindow &parent, const DialogLook &look,
                 PixelRect tab_rc,
                 const WindowStyle style,
-                bool vertical);
+                bool vertical, bool reverse_side = false);
 
   ~TabBarControl();
 

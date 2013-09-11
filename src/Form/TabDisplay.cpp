@@ -37,10 +37,11 @@ static constexpr unsigned TabLineHeightInitUnscaled = 5;
 
 TabDisplay::TabDisplay(TabBarControl& _theTabBar, const DialogLook &_look,
                        ContainerWindow &parent, PixelRect rc,
-                       bool _vertical)
+                       bool _vertical, bool _reverse_side)
   :tab_bar(_theTabBar),
    look(_look),
    vertical(_vertical),
+   reverse_side(_reverse_side),
    dragging(false),
    tab_line_height(vertical
                    ? (Layout::Scale(TabLineHeightInitUnscaled) * 0.75)
@@ -106,7 +107,7 @@ TabDisplay::GetButtonSize(unsigned i) const
           (GetWidth() - finalmargin) /
           ((row == 0) ? portraitColumnsRow0 : portraitColumnsRow1) - margin;
 
-    rc.top = row * (rowheight + margin);
+    rc.top = row * (rowheight + margin) + reverse_side ? tab_line_height : 0;
     rc.bottom = rc.top + rowheight;
 
     rc.left = finalmargin + (margin + but_width) * (row ? (i - portraitColumnsRow0) : i);

@@ -72,6 +72,11 @@ protected:
 
   const bool vertical;
 
+  /**
+   * show tabs on bottom or right of screen
+   */
+  const bool reverse_side;
+
   bool dragging; // tracks that mouse is down and captured
   bool drag_off_button; // set by mouse_move
   unsigned down_index; // index of tab where mouse down occurred
@@ -86,7 +91,7 @@ public:
    */
   TabDisplay(TabBarControl& _theTabBar, const DialogLook &look,
              ContainerWindow &parent, PixelRect rc,
-             bool vertical);
+             bool vertical, bool reverse_side);
 
   virtual ~TabDisplay();
 
@@ -96,6 +101,13 @@ public:
 
   bool IsVertical() const {
     return vertical;
+  }
+
+  /**
+   * if true, display tabs on right or bottom of main screen
+   */
+  bool IsReverseSide() const {
+    return reverse_side;
   }
 
   /**
