@@ -67,7 +67,6 @@ Copyright_License {
 #include "Computer/GlideComputer.hpp"
 #include "Computer/GlideComputerInterface.hpp"
 #include "Computer/Events.hpp"
-#include "Monitor/AllMonitors.hpp"
 #include "StatusMessage.hpp"
 #include "MergeThread.hpp"
 #include "CalculationThread.hpp"
@@ -113,7 +112,6 @@ Copyright_License {
 static Markers *marks;
 static TaskManager *task_manager;
 static GlideComputerEvents *glide_computer_events;
-static AllMonitors *all_monitors;
 static GlideComputerTaskEvents *task_events;
 
 static bool
@@ -444,8 +442,6 @@ Startup()
   glide_computer_events->Reset();
   live_blackboard.AddListener(*glide_computer_events);
 
-  all_monitors = new AllMonitors();
-
   if (computer_settings.logger.enable_flight_logger) {
     flight_logger = new GlueFlightLogger(live_blackboard);
     LocalPath(path, _T("flights.log"));
@@ -522,7 +518,6 @@ Shutdown()
   delete flight_logger;
   flight_logger = NULL;
 
-  delete all_monitors;
   live_blackboard.RemoveListener(*glide_computer_events);
   delete glide_computer_events;
 
