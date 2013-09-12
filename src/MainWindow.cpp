@@ -1052,7 +1052,9 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
   /* hide the map (might be hidden already) */
   if (map != NULL) {
     map->FastHide();
-    widget_overlays.Hide();
+    widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+                                     _widget != NULL,
+                                     map != NULL, FullScreen);
 
 #ifndef ENABLE_OPENGL
     if (!draw_suspended) {
