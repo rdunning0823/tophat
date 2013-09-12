@@ -37,7 +37,8 @@
 
 GestureZone::GestureZone()
   :x_zone_width(Layout::GetXDPI() / 2), draw_initialized(false),
-   help_duration(15000), gesture_look(UIGlobals::GetLook().gesture) {}
+   help_duration(15000), gesture_look(UIGlobals::GetLook().gesture),
+   available(false){}
 
 void
 GestureZone::SetZoneWidth(PixelRect rc_map)
@@ -53,6 +54,9 @@ GestureZone::SetZoneWidth(PixelRect rc_map)
 bool
 GestureZone::InZone(PixelRect map_rc, RasterPoint p)
 {
+  if (!available)
+    return false;
+
   PixelRect rc = GetZoneRect(map_rc);
   rc.top = map_rc.top;
   rc.bottom = map_rc.bottom;
@@ -161,6 +165,10 @@ void
 GestureZone::DrawZone(Canvas &canvas, PixelRect rc_map, bool terrain_enabled)
 {
   CheckInitialize();
+
+  if (!available)
+    return;
+
   SetZoneWidth(rc_map);
   PixelRect rc = GetZoneRect(rc_map);
 

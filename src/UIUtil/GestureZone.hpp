@@ -58,6 +58,11 @@ public:
 
   const GestureLook &gesture_look;
 
+  /**
+   * is the zone available, or is it not for the current system
+   */
+  bool available;
+
   GestureZone();
 
   /**
