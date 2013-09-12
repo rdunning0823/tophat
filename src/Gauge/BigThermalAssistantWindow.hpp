@@ -39,7 +39,6 @@ public:
 
   void Create(ContainerWindow &parent, PixelRect rc,
            WindowStyle window_style=WindowStyle()) {
-    window_style.EnableDoubleClicks();
     ThermalAssistantWindow::Create(parent, rc, window_style);
   }
 
@@ -57,7 +56,6 @@ protected:
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y,
                            unsigned keys) override;
-  virtual bool OnMouseDouble(PixelScalar x, PixelScalar y) override;
   virtual bool OnKeyDown(unsigned key_code) override;
   virtual void OnCancelMode() override;
 };

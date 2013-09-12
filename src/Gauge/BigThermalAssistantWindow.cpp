@@ -28,14 +28,6 @@ Copyright_License {
 #include "LogFile.hpp" //debug
 
 bool
-BigThermalAssistantWindow::OnMouseDouble(PixelScalar x, PixelScalar y)
-{
-  StopDragging();
-  InputEvents::ShowMenu();
-  return true;
-}
-
-bool
 BigThermalAssistantWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
   if (!dragging) {
