@@ -277,9 +277,11 @@ MainWindow::InitialiseConfigured()
   }
 #ifdef ENABLE_OPENGL
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
-  widget_overlays.Add(new ScreensButtonWidget(), rc_current);
-  widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
-  widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
+  ScreensButtonWidget *screen_but = new ScreensButtonWidget();
+  ZoomInButtonWidget *z_in_but = new ZoomInButtonWidget(screen_but);
+  widget_overlays.Add(z_in_but, rc_current);
+  widget_overlays.Add(new ZoomOutButtonWidget(z_in_but), rc_current);
+  widget_overlays.Add(screen_but, rc_current);
 #endif
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);

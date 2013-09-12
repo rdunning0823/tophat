@@ -55,8 +55,8 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
   UPixelScalar clear_border_width = Layout::Scale(2);
   PixelRect rc;
   if (Layout::landscape) {
-    rc.left = rc_map.left + GetWidth() + 2 * clear_border_width;
-    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+    rc.left = zoom_in->GetPosition().right;
+    rc.right = rc.left + GetWidth();
     rc.bottom = rc_map.bottom;
     rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
   } else {

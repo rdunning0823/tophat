@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_ZOOM_IN_BUTTON_WIDGET_HPP
 
 #include "Widgets/OverlayButtonWidget.hpp"
+#include "Widgets/ScreensButtonWidget.hpp"
 #include "Form/ActionListener.hpp"
 #include "Projection/MapWindowProjection.hpp"
 #include "Look/ButtonLook.hpp"
@@ -37,7 +38,19 @@ struct PixelRect;
  * a class that is a widget that draws the a zoom in button
  */
 class ZoomInButtonWidget : public OverlayButtonWidget {
+protected:
+  /**
+   * pointer to the screen button widget so we can adjust
+   * our position
+   */
+  ScreensButtonWidget *s_but;
+
+  bool prepared;
 public:
+  ZoomInButtonWidget(ScreensButtonWidget *_s_but)
+    :OverlayButtonWidget(), s_but(_s_but), prepared(false) {
+    assert(s_but != nullptr);
+  }
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
   virtual void Move(const PixelRect &rc) final;
@@ -59,6 +72,8 @@ public:
   virtual UPixelScalar GetWidth() const final;
 
   virtual UPixelScalar GetHeight() const final;
+
+  PixelRect GetPosition() const;
 
   /**
    * The OnAction is derived from ActionListener

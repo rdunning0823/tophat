@@ -28,6 +28,7 @@ Copyright_License {
 #include "Form/ActionListener.hpp"
 #include "Projection/MapWindowProjection.hpp"
 #include "Look/ButtonLook.hpp"
+#include "ZoomInButtonWidget.hpp"
 
 struct IconLook;
 class ContainerWindow;
@@ -38,7 +39,13 @@ struct PixelRect;
  */
 class ZoomOutButtonWidget : public OverlayButtonWidget {
 protected:
+  /**
+   * pointer to the zoom in button
+   */
+  ZoomInButtonWidget *zoom_in;
 public:
+  ZoomOutButtonWidget(ZoomInButtonWidget *_zoom_in)
+    :zoom_in(_zoom_in) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
   virtual void Move(const PixelRect &rc) final;

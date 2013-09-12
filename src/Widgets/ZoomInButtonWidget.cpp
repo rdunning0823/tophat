@@ -44,10 +44,12 @@ void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
                             const PixelRect &rc)
 {
+  assert(!prepared);
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   SetBitmap(&icon_look.hBmpZoomInButton);
   OverlayButtonWidget::Prepare(parent, rc);
   bitmap_size_raw.cx = bitmap_size_raw.cy = Fonts::map_bold.GetHeight();
+  prepared = true;
 }
 
 void
@@ -56,18 +58,38 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
   UPixelScalar clear_border_width = Layout::Scale(2);
   PixelRect rc;
 
-  if (Layout::landscape) {
-    rc.left = rc_map.left;
-    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+  switch (s_but->GetButtonPosition()) {
+  case ScreensButtonWidget::ButtonPosition::Bottom:
+    // must be landscape mode
     rc.bottom = rc_map.bottom;
     rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
-  } else {
-    rc.left = rc_map.left;
-    rc.right = rc.left + (GetWidth() + 2 * clear_border_width);
-    rc.bottom = rc_map.bottom - GetHeight() - 2 * clear_border_width;
-    rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
-  }
 
+    if (s_but->GetPosition().left - rc_map.left - (3 * (PixelScalar)GetWidth()) < 0) {
+
+      // draw adjacent to "S" button's left (with room for Zoom In button)
+      rc.right = s_but->GetPosition().left - GetWidth();
+      rc.left = rc.right - GetWidth();
+    } else {
+      rc.left = rc_map.left;
+      rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+    }
+    break;
+
+  case ScreensButtonWidget::ButtonPosition::Left:
+  case ScreensButtonWidget::ButtonPosition::Right:
+    if (Layout::landscape) {
+      rc.left = rc_map.left;
+      rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+      rc.bottom = rc_map.bottom;
+      rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+    } else {
+      rc.left = rc_map.left;
+      rc.right = rc.left + (GetWidth() + 2 * clear_border_width);
+      rc.bottom = rc_map.bottom - GetHeight() - 2 * clear_border_width;
+      rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
+    }
+    break;
+  }
   WindowWidget::Move(rc);
 }
 
@@ -81,6 +103,15 @@ UPixelScalar
 ZoomInButtonWidget::GetHeight() const
 {
   return GetWidth();
+}
+
+PixelRect
+ZoomInButtonWidget::GetPosition() const
+{
+  if (!prepared)
+    return {0, 0, 1, 1};
+
+  return WindowWidget::GetWindow().GetPosition();
 }
 
 void

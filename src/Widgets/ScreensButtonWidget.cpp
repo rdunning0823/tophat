@@ -35,16 +35,10 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 #include "Input/InputEvents.hpp"
-#include "InfoBoxes/InfoBoxLayout.hpp"
 
-enum ButtonPosition {
-  Bottom,
-  Left,
-  Right,
-};
-
-static ButtonPosition
-GetButtonPosition(InfoBoxSettings::Geometry geometry, bool landscape)
+ScreensButtonWidget::ButtonPosition
+ScreensButtonWidget::GetButtonPosition(InfoBoxSettings::Geometry geometry,
+                                       bool landscape)
 {
   if (landscape)
     switch (geometry) {
@@ -52,7 +46,7 @@ GetButtonPosition(InfoBoxSettings::Geometry geometry, bool landscape)
     case InfoBoxSettings::Geometry::LEFT_6_RIGHT_3_VARIO:
     case InfoBoxSettings::Geometry::TOP_8_VARIO:
     case InfoBoxSettings::Geometry::OBSOLETE_SPLIT_8:
-        return ButtonPosition::Bottom;
+        return ScreensButtonWidget::ButtonPosition::Bottom;
 
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_8:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
@@ -64,17 +58,26 @@ GetButtonPosition(InfoBoxSettings::Geometry geometry, bool landscape)
     case InfoBoxSettings::Geometry::OBSOLETE_BOTTOM_RIGHT_8:
     case InfoBoxSettings::Geometry::OBSOLETE_BOTTOM_RIGHT_12:
     case InfoBoxSettings::Geometry::OBSOLETE_BOTTOM_RIGHT_4:
-      return ButtonPosition::Left;
+      return ScreensButtonWidget::ButtonPosition::Left;
 
     case InfoBoxSettings::Geometry::TOP_LEFT_8:
     case InfoBoxSettings::Geometry::TOP_LEFT_12:
     case InfoBoxSettings::Geometry::TOP_LEFT_4:
     case InfoBoxSettings::Geometry::OBSOLETE_TOP_LEFT_8:
     case InfoBoxSettings::Geometry::OBSOLETE_TOP_LEFT_4:
-      return ButtonPosition::Right;
+      return ScreensButtonWidget::ButtonPosition::Right;
     }
 
-  return ButtonPosition::Left;
+  return ScreensButtonWidget::ButtonPosition::Left;
+}
+
+PixelRect
+ScreensButtonWidget::GetPosition() const
+{
+  if (!prepared)
+    return {0, 0, 1, 1};
+
+  return WindowWidget::GetWindow().GetPosition();
 }
 
 void
@@ -108,9 +111,11 @@ void
 ScreensButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
+  assert (!prepared);
   const IconLook &icons = UIGlobals::GetIconLook();
   SetBitmap(&icons.hBmpScreensButton);
   OverlayButtonWidget::Prepare(parent, rc);
+  prepared = true;
 }
 
 void
@@ -122,8 +127,10 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   UPixelScalar clear_border_width = Layout::Scale(2);
   PixelRect rc;
 
-  switch (GetButtonPosition(ui_settings.info_boxes.geometry,
-                            Layout::landscape)) {
+  button_position = GetButtonPosition(ui_settings.info_boxes.geometry,
+                                      Layout::landscape);
+
+  switch (button_position) {
   case ButtonPosition::Left:
     rc.left = 0;
     rc.right = rc.left + GetWidth() + clear_border_width;

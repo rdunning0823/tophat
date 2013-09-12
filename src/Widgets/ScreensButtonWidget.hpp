@@ -28,6 +28,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
 #include "Look/ButtonLook.hpp"
+#include "InfoBoxes/InfoBoxLayout.hpp"
 
 #include <tchar.h>
 
@@ -36,8 +37,18 @@ class ContainerWindow;
 struct PixelRect;
 
 class ScreensButtonWidget : public OverlayButtonWidget {
+public:
+  enum ButtonPosition {
+    Bottom,
+    Left,
+    Right,
+  };
 protected:
   OverlayButton *the_button;
+
+  ButtonPosition button_position;
+
+  bool prepared;
 
   /**
    * height to draw the button, or if 0, use bitmap's size
@@ -45,7 +56,9 @@ protected:
   unsigned height;
 public:
   ScreensButtonWidget()
-    :height(0) {}
+    :the_button(nullptr), button_position(Bottom), prepared(false), height(0)
+  {}
+
   /**
    * Shows or hides the widgets based on these parameters
    * @rc. the rc of the map
@@ -62,6 +75,16 @@ public:
    * The OnAction is derived from ActionListener
    */
   virtual void OnAction(int id);
+
+  PixelRect GetPosition() const;
+
+  ButtonPosition GetButtonPosition() const {
+    return button_position;
+  }
+
+  ButtonPosition GetButtonPosition(InfoBoxSettings::Geometry geometry,
+                                   bool landscape);
+
 };
 
 #endif
