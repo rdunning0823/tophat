@@ -825,21 +825,27 @@ TrafficWidget::UpdateLayout()
   const PixelScalar x0 = x1 - button_width;
   const PixelScalar x2 = x1 + button_width;
 
-  const int y0 = margin;
-  const int y1 = y0 + button_height;
   const int y3 = rc.bottom - margin;
   const int y2 = y3 - button_height;
 
   PixelRect button_rc;
 
-  button_rc.left = x0;
-  button_rc.top = y0;
-  button_rc.right = x1 - margin;
-  button_rc.bottom = y1;
+  button_rc.left = 0;
+  button_rc.right = button_width;
+  if (Layout::landscape)
+    button_rc.bottom = rc.bottom;
+  else
+    button_rc.bottom = rc.bottom - button_height;
+  button_rc.top = button_rc.bottom - button_height;
   zoom_in_button->Move(button_rc);
 
-  button_rc.left = x1;
-  button_rc.right = x2 - margin;
+  if (Layout::landscape)
+    button_rc.left = button_width;
+  else
+    button_rc.left = 0;
+  button_rc.right = button_rc.left + button_width;
+  button_rc.bottom = rc.bottom;
+  button_rc.top = button_rc.bottom - button_height;
   zoom_out_button->Move(button_rc);
 
   button_rc.left = x0;
