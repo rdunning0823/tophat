@@ -24,8 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_ZOOM_IN_BUTTON_WIDGET_HPP
 #define XCSOAR_ZOOM_IN_BUTTON_WIDGET_HPP
 
-#include "Widgets/MapOverlayWidget.hpp"
-#include "Widgets/ZoomButton.hpp"
+#include "Widgets/OverlayButtonWidget.hpp"
 #include "Form/ActionListener.hpp"
 #include "Projection/MapWindowProjection.hpp"
 #include "Look/ButtonLook.hpp"
@@ -37,48 +36,16 @@ struct PixelRect;
 /**
  * a class that is a widget that draws the a zoom in button
  */
-class ZoomInButtonWidget : public MapOverlayWidget, protected ActionListener {
-protected:
-  /**
-   * size of the button (unscaled)
-   */
-  PixelSize button_size_raw;
-
-  /**
-   * a customized copy of button_look
-   */
-  ButtonLook white_look;
-
-
-
+class ZoomInButtonWidget : public OverlayButtonWidget {
 public:
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide();
-  virtual void Move(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
+  virtual void Move(const PixelRect &rc) final;
 
   /**
    * How much height does this widget use at the bottom of the map screen
    */
-  virtual UPixelScalar HeightFromBottomLeft();
-
-  /**
-   * returns width of button
-   */
-  UPixelScalar GetWidth() const;
-
-  /**
-   * returns height of button
-   */
-  UPixelScalar GetHeight() const;
-
-  ZoomButton& CreateButton(ContainerWindow &parent,
-                           const ButtonLook &button_look,
-                           const IconLook &icon_look,
-                           const PixelRect &rc_map);
-
+  virtual UPixelScalar HeightFromBottomLeft() final;
   /**
    * Shows or hides the widgets based on these parameters
    * @rc. the rc of the map
@@ -87,14 +54,18 @@ public:
    * @is_map. is the map non-NULL
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
-                                bool is_main_window_widget, bool is_map);
+                                bool is_main_window_widget, bool is_map) final;
+
+  virtual UPixelScalar GetWidth() const final;
+
+  virtual UPixelScalar GetHeight() const final;
 
   /**
    * The OnAction is derived from ActionListener
    * Toggles between the more/less menus (MapDisplay1, MapDisplay2)
    * and hiding the menu
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) final;
 private:
 
 };

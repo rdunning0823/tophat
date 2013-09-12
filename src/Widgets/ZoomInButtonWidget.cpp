@@ -44,34 +44,10 @@ void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
                             const PixelRect &rc)
 {
-  white_look.Initialise(Fonts::map_bold);
-/*  white_look.SetBackgroundColor(COLOR_WHITE);
-  white_look.button.standard.background_color = COLOR_WHITE;
-  white_look.button.focused.background_color = COLOR_WHITE;*/
-
-  button_size_raw.cx = button_size_raw.cy = Fonts::map_bold.GetHeight();
-
-  CreateButton(parent, white_look, UIGlobals::GetIconLook(), rc);
-  Move(rc);
-}
-
-void
-ZoomInButtonWidget::Unprepare()
-{
-  WindowWidget::Unprepare();
-  DeleteWindow();
-}
-
-void
-ZoomInButtonWidget::Show(const PixelRect &rc)
-{
-  GetWindow().Show();
-}
-
-void
-ZoomInButtonWidget::Hide()
-{
-  GetWindow().Hide();
+  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
+  SetBitmap(&icon_look.hBmpZoomInButton);
+  OverlayButtonWidget::Prepare(parent, rc);
+  bitmap_size_raw.cx = bitmap_size_raw.cy = Fonts::map_bold.GetHeight();
 }
 
 void
@@ -98,7 +74,7 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
 UPixelScalar
 ZoomInButtonWidget::GetWidth() const
 {
-  return button_size_raw.cx * MapOverlayButton::GetScale();
+  return bitmap_size_raw.cx * MapOverlayButton::GetScale();
 }
 
 UPixelScalar
@@ -135,19 +111,4 @@ ZoomInButtonWidget::HeightFromBottomLeft()
     return GetHeight() + Layout::Scale(3);
   else
     return GetHeight() * 2 + Layout::Scale(6);
-}
-
-ZoomButton &
-ZoomInButtonWidget::CreateButton(ContainerWindow &parent,
-                                 const ButtonLook &button_look,
-                                 const IconLook &icon_look,
-                                 const PixelRect &rc_map)
-{
-  ButtonWindowStyle button_style;
-  button_style.multiline();
-
-  ZoomButton *button = new ZoomButton(parent, button_look, icon_look, rc_map,
-                                      button_style, true, *this, 0);
-  SetWindow(button);
-  return *button;
 }
