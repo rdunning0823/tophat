@@ -676,6 +676,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Startup.cpp \
 	$(SRC)/Components.cpp \
 	\
+	$(SRC)/Widgets/OverlayButtonWidget.cpp \
 	$(SRC)/Widgets/MainMenuButtonWidget.cpp \
 	$(SRC)/Widgets/ScreensButtonWidget.cpp \
 	$(SRC)/Widgets/MapOverlayButton.cpp \
