@@ -140,7 +140,6 @@ protected:
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
   virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseDouble(PixelScalar x, PixelScalar y) override;
   virtual bool OnKeyDown(unsigned key_code) override;
   virtual void OnCancelMode() override;
 
@@ -735,14 +734,6 @@ FlarmTrafficControl::OnMouseUp(PixelScalar x, PixelScalar y)
 }
 
 bool
-FlarmTrafficControl::OnMouseDouble(PixelScalar x, PixelScalar y)
-{
-  StopDragging();
-  InputEvents::ShowMenu();
-  return true;
-}
-
-bool
 FlarmTrafficControl::OnMouseGesture(const TCHAR* gesture)
 {
   if (StringIsEqual(gesture, _T("U"))) {
@@ -916,7 +907,6 @@ TrafficWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
 #endif
 
   WindowStyle style;
-  style.EnableDoubleClicks();
 
   view = new FlarmTrafficControl(look.flarm_dialog);
   view->Create(GetContainer(), rc, style);
