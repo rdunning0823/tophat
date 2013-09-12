@@ -43,6 +43,7 @@ struct IconLook {
   Bitmap hBmpTabTimes;
 
   Bitmap hBmpMenuButton;
+  Bitmap hBmpScreensButton;
   Bitmap hBmpCheckMark;
   Bitmap hBmpSearch;
   Bitmap hBmpSearchChecked;

@@ -176,4 +176,6 @@
 #define IDB_BEARING_RIGHT_FOUR_HD      5513
 #define IDB_HAND_POINTER                514
 #define IDB_HAND_POINTER_HD            5514
+#define IDB_SCREENS_BUTTON              515
+#define IDB_SCREENS_BUTTON_HD          5515
 

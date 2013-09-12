@@ -60,6 +60,7 @@ Copyright_License {
 #include "Pan.hpp"
 #include "MapWindow/MapWidgetOverlays.hpp"
 #include "Widgets/MainMenuButtonWidget.hpp"
+#include "Widgets/ScreensButtonWidget.hpp"
 #include "Widgets/TaskNavSliderWidget.hpp"
 #include "Widgets/ZoomInButtonWidget.hpp"
 #include "Widgets/ZoomOutButtonWidget.hpp"
@@ -292,6 +293,7 @@ MainWindow::InitialiseConfigured()
   }
 #ifdef ENABLE_OPENGL
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
+  widget_overlays.Add(new ScreensButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomInButtonWidget(), rc_current);
   widget_overlays.Add(new ZoomOutButtonWidget(), rc_current);
 #endif
