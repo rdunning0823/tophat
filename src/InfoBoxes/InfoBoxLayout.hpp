@@ -60,6 +60,16 @@ namespace InfoBoxLayout
   gcc_const
   int
   GetBorder(InfoBoxSettings::Geometry geometry, bool landscape, unsigned i);
+
+  /**
+   * will this geometry display InfoBoxes across the bottom of the screen
+   * when in portrait mode?
+   * @param geometry
+   * @return bool
+   */
+  gcc_const
+  bool
+  HasInfoBoxesOnBottom(InfoBoxSettings::Geometry geometry);
 };
 
 #endif
