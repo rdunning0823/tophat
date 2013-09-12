@@ -1008,9 +1008,9 @@ location=22
 
 mode=Menu
 type=key
-data=9
-event=ScreenModes next
-label=Switch screens
+data=6
+event=Mode Orientation
+label=Screen orientation
 location=23
 
 # -------------
@@ -1020,18 +1020,10 @@ location=23
 mode=Menu1
 type=key
 data=0
-event=Setup Wind
-event=Mode default
-label=Setup Wind
-location=16
-
-mode=Menu1
-type=key
-data=0
 event=ThermalAssistant
 event=Mode default
 label=Thermal Assistant
-location=17
+location=16
 
 mode=Menu1
 type=key
@@ -1040,13 +1032,6 @@ event=Mode default
 event=Status all
 label=Status
 location=21
-
-mode=Menu1
-type=key
-data=6
-event=Mode Orientation
-label=Screen orientation
-location=22
 
 # -------------
 # mode=Menu2
@@ -1076,6 +1061,13 @@ event=Mode default
 label=Bugs & Ballast
 location=22
 
+mode=Menu2
+type=key
+data=0
+event=Setup Wind
+event=Mode default
+label=Setup Wind
+location=23
 # -------------
 # mode=MenuLast
 # -------------
