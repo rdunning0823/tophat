@@ -46,8 +46,8 @@ BigThermalAssistantWidget::UpdateLayout()
   PixelRect button_rc;
   button_rc.bottom = rc.bottom - margin;
   button_rc.top = button_rc.bottom - button_height;
-  button_rc.right = rc.right - margin;
-  button_rc.left = button_rc.right - Layout::Scale(50);
+  button_rc.left = rc.left + margin;
+  button_rc.right = button_rc.left + Layout::Scale(50);
   close_button->Move(button_rc);
 #endif
 }
