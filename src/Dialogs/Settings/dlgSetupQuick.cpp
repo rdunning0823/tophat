@@ -216,7 +216,7 @@ ShowPanel(unsigned page)
     break;
   case SCREENS:
     widget = CreateLayoutConfigPanel(true);
-    title = _("Custom screens");
+    title = _("Set up screen");
     break;
   case DEVICE:
   case PLANE:
@@ -410,7 +410,7 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                button_style, *this, PILOT);
 
   screens_button = new WndButton(GetClientAreaWindow(), button_look,
-                                 N_("Screens"),
+                                 N_("Screen"),
                                  rc_screens_button,
                                  button_style, *this, SCREENS);
 
