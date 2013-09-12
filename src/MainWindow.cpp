@@ -155,22 +155,6 @@ MainWindow::~MainWindow()
   Destroy();
 }
 
-gcc_pure
-PixelRect
-MainWindow::GetUpperRect() const
-{
-  PixelRect result = GetMainRect();
-
-  unsigned total_height = GetMainRect().GetSize().cy;
-  unsigned map_height = map->GetClientRect().GetSize().cy;
-
-  if (total_height > map_height) {
-    result.bottom -= (total_height - map_height);
-  }
-
-  return result;
-}
-
 void
 MainWindow::Create(PixelSize size, TopWindowStyle style)
 {
@@ -421,9 +405,9 @@ MainWindow::ReinitialiseLayout()
     map->FullRedraw();
   }
 
-  widget_overlays.UpdateVisibility(GetUpperRect(), IsPanning(),
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
-                                   map != NULL);
+                                   map != NULL, FullScreen);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   map->SetCompassOffset(widget_overlays.HeightFromTop());
@@ -744,9 +728,9 @@ MainWindow::OnTimer(WindowTimer &_timer)
     }
   }
 
-  widget_overlays.UpdateVisibility(GetUpperRect(), IsPanning(),
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
-                                   map != NULL);
+                                   map != NULL, FullScreen);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #ifndef ENABLE_OPENGL
@@ -970,9 +954,9 @@ MainWindow::ActivateMap()
     }
 #endif
   }
-  widget_overlays.UpdateVisibility(GetUpperRect(), IsPanning(),
+  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
-                                   map != NULL);
+                                   map != NULL, FullScreen);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #ifndef ENABLE_OPENGL

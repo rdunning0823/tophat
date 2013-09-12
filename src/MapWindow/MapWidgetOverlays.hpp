@@ -58,13 +58,14 @@ public:
 
   /**
    * Shows or hides each of the widgets based on these parameters
-   * @rc. the rc of the current visible map window
+   * @rc. the rc of the full screen map window
    * @is_panning.  is the map in panning mode
    * @is_main_window_widget. is the mainWindow's widget non-NULL
    * @is_map. is the map non-NULL
    */
-  void UpdateVisibility(const PixelRect &rc_current, bool is_panning,
-                        bool is_main_window_widget, bool is_map);
+  void UpdateVisibility(const PixelRect &rc_full_screen, bool is_panning,
+                        bool is_main_window_widget, bool is_map,
+                        bool is_full_screen);
 
   /**
    * Adds an Uninitialised widget to the list of widgets

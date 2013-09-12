@@ -207,11 +207,6 @@ private:
   }
 
   /**
-   * returns part of the map rect not taken by the bottom widget
-   */
-  gcc_pure
-  PixelRect GetUpperRect() const;
-  /**
    * Adjust the flarm radar position
    */
   void ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout ib_layout);
