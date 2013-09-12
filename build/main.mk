@@ -684,7 +684,6 @@ XCSOAR_SOURCES := \
 	$(SRC)/Widgets/TaskNavSliderShape.cpp \
 	$(SRC)/Widgets/ZoomOutButtonWidget.cpp \
 	$(SRC)/Widgets/ZoomInButtonWidget.cpp \
-	$(SRC)/Widgets/ZoomButton.cpp \
 	$(SRC)/Widgets/TaskNavDataCache.cpp \
 	$(SRC)/Widgets/TaskButtonWidget.cpp \
 	$(SRC)/Widgets/TaskPreviousButtonWidget.cpp \
