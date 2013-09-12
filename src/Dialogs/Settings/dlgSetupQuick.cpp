@@ -115,13 +115,16 @@ public:
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc) {};
   virtual void Hide() {};
-  virtual void Move(const PixelRect &rc) {};
 
   /**
    * sets up rectangles for layout of screen
    * @param rc. rect of dialog
    */
   void SetRectangles(const PixelRect &rc);
+
+  virtual void OnResize(PixelSize new_size) override;
+
+  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
 
   /**
    * from ActionListener
@@ -420,6 +423,35 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            button_style, *this, ADVANCED);
 
   RefreshForm();
+}
+
+void
+SetupQuick::ReinitialiseLayout(const PixelRect &parent_rc)
+{
+  WndForm::Move(parent_rc);
+}
+
+void
+SetupQuick::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+  SetRectangles(GetClientRect());
+
+  nationality_text->Move(rc_nationality_text);
+  site_files_text->Move(rc_site_files_text);
+  plane_text->Move(rc_plane_text);
+  device_text->Move(rc_device_text);
+  safety_text->Move(rc_safety_text);
+  pilot_text->Move(rc_pilot_text);
+  nationality_button->Move(rc_nationality_button);
+  site_files_button->Move(rc_site_files_button);
+  plane_button->Move(rc_plane_button);
+  device_button->Move(rc_device_button);
+  safety_button->Move(rc_safety_button);
+  pilot_button->Move(rc_pilot_button);
+  screens_button->Move(rc_screens_button);
+  ok->Move(rc_ok);
+  advanced->Move(rc_advanced);
 }
 
 void
