@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "ScreensButtonWidget.hpp"
-#include "MapOverlayButton.hpp"
 #include "Form/SymbolButton.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
@@ -78,51 +77,6 @@ GetButtonPosition(InfoBoxSettings::Geometry geometry, bool landscape)
   return ButtonPosition::Left;
 }
 
-bool
-ScreensButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
-{
-  if (IsInside(x, y))
-    return WndButton::OnMouseMove(x, y, keys);
-  else
-    OnCancelMode();
-  return true;
-}
-
-void
-ScreensButton::OnPaint(Canvas &canvas)
-{
-  PixelRect rc = {
-    PixelScalar(0), PixelScalar(0), PixelScalar(canvas.GetWidth()),
-    PixelScalar(canvas.GetHeight())
-  };
-
-  bool pressed = IsDown();
-#ifdef ENABLE_OPENGL
-  bool transparent = true;
-#else
-  bool transparent = false;
-#endif
-  //Todo fix the GDI rendering so it draws transparent correctly
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
-  rc = renderer.GetDrawingRect(rc, pressed);
-
-  canvas.SelectNullPen();
-  if (!IsEnabled())
-    canvas.Select(button_look.disabled.brush);
-  else
-    canvas.Select(button_look.standard.foreground_brush);
-  const Bitmap *bmp = &icon_look.hBmpScreensButton;
-  const PixelSize bitmap_size = bmp->GetSize();
-  const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
-  const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
-  canvas.CopyAnd(rc.left + offsetx,
-                  rc.top + offsety,
-                  bitmap_size.cx / 2,
-                  bitmap_size.cy,
-                  *bmp,
-                  bitmap_size.cx / 2, 0);
-}
-
 void
 ScreensButtonWidget::UpdateVisibility(const PixelRect &rc,
                                        bool is_panning,
@@ -150,44 +104,13 @@ ScreensButtonWidget::UpdateVisibility(const PixelRect &rc,
     Hide();
 }
 
-UPixelScalar
-ScreensButtonWidget::HeightFromBottomRight()
-{
-  return bitmap_size_raw.cy * MapOverlayButton::GetScale() + Layout::Scale(3);
-}
-
 void
 ScreensButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
-  white_look.Initialise(Fonts::map_bold);
-
   const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *bmp = &icons.hBmpScreensButton;
-  bitmap_size_raw = bmp->GetSize();
-
-  the_button = &CreateButton(parent, white_look, icon_look, rc);
-  Move(rc);
-}
-
-void
-ScreensButtonWidget::Unprepare()
-{
-  WindowWidget::Unprepare();
-  DeleteWindow();
-}
-
-void
-ScreensButtonWidget::Show(const PixelRect &rc)
-{
-  GetWindow().Show();
-}
-
-void
-ScreensButtonWidget::Hide()
-{
-  GetWindow().Hide();
+  SetBitmap(&icons.hBmpScreensButton);
+  OverlayButtonWidget::Prepare(parent, rc);
 }
 
 void
@@ -227,43 +150,9 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   GetWindow().Move(rc);
 }
 
-UPixelScalar
-ScreensButtonWidget::GetWidth() const
-{
-  return bitmap_size_raw.cx / 2 * MapOverlayButton::GetScale() / 2.5;
-}
-
-UPixelScalar
-ScreensButtonWidget::GetHeight() const
-{
-  const UPixelScalar base_height = bitmap_size_raw.cy *
-      MapOverlayButton::GetScale() / 2.5;
-
-  if (height == 0)
-    return base_height;
-  else
-   return height + base_height / 2;
-}
-
 void
 ScreensButtonWidget::OnAction(int id)
 {
   InputEvents::HideMenu();
   InputEvents::eventScreenModes(_T("next"));
-}
-
-ScreensButton &
-ScreensButtonWidget::CreateButton(ContainerWindow &parent,
-                                   const ButtonLook &button_look,
-                                   const IconLook &icon_look,
-                                   const PixelRect &rc_map)
-{
-  ButtonWindowStyle button_style;
-  button_style.multiline();
-
-  ScreensButton *button =
-    new ScreensButton(parent, button_look, icon_look, _T(""), // TODO replace "" with NULL
-                       rc_map, button_style, *this, 0);
-  SetWindow(button);
-  return *button;
 }
