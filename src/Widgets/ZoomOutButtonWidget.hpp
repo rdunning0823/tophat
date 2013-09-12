@@ -24,8 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_ZOOM_OUT_BUTTON_WIDGET_HPP
 #define XCSOAR_ZOOM_OUT_BUTTON_WIDGET_HPP
 
-#include "Widgets/MapOverlayWidget.hpp"
-#include "Widgets/ZoomButton.hpp"
+#include "Widgets/OverlayButtonWidget.hpp"
 #include "Form/ActionListener.hpp"
 #include "Projection/MapWindowProjection.hpp"
 #include "Look/ButtonLook.hpp"
@@ -37,27 +36,12 @@ struct PixelRect;
 /**
  * a class that is a widget that draws the a zoom in button
  */
-class ZoomOutButtonWidget : public MapOverlayWidget, protected ActionListener {
+class ZoomOutButtonWidget : public OverlayButtonWidget {
 protected:
-  /**
-   * size of the button (unscaled)
-   */
-  PixelSize button_size_raw;
-
-  /**
-   * a customized copy of button_look
-   */
-  ButtonLook white_look;
-
-
-
 public:
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide();
-  virtual void Move(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
+  virtual void Move(const PixelRect &rc) final;
 
   /**
    * How much height does this widget use at the bottom of the map screen
@@ -73,11 +57,6 @@ public:
    * returns height of button
    */
   UPixelScalar GetHeight() const;
-
-  ZoomButton& CreateButton(ContainerWindow &parent,
-                           const ButtonLook &button_look,
-                           const IconLook &icon_look,
-                           const PixelRect &rc_map);
 
   /**
    * Shows or hides the widgets based on these parameters
