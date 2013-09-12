@@ -825,9 +825,6 @@ TrafficWidget::UpdateLayout()
   const PixelScalar x0 = x1 - button_width;
   const PixelScalar x2 = x1 + button_width;
 
-  const int y3 = rc.bottom - margin;
-  const int y2 = y3 - button_height;
-
   PixelRect button_rc;
 
   button_rc.left = 0;
@@ -849,9 +846,9 @@ TrafficWidget::UpdateLayout()
   zoom_out_button->Move(button_rc);
 
   button_rc.left = x0;
-  button_rc.top = y2;
+  button_rc.top = 0;
   button_rc.right = x1 - margin;
-  button_rc.bottom = y3;
+  button_rc.bottom = button_height;
   previous_item_button->Move(button_rc);
 
   button_rc.left = x1;
