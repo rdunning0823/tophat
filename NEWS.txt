@@ -1,13 +1,13 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-TopHat 1.2.1 beta TBD
+Top Hat Soaring 1.3 beta 9/14/2013
 * User testing of "multiple screens"
-  - swipe zones on left and right
+  - Screen advance button displayed on screen
   - QuickSetup access to screen and infobox customization
   - Wind settings.  Remove Clear button and Source box
 
-* Merge XCSoar 6.7 code
+* Merge XCSoar 6.7alpha2
 * user interface
   - resizable main window
   - added AutoZoom gesture (up-down)
