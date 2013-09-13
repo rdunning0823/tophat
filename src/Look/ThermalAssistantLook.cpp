@@ -24,14 +24,15 @@
 #include "ThermalAssistantLook.hpp"
 #include "StandardFonts.hpp"
 #include "Screen/Layout.hpp"
+#include "Asset.hpp"
 
 void
 ThermalAssistantLook::Initialise(bool small, bool inverse)
 {
   background_color = COLOR_WHITE;
-  circle_color = Color(0xB0, 0xB0, 0xB0);
+  circle_color = HasColors() ? Color(0xB0, 0xB0, 0xB0) : COLOR_DARK_GRAY;
   text_color = Color(0x00, 0x00, 0x00);
-  polygon_fill_color = Color(0xCC, 0xCC, 0xFF);
+  polygon_fill_color = HasColors() ? Color(0xCC, 0xCC, 0xFF) : COLOR_GRAY;
   polygon_border_color = Color(0x00, 0x00, 0xFF);
 
 #ifdef ENABLE_OPENGL
