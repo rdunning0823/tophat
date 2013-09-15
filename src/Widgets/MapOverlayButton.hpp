@@ -35,6 +35,11 @@ namespace MapOverlayButton {
    */
   unsigned GetScale();
 
+  /**
+   * returns standard button height.  Not scaled by GetScale()
+   */
+  unsigned GetStandardButtonHeight();
+
 }
 
 #endif

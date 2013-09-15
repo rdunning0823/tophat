@@ -22,10 +22,18 @@ Copyright_License {
 */
 
 #include "MapOverlayButton.hpp"
+#include "Look/GlobalFonts.hpp"
+#include "Screen/Font.hpp"
 
 unsigned
 MapOverlayButton::GetScale()
 {
   return 3;
+}
+
+unsigned
+MapOverlayButton::GetStandardButtonHeight()
+{
+  return Fonts::map_bold.GetHeight();
 }
 

@@ -50,13 +50,9 @@ protected:
 
   bool prepared;
 
-  /**
-   * height to draw the button, or if 0, use bitmap's size
-   */
-  unsigned height;
 public:
   ScreensButtonWidget()
-    :the_button(nullptr), button_position(Bottom), prepared(false), height(0)
+    :the_button(nullptr), button_position(Bottom), prepared(false)
   {}
 
   /**
@@ -84,6 +80,10 @@ public:
 
   ButtonPosition GetButtonPosition(InfoBoxSettings::Geometry geometry,
                                    bool landscape);
+
+  virtual UPixelScalar GetHeight() const final;
+
+  virtual UPixelScalar GetWidth() const final;
 
 };
 

@@ -33,7 +33,6 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
 #include "UIState.hpp"
-#include "Look/GlobalFonts.hpp"
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
 #include "Screen/Canvas.hpp"
@@ -46,7 +45,6 @@ ZoomOutButtonWidget::Prepare(ContainerWindow &parent,
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   SetBitmap(&icon_look.hBmpZoomOutButton);
   OverlayButtonWidget::Prepare(parent, rc);
-  bitmap_size_raw.cx = bitmap_size_raw.cy = Fonts::map_bold.GetHeight();
 }
 
 void
@@ -56,7 +54,7 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
   PixelRect rc;
   if (Layout::landscape) {
     rc.left = zoom_in->GetPosition().right;
-    rc.right = rc.left + GetWidth();
+    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
     rc.bottom = rc_map.bottom;
     rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
   } else {
@@ -72,7 +70,8 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
 UPixelScalar
 ZoomOutButtonWidget::GetWidth() const
 {
-  return bitmap_size_raw.cx * MapOverlayButton::GetScale();
+  return MapOverlayButton::GetStandardButtonHeight() *
+      MapOverlayButton::GetScale();
 }
 
 UPixelScalar

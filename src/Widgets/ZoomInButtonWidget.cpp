@@ -33,8 +33,6 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
 #include "UIState.hpp"
-#include "Look/GlobalFonts.hpp"
-#include "Look/GlobalFonts.hpp"
 #include "Input/InputEvents.hpp"
 #include "Widgets/MapOverlayButton.hpp"
 #include "Screen/Canvas.hpp"
@@ -48,7 +46,6 @@ ZoomInButtonWidget::Prepare(ContainerWindow &parent,
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   SetBitmap(&icon_look.hBmpZoomInButton);
   OverlayButtonWidget::Prepare(parent, rc);
-  bitmap_size_raw.cx = bitmap_size_raw.cy = Fonts::map_bold.GetHeight();
   prepared = true;
 }
 
@@ -67,8 +64,8 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
     if (s_but->GetPosition().left - rc_map.left - (3 * (PixelScalar)GetWidth()) < 0) {
 
       // draw adjacent to "S" button's left (with room for Zoom In button)
-      rc.right = s_but->GetPosition().left - GetWidth();
-      rc.left = rc.right - GetWidth();
+      rc.right = s_but->GetPosition().left - GetWidth() - 2 * clear_border_width;
+      rc.left = rc.right - GetWidth() - 2 * clear_border_width;
     } else {
       rc.left = rc_map.left;
       rc.right = rc.left + GetWidth() + 2 * clear_border_width;
@@ -96,7 +93,8 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
 UPixelScalar
 ZoomInButtonWidget::GetWidth() const
 {
-  return bitmap_size_raw.cx * MapOverlayButton::GetScale();
+  return MapOverlayButton::GetStandardButtonHeight() *
+      MapOverlayButton::GetScale();
 }
 
 UPixelScalar

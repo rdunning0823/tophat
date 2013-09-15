@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "ScreensButtonWidget.hpp"
+#include "Widgets/MapOverlayButton.hpp"
 #include "Form/SymbolButton.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
@@ -31,7 +32,6 @@ Copyright_License {
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
-#include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 #include "Input/InputEvents.hpp"
@@ -87,21 +87,6 @@ ScreensButtonWidget::UpdateVisibility(const PixelRect &rc,
                                        bool is_map)
 {
   if (!is_panning) {
-    const UISettings &ui_settings = CommonInterface::GetUISettings();
-    const InfoBoxLayout::Layout ib_layout =
-      InfoBoxLayout::Calculate(UIGlobals::GetMainWindow().GetClientRect(),
-                               ui_settings.info_boxes.geometry);
-    bool full_screen = CommonInterface::main_window->GetFullScreen();
-
-    if (false && !Layout::landscape && full_screen &&
-        InfoBoxLayout::HasInfoBoxesOnBottom(ib_layout.geometry) &&
-        (PixelScalar)CommonInterface::main_window->GetHeight() >
-        ib_layout.remaining.bottom)
-      height = CommonInterface::main_window->GetHeight() -
-        ib_layout.remaining.bottom;
-    else
-      height = 0;
-
     Show(rc);
   } else
     Hide();
@@ -133,28 +118,40 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   switch (button_position) {
   case ButtonPosition::Left:
     rc.left = 0;
-    rc.right = rc.left + GetWidth() + clear_border_width;
+    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
     rc.bottom = rc_main.GetCenter().y;
     rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
   break;
 
   case ButtonPosition::Right:
     rc.right = rc_main.right;
-    rc.left = rc.right - GetWidth() - clear_border_width;
+    rc.left = rc.right - GetWidth() - 2 * clear_border_width;
     rc.bottom = rc_main.GetCenter().y;
     rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
   break;
 
   case ButtonPosition::Bottom:
     rc.left = rc_main.GetCenter().x - GetWidth() / 2;
-    rc.right = rc.left + GetWidth() + clear_border_width;
+    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
     rc.bottom = rc_main.bottom;
     rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
   break;
 }
-
   WindowWidget::Move(rc);
   GetWindow().Move(rc);
+}
+
+UPixelScalar
+ScreensButtonWidget::GetWidth() const
+{
+  return MapOverlayButton::GetStandardButtonHeight() *
+      MapOverlayButton::GetScale();
+}
+
+UPixelScalar
+ScreensButtonWidget::GetHeight() const
+{
+  return GetWidth();
 }
 
 void
