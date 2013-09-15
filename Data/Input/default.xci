@@ -1010,7 +1010,7 @@ mode=Menu
 type=key
 data=6
 event=Mode Orientation
-label=Screen orientation
+label=Map orientation
 location=23
 
 # -------------
