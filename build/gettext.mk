@@ -6,7 +6,7 @@ MSGCAT = msgcat
 MSGFMT = msgfmt
 MSGMERGE = msgmerge
 
-GETTEXT_PACKAGE = xcsoar
+GETTEXT_PACKAGE = tophat
 GETTEXT_SOURCES = $(XCSOAR_SOURCES) \
 	$(wildcard $(SRC)/Dialogs/Vega/*Parameters.hpp) \
 	$(SRC)/Terrain/RasterWeather.cpp

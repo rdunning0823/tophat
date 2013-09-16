@@ -33,7 +33,7 @@ public class Loader {
 
   static {
     try {
-      System.loadLibrary("xcsoar");
+      System.loadLibrary("tophat");
       loaded = true;
     } catch (UnsatisfiedLinkError e) {
       Log.e(TAG, e.getMessage());

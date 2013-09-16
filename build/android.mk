@@ -23,7 +23,7 @@ endif
 ANDROID_SDK_PLATFORM_DIR = $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)
 ANDROID_ABI_DIR = $(ANDROID_BUILD)/libs/$(ANDROID_ABI3)
 
-ANDROID_LIB_NAMES = xcsoar
+ANDROID_LIB_NAMES = tophat
 
 ifneq ($(V),2)
 ANDROID_TOOL_OPTIONS = --silent
@@ -168,7 +168,7 @@ ifeq ($(FAT_BINARY),y)
 
 ANDROID_LIB_BUILD =
 
-# Example: $(eval $(call generate-abi,xcsoar,armeabi-v7a,ANDROID7))
+# Example: $(eval $(call generate-abi,tophat,armeabi-v7a,ANDROID7))
 define generate-abi
 
 ANDROID_LIB_BUILD += $$(ANDROID_BUILD)/libs/$(2)/lib$(1).so
@@ -181,7 +181,7 @@ $$(OUT)/$(3)/bin/lib$(1).so:
 
 endef
 
-# Example: $(eval $(call generate-abi,xcsoar))
+# Example: $(eval $(call generate-abi,tophat))
 define generate-all-abis
 $(eval $(call generate-abi,$(1),armeabi,ANDROID))
 $(eval $(call generate-abi,$(1),armeabi-v7a,ANDROID7))

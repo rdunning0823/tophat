@@ -49,10 +49,10 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(KOBO_MENU_BIN) $(XCSOAR_BIN) \
 	$(topdir)/kobo/inittab $(topdir)/kobo/rcS
 	@$(NQ)echo "  TAR     $@"
 	$(Q)rm -rf $(@D)/KoboRoot
-	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc $(@D)/KoboRoot/opt/xcsoar/bin $(@D)/KoboRoot/opt/xcsoar/share/fonts
-	$(Q)install -m 0755 $(KOBO_MENU_BIN) $(XCSOAR_BIN) $(topdir)/kobo/rcS $(@D)/KoboRoot/opt/xcsoar/bin
+	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc $(@D)/KoboRoot/opt/tophat/bin $(@D)/KoboRoot/opt/tophat/share/fonts
+	$(Q)install -m 0755 $(KOBO_MENU_BIN) $(XCSOAR_BIN) $(topdir)/kobo/rcS $(@D)/KoboRoot/opt/tophat/bin
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
-	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/xcsoar/share/fonts
+	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 
 endif

@@ -1,5 +1,5 @@
 ifeq ($(HAVE_POSIX),y)
-PROGRAM_NAME = xcsoar
+PROGRAM_NAME = tophat
 else
 PROGRAM_NAME = XCSoar
 endif

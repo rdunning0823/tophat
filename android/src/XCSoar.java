@@ -77,7 +77,7 @@ public class XCSoar extends Activity {
     if (!Loader.loaded) {
       TextView tv = new TextView(this);
       tv.setTextSize(20);
-      tv.setText("Failed to load the native XCSoar libary.\n" +
+      tv.setText("Failed to load the native Top Hat Soaring libary.\n" +
                  "Report this problem to us, and include the following information:\n" +
                  "ABI=" + Build.CPU_ABI + "\n" +
                  "PRODUCT=" + Build.PRODUCT + "\n" +
