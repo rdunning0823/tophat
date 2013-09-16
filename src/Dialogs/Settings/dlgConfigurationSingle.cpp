@@ -43,4 +43,5 @@ dlgConfigurationSingle(Widget &widget, const TCHAR *caption)
   dialog.AddButton(_("OK"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();
+  dialog.Hide();
 }
