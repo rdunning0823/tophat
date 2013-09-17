@@ -60,6 +60,8 @@ OverlayButton::OnPaint(Canvas &canvas)
   bool transparent = true;
 #else
   bool transparent = false;
+  if (IsKobo())
+    transparent = true;
 #endif
   //Todo fix the GDI rendering so it draws transparent correctly
   renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
