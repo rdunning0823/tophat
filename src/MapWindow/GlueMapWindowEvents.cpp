@@ -442,7 +442,7 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   if (IsPanning())
     DrawPanInfo(canvas);
 
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   if (!IsPanning())
     DrawMainMenuButtonOverlay(canvas);
   DrawZoomButtonOverlays(canvas);

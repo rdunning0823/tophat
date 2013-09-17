@@ -275,7 +275,7 @@ MainWindow::InitialiseConfigured()
     task_nav_slider_widget = new TaskNavSliderWidget();
     widget_overlays.Add(task_nav_slider_widget, rc_current);
   }
-#ifdef ENABLE_OPENGL
+#if defined(ENABLE_OPENGL) | defined(KOBO)
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
   ScreensButtonWidget *screen_but = new ScreensButtonWidget();
   ZoomInButtonWidget *z_in_but = new ZoomInButtonWidget(screen_but);
@@ -413,10 +413,9 @@ MainWindow::ReinitialiseLayout()
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   map->SetCompassOffset(widget_overlays.HeightFromTop());
-#ifdef ENABLE_OPENGL
+#if defined(ENABLE_OPENGL) | defined(KOBO)
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
-#endif
-#ifndef ENABLE_OPENGL
+#else
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
@@ -735,7 +734,7 @@ MainWindow::OnTimer(WindowTimer &_timer)
                                    map != NULL, FullScreen);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
     map->SetMainMenuButtonRect();
     map->SetZoomButtonsRect();
 #endif
@@ -869,7 +868,7 @@ MainWindow::SetFullScreen(bool _full_screen)
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
@@ -961,7 +960,7 @@ MainWindow::ActivateMap()
                                    map != NULL, FullScreen);
   map->SetCompassOffset(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
 #endif
