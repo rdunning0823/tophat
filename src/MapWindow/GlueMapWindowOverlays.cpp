@@ -238,18 +238,18 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
       (outer_rect.right - outer_rect.left)) / 2;
   outer_rect.Offset(x_offset, 0);
 
-  slider_shape.DrawText(canvas, outer_rect,
-                       idx, false,
-                       wp_name.c_str(),
-                       has_entered, has_exited,
-                       task_mode,
-                       task_size,
-                       tp_valid, distance, distance_valid,
-                       altitude_difference,
-                       altitude_difference_valid,
-                       bearing,
-                       bearing_valid,
-                       border_width);
+  slider_shape.Draw(canvas, outer_rect,
+                    idx, false, false,
+                    wp_name.c_str(),
+                    has_entered, has_exited,
+                    task_mode,
+                    task_size,
+                    tp_valid, distance, distance_valid,
+                    altitude_difference,
+                    altitude_difference_valid,
+                    bearing,
+                    bearing_valid,
+                    border_width);
 }
 #endif
 
