@@ -27,10 +27,8 @@ Copyright_License {
 #include "Screen/Features.hpp"
 #include "Engine/Task/ObservationZones/CylinderZone.hpp"
 #include "Engine/Task/ObservationZones/Boundary.hpp"
-#include "Renderer/AirspaceRendererSettings.hpp"
-#include "Look/AirspaceLook.hpp"
-#include "Look/TaskLook.hpp"
 #include "Projection/WindowProjection.hpp"
+#include "Look/TaskLook.hpp"
 #include "Asset.hpp"
 
 void

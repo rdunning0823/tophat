@@ -291,7 +291,7 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 bool
 OrderedTaskSave(OrderedTask &task)
 {
-  assert(protected_task_manager != NULL);
+  assert(protected_task_manager != nullptr);
 
   TCHAR fname[69] = _T("");
   CopyString(fname, task.GetTaskName(), StringLength(task.GetTaskName()) + 1);

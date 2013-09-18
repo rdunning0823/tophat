@@ -1357,7 +1357,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Circle Diameter"),
     N_("Circle D"),
-    N_("Cirle diameter. Displays estimated circle diameter and full circle flight time. Useful for evaluating best thermalling mode with a glider at different wing loading."),
+    N_("Circle diameter. Displays estimated circle diameter and full circle flight time. Useful for evaluating best thermalling mode with a glider at different wing loading."),
     UpdateInfoBoxCircleDiameter,
     CIRCLE_DIAMETER,
     CIRCLE_DIAMETER,
@@ -1373,6 +1373,18 @@ static constexpr MetaData meta_data[] = {
     TAKEOFF_DISTANCE,
     STANDARD,
   },
+
+  // OLC_SPEED
+  {
+    N_("On-Line Contest speed"),
+    N_("OLC Speed"),
+    N_("Instantaneous evaluation of the flown speed according to the configured On-Line Contest rule set."),
+    IBFHelper<InfoBoxContentOLCSpeed>::Create,
+    OLC_SPEED,
+    OLC_SPEED,
+    STANDARD,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

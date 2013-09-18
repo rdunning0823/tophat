@@ -24,7 +24,7 @@ Copyright_License {
 #include "GestureLook.hpp"
 #include "Screen/Layout.hpp"
 
-#include "resource.h"
+#include "Resources.hpp"
 
 void
 GestureLook::Initialise()

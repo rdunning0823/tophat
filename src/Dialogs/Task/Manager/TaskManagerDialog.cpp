@@ -70,17 +70,18 @@ struct TaskManagerLayout {
   bool vertical;
 };
 
-/* TODO: eliminate all global variables */
-static TaskManagerDialog *instance;
-static unsigned TurnpointTab = 0;
-static unsigned PropertiesTab = 0;
-
 TaskManagerDialog::~TaskManagerDialog()
 {
   delete task_view;
   delete target_button;
   delete tab_bar;
   delete task;
+}
+
+void
+TaskManagerDialog::ReinitialiseLayout(const PixelRect &parent_rc)
+{
+  Move(parent_rc);
 }
 
 bool
@@ -201,9 +202,9 @@ TaskManagerDialog::Create(SingleWindow &parent)
     CommonInterface::GetUISettings().dialog.tab_style
     == DialogSettings::TabStyle::Icon;
   const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *TurnPointIcon = enable_icons ? &icons.hBmpTabTask : NULL;
-  const Bitmap *BrowseIcon = enable_icons ? &icons.hBmpTabWrench : NULL;
-  const Bitmap *PropertiesIcon = enable_icons ? &icons.hBmpTabSettings : NULL;
+  const Bitmap *TurnPointIcon = enable_icons ? &icons.hBmpTabTask : nullptr;
+  const Bitmap *BrowseIcon = enable_icons ? &icons.hBmpTabWrench : nullptr;
+  const Bitmap *PropertiesIcon = enable_icons ? &icons.hBmpTabSettings : nullptr;
 
   if (layout.vertical) {
     tab_bar->AddTab(wEdit, _("Turn Points"), TurnPointIcon);
@@ -232,6 +233,27 @@ TaskManagerDialog::Create(SingleWindow &parent)
   }
 
   UpdateCaption();
+}
+
+void
+TaskManagerDialog::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+
+  ContainerWindow &client_area = GetClientAreaWindow();
+  const PixelRect rc = client_area.GetClientRect();
+  const TaskManagerLayout layout = CalculateTaskManagerLayout(rc);
+
+  task_view_position = layout.task_view;
+
+  if (task_view != nullptr)
+    task_view->Move(layout.task_view);
+
+  if (target_button != nullptr)
+    target_button->Move(layout.target_button);
+
+  if (tab_bar != nullptr)
+    tab_bar->UpdateLayout(rc, layout.tab_bar, layout.vertical);
 }
 
 void
@@ -436,14 +458,13 @@ TaskManagerDialog::Revert()
 void
 dlgTaskManagerShowModal()
 {
-  if (protected_task_manager == NULL)
+  if (protected_task_manager == nullptr)
     return;
 
   TaskManagerDialogUsShowModal();
   return;
 
   TaskManagerDialog dialog(UIGlobals::GetDialogLook());
-  instance = &dialog;
 
   dialog.Create(UIGlobals::GetMainWindow());
 

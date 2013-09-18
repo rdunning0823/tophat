@@ -57,6 +57,7 @@ GetActiveLanguageName();
 
 struct BuiltinLanguage {
   unsigned language;
+  const void *begin, *size;
   const TCHAR *resource;
   const TCHAR *name;
 };

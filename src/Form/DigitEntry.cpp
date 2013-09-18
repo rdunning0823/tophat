@@ -68,6 +68,9 @@ DigitEntry::Create(ContainerWindow &parent, const PixelRect &rc,
     digit.value = 0;
   }
 
+  max_width = rc.right - rc.left;
+
+  CalculateLayout();
 
   PaintWindow::Create(parent, rc, style);
   CalculateLayout();
@@ -221,6 +224,19 @@ DigitEntry::CalculateLayout()
     value_width = (PixelScalar)(fixed(value_width) * max_width_ratio);
     digit.left = last_right;
     last_right = digit.right = digit.left + value_width;
+  }
+
+  /* check if width of entry form exceeds available width and adjust
+     column widths appropiately */
+  if (last_right > max_width) {
+    unsigned width_adjust = (last_right - max_width) / length + 1;
+    last_right = 0;
+    for (unsigned i = 0; i < length; ++i) {
+      Column &digit = columns[i];
+      PixelScalar value_width = digit.right - digit.left;
+      digit.left = last_right;
+      last_right = digit.right = digit.left + value_width - width_adjust;
+    }
   }
 }
 

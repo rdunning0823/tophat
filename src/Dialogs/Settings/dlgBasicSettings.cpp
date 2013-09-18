@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/WidgetDialog.hpp"
-#include "Protection.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Computer/Settings.hpp"
 #include "Units/Units.hpp"
@@ -38,7 +37,6 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Form/Button.hpp"
 #include "Form/Form.hpp"
-#include "Form/ButtonPanel.hpp"
 #include "Language/Language.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Event/Timer.hpp"

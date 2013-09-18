@@ -37,9 +37,6 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Components.hpp"
 #include "Simulator.hpp"
-#include "Protection.hpp"
-
-#include "Util/Macros.hpp"
 
 #include <tchar.h>
 #include <stdio.h>

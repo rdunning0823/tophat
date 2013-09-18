@@ -33,9 +33,7 @@ Copyright_License {
 
 struct DialogLook;
 class Bitmap;
-class ContainerWindow;
 class TabDisplay;
-class TabButton;
 
 /** TabBarControl displays tabs that show/hide the windows
  * associated with each tab.  For example a "Panel" control.
@@ -68,6 +66,9 @@ public:
 
   ~TabBarControl();
 
+  void UpdateLayout(const PixelRect &rc, const PixelRect &tab_rc,
+                    bool vertical);
+
   void SetPageFlippedCallback(PageFlippedCallback _page_flipped_callback) {
     assert(!page_flipped_callback);
     assert(_page_flipped_callback);
@@ -76,7 +77,8 @@ public:
   }
 
 public:
-  unsigned AddTab(Widget *widget, const TCHAR *caption, const Bitmap *bmp = NULL);
+  unsigned AddTab(Widget *widget, const TCHAR *caption,
+                  const Bitmap *bmp=nullptr);
 
 public:
   gcc_pure

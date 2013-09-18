@@ -24,7 +24,7 @@ Copyright_License {
 #include "MapLook.hpp"
 #include "MapSettings.hpp"
 #include "Screen/Layout.hpp"
-#include "resource.h"
+#include "Resources.hpp"
 
 void
 MapLook::Initialise(const MapSettings &settings,
@@ -49,8 +49,10 @@ MapLook::Initialise(const MapSettings &settings,
 
   terrain_warning_icon.LoadResource(IDB_TERRAINWARNING, IDB_TERRAINWARNING_HD);
 
-  compass_brush.Set(COLOR_GRAY);
-  compass_pen.Set(Layout::ScalePenWidth(1), COLOR_BLACK);
+  compass_brush.Set(IsDithered() ? COLOR_WHITE : COLOR_GRAY);
+  compass_pen.Set(Layout::ScalePenWidth(1), HasColors()? COLOR_GRAY : COLOR_BLACK);
+  compass_triangle_brush.Set(IsDithered() ? COLOR_BLACK : Color(50, 50, 50));
+  compass_triangle_pen.Set(Layout::ScalePenWidth(1), HasColors()? COLOR_GRAY : COLOR_BLACK);
 
   traffic_safe_icon.LoadResource(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, false);
   traffic_warning_icon.LoadResource(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, false);

@@ -28,8 +28,8 @@ Copyright_License {
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Renderer/SymbolRenderer.hpp"
-#include "resource.h"
 #include "Language/Language.hpp"
+#include "Resources.hpp"
 #include "Asset.hpp"
 #include "Screen/Layout.hpp"
 

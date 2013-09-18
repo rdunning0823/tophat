@@ -34,6 +34,7 @@ Top Hat Soaring 1.3 beta 9/17/2013
   - new content "Next distance (nominal)"
   - new content "Takeoff distance" (#3059)
   - new panel for "Team code" provides quick access to team code settings (#2899)
+  - new content "OLC speed" (#2352)
 * tasks
   - custom "start requires arm" setting (#2782)
   - new option to disable OLC optimisation

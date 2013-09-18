@@ -27,7 +27,6 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Float.hpp"
-#include "Form/DataField/Angle.hpp"
 #include "Form/DataField/Boolean.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"

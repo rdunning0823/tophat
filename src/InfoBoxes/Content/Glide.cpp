@@ -25,7 +25,6 @@ Copyright_License {
 #include "InfoBoxes/Content/Task.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
 #include "Engine/Util/Gradient.hpp"
-#include "Computer/GlideRatioCalculator.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "InfoBoxes/Panel/GrAverage.hpp"
 #include "Interface.hpp"
@@ -33,7 +32,6 @@ Copyright_License {
 #include "Language/Language.hpp"
 
 #include <tchar.h>
-#include <stdio.h>
 
 void
 UpdateInfoBoxGRInstant(InfoBoxData &data)

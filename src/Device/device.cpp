@@ -32,8 +32,6 @@ Copyright_License {
 #include "Asset.hpp"
 #include "Util/Algorithm.hpp"
 
-#include <assert.h>
-
 static void
 devInitOne(DeviceDescriptor &device, const DeviceConfig &config)
 {

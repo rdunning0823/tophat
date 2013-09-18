@@ -21,8 +21,6 @@
  */
 
 #include "TaskManager.hpp"
-#include "Visitors/TaskPointVisitor.hpp"
-#include "Solvers/TaskSolution.hpp"
 #include "Ordered/OrderedTask.hpp"
 #include "Ordered/Points/OrderedTaskPoint.hpp"
 #include "Ordered/Points/AATPoint.hpp"

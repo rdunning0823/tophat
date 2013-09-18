@@ -41,7 +41,6 @@ Copyright_License {
 struct Look;
 struct GestureLook;
 class Logger;
-class SingleWindow;
 
 class OffsetHistory
 {

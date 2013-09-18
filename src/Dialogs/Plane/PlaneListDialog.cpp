@@ -280,7 +280,6 @@ bool
 PlaneListWidget::LoadWithDialog(unsigned i)
 {
   assert(i < list.size());
-
   StaticString<256> tmp;
   tmp.Format(_("Do you want to activate plane profile \"%s\"?"),
              list[i].name.c_str());

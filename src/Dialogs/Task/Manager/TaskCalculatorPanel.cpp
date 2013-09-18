@@ -90,7 +90,7 @@ TaskCalculatorPanel::Refresh()
 void
 TaskCalculatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  assert(protected_task_manager != NULL);
+  assert(protected_task_manager != nullptr);
 
   instance = this;
 
