@@ -90,4 +90,4 @@ fi
 exec /opt/xcsoar/bin/KoboMenu
 
 # just in case launching KoboMenu fails: try xcsoar
-exec /opt/xcsoar/bin/xcsoar
+exec /opt/xcsoar/bin/tophat

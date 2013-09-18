@@ -163,8 +163,8 @@ KoboRunXCSoar(const char *mode)
   char buffer[256];
   const char *cmd = buffer;
 
-  if (!SiblingPath("xcsoar", buffer, sizeof(buffer)))
-    cmd = "/mnt/onboard/XCSoar/xcsoar";
+  if (!SiblingPath("tophat", buffer, sizeof(buffer)))
+    cmd = "/mnt/onboard/XCSoar/tophat";
 
   Run(cmd, mode);
 #endif
