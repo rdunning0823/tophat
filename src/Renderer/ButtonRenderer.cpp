@@ -28,7 +28,7 @@ Copyright_License {
 #include "Look/ButtonLook.hpp"
 #include "Screen/Util.hpp"
 
-#ifdef ENABLE_OPENGL
+#if defined(ENABLE_OPENGL) | defined(KOBO)
 
 void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,

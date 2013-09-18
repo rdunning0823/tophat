@@ -30,6 +30,7 @@ Copyright_License {
 #include "Screen/Color.hpp"
 #include "Screen/Layout.hpp"
 #endif
+#include "MathTables.h"
 
 gcc_const
 static RasterPoint
@@ -179,7 +180,7 @@ RoundRect(Canvas &canvas, int left, int top,
   if (npoly)
     canvas.DrawPolygon(pt, npoly);
 }
-#ifdef ENABLE_OPENGL
+#if defined(ENABLE_OPENGL) | defined(KOBO)
 void
 DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
                 const Pen &light_border_pen, Color background_color,
@@ -197,8 +198,8 @@ DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
     canvas.Select(Brush(background_color));
 
   canvas.DrawRoundRectangle(rc.left, rc.top,
-                            rc.right, rc.bottom,
+                            rc.right, rc.bottom - 1,
                             20,
                             20);
 }
-#endif /* ENABLE_OPENGL */
+#endif /* defined(ENABLE_OPENGL) | defined(KOBO) */

@@ -48,7 +48,7 @@ bool
 KeyHole(Canvas &canvas, int x, int y, unsigned radius,
         Angle start, Angle end, unsigned inner_radius);
 
-#ifdef ENABLE_OPENGL
+#if defined(ENABLE_OPENGL) | defined(KOBO)
 /**
  * draws fancy button
  */
