@@ -25,6 +25,9 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Util/Macros.hpp"
 #include "Math/FastMath.h"
+#ifdef KOBO
+#include "MathTables.h"
+#endif
 
 gcc_const
 static RasterPoint
