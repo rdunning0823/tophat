@@ -34,7 +34,7 @@ umask 022
 # - the XCSoar installation is broken
 if [ -f /mnt/onboard/.kobo/Kobo.tgz -o -f /mnt/onboard/.kobo/KoboRoot.tgz \
     -o -f /mnt/onboard/XCSoarData/kobo/start_nickel \
-    -o ! -x /opt/xcsoar/bin/KoboMenu ]; then
+    -o ! -x /opt/tophat/bin/KoboMenu ]; then
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     umount -l /mnt/onboard
     exec /etc/init.d/rcS
@@ -87,7 +87,7 @@ if [ -f /mnt/onboard/XCSoarData/kobo/init.sh ]; then
 fi
 
 # finally, open the menu
-exec /opt/xcsoar/bin/KoboMenu
+exec /opt/tophat/bin/KoboMenu
 
 # just in case launching KoboMenu fails: try xcsoar
-exec /opt/xcsoar/bin/tophat
+exec /opt/tophat/bin/tophat
