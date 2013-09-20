@@ -73,21 +73,15 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   const unsigned name_y = rc.top
     + (banner_height - large_font.GetHeight()) / 2;
 
-  const TCHAR *const name1 = _T("XC");
+  const TCHAR *const name1 = _T("Top Hat Soaring");
   canvas.DrawText(x, name_y, name1);
   x += canvas.CalcTextWidth(name1);
 
-  const TCHAR *const name2 = _T("Soar");
-  canvas.SetTextColor(COLOR_GRAY);
-  canvas.DrawText(x, name_y, name2);
-  canvas.SetTextColor(COLOR_BLACK);
-  x += canvas.CalcTextWidth(name2) + 30;
-
   /* some more text */
-  const TCHAR *const website = _T("www.xcsoar.org");
-  canvas.Select(normal_font);
-  canvas.DrawText(x, rc.top + (banner_height - normal_font.GetHeight()) / 2,
-                  website);
+  x = rc.left + padding;
+  const TCHAR *const website = _T("www.tophatsoaring.org");
+  canvas.Select(bold_font);
+  canvas.DrawText(x, rc.top + banner_height + padding, website);
 
   const TCHAR *const comment = _T("powered off");
   canvas.DrawText(rc.right - canvas.CalcTextWidth(comment) - padding,
