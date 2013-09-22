@@ -164,7 +164,6 @@ MapDisplayConfigPanel::Save(bool &_changed)
   changed |= SaveValue(CirclingZoom, ProfileKeys::CircleZoom,
                        settings_map.circle_zoom_enabled);
 
-
   changed |= SaveValue(MaxAutoZoomDistance, UnitGroup::DISTANCE,
                        ProfileKeys::MaxAutoZoomDistance,
                        settings_map.max_auto_zoom_distance);

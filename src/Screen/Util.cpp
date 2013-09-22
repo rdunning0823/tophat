@@ -30,7 +30,9 @@ Copyright_License {
 #include "Screen/Color.hpp"
 #include "Screen/Layout.hpp"
 #endif
+#ifdef KOBO
 #include "MathTables.h"
+#endif
 
 gcc_const
 static RasterPoint

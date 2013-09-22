@@ -286,7 +286,7 @@ private:
   void DrawTaskNavSliderShape(Canvas &canvas);
 #endif
 
-  void SwitchZoomClimb(bool circling);
+  void SwitchZoomClimb();
 
   void SaveDisplayModeScales();
 
@@ -303,6 +303,13 @@ private:
 
 public:
   void UpdateMapScale();
+
+  /**
+   * Restore the map scale from MapSettings::cruise_scale or
+   * MapSettings::circling_scale.
+   */
+  void RestoreMapScale();
+
   void UpdateDisplayMode();
   void SetMapScale(fixed scale);
 
