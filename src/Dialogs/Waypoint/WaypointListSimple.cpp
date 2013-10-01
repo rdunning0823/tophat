@@ -245,7 +245,7 @@ WaypointListSimpleDialog::OnCursorMoved(gcc_unused unsigned i)
                                alt_buffer.buffer(), true);
   }
 
-  if (basic.time_available) {
+  if (basic.time_available && basic.date_time_utc.IsDatePlausible()) {
     const SunEphemeris::Result sun =
       SunEphemeris::CalcSunTimes(info.waypoint->location, basic.date_time_utc,
                                  settings.utc_offset);
