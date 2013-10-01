@@ -108,6 +108,13 @@ CondorDevice::ParseNMEA(const char *String, NMEAInfo &info)
   char type[16];
   line.Read(type, 16);
 
+  if (!info.date_time_utc.IsDatePlausible()) {
+    struct BrokenDate today = BrokenDate::TodayUTC();
+    info.date_time_utc.year = today.year;
+    info.date_time_utc.month = today.month;
+    info.date_time_utc.day = today.day;
+    info.date_time_utc.day_of_week = today.day_of_week;
+  }
   if (StringIsEqual(type, "$LXWP0"))
     return cLXWP0(line, info);
 
