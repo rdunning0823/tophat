@@ -35,6 +35,8 @@
 #include "Language/Language.hpp"
 #include "Renderer/TextInBox.hpp"
 
+#include <algorithm>
+
 GestureZone::GestureZone()
   :x_zone_width(Layout::GetXDPI() / 2), draw_initialized(false),
    help_duration(15000), gesture_look(UIGlobals::GetLook().gesture),
