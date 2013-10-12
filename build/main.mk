@@ -1,7 +1,7 @@
 ifeq ($(HAVE_POSIX),y)
 PROGRAM_NAME = tophat
 else
-PROGRAM_NAME = XCSoar
+PROGRAM_NAME = TopHat
 endif
 
 DIALOG_SOURCES = \
