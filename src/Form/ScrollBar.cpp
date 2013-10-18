@@ -45,7 +45,7 @@ ScrollBar::SetSize(const PixelSize size)
   unsigned width;
 
   // if the device has a pointer (mouse/touchscreen/etc.)
-  if (HasTouchScreen())
+  if (UseTouchScreenLayout())
     /* wide scroll bar for touch screen */
     width = Layout::Scale(24);
   else if (HasPointer())
