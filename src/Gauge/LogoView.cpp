@@ -99,14 +99,11 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
     titley = (height - title_size.cy) / 2;
     break;
   case PORTRAIT:
+  case SQUARE:
     logox = (width - logo_size.cx) / 2;
     logoy = (height - (logo_size.cy + title_size.cy * 2)) / 2;
     titlex = (width - title_size.cx) / 2;
     titley = logoy + logo_size.cy + title_size.cy;
-    break;
-  case SQUARE:
-    logox = (width - logo_size.cx) / 2;
-    logoy = (height - logo_size.cy) / 2;
     break;
   }
 
