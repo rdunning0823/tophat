@@ -227,17 +227,29 @@ HasPointer()
 }
 
 /**
- * Does this device have a touch screen?  This is useful to know for
- * sizing controls, as a touch screen may require bigger areas.
+ * Does this device have a touch screen?  Used for distinguishing
+ * between behaviours
  */
 constexpr
 static inline bool
 HasTouchScreen()
 {
+  return IsAndroid() || (IsWindowsCE() && !IsAltair()) || IsKobo();
+}
+
+
+/**
+ * Does this device have a touch screen?  This is useful to know for
+ * sizing controls, as a touch screen may require bigger areas.
+ */
+constexpr
+static inline bool
+UseTouchScreenLayout()
+{
 #ifdef NDEBUG
   return true;
 #else
-  return IsAndroid() || (IsWindowsCE() && !IsAltair()) || IsKobo();
+  return HasTouchScreen();
 #endif
 }
 
