@@ -71,7 +71,7 @@ Layout::Initialize(PixelSize new_size)
 
   minimum_control_height = Scale(30);
 
-  if (HasTouchScreen()) {
+  if (UseTouchScreenLayout()) {
     /* larger rows for touch screens */
     maximum_control_height = Display::GetYDPI() * 3 / 7;
     if (maximum_control_height < minimum_control_height)
@@ -80,5 +80,5 @@ Layout::Initialize(PixelSize new_size)
     maximum_control_height = minimum_control_height;
   }
 
-  hit_radius = x_dpi / (HasTouchScreen() ? 3 : 12);
+  hit_radius = x_dpi / (UseTouchScreenLayout() ? 3 : 12);
 }
