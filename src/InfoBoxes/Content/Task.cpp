@@ -692,14 +692,12 @@ UpdateInfoBoxTaskAADistance(InfoBoxData &data)
   const auto &calculated = CommonInterface::Calculated();
   const TaskStats &task_stats = calculated.ordered_task_stats;
 
-  if (!task_stats.has_targets ||
-      !task_stats.total.planned.IsDefined()) {
-    data.SetInvalid();
-    return;
-  }
+  fixed rPlanned = task_stats.total.solution_remaining.IsDefined()
+    ? task_stats.total.solution_remaining.vector.distance
+    : fixed(0);
 
   // Set Value
-  data.SetValueFromDistance(task_stats.total.planned.GetDistance());
+  data.SetValueFromDistance(rPlanned);
 }
 
 void
