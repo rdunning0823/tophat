@@ -913,11 +913,6 @@ AbstractTaskFactory::Validate()
     valid = false;
   }
 
-  if (!IsNonRepeated()) {
-    AddValidationError(TaskValidationErrorType::REPEATED_TASK_POINT);
-    valid = false;
-  }
-
   return valid;
 }
 
@@ -955,26 +950,6 @@ AbstractTaskFactory::IsClosed() const
 }
 
 bool 
-AbstractTaskFactory::IsNonRepeated() const
-{
-  if (task.TaskSize() < 3)
-    return true;
-
-  const Waypoint *wp_last = nullptr;
-  for (unsigned i = 0; i < task.TaskSize(); i++) {
-    const OrderedTaskPoint &otp = task.GetPoint(i);
-    const Waypoint &wp = otp.GetWaypoint();
-    if (wp_last != nullptr) {
-      if (*wp_last == wp && i != 1 && i != (task.TaskSize() - 1)) {
-        return false;
-      }
-    }
-    wp_last = &wp;
-  }
-  return true;
-}
-
-bool
 AbstractTaskFactory::IsUnique() const
 {
   const unsigned size = task.TaskSize();

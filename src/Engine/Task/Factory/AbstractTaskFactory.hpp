@@ -558,13 +558,6 @@ public:
   bool IsClosed() const;
 
   /**
-   * Determines whether a task has repeated task points
-   * Allows for case where Start == Finish
-   */
-  gcc_pure
-  bool IsNonRepeated() const;
-
-  /**
    * Determines whether task is unique 
    * (other than start/finish, no points used more than once)
    * @return true if task is unique

@@ -40,7 +40,6 @@ static const TCHAR *const validation_error_strings[] = {
   N_("Empty task"),
   N_("non-FAI turn points"),
   N_("non-MAT turn points"),
-  N_("repeated task point"),
 };
 
 static_assert(ARRAY_SIZE(validation_error_strings) == unsigned(TaskValidationErrorType::COUNT),
