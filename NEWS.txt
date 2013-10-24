@@ -1,8 +1,9 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Top Hat Soaring 1.3.3 *** TBD ***
+Top Hat Soaring 1.3.3 10/24/2013
 * add checkbox to waypoint list to sort by distance
+* fix KOBO crash in waypoint list
 
 Top Hat Soaring 1.3.2 10/18/2013
 * fix bug loading tasks with turnpoints not in waypoint file
