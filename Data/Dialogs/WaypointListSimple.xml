@@ -1,13 +1,9 @@
 <Form Caption="Select Waypoint">
   <List Name="frmWaypointList" X="0" Y="35" Height="-55" />
-  <Button Name="cmdByName" Caption="Name" X="0" Y="0" Width="80" Height="35" OnClick="OnByNameClicked" />
-  <Button Name="cmdByDistance" Caption="Distance" X="80" Y="0" Width="80" Height="35" OnClick="OnByDistanceClicked" />
+  <CheckBox Name="chkbByDistance" Caption="By distance" X="0" Y="0" Height="25" Width="160" OnClick="OnByDistanceClicked"/>
   <SymbolButton Name="cmdSearch" Caption="Search" X="160" Y="0" Width="80" Height="35" OnClick="OnSearchClicked" />
-  <Label Name="lblByName" Caption="Name" X="0" Y="0" Width="80" Height="35"/>
-  <Label Name="lblByDistance" Caption="Distance" X="80" Y="0" Width="80" Height="35" />
-  <Canvas Name="ButtonsBackground" X="0" Y="0" Width="160" Height="35" OnPaint="OnPaintButtonsBackground" />
-
-  <Label Name="frmSummaryLabels1" X="0" Width="50" Y="-55" Height="20"/>
+  
+    <Label Name="frmSummaryLabels1" X="0" Width="50" Y="-55" Height="20"/>
   <Label Name="frmSummaryValues1" X="50" Y="-55" Width="70" Height="20"/>
   <Label Name="frmSummaryLabels2" X="120" Width="50" Y="-55" Height="20"/>
   <Label Name="frmSummaryValues2" X="170" Y="-55" Width="70" Height="20"/>

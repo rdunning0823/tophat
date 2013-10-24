@@ -29,6 +29,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
+#include "Form/CheckBox.hpp"
 #include "Form/SymbolButton.hpp"
 #include "Form/List.hpp"
 #include "Form/Frame.hpp"
@@ -69,11 +70,8 @@ static WndFrame *summary_labels1;
 static WndFrame *summary_values1;
 static WndFrame *summary_labels2;
 static WndFrame *summary_values2;
-static WndButton *name_sort_button;
-static WndButton *distance_sort_button;
+static CheckBox *distance_sort_checkbox;
 static WndSymbolButton *search_button;
-static WndFrame *name_sort_frame;
-static WndFrame *distance_sort_frame;
 
 static OrderedTask *ordered_task;
 static unsigned ordered_task_index;
@@ -151,21 +149,6 @@ PrepareData()
 }
 
 static void
-PrepareButtons()
-{
-  name_sort_frame->SetAlignCenter();
-  name_sort_frame->SetVAlignCenter();
-  distance_sort_frame->SetAlignCenter();
-  distance_sort_frame->SetVAlignCenter();
-
-  name_sort_frame->SetCaptionColor(COLOR_WHITE);
-  distance_sort_frame->SetCaptionColor(COLOR_WHITE);
-
-  name_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
-  distance_sort_frame->SetFont(*UIGlobals::GetDialogLook().button.font);
-}
-
-static void
 FillList(WaypointList &list, const Waypoints &src,
          GeoPoint location, Angle heading, const WaypointListDialogState &state)
 {
@@ -201,15 +184,12 @@ FillList(WaypointList &list, const Waypoints &src,
 static void
 UpdateButtons()
 {
-  name_sort_button->SetVisible(sort_direction != SortDirection::NAME);
-  distance_sort_button->SetVisible(sort_direction != SortDirection::DISTANCE);
+  distance_sort_checkbox->SetState(sort_direction == SortDirection::DISTANCE);
+
   if (dialog_state.name.empty())
     search_button->SetCaption(_T("Search"));
   else
     search_button->SetCaption(_T("SearchChecked"));
-
-  name_sort_frame->SetVisible(sort_direction == SortDirection::NAME);
-  distance_sort_frame->SetVisible(sort_direction == SortDirection::DISTANCE);
 }
 
 void
@@ -309,10 +289,6 @@ OnSearchClicked(gcc_unused WndButton &button)
              WaypointFilter::NAME_LENGTH + 1);
 
   UpdateList();
-  if (sort_direction == SortDirection::NAME)
-    name_sort_button->SetFocus();
-  else
-    distance_sort_button->SetFocus();
 }
 
 static void
@@ -361,16 +337,12 @@ WaypointListSimpleDialog::OnActivateItem(unsigned index)
 }
 
 static void
-OnByNameClicked(gcc_unused WndButton &button)
+OnByDistanceClicked(CheckBoxControl &control)
 {
-  sort_direction = SortDirection::NAME;
-  UpdateList();
-}
-
-static void
-OnByDistanceClicked(gcc_unused WndButton &button)
-{
-  sort_direction = SortDirection::DISTANCE;
+  if (control.GetState())
+    sort_direction = SortDirection::DISTANCE;
+  else
+    sort_direction = SortDirection::NAME;
   UpdateList();
 }
 
@@ -379,12 +351,6 @@ OnByBearingClicked(gcc_unused WndButton &button)
 {
   sort_direction = SortDirection::BEARING;
   UpdateList();
-}
-
-static void
-OnPaintButtonsBackground(WndOwnerDrawFrame *Sender, Canvas &canvas)
-{
-  canvas.Clear(COLOR_BLACK);
 }
 
 static void
@@ -402,10 +368,8 @@ OnCloseClicked(gcc_unused WndButton &button)
 static constexpr CallBackTableEntry callback_table[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnSelectClicked),
-  DeclareCallBackEntry(OnByNameClicked),
   DeclareCallBackEntry(OnByDistanceClicked),
   DeclareCallBackEntry(OnByBearingClicked),
-  DeclareCallBackEntry(OnPaintButtonsBackground),
   DeclareCallBackEntry(OnSearchClicked),
   DeclareCallBackEntry(nullptr)
 };
@@ -448,21 +412,12 @@ ShowWaypointListSimpleDialog(const GeoPoint &_location,
   assert(summary_labels2 != nullptr);
   assert(summary_values2 != nullptr);
 
-  name_sort_button = (WndButton*)dialog->FindByName(_T("cmdByName"));
-  distance_sort_button = (WndButton*)dialog->FindByName(_T("cmdByDistance"));
+  distance_sort_checkbox = (CheckBox*)dialog->FindByName(_T("chkbByDistance"));
   search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));
-  assert(name_sort_button != nullptr);
-  assert(distance_sort_button != nullptr);
+  assert(distance_sort_checkbox != nullptr);
   assert(search_button != nullptr);
 
-    name_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByName"));
-  distance_sort_frame = (WndFrame*)dialog->FindByName(_T("lblByDistance"));
-  assert(name_sort_frame != nullptr);
-  assert(distance_sort_frame != nullptr);
-
   dialog_state.name = _T("");
-
-  PrepareButtons();
 
   location = _location;
   ordered_task = _ordered_task;
