@@ -220,7 +220,7 @@ TaskNavDataCache::CalcAltitudeDifferential(const GeoPoint &point,
 
 TaskNavDataCache::tp_info &
 TaskNavDataCache::CalcPoint(TaskNavDataCache::tp_info &tp_data,
-                              const Waypoint &wp)
+                            const Waypoint &wp)
 {
   const MoreData &more_data = CommonInterface::Basic();
 
