@@ -171,8 +171,10 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     tp.IsValid(),
                     use_target ? tp.distance_remaining : tp.distance,
                     use_target ? tp.distance_remaining_valid : tp.distance_valid,
-                    use_target ? tp.altitude_difference : tp.altitude_difference, // TODO Fix
-                    use_target ? tp.altitude_difference_valid : tp.altitude_difference_valid, //TODO Fix
+                    use_target ? tp.altitude_difference_remaining :
+                        tp.altitude_difference,
+                    use_target ? tp.altitude_difference_remaining_valid :
+                        tp.altitude_difference_valid,
                     use_target ? tp.delta_bearing_remaining : tp.delta_bearing,
                     use_target ? tp.delta_bearing_remaining_valid : tp.bearing_valid,
                     border_width);

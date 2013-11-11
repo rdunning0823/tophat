@@ -150,7 +150,7 @@ TaskNavDataCache::CalcTaskPoint(unsigned idx)
     return tps[idx];
   }
 
-  CalcTarget(tps[idx]);
+  CalcTarget(tps[idx], tps[idx].waypoint->elevation);
   return CalcPoint(tps[idx], *tps[idx].waypoint);
 }
 
@@ -165,7 +165,8 @@ TaskNavDataCache::ValidateTarget(TaskNavDataCache::tp_info &tp_data,
 }
 
 TaskNavDataCache::tp_info &
-TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data)
+TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data,
+                             fixed target_altitude)
 {
   assert(tp_data.target != nullptr);
   // New dist & bearing
@@ -174,6 +175,18 @@ TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data)
 
     tp_data.distance_remaining = vector.distance;
     tp_data.delta_bearing_remaining = vector.bearing - basic.track;
+
+    tp_data.altitude_difference_remaining_valid = false;
+    const MoreData &more_data = CommonInterface::Basic();
+
+    // altitude differential
+    if (basic.location_available && more_data.NavAltitudeAvailable() &&
+        settings.polar.glide_polar_task.IsValid()) {
+
+      tp_data.altitude_difference_remaining =
+          CalcAltitudeDifferential(*tp_data.target, target_altitude);
+      tp_data.altitude_difference_remaining_valid = true;
+    }
   }
   ValidateTarget(tp_data, basic.location_available);
 

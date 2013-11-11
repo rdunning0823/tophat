@@ -284,6 +284,7 @@ public:
    * Calcs the glide solution of the ith Task TP cache if it's old.
    * Does not calculate the has_entered status.
    * Must only be called after SetTaskPoint is called.
+   * Note: for Target, elevation of TP is used
    * @param i.  index of ordered task
    * @param ordered_task.  The ordered task.
    * @return The udpated ith Task TP info
@@ -306,10 +307,11 @@ public:
   fixed CalcAltitudeDifferential(const GeoPoint &point, fixed point_elevation);
 
   /**
-   * calculates the target bearing and distance for ordered tasks
+   * calculates the target bearing, distance and altitude difference
+   * for ordered tasks
    * using "distance remaining"
    */
-  tp_info &CalcTarget(tp_info &tp_data);
+  tp_info &CalcTarget(tp_info &tp_data, fixed target_altitude);
 
   /**
    * validates or invalidates the target-specific information
