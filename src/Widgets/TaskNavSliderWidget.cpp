@@ -41,6 +41,9 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
+#include "Engine/Task/Factory/TaskFactoryType.hpp"
+#include "Engine/Task/Factory/AbstractTaskFactory.hpp"
+
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -97,6 +100,7 @@ TaskNavSliderWidget::ReadTask()
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
   task_data_cache.UpdateOrderedTask(task_manager->GetOrderedTask(),
                                     task_manager->GetMode(),
+                                    task_manager->GetOrderedTask().GetFactoryType(),
                                     task_manager->GetActiveTaskPointIndex(),
                                     task_manager->GetTaskTimeStamp());
 
@@ -149,6 +153,9 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   }
 
   TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
+  bool use_target =
+      task_data_cache.GetTaskFactoryType() == TaskFactoryType::AAT &&
+      task_data_cache.GetTaskMode() == TaskType::ORDERED;
 
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
   const TerrainRendererSettings &terrain = settings_map.terrain;
@@ -159,12 +166,15 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     tp.IsValid() ? tp.waypoint->name.c_str() : _T(""),
                     tp.GetHasEntered(), tp.GetHasExited(),
                     task_data_cache.GetTaskMode(),
+                    task_data_cache.GetTaskFactoryType(),
                     task_data_cache.GetOrderedTaskSize(),
-                    tp.IsValid(), tp.distance, tp.distance_valid,
-                    tp.altitude_difference,
-                    tp.altitude_difference_valid,
-                    tp.delta_bearing,
-                    tp.bearing_valid,
+                    tp.IsValid(),
+                    use_target ? tp.distance_remaining : tp.distance,
+                    use_target ? tp.distance_remaining_valid : tp.distance_valid,
+                    use_target ? tp.altitude_difference : tp.altitude_difference, // TODO Fix
+                    use_target ? tp.altitude_difference_valid : tp.altitude_difference_valid, //TODO Fix
+                    use_target ? tp.delta_bearing_remaining : tp.delta_bearing,
+                    use_target ? tp.delta_bearing_remaining_valid : tp.bearing_valid,
                     border_width);
 }
 

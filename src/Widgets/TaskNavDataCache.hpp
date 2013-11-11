@@ -28,6 +28,7 @@ Copyright_License {
 #include "Engine/Task/TaskManager.hpp"
 #include "Util/StaticString.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
+#include "Engine/Task/Factory/TaskFactoryType.hpp"
 
 #include <assert.h>
 
@@ -65,20 +66,33 @@ public:
     const GeoPoint* target;
 
     fixed distance;
+
     /**
      * true if distance was computable
      */
     bool distance_valid;
     Angle delta_bearing;
+
     /**
      * true if delta_bearing was computable
      */
     bool bearing_valid;
     fixed altitude_difference;
+
     /**
      * true if altidude difference was computable
      */
     bool altitude_difference_valid;
+
+    /**
+     * altitude difference to target
+     */
+    fixed altitude_difference_remaining;
+
+    /**
+     * true if altitude difference to target was computable
+     */
+    bool altitude_difference_remaining_valid;
 
     /**
      * distance to target
@@ -161,6 +175,11 @@ protected:
   TaskType mode;
 
   /**
+   * the type of task (AAT, MAT etc)
+   */
+  TaskFactoryType task_factory_type;
+
+  /**
    * the active task point index from the task manager
    */
   unsigned active_task_point_index;
@@ -177,6 +196,7 @@ public:
 
   void UpdateOrderedTask(const OrderedTask &ordered_task,
                          TaskType _mode,
+                         TaskFactoryType _task_factory_type,
                          unsigned _active_task_point_index,
                          int _task_manager_time_stamp);
 
@@ -212,6 +232,13 @@ public:
    */
   TaskType GetTaskMode() {
     return mode;
+  }
+
+  /**
+   * returns task factory type
+   */
+  TaskFactoryType GetTaskFactoryType() {
+    return task_factory_type;
   }
 
   tp_info &GetPoint(unsigned i);

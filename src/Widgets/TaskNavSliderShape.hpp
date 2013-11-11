@@ -29,6 +29,8 @@ Copyright_License {
 #include "Engine/Task/TaskManager.hpp"
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
+#include "Engine/Task/Factory/TaskFactoryType.hpp"
+
 #include <assert.h>
 #include <stdint.h>
 
@@ -182,7 +184,8 @@ public:
             unsigned idx, bool selected, bool is_current_tp,
             const TCHAR *tp_name,
             bool has_entered, bool has_exited,
-            TaskType task_mode, unsigned task_size,
+            TaskType task_mode, TaskFactoryType task_factory_type,
+            unsigned task_size,
             bool tp_valid, fixed tp_distance, bool distance_valid,
             fixed tp_altitude_difference,
             bool altitude_difference_valid,

@@ -46,6 +46,7 @@ TaskNavDataCache::TaskNavDataCache(const ComputerSettings &_settings,
 void
 TaskNavDataCache::UpdateOrderedTask(const OrderedTask &ordered_task,
                                     TaskType _mode,
+                                    TaskFactoryType _task_factory_type,
                                     unsigned _active_task_point_index,
                                     int _task_manager_time_stamp)
 {
@@ -53,6 +54,7 @@ TaskNavDataCache::UpdateOrderedTask(const OrderedTask &ordered_task,
 
   task_manager_time_stamp = _task_manager_time_stamp;
   mode = _mode;
+  task_factory_type = _task_factory_type;
   ordered_task_size = ordered_task.TaskSize();
   active_task_point_index = _active_task_point_index;
   SetActiveWaypoint(ordered_task.GetActiveTaskPoint());
