@@ -89,6 +89,8 @@ void
 TaskNavDataCache::UpdateTargets(const OrderedTask &ordered_task)
 {
   assert(ordered_task_size == ordered_task.TaskSize());
+  if (GetTaskFactoryType() != TaskFactoryType::AAT)
+    return;
 
   for (unsigned i = 0; i < ordered_task_size; i++) {
     const OrderedTaskPoint &tp = ordered_task.GetTaskPoint(i);
