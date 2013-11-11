@@ -180,12 +180,36 @@ TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data)
   return tp_data;
 }
 
+fixed
+TaskNavDataCache::CalcAltitudeDifferential(const GeoPoint &point,
+                                           fixed point_elevation)
+{
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+
+  assert(basic.location_available);
+  assert(more_data.NavAltitudeAvailable());
+  assert(settings.polar.glide_polar_task.IsValid());
+
+  // altitude differential
+  const GlideState glide_state(
+    basic.location.DistanceBearing(point),
+    point_elevation + settings.task.safety_height_arrival,
+    more_data.nav_altitude,
+    calculated.GetWindOrZero());
+
+  const GlideResult &result =
+    MacCready::Solve(settings.task.glide,
+                     settings.polar.glide_polar_task,
+                     glide_state);
+  return result.pure_glide_altitude_difference;
+}
+
 TaskNavDataCache::tp_info &
 TaskNavDataCache::CalcPoint(TaskNavDataCache::tp_info &tp_data,
                               const Waypoint &wp)
 {
   const MoreData &more_data = CommonInterface::Basic();
-  const DerivedInfo &calculated = CommonInterface::Calculated();
 
   if (tp_data.IsCurrent()) {
     return tp_data;
@@ -197,18 +221,8 @@ TaskNavDataCache::CalcPoint(TaskNavDataCache::tp_info &tp_data,
   tp_data.altitude_difference_valid = false;
   if (basic.location_available && more_data.NavAltitudeAvailable() &&
       settings.polar.glide_polar_task.IsValid()) {
-    const GlideState glide_state(
-      basic.location.DistanceBearing(wp.location),
-      wp.elevation + settings.task.safety_height_arrival,
-      more_data.nav_altitude,
-      calculated.GetWindOrZero());
 
-    const GlideResult &result =
-      MacCready::Solve(settings.task.glide,
-                       settings.polar.glide_polar_task,
-                       glide_state);
-    tp_data.altitude_difference = result.pure_glide_altitude_difference;
-
+    tp_data.altitude_difference = CalcAltitudeDifferential(wp.location, wp.elevation);
     tp_data.altitude_difference_valid = true;
   }
 

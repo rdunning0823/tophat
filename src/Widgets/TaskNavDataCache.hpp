@@ -300,6 +300,12 @@ public:
                        const Waypoint &wp);
 
   /**
+   * calculates the altitude differential needed to get to the point
+   * using the current flight parameters and settings
+   */
+  fixed CalcAltitudeDifferential(const GeoPoint &point, fixed point_elevation);
+
+  /**
    * calculates the target bearing and distance for ordered tasks
    * using "distance remaining"
    */
