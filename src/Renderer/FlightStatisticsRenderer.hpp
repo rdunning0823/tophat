@@ -78,6 +78,12 @@ public:
    */
   static void CaptionOLC(TCHAR *buffer, const ContestSettings &settings,
                          const DerivedInfo &derived, bool long_line);
+
+private:
+  void DrawContestSolution(Canvas &canvas, const Projection &projection,
+                           const ContestStatistics &statistics, unsigned i) const;
+  void DrawContestTriangle(Canvas &canvas, const Projection &projection,
+                           const ContestStatistics &statistics, unsigned i) const;
 };
 
 #endif

@@ -25,6 +25,8 @@ Copyright_License {
 #define XCSOAR_LANGUAGE_GLUE_HPP
 
 #include <tchar.h>
+void
+InitLanguage();
 
 void ReadLanguageFile();
 
