@@ -54,6 +54,9 @@ Copyright_License {
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
+#ifndef ENABLE_OPENGL
+#include "Engine/Task/Factory/TaskFactoryType.hpp"
+#endif
 
 #include <stdio.h>
 
@@ -165,6 +168,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
 {
   TaskWaypoint *tp;
   TaskType task_mode = TaskType::GOTO;
+  TaskFactoryType task_factory_type = TaskFactoryType::RACING;
   const OrderedTask *ot;
   const Waypoint *wp;
   if (true) {
@@ -172,6 +176,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
     ot = &task_manager->GetOrderedTask();
     tp = task_manager->GetActiveTaskPoint();
     task_mode = task_manager->GetMode();
+    task_factory_type = task_manager->GetOrderedTask().GetFactoryType();
   }
   StaticString<255> wp_name(_T(""));
   unsigned task_size = 1;
@@ -241,6 +246,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                     wp_name.c_str(),
                     has_entered, has_exited,
                     task_mode,
+                    task_factory_type,
                     task_size,
                     tp_valid, distance, distance_valid,
                     altitude_difference,
