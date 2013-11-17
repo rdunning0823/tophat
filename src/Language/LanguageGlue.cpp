@@ -222,7 +222,7 @@ FindLanguage(const TCHAR *resource)
 
   return nullptr;
 }
-
+/* HAVE_BUILTIN_LANGUAGES */
 static const BuiltinLanguage *
 DetectLanguage()
 {
@@ -451,7 +451,11 @@ GetActiveLanguageName()
     ? buffer : _T("en.mo");
 
   if (StringIsEmpty(value) || StringIsEqual(value, _T("auto"))) {
+#ifdef HAVE_NATIVE_GETTEXT
+    const BuiltinLanguage *built_in_language = nullptr;
+#else
     const BuiltinLanguage *built_in_language = DetectLanguage();
+#endif
     if (built_in_language != nullptr)
       value = built_in_language->name;
   }
