@@ -458,6 +458,7 @@ GetActiveLanguageName()
 #endif
     if (built_in_language != nullptr)
       value = built_in_language->name;
+    return value;
   }
 #ifdef HAVE_BUILTIN_LANGUAGES
   unsigned id = FindLanguageIndex(value);
