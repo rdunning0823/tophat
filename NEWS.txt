@@ -20,6 +20,21 @@ Top Hat Soaring 1.3 beta 9/17/2013
   - Thermal assistant.  Fixed colors for grayscale devices
 
 * Merge XCSoar 6.7alpha2
+* replay
+  - fix crash replaying an IGC file with no B record extensions (#3107)
+* data files
+  - save the previous log file in "xcsoar-old.log"
+* user interface
+  - new translation: Lithuanian
+* devices
+  - CAI302: work around transmission errors during IGC file download (#3074)
+* Android
+  - fix crash in "credits" dialog on Android 4 (#3106)
+  - work around Vivante GPU texture bugs (#1995, #2228, #2990, #2998, #3105)
+* Kobo
+  - fix passphrase entry in WiFi setup (#3053)
+  - fix compatibility with old Kobo firmware
+
 * new target: Kobo e-book readers
 * user interface
   - resizable main window
@@ -59,6 +74,7 @@ Top Hat Soaring 1.3 beta 9/17/2013
   - support the OLC/DMSt 500km triangle threshold (#2963)
   - render finish point as achieved when task is finished (#2140)
   - subtract start/finish cylinder radius from task distance (#2308)
+  - fix parsing of .cup task files
 * route planner
   - ignore inactive and acknowledged airspaces (#2866)
 * calculations
@@ -85,7 +101,6 @@ Top Hat Soaring 1.3 beta 9/17/2013
 * data files
   - default profile is called "default.prf" instead of "xcsoar-registry.prf"
   - log file is called "xcsoar.log" instead of "xcsoar-startup.log"
-  - save the previous log file in "xcsoar.old"
   - fix name truncation when saving a waypoint file on Windows (#3096)
 * tasks
   - fix parsing of .cup task files
