@@ -1,6 +1,11 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Top Hat Soaring 1.3.4 TBD
+* Fix bug in display of name of language when "automatic"
+* Change Navbar to navigate to target instead of turnpoint for TAT/AAT
+* merge XCSoar 6.7.1
+
 Top Hat Soaring 1.3.3 10/24/2013
 * add checkbox to waypoint list to sort by distance
 * fix KOBO crash in waypoint list
@@ -20,111 +25,110 @@ Top Hat Soaring 1.3 beta 9/17/2013
   - Thermal assistant.  Fixed colors for grayscale devices
 
 * Merge XCSoar 6.7alpha2
-* replay
-  - fix crash replaying an IGC file with no B record extensions (#3107)
-* data files
-  - save the previous log file in "xcsoar-old.log"
-* user interface
-  - new translation: Lithuanian
-* devices
-  - CAI302: work around transmission errors during IGC file download (#3074)
-* Android
-  - fix crash in "credits" dialog on Android 4 (#3106)
-  - work around Vivante GPU texture bugs (#1995, #2228, #2990, #2998, #3105)
-* Kobo
-  - fix passphrase entry in WiFi setup (#3053)
-  - fix compatibility with old Kobo firmware
-
-* new target: Kobo e-book readers
-* user interface
-  - resizable main window
-  - added AutoZoom gesture (up-down)
-  - obsolete configuration pages "devices", "polar", "logger info" removed
-  - new page: "horizon" (#1592)
-  - default page gesture changed right/left sense according to other xc ui interaction pattern
-  - pressing the Escape key in task manager switches to "Close" tab (#2877)
-  - separate font for dialogs (#723, #2806)
-  - repetitive airspace warning sound (#2952)
-  - never close dialogs due to display rotation
-  - disable custom fonts on Altair
-  - improve small dialog font on Altair
-  - fix loading translations on Linux (#2041)
-* map
-  - terrain countour lines (#2451)
-  - continue loading terrain/topography without GPS fix (#2723)
-  - suppress drawing duplicate topography labels
-  - draw projected path when turning
-  - additional zoom levels (#3037)
-  - global "don't fill airspace" setting (#3047)
-  - fix rendering errors when some airspaces have no border (#3045)
-  - fix distinct page zoom in conjunction with circling zoom (#2907)
-* infoboxes
-  - new content "Speed task last hour"
-  - new content "Next distance (nominal)"
-  - new content "Takeoff distance" (#3059)
-  - new panel for "Team code" provides quick access to team code settings (#2899)
-  - new content "OLC speed" (#2352)
-* tasks
-  - custom "start requires arm" setting (#2782)
-  - new option to disable OLC optimisation
-  - MAT: ask user whether to add turn points while flying over it
-  - update the calculator without a GPS fix (#2876)
-  - fix task speed and time estimates before task start (#2876, #2906)
-  - show "arm advance" button when manual arming is necessary (#1729)
-  - support the OLC/DMSt 500km triangle threshold (#2963)
-  - render finish point as achieved when task is finished (#2140)
-  - subtract start/finish cylinder radius from task distance (#2308)
-  - fix parsing of .cup task files
-* route planner
-  - ignore inactive and acknowledged airspaces (#2866)
-* calculations
-  - add more weight to zig-zag wind compared to circling wind
-  - enable circling wind calculation in IGC replay (#2672)
-  - fix OLC triangle display (#2775)
-* waypoint editor
-  - delete waypoint implemented
-  - CUP file support added
-* devices
-  - enabling/disabling devices on-the-fly
-  - "debug" button
-  - more robust midnight wraparound handling (#2857)
-  - new driver from Cambridge L-Nav
-  - support TCP client connection
-* Android
-  - support IOIO via OpenAccessory (Android 4.x)
-  - support USB host mode and USB-RS232 adapters on the Nook (#2886)
-  - show Bluetooth name instead of MAC address in device list
-  - enable fast refresh mode on Nook Simple Touch
-* Analysis
-  - a retrospective task is compiled that summarises waypoints the aircraft has 
+  * replay
+    - fix crash replaying an IGC file with no B record extensions (#3107)
+  * data files
+    - save the previous log file in "xcsoar-old.log"
+  * user interface
+    - new translation: Lithuanian
+  * devices
+    - CAI302: work around transmission errors during IGC file download (#3074)
+  * Android
+    - fix crash in "credits" dialog on Android 4 (#3106)
+    - work around Vivante GPU texture bugs (#1995, #2228, #2990, #2998, #3105)
+  * Kobo
+    - fix passphrase entry in WiFi setup (#3053)
+    - fix compatibility with old Kobo firmware
+  * new target: Kobo e-book readers
+  * user interface
+    - resizable main window
+    - added AutoZoom gesture (up-down)
+    - obsolete configuration pages "devices", "polar", "logger info" removed
+    - new page: "horizon" (#1592)
+    - default page gesture changed right/left sense according to other xc ui interaction pattern
+    - pressing the Escape key in task manager switches to "Close" tab (#2877)
+    - separate font for dialogs (#723, #2806)
+    - repetitive airspace warning sound (#2952)
+    - never close dialogs due to display rotation
+    - disable custom fonts on Altair
+    - improve small dialog font on Altair
+    - fix loading translations on Linux (#2041)
+  * map
+    - terrain countour lines (#2451)
+    - continue loading terrain/topography without GPS fix (#2723)
+    - suppress drawing duplicate topography labels
+    - draw projected path when turning
+    - additional zoom levels (#3037)
+    - global "don't fill airspace" setting (#3047)
+    - fix rendering errors when some airspaces have no border (#3045)
+    - fix distinct page zoom in conjunction with circling zoom (#2907)
+  * infoboxes
+    - new content "Speed task last hour"
+    - new content "Next distance (nominal)"
+    - new content "Takeoff distance" (#3059)
+    - new panel for "Team code" provides quick access to team code settings (#2899)
+    - new content "OLC speed" (#2352)
+  * tasks
+    - custom "start requires arm" setting (#2782)
+    - new option to disable OLC optimisation
+    - MAT: ask user whether to add turn points while flying over it
+    - update the calculator without a GPS fix (#2876)
+    - fix task speed and time estimates before task start (#2876, #2906)
+    - show "arm advance" button when manual arming is necessary (#1729)
+    - support the OLC/DMSt 500km triangle threshold (#2963)
+    - render finish point as achieved when task is finished (#2140)
+    - subtract start/finish cylinder radius from task distance (#2308)
+    - fix parsing of .cup task files
+  * route planner
+    - ignore inactive and acknowledged airspaces (#2866)
+  * calculations
+    - add more weight to zig-zag wind compared to circling wind
+    - enable circling wind calculation in IGC replay (#2672)
+    - fix OLC triangle display (#2775)
+  * waypoint editor
+    - delete waypoint implemented
+    - CUP file support added
+  * devices
+    - enabling/disabling devices on-the-fly
+    - "debug" button
+    - more robust midnight wraparound handling (#2857)
+    - new driver from Cambridge L-Nav
+    - support TCP client connection
+  * Android
+    - support IOIO via OpenAccessory (Android 4.x)
+    - support USB host mode and USB-RS232 adapters on the Nook (#2886)
+    - show Bluetooth name instead of MAC address in device list
+    - enable fast refresh mode on Nook Simple Touch
+  * Analysis
+    - a retrospective task is compiled that summarises waypoints the aircraft has 
     visited (within 15km radius).  These waypoints are drawn on OLC page of analysis dialog.
-* data files
-  - default profile is called "default.prf" instead of "xcsoar-registry.prf"
-  - log file is called "xcsoar.log" instead of "xcsoar-startup.log"
-  - fix name truncation when saving a waypoint file on Windows (#3096)
-* tasks
-  - fix parsing of .cup task files
-* user interface
-  - reduce flickering in system configuration
-* map
-  - reduce CPU usage of airspace and topography renderer
-* tasks
-  - remove keyhole from the BGA start sector zone
-* devices
-  - enable Nook's internal GPS for mock locations (#2999)
-* configuration
-  - fix loading home waypoint on longitudes bigger than 90 degrees
-* map
-  - fix stuttering terrain on Windows CE
-  - fix multi-touch pan gesture (#2684)
-* calculations
-  - improve robustness of the zig-zag wind algorithm (#2961)
-* devices
-  - FLARM: work around a Garrecht TRX-1090 firmware bug (#2745, #2749)
-  - LX: faster LXNAV Nano detection over Bluetooth (#2819)
-  - Volkslogger: increase timeout to calculate security (#2910)
-  - fix bogus error message after pressing "Cancel"
-  - show Bluetooth name instead of MAC address in device list
+  * data files
+    - default profile is called "default.prf" instead of "xcsoar-registry.prf"
+    - log file is called "xcsoar.log" instead of "xcsoar-startup.log"
+    - fix name truncation when saving a waypoint file on Windows (#3096)
+  * tasks
+    - fix parsing of .cup task files
+  * user interface
+    - reduce flickering in system configuration
+  * map
+    - reduce CPU usage of airspace and topography renderer
+  * tasks
+    - remove keyhole from the BGA start sector zone
+  * devices
+    - enable Nook's internal GPS for mock locations (#2999)
+  * configuration
+    - fix loading home waypoint on longitudes bigger than 90 degrees
+  * map
+    - fix stuttering terrain on Windows CE
+    - fix multi-touch pan gesture (#2684)
+  * calculations
+    - improve robustness of the zig-zag wind algorithm (#2961)
+  * devices
+    - FLARM: work around a Garrecht TRX-1090 firmware bug (#2745, #2749)
+    - LX: faster LXNAV Nano detection over Bluetooth (#2819)
+    - Volkslogger: increase timeout to calculate security (#2910)
+    - fix bogus error message after pressing "Cancel"
+    - show Bluetooth name instead of MAC address in device list
 
 TopHat 1.2 9/12/2013
 * fix Change "Fly" button to "Close" in task manager
