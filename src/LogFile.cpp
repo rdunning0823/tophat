@@ -56,7 +56,7 @@ OpenLog()
 
     {
       TCHAR old_path[MAX_PATH];
-      LocalPath(old_path, _T("xcsoar-old.log"));
+      LocalPath(old_path, _T("tophat-old.log"));
       File::Replace(path, old_path);
     }
 
