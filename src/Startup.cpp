@@ -93,6 +93,7 @@ Copyright_License {
 #include "Units/Units.hpp"
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "Thread/Debug.hpp"
+#include "Android/Nook.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
@@ -278,6 +279,12 @@ Startup()
 
   // Initialize DeviceBlackboard
   device_blackboard = new DeviceBlackboard();
+
+  if (IsNookSimpleTouch()) {
+    Nook::EnterFastMode();
+    Nook::SetCharge500();
+    Nook::InitInternalUsb();
+  }
 
   DeviceListInitialise();
 
