@@ -104,6 +104,14 @@ protected:
    */
   void InitUsb();
 
+
+  /**
+   * initialize the internal TTL port on the Nook's mother board as
+   * /dev/ttyS1 (must be rooted with USB Kernel)
+   * Access to this port requires soldering to the Nook's mother board
+   */
+  void InitInternalUsb();
+
   /**
    * Enter FastMode to eliminate full refresh of screen
    * requires Nook kernel rooted to support FastMode

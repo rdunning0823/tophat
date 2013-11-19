@@ -31,6 +31,7 @@ Copyright_License {
 
 static char cmd_host[] = "su -c 'echo host > /sys/devices/platform/musb_hdrc/mode'";
 static char cmd_usb_rw[] = "su -c 'chmod 666 /dev/ttyUSB0'";
+static char cmd_internal_usb_rw[] = "su -c 'chmod 666 /dev/ttyS1'";
 
 static char cmd_set_charge_500[] = "su -c 'echo 500000 > /sys/class/regulator/regulator.5/device/force_current'";
 static char cmd_set_charge_100[] = "su -c 'echo 100000 > /sys/class/regulator/regulator.5/device/force_current'";
@@ -63,6 +64,12 @@ Nook::InitUsb()
   Sleep(500);
 
   system(cmd_usb_rw);
+}
+
+void
+Nook::InitInternalUsb()
+{
+  system(cmd_internal_usb_rw);
 }
 
 void

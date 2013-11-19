@@ -158,6 +158,7 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
   if (IsNookSimpleTouch()) {
     Nook::EnterFastMode();
     Nook::SetCharge500();
+    Nook::InitInternalUsb();
   }
 
   return Startup();
