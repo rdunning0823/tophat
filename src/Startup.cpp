@@ -280,11 +280,13 @@ Startup()
   // Initialize DeviceBlackboard
   device_blackboard = new DeviceBlackboard();
 
+#ifdef ANDROID
   if (IsNookSimpleTouch()) {
     Nook::EnterFastMode();
     Nook::SetCharge500();
     Nook::InitInternalUsb();
   }
+#endif
 
   DeviceListInitialise();
 
