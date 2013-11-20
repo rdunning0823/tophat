@@ -141,19 +141,6 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   GetWindow().Move(rc);
 }
 
-UPixelScalar
-ScreensButtonWidget::GetWidth() const
-{
-  return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
-}
-
-UPixelScalar
-ScreensButtonWidget::GetHeight() const
-{
-  return GetWidth();
-}
-
 void
 ScreensButtonWidget::OnAction(int id)
 {

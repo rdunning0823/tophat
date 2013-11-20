@@ -80,11 +80,6 @@ public:
 
   ButtonPosition GetButtonPosition(InfoBoxSettings::Geometry geometry,
                                    bool landscape);
-
-  virtual UPixelScalar GetHeight() const final;
-
-  virtual UPixelScalar GetWidth() const final;
-
 };
 
 #endif
