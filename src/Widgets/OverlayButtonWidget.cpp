@@ -123,13 +123,15 @@ OverlayButtonWidget::Hide()
 UPixelScalar
 OverlayButtonWidget::GetWidth() const
 {
-  return bitmap_size_raw.cx / 2 * MapOverlayButton::GetScale() / 2.5;
+  return MapOverlayButton::GetStandardButtonHeight() *
+      MapOverlayButton::GetScale();
 }
 
 UPixelScalar
 OverlayButtonWidget::GetHeight() const
 {
-  return bitmap_size_raw.cy * MapOverlayButton::GetScale() / 2.5;
+  return MapOverlayButton::GetStandardButtonHeight() *
+      MapOverlayButton::GetScale();
 }
 
 OverlayButton &

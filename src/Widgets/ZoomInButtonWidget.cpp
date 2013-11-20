@@ -90,19 +90,6 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
   WindowWidget::Move(rc);
 }
 
-UPixelScalar
-ZoomInButtonWidget::GetWidth() const
-{
-  return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
-}
-
-UPixelScalar
-ZoomInButtonWidget::GetHeight() const
-{
-  return GetWidth();
-}
-
 PixelRect
 ZoomInButtonWidget::GetPosition() const
 {

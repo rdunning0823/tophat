@@ -69,10 +69,6 @@ public:
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map) final;
 
-  virtual UPixelScalar GetWidth() const final;
-
-  virtual UPixelScalar GetHeight() const final;
-
   PixelRect GetPosition() const;
 
   /**
