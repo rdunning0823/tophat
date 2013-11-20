@@ -35,25 +35,18 @@ class Bitmap;
 class ActionListener;
 struct PixelRect;
 
-/**
- * a shared properties of all the map overlay buttons
- */
-
-namespace MapOverlayButton {
-
+class MapOverlayButton : public WndButton {
+public:
   /**
    * size from 2 (tiny) to 6 (huge) of map overlay buttons
    */
-  unsigned GetScale();
+  static unsigned GetScale();
 
   /**
    * returns standard button height.  Not scaled by GetScale()
    */
-  unsigned GetStandardButtonHeight();
+  static unsigned GetStandardButtonHeight();
 
-}
-
-class OverlayButton : public WndButton {
 protected:
   const IconLook &icon_look;
   const ButtonLook &button_look;
@@ -64,11 +57,11 @@ protected:
 
 public:
 
-  OverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
-                 const IconLook &_icon_look,
-                 const Bitmap *_bmp, const PixelRect &rc,
-                 ButtonWindowStyle style,
-                 ActionListener& listener, int id)
+  MapOverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
+                    const IconLook &_icon_look,
+                    const Bitmap *_bmp, const PixelRect &rc,
+                    ButtonWindowStyle style,
+                    ActionListener& listener, int id)
   :WndButton(parent, _button_look, _T(""), rc, style, listener, id),
    icon_look(_icon_look), button_look(_button_look), bmp(_bmp) {}
 

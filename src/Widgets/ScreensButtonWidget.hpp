@@ -44,7 +44,7 @@ public:
     Right,
   };
 protected:
-  OverlayButton *the_button;
+  MapOverlayButton *the_button;
 
   ButtonPosition button_position;
 

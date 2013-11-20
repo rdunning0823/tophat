@@ -87,7 +87,7 @@ OverlayButtonWidget::GetHeight() const
       MapOverlayButton::GetScale();
 }
 
-OverlayButton &
+MapOverlayButton &
 OverlayButtonWidget::CreateButton(ContainerWindow &parent,
                                    const ButtonLook &button_look,
                                    const IconLook &icon_look,
@@ -96,11 +96,9 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
   ButtonWindowStyle button_style;
   button_style.multiline();
 
-  OverlayButton *button =
-    new OverlayButton(parent, button_look, icon_look, bmp,
-                      rc_map, button_style, *this, 0);
+  MapOverlayButton *button =
+    new MapOverlayButton(parent, button_look, icon_look, bmp,
+                         rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;
 }
-
-

@@ -71,10 +71,10 @@ public:
   virtual void Show(const PixelRect &rc);
   virtual void Hide();
   virtual void Move(const PixelRect &rc) = 0;
-  OverlayButton& CreateButton(ContainerWindow &parent,
-                              const ButtonLook &button_look,
-                              const IconLook &icon_look,
-                              const PixelRect &rc);
+  MapOverlayButton& CreateButton(ContainerWindow &parent,
+                                 const ButtonLook &button_look,
+                                 const IconLook &icon_look,
+                                 const PixelRect &rc);
 
   /**
    * How much height does this widget use at the bottom right of the map screen

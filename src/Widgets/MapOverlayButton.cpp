@@ -53,7 +53,7 @@ MapOverlayButton::GetStandardButtonHeight()
 
 
 bool
-OverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
+MapOverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 {
   if (IsInside(x, y))
     return WndButton::OnMouseMove(x, y, keys);
@@ -63,7 +63,7 @@ OverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 }
 
 void
-OverlayButton::OnPaint(Canvas &canvas)
+MapOverlayButton::OnPaint(Canvas &canvas)
 {
   PixelRect rc = {
     PixelScalar(0), PixelScalar(0), PixelScalar(canvas.GetWidth()),
