@@ -27,8 +27,6 @@ Copyright_License {
 #include "Form/List.hpp"
 #include "Time/PeriodClock.hpp"
 
-#include "LogFile.hpp"
-
 struct DialogLook;
 class ContainerWindow;
 struct PixelRect;
