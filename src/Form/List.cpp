@@ -49,7 +49,7 @@ gcc_const
 static bool
 UsePixelPan()
 {
-  return !IsKobo();
+  return HasDraggableScreen();
 }
 
 ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
