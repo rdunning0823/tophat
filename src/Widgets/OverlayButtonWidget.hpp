@@ -24,49 +24,14 @@ Copyright_License {
 #ifndef XCSOAR_OVERLAY_BUTTON_WIDGET_HPP
 #define XCSOAR_OVERLAY_BUTTON_WIDGET_HPP
 
+#include "Widgets/MapOverlayButton.hpp"
 #include "Widgets/MapOverlayWidget.hpp"
-#include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
-#include "Look/ButtonLook.hpp"
-
-#include <tchar.h>
 
 struct IconLook;
 class ContainerWindow;
 class Bitmap;
 struct PixelRect;
-
-class OverlayButton : public WndButton {
-protected:
-  const IconLook &icon_look;
-  const ButtonLook &button_look;
-  /**
-   * the bitmap displayed in the button
-   */
-  const Bitmap *bmp;
-
-public:
-
-  OverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
-                 const IconLook &_icon_look,
-                 const Bitmap *_bmp, const PixelRect &rc,
-                 ButtonWindowStyle style,
-                 ActionListener& listener, int id)
-  :WndButton(parent, _button_look, _T(""), rc, style, listener, id),
-   icon_look(_icon_look), button_look(_button_look), bmp(_bmp) {}
-
-  /**
-   * The OnPaint event is called when the button needs to be drawn
-   * (derived from PaintWindow)
-   */
-  virtual void OnPaint(Canvas &canvas);
-
-  /**
-   * handles on mouse move, and if dragged off button face, cancels drag
-   * This allows background object to accept capture at this time
-   */
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
-};
 
 class OverlayButtonWidget : public MapOverlayWidget, protected ActionListener {
 protected:

@@ -29,59 +29,12 @@ Copyright_License {
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
-#include "Language/Language.hpp"
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
 #include "Look/GlobalFonts.hpp"
-#include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 
-bool
-OverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
-{
-  if (IsInside(x, y))
-    return WndButton::OnMouseMove(x, y, keys);
-  else
-    OnCancelMode();
-  return true;
-}
-
-void
-OverlayButton::OnPaint(Canvas &canvas)
-{
-  PixelRect rc = {
-    PixelScalar(0), PixelScalar(0), PixelScalar(canvas.GetWidth()),
-    PixelScalar(canvas.GetHeight())
-  };
-
-  bool pressed = IsDown();
-#ifdef ENABLE_OPENGL
-  bool transparent = true;
-#else
-  bool transparent = false;
-  if (IsKobo())
-    transparent = true;
-#endif
-  //Todo fix the GDI rendering so it draws transparent correctly
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
-  rc = renderer.GetDrawingRect(rc, pressed);
-
-  canvas.SelectNullPen();
-  if (!IsEnabled())
-    canvas.Select(button_look.disabled.brush);
-  else
-    canvas.Select(button_look.standard.foreground_brush);
-  const PixelSize bitmap_size = bmp->GetSize();
-  const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
-  const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
-  canvas.CopyAnd(rc.left + offsetx,
-                  rc.top + offsety,
-                  bitmap_size.cx / 2,
-                  bitmap_size.cy,
-                  *bmp,
-                  bitmap_size.cx / 2, 0);
-}
 
 UPixelScalar
 OverlayButtonWidget::HeightFromBottomRight()
