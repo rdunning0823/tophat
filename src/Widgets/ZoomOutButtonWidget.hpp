@@ -56,16 +56,6 @@ public:
   virtual UPixelScalar HeightFromBottomLeft();
 
   /**
-   * returns width of button
-   */
-  UPixelScalar GetWidth() const;
-
-  /**
-   * returns height of button
-   */
-  UPixelScalar GetHeight() const;
-
-  /**
    * Shows or hides the widgets based on these parameters
    * @rc. the rc of the map
    * @is_panning.  is the map in panning mode

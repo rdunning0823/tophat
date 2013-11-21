@@ -67,19 +67,6 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
   WindowWidget::Move(rc);
 }
 
-UPixelScalar
-ZoomOutButtonWidget::GetWidth() const
-{
-  return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
-}
-
-UPixelScalar
-ZoomOutButtonWidget::GetHeight() const
-{
-  return GetWidth();
-}
-
 void
 ZoomOutButtonWidget::OnAction(int id)
 {
