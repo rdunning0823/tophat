@@ -54,6 +54,8 @@ Font Fonts::map_bold;
 Font Fonts::map_label;
 /// font labels for important labels (e.g. big/medium cities)
 Font Fonts::map_label_important;
+/// font labels for map overlay buttons
+Font Fonts::map_overlay_button;
 
 bool
 Fonts::Load(const FontSettings &settings)
@@ -78,11 +80,13 @@ Fonts::Load(const FontSettings &settings)
   map_label_important.Load(settings.map_label_important);
   map.Load(settings.map);
   map_bold.Load(settings.map_bold);
+  map_overlay_button.Load(settings.map_overlay_button);
   monospace.Load(settings.monospace);
 
   return title.IsDefined() && cdi.IsDefined() &&
     map_label.IsDefined() && map_label_important.IsDefined() &&
     map.IsDefined() && map_bold.IsDefined() &&
+    map_overlay_button.IsDefined() &&
     monospace.IsDefined();
 }
 
@@ -103,5 +107,6 @@ Fonts::Deinitialize()
   cdi.Destroy();
   map_label.Destroy();
   map_label_important.Destroy();
+  map_overlay_button.Destroy();
   monospace.Destroy();
 }

@@ -65,6 +65,7 @@ namespace Fonts
   extern Font map_bold;
   extern Font map_label;
   extern Font map_label_important;
+  extern Font map_overlay_button;
 
   bool Load(const FontSettings &settings);
 

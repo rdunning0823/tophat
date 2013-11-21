@@ -79,6 +79,8 @@ LoadAltairLogFonts(FontSettings &settings)
   InitialiseLogfont(&settings.map, _T("RasterGothicFourteenCond"), 15);
   InitialiseLogfont(&settings.map_bold,
                     _T("RasterGothicFourteenCond"), 15, true);
+  InitialiseLogfont(&settings.map_overlay_button,
+                    _T("RasterGothicTwentyFourCond"), 36, true);
   InitialiseLogfont(&settings.infobox_small,
                     _T("RasterGothicEighteenCond"), 19, true);
   InitialiseLogfont(&settings.monospace, GetStandardMonospaceFontFace(),
@@ -139,6 +141,10 @@ InitialiseLogFonts(FontSettings &settings)
   // Font for map bold text
   InitialiseLogfont(&settings.map_bold, GetStandardFontFace(),
                     unsigned(font_height * 0.507), true);
+
+  // Font for map overlay buttons
+  InitialiseLogfont(&settings.map_overlay_button, GetStandardFontFace(),
+                    unsigned(font_height * 1.3), true);
 
 #ifndef GNAV
   InitialiseLogfont(&settings.infobox_units, GetStandardFontFace(),

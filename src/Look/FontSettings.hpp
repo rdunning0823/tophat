@@ -48,6 +48,7 @@ struct FontSettings {
   LOGFONT map_bold;
   LOGFONT map_label;
   LOGFONT map_label_important;
+  LOGFONT map_overlay_button;
 };
 
 #endif
