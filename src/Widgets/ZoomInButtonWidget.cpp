@@ -43,8 +43,7 @@ ZoomInButtonWidget::Prepare(ContainerWindow &parent,
                             const PixelRect &rc)
 {
   assert(!prepared);
-  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
-  SetBitmap(&icon_look.hBmpZoomInButton);
+  SetText(_T("+"));
   OverlayButtonWidget::Prepare(parent, rc);
   prepared = true;
 }

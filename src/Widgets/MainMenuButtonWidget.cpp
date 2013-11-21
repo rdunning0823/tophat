@@ -53,8 +53,7 @@ void
 MainMenuButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
-  SetBitmap(&icon_look.hBmpMenuButton);
+  SetText(_T("M"));
   OverlayButtonWidget::Prepare(parent, rc);
 }
 

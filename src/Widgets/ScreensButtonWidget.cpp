@@ -97,8 +97,7 @@ ScreensButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
   assert (!prepared);
-  const IconLook &icons = UIGlobals::GetIconLook();
-  SetBitmap(&icons.hBmpScreensButton);
+  SetText(_T("S"));
   OverlayButtonWidget::Prepare(parent, rc);
   prepared = true;
 }

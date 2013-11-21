@@ -42,8 +42,7 @@ void
 ZoomOutButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
-  SetBitmap(&icon_look.hBmpZoomOutButton);
+  SetText(_T("-"));
   OverlayButtonWidget::Prepare(parent, rc);
 }
 
