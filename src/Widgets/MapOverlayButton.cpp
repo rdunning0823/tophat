@@ -81,18 +81,45 @@ MapOverlayButton::OnPaint(Canvas &canvas)
   renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
   rc = renderer.GetDrawingRect(rc, pressed);
 
-  canvas.SelectNullPen();
-  if (!IsEnabled())
-    canvas.Select(button_look.disabled.brush);
-  else
-    canvas.Select(button_look.standard.foreground_brush);
-  const PixelSize bitmap_size = bmp->GetSize();
-  const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
-  const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
-  canvas.CopyAnd(rc.left + offsetx,
-                  rc.top + offsety,
-                  bitmap_size.cx / 2,
-                  bitmap_size.cy,
-                  *bmp,
-                  bitmap_size.cx / 2, 0);
+  if (bmp != nullptr) {
+    canvas.SelectNullPen();
+    if (!IsEnabled())
+      canvas.Select(button_look.disabled.brush);
+    else
+      canvas.Select(button_look.standard.foreground_brush);
+    const PixelSize bitmap_size = bmp->GetSize();
+    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
+    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
+    canvas.CopyAnd(rc.left + offsetx,
+                    rc.top + offsety,
+                    bitmap_size.cx / 2,
+                    bitmap_size.cy,
+                    *bmp,
+                    bitmap_size.cx / 2, 0);
+  } else {
+
+    canvas.SetTextColor(button_look.standard.foreground_color);
+    canvas.Select(*button_look.font);
+
+  #ifndef USE_GDI
+    unsigned style = GetTextStyle();
+
+    canvas.DrawFormattedText(&rc, GetText().c_str(), style);
+  #else
+    unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
+
+    PixelRect text_rc = rc;
+    canvas.DrawFormattedText(&text_rc,  GetText().c_str(), style | DT_CALCRECT);
+    text_rc.right = rc.right;
+
+    PixelScalar offset = rc.bottom - text_rc.bottom;
+    if (offset > 0) {
+      offset /= 2;
+      text_rc.top += offset;
+      text_rc.bottom += offset;
+    }
+
+    canvas.DrawFormattedText(&text_rc,  GetText().c_str(), style);
+  #endif
+  }
 }

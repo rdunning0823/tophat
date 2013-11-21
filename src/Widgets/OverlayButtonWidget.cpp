@@ -46,10 +46,16 @@ void
 OverlayButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   white_look.Initialise(Fonts::map_bold);
-  bitmap_size_raw = bmp->GetSize();
+  white_look.font = &Fonts::map_overlay_button;
+  if (bmp != nullptr) {
+    bitmap_size_raw = bmp->GetSize();
+  } else {
+    assert(text != nullptr);
+    bitmap_size_raw = white_look.font->TextSize(text);
+  }
 
+  const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   CreateButton(parent, white_look, icon_look, rc);
   Move(rc);
 }
@@ -96,8 +102,10 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
   ButtonWindowStyle button_style;
   button_style.multiline();
 
+  const TCHAR *text2 = text == nullptr ? _T("") : text;
+
   MapOverlayButton *button =
-    new MapOverlayButton(parent, button_look, icon_look, bmp,
+    new MapOverlayButton(parent, button_look, icon_look, bmp, text2,
                          rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;

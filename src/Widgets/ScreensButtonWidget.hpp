@@ -52,7 +52,8 @@ protected:
 
 public:
   ScreensButtonWidget()
-    :the_button(nullptr), button_position(Bottom), prepared(false)
+    :OverlayButtonWidget(), the_button(nullptr), button_position(Bottom),
+     prepared(false)
   {}
 
   /**

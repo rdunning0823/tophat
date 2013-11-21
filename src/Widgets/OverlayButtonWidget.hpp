@@ -50,7 +50,14 @@ protected:
    */
   const Bitmap *bmp;
 
+  /**
+   * text displayed in the button
+   */
+  const TCHAR *text;
+
 public:
+  OverlayButtonWidget()
+    : bmp(nullptr), text(nullptr) {}
 
   /**
    * Shows or hides the widgets based on these parameters
@@ -98,7 +105,13 @@ public:
 
 protected:
   void SetBitmap(const Bitmap *_bmp) {
+    assert(text == nullptr);
     bmp = _bmp;
+  }
+
+  void SetText(const TCHAR * _text) {
+    assert(bmp == nullptr);
+    text = _text;
   }
 };
 

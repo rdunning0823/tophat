@@ -37,7 +37,8 @@ struct PixelRect;
 
 class MainMenuButtonWidget : public OverlayButtonWidget {
 public:
-
+  MainMenuButtonWidget()
+    :OverlayButtonWidget() {};
   /**
    * Shows or hides the widgets based on these parameters
    * @rc. the rc of the map

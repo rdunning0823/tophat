@@ -59,10 +59,11 @@ public:
 
   MapOverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
                     const IconLook &_icon_look,
-                    const Bitmap *_bmp, const PixelRect &rc,
+                    const Bitmap *_bmp, const TCHAR * _text,
+                    const PixelRect &rc,
                     ButtonWindowStyle style,
                     ActionListener& listener, int id)
-  :WndButton(parent, _button_look, _T(""), rc, style, listener, id),
+  :WndButton(parent, _button_look, _text, rc, style, listener, id),
    icon_look(_icon_look), button_look(_button_look), bmp(_bmp) {}
 
   /**

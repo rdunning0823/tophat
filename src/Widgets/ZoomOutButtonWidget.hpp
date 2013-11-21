@@ -45,7 +45,7 @@ protected:
   ZoomInButtonWidget *zoom_in;
 public:
   ZoomOutButtonWidget(ZoomInButtonWidget *_zoom_in)
-    :zoom_in(_zoom_in) {}
+    :OverlayButtonWidget(), zoom_in(_zoom_in) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
   virtual void Move(const PixelRect &rc) final;
