@@ -393,8 +393,8 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
   const PixelScalar bmp_y = (text_size.cy + bmp_size.cy) / 2;
 
 
-  UPixelScalar zoom_button_width = Fonts::map_bold.GetHeight() *
-      MapOverlayButton::GetScale() + 2 * Layout::Scale(2);
+  UPixelScalar zoom_button_width = MapOverlayButton::GetStandardButtonHeight()
+      * MapOverlayButton::GetScale();
 
   PixelScalar x = rc.left + (Layout::landscape ? 2 : 1) * zoom_button_width;
 
@@ -638,17 +638,11 @@ GlueMapWindow::DrawStallRatio(Canvas &canvas, const PixelRect &rc) const
 void
 GlueMapWindow::SetMainMenuButtonRect()
 {
-  UPixelScalar clear_border_width = Layout::Scale(2);
-
-  const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *bmp = &icons.hBmpMenuButton;
-  const PixelSize bitmap_size = bmp->GetSize();
   PixelSize menu_button_size;
 
-  menu_button_size.cx = (bitmap_size.cx / 2 * MapOverlayButton::GetScale() / 2.5) -
-      2 * clear_border_width;
-  menu_button_size.cy = (bitmap_size.cy * MapOverlayButton::GetScale()) / 2.5 -
-      2 * clear_border_width;
+  menu_button_size.cx = MapOverlayButton::GetStandardButtonHeight()
+      * MapOverlayButton::GetScale();
+  menu_button_size.cy = menu_button_size.cx;
 
   UPixelScalar pen_width = Layout::Scale(2);
   rc_main_menu_button = GetClientRect();
@@ -665,8 +659,9 @@ GlueMapWindow::SetZoomButtonsRect()
   const PixelRect rc_map = GetClientRect();
 
   PixelSize button_size;
-  button_size.cx = button_size.cy = Fonts::map_bold.GetHeight()
-      * MapOverlayButton::GetScale() * .8;
+  button_size.cx = button_size.cy =
+      MapOverlayButton::GetStandardButtonHeight()
+      * MapOverlayButton::GetScale();
 
   rc_zoom_in_button.left = rc_map.left;
   if (Layout::landscape) {

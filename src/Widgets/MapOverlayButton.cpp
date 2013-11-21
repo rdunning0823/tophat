@@ -51,7 +51,6 @@ MapOverlayButton::GetStandardButtonHeight()
   return Fonts::map_bold.GetHeight();
 }
 
-
 bool
 MapOverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 {
