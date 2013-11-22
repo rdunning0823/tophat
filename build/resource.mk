@@ -44,9 +44,9 @@ $(eval $(call rsvg-convert,$(PNG_ICONS_160),$(DATA)/icons/%_160.png,$(DATA)/icon
 $(eval $(call rsvg-convert,$(PNG_ICONS_420),$(DATA)/icons/%_420.png,$(DATA)/icons/%.svg,--x-zoom=4.2 --y-zoom=4.2))
 
 # convert to uncompressed 8-bit BMP
-$(eval $(call convert-to-bmp,$(BMP_ICONS) $(BMP_ICONS_160),%.bmp,%_tile.png))
+$(eval $(call convert-to-bmp,$(BMP_ICONS) $(BMP_ICONS_160) $(BMP_ICONS_420),%.bmp,%_tile.png))
 
-$(eval $(call convert-to-bmp,$(BMP_ICONS) $(BMP_ICONS_420),%.bmp,%_tile.png))
+#$(eval $(call convert-to-bmp,$(BMP_ICONS) ,%.bmp,%_tile.png))
 
 ####### splash logo
 
