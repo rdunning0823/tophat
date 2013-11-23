@@ -31,11 +31,28 @@ Copyright_License {
 #include "Screen/OpenGL/Compatibility.hpp"
 #endif
 
+
+
 void
 MaskedIcon::LoadResource(ResourceId id, ResourceId big_id, bool center)
 {
-  if (Layout::ScaleEnabled()) {
-    if (big_id.IsDefined())
+  ResourceId big2_id = ResourceId::Null();
+  LoadResource(id, big_id, big2_id, center);
+}
+
+void
+MaskedIcon::LoadResource(ResourceId id, ResourceId big_id,
+                         ResourceId big2_id, bool center)
+{
+  if (Layout::ScaleEnabled()) { /* Layout::scale > 1 */
+    if (Layout::scale >= 3) {
+      if (big2_id.IsDefined())
+        bitmap.Load(big2_id);
+      else if (big_id.IsDefined())
+        bitmap.LoadStretch(big_id, Layout::scale - 1); /* stretch not implmented */
+      else
+        bitmap.LoadStretch(big_id, Layout::scale);
+    } else if (big_id.IsDefined())
       bitmap.Load(big_id);
     else
       bitmap.LoadStretch(id, Layout::FastScale(1));

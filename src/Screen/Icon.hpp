@@ -50,6 +50,15 @@ public:
     return bitmap.IsDefined();
   }
 
+  /**
+   * @param id the resource id
+   * @param big_id larger resource id
+   * @param big2_id extra large resource id
+   * @param center flag
+   */
+  void LoadResource(ResourceId id, ResourceId big_id,
+                    ResourceId big2_id, bool center=true);
+
   void LoadResource(ResourceId id, ResourceId big_id = ResourceId::Null(),
                     bool center=true);
 
