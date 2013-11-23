@@ -16,6 +16,8 @@
 
 #endif
 
+#define GET_ICON(scale, hd2, hd, lo) scale > 1 ? (scale > 3 ? hd2 : hd) : lo
+
 MAKE_RESOURCE(IDB_LANDABLE, 139);
 MAKE_RESOURCE(IDB_LANDABLE_HD, 5139);
 MAKE_RESOURCE(IDB_LANDABLE_HD2, 54139);
