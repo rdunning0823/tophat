@@ -37,8 +37,8 @@ $(SVG_NOALIAS_ICONS): $(DATA)/icons/%.svg: build/svg_preprocess.xsl Data/icons/%
 # Default 100PPI (eg 320x240 4" display)
 $(eval $(call rsvg-convert,$(PNG_ICONS),$(DATA)/icons/%.png,$(DATA)/icons/%.svg,--x-zoom=1.0 --y-zoom=1.0))
 
-#160PPI (eg 640x480 5" display)
-$(eval $(call rsvg-convert,$(PNG_ICONS_160),$(DATA)/icons/%_160.png,$(DATA)/icons/%.svg,--x-zoom=1.6316 --y-zoom=1.6316))
+#200PPI (eg 640x480 5" display)
+$(eval $(call rsvg-convert,$(PNG_ICONS_160),$(DATA)/icons/%_160.png,$(DATA)/icons/%.svg,--x-zoom=2 --y-zoom=2))
 
 #420PPI (eg HTC One 1080 x 1920 pixels, 4.7" display)
 $(eval $(call rsvg-convert,$(PNG_ICONS_420),$(DATA)/icons/%_420.png,$(DATA)/icons/%.svg,--x-zoom=4.2 --y-zoom=4.2))
