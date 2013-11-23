@@ -47,16 +47,16 @@ MapLook::Initialise(const MapSettings &settings,
   above_terrain_brush.Set(above_terrain_bitmap);
 #endif
 
-  terrain_warning_icon.LoadResource(IDB_TERRAINWARNING, IDB_TERRAINWARNING_HD);
+  terrain_warning_icon.LoadResource(IDB_TERRAINWARNING, IDB_TERRAINWARNING_HD, IDB_TERRAINWARNING_HD2);
 
   compass_brush.Set(IsDithered() ? COLOR_WHITE : COLOR_GRAY);
   compass_pen.Set(Layout::ScalePenWidth(1), HasColors()? COLOR_GRAY : COLOR_BLACK);
   compass_triangle_brush.Set(IsDithered() ? COLOR_BLACK : Color(50, 50, 50));
   compass_triangle_pen.Set(Layout::ScalePenWidth(1), HasColors()? COLOR_GRAY : COLOR_BLACK);
 
-  traffic_safe_icon.LoadResource(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, false);
-  traffic_warning_icon.LoadResource(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, false);
-  traffic_alarm_icon.LoadResource(IDB_TRAFFIC_ALARM, IDB_TRAFFIC_ALARM_HD, false);
+  traffic_safe_icon.LoadResource(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, IDB_TRAFFIC_SAFE_HD2, false);
+  traffic_warning_icon.LoadResource(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, IDB_TRAFFIC_WARNING_HD2, false);
+  traffic_alarm_icon.LoadResource(IDB_TRAFFIC_ALARM, IDB_TRAFFIC_ALARM_HD, IDB_TRAFFIC_ALARM_HD2, false);
 
   static constexpr Color clrSepia(0x78,0x31,0x18);
   reach_pen.Set(Pen::DASH, Layout::ScalePenWidth(2), clrSepia);
@@ -68,25 +68,25 @@ MapLook::Initialise(const MapSettings &settings,
   contest_pens[1].Set(Layout::ScalePenWidth(1) + 1, COLOR_ORANGE);
   contest_pens[2].Set(Layout::ScalePenWidth(1), COLOR_BLUE);
 
-  thermal_source_icon.LoadResource(IDB_THERMALSOURCE, IDB_THERMALSOURCE_HD);
+  thermal_source_icon.LoadResource(IDB_THERMALSOURCE, IDB_THERMALSOURCE_HD, IDB_THERMALSOURCE_HD2);
 
-  traffic_safe_icon.LoadResource(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, false);
-  traffic_warning_icon.LoadResource(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, false);
-  traffic_alarm_icon.LoadResource(IDB_TRAFFIC_ALARM, IDB_TRAFFIC_ALARM_HD, false);
+  traffic_safe_icon.LoadResource(IDB_TRAFFIC_SAFE, IDB_TRAFFIC_SAFE_HD, IDB_TRAFFIC_SAFE_HD2, false);
+  traffic_warning_icon.LoadResource(IDB_TRAFFIC_WARNING, IDB_TRAFFIC_WARNING_HD, IDB_TRAFFIC_WARNING_HD2, false);
+  traffic_alarm_icon.LoadResource(IDB_TRAFFIC_ALARM, IDB_TRAFFIC_ALARM_HD, IDB_TRAFFIC_ALARM_HD2, false);
 
-  map_scale_left_icon.LoadResource(IDB_MAPSCALE_LEFT, IDB_MAPSCALE_LEFT_HD, false);
-  map_scale_right_icon.LoadResource(IDB_MAPSCALE_RIGHT, IDB_MAPSCALE_RIGHT_HD, false);
+  map_scale_left_icon.LoadResource(IDB_MAPSCALE_LEFT, IDB_MAPSCALE_LEFT_HD, IDB_MAPSCALE_LEFT_HD2, false);
+  map_scale_right_icon.LoadResource(IDB_MAPSCALE_RIGHT, IDB_MAPSCALE_RIGHT_HD, IDB_MAPSCALE_RIGHT_HD2, false);
 
-  logger_on_icon.LoadResource(IDB_LOGGER, IDB_LOGGER_HD);
-  logger_off_icon.LoadResource(IDB_LOGGEROFF, IDB_LOGGEROFF_HD);
+  logger_on_icon.LoadResource(IDB_LOGGER, IDB_LOGGER_HD, IDB_LOGGER_HD2);
+  logger_off_icon.LoadResource(IDB_LOGGEROFF, IDB_LOGGEROFF_HD, IDB_LOGGEROFF_HD2);
 
-  cruise_mode_icon.LoadResource(IDB_CRUISE, IDB_CRUISE_HD, false);
-  climb_mode_icon.LoadResource(IDB_CLIMB, IDB_CLIMB_HD, false);
-  final_glide_mode_icon.LoadResource(IDB_FINALGLIDE, IDB_FINALGLIDE_HD, false);
-  abort_mode_icon.LoadResource(IDB_ABORT, IDB_ABORT_HD, false);
+  cruise_mode_icon.LoadResource(IDB_CRUISE, IDB_CRUISE_HD, IDB_CRUISE_HD2, false);
+  climb_mode_icon.LoadResource(IDB_CLIMB, IDB_CLIMB_HD, IDB_CLIMB_HD2, false);
+  final_glide_mode_icon.LoadResource(IDB_FINALGLIDE, IDB_FINALGLIDE_HD, IDB_FINALGLIDE_HD2, false);
+  abort_mode_icon.LoadResource(IDB_ABORT, IDB_ABORT_HD, IDB_ABORT_HD2, false);
 
-  waiting_for_fix_icon.LoadResource(IDB_GPSSTATUS1, IDB_GPSSTATUS1_HD, false);
-  no_gps_icon.LoadResource(IDB_GPSSTATUS2, IDB_GPSSTATUS2_HD, false);
+  waiting_for_fix_icon.LoadResource(IDB_GPSSTATUS1, IDB_GPSSTATUS1_HD, IDB_GPSSTATUS1_HD2, false);
+  no_gps_icon.LoadResource(IDB_GPSSTATUS2, IDB_GPSSTATUS2_HD, IDB_GPSSTATUS2_HD2, false);
 
   overlay_font = &bold_font;
 }
