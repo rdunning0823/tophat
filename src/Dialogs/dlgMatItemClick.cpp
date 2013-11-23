@@ -413,7 +413,7 @@ MatClickPanel::RefreshFormForAdd()
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   StaticString<32> time;
 
-  FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
+  FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
 
   StaticString<25> altitude_text(_T(""));
   fixed altitude_difference = task_stats.total.solution_remaining.altitude_difference;
