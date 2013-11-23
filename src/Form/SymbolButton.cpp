@@ -32,6 +32,7 @@ Copyright_License {
 #include "Resources.hpp"
 #include "Asset.hpp"
 #include "Screen/Layout.hpp"
+#include "UIGlobals.hpp"
 
 void
 WndSymbolButton::OnPaint(Canvas &canvas)
@@ -110,11 +111,12 @@ WndSymbolButton::OnPaint(Canvas &canvas)
 
     //draw search icon
   } else if (caption == N_("Search") || caption == N_("SearchChecked")) {
-    Bitmap bmp(caption == N_("Search") ?
-        (Layout::scale == 1 ? IDB_SEARCH : IDB_SEARCH_HD) :
-        (Layout::scale == 1 ? IDB_SEARCH_CHECKED : IDB_SEARCH_CHECKED_HD));
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const Bitmap *bmp;
+    bmp = caption == N_("Search") ? &icon_look.hBmpSearch :
+        &icon_look.hBmpSearchChecked;
 
-    const PixelSize bitmap_size = bmp.GetSize();
+    const PixelSize bitmap_size = bmp->GetSize();
     const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
     const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
     if (IsDown())
@@ -122,21 +124,22 @@ WndSymbolButton::OnPaint(Canvas &canvas)
                        rc.top + offsety,
                        bitmap_size.cx / 2,
                        bitmap_size.cy,
-                       bmp,
+                       *bmp,
                        bitmap_size.cx / 2, 0);
     else
       canvas.CopyAnd(rc.left + offsetx,
                       rc.top + offsety,
                       bitmap_size.cx / 2,
                       bitmap_size.cy,
-                      bmp,
+                      *bmp,
                       bitmap_size.cx / 2, 0);
 
   }
 
   //draw gear for set up icon
   else if (caption == N_("Setup")) {
-    Bitmap bmp(Layout::scale == 1 ? IDB_SETTINGS : IDB_SETTINGS_HD);
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const Bitmap &bmp = icon_look.hBmpTabSettings;
 
     const PixelSize bitmap_size = bmp.GetSize();
     const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
