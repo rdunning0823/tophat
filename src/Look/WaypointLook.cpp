@@ -29,17 +29,17 @@ void
 WaypointLook::Initialise(const WaypointRendererSettings &settings,
                          const Font &_font, const Font &_bold_font)
 {
-  small_icon.LoadResource(IDB_SMALL, IDB_SMALL_HD);
-  turn_point_icon.LoadResource(IDB_TURNPOINT, IDB_TURNPOINT_HD);
-  task_turn_point_icon.LoadResource(IDB_TASKTURNPOINT, IDB_TASKTURNPOINT_HD);
-  mountain_top_icon.LoadResource(IDB_MOUNTAIN_TOP, IDB_MOUNTAIN_TOP_HD);
-  mountain_pass_icon.LoadResource(IDB_MOUNTAIN_PASS, IDB_MOUNTAIN_PASS_HD);
-  bridge_icon.LoadResource(IDB_BRIDGE, IDB_BRIDGE_HD);
-  tunnel_icon.LoadResource(IDB_TUNNEL, IDB_TUNNEL_HD);
-  tower_icon.LoadResource(IDB_TOWER, IDB_TOWER_HD);
-  power_plant_icon.LoadResource(IDB_POWER_PLANT, IDB_POWER_PLANT_HD);
-  obstacle_icon.LoadResource(IDB_OBSTACLE, IDB_OBSTACLE_HD);
-  thermal_hotspot_icon.LoadResource(IDB_THERMAL_HOTSPOT, IDB_THERMAL_HOTSPOT_HD);
+  small_icon.LoadResource(IDB_SMALL, IDB_SMALL_HD, IDB_SMALL_HD2);
+  turn_point_icon.LoadResource(IDB_TURNPOINT, IDB_TURNPOINT_HD, IDB_TURNPOINT_HD2);
+  task_turn_point_icon.LoadResource(IDB_TASKTURNPOINT, IDB_TASKTURNPOINT_HD, IDB_TASKTURNPOINT_HD2);
+  mountain_top_icon.LoadResource(IDB_MOUNTAIN_TOP, IDB_MOUNTAIN_TOP_HD, IDB_MOUNTAIN_TOP_HD2);
+  mountain_pass_icon.LoadResource(IDB_MOUNTAIN_PASS, IDB_MOUNTAIN_PASS_HD, IDB_MOUNTAIN_PASS_HD2);
+  bridge_icon.LoadResource(IDB_BRIDGE, IDB_BRIDGE_HD, IDB_BRIDGE_HD2);
+  tunnel_icon.LoadResource(IDB_TUNNEL, IDB_TUNNEL_HD, IDB_TUNNEL_HD2);
+  tower_icon.LoadResource(IDB_TOWER, IDB_TOWER_HD, IDB_TOWER_HD2);
+  power_plant_icon.LoadResource(IDB_POWER_PLANT, IDB_POWER_PLANT_HD, IDB_POWER_PLANT_HD2);
+  obstacle_icon.LoadResource(IDB_OBSTACLE, IDB_OBSTACLE_HD, IDB_OBSTACLE_HD2);
+  thermal_hotspot_icon.LoadResource(IDB_THERMAL_HOTSPOT, IDB_THERMAL_HOTSPOT_HD, IDB_THERMAL_HOTSPOT_HD2);
 
   reachable_brush.Set(COLOR_GREEN);
   terrain_unreachable_brush.Set(LightColor(COLOR_RED));
@@ -51,42 +51,42 @@ WaypointLook::Initialise(const WaypointRendererSettings &settings,
 
   switch (settings.landable_style) {
   case WaypointRendererSettings::LandableStyle::PURPLE_CIRCLE:
-    airport_reachable_icon.LoadResource(IDB_REACHABLE, IDB_REACHABLE_HD);
-    airport_marginal_icon.LoadResource(IDB_MARGINAL, IDB_MARGINAL_HD);
-    airport_unreachable_icon.LoadResource(IDB_LANDABLE, IDB_LANDABLE_HD);
-    field_reachable_icon.LoadResource(IDB_REACHABLE, IDB_REACHABLE_HD);
-    field_marginal_icon.LoadResource(IDB_MARGINAL, IDB_MARGINAL_HD);
-    field_unreachable_icon.LoadResource(IDB_LANDABLE, IDB_LANDABLE_HD);
+    airport_reachable_icon.LoadResource(IDB_REACHABLE, IDB_REACHABLE_HD, IDB_REACHABLE_HD2);
+    airport_marginal_icon.LoadResource(IDB_MARGINAL, IDB_MARGINAL_HD, IDB_MARGINAL_HD2);
+    airport_unreachable_icon.LoadResource(IDB_LANDABLE, IDB_LANDABLE_HD, IDB_LANDABLE_HD2);
+    field_reachable_icon.LoadResource(IDB_REACHABLE, IDB_REACHABLE_HD, IDB_REACHABLE_HD2);
+    field_marginal_icon.LoadResource(IDB_MARGINAL, IDB_MARGINAL_HD, IDB_MARGINAL_HD2);
+    field_unreachable_icon.LoadResource(IDB_LANDABLE, IDB_LANDABLE_HD, IDB_LANDABLE_HD2);
     break;
 
   case WaypointRendererSettings::LandableStyle::BW:
     airport_reachable_icon.LoadResource(IDB_AIRPORT_REACHABLE,
-                                    IDB_AIRPORT_REACHABLE_HD);
+                                    IDB_AIRPORT_REACHABLE_HD, IDB_AIRPORT_REACHABLE_HD2);
     airport_marginal_icon.LoadResource(IDB_AIRPORT_MARGINAL,
-                                   IDB_AIRPORT_MARGINAL_HD);
+                                   IDB_AIRPORT_MARGINAL_HD, IDB_AIRPORT_MARGINAL_HD2);
     airport_unreachable_icon.LoadResource(IDB_AIRPORT_UNREACHABLE,
-                                      IDB_AIRPORT_UNREACHABLE_HD);
+                                      IDB_AIRPORT_UNREACHABLE_HD, IDB_AIRPORT_UNREACHABLE_HD2);
     field_reachable_icon.LoadResource(IDB_OUTFIELD_REACHABLE,
-                                  IDB_OUTFIELD_REACHABLE_HD);
+                                  IDB_OUTFIELD_REACHABLE_HD, IDB_OUTFIELD_REACHABLE_HD2);
     field_marginal_icon.LoadResource(IDB_OUTFIELD_MARGINAL,
-                                 IDB_OUTFIELD_MARGINAL_HD);
+                                 IDB_OUTFIELD_MARGINAL_HD, IDB_OUTFIELD_MARGINAL_HD2);
     field_unreachable_icon.LoadResource(IDB_OUTFIELD_UNREACHABLE,
-                                    IDB_OUTFIELD_UNREACHABLE_HD);
+                                    IDB_OUTFIELD_UNREACHABLE_HD, IDB_OUTFIELD_UNREACHABLE_HD2);
     break;
 
   case WaypointRendererSettings::LandableStyle::TRAFFIC_LIGHTS:
     airport_reachable_icon.LoadResource(IDB_AIRPORT_REACHABLE,
-                                    IDB_AIRPORT_REACHABLE_HD);
+                                    IDB_AIRPORT_REACHABLE_HD, IDB_AIRPORT_REACHABLE_HD2);
     airport_marginal_icon.LoadResource(IDB_AIRPORT_MARGINAL2,
-                                   IDB_AIRPORT_MARGINAL2_HD);
+                                   IDB_AIRPORT_MARGINAL2_HD, IDB_AIRPORT_MARGINAL2_HD2);
     airport_unreachable_icon.LoadResource(IDB_AIRPORT_UNREACHABLE2,
-                                      IDB_AIRPORT_UNREACHABLE2_HD);
+                                      IDB_AIRPORT_UNREACHABLE2_HD, IDB_AIRPORT_UNREACHABLE2_HD2);
     field_reachable_icon.LoadResource(IDB_OUTFIELD_REACHABLE,
-                                  IDB_OUTFIELD_REACHABLE_HD);
+                                  IDB_OUTFIELD_REACHABLE_HD, IDB_OUTFIELD_REACHABLE_HD2);
     field_marginal_icon.LoadResource(IDB_OUTFIELD_MARGINAL2,
-                                 IDB_OUTFIELD_MARGINAL2_HD);
+                                 IDB_OUTFIELD_MARGINAL2_HD, IDB_OUTFIELD_MARGINAL2_HD2);
     field_unreachable_icon.LoadResource(IDB_OUTFIELD_UNREACHABLE2,
-                                    IDB_OUTFIELD_UNREACHABLE2_HD);
+                                    IDB_OUTFIELD_UNREACHABLE2_HD, IDB_OUTFIELD_UNREACHABLE2_HD2);
     break;
   }
 
