@@ -41,6 +41,7 @@ IDI_XCSOAR              ICON    DISCARDABLE     "bitmaps/xcsoarswift.ico"
 
 BITMAP_ICON(IDB_ABORT, "mode_abort")
 BITMAP_ICON(IDB_ABORT_HD, "mode_abort_160")
+BITMAP_ICON(IDB_ABORT_HD2, "mode_abort_420")
 
 HATCH_BITMAP(IDB_ABOVETERRAIN, "aboveterrain")
 
