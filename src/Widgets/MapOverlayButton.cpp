@@ -98,6 +98,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
                     bitmap_size.cx / 2, 0);
   } else {
 
+    canvas.SetBackgroundTransparent();
     canvas.SetTextColor(button_look.standard.foreground_color);
     canvas.Select(*button_look.font);
 
