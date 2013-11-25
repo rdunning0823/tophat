@@ -27,6 +27,7 @@ Copyright_License {
 #include "Widget/WindowWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
+#include "Look/IconLook.hpp"
 #include "Screen/Init.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
@@ -48,6 +49,7 @@ enum Buttons {
 static DialogSettings dialog_settings;
 static SingleWindow *global_main_window;
 static DialogLook *global_dialog_look;
+static IconLook *global_icon_look;
 
 const DialogSettings &
 UIGlobals::GetDialogSettings()
@@ -69,6 +71,14 @@ UIGlobals::GetDialogLook()
   assert(global_dialog_look != nullptr);
 
   return *global_dialog_look;
+}
+
+const IconLook &
+UIGlobals::GetIconLook()
+{
+  assert(global_icon_look != nullptr);
+
+  return *global_icon_look;
 }
 
 class KoboMenuWidget final : public WindowWidget, ActionListener {
@@ -167,6 +177,9 @@ Main()
   dialog_look.Initialise(bold_font, normal_font, small_font,
                          bold_font, bold_font, bold_font);
 
+  IconLook icon_look;
+  icon_look.Initialise();
+
   TopWindowStyle main_style;
   main_style.Resizable();
 
@@ -175,6 +188,7 @@ Main()
   main_window.Show();
 
   global_dialog_look = &dialog_look;
+  global_icon_look = &icon_look;
   global_main_window = &main_window;
 
   int action = Main(main_window, dialog_look);

@@ -8,6 +8,7 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Screen/TerminalWindow.cpp \
 	$(SRC)/Look/TerminalLook.cpp \
 	$(SRC)/Look/DialogLook.cpp \
+	$(SRC)/Look/IconLook.cpp \
 	$(SRC)/Look/ButtonLook.cpp \
 	$(SRC)/Gauge/LogoView.cpp \
 	$(SRC)/Dialogs/DialogSettings.cpp \
