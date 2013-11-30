@@ -7,7 +7,7 @@
 # allows the user to choose between XCSoar and Nickel (the original
 # Kobo software)
 
-::sysinit:/opt/tophat/bin/rcS
+::sysinit:/etc/init.d/rcS.tophat
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r
 ::restart:/sbin/init

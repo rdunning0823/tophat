@@ -85,6 +85,7 @@ KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) \
 	$(BITSTREAM_VERA_FILES) \
+	$(topdir)/kobo/rcS.tophat \
 	$(topdir)/kobo/inittab $(topdir)/kobo/rcS $(topdir)/kobo/inetd.conf
 	@$(NQ)echo "  TAR     $@"
 	$(Q)rm -rf $(@D)/KoboRoot
@@ -93,6 +94,8 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
 	$(Q)install -m 0644 $(topdir)/kobo/inetd.conf $(@D)/KoboRoot/etc
+	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc/init.d
+	$(Q)install -m 0755 $(topdir)/kobo/rcS.tophat $(@D)/KoboRoot/etc/init.d
 	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 

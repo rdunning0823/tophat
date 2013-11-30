@@ -89,8 +89,6 @@ fi
 # for WiFi network
 [ -d /dev/pts ] || mkdir -p /dev/pts
 mount | grep -q devpts || mount -t devpts devpts /dev/pts
-insmod /drivers/ntx508/usb/gadget/arcotg_udc.ko
-insmod /drivers/ntx508/usb/gadget/g_ether.ko
 /usr/sbin/inetd /etc/inetd.conf &
 
 # add link so ftp users can find XCSoarData more easily

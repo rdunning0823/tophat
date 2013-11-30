@@ -1,0 +1,99 @@
+#!/bin/sh
+                
+mount -o remount,noatime,nodiratime /dev/mmcblk0p1 /
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/lib:
+runlevel=S
+prevlevel=N
+umask 022
+export PATH runlevel prevlevel
+
+# mount the data partition
+/bin/dosfsck -a -w /dev/mmcblk0p3
+/bin/mkdir -p /mnt/onboard
+/bin/mount -t vfat -o iocharset=utf8 /dev/mmcblk0p3 /mnt/onboard
+/bin/rm -rf /mnt/onboard/fsck* /mnt/onboard/FSCK*
+
+# launch the original Kobo init script if:
+# - there's a pending update
+# - Nickel start was scheduled
+# - the XCSoar installation is broken
+if [ -f /mnt/onboard/.kobo/Kobo.tgz -o -f /mnt/onboard/.kobo/KoboRoot.tgz \
+    -o -f /mnt/onboard/XCSoarData/kobo/start_nickel \
+    -o ! -x /opt/tophat/bin/KoboMenu ]; then
+    rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
+    umount -l /mnt/onboard
+    exec /etc/init.d/rcS
+fi
+
+for i in /proc /dev /root /tmp /sys /mnt/sd /mnt/onboard /mnt/user /var/lib /var/log /var/run /lib/modules/`uname -r`; do
+	[ ! -d $i ] && mkdir -p $i
+done;
+
+/bin/mount -t proc  none  /proc
+/bin/mount -t tmpfs none -o size=16m /tmp
+/bin/mount -t tmpfs none /dev
+/bin/mount -t tmpfs none -o size=16k /var/lib
+/bin/mount -t tmpfs none -o size=16k /var/log
+/bin/mount -t tmpfs none -o size=128k /var/run
+/bin/mount -t sysfs none -o size=500k /sys
+
+echo "continuing"
+
+echo -e '\000\000\000\000' > /proc/sys/kernel/hotplug
+
+/sbin/udevd -d
+/sbin/udevadm control --env=STARTUP=1
+/sbin/udevadm trigger --verbose
+/sbin/udevadm settle --timeout=2
+/sbin/udevadm control --env=STARTUP=
+
+( usleep 10000; /etc/init.d/on-animator.sh ) &
+
+# displaying rtc alarm
+echo "disabling rtc alarm"
+/usr/local/Kobo/pickel disable.rtc.alarm
+
+# MJ:
+mkdir /dev/pts
+/bin/mount -t devpts devpts /dev/pts
+
+echo "adjusting kernel settings"
+
+echo -n 8192 > /proc/sys/vm/min_free_kbytes
+echo -n 67108864 > /proc/sys/kernel/shmmax
+
+if [ -e /mnt/onboard/.kobo/KoboRoot.tgz ]; then
+	killall on-animator.sh
+	zcat /etc/images/$PREFIX\ghostbuster.raw.gz | /usr/local/Kobo/pickel showpic
+	/etc/init.d/update-animator.sh &
+	zcat /mnt/onboard/.kobo/KoboRoot.tgz > /dev/null && tar zxf /mnt/onboard/.kobo/KoboRoot.tgz -C /
+	if [ -e /mnt/onboard/.kobo/upgrade ]; then
+		/etc/init.d/upgrade-wifi.sh
+		rm -rf /mnt/onboard/.kobo/upgrade
+	fi
+	rm /mnt/onboard/.kobo/KoboRoot.tgz
+	killall update-animator.sh
+	echo "Done upgrading..."
+	zcat /etc/images/$PREFIX\ghostbuster.raw.gz | /usr/local/Kobo/pickel showpic
+	zcat /etc/images/$PREFIX\reboot.raw.gz | /usr/local/Kobo/pickel showpic
+	sync
+	reboot
+fi
+
+# disable the flashing led
+echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
+echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
+echo "dc 0" > /sys/devices/platform/pmic_light.1/lit
+
+# kill off the start screen
+killall on-animator.sh
+
+# for WiFi network
+/usr/sbin/inetd /etc/inetd.conf &
+
+echo "starting tophat..."
+echo 3 > /sys/class/graphics/fb0/rotate
+/opt/tophat/bin/KoboMenu &
+
+
