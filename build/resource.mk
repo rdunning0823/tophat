@@ -51,6 +51,8 @@ $(eval $(call convert-to-bmp,$(BMP_ICONS) $(BMP_ICONS_160) $(BMP_ICONS_420),%.bm
 ####### splash logo
 
 SVG_SPLASH = Data/graphics/logo.svg Data/graphics/logo_red.svg
+PNG_SPLASH_420 = $(patsubst Data/graphics/%.svg,$(DATA)/graphics/%_420.png,$(SVG_SPLASH))
+BMP_SPLASH_420 = $(PNG_SPLASH_420:.png=.bmp)
 PNG_SPLASH_160 = $(patsubst Data/graphics/%.svg,$(DATA)/graphics/%_160.png,$(SVG_SPLASH))
 BMP_SPLASH_160 = $(PNG_SPLASH_160:.png=.bmp)
 PNG_SPLASH_80 = $(patsubst Data/graphics/%.svg,$(DATA)/graphics/%_80.png,$(SVG_SPLASH))
@@ -59,12 +61,13 @@ PNG_SPLASH_128 = $(patsubst Data/graphics/%.svg,$(DATA)/graphics/%_128.png,$(SVG
 ICNS_SPLASH_128 = $(PNG_SPLASH_128:.png=.icns)
 
 # render from SVG to PNG
+$(eval $(call rsvg-convert,$(PNG_SPLASH_420),$(DATA)/graphics/%_420.png,Data/graphics/%.svg,--width=420))
 $(eval $(call rsvg-convert,$(PNG_SPLASH_160),$(DATA)/graphics/%_160.png,Data/graphics/%.svg,--width=160))
 $(eval $(call rsvg-convert,$(PNG_SPLASH_80),$(DATA)/graphics/%_80.png,Data/graphics/%.svg,--width=80))
 $(eval $(call rsvg-convert,$(PNG_SPLASH_128),$(DATA)/graphics/%_128.png,Data/graphics/%.svg,--width=128))
 
 # convert to uncompressed 8-bit BMP
-$(eval $(call convert-to-bmp-white,$(BMP_SPLASH_160) $(BMP_SPLASH_80),%.bmp,%.png))
+$(eval $(call convert-to-bmp-white,$(BMP_SPLASH_420) $(BMP_SPLASH_160) $(BMP_SPLASH_80),%.bmp,%.png))
 
 # convert to icns (mac os x icon)
 $(ICNS_SPLASH_128): %.icns: %.png
@@ -179,7 +182,7 @@ RESOURCE_FILES += $(PNG_BITMAPS)
 endif
 
 RESOURCE_FILES += $(BMP_ICONS) $(BMP_ICONS_160) $(BMP_ICONS_420)
-RESOURCE_FILES += $(BMP_SPLASH_160) $(BMP_SPLASH_80)
+RESOURCE_FILES += $(BMP_SPLASH_420) $(BMP_SPLASH_160) $(BMP_SPLASH_80)
 RESOURCE_FILES += $(BMP_DIALOG_TITLE) $(BMP_PROGRESS_BORDER)
 RESOURCE_FILES += $(BMP_TITLE_320) $(BMP_TITLE_110)
 RESOURCE_FILES += $(BMP_LAUNCH_ALL)
