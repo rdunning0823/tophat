@@ -316,6 +316,7 @@ BITMAP_GRAPHIC(IDB_TITLE_HD, "title_320")
 #endif
 BITMAP_ICON(IDB_WEATHER_STATION, "map_weather_station")
 BITMAP_ICON(IDB_WEATHER_STATION_HD, "map_weather_station_160")
+BITMAP_ICON(IDB_WEATHER_STATION_HD2, "map_weather_station_420")
 // --- Audio ---
 
 SOUND(IDR_FAIL, "fail")
