@@ -223,7 +223,7 @@ protected:
   virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
   virtual bool OnMouseWheel(PixelScalar x, PixelScalar y, int delta) override;
 
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   /**
    * returns true if handled by the button overlays.
    */
@@ -313,8 +313,14 @@ public:
   void UpdateDisplayMode();
   void SetMapScale(fixed scale);
 
-#ifndef ENABLE_OPENGL
   /**
+   * resizes the TaskNavSlider shape for the current screen layout
+   * only when it's !HasDraggableScreen()
+   */
+  void SetTaskNavSliderShape();
+
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+/**
    * resizes the rc_main_menu_button for the current screen layout
    * when drawing without OPENGL
    */
@@ -324,22 +330,16 @@ public:
    * screen layout when drawing without OPENGL
    */
   virtual void SetZoomButtonsRect();
-#endif
-  /**
-   * resizes the TaskNavSlider shape for the current screen layout
-   * only when it's !HasDraggableScreen()
-   */
-  void SetTaskNavSliderShape();
 
-#ifndef ENABLE_OPENGL
   /**
-   * locations of Map overlay buttons
-   * With OPENGL, these are separate widgets
+   * locations of Map overlay buttons when not using
+   * OPENGL or KOBO
    */
   PixelRect rc_main_menu_button;
   PixelRect rc_zoom_out_button;
   PixelRect rc_zoom_in_button;
 #endif
+
   /**
    * draws the slider shape if the screen does not have good dragging
    * e.g. !HasDraggableScreen()

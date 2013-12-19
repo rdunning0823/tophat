@@ -208,7 +208,8 @@ public:
   void SetGPSStatusOffset(unsigned y) {
     gps_status_offset_y = y;
   }
-#ifndef ENABLE_OPENGL
+
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   /**
    * resizes the rc_main_menu_button for the current screen layout
    */

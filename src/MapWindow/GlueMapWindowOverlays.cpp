@@ -81,7 +81,7 @@ GlueMapWindow::DrawGesture(Canvas &canvas) const
     canvas.DrawLinePiece(*it_last, *it);
 }
 
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
 /**
  * DrawTwoLines seems to always use pen width = 1,
  * we we'll draw consecutive rectangles to emulate thicker pen
@@ -634,7 +634,7 @@ GlueMapWindow::DrawStallRatio(Canvas &canvas, const PixelRect &rc) const
   }
 }
 
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
 void
 GlueMapWindow::SetMainMenuButtonRect()
 {

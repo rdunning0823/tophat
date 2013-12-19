@@ -118,7 +118,7 @@ IsCtrlKeyPressed()
 bool
 GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   if (ButtonOverlaysOnMouseDown(x, y))
     return true;
 #endif
@@ -510,7 +510,7 @@ GlueMapWindow::Render(Canvas &canvas, const PixelRect &rc)
   }
 }
 
-#ifndef ENABLE_OPENGL
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
 bool
 GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
 {
