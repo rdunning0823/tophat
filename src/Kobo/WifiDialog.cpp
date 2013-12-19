@@ -73,7 +73,7 @@ public:
       std::max(Layout::GetMaximumControlHeight(),
                unsigned(Layout::GetTextPadding()) * 3
                + look.text_font->GetHeight()
-               + look.small_font->GetHeight());
+               + look.text_font->GetHeight());
 
     CreateList(parent, look, rc, row_height);
     UpdateList();
@@ -167,7 +167,7 @@ WifiListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   canvas.Select(*look.text_font);
   canvas.DrawText(x1, y1, info.ssid);
 
-  canvas.Select(*look.small_font);
+  canvas.Select(*look.text_font);
   canvas.DrawText(x1, y2, info.bssid);
 
   const TCHAR *state = nullptr;
