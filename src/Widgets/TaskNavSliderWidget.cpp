@@ -58,7 +58,8 @@ Copyright_License {
 TaskNavSliderWidget::TaskNavSliderWidget()
   :task_data_cache(CommonInterface::GetComputerSettings(),
                    CommonInterface::Basic(),
-                   CommonInterface::Calculated().task_stats) {}
+                   CommonInterface::Calculated().task_stats),
+                   last_rc_map({0, 0, 0, 0}) {}
 
 void
 TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc, bool is_panning,
@@ -288,6 +289,17 @@ void
 TaskNavSliderWidget::Move(const PixelRect &rc_map)
 {
   PixelRect rc = rc_map;
+  if (rc.left == last_rc_map.left &&
+      rc.right == last_rc_map.right &&
+      rc.top == last_rc_map.top &&
+      rc.bottom == last_rc_map.bottom)
+    return;
+
+  last_rc_map.left = rc.left;
+  last_rc_map.right = rc.right;
+  last_rc_map.top = rc.top;
+  last_rc_map.bottom = rc.bottom;
+
   slider_shape.Resize(rc_map.right - rc_map.left);
   rc.bottom = rc.top + slider_shape.GetHeight();
   --rc.top;

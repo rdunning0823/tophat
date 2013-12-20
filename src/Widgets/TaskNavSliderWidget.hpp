@@ -50,6 +50,7 @@ protected:
 
   SliderShape slider_shape;
   TaskNavDataCache task_data_cache;
+  PixelRect last_rc_map;
 
 protected:
 
