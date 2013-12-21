@@ -173,12 +173,19 @@ public:
   void Resize(UPixelScalar map_width);
 
   /**
+   * @param poly.  Points of the Shape outline
+   * @return true if the shape is one dimensional in x axis (not displayable)
+   */
+  bool IsSquashed(RasterPoint poly[]);
+
+  /**
    * draws the outline of the slider shape
    * @param rc.  rect of the slider shape.  Note that this may overextend
    * the canvas size
    * @border_width. the pen border width
+   * @return true if the outline is visible, false if it's off the canvas
    */
-  void DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned border_width);
+  bool DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned border_width);
 
   /**
    * Draws the text and the outline of the shape

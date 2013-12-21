@@ -60,19 +60,52 @@ SliderShape::GetMediumFont()
   return *dialog_look.caption.font;
 }
 
-void
+bool
+SliderShape::IsSquashed(RasterPoint poly[])
+{
+  return poly[2].x == poly[7].x;
+}
+
+bool
 SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
 {
-  UPixelScalar x_offset = rc.left;
-  UPixelScalar y_offset =  0;
+  PixelRect canvas_rect = canvas.GetRect();
+
+  PixelScalar x_offset = rc.left;
+  PixelScalar y_offset =  0;
   RasterPoint poly[8];
+
+  /* KOBO dithering centers odd shaped widths within 1/2 pixel,
+   * and we need to stay within the canvas or memory gets corrupted */
+#ifdef KOBO
+  PixelScalar width_offset = 1;
+#else
+  PixelScalar width_offset = 0;
+#endif
+
   for (unsigned i=0; i < 8; i++) {
-    poly[i].x = GetPoint(i).x + x_offset;
-    poly[i].y = GetPoint(i).y + y_offset - 1;
+    PixelScalar x = GetPoint(i).x + x_offset;
+    PixelScalar y = GetPoint(i).y + y_offset;
+
+    x = std::max(x, PixelScalar(canvas_rect.left + width / 2 + width_offset));
+    x = std::min(x, PixelScalar(canvas_rect.right - width / 2 - 1));
+    y = std::max(y, PixelScalar(canvas_rect.top + width / 2 + width_offset));
+    y = std::min(y, PixelScalar(canvas_rect.bottom - width / 2 - 1));
+
+    poly[i].y = y;
+    poly[i].x = x;
+
+    assert(canvas_rect.IsInside({x, y}));
+  }
+
+  if (IsSquashed(poly)) {
+    return false;
   }
 
   canvas.Select(Pen(width, COLOR_BLACK));
   canvas.DrawPolygon(poly, 8);
+
+  return true;
 }
 
 #ifdef _WIN32
@@ -151,7 +184,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
   canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
     selected, true, false)));
-  DrawOutline(canvas, rc_outer, border_width);
+  if (!DrawOutline(canvas, rc_outer, border_width))
+    return;
+
 #ifdef _WIN32
   if (HasDraggableScreen()) // PC or WM
     PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
