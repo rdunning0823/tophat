@@ -281,12 +281,16 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   if (draw_checkmark) {
     const int offsety = line_two_y_offset +
         (rc.bottom - line_two_y_offset - bitmap_size.cy) / 2;
-    canvas.CopyAnd(left_bitmap,
-                    rc.top + offsety,
-                    bitmap_size.cx / 2,
-                    bitmap_size.cy,
-                    *bmp,
-                    bitmap_size.cx / 2, 0);
+    RasterPoint upper_left(left_bitmap, rc.top + offsety);
+    RasterPoint lower_right(upper_left.x + bitmap_size.cx / 2,
+                            upper_left.y + bitmap_size.cy);
+    if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right))
+      canvas.CopyAnd(left_bitmap,
+                     rc.top + offsety,
+                     bitmap_size.cx / 2,
+                     bitmap_size.cy,
+                     *bmp,
+                     bitmap_size.cx / 2, 0);
   }
 
 #ifdef NOT_DEFINED_EVER
