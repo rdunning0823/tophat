@@ -44,7 +44,6 @@ Copyright_License {
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
 
-
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
 #include "Screen/OpenGL/Globals.hpp"
@@ -161,6 +160,9 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
   const TerrainRendererSettings &terrain = settings_map.terrain;
   unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
+  if (IsKobo())
+    border_width /= 2;
+
   slider_shape.Draw(canvas, rc_outer,
                     idx, GetList().GetCursorDownIndex() == (int)idx,
                     idx == waypoint_index,
