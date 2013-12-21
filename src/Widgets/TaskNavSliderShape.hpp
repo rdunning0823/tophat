@@ -174,11 +174,15 @@ public:
 
   /**
    * draws the outline of the slider shape
+   * @param rc.  rect of the slider shape.  Note that this may overextend
+   * the canvas size
+   * @border_width. the pen border width
    */
   void DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned border_width);
 
   /**
    * Draws the text and the outline of the shape
+   * @param rc_outer. rc of list item.  This may not be visible in the canvas
    */
   void Draw(Canvas &canvas, const PixelRect rc_outer,
             unsigned idx, bool selected, bool is_current_tp,
