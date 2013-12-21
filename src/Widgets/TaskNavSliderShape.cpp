@@ -355,15 +355,21 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
     return 0;
 
   PixelSize bmp_bearing_size = bmp_bearing->GetSize();
-  const PixelScalar vert_margin = points[2].y - bmp_bearing_size.cy / 2 - 1;
+  const PixelScalar vert_margin = points[2].y - bmp_bearing_size.cy / 2;
 
   UPixelScalar x_offset = (direction == -1) ? bearing_icon_hor_margin + 1 :
       GetWidth() - bearing_icon_hor_margin -bmp_bearing_size.cx / 2;
 
-  canvas.CopyAnd(rc_outer.left + x_offset, vert_margin,
-                 bmp_bearing_size.cx / 2, bmp_bearing_size.cy,
-                 *bmp_bearing,
-                 bmp_bearing_size.cx / 2, 0);
+  RasterPoint upper_left(rc_outer.left + x_offset, vert_margin);
+  RasterPoint lower_right(upper_left.x + bmp_bearing_size.cx / 2,
+                          upper_left.y + bmp_bearing_size.cy);
+
+  if (canvas.GetRect().IsInside(upper_left) &&
+      canvas.GetRect().IsInside(lower_right))
+    canvas.CopyAnd(rc_outer.left + x_offset, vert_margin,
+                   bmp_bearing_size.cx / 2, bmp_bearing_size.cy,
+                   *bmp_bearing,
+                   bmp_bearing_size.cx / 2, 0);
   return direction;
 }
 
