@@ -159,6 +159,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   const Font &small_font = GetSmallFont();
   const Font &medium_font = GetMediumFont();
   UPixelScalar width;
+  PixelScalar left;
   PixelRect rc = rc_outer;
   rc.left += 3 * GetHintWidth() / 2;
   rc.right -= 3 * GetHintWidth() / 2;
@@ -171,9 +172,12 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     canvas.Select(small_font);
     buffer = _("Click to navigate");
     width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.DrawText(rc.left + (rc.right - rc.left - width) / 2,
-                    rc.top + (rc.bottom - rc.top - small_font.GetHeight()) / 2,
-                    buffer.c_str());
+    left = rc.left + (rc.right - rc.left - width) / 2;
+    if (left > 0)
+      canvas.TextAutoClipped(left,
+                             rc.top + (rc.bottom - rc.top -
+                                 small_font.GetHeight()) / 2,
+                             buffer.c_str());
 #ifdef _WIN32
     if (HasDraggableScreen()) // PC or WM
       PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
@@ -237,8 +241,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     FormatRelativeUserAltitude(tp_altitude_difference, height_buffer.buffer(),
                                true);
     height_width = canvas.CalcTextWidth(height_buffer.c_str());
-    canvas.DrawText(rc.right - height_width,
-                    line_one_y_offset, height_buffer.c_str());
+    left = rc.right - height_width;
+    if (left > 0)
+      canvas.TextAutoClipped(left, line_one_y_offset, height_buffer.c_str());
   }
 
   // bearing chevrons for ordered when not start
@@ -268,8 +273,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
         (PixelScalar)(rc.right - rc.left - label_width -
             Layout::FastScale(15))) {
       canvas.Select(small_font);
-      canvas.DrawText(rc.left,
-                      line_one_y_offset, buffer.c_str());
+      left = rc.left;
+      if (left > 0)
+        canvas.TextAutoClipped(left, line_one_y_offset, buffer.c_str());
       offset = rc.left + label_width +
           (rc.right - rc.left - distance_width - height_width
               - label_width) / 2;
@@ -277,7 +283,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     }
 
     canvas.Select(medium_font);
-    canvas.DrawText(offset, line_one_y_offset, distance_buffer.c_str());
+    left = offset;
+    if (left > 0)
+      canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
 
     if (do_bearing)
       bearing_direction = DrawBearing(canvas, rc_outer,bearing);
@@ -308,6 +316,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   } else
     left_bitmap = rc_name.left + (rc_name.right - rc_name.left - width) / 2;
 
+  // TODO make clip to show bearing bitmap and also clip for canvas
   canvas.DrawClippedText(left_bitmap + bitmap_size.cx / 2,
                   line_two_y_offset,
                   rc_name.right - rc_name.left - bitmap_size.cx / 2, tp_name);
