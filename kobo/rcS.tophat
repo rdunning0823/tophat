@@ -156,5 +156,7 @@ else
 
     echo 3 > /sys/class/graphics/fb0/rotate
     /opt/tophat/bin/KoboMenu &
+    /sbin/udevadm control --env=STARTUP=1
+    killall plug
 fi
 [ $PLATFORM != freescale ] && udevadm trigger &
