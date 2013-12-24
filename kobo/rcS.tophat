@@ -1,30 +1,28 @@
 #!/bin/sh
-                
+
+PRODUCT=`/bin/kobo_config.sh`;
+[ $PRODUCT != trilogy ] && PREFIX=$PRODUCT-
+
 mount -o remount,noatime,nodiratime /dev/mmcblk0p1 /
+
+PLATFORM=freescale
+if [ `dd if=/dev/mmcblk0 bs=512 skip=1024 count=1 | grep -c "HW CONFIG"` == 1 ]; then
+	PLATFORM=ntx508
+fi
+
+if [ $PLATFORM == freescale ]; then
+	if [ ! -s /lib/firmware/imx/epdc_E60_V220.fw ]; then
+		mkdir -p /lib/firmware/imx
+		dd if=/dev/mmcblk0 bs=512K skip=10 count=1 | zcat > /lib/firmware/imx/epdc_E60_V220.fw
+		sync
+	fi
+fi
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/lib:
 runlevel=S
 prevlevel=N
 umask 022
 export PATH runlevel prevlevel
-
-# mount the data partition
-/bin/dosfsck -a -w /dev/mmcblk0p3
-/bin/mkdir -p /mnt/onboard
-/bin/mount -t vfat -o iocharset=utf8 /dev/mmcblk0p3 /mnt/onboard
-/bin/rm -rf /mnt/onboard/fsck* /mnt/onboard/FSCK*
-
-# launch the original Kobo init script if:
-# - there's a pending update
-# - Nickel start was scheduled
-# - the XCSoar installation is broken
-if [ -f /mnt/onboard/.kobo/Kobo.tgz -o -f /mnt/onboard/.kobo/KoboRoot.tgz \
-    -o -f /mnt/onboard/XCSoarData/kobo/start_nickel \
-    -o ! -x /opt/tophat/bin/KoboMenu ]; then
-    rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
-    umount -l /mnt/onboard
-    exec /etc/init.d/rcS
-fi
 
 for i in /proc /dev /root /tmp /sys /mnt/sd /mnt/onboard /mnt/user /var/lib /var/log /var/run /lib/modules/`uname -r`; do
 	[ ! -d $i ] && mkdir -p $i
@@ -38,31 +36,51 @@ done;
 /bin/mount -t tmpfs none -o size=128k /var/run
 /bin/mount -t sysfs none -o size=500k /sys
 
-echo "continuing"
+for i in /var/run/dbus /var/lib/dbus; do
+	mkdir -p $i
+done
+
+mkfifo /tmp/nickel-hardware-status
+rm -rf /etc/udev/rules.d/70-persistent-net.rules
 
 echo -e '\000\000\000\000' > /proc/sys/kernel/hotplug
-
 /sbin/udevd -d
-/sbin/udevadm control --env=STARTUP=1
-/sbin/udevadm trigger --verbose
-/sbin/udevadm settle --timeout=2
-/sbin/udevadm control --env=STARTUP=
 
-( usleep 10000; /etc/init.d/on-animator.sh ) &
+if [ $PLATFORM == freescale ] || [ ! -e /etc/udev.tgz ]; then
+	/sbin/udevadm control --env=STARTUP=1
+	/sbin/udevadm trigger
+	/sbin/udevadm settle --timeout=2
+	/sbin/udevadm control --env=STARTUP=
+	[ $PLATFORM != freescale ] && tar cpzf /etc/udev.tgz /dev &
+else
+	zcat /etc/udev.tgz > /dev/null || ( rm -rf /etc/udev.tgz; reboot )
+	tar zxf /etc/udev.tgz -C /
+fi
 
-# displaying rtc alarm
-echo "disabling rtc alarm"
-/usr/local/Kobo/pickel disable.rtc.alarm
+( usleep 400000; /etc/init.d/on-animator.sh ) &
 
-# MJ:
-mkdir /dev/pts
-/bin/mount -t devpts devpts /dev/pts
-
-echo "adjusting kernel settings"
+dosfsck -a -w /dev/mmcblk0p3
+mount -t vfat -o noatime,nodiratime,shortname=mixed,utf8 /dev/mmcblk0p3 /mnt/onboard
+rm -rf /mnt/onboard/fsck*
+rm -rf /mnt/onboard/FSCK*
+rm -rf /usr/local/Kobo/db.tgz
 
 echo -n 8192 > /proc/sys/vm/min_free_kbytes
 echo -n 67108864 > /proc/sys/kernel/shmmax
 
+if [ ! -e /mnt/onboard/.kobo ]; then
+	mkdir -p /mnt/onboard/.kobo
+	tar zxf /usr/local/Kobo/db.tgz -C /mnt/onboard
+	sync
+	echo "Decompressed database"
+fi
+
+if [ -e /mnt/onboard/.kobo/Kobo.tgz ]; then
+	zcat /mnt/onboard/.kobo/Kobo.tgz > /dev/null && tar zxf /mnt/onboard/.kobo/Kobo.tgz -C /usr/local/Kobo/
+	rm /mnt/onboard/.kobo/Kobo.tgz
+	echo "Done upgrading..."
+fi
+                               
 if [ -e /mnt/onboard/.kobo/KoboRoot.tgz ]; then
 	killall on-animator.sh
 	zcat /etc/images/$PREFIX\ghostbuster.raw.gz | /usr/local/Kobo/pickel showpic
@@ -81,19 +99,42 @@ if [ -e /mnt/onboard/.kobo/KoboRoot.tgz ]; then
 	reboot
 fi
 
-# disable the flashing led
-echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
-echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
-echo "dc 0" > /sys/devices/platform/pmic_light.1/lit
+(
+	/usr/local/Kobo/pickel disable.rtc.alarm
 
-# kill off the start screen
-killall on-animator.sh
+	if [ ! -e /etc/wpa_supplicant/wpa_supplicant.conf ]; then
+		cp /etc/wpa_supplicant/wpa_supplicant.conf.template /etc/wpa_supplicant/wpa_supplicant.conf
+	fi
 
-# for WiFi network
-/usr/sbin/inetd /etc/inetd.conf &
+	echo 1 > /sys/devices/platform/mxc_dvfs_core.0/enable
 
-echo "starting tophat..."
-echo 3 > /sys/class/graphics/fb0/rotate
-/opt/tophat/bin/KoboMenu &
+	/sbin/hwclock -s -u
+) &
 
+INTERFACE=wlan0
+WIFI_MODULE=ar6000
+if [ $PLATFORM == ntx508 ]; then
+	INTERFACE=eth0
+	WIFI_MODULE=dhd
+fi
 
+export INTERFACE
+export WIFI_MODULE
+
+export QWS_MOUSE_PROTO="tslib_nocal:/dev/input/event1"
+export QWS_KEYBOARD=imx508kbd:/dev/input/event0
+export QWS_DISPLAY=Transformed:imx508:Rot90
+export NICKEL_HOME=/mnt/onboard/.kobo
+export LD_LIBRARY_PATH=/usr/local/Kobo
+export WIFI_MODULE_PATH=/drivers/$PLATFORM/wifi/$WIFI_MODULE.ko
+export LANG=en_US.UTF-8
+export UBOOT_MMC=/etc/u-boot/$PLATFORM/u-boot.mmc
+export UBOOT_RECOVERY=/etc/u-boot/$PLATFORM/u-boot.recovery
+
+/bin/dbus-uuidgen > /var/lib/dbus/machine-id
+/bin/dbus-daemon --system &
+export DBUS_SESSION_BUS_ADDRESS=`/bin/dbus-daemon --session --print-address --fork`
+
+/usr/local/Kobo/hindenburg &
+/usr/local/Kobo/nickel -qws -skipFontLoad &
+[ $PLATFORM != freescale ] && udevadm trigger &
