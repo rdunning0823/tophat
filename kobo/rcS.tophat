@@ -141,5 +141,20 @@ mkdir /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
 /usr/local/Kobo/hindenburg &
-/usr/local/Kobo/nickel -qws -skipFontLoad &
+if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
+    -o ! -x /opt/tophat/bin/KoboMenu ]; then
+    rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
+    /usr/local/Kobo/nickel -qws -skipFontLoad &
+else
+    # disable the flashing led
+    echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
+    echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
+    echo "dc 0" > /sys/devices/platform/pmic_light.1/lit
+
+    # kill off the start screen
+    killall on-animator.sh
+
+    echo 3 > /sys/class/graphics/fb0/rotate
+    /opt/tophat/bin/KoboMenu &
+fi
 [ $PLATFORM != freescale ] && udevadm trigger &
