@@ -135,6 +135,11 @@ export UBOOT_RECOVERY=/etc/u-boot/$PLATFORM/u-boot.recovery
 /bin/dbus-daemon --system &
 export DBUS_SESSION_BUS_ADDRESS=`/bin/dbus-daemon --session --print-address --fork`
 
+# for WiFi network
+mkdir /dev/pts
+/bin/mount -t devpts devpts /dev/pts
+/usr/sbin/inetd /etc/inetd.conf &
+
 /usr/local/Kobo/hindenburg &
 /usr/local/Kobo/nickel -qws -skipFontLoad &
 [ $PLATFORM != freescale ] && udevadm trigger &
