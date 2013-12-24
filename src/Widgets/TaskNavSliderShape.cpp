@@ -336,31 +336,6 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                      *bmp,
                      bitmap_size.cx / 2, 0);
   }
-
-#ifdef NOT_DEFINED_EVER
-  // bearing delta waypoint for ordered when not start
-  // or for non ordered task
-  // TODO make this configurable to show delta or true bearing
-  bool do_bearing = false;
-  Angle bearing;
-  if (tp.bearing_valid && task_mode ==
-      TaskType::ORDERED && idx > 0) {
-    do_bearing = true;
-    bearing = tp.delta_bearing;
-  } else if (task_mode != TaskType::ORDERED &&
-      tp.bearing_valid) {
-    do_bearing = true;
-    bearing = tp.delta_bearing;
-  }
-
-  if (false && do_bearing) {
-    FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE, bearing);
-    width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.Select(small_font);
-    canvas.text((rc.left + rc.right - width) / 2,
-                line_one_y_offset, buffer.c_str());
-  }
-#endif
 }
 
 int
