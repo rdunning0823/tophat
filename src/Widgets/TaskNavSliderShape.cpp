@@ -60,11 +60,35 @@ SliderShape::GetMediumFont()
   return *dialog_look.caption.font;
 }
 
-bool
-SliderShape::IsSquashed(RasterPoint poly[])
+SliderShape::VisibilityLevel
+SliderShape::GetVisibilityLevel(Canvas &canvas, RasterPoint poly[])
 {
-  return poly[2].x == poly[7].x;
+  const PixelRect rc = canvas.GetRect();
+  RasterPoint left_tip = poly[7];
+  RasterPoint left_body = poly[5];
+  left_body.x += Layout::Scale(1);
+
+  RasterPoint right_tip = poly[2];
+  RasterPoint right_body = poly[1];
+  right_body.x -= Layout::Scale(1);
+
+  if (rc.IsInside(left_tip) && rc.IsInside(right_tip))
+    return Full;
+
+  if (rc.IsInside(left_tip)) {
+    if (rc.IsInside(left_body))
+      return LeftTipAndBody;
+    else
+      return LeftTip;
+  } else if (rc.IsInside(right_tip)) {
+    if (rc.IsInside(right_body))
+      return RightTipAndBody;
+    else
+      return RightTip;
+  } else
+    return None;
 }
+
 
 bool
 SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
@@ -74,6 +98,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   PixelScalar x_offset = rc.left;
   PixelScalar y_offset =  0;
   RasterPoint poly[8];
+  RasterPoint poly_raw[8];
 
   /* KOBO dithering centers odd shaped widths within 1/2 pixel,
    * and we need to stay within the canvas or memory gets corrupted */
@@ -87,6 +112,9 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
     PixelScalar x = GetPoint(i).x + x_offset;
     PixelScalar y = GetPoint(i).y + y_offset;
 
+    poly_raw[i].y = y;
+    poly_raw[i].x = x;
+
     x = std::max(x, PixelScalar(canvas_rect.left + width / 2 + width_offset));
     x = std::min(x, PixelScalar(canvas_rect.right - width / 2 - 1));
     y = std::max(y, PixelScalar(canvas_rect.top + width / 2 + width_offset));
@@ -98,12 +126,36 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
     assert(canvas_rect.IsInside({x, y}));
   }
 
-  if (IsSquashed(poly)) {
-    return false;
-  }
+  const VisibilityLevel visibility = GetVisibilityLevel(canvas, poly_raw);
 
-  canvas.Select(Pen(width, COLOR_BLACK));
-  canvas.DrawPolygon(poly, 8);
+  if (visibility == None)
+    return false;
+
+  switch (visibility) {
+  case Full:
+  case LeftTipAndBody:
+  case RightTipAndBody:
+    canvas.Select(Pen(width, COLOR_BLACK));
+    canvas.DrawPolygon(poly, 8);
+    break;
+
+  /** some or all of the left tip, but no body */
+  case LeftTip:
+  case RightTip:
+    canvas.SelectWhitePen();
+    canvas.DrawPolygon(poly, 8);
+    canvas.Select(Pen(width, COLOR_BLACK));
+    if (visibility == LeftTip)
+      canvas.DrawTwoLines(poly[0], poly[6], poly[5]);
+    else
+      canvas.DrawTwoLines(poly[1], poly[2], poly[4]);
+    break;
+
+  /* no part is visible */
+  case None:
+    gcc_unreachable();
+    break;
+  }
 
   return true;
 }

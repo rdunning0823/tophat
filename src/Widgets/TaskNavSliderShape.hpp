@@ -42,6 +42,25 @@ enum class TaskType : uint8_t;
 
 class SliderShape {
 private:
+  /**
+   * how much of the shape is visible in the canvas
+   */
+  enum VisibilityLevel {
+    /** the entire shape is visible */
+    Full,
+
+    /** some or all of the left tip, but no body */
+    LeftTip,
+    RightTip,
+
+    /** all of the left tip and some of the body */
+    LeftTipAndBody,
+    RightTipAndBody,
+
+    /* no part is visible */
+    None,
+  };
+
   PixelRect inner_rect;
   PixelRect outer_rect;
 
@@ -174,9 +193,10 @@ public:
 
   /**
    * @param poly.  Points of the Shape outline
-   * @return true if the shape is one dimensional in x axis (not displayable)
+   * @param canvas
+   * @return enum describing what portion of shape is visible in canvas
    */
-  bool IsSquashed(RasterPoint poly[]);
+  VisibilityLevel GetVisibilityLevel(Canvas &canvas, RasterPoint poly[]);
 
   /**
    * draws the outline of the slider shape
