@@ -140,10 +140,10 @@ mkdir /dev/pts
 /bin/mount -t devpts devpts /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
-/usr/local/Kobo/hindenburg &
 if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
+    /usr/local/Kobo/hindenburg &
     /usr/local/Kobo/nickel -qws -skipFontLoad &
 else
     # disable the flashing led
