@@ -381,8 +381,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     RasterPoint lower_right(upper_left.x + bitmap_size.cx / 2,
                             upper_left.y + bitmap_size.cy);
     if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right))
-      canvas.CopyAnd(left_bitmap,
-                     rc.top + offsety,
+      canvas.CopyAnd(upper_left.x,
+                     upper_left.y,
                      bitmap_size.cx / 2,
                      bitmap_size.cy,
                      *bmp,
@@ -441,7 +441,8 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
 
   if (canvas.GetRect().IsInside(upper_left) &&
       canvas.GetRect().IsInside(lower_right))
-    canvas.CopyAnd(rc_outer.left + x_offset, vert_margin,
+    canvas.CopyAnd(upper_left.x,
+                   upper_left.y,
                    bmp_bearing_size.cx / 2, bmp_bearing_size.cy,
                    *bmp_bearing,
                    bmp_bearing_size.cx / 2, 0);
