@@ -29,7 +29,9 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Form/Form.hpp"
 #include "Form/ActionListener.hpp"
+#include "Event/Timer.hpp"
 #include "Widget/RowFormWidget.hpp"
+#include "Net/IpAddress.hpp"
 #include "System.hpp"
 
 gcc_pure
@@ -40,23 +42,35 @@ GetWifiToggleCaption()
 }
 
 class NetworkWidget final
-  : public RowFormWidget, ActionListener {
+  : public RowFormWidget, ActionListener, Timer {
   enum Buttons {
     TOGGLE_WIFI,
     WIFI,
     TELNET,
+    IPADDRESS,
   };
 
-  WndButton *toggle_wifi_button, *wifi_button;
+  WndButton *toggle_wifi_button, *wifi_button, *ip_address_button;
 
 public:
   NetworkWidget(const DialogLook &look):RowFormWidget(look) {}
 
   void UpdateButtons();
+  void UpdateIpAddress();
 
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override;
+
+  virtual void Unprepare() override {
+    Timer::Cancel();
+    RowFormWidget::Unprepare();
+  }
+
+  /* virtual methods from class Timer */
+  virtual void OnTimer() {
+    UpdateIpAddress();
+  }
 
 private:
   void ToggleWifi();
@@ -64,6 +78,18 @@ private:
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
 };
+
+void
+NetworkWidget::UpdateIpAddress()
+{
+  char buffer[256];
+  if (IpAddress::GetFormattedIpAddress(buffer) && strlen(buffer) > 3) {
+    unsigned i = strlen(buffer);
+    buffer[i - 1] = '\0';
+    ip_address_button->SetCaption(buffer);
+  } else
+    ip_address_button->SetCaption(_T("Not connected"));
+}
 
 void
 NetworkWidget::UpdateButtons()
@@ -81,8 +107,10 @@ NetworkWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   wifi_button = AddButton(_("Wifi"), *this, WIFI);
 
   AddButton(_T("Telnet server"), *this, TELNET);
+  ip_address_button = AddButton(_T(""), *this, IPADDRESS);
 
   UpdateButtons();
+  Timer::Schedule(1000);
 }
 
 void

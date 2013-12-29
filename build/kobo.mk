@@ -26,6 +26,8 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Kobo/NetworkDialog.cpp \
 	$(SRC)/Kobo/WPASupplicant.cpp \
 	$(SRC)/Kobo/WifiDialog.cpp \
+	$(SRC)/Event/Shared/Timer.cpp \
+	$(SRC)/Net/IpAddress.cpp \
 	$(SRC)/Kobo/FakeSymbols.cpp \
 	$(SRC)/Kobo/KoboMenu.cpp
 KOBO_MENU_LDADD = $(FAKE_LIBS)
