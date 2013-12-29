@@ -124,8 +124,9 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
   canvas.DrawText(2, 2, TopHat_ProductToken);
-  canvas.DrawText(2, 4 + text_height, XCSoar_ProductToken);
+  canvas.DrawText(2, 4 + text_height, XCSoar_ProductTokenShort);
+  canvas.DrawText(2, 6 + 2 * text_height, XCSoar_GitSuffix);
 #ifndef NDEBUG
-  canvas.DrawText(2, 6 + 2 * text_height, _T("DEBUG"));
+  canvas.DrawText(2, 8 + 3 * text_height, _T("DEBUG"));
 #endif
 }
