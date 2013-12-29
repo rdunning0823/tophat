@@ -38,6 +38,8 @@ extern const TCHAR TopHat_VersionStringOld[];
 extern const TCHAR XCSoar_ProductToken[];
 /** based on XCSoar 5.2.5F */
 extern const TCHAR XCSoar_ProductTokenShort[];
+/** git suffix to version */
+extern const TCHAR XCSoar_GitSuffix[];
 /** TopHat version */
 extern const TCHAR TopHat_ProductToken[];
 
