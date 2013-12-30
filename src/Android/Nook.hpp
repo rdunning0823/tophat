@@ -93,6 +93,15 @@ protected:
       return upper_battery_threshhold - 2;
   }
 
+  unsigned GetLowerFastChargeThreshhold() {
+      return upper_battery_threshhold - 20;
+  }
+
+  /**
+   * Set charge rate to 1.5A
+   */
+  void SetFastCharging();
+
   void SetCharging();
 
   void SetDischarging();
@@ -132,6 +141,11 @@ protected:
    * requires Nook kernel rooted to support FastMode
    */
   void ExitFastMode();
+
+  /**
+   * Set Nook regulator's charge rate to 1.5A.
+   */
+  void SetCharge1500();
 
   /**
    * Set Nook regulator's charge rate to 500mA.

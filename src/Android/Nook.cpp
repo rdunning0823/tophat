@@ -33,6 +33,7 @@ static char cmd_host[] = "su -c 'echo host > /sys/devices/platform/musb_hdrc/mod
 static char cmd_usb_rw[] = "su -c 'chmod 666 /dev/ttyUSB0'";
 static char cmd_internal_usb_rw[] = "su -c 'chmod 666 /dev/ttyS1'";
 
+static char cmd_set_charge_1500[] = "su -c 'echo 1500000 > /sys/class/regulator/regulator.5/device/force_current'";
 static char cmd_set_charge_500[] = "su -c 'echo 500000 > /sys/class/regulator/regulator.5/device/force_current'";
 static char cmd_set_charge_100[] = "su -c 'echo 100000 > /sys/class/regulator/regulator.5/device/force_current'";
 
@@ -73,6 +74,12 @@ Nook::InitInternalUsb()
 }
 
 void
+Nook::SetCharge1500()
+{
+  system(cmd_set_charge_1500);
+}
+
+void
 Nook::SetCharge500()
 {
   system(cmd_set_charge_500);
@@ -100,7 +107,7 @@ Nook::BatteryController::Initialise(unsigned value) {
 void
 Nook::BatteryController::DetectIfActuallyCharging(unsigned value)
 {
-  if (value > last_charge_percent)
+  if (value > last_charge_percent && (last_charge_rate == 100))
     last_charge_rate = 500;
   else if (value < last_charge_percent)
     last_charge_rate = 100;
@@ -113,20 +120,29 @@ Nook::BatteryController::ProcessChargeRate(unsigned value)
 
   DetectIfActuallyCharging(value);
 
-  if (IsCharging()) {
-    if (value >= GetUpperChargeThreshhold())
-      SetDischarging();
-  } else {
-    if (value <= GetLowerChargeThreshhold())
-      SetCharging();
-  }
+  if (value >= GetUpperChargeThreshhold())
+    SetDischarging();
+  else if (value <= GetLowerFastChargeThreshhold())
+    SetFastCharging();
+  else
+    SetCharging();
+
   last_charge_percent = value;
+}
+
+void
+Nook::BatteryController::SetFastCharging()
+{
+  if (last_charge_rate != 1500) {
+    last_charge_rate = 1500;
+    Nook::SetCharge1500();
+  }
 }
 
 void
 Nook::BatteryController::SetCharging()
 {
-  if(last_charge_rate != 500) {
+  if (last_charge_rate != 500) {
     last_charge_rate = 500;
     Nook::SetCharge500();
   }
