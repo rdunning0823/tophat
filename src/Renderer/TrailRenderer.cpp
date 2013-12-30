@@ -164,7 +164,10 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
     RasterPoint pt = projection.GeoToScreen(gp);
 
     if (last_valid) {
-      if (settings.type == TrailSettings::Type::ALTITUDE) {
+      if (settings.type == TrailSettings::Type::SIMPLE) {
+        canvas.Select(look.simple_pen);
+        canvas.DrawLinePiece(last_point, pt);
+      } else if (settings.type == TrailSettings::Type::ALTITUDE) {
         unsigned index = GetAltitudeColorIndex(it->GetAltitude(),
                                                value_min, value_max);
         canvas.Select(look.trail_pens[index]);

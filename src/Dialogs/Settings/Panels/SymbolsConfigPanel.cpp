@@ -111,6 +111,9 @@ static constexpr StaticEnumChoice trail_type_list[] = {
        "Orange to red = climb. Light blue to dark blue = sink. "
        "Zero lift is presented as a yellow line.") },
   { (unsigned)TrailSettings::Type::ALTITUDE, N_("Altitude"), N_("The colour scheme corresponds to the height.") },
+  { (unsigned)TrailSettings::Type::SIMPLE,
+    N_("Simple"),
+    N_("Simple, fixed-width black line suitable for low contrast displays like the Nook Simple Touch.") },
   { 0 }
 };
 

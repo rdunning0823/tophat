@@ -37,6 +37,7 @@ struct TrailLook {
   Brush trail_brushes[NUMSNAILCOLORS];
   Pen trail_pens[NUMSNAILCOLORS];
   Pen scaled_trail_pens[NUMSNAILCOLORS];
+  Pen simple_pen;
 
   Pen trace_pen;
 

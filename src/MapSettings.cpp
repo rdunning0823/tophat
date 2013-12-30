@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "MapSettings.hpp"
+#include "Asset.hpp"
 
 void
 MapItemListSettings::SetDefaults()
@@ -35,7 +36,11 @@ TrailSettings::SetDefaults()
 {
   wind_drift_enabled = true;
   scaling_enabled = true;
-  type = Type::VARIO_1;
+  if (HasColors())
+    type = Type::VARIO_1;
+  else
+    type = Type::SIMPLE;
+
   length = Length::LONG;
 }
 

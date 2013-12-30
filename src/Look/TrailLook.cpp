@@ -96,6 +96,7 @@ TrailLook::Initialise(const TrailSettings &settings)
 {
   UPixelScalar iwidth;
   UPixelScalar minwidth = Layout::ScalePenWidth(2);
+  PixelScalar simple_width = Layout::ScalePenWidth(2);
 
   for (unsigned i = 0; i < NUMSNAILCOLORS; ++i) {
     short ih = i * 200 / (NUMSNAILCOLORS - 1);
@@ -115,5 +116,6 @@ TrailLook::Initialise(const TrailSettings &settings)
     scaled_trail_pens[i].Set(iwidth, color);
   }
 
+  simple_pen.Set(simple_width, {0,   0x00, 0x00, 0x00});
   trace_pen.Set(2, Color(50, 243, 45));
 }
