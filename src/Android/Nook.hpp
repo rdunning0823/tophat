@@ -62,8 +62,14 @@ public:
   BatteryController()
     :last_charge_rate(0), initialised(false) {};
 
+  /**
+   * @param value. percent remaining in battery
+   */
   void ProcessChargeRate(unsigned value);
 
+  /**
+   * @param value. percent remaining in battery
+   */
   void Initialise(unsigned value);
 
   bool IsInitialised() {
