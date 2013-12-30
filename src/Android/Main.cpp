@@ -141,6 +141,8 @@ Java_org_tophat_NativeView_initializeNative(JNIEnv *env, jobject obj,
                                sdk_version, product);
 #ifdef __arm__
   is_nook = strcmp(native_view->GetProduct(), "NOOK") == 0;
+  if (is_nook)
+    is_dithered = true;
 #endif
 
   event_queue = new EventQueue();
