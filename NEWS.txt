@@ -2,12 +2,19 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 1.3.4 TBD
+* Made wind arrow higher contrast on Kobo, Nook
+* Added display of IP address on Kobo Network screen
+* Make fonts larger on startup logo screen
+* Add black & white "Simple" snail trail option for eInk
 * Upgrade icons for hi res displays like the HTC One phone with 1080 x 1920
 * Change Navbar to navigate to target instead of turnpoint for TAT/AAT
-* Nook fix startup so first time after installation, Top Hat stays in foreground
 * Nook support for internal TTL port 
-* Fix bug in display of name of language when "automatic"
-* Fix bug in Mat "add turnpoint" dialog for Est. Finish time
+* Integrated TopHat's grayscaling with XCSoar's kobo dithering
+* Fix Nook startup so first time after installation, Top Hat stays in foreground
+* Fix Nook battery manager to fast charge when necessary (e.g. cold weather)
+* Fix display of name of language when "automatic"
+* Fix Mat "add turnpoint" dialog for Est. Finish time
+* Fix Kobo stability issue (landscape and portrait)
 * merge XCSoar 6.7.1
 
 Top Hat Soaring 1.3.3 10/24/2013
