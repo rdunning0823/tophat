@@ -96,7 +96,7 @@ Nook::BatteryController::Initialise(unsigned value) {
   assert(!initialised);
 
   initialised = true;
-  upper_battery_threshhold = 99;
+  upper_battery_threshhold = 100;
   last_charge_percent = value;
   if (value >= GetUpperChargeThreshhold())
     SetDischarging();
