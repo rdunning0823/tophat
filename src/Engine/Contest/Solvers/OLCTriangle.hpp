@@ -26,6 +26,7 @@
 #include "AbstractContest.hpp"
 #include "TraceManager.hpp"
 #include "Trace/Point.hpp"
+#include "LogFile.hpp"
 
 #include <map>
 
@@ -315,7 +316,10 @@ private:
 
       if (!fai) return true;
 
-      assert(df_min == df_max);
+      if (df_min != df_max) {
+        LogDebug("src/Engine/Contest/Solvers/OLCTriangle.hpp:318: bool OLCTriangle::CandidateSet::integral(OLCTriangle*, bool, unsigned int) const: Assertion `df_min == df_max' failed. %u!=%u",
+                 df_min, df_max);
+      }
 
       // fast checks, as in isFeasible
 
