@@ -28,6 +28,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Custom/TopCanvas.hpp"
 #include "Screen/FreeType/Init.hpp"
+#include "Screen/Debug.hpp"
 #include "Screen/Layout.hpp"
 #include "Renderer/FlightListRenderer.hpp"
 #include "FlightInfo.hpp"
@@ -121,6 +122,7 @@ int main(int argc, char **argv)
 {
   /* enable FreeType anti-aliasing, because we don't use dithering in
      this program */
+  ScreenInitialized();
   FreeType::mono = false;
 
   FreeType::Initialise();
