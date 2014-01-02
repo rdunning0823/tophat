@@ -164,8 +164,6 @@ FormKeyDown(unsigned key_code)
 #ifdef GNAV
   case '6':
 #endif
-    ((WndButton *)form->FindByName(_T("cmdPrev")))->SetFocus();
-    NextPage(-1);
     return true;
 
   case KEY_RIGHT:
@@ -440,7 +438,7 @@ dlgWaypointDetailsShowModal(const Waypoint &_waypoint,
 
   if (!allow_navigation) {
     for (const TCHAR *button_name :
-         { _T("cmdPrev"), _T("cmdNext"), _T("cmdGoto") }) {
+         { _T("cmdNext"), _T("cmdGoto") }) {
       Window *button = form->FindByName(button_name);
       assert(button != nullptr);
       button->Hide();
