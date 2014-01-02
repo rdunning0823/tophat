@@ -61,9 +61,15 @@ dlgConfigWaypointsShowModal();
 bool
 dlgWaypointEditShowModal(Waypoint &way_point);
 
+/**
+ * @param waypoint
+ * @param allow_navigation.  If false, Goto, Prev, and Next are hidden
+ * @param allow_prev_next.  If false, Prev and Next are hidden
+ */
 void
 dlgWaypointDetailsShowModal(const Waypoint& waypoint,
-                            bool allow_navigation = true);
+                            bool allow_navigation = true,
+                            bool allow_prev_next = true);
 
 bool
 PopupNearestWaypointDetails(const Waypoints &way_points,

@@ -372,7 +372,7 @@ UpdateCaption()
 
 void 
 dlgWaypointDetailsShowModal(const Waypoint &_waypoint,
-                            bool allow_navigation)
+                            bool allow_navigation, bool allow_prev_next)
 {
   waypoint = &_waypoint;
 
@@ -439,6 +439,15 @@ dlgWaypointDetailsShowModal(const Waypoint &_waypoint,
   if (!allow_navigation) {
     for (const TCHAR *button_name :
          { _T("cmdNext"), _T("cmdGoto") }) {
+      Window *button = form->FindByName(button_name);
+      assert(button != nullptr);
+      button->Hide();
+    }
+  }
+
+  if (!allow_prev_next) {
+    for (const TCHAR *button_name :
+         { _T("cmdNext") }) {
       Window *button = form->FindByName(button_name);
       assert(button != nullptr);
       button->Hide();
