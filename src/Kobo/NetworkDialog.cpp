@@ -46,7 +46,6 @@ class NetworkWidget final
   enum Buttons {
     TOGGLE_WIFI,
     WIFI,
-    TELNET,
     IPADDRESS,
   };
 
@@ -106,7 +105,6 @@ NetworkWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   wifi_button = AddButton(_("Wifi"), *this, WIFI);
 
-  AddButton(_T("Telnet server"), *this, TELNET);
   ip_address_button = AddButton(_T(""), *this, IPADDRESS);
 
   UpdateButtons();
@@ -135,10 +133,6 @@ NetworkWidget::OnAction(int id)
 
   case WIFI:
     ShowWifiDialog();
-    break;
-
-  case TELNET:
-    KoboRunTelnetd();
     break;
   }
 }
