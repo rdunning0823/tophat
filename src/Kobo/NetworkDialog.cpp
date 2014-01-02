@@ -33,6 +33,7 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Net/IpAddress.hpp"
 #include "System.hpp"
+#include <stdlib.h>
 
 gcc_pure
 static const TCHAR *
@@ -85,7 +86,9 @@ NetworkWidget::UpdateIpAddress()
   if (IpAddress::GetFormattedIpAddress(buffer) && strlen(buffer) > 3) {
     unsigned i = strlen(buffer);
     buffer[i - 1] = '\0';
-    ip_address_button->SetCaption(buffer);
+    char caption[256];
+    _stprintf(caption, _T("connect with username='root'\n  telnet %s or ftp %s"), buffer, buffer);
+    ip_address_button->SetCaption(caption);
   } else
     ip_address_button->SetCaption(_T("Not connected"));
 }
