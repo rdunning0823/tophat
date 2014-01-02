@@ -114,7 +114,7 @@ AlternatesListWidget2::DoDetails()
 {
   const Waypoint *waypoint = GetWaypoint();
   if (waypoint != nullptr) {
-    dlgWaypointDetailsShowModal(*waypoint);
+    dlgWaypointDetailsShowModal(*waypoint, true, false);
     return true;
   }
   return false;
