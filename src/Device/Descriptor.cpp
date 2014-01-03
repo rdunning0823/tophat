@@ -528,8 +528,8 @@ DeviceDescriptor::AutoReopen(OperationEnvironment &env)
       IsOccupied() ||
       !config.IsAvailable() ||
       !ShouldReopen() ||
-      /* attempt to reopen a failed device every 30 seconds */
-      !reopen_clock.CheckUpdate(30000))
+      /* attempt to reopen a failed device every 5 seconds */
+      !reopen_clock.CheckUpdate(5000))
     return;
 
 #ifdef ANDROID
