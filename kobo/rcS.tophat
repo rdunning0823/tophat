@@ -168,6 +168,13 @@ else
     # kill off the start screen
     killall on-animator.sh
 
+# workaround for Kobo Touch N905B kernel bug: the mxc_fb driver
+# crashes when KoboMenu tries to rotate the display too early after
+# boot
+    if [ `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` = "SN-N905B" ]; then
+        sleep 1
+    fi
+
     echo 3 > /sys/class/graphics/fb0/rotate
     /opt/tophat/bin/KoboMenu &
     /sbin/udevadm control --env=STARTUP=1
