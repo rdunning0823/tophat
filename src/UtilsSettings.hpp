@@ -39,12 +39,8 @@ extern bool MapFileChanged;
 extern bool LanguageChanged;
 extern bool require_restart;
 
-/**
- * show the system information pages
- * @param page_name.  Show only a single page or "" = all pages.
- */
 void
-SystemConfiguration(const TCHAR *page_name = _T(""));
+SystemConfiguration();
 
 void
 SystemConfiguration(Widget &widget, const TCHAR *caption);

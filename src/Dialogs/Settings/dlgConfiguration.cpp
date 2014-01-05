@@ -78,7 +78,6 @@ Copyright_License {
 
 static unsigned current_page;
 static WndForm *dialog = NULL;
-static bool single_page;
 
 static TabMenuControl* tab_menu = NULL;
 
@@ -163,7 +162,7 @@ OnPrevClicked()
 static void
 OnCloseClicked()
 {
-  if (tab_menu->IsCurrentPageTheMenu() || single_page)
+  if (tab_menu->IsCurrentPageTheMenu())
     dialog->SetModalResult(mrOK);
   else
     tab_menu->GotoMenuPage();
@@ -172,9 +171,6 @@ OnCloseClicked()
 static bool
 FormKeyDown(unsigned key_code)
 {
-  if (single_page)
-    return false;
-
   if (tab_menu->InvokeKeyPress(key_code))
     return true;
 
@@ -230,12 +226,8 @@ static constexpr CallBackTableEntry CallBackTable[] = {
   DeclareCallBackEntry(NULL)
 };
 
-/**
- * @page_name: text name of a page to display single page
- * or empty to show all pages with the menu
- */
 static void
-PrepareConfigurationDialog(const TCHAR *page_name)
+PrepareConfigurationDialog()
 {
   gcc_unused ScopeBusyIndicator busy;
 
@@ -248,36 +240,18 @@ PrepareConfigurationDialog(const TCHAR *page_name)
   dialog->SetKeyDownFunction(FormKeyDown);
 
   PrepareConfigurationMenu();
-  int page = tab_menu->FindPage(page_name);
-  single_page = (page >= 0);
-  bool expert_mode = !single_page;
-  CommonInterface::SetUISettings().dialog.expert = expert_mode;
   tab_menu->UpdateLayout();
-  if (single_page) {
-    assert((unsigned)page < tab_menu->GetNumPages());
-    WndButton *b = (WndButton*)dialog->FindByName(_T("cmdPrev"));
-    b->SetVisible(false);
-    b = (WndButton*)dialog->FindByName(_T("cmdNext"));
-    b->SetVisible(false);
-    tab_menu->SetCurrentPage((unsigned)page);
-  } else {
-    tab_menu->GotoMenuPage();
+  tab_menu->GotoMenuPage();
 
-    /* restore last selected menu item */
-    static bool multi_page_initialized = false;
-    if (!multi_page_initialized)
-      multi_page_initialized = true;
-    else
-      tab_menu->SetLastContentPage((unsigned)current_page);
-  }
+  /* restore last selected menu item */
+  tab_menu->SetLastContentPage((unsigned)current_page);
 }
 
 static void
 Save()
 {
   /* save page number for next time this dialog is opened */
-  if (!single_page)
-    current_page = tab_menu->GetLastContentPage();
+  current_page = tab_menu->GetLastContentPage();
 
   // TODO enhancement: implement a cancel button that skips all this
   // below after exit.
@@ -293,9 +267,9 @@ Save()
   }
 }
 
-void dlgConfigurationShowModal(const TCHAR *page_name)
+void dlgConfigurationShowModal()
 {
-  PrepareConfigurationDialog(page_name);
+  PrepareConfigurationDialog();
 
   dialog->ShowModal();
 

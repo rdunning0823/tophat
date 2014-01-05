@@ -230,11 +230,11 @@ SystemConfiguration(Widget &widget, const TCHAR *caption)
 }
 
 void
-SystemConfiguration(const TCHAR *page_name)
+SystemConfiguration()
 {
   const UISettings old_ui_settings = CommonInterface::GetUISettings();
 
   SettingsEnter();
-  dlgConfigurationShowModal(page_name);
+  dlgConfigurationShowModal();
   SettingsLeave(old_ui_settings);
 }

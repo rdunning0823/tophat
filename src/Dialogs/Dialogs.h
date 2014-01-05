@@ -49,7 +49,7 @@ bool dlgMatItemClickShowModal(const Waypoint &wp);
 void dlgBrightnessShowModal();
 
 void dlgChecklistShowModal();
-void dlgConfigurationShowModal(const TCHAR *page_name = _T(""));
+void dlgConfigurationShowModal();
 void dlgConfigFontsShowModal();
 
 /**
