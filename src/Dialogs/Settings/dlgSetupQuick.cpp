@@ -488,5 +488,5 @@ ShowDialogSetupQuick()
   instance->Hide();
   instance->Unprepare();
   delete instance;
-
+  Profile::Save();
 }
