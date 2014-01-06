@@ -38,11 +38,6 @@ protected:
   bool prepared;
 
   /**
-   * size of bitmap on which size of widget is based (unscaled)
-   */
-  PixelSize bitmap_size_raw;
-
-  /**
    * a customized copy of button_look
    */
   ButtonLook white_look;

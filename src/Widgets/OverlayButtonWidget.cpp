@@ -39,7 +39,7 @@ Copyright_License {
 UPixelScalar
 OverlayButtonWidget::HeightFromBottomRight()
 {
-  return bitmap_size_raw.cy * MapOverlayButton::GetScale() + Layout::Scale(3);
+  return GetHeight();
 }
 
 void
@@ -49,12 +49,6 @@ OverlayButtonWidget::Prepare(ContainerWindow &parent,
   assert(prepared == false);
   white_look.Initialise(Fonts::map_bold);
   white_look.font = &Fonts::map_overlay_button;
-  if (bmp != nullptr) {
-    bitmap_size_raw = bmp->GetSize();
-  } else {
-    assert(text != nullptr);
-    bitmap_size_raw = white_look.font->TextSize(text);
-  }
 
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   CreateButton(parent, white_look, icon_look, rc);
