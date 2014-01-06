@@ -281,7 +281,7 @@ ListControl::EnsureVisible(unsigned i)
 }
 
 bool
-ListControl::SetCursorIndex(unsigned i)
+ListControl::SetCursorIndex(unsigned i, bool ensure_visible)
 {
   if (i >= length)
     return false;
@@ -289,7 +289,8 @@ ListControl::SetCursorIndex(unsigned i)
   if (i == GetCursorIndex())
     return true;
 
-  EnsureVisible(i);
+  if (ensure_visible)
+    EnsureVisible(i);
 
   Invalidate_item(cursor);
   cursor = i;
@@ -642,7 +643,7 @@ ListControl::OnMouseDown(PixelScalar x, PixelScalar y)
     } else {
       // If item was not selected before
       // -> select it
-      SetCursorIndex(index);
+      SetCursorIndex(index, false);
       drag_mode = DragMode::SCROLL;
     }
 #ifndef _WIN32_WCE

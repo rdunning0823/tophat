@@ -249,10 +249,11 @@ public:
   /**
    * Moves the cursor to the specified position.
    *
+   * @param ensure_visible.  If false, does not scroll to item
    * @return true if the cursor was moved to the specified position,
    * false if the position was invalid
    */
-  bool SetCursorIndex(unsigned i);
+  bool SetCursorIndex(unsigned i, bool ensure_visible = true);
 
   /**
    * Move the cursor this many items up (negative delta) or down
