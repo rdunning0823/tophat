@@ -392,11 +392,10 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
   PixelSize bmp_size = look.map_scale_left_icon.GetSize();
   const PixelScalar bmp_y = (text_size.cy + bmp_size.cy) / 2;
 
-
   UPixelScalar zoom_button_width = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale();
+      * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
 
-  PixelScalar x = rc.left + (Layout::landscape ? 2 : 1) * zoom_button_width;
+  PixelScalar x = rc.left + (Layout::landscape ? 0 : 1) * zoom_button_width;
 
   canvas.DrawFilledRectangle(x, rc.bottom - text_size.cy - Layout::Scale(1),
                              x + 2 * bmp_size.cx + text_size.cx + Layout::Scale(2),
