@@ -42,10 +42,8 @@ void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
                             const PixelRect &rc)
 {
-  assert(!prepared);
   SetText(_T("+"));
   OverlayButtonWidget::Prepare(parent, rc);
-  prepared = true;
 }
 
 void
@@ -87,15 +85,6 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
     break;
   }
   WindowWidget::Move(rc);
-}
-
-PixelRect
-ZoomInButtonWidget::GetPosition() const
-{
-  if (!prepared)
-    return {0, 0, 1, 1};
-
-  return WindowWidget::GetWindow().GetPosition();
 }
 
 void

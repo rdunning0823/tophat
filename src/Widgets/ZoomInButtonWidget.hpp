@@ -45,10 +45,9 @@ protected:
    */
   ScreensButtonWidget *s_but;
 
-  bool prepared;
 public:
   ZoomInButtonWidget(ScreensButtonWidget *_s_but)
-    :OverlayButtonWidget(), s_but(_s_but), prepared(false) {
+    :OverlayButtonWidget(), s_but(_s_but) {
     assert(s_but != nullptr);
   }
 
@@ -68,8 +67,6 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map) final;
-
-  PixelRect GetPosition() const;
 
   /**
    * The OnAction is derived from ActionListener

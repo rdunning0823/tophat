@@ -46,12 +46,9 @@ public:
 protected:
   ButtonPosition button_position;
 
-  bool prepared;
-
 public:
   ScreensButtonWidget()
-    :OverlayButtonWidget(), button_position(Bottom),
-     prepared(false)
+    :OverlayButtonWidget(), button_position(Bottom)
   {}
 
   /**
@@ -70,8 +67,6 @@ public:
    * The OnAction is derived from ActionListener
    */
   virtual void OnAction(int id);
-
-  PixelRect GetPosition() const;
 
   ButtonPosition GetButtonPosition() const {
     return button_position;

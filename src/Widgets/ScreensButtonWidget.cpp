@@ -71,15 +71,6 @@ ScreensButtonWidget::GetButtonPosition(InfoBoxSettings::Geometry geometry,
   return ScreensButtonWidget::ButtonPosition::Left;
 }
 
-PixelRect
-ScreensButtonWidget::GetPosition() const
-{
-  if (!prepared)
-    return {0, 0, 1, 1};
-
-  return WindowWidget::GetWindow().GetPosition();
-}
-
 void
 ScreensButtonWidget::UpdateVisibility(const PixelRect &rc,
                                        bool is_panning,
@@ -96,10 +87,8 @@ void
 ScreensButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  assert (!prepared);
   SetText(_T("S"));
   OverlayButtonWidget::Prepare(parent, rc);
-  prepared = true;
 }
 
 void

@@ -35,6 +35,8 @@ struct PixelRect;
 
 class OverlayButtonWidget : public MapOverlayWidget, protected ActionListener {
 protected:
+  bool prepared;
+
   /**
    * size of bitmap on which size of widget is based (unscaled)
    */
@@ -57,7 +59,7 @@ protected:
 
 public:
   OverlayButtonWidget()
-    : bmp(nullptr), text(nullptr) {}
+    : prepared(false), bmp(nullptr), text(nullptr) {}
 
   /**
    * Shows or hides the widgets based on these parameters
@@ -97,6 +99,11 @@ public:
    * returns height of button
    */
   UPixelScalar GetHeight() const;
+
+  /**
+   * Position of the button displayed
+   */
+  PixelRect GetPosition() const;
 
   /**
    * The OnAction is derived from ActionListener
