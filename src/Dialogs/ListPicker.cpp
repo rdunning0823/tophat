@@ -175,6 +175,7 @@ ListPicker(const TCHAR *caption,
 
   if (_itemhelp_callback != nullptr) {
     text_widget = new TextWidget();
+    text_widget->SetFixedHeight(item_height * 2);
     widget = two_widgets = new TwoWidgets(list_widget, text_widget);
 
     list_widget->EnableItemHelp(_itemhelp_callback, text_widget, two_widgets);
