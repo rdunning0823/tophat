@@ -35,6 +35,11 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 #include "Input/InputEvents.hpp"
+#include "InfoBoxes/InfoBoxSettings.hpp"
+#include "PageSettings.hpp"
+#include "PageState.hpp"
+#include "PageActions.hpp"
+#include "UIState.hpp"
 
 ScreensButtonWidget::ButtonPosition
 ScreensButtonWidget::GetButtonPosition(InfoBoxSettings::Geometry geometry,
@@ -88,7 +93,7 @@ ScreensButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
   OverlayButtonWidget::Prepare(parent, rc);
-  SetText(_T("S"));
+  UpdateText();
 }
 
 void
@@ -130,8 +135,27 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
 }
 
 void
+ScreensButtonWidget::UpdateText()
+{
+
+  const PagesState &state = CommonInterface::GetUIState().pages;
+  TCHAR line_two[50];
+  const PageLayout *pl =
+    &CommonInterface::SetUISettings().pages.pages[state.current_index];
+  const InfoBoxSettings &info_box_settings =
+    CommonInterface::GetUISettings().info_boxes;
+  assert(pl != NULL);
+
+  pl->MakeInfoBoxSetTitle(info_box_settings, line_two);
+  SetLineTwoText(line_two);
+
+  SetText(_T("S"));
+}
+
+void
 ScreensButtonWidget::OnAction(int id)
 {
   InputEvents::HideMenu();
   InputEvents::eventScreenModes(_T("next"));
+  UpdateText();
 }

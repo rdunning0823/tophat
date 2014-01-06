@@ -68,6 +68,12 @@ public:
    */
   virtual void OnAction(int id);
 
+  /**
+   * updates the text on the button
+   */
+  void UpdateText();
+
+
   ButtonPosition GetButtonPosition() const {
     return button_position;
   }
