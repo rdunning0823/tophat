@@ -47,14 +47,9 @@ protected:
    */
   const Bitmap *bmp;
 
-  /**
-   * text displayed in the button
-   */
-  const TCHAR *text;
-
 public:
   OverlayButtonWidget()
-    : prepared(false), bmp(nullptr), text(nullptr) {}
+    : prepared(false), bmp(nullptr) {}
 
   /**
    * Shows or hides the widgets based on these parameters
@@ -106,14 +101,30 @@ public:
   virtual void OnAction(int id) = 0;
 
 protected:
+  /**
+   * Button must be created before this is called
+   */
   void SetBitmap(const Bitmap *_bmp) {
-    assert(text == nullptr);
+    assert(GetButton().GetText().compare(_T("")) == 0);
     bmp = _bmp;
   }
 
+  /**
+   * Button must be created before this is called
+   */
+  MapOverlayButton &GetButton() {
+    assert(prepared == true);
+    return (MapOverlayButton&)WindowWidget::GetWindow();
+  }
+
+  /**
+   * widget must be prepared before this is called
+   * Button must be created before this is called
+   */
   void SetText(const TCHAR * _text) {
     assert(bmp == nullptr);
-    text = _text;
+    assert(prepared == true);
+    GetButton().SetText(_text);
   }
 };
 

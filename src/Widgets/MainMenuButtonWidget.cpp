@@ -53,8 +53,8 @@ void
 MainMenuButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  SetText(_T("M"));
   OverlayButtonWidget::Prepare(parent, rc);
+  SetText(_T("M"));
 }
 
 void

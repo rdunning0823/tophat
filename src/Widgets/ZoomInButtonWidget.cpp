@@ -42,8 +42,8 @@ void
 ZoomInButtonWidget::Prepare(ContainerWindow &parent,
                             const PixelRect &rc)
 {
-  SetText(_T("+"));
   OverlayButtonWidget::Prepare(parent, rc);
+  SetText(_T("+"));
 }
 
 void

@@ -87,8 +87,8 @@ void
 ScreensButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  SetText(_T("S"));
   OverlayButtonWidget::Prepare(parent, rc);
+  SetText(_T("S"));
 }
 
 void

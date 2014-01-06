@@ -107,10 +107,8 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
   ButtonWindowStyle button_style;
   button_style.multiline();
 
-  const TCHAR *text2 = text == nullptr ? _T("") : text;
-
   MapOverlayButton *button =
-    new MapOverlayButton(parent, button_look, icon_look, bmp, text2,
+    new MapOverlayButton(parent, button_look, icon_look, bmp,
                          rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;
