@@ -49,23 +49,22 @@ ZoomInButtonWidget::Prepare(ContainerWindow &parent,
 void
 ZoomInButtonWidget::Move(const PixelRect &rc_map)
 {
-  UPixelScalar clear_border_width = Layout::Scale(2);
   PixelRect rc;
 
   switch (s_but->GetButtonPosition()) {
   case ScreensButtonWidget::ButtonPosition::Bottom:
     // must be landscape mode
     rc.bottom = rc_map.bottom;
-    rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+    rc.top = rc.bottom - GetHeight();
 
     if (s_but->GetPosition().left - rc_map.left - (3 * (PixelScalar)GetWidth()) < 0) {
 
       // draw adjacent to "S" button's left (with room for Zoom In button)
-      rc.right = s_but->GetPosition().left - GetWidth() - 2 * clear_border_width;
-      rc.left = rc.right - GetWidth() - 2 * clear_border_width;
+      rc.right = s_but->GetPosition().left - GetWidth();
+      rc.left = rc.right - GetWidth();
     } else {
       rc.left = rc_map.left;
-      rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+      rc.right = rc.left + GetWidth();
     }
     break;
 
@@ -73,14 +72,14 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
   case ScreensButtonWidget::ButtonPosition::Right:
     if (Layout::landscape) {
       rc.left = rc_map.left;
-      rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+      rc.right = rc.left + GetWidth() + 2;
       rc.bottom = rc_map.bottom;
-      rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+      rc.top = rc.bottom - GetHeight() - 2;
     } else {
       rc.left = rc_map.left;
-      rc.right = rc.left + (GetWidth() + 2 * clear_border_width);
-      rc.bottom = rc_map.bottom - GetHeight() - 2 * clear_border_width;
-      rc.top = rc.bottom - (GetHeight() + 2 * clear_border_width);
+      rc.right = rc.left + GetWidth();
+      rc.bottom = rc_map.bottom - GetHeight();
+      rc.top = rc.bottom - GetHeight();
     }
     break;
   }

@@ -79,14 +79,14 @@ UPixelScalar
 OverlayButtonWidget::GetWidth() const
 {
   return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
+      MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
 }
 
 UPixelScalar
 OverlayButtonWidget::GetHeight() const
 {
   return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
+      MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
 }
 
 PixelRect

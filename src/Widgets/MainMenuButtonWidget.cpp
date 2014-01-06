@@ -60,12 +60,11 @@ MainMenuButtonWidget::Prepare(ContainerWindow &parent,
 void
 MainMenuButtonWidget::Move(const PixelRect &rc_map)
 {
-  UPixelScalar clear_border_width = Layout::Scale(2);
   PixelRect rc;
   rc.right = rc_map.right;
-  rc.left = rc.right - GetWidth() - 2 * clear_border_width;
+  rc.left = rc.right - GetWidth();
   rc.bottom = rc_map.bottom;
-  rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+  rc.top = rc.bottom - GetHeight();
 
   WindowWidget::Move(rc);
   GetWindow().Move(rc);

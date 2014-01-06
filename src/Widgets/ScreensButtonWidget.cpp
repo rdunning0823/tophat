@@ -102,7 +102,6 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   const PixelRect rc_main = UIGlobals::GetMainWindow().GetClientRect();
 
-  UPixelScalar clear_border_width = Layout::Scale(2);
   PixelRect rc;
 
   button_position = GetButtonPosition(ui_settings.info_boxes.geometry,
@@ -111,23 +110,23 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   switch (button_position) {
   case ButtonPosition::Left:
     rc.left = 0;
-    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+    rc.right = rc.left + GetWidth();
     rc.bottom = rc_main.GetCenter().y;
-    rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+    rc.top = rc.bottom - GetHeight();
   break;
 
   case ButtonPosition::Right:
     rc.right = rc_main.right;
-    rc.left = rc.right - GetWidth() - 2 * clear_border_width;
+    rc.left = rc.right - GetWidth();
     rc.bottom = rc_main.GetCenter().y;
-    rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+    rc.top = rc.bottom - GetHeight();
   break;
 
   case ButtonPosition::Bottom:
     rc.left = rc_main.GetCenter().x - GetWidth() / 2;
-    rc.right = rc.left + GetWidth() + 2 * clear_border_width;
+    rc.right = rc.left + GetWidth();
     rc.bottom = rc_main.bottom;
-    rc.top = rc.bottom - GetHeight() - 2 * clear_border_width;
+    rc.top = rc.bottom - GetHeight();
   break;
 }
   WindowWidget::Move(rc);
