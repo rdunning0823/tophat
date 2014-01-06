@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_TEXT_WIDGET_HPP
 
 #include "WindowWidget.hpp"
+#include "Screen/Point.hpp"
 
 #include <tchar.h>
 
@@ -35,8 +36,12 @@ class Color;
  */
 class TextWidget : public WindowWidget {
 public:
+  PixelScalar fixed_height;
   void SetText(const TCHAR *text);
   void SetColor(Color _color);
+
+  TextWidget()
+  : fixed_height(0u) {}
 
   /* virtual methods from class Widget */
   virtual PixelSize GetMinimumSize() const override;
@@ -45,6 +50,13 @@ public:
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override;
   virtual void Unprepare() override;
+
+  /**
+   * if non-zero, determines the height of the widget
+   */
+  virtual void SetFixedHeight(PixelScalar height) {
+    fixed_height = height;
+  }
 };
 
 #endif
