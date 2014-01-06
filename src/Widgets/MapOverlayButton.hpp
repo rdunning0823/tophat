@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Form/Button.hpp"
 #include "Look/ButtonLook.hpp"
+#include "Look/DialogLook.hpp"
 
 #include <tchar.h>
 
@@ -36,6 +37,14 @@ class ActionListener;
 struct PixelRect;
 
 class MapOverlayButton : public WndButton {
+
+protected:
+  /** optional text displayed after main text as a subscript */
+  tstring subscript_text;
+
+  /** optional text displayed under main text */
+  tstring line_two_text;
+
 public:
   /**
    * size from 2 (tiny) to 6 (huge) of map overlay buttons
@@ -50,6 +59,7 @@ public:
 protected:
   const IconLook &icon_look;
   const ButtonLook &button_look;
+  const DialogLook &dialog_look;
   /**
    * the bitmap displayed in the button
    */
@@ -58,13 +68,15 @@ protected:
 public:
 
   MapOverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
-                    const IconLook &_icon_look,
+                   const IconLook &_icon_look,
+                   const DialogLook &_dialog_look,
                     const Bitmap *_bmp,
                     const PixelRect &rc,
                     ButtonWindowStyle style,
                     ActionListener& listener, int id)
   :WndButton(parent, _button_look, _T(""), rc, style, listener, id),
-   icon_look(_icon_look), button_look(_button_look), bmp(_bmp) {}
+   icon_look(_icon_look), button_look(_button_look),
+   dialog_look(_dialog_look), bmp(_bmp) {}
 
   /**
    * The OnPaint event is called when the button needs to be drawn
@@ -77,6 +89,30 @@ public:
    * This allows background object to accept capture at this time
    */
   virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
+
+  /**
+   * updates subscript text of button
+   */
+  void SetSubscripText(const TCHAR * _text) {
+    subscript_text = _text;
+  }
+
+  /**
+   * updates line two text of button
+   */
+  void SetLineTwoText(const TCHAR * _text) {
+    line_two_text = _text;
+  }
+
+  const Font &GetLargeFont()
+  {
+    return *button_look.font;
+  }
+
+  const Font &GetMediumFont()
+  {
+    return *dialog_look.caption.font;
+  }
 };
 
 

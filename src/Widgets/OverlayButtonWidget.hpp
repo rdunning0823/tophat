@@ -118,13 +118,32 @@ protected:
   }
 
   /**
-   * widget must be prepared before this is called
    * Button must be created before this is called
    */
   void SetText(const TCHAR * _text) {
     assert(bmp == nullptr);
     assert(prepared == true);
     GetButton().SetText(_text);
+  }
+
+  /**
+   * Updates subscript text of button
+   * Button must be created before this is called
+   */
+  void SetSubscriptText(const TCHAR * _text) {
+    assert(bmp == nullptr);
+    assert(prepared == true);
+    GetButton().SetSubscripText(_text);
+  }
+
+  /**
+   * Updates line two text of button
+   * Button must be created before this is called
+   */
+  void SetLineTwoText(const TCHAR * _text) {
+    assert(bmp == nullptr);
+    assert(prepared == true);
+    GetButton().SetLineTwoText(_text);
   }
 };
 

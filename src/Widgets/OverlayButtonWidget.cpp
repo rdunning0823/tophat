@@ -106,9 +106,10 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
 {
   ButtonWindowStyle button_style;
   button_style.multiline();
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
   MapOverlayButton *button =
-    new MapOverlayButton(parent, button_look, icon_look, bmp,
+    new MapOverlayButton(parent, button_look, icon_look, dialog_look, bmp,
                          rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;

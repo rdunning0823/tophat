@@ -27,7 +27,6 @@ Copyright_License {
 
 #include "Form/SymbolButton.hpp"
 #include "UIGlobals.hpp"
-#include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
@@ -100,12 +99,49 @@ MapOverlayButton::OnPaint(Canvas &canvas)
 
     canvas.SetBackgroundTransparent();
     canvas.SetTextColor(button_look.standard.foreground_color);
-    canvas.Select(*button_look.font);
+
+
+    PixelSize sz;
+    sz.cx = rc.right - rc.left;
+    sz.cy = rc.bottom - rc.top;
+    PixelSize sz_main = GetLargeFont().TextSize(GetText().c_str());
+    PixelSize sz_subscript = GetMediumFont().TextSize(subscript_text.c_str());
+    PixelSize sz_line_two = GetMediumFont().TextSize(line_two_text.c_str());
+    sz_main.cx *= 0.85;
+    sz_subscript.cx *= 0.85;
+    sz_line_two.cx *= 0.85;
+
+    PixelRect rc_main_text = rc;
+    rc_main_text.left = rc.left + (sz.cx - sz_main.cx) / 2;
+    rc_main_text.right = rc_main_text.left + sz_main.cx;
+    rc_main_text.top = rc.top + (sz.cy - sz_main.cy) / 2;
+    rc_main_text.bottom = rc_main_text.top + sz_main.cy;
+
+    rc_main_text.Offset(-sz_subscript.cx / 2, 0);
+    if (sz_line_two.cx > 0)
+      rc_main_text.Offset(0, -sz_line_two.cy / 2);
+
+    canvas.Select(GetLargeFont());
 
   #ifndef USE_GDI
-    unsigned style = GetTextStyle();
+    canvas.TextAutoClipped(rc_main_text.left, rc_main_text.top, GetText().c_str());
 
-    canvas.DrawFormattedText(&rc, GetText().c_str(), style);
+    if (sz_subscript.cx > 0) {
+      PixelRect rc_subscript = rc_main_text;
+      rc_subscript.left = rc_main_text.right + Layout::Scale(1);
+      rc_subscript.top = rc_main_text.bottom - sz_subscript.cy - sz_main.cy / 10;
+      canvas.Select(GetMediumFont());
+      canvas.TextAutoClipped(rc_subscript.left, rc_subscript.top, subscript_text.c_str());
+    }
+
+    if (sz_line_two.cx > 0) {
+      PixelRect rc_line_two = rc;
+      rc_line_two.left = rc.left + (sz.cx - sz_line_two.cx) / 2;
+      rc_line_two.top = rc_line_two.bottom - sz_line_two.cy;
+      canvas.Select(GetMediumFont());
+      canvas.TextAutoClipped(rc_line_two.left, rc_line_two.top, line_two_text.c_str());
+    }
+
   #else
     unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
 
