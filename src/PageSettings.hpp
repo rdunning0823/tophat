@@ -163,6 +163,13 @@ struct PageLayout
     valid = false;
   }
 
+  /**
+   * fills buffer with name of active InfoBox set
+   * @param buffer
+   */
+  void MakeInfoBoxSetTitle(const InfoBoxSettings &info_box_settings,
+                           TCHAR *buffer) const;
+
   void MakeTitle(const InfoBoxSettings &info_box_settings,
                  TCHAR *str, const bool concise=false) const;
 

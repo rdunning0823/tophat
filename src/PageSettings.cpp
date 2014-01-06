@@ -27,6 +27,21 @@ Copyright_License {
 
 #include <algorithm>
 
+
+void
+PageLayout::MakeInfoBoxSetTitle(const InfoBoxSettings &info_box_settings,
+                                TCHAR *buffer) const
+{
+  if (!infobox_config.enabled)
+    buffer[0] = '\0';
+  else if (!infobox_config.auto_switch &&
+      infobox_config.panel < InfoBoxSettings::MAX_PANELS)
+    _tcscpy(buffer,
+            gettext(info_box_settings.panels[infobox_config.panel].name));
+  else
+    _tcscpy(buffer, _("Auto"));
+}
+
 void
 PageLayout::MakeTitle(const InfoBoxSettings &info_box_settings,
                       TCHAR *buffer, const bool concise) const
