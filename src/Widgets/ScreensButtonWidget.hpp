@@ -44,15 +44,13 @@ public:
     Right,
   };
 protected:
-  MapOverlayButton *the_button;
-
   ButtonPosition button_position;
 
   bool prepared;
 
 public:
   ScreensButtonWidget()
-    :OverlayButtonWidget(), the_button(nullptr), button_position(Bottom),
+    :OverlayButtonWidget(), button_position(Bottom),
      prepared(false)
   {}
 
