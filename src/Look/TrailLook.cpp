@@ -116,6 +116,6 @@ TrailLook::Initialise(const TrailSettings &settings)
     scaled_trail_pens[i].Set(iwidth, color);
   }
 
-  simple_pen.Set(simple_width, {0,   0x00, 0x00, 0x00});
+  simple_pen.Set(simple_width, COLOR_BLACK);
   trace_pen.Set(2, Color(50, 243, 45));
 }
