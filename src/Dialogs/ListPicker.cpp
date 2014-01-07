@@ -183,10 +183,10 @@ ListPicker(const TCHAR *caption,
 
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, widget);
 
-  dialog.AddButton(_("Cancel"), mrCancel);
-
   if (num_items > 0)
-  dialog.AddButton(_("Select"), mrOK);
+    dialog.AddButton(_("Select"), mrOK);
+
+  dialog.AddButton(_("Cancel"), mrCancel);
 
   if (help_text != nullptr)
     dialog.AddButton(_("Help"), *list_widget, HELP);
