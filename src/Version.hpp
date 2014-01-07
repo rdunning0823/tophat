@@ -28,6 +28,8 @@ Copyright_License {
 
 /** 5.2.5 */
 extern const TCHAR XCSoar_Version[];
+/** 1.3.4 */
+extern const TCHAR TopHat_Version[];
 /** 5.2.5F */
 extern const TCHAR XCSoar_VersionLong[];
 /** 5.2.5F-PC */

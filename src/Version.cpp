@@ -73,6 +73,7 @@ Copyright_License {
 #endif
 
 const TCHAR XCSoar_Version[] = _T(VERSION);
+const TCHAR TopHat_Version[] = _T(TOPHAT_VERSION);
 const TCHAR XCSoar_VersionLong[] = _T(VERSION VERSION_SUFFIX);
 const TCHAR XCSoar_VersionString[] = _T(VERSION VERSION_SUFFIX "-" TARGET);
 const TCHAR TopHat_VersionStringOld[] = _T(TARGET " " TOPHAT_VERSION VERSION_SUFFIX " " __DATE__);
