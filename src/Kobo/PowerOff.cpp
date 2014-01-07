@@ -35,6 +35,7 @@ Copyright_License {
 #include "Logger/FlightParser.hpp"
 #include "IO/FileLineReader.hpp"
 #include "Resources.hpp"
+#include "Version.hpp"
 
 #include <algorithm>
 #include <stdio.h>
@@ -84,6 +85,15 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   canvas.Select(bold_font);
   canvas.DrawText(x, rc.top + banner_height + padding, website);
 
+  /* Version at bottom right */
+  x = rc.right - canvas.CalcTextSize(TopHat_Version).cx - padding * 5;
+  int y = rc.bottom - 2 * canvas.CalcTextSize(TopHat_Version).cy;
+  canvas.DrawText(x, y, TopHat_Version);
+  const TCHAR *const version = _T("version ");
+  x -= canvas.CalcTextSize(version).cx;
+  canvas.DrawText(x, y, version);
+
+  /* power off message */
   const TCHAR *const comment = _T("powered off");
   canvas.DrawText(rc.right - canvas.CalcTextWidth(comment) - padding,
                   rc.top + padding, comment);
