@@ -58,7 +58,7 @@ TaskNavSliderWidget::TaskNavSliderWidget()
   :task_data_cache(CommonInterface::GetComputerSettings(),
                    CommonInterface::Basic(),
                    CommonInterface::Calculated().task_stats),
-                   last_rc_map({0, 0, 0, 0}) {}
+                   last_rc_map(PixelRect(0, 0, 0, 0)) {}
 
 void
 TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc, bool is_panning,
