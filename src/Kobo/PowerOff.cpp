@@ -52,13 +52,16 @@ namespace Layout {
 static void
 DrawBanner(Canvas &canvas, PixelRect &rc)
 {
-  const unsigned padding = 2;
+  const unsigned padding = 10;
+  const unsigned left_margin = 28;
+  const unsigned top_logo_margin = 46;
+
   const Bitmap logo(IDB_LOGO);
   const unsigned banner_height = logo.GetHeight();
 
   /* draw the XCSoar logo */
-  int x = rc.left + padding;
-  canvas.Copy(x, rc.top + padding,
+  int x = rc.left + left_margin;
+  canvas.Copy(x, rc.top + top_logo_margin,
               logo.GetWidth(), logo.GetHeight(),
               logo, 0, 0);
 
@@ -72,7 +75,7 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   Font large_font;
   large_font.LoadFile("/opt/tophat/share/fonts/VeraBd.ttf", 40);
   canvas.Select(large_font);
-  const unsigned name_y = rc.top
+  const unsigned name_y = rc.top + top_logo_margin
     + (banner_height - large_font.GetHeight()) / 2;
 
   const TCHAR *const name1 = _T("Top Hat Soaring");
@@ -80,13 +83,14 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   x += canvas.CalcTextWidth(name1);
 
   /* some more text */
-  x = rc.left + padding;
+  x = rc.left + left_margin;
   const TCHAR *const website = _T("www.tophatsoaring.org");
   canvas.Select(bold_font);
-  canvas.DrawText(x, rc.top + banner_height + padding, website);
+  canvas.DrawText(x, rc.top + banner_height + padding + top_logo_margin,
+                  website);
 
   /* Version at bottom right */
-  x = rc.right - canvas.CalcTextSize(TopHat_Version).cx - padding * 5;
+  x = rc.right - canvas.CalcTextSize(TopHat_Version).cx - padding;
   int y = rc.bottom - 2 * canvas.CalcTextSize(TopHat_Version).cy;
   canvas.DrawText(x, y, TopHat_Version);
   const TCHAR *const version = _T("version ");
