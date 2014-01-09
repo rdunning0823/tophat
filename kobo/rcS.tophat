@@ -175,6 +175,11 @@ else
         sleep 1
     fi
 
+# add link so ftp users can find XCSoarData more easily
+    if ! [ -f /XCSoarData ]; then
+      ln -s /mnt/onboard/XCSoarData /XCSoarData;
+    fi
+
     echo 3 > /sys/class/graphics/fb0/rotate
     /opt/tophat/bin/KoboMenu &
     /sbin/udevadm control --env=STARTUP=1
