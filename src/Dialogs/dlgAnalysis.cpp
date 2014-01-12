@@ -347,7 +347,7 @@ Update()
               _("Task Speed"));
     wf->SetCaption(sTmp);
     wInfo->SetCaption(_T(""));
-    SetCalcCaption(_("Task Calc"));
+    SetCalcCaption(_("Task stats"));
     break;
 
   case AnalysisPage::TASK:
@@ -356,7 +356,7 @@ Update()
     wf->SetCaption(sTmp);
     FlightStatisticsRenderer::CaptionTask(sTmp, calculated);
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Task calc"));
+    SetCalcCaption(_("Task stats"));
     break;
 
   case AnalysisPage::OLC:
