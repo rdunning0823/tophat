@@ -294,7 +294,7 @@ Update()
     wf->SetCaption(sTmp);
     BarographCaption(sTmp, glide_computer->GetFlightStats());
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Bugs & ballast"));
+    SetCalcCaption(_(""));
     break;
 
   case AnalysisPage::CLIMB:
@@ -303,7 +303,7 @@ Update()
     wf->SetCaption(sTmp);
     ClimbChartCaption(sTmp, glide_computer->GetFlightStats());
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Task Calc"));
+    SetCalcCaption(_(""));
     break;
 
   case AnalysisPage::THERMAL_BAND:
