@@ -339,7 +339,7 @@ Update()
     wf->SetCaption(sTmp);
     TemperatureChartCaption(sTmp, glide_computer->GetCuSonde());
     wInfo->SetCaption(sTmp);
-    SetCalcCaption(_("Bugs & ballast"));
+    SetCalcCaption(_(""));
     break;
 
   case AnalysisPage::TASK_SPEED:
