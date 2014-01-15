@@ -154,12 +154,28 @@ mkdir /dev/pts
 /bin/mount -t devpts devpts /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
+DotKobo=/mnt/onboard/.kobo
+
 if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
+    if /bin/dd if=/dev/mmcblk0 bs=1M bs=512 skip=2048 count=1 2>/dev/null | \
+	strings | grep -q USB-hot-plug; then
+	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+	cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
+	touch ${DotKobo}/KoboRoot.tgz
+	reboot
+    fi
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     /usr/local/Kobo/hindenburg &
     /usr/local/Kobo/nickel -qws -skipFontLoad &
 else
+    if ! /bin/dd if=/dev/mmcblk0 bs=1M bs=512 skip=2048 count=1 2>/dev/null | \
+	strings | grep -q USB-hot-plug; then
+	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+	cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
+	touch ${DotKobo}/KoboRoot.tgz
+	reboot
+    fi
     # disable the flashing led
     echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
     echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
