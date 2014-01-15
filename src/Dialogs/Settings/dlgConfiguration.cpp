@@ -240,6 +240,7 @@ PrepareConfigurationDialog()
   dialog->SetKeyDownFunction(FormKeyDown);
 
   PrepareConfigurationMenu();
+  CommonInterface::SetUISettings().dialog.expert = true;
   tab_menu->UpdateLayout();
   tab_menu->GotoMenuPage();
 
