@@ -139,7 +139,9 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 {
   PixelRect rc = WndForm::GetClientRect();
   rc.bottom -= WndForm::GetTitleHeight();
-  PixelScalar height = Layout::Scale(25);
+  unsigned max_control_height = rc.GetSize().cy / 8;
+
+  PixelScalar height = std::min(max_control_height, Layout::GetMaximumControlHeight());
 
   PixelRect rc_left = rc;
   PixelRect rc_right = rc;
@@ -182,13 +184,26 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - height;
+  if (Layout::landscape) {
+    rc_ok.top = rc_advanced.top = rc.bottom - height;
+    rc_advanced.bottom = rc.bottom;
 
-  rc_advanced.right = rc_right.right;
-  rc_advanced.left = rc_advanced.right - Layout::Scale(80);
-  rc_advanced.bottom = rc_ok.top - 1;
-  rc_advanced.top = rc_advanced.bottom - height;
-  rc_screens_button = rc_advanced;
-  rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
+    rc_advanced.right = rc_right.right;
+    rc_advanced.left = rc_advanced.right - Layout::Scale(80);
+    rc_screens_button = rc_advanced;
+    rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
+
+    rc_ok.right = rc_screens_button.left;
+
+  } else {
+    rc_advanced.right = rc_right.right;
+    rc_advanced.left = rc_advanced.right - Layout::Scale(80);
+    rc_advanced.bottom = rc_ok.top - 1;
+    rc_advanced.top = rc_advanced.bottom - height;
+    rc_screens_button = rc_advanced;
+    rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
+  }
+
 }
 
 static void
