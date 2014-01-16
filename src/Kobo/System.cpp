@@ -28,6 +28,7 @@ Copyright_License {
 #include "OS/Sleep.h"
 #include "Util/StaticString.hpp"
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -175,5 +176,23 @@ KoboRunTelnetd()
 {
 #ifdef KOBO
   Run("/usr/sbin/telnetd", "-l", "/bin/sh");
+#endif
+}
+
+bool IsKoboUsbHostKernel()
+{
+#ifdef KOBO
+  static char cmd_find_ip[] = "/bin/dd if=/dev/mmcblk0 bs=1M bs=512 skip=2048 count=1 2>/dev/null | strings | grep";
+  static char search_string[] = "USB-hot-plug";
+
+  const char *local_path = "/tmp/usb_host.txt";
+  TCHAR command[256];
+  _stprintf(command, _T("%s %s > %s"), cmd_find_ip, search_string, local_path);
+  system(command);
+  StaticString <256> buffer;
+  File::ReadString(local_path, buffer.buffer(), 256);
+  return buffer.Contains(search_string);
+#else
+  return false;
 #endif
 }

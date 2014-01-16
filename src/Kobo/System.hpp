@@ -51,4 +51,10 @@ KoboRunXCSoar(const char *mode);
 void
 KoboRunTelnetd();
 
+/**
+ * returns true if the current kernel supports USB Host mode
+ */
+bool
+IsKoboUsbHostKernel();
+
 #endif
