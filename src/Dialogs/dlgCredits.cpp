@@ -40,6 +40,9 @@ Copyright_License {
 #include "Resources.hpp"
 
 #include <assert.h>
+#if defined(KOBO)
+#include <sys/utsname.h>
+#endif
 
 static WndForm *wf = NULL;
 static TabbedControl *tab = NULL;
@@ -152,6 +155,15 @@ OnLogoPaint(Canvas &canvas, const PixelRect &rc)
   canvas.DrawText(x, y, _T("git: "));
   canvas.DrawText(x + Layout::FastScale(80), y, _T(GIT_COMMIT_ID));
 #endif
+#if defined(KOBO)
+  canvas.SetTextColor(COLOR_BLACK);
+  y += Layout::FastScale(22);
+  canvas.DrawText(x, y, _T("uImage: "));
+  struct utsname buf;
+  uname(&buf);
+  canvas.DrawText(x + Layout::FastScale(70), y, _T(buf.release));
+#endif
+
   y += Layout::FastScale(37);
 
   canvas.DrawText(x, y, _T("more information at"));
