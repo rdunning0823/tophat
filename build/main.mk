@@ -351,6 +351,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Gauge/GlueGaugeVario.cpp \
 	$(SRC)/Gauge/TaskView.cpp \
 	$(SRC)/Gauge/LogoView.cpp \
+	$(SRC)/Kobo/System.cpp \
 	\
 	$(SRC)/Waypoint/WaypointDetailsReader.cpp \
 	$(SRC)/Menu/MenuData.cpp \

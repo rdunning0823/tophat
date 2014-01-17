@@ -26,7 +26,9 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Resources.hpp"
 #include "Version.hpp"
-
+#ifdef KOBO
+#include "Kobo/System.hpp"
+#endif
 #include <algorithm>
 
 LogoView::LogoView()
@@ -123,10 +125,20 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   const int text_height = canvas.CalcTextSize(TopHat_ProductToken).cy;
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
-  canvas.DrawText(2, 2, TopHat_ProductToken);
-  canvas.DrawText(2, 4 + text_height, XCSoar_ProductTokenShort);
-  canvas.DrawText(2, 6 + 2 * text_height, XCSoar_GitSuffix);
+  unsigned y = 2;
+  canvas.DrawText(2, y, TopHat_ProductToken);
+  y += 2 + text_height;
+  canvas.DrawText(2, y, XCSoar_ProductTokenShort);
+  y += 2 + text_height;
+  canvas.DrawText(2, y, XCSoar_GitSuffix);
+#ifdef KOBO
+  if (IsKoboUsbHostKernel()) {
+    y += 2 + text_height;
+    canvas.DrawText(2, y, _T("USB host supported"));
+  }
+#endif
 #ifndef NDEBUG
-  canvas.DrawText(2, 8 + 3 * text_height, _T("DEBUG"));
+  y += 2 + text_height;
+  canvas.DrawText(2, y, _T("DEBUG"));
 #endif
 }
