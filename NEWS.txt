@@ -6,7 +6,7 @@ Top Hat Soaring 1.3.4 TBD
 * Made lists less jerky
 * Display InfoBox set name in "S" button
 * Improved position of map scale arrow 
-* Integration with USB Host Kobo uImage
+* Integration with USB Host Kobo uImage and PC USB connect modes
 * Made wind arrow higher contrast on Kobo, Nook
 * Added display of IP address on Kobo Network screen
 * Simplify ftp file transfer to Kobo XCSoarData
