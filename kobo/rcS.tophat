@@ -96,19 +96,12 @@ if [ -e /mnt/onboard/.kobo/Kobo.tgz ]; then
 fi
                                
 if [ -e /mnt/onboard/.kobo/KoboRoot.tgz ]; then
-	killall on-animator.sh
-	zcat /etc/images/$PREFIX\ghostbuster.raw.gz | /usr/local/Kobo/pickel showpic
-	/etc/init.d/update-animator.sh &
 	zcat /mnt/onboard/.kobo/KoboRoot.tgz > /dev/null && tar zxf /mnt/onboard/.kobo/KoboRoot.tgz -C /
 	if [ -e /mnt/onboard/.kobo/upgrade ]; then
 		/etc/init.d/upgrade-wifi.sh
 		rm -rf /mnt/onboard/.kobo/upgrade
 	fi
 	rm /mnt/onboard/.kobo/KoboRoot.tgz
-	killall update-animator.sh
-	echo "Done upgrading..."
-	zcat /etc/images/$PREFIX\ghostbuster.raw.gz | /usr/local/Kobo/pickel showpic
-	zcat /etc/images/$PREFIX\reboot.raw.gz | /usr/local/Kobo/pickel showpic
 	sync
 	reboot
 fi
