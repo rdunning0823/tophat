@@ -38,6 +38,9 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "System.hpp"
 #include "NetworkDialog.hpp"
+#include "Event/Timer.hpp"
+#include "OS/FileUtil.hpp"
+#include "Form/Button.hpp"
 
 enum Buttons {
   LAUNCH_NICKEL = 100,
@@ -81,26 +84,51 @@ UIGlobals::GetIconLook()
   return *global_icon_look;
 }
 
-class KoboMenuWidget final : public WindowWidget, ActionListener {
+class KoboMenuWidget final : public WindowWidget, ActionListener, Timer {
   ActionListener &dialog;
   SimulatorPromptWindow w;
+  WndButton *poweroff_button;
+
+  /* should poweroff button behave as a reboot button ? */
+  bool do_reboot;
 
 public:
   KoboMenuWidget(const DialogLook &_look,
                  ActionListener &_dialog)
     :dialog(_dialog),
-     w(_look, _dialog, false) {}
+     w(_look, _dialog, false), do_reboot(false) {}
 
   void CreateButtons(WidgetDialog &buttons);
+
+  /**
+   * if update file exists, change "Poweroff" button to "Reboot"
+   */
+  void UpdateButtons();
 
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override;
 
+  virtual void Unprepare() override {
+    Timer::Cancel();
+    WindowWidget::Unprepare();
+  }
+
   virtual bool KeyPress(unsigned key_code) override;
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
+
+  /* virtual methods from class Timer */
+  virtual void OnTimer() {
+    UpdateButtons();
+  }
+
+  const TCHAR *
+  GetPowerOffCaption(bool do_reboot)
+  {
+    return do_reboot ? _T("Reboot") : _T("Poweroff");
+  }
 };
 
 void
@@ -108,8 +136,20 @@ KoboMenuWidget::CreateButtons(WidgetDialog &buttons)
 {
   buttons.AddButton(("PC connect"), dialog, LAUNCH_NICKEL);
   buttons.AddButton(_("Wifi"), *this, NETWORK);
-  buttons.AddButton(("Reboot"), dialog, REBOOT);
-  buttons.AddButton(("Poweroff"), dialog, POWEROFF);
+  poweroff_button = buttons.AddButton(GetPowerOffCaption(false), *this, POWEROFF);
+  UpdateButtons();
+}
+
+void
+KoboMenuWidget::UpdateButtons()
+{
+  if (do_reboot)
+    return;
+
+  if(File::Exists(_T("/mnt/onboard/.kobo/KoboRoot.tgz"))) {
+    do_reboot = true;
+    poweroff_button->SetCaption(GetPowerOffCaption(do_reboot));
+  }
 }
 
 void
@@ -122,6 +162,7 @@ KoboMenuWidget::Prepare(ContainerWindow &parent,
 
   w.Create(parent, rc, style);
   SetWindow(&w);
+  Timer::Schedule(1000);
 }
 
 bool
@@ -146,6 +187,12 @@ KoboMenuWidget::OnAction(int id)
   case NETWORK:
     ShowNetworkDialog();
     break;
+
+  case POWEROFF:
+    if (do_reboot)
+      dialog.OnAction(REBOOT);
+    else
+      dialog.OnAction(POWEROFF);
   }
 }
 
