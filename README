@@ -18,11 +18,11 @@ Getting the source
 The Top Hat source code is managed with git (http://git-scm.com/).  It
 can be downloaded with the following command:
 
- git clone git://github.com/rdunning0823/xcsoar
+ git clone git://github.com/rdunning0823/tophat
  
  Note: because Top Hat is currently rebased regurlarly off XCSoar, the 
- working branch of Top Hat is NOT "master".
- Our current working branch is TopHat_master_6.6.  This will change soon!
+ working branch of Top Hat is "TopHat_master" NOT "master".  Master is 
+ the XCSoar code on which TopHat is based.
 
 To update your repository, type:
 
