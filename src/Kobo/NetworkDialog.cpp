@@ -39,7 +39,7 @@ gcc_pure
 static const TCHAR *
 GetWifiToggleCaption()
 {
-  return IsKoboWifiOn() ? _T("Wifi OFF") : _T("Wifi ON");
+  return IsKoboWifiOn() ? _T("Disable Wifi") : _T("Enable Wifi");
 }
 
 class NetworkWidget final
