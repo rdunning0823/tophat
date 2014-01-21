@@ -106,7 +106,7 @@ NetworkWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   toggle_wifi_button = AddButton(GetWifiToggleCaption(),
                                  *this, TOGGLE_WIFI);
 
-  wifi_button = AddButton(_("Wifi"), *this, WIFI);
+  wifi_button = AddButton(_("Select network"), *this, WIFI);
 
   ip_address_button = AddButton(_T(""), *this, IPADDRESS);
 
