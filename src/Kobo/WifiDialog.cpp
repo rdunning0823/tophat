@@ -217,7 +217,7 @@ WifiListWidget::Connect()
 
     StaticString<32> passphrase;
     passphrase.clear();
-    if (!TextEntryDialog(passphrase, caption))
+    if (!TextEntryDialog(passphrase, caption, false))
       return;
     if (!WifiConnect(wpa_supplicant, ssid, passphrase))
       ShowMessageBox(_T("Network failure"), _("Connect"), MB_OK);
