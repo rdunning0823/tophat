@@ -31,6 +31,7 @@
 #include "Device/Driver/EWMicroRecorder.hpp"
 #include "Device/Driver/Eye.hpp"
 #include "Device/Driver/FLARM.hpp"
+#include "Device/Driver/FlymasterB1.hpp"
 #include "Device/Driver/FlymasterF1.hpp"
 #include "Device/Driver/FlyNet.hpp"
 #include "Device/Driver/Flytec.hpp"
@@ -520,6 +521,44 @@ TestEye()
   ok1(nmea_info.acceleration.available);
   ok1(nmea_info.acceleration.real);
   ok1(equals(nmea_info.acceleration.g_load, 9.864654074));
+}
+
+static void
+TestFlymasterB1()
+{
+  NullPort null;
+  Device *device = flymaster_b1_driver.CreateOnPort(dummy_config, null);
+  ok1(device != NULL);
+
+  NMEAInfo nmea_info;
+  nmea_info.Reset();
+  nmea_info.clock = fixed(1);
+
+  ok1(device->ParseNMEA("$VARIO,999.98,-12,12.4,12.7,0,21.3,25.5*66",
+                        nmea_info));
+  ok1(!nmea_info.airspeed_available);
+  ok1(nmea_info.total_energy_vario_available);
+  ok1(equals(nmea_info.total_energy_vario, -1.2));
+  ok1(!nmea_info.voltage_available);
+  ok1(nmea_info.temperature_available);
+  ok1(equals(nmea_info.temperature,
+             Units::ToSysUnit(fixed(21.3), Unit::DEGREES_CELCIUS)));
+  ok1(!nmea_info.baro_altitude_available);
+  ok1(!nmea_info.pressure_altitude_available);
+  ok1(nmea_info.static_pressure_available);
+  ok1(equals(nmea_info.static_pressure.GetPascal(), 99998));
+
+  ok1(device->ParseNMEA("$VARIO,999.98,-12,12.4,12.7,1,21.3,25.5*67",
+                        nmea_info));
+  ok1(nmea_info.voltage_available);
+  ok1(equals(nmea_info.voltage, 12.4));
+
+  ok1(device->ParseNMEA("$VARIO,999.98,-12,12.4,12.7,2,21.3,25.5*64",
+                        nmea_info));
+  ok1(nmea_info.voltage_available);
+  ok1(equals(nmea_info.voltage, 12.7));
+
+  delete device;
 }
 
 static void
@@ -1376,6 +1415,7 @@ int main(int argc, char **argv)
   TestCAI302();
   TestCProbe();
   TestEye();
+  TestFlymasterB1();
   TestFlymasterF1();
   TestFlytec();
   TestLeonardo();
