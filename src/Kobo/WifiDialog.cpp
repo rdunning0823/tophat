@@ -72,8 +72,8 @@ public:
     const unsigned row_height =
       std::max(Layout::GetMaximumControlHeight(),
                unsigned(Layout::GetTextPadding()) * 3
-               + look.text_font->GetHeight()
-               + look.text_font->GetHeight());
+               + look.list.font->GetHeight()
+               + look.list.font->GetHeight());
 
     CreateList(parent, look, rc, row_height);
     UpdateList();
@@ -160,15 +160,12 @@ WifiListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   const auto &info = networks[idx];
   const unsigned padding = Layout::GetTextPadding();
 
+  const Font &font(*look.list.font);
   const unsigned x1 = rc.left + padding;
-  const unsigned y1 = rc.top + padding;
-  const unsigned y2 = y1 + look.text_font->GetHeight() + padding;
+  const unsigned y1 = rc.top + (rc.bottom - rc.top -  font.GetHeight()) / 2;
 
-  canvas.Select(*look.text_font);
+  canvas.Select(font);
   canvas.DrawText(x1, y1, info.ssid);
-
-  canvas.Select(*look.text_font);
-  canvas.DrawText(x1, y2, info.bssid);
 
   const TCHAR *state = nullptr;
   if (StringIsEqual(info.bssid, status.bssid))
@@ -183,13 +180,6 @@ WifiListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   if (state != nullptr) {
     unsigned width = canvas.CalcTextWidth(state);
     canvas.DrawText(rc.right - padding - width, y1, state);
-  }
-
-  if (info.signal_level >= 0) {
-    StaticString<20> text;
-    text.UnsafeFormat(_T("%u"), info.signal_level);
-    unsigned width = canvas.CalcTextWidth(text);
-    canvas.DrawText(rc.right - padding - width, y2, text);
   }
 }
 
