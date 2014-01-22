@@ -172,10 +172,10 @@ WifiListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
     state = _("Connected");
   else if (info.id >= 0)
     state = info.signal_level >= 0
-      ? _("Saved and visible")
-      : _("Saved, but not visible");
+      ? _("Saved and in range")
+      : _("Saved, but not in range");
   else if (info.signal_level >= 0)
-    state = _("Visible");
+    state = _("In range");
 
   if (state != nullptr) {
     unsigned width = canvas.CalcTextWidth(state);
