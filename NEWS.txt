@@ -21,6 +21,7 @@ Top Hat Soaring 1.3.4 TBD
 * Fix display of name of language when "automatic"
 * Fix Mat "add turnpoint" dialog for Est. Finish time
 * Fix Kobo stability issue (landscape and portrait)
+* Fix Kobo fix touch screen bug (#3195, #3211)
 * merge XCSoar 6.7.1
 
 Top Hat Soaring 1.3.3 10/24/2013
