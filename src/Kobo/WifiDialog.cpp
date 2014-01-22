@@ -428,8 +428,8 @@ ShowWifiDialog()
   WifiListWidget widget;
   WidgetDialog dialog(look);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Wifi"), &widget);
-  widget.CreateButtons(dialog);
   dialog.AddButton(_("Close"), mrOK);
+  widget.CreateButtons(dialog);
   dialog.ShowModal();
   dialog.StealWidget();
 }
