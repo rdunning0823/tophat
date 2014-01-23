@@ -31,6 +31,7 @@ Copyright_License {
 #include "Screen/SingleWindow.hpp"
 #include "Util/StaticArray.hpp"
 #include "UIGlobals.hpp"
+#include "Screen/Font.hpp"
 
 #include <assert.h>
 #include <limits.h>
@@ -65,8 +66,13 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
 
   ContainerWindow &client_area = wf.GetClientAreaWindow();
 
+  // add this margin at top and bottom of the window and above buttons
+  UPixelScalar top_bottom_margin = dialog_look.text_font->TextSize(_T("A")).cy;
+
   // Create text element
-  WndFrame *text_frame = new WndFrame(client_area, dialog_look, form_rc);
+  PixelRect text_rc = form_rc;
+  text_rc.top += top_bottom_margin;
+  WndFrame *text_frame = new WndFrame(client_area, dialog_look, text_rc);
 
   text_frame->SetCaption(text);
   text_frame->SetAlignCenter();
@@ -76,14 +82,15 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
 
   const PixelSize root_size = main_window.GetSize();
 
-  dialog_height = wf.GetTitleHeight() + Layout::Scale(10) + text_height + button_height;
+  dialog_height = wf.GetTitleHeight() + Layout::Scale(10) + text_height +
+      button_height + 3 * top_bottom_margin;
   PixelScalar dialog_x = (root_size.cx - dialog_width) / 2;
   PixelScalar dialog_y = (root_size.cy - dialog_height) / 2;
   wf.Move(dialog_x, dialog_y, dialog_width, dialog_height);
 
   PixelRect button_rc;
   button_rc.left = 0;
-  button_rc.top = Layout::Scale(6) + text_height;
+  button_rc.top = Layout::Scale(6) + text_height + 2 * top_bottom_margin;
   button_rc.right = button_rc.left + button_width;
   button_rc.bottom = button_rc.top + button_height;
 
