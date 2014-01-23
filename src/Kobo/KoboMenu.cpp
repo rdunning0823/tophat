@@ -24,6 +24,7 @@ Copyright_License {
 #include "Dialogs/DialogSettings.hpp"
 #include "Dialogs/SimulatorPromptWindow.hpp"
 #include "Dialogs/WidgetDialog.hpp"
+#include "Dialogs/Message.hpp"
 #include "Widget/WindowWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
@@ -134,7 +135,7 @@ public:
 void
 KoboMenuWidget::CreateButtons(WidgetDialog &buttons)
 {
-  buttons.AddButton(("PC connect"), dialog, LAUNCH_NICKEL);
+  buttons.AddButton(("PC connect"), *this, LAUNCH_NICKEL);
   buttons.AddButton(_("Wifi"), *this, NETWORK);
   poweroff_button = buttons.AddButton(GetPowerOffCaption(false), *this, POWEROFF);
   UpdateButtons();
@@ -193,6 +194,13 @@ KoboMenuWidget::OnAction(int id)
       dialog.OnAction(REBOOT);
     else
       dialog.OnAction(POWEROFF);
+    break;
+  case LAUNCH_NICKEL:
+    if (ShowMessageBox(_("Connect to PC with USB cable?  \n\nThis takes a minute.  "
+        "The screen will flash. Then click 'Computer Setup' and connect the cable"), _("USB cable connect"),
+                       MB_YESNO | MB_ICONQUESTION) == IDYES)
+      dialog.OnAction(LAUNCH_NICKEL);
+
   }
 }
 
