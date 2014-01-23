@@ -40,7 +40,6 @@ Copyright_License {
 #include "InfoBoxes/Panel/Home.hpp"
 #include "InfoBoxes/Panel/NextWaypoint.hpp"
 
-
 #include <tchar.h>
 #include <stdio.h>
 
@@ -585,6 +584,56 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
     data.SetCommentFromBearingDifference(bd);
   } else
     data.SetCommentInvalid();
+}
+
+void
+InfoBoxContentHomeGR::Update(InfoBoxData &data)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const MoreData &more_data = CommonInterface::Basic();
+  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+
+  if (!common_stats.vector_home.IsValid() ||
+      !settings.poi.home_location_available ||
+      !settings.poi.home_elevation_available) {
+    data.SetNotConfigured();
+    data.SetCommentInvalid();
+    return;
+  }
+
+  if (!basic.location_available || !more_data.NavAltitudeAvailable()) {
+    data.SetInvalid();
+    data.SetCommentInvalid();
+    return;
+  }
+
+  if (common_stats.vector_home.IsValid())
+    data.SetCommentFromDistance(common_stats.vector_home.distance);
+  else
+     data.SetCommentInvalid();
+
+  fixed d = common_stats.vector_home.distance;
+
+  if (!positive(d)) {
+    data.SetInvalid();
+    data.SetCommentInvalid();
+    return;
+  }
+  fixed gradient = ::AngleToGradient((more_data.nav_altitude -
+      settings.poi.home_elevation -
+      settings.task.safety_height_arrival) / d);
+
+  // Set Value
+  if (!positive(gradient)) {
+    data.SetValue(_T("+++"));
+    return;
+  }
+  if (::GradientValid(gradient)) {
+    data.SetValueFromGlideRatio(gradient);
+  } else {
+    data.SetInvalid();
+  }
 }
 
 void

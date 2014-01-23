@@ -110,6 +110,12 @@ public:
   virtual void Update(InfoBoxData &data);
 };
 
+class InfoBoxContentHomeGR : public InfoBoxContentHome
+{
+public:
+  virtual void Update(InfoBoxData &data);
+};
+
 class InfoBoxContentHomeAltitudeDiff : public InfoBoxContentHome
 {
 public:

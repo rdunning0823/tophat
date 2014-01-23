@@ -1385,6 +1385,16 @@ static constexpr MetaData meta_data[] = {
     STANDARD,
   },
 
+  {
+    N_("Home glide ratio"),
+    N_("Home GR"),
+    N_("Glide ratio required to reach the home waypoint (including safety height).  User can change the home waypoint by clicking.  Distance shown in comment."),
+    IBFHelper<InfoBoxContentHomeGR>::Create,
+    HomeGlideRatio,
+    HomeGlideRatio,
+    STANDARD,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

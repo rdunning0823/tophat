@@ -152,6 +152,7 @@ namespace InfoBoxFactory
 
     TAKEOFF_DISTANCE,
     OLC_SPEED,
+    HomeGlideRatio, /* Glide ratio to home waypoint (if defined) */
 
     e_NUM_TYPES /* Last item */
   };
