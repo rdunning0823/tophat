@@ -104,8 +104,10 @@ MapOverlayButton::OnPaint(Canvas &canvas)
   } else {
 
     canvas.SetBackgroundTransparent();
-    canvas.SetTextColor(button_look.standard.foreground_color);
-
+    if (HasCursorKeys() ? (HasFocus() | pressed) : pressed)
+      canvas.SetTextColor(button_look.focused.foreground_color);
+    else
+      canvas.SetTextColor(button_look.standard.foreground_color);
 
     PixelSize sz;
     sz.cx = rc.right - rc.left;
