@@ -123,7 +123,7 @@ WndButton::OnPaint(Canvas &canvas)
   const ButtonLook &look = renderer.GetLook();
 
   const bool pressed = IsDown();
-  const bool focused = HasCursorKeys() ? HasFocus() : pressed;
+  const bool focused = HasCursorKeys() ? (HasFocus() | pressed) : pressed;
 
   PixelRect rc = canvas.GetRect();
   renderer.DrawButton(canvas, rc, focused, pressed);
@@ -136,6 +136,7 @@ WndButton::OnPaint(Canvas &canvas)
   rc = renderer.GetDrawingRect(rc, pressed);
 
   canvas.SetBackgroundTransparent();
+
   if (!IsEnabled())
     canvas.SetTextColor(look.disabled.color);
   else if (focused)
