@@ -199,6 +199,14 @@ public:
   VisibilityLevel GetVisibilityLevel(Canvas &canvas, RasterPoint poly[]);
 
   /**
+   * draws the full outline but draws the top with narrow line
+   * @param poly.  the finalized point set
+   * @param width. the width of all points except the top line
+   * @param color
+   */
+  void DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
+                      unsigned width, const Color color);
+  /**
    * draws the outline of the slider shape
    * @param rc.  rect of the slider shape.  Note that this may overextend
    * the canvas size

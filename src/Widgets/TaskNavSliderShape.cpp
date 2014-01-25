@@ -89,6 +89,26 @@ SliderShape::GetVisibilityLevel(Canvas &canvas, RasterPoint poly[])
     return None;
 }
 
+void
+SliderShape::DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
+                            unsigned width, const Color color)
+{
+  /* clear background */
+  canvas.SelectWhitePen();
+  canvas.DrawPolygon(poly, 8);
+  if (IsKobo()) {
+    canvas.Select(Pen(2, COLOR_WHITE));
+    canvas.DrawLine(poly[0].x, 1, poly[1].x, 1);
+  }
+
+
+  /* draw with normal width but don't draw top line */
+  canvas.Select(Pen(width, color));
+  canvas.DrawTwoLines(poly[1], poly[2], poly[3]);
+  canvas.DrawTwoLines(poly[3], poly[4], poly[5]);
+  canvas.DrawTwoLines(poly[5], poly[6], poly[7]);
+  canvas.DrawLine(poly[7].x, poly[7].y, poly[0].x, poly[0].y);
+}
 
 bool
 SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
@@ -101,11 +121,15 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   RasterPoint poly_raw[8];
 
   /* KOBO dithering centers odd shaped widths within 1/2 pixel,
-   * and we need to stay within the canvas or memory gets corrupted */
+   * and we need to stay within the canvas or memory gets corrupted
+   * The lines have square ends so the diagonal ones actually go
+   * a pixel past the end vertically and horizontally */
 #ifdef KOBO
   PixelScalar width_offset = 1;
+  PixelScalar top_line_offset = 2;
 #else
   PixelScalar width_offset = 0;
+  PixelScalar top_line_offset = 0;
 #endif
 
   for (unsigned i=0; i < 8; i++) {
@@ -117,7 +141,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
 
     x = std::max(x, PixelScalar(canvas_rect.left + width / 2 + width_offset));
     x = std::min(x, PixelScalar(canvas_rect.right - width / 2 - 1));
-    y = std::max(y, PixelScalar(canvas_rect.top + width / 2 + width_offset));
+    y = std::max(y, PixelScalar(canvas_rect.top + top_line_offset));
     y = std::min(y, PixelScalar(canvas_rect.bottom - width / 2 - 1));
 
     poly[i].y = y;
@@ -135,8 +159,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   case Full:
   case LeftTipAndBody:
   case RightTipAndBody:
-    canvas.Select(Pen(width, COLOR_BLACK));
-    canvas.DrawPolygon(poly, 8);
+    DrawOutlineAll(canvas, poly, width, COLOR_BLACK);
     break;
 
   /** some or all of the left tip, but no body */
