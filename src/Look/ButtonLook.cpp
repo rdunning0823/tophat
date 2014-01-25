@@ -34,7 +34,7 @@ ButtonLook::Initialise(const Font &_font)
 
   standard.background_color = IsDithered() ? COLOR_WHITE : COLOR_LIGHT_GRAY;
   if (IsDithered()) {
-    standard.light_border_pen.Set(1, COLOR_BLACK);
+    standard.light_border_pen.Set(1, LightColor(COLOR_DARK_GRAY));
     standard.dark_border_pen.Set(1, COLOR_BLACK);
   } else if (!HasColors()) {
     standard.light_border_pen.Set(1, LightColor(COLOR_DARK_GRAY));
