@@ -194,7 +194,7 @@ DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
   rc.right -= 1;
   rc.top += 1;
 
-  if (transparent)
+  if (transparent && !pressed)
     canvas.SelectHollowBrush();
   else
     canvas.Select(Brush(background_color));

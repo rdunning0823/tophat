@@ -34,7 +34,7 @@ void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
                            bool pressed, bool transparent)
 {
-  const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+  const ButtonLook::StateLook &_look = (focused || pressed) ? look.focused : look.standard;
 
   DrawButtonFancy(canvas, rc, _look.dark_border_pen, _look.light_border_pen,
                   _look.background_color, focused, pressed, transparent);
