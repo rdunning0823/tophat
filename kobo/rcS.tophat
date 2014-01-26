@@ -189,6 +189,11 @@ else
       ln -s /mnt/onboard/XCSoarData /XCSoarData;
     fi
 
+    # launch user script
+    if [ -f /mnt/onboard/XCSoarData/kobo/init.sh ]; then
+      source /mnt/onboard/XCSoarData/kobo/init.sh
+    fi
+
     echo 3 > /sys/class/graphics/fb0/rotate
     /opt/tophat/bin/KoboMenu &
     /sbin/udevadm control --env=STARTUP=1
