@@ -73,7 +73,7 @@ ScreensButtonWidget::GetButtonPosition(InfoBoxSettings::Geometry geometry,
       return ScreensButtonWidget::ButtonPosition::Right;
     }
 
-  return ScreensButtonWidget::ButtonPosition::Left;
+  return ScreensButtonWidget::ButtonPosition::Right;
 }
 
 void
