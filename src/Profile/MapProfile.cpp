@@ -70,7 +70,8 @@ Profile::Load(MapSettings &settings)
 //  GetEnum(ProfileKeys::DisplayTrackBearing, settings.display_ground_track);
   Get(ProfileKeys::AutoZoom, settings.auto_zoom_enabled);
 
-  GetEnum(ProfileKeys::WindArrowStyle, settings.wind_arrow_style);
+// hard code to default
+//  GetEnum(ProfileKeys::WindArrowStyle, settings.wind_arrow_style);
 
   settings.waypoint.LoadFromProfile();
 
