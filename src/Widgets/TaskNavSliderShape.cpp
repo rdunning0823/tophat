@@ -97,6 +97,8 @@ SliderShape::DrawBackgroundAll(Canvas &canvas, const RasterPoint poly[])
   canvas.DrawPolygon(poly, 8);
   if (IsKobo()) {
     canvas.Select(Pen(2, COLOR_WHITE));
+    assert(canvas.GetRect().IsInside({poly[0].x, 1}));
+    assert(canvas.GetRect().IsInside({poly[1].x, 1}));
     canvas.DrawLine(poly[0].x, 1, poly[1].x, 1);
   }
 }
@@ -123,6 +125,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   RasterPoint poly[8];
   RasterPoint poly_raw[8];
 
+  assert (width > 0);
   /* KOBO dithering centers odd shaped widths within 1/2 pixel,
    * and we need to stay within the canvas or memory gets corrupted
    * The lines have square ends so the diagonal ones actually go
