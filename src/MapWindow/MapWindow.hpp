@@ -148,9 +148,10 @@ protected:
   bool compass_visible;
 
   /**
-   * distance from the top of the map where the compass is displayed
+   * distance from the top of the map, if nav bar is visible where other items
+   * can be displayed without overlap of nav bar
    */
-  unsigned compass_offset_y;
+  unsigned nav_slider_bar_visible_height;
 
   /**
    * distance from the bottom of the map where the GPSStatus is displayed
@@ -194,11 +195,11 @@ public:
   }
 
   /**
-   * @param y. The distance from the top of the map where the compass
-   * will display
+   * Used by other overlays to calculate where they are displayed
+   * @param y. The current height of the Nav Bar
    */
-  void SetCompassOffset(unsigned y) {
-    compass_offset_y = y;
+  void SetNavBarVisibleHeight(unsigned y) {
+    nav_slider_bar_visible_height = y;
   }
 
   /**

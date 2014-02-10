@@ -47,7 +47,7 @@ MapWindow::DrawCompass(Canvas &canvas, const PixelRect &rc) const
     return;
 
   PixelRect rc_compass = rc;
-  rc_compass.top += compass_offset_y;
+  rc_compass.top += nav_slider_bar_visible_height;
   CompassRenderer compass_renderer(look);
   compass_renderer.Draw(canvas, render_projection.GetScreenAngle(), rc_compass);
 }

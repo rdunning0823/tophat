@@ -407,7 +407,7 @@ MainWindow::ReinitialiseLayout()
                                    map != NULL, FullScreen);
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
-  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
 #if defined(ENABLE_OPENGL) | defined(KOBO)
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #else
@@ -723,7 +723,7 @@ MainWindow::OnTimer(WindowTimer &_timer)
   widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
-  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
     map->SetMainMenuButtonRect();
@@ -857,7 +857,7 @@ MainWindow::SetFullScreen(bool _full_screen)
     map->FastMove(GetMainRect());
 
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
-  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   map->SetMainMenuButtonRect();
@@ -949,7 +949,7 @@ MainWindow::ActivateMap()
   widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
-  map->SetCompassOffset(widget_overlays.HeightFromTop());
+  map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   map->SetMainMenuButtonRect();

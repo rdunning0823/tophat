@@ -58,7 +58,7 @@ MapWindow::MapWindow(const MapLook &_look,
    skylines_data(nullptr),
 #endif
    compass_visible(true),
-   compass_offset_y(0), gps_status_offset_y(0)
+   nav_slider_bar_visible_height(0), gps_status_offset_y(0)
 #ifndef ENABLE_OPENGL
    , ui_generation(1), buffer_generation(0),
    scale_buffer(0)
