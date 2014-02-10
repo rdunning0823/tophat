@@ -585,7 +585,8 @@ GlueMapWindow::RenderTrackBearing(Canvas &canvas, const RasterPoint aircraft_pos
 }
 
 void
-GlueMapWindow::DrawThermalBand(Canvas &canvas, const PixelRect &rc) const
+GlueMapWindow::DrawThermalBand(Canvas &canvas, const PixelRect &rc,
+                               unsigned nav_slider_bar_visible_height) const
 {
   if (Calculated().task_stats.total.solution_remaining.IsOk() &&
       Calculated().task_stats.total.solution_remaining.altitude_difference > fixed(50)
@@ -595,8 +596,8 @@ GlueMapWindow::DrawThermalBand(Canvas &canvas, const PixelRect &rc) const
   PixelRect tb_rect;
   tb_rect.left = rc.left;
   tb_rect.right = rc.left+Layout::Scale(20);
-  tb_rect.top = Layout::Scale(2);
-  tb_rect.bottom = (rc.bottom-rc.top)/5 - Layout::Scale(2);
+  tb_rect.top = nav_slider_bar_visible_height;
+  tb_rect.bottom = (rc.bottom-rc.top) / 5 + tb_rect.top;
 
   const ThermalBandRenderer &renderer = thermal_band_renderer;
   if (task != NULL) {

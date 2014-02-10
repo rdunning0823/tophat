@@ -501,7 +501,7 @@ GlueMapWindow::Render(Canvas &canvas, const PixelRect &rc)
   if (IsNearSelf()) {
     draw_sw.Mark("DrawGlueMisc");
     if (GetMapSettings().show_thermal_profile)
-      DrawThermalBand(canvas, rc);
+      DrawThermalBand(canvas, rc, nav_slider_bar_visible_height);
     DrawStallRatio(canvas, rc);
     DrawFlightMode(canvas, rc);
     DrawFinalGlide(canvas, rc);

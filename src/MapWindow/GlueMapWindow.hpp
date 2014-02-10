@@ -258,7 +258,8 @@ private:
                      const NMEAInfo &info) const;
   void DrawCrossHairs(Canvas &canvas) const;
   void DrawPanInfo(Canvas &canvas) const;
-  void DrawThermalBand(Canvas &canvas, const PixelRect &rc) const;
+  void DrawThermalBand(Canvas &canvas, const PixelRect &rc,
+                       unsigned nav_slider_bar_visible_height) const;
   void DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const;
   void DrawVario(Canvas &canvas, const PixelRect &rc) const;
   void DrawStallRatio(Canvas &canvas, const PixelRect &rc) const;
