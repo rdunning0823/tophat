@@ -199,6 +199,12 @@ public:
   VisibilityLevel GetVisibilityLevel(Canvas &canvas, RasterPoint poly[]);
 
   /**
+   * draws white background for entire shape
+   * @param poly.  the finalized point set
+   */
+  void DrawBackgroundAll(Canvas &canvas, const RasterPoint poly[]);
+
+  /**
    * draws the full outline but draws the top with narrow line
    * @param poly.  the finalized point set
    * @param width. the width of all points except the top line

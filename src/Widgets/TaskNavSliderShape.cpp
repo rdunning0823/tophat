@@ -90,8 +90,7 @@ SliderShape::GetVisibilityLevel(Canvas &canvas, RasterPoint poly[])
 }
 
 void
-SliderShape::DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
-                            unsigned width, const Color color)
+SliderShape::DrawBackgroundAll(Canvas &canvas, const RasterPoint poly[])
 {
   /* clear background */
   canvas.SelectWhitePen();
@@ -100,8 +99,12 @@ SliderShape::DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
     canvas.Select(Pen(2, COLOR_WHITE));
     canvas.DrawLine(poly[0].x, 1, poly[1].x, 1);
   }
+}
 
-
+void
+SliderShape::DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
+                            unsigned width, const Color color)
+{
   /* draw with normal width but don't draw top line */
   canvas.Select(Pen(width, color));
   canvas.DrawTwoLines(poly[1], poly[2], poly[3]);
@@ -159,6 +162,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   case Full:
   case LeftTipAndBody:
   case RightTipAndBody:
+    DrawBackgroundAll(canvas, poly);
     DrawOutlineAll(canvas, poly, width, COLOR_BLACK);
     break;
 
@@ -166,7 +170,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   case LeftTip:
   case RightTip:
     canvas.SelectWhitePen();
-    canvas.DrawPolygon(poly, 8);
+    canvas.DrawPolygon(poly, 8); // could this be the problem? repeated poly points?
     canvas.Select(Pen(width, COLOR_BLACK));
     if (visibility == LeftTip)
       canvas.DrawTwoLines(poly[0], poly[6], poly[5]);
