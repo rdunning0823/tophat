@@ -96,10 +96,11 @@ SliderShape::DrawBackgroundAll(Canvas &canvas, const RasterPoint poly[])
   canvas.SelectWhitePen();
   canvas.DrawPolygon(poly, 8);
   if (IsKobo()) {
+    const unsigned y = 2;
     canvas.Select(Pen(2, COLOR_WHITE));
-    assert(canvas.GetRect().IsInside({poly[0].x, 1}));
-    assert(canvas.GetRect().IsInside({poly[1].x, 1}));
-    canvas.DrawLine(poly[0].x, 1, poly[1].x, 1);
+    assert(canvas.GetRect().IsInside({poly[0].x, y}));
+    assert(canvas.GetRect().IsInside({poly[1].x, y}));
+    canvas.DrawLine(poly[0].x, y, poly[1].x, y);
   }
 }
 
