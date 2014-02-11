@@ -450,7 +450,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentWindSpeed>::Create,
     e_WindBearing_Est, // Wind B
     e_Home_Temperature, // Max Temp
-    STANDARD,
+    DEPRECATED,
   },
 
   // e_WindBearing_Est
