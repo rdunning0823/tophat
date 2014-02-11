@@ -41,6 +41,7 @@ class WindSettingsPanel final
     SOURCE,
     Speed,
     Direction,
+    WIND_ARROW_LOCATION,
     CLEAR_MANUAL_BUTTON,
   };
 

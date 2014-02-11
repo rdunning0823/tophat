@@ -98,7 +98,22 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                   this);
 
     manual_modified = false;
+  } else {
+    AddDummy();
+    AddDummy();
+    AddDummy();
   }
+
+  static constexpr StaticEnumChoice wind_arrow_list[] = {
+    { (unsigned)WindArrowLocation::MAP_AND_INFOBOX, N_("Map and Wind infobox"), N_("Show the wind arrow in both the Wind infobox and on the map.") },
+    { (unsigned)WindArrowLocation::MAP_ONLY, N_("Map only"), N_("Show the wind arrow on the map but not in the Wind infobox.") },
+    { (unsigned)WindArrowLocation::INFOBOX_ONLY, N_("Wind infobox only"), N_("Show the wind arrow in the Wind infobox but not on the map.") },
+    { (unsigned)WindArrowLocation::NOWHERE, N_("Nowhere"), N_("Do not display the wind arrow anywhere.") },
+    { 0 }
+  };
+
+  AddEnum(_("Wind arrow location"), _("Determines where the wind arrow is shown."),
+          wind_arrow_list, (unsigned)map_settings.wind_arrow_location);
 
   if (clear_manual_button)
     AddButton(_("Clear"), *this, CLEAR_MANUAL);
@@ -162,6 +177,9 @@ WindSettingsPanel::Save(bool &_changed)
   if (edit_trail_drift)
     changed |= SaveValue(TrailDrift, ProfileKeys::TrailDrift,
                          map_settings.trail.wind_drift_enabled);
+
+  changed |= SaveValueEnum(WIND_ARROW_LOCATION, ProfileKeys::WindArrowLocation,
+                           map_settings.wind_arrow_location);
 
   _changed |= changed;
   return true;

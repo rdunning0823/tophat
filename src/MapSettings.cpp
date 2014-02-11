@@ -56,6 +56,7 @@ MapSettings::SetDefaults()
   display_ground_track = DisplayGroundTrack::AUTO;
   auto_zoom_enabled = false;
   wind_arrow_style = WindArrowStyle::ARROW_HEAD;
+  wind_arrow_location = WindArrowLocation::MAP_AND_INFOBOX;
   waypoint.SetDefaults();
   airspace.SetDefaults();
   glider_screen_position = 30; // 30% from bottom

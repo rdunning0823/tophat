@@ -123,6 +123,14 @@ enum class WindArrowStyle: uint8_t {
   NO_ARROW,
 };
 
+/** where will we display a wind arrow? */
+enum class WindArrowLocation: uint8_t {
+  MAP_ONLY,
+  INFOBOX_ONLY,
+  MAP_AND_INFOBOX,
+  NOWHERE,
+};
+
 struct MapSettings {
   /** Map zooms in on circling */
   bool circle_zoom_enabled;
@@ -143,6 +151,8 @@ struct MapSettings {
   /** Automatic zoom when closing in on waypoint */
   bool auto_zoom_enabled;
   WindArrowStyle wind_arrow_style;
+
+  WindArrowLocation wind_arrow_location;
 
   WaypointRendererSettings waypoint;
   AirspaceRendererSettings airspace;

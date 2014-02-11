@@ -189,6 +189,7 @@ extern const char UserLevel[];
 extern const char RiskGamma[];
 extern const char PredictWindDrift[];
 extern const char WindArrowStyle[];
+extern const char WindArrowLocation[];
 extern const char EnableFinalGlideBarMC0[];
 extern const char FinalGlideBarDisplayMode[];
 extern const char EnableVarioBar[];

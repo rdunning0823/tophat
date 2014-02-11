@@ -195,6 +195,27 @@ InfoBoxContentWindArrow::Update(InfoBoxData &data)
     return;
   }
 
+  switch (CommonInterface::GetMapSettings().wind_arrow_location) {
+  case WindArrowLocation::MAP_ONLY:
+  case WindArrowLocation::NOWHERE:
+    // clear custom flag
+    data.SetInvalid();
+
+    // Set Value
+    data.SetValue(_T("%2.0f"),
+                      Units::ToUserWindSpeed(info.wind.norm));
+    // Set Unit
+    data.SetValueUnit(Units::current.wind_speed_unit);
+    // Set Comment
+    data.SetComment(info.wind.bearing);
+    return;
+    break;
+
+  case WindArrowLocation::MAP_AND_INFOBOX:
+  case WindArrowLocation::INFOBOX_ONLY:
+    break;
+  }
+
   data.SetCustom();
 
   TCHAR speed_buffer[16], bearing_buffer[16];

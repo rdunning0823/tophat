@@ -36,8 +36,16 @@ MapWindow::DrawWind(Canvas &canvas, const RasterPoint &Start,
     return;
 
   WindArrowRenderer wind_arrow_renderer(look.wind);
-  wind_arrow_renderer.Draw(canvas, render_projection.GetScreenAngle(),
-                           Start, rc, Calculated(), GetMapSettings());
+  switch (GetMapSettings().wind_arrow_location) {
+  case WindArrowLocation::MAP_AND_INFOBOX:
+  case WindArrowLocation::MAP_ONLY:
+    wind_arrow_renderer.Draw(canvas, render_projection.GetScreenAngle(),
+                             Start, rc, Calculated(), GetMapSettings());
+    break;
+  case WindArrowLocation::INFOBOX_ONLY:
+  case WindArrowLocation::NOWHERE:
+    break;
+  }
 }
 
 void

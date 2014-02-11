@@ -194,6 +194,7 @@ const char UserLevel[] = "UserLevel";
 const char RiskGamma[] = "RiskGamma";
 const char PredictWindDrift[] = "PredictWindDrift";
 const char WindArrowStyle[] = "WindArrowStyle";
+const char WindArrowLocation[] = "WindArrowLocation";
 const char EnableFinalGlideBarMC0[] = "EnableFinalGlideBarMC0";
 const char FinalGlideBarDisplayMode[] = "FinalGlideBarDisplayMode";
 const char EnableVarioBar[] = "EnableVarioBar";
