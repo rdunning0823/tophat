@@ -47,6 +47,9 @@ class WindSettingsPanel final
 
   const bool edit_manual_wind, clear_manual_button, edit_trail_drift;
 
+  /** controls whether the wind location property is shown */
+  const bool edit_wind_location;
+
   /**
    * Has the user modified the manual wind?
    */
@@ -73,9 +76,11 @@ public:
   /**
    * @param manual_wind edit the manual wind setting
    * @param clear_manual_button add a "Clear" button
+   * @param edit_wind_location show the wind location property
    */
   WindSettingsPanel(bool edit_manual_wind, bool clear_manual_button,
-                    bool edit_trail_drift);
+                    bool edit_trail_drift,
+                    bool edit_wind_location);
 
   /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;

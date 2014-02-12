@@ -69,7 +69,7 @@ WindSetupInfoBoxPanel::Hide()
 Widget *
 LoadWindSetupInfoBoxPanel(unsigned id)
 {
-  WindSettingsPanel *inner_widget = new WindSettingsPanel(true, true, true);
+  WindSettingsPanel *inner_widget = new WindSettingsPanel(true, true, true, true);
   WindSetupInfoBoxPanel *outer_widget = new WindSetupInfoBoxPanel(id, inner_widget);
   inner_widget->SetForm(outer_widget);
   return outer_widget;

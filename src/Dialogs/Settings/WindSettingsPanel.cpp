@@ -35,11 +35,13 @@ Copyright_License {
 
 WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind,
                                      bool _clear_manual_button,
-                                     bool _edit_trail_drift)
+                                     bool _edit_trail_drift,
+                                     bool _edit_wind_location)
   :RowFormWidget(UIGlobals::GetDialogLook()),
    edit_manual_wind(_edit_manual_wind),
    clear_manual_button(false),
    edit_trail_drift(_edit_trail_drift),
+   edit_wind_location(_edit_wind_location),
    form(nullptr) {}
 
 void
@@ -112,8 +114,11 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { 0 }
   };
 
-  AddEnum(_("Wind arrow location"), _("Determines where the wind arrow is shown."),
-          wind_arrow_list, (unsigned)map_settings.wind_arrow_location);
+  if (edit_wind_location)
+    AddEnum(_("Wind arrow location"), _("Determines where the wind arrow is shown."),
+            wind_arrow_list, (unsigned)map_settings.wind_arrow_location);
+  else
+    AddDummy();
 
   if (clear_manual_button)
     AddButton(_("Clear"), *this, CLEAR_MANUAL);
@@ -178,8 +183,9 @@ WindSettingsPanel::Save(bool &_changed)
     changed |= SaveValue(TrailDrift, ProfileKeys::TrailDrift,
                          map_settings.trail.wind_drift_enabled);
 
-  changed |= SaveValueEnum(WIND_ARROW_LOCATION, ProfileKeys::WindArrowLocation,
-                           map_settings.wind_arrow_location);
+  if (edit_wind_location)
+    changed |= SaveValueEnum(WIND_ARROW_LOCATION, ProfileKeys::WindArrowLocation,
+                             map_settings.wind_arrow_location);
 
   _changed |= changed;
   return true;
