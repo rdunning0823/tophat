@@ -41,6 +41,7 @@ enum ControlIndex {
   TRAIL_DRIFT,
   TRAIL_TYPE,
   TRAIL_WIDTH,
+  WIND_ARROW_LOCATION,
 };
 
 class SymbolsConfigPanel final
@@ -163,6 +164,17 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   SetExpertRow(TRAIL_WIDTH);
 
   ShowTrailControls(settings_map.trail.length != TrailSettings::Length::OFF);
+
+  static constexpr StaticEnumChoice wind_arrow_list[] = {
+    { (unsigned)WindArrowLocation::MAP_AND_INFOBOX, N_("Map and Wind infobox"), N_("Show the wind arrow in both the Wind infobox and on the map.") },
+    { (unsigned)WindArrowLocation::MAP_ONLY, N_("Map only"), N_("Show the wind arrow on the map but not in the Wind infobox.") },
+    { (unsigned)WindArrowLocation::INFOBOX_ONLY, N_("Wind infobox only"), N_("Show the wind arrow in the Wind infobox but not on the map.") },
+    { (unsigned)WindArrowLocation::NOWHERE, N_("Nowhere"), N_("Do not display the wind arrow anywhere.") },
+    { 0 }
+  };
+
+  AddEnum(_("Wind arrow location"), _("Determines where the wind arrow is shown."),
+          wind_arrow_list, (unsigned)settings_map.wind_arrow_location);
 }
 
 bool
@@ -188,6 +200,9 @@ SymbolsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(TRAIL_WIDTH, ProfileKeys::SnailWidthScale,
                        settings_map.trail.scaling_enabled);
+
+  changed |= SaveValueEnum(WIND_ARROW_LOCATION, ProfileKeys::WindArrowLocation,
+                           settings_map.wind_arrow_location);
 
   _changed |= changed;
 
