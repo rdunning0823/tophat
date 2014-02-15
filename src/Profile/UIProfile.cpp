@@ -108,7 +108,8 @@ Profile::Load(UISettings &settings)
 {
   Load(settings.display);
 
-  Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
+// hard code to default
+//  Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 
   Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
