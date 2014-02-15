@@ -333,10 +333,13 @@ TaskNavSliderWidget::OnActivateItem(unsigned index)
       || InputEvents::IsMode(menu_goto.buffer()))
     InputEvents::HideMenu();
   else if (task_data_cache.GetTaskMode() == TaskType::GOTO ||
-        task_data_cache.GetTaskMode() == TaskType::ABORT)
+        task_data_cache.GetTaskMode() == TaskType::ABORT) {
+    InputEvents::ShowMenu();
     InputEvents::setMode(menu_goto.buffer());
-  else
+  } else {
+    InputEvents::ShowMenu();
     InputEvents::setMode(menu_ordered.buffer());
+  }
 
   return;
 }
