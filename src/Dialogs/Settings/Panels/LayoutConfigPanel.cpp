@@ -184,8 +184,8 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     AddDummy();
 
   if (quick_setup) {
-    AddButton(_("Custom screens"), *this, CustomizeScreens);
-    AddButton(_("Custom infobox sets"), *this, CustomizeInfoBoxes);
+    AddButton(_("Edit screens"), *this, CustomizeScreens);
+    AddButton(_("Edit infoboxes"), *this, CustomizeInfoBoxes);
 
   } else {
     AddDummy();
