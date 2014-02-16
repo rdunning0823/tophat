@@ -77,6 +77,9 @@ const TCHAR* tips [] = {
     N_("Too many waypoint labels?  Not enough?  Click the 'Labels...' button on the menu to toggle more, fewer, less options.'"),
     N_("While flying, you should be able to do anything from either the Nav Bar or the primary 'M' menu."),
     N_("Enter the pilot's name for the .IGC file with the Setup menu"),
+    N_("Too many buttons on the screen? Move the 'S' button to the menu in Setup > Screens"),
+    N_("Clean up the screen?  Click the Wind infobox and select to show the Wind arrow only in the infobox"),
+
 };
 
 enum ControlIndex {
