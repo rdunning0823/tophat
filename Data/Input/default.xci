@@ -78,7 +78,7 @@ event=Beep 1
 # mode=default
 # ------------
 
-mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Info1 Info2 Menu Menu1 Menu2 MenuLast Vario1 Vario2 NavOrdered NavGoto Orientation
+mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Info1 Info2 Menu MenuWithScreens Menu1 Menu2 MenuLast Vario1 Vario2 NavOrdered NavGoto Orientation
 type=key
 data=ESCAPE
 event=Mode default
@@ -1007,6 +1007,58 @@ label=$(TopographyToggleActionName) roads, cities, water
 location=22
 
 mode=Menu
+type=key
+data=6
+event=Mode Orientation
+label=Map orientation
+location=23
+
+# -------------
+# mode=MenuWithScreens
+# alternative to Menu when Screens button is hidden
+# -------------
+
+mode=MenuWithScreens
+type=key
+data=6
+event=DeclutterLabels show
+event=DeclutterLabels toggle
+label=Labels\n$(MapLabelsToggleActionName)
+location=16
+
+mode=MenuWithScreens
+type=key
+data=0
+event=Zoom auto show
+event=Zoom auto toggle
+event=Mode default
+label=Set zoom $(ZoomAutoToggleActionName)
+location=17
+
+mode=MenuWithScreens
+type=key
+data=6
+event=ScreenModes next
+label=Switch screen
+location=18
+
+mode=MenuWithScreens
+type=key
+data=8
+event=TerrainTopography terrain toggle
+event=Mode default
+label=$(TerrainToggleActionName) terrain
+location=21
+
+mode=MenuWithScreens
+type=key
+data=9
+event=TerrainTopography topography toggle
+event=Mode default
+label=$(TopographyToggleActionName) roads, cities, water
+location=22
+
+mode=MenuWithScreens
 type=key
 data=6
 event=Mode Orientation
