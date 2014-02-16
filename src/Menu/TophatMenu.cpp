@@ -48,7 +48,8 @@ namespace TophatMenu {
       InputEvents::HideMenu();
 
     else if (CommonInterface::GetUISettings().screens_button_location ==
-        UISettings::ScreensButtonLocation::MAP)
+        UISettings::ScreensButtonLocation::MAP ||
+        CommonInterface::SetUISettings().pages.n_pages < 2)
       ShowMenu(menu);
     else
       ShowMenu(menu_alt_with_screens_button);
