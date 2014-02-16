@@ -48,6 +48,7 @@ Copyright_License {
 enum ControlIndex {
   DisplayOrientation,
   AppInfoBoxGeom,
+  ScreensButtonLocation,
   AppInverseInfoBox,
   AppInfoBoxColors,
   CustomizeScreens,
@@ -65,6 +66,16 @@ static constexpr StaticEnumChoice display_orientation_list[] = {
     N_("Reverse Portrait") },
   { (unsigned)DisplaySettings::Orientation::REVERSE_LANDSCAPE,
     N_("Reverse Landscape") },
+  { 0 }
+};
+
+static constexpr StaticEnumChoice screens_button_location_list[] = {
+  { (unsigned)UISettings::ScreensButtonLocation::MAP,
+    N_("On the map"),
+    N_("Show the Screens button on the map at all times.") },
+  { (unsigned)UISettings::ScreensButtonLocation::MENU,
+    N_("On the menu"),
+    N_("Show the Screens button on the menu.") },
   { 0 }
 };
 
@@ -152,6 +163,10 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
 
+  AddEnum(_("Screens button location"),
+             _("Show the 'S' Screens button on the map or in the first menu."),
+             screens_button_location_list, (unsigned)ui_settings.screens_button_location);
+
   if (!quick_setup) {
     AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
                ui_settings.info_boxes.inverse);
@@ -201,6 +216,9 @@ LayoutConfigPanel::Save(bool &_changed)
                   ui_settings.info_boxes.geometry);
 
   changed |= info_box_geometry_changed;
+
+  changed |= SaveValueEnum(ScreensButtonLocation, ProfileKeys::ScreensButtonLocation,
+                           ui_settings.screens_button_location);
 
   if (!quick_setup)
     changed |= require_restart |=

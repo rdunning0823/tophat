@@ -355,6 +355,7 @@ XCSOAR_SOURCES := \
 	\
 	$(SRC)/Waypoint/WaypointDetailsReader.cpp \
 	$(SRC)/Menu/MenuData.cpp \
+	$(SRC)/Menu/TophatMenu.cpp \
 	$(SRC)/Menu/MenuBar.cpp \
 	$(SRC)/Menu/ButtonLabel.cpp \
 	$(SRC)/Menu/ExpandMacros.cpp \
