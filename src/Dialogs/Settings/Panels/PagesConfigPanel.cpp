@@ -207,8 +207,8 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
 
   static constexpr StaticEnumChoice ib_list[] = {
-    { IBP_AUTO, N_("Auto") },
-    { IBP_NONE, N_("None") },
+    { IBP_AUTO, N_("Auto"), N_("Displays either the Circling, Cruise or Final glide infoxboxes") },
+    { IBP_NONE, N_("None"), N_("Show fullscreen (no infoboxes)") },
     { 0 }
   };
 
@@ -216,8 +216,27 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                             _("Specifies which Infobox set should be displayed on this page."),
                             ib_list, IBP_AUTO, this);
   DataFieldEnum &ib = *(DataFieldEnum *)wp->GetDataField();
-  for (unsigned i = 0; i < InfoBoxSettings::MAX_PANELS; ++i)
-    ib.AddChoice(i, gettext(info_box_settings.panels[i].name));
+  for (unsigned i = 0; i < InfoBoxSettings::MAX_PANELS; ++i) {
+    const TCHAR cruise_help[] = "For cruise mode.  Displayed when 'Auto' is selected and ship is below final glide altitude";
+    const TCHAR circling_help[] = "For circling mode.  Displayed when 'Auto' is selected and ship is circling";
+    const TCHAR final_glide_help[] = "For final glide mode.  Displayed when 'Auto' is selected and ship is above final glide altitude";
+    const TCHAR *display_text = gettext(info_box_settings.panels[i].name);
+    const TCHAR *help_text = _T("A custom infobox set");
+    switch (i) {
+    case 0:
+      help_text = circling_help;
+      break;
+    case 1:
+      help_text = cruise_help;
+      break;
+    case 2:
+      help_text = final_glide_help;
+      break;
+    default:
+      break;
+    }
+    ib.AddChoice(i, display_text, display_text, help_text);
+  }
 
   static constexpr StaticEnumChoice bottom_list[] = {
     { (unsigned)PageLayout::Bottom::NOTHING, N_("Nothing") },
