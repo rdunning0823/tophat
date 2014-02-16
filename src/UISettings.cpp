@@ -39,6 +39,8 @@ UISettings::SetDefaults()
   restart_gesture_help = true;
   clear_gesture_help = false;
 
+  screens_button_location = ScreensButtonLocation::MENU;
+
   popup_message_position = PopupMessagePosition::CENTER;
 
   haptic_feedback = HapticFeedback::DEFAULT;

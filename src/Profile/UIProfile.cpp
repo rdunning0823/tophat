@@ -126,6 +126,8 @@ Profile::Load(UISettings &settings)
 
   GetEnum(ProfileKeys::LatLonUnits, settings.coordinate_format);
 
+  GetEnum(ProfileKeys::ScreensButtonLocation, settings.screens_button_location);
+
   LoadUnits(settings.units);
   Load(settings.map);
   Load(settings.info_boxes);

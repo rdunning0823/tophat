@@ -270,7 +270,7 @@ extern const char PagesDistinctZoom[];
 
 extern const char FilePickAndDownloadAreaFilter[];
 extern const char FilePickAndDownloadSubAreaFilter[];
-
+extern const char ScreensButtonLocation[];
 }
 
 #endif
