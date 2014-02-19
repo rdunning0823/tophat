@@ -1196,7 +1196,7 @@ type=key
 data=6
 event=Orientation northup
 event=Mode default
-label=North up
+label=$(OrientationNorthUp)
 location=16
 
 mode=Orientation
@@ -1204,7 +1204,7 @@ type=key
 data=6
 event=Orientation trackup
 event=Mode default
-label=Track up
+label=$(OrientationTrackUp)
 location=17
 
 mode=Orientation
@@ -1212,7 +1212,7 @@ type=key
 data=6
 event=Orientation targetup
 event=Mode default
-label=Target up
+label=$(OrientationTargetUp)
 location=18
 
 # ----------------------------------
