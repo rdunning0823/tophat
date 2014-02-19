@@ -721,6 +721,7 @@ FlarmTrafficControl::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 FlarmTrafficControl::OnMouseUp(PixelScalar x, PixelScalar y)
 {
+  InputEvents::HideMenu();
   if (dragging) {
     StopDragging();
 
