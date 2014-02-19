@@ -217,11 +217,11 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                             ib_list, IBP_AUTO, this);
   DataFieldEnum &ib = *(DataFieldEnum *)wp->GetDataField();
   for (unsigned i = 0; i < InfoBoxSettings::MAX_PANELS; ++i) {
-    const TCHAR cruise_help[] = "For cruise mode.  Displayed when 'Auto' is selected and ship is below final glide altitude";
-    const TCHAR circling_help[] = "For circling mode.  Displayed when 'Auto' is selected and ship is circling";
-    const TCHAR final_glide_help[] = "For final glide mode.  Displayed when 'Auto' is selected and ship is above final glide altitude";
+    const TCHAR cruise_help[] = N_("For cruise mode.  Displayed when 'Auto' is selected and ship is below final glide altitude");
+    const TCHAR circling_help[] = N_("For circling mode.  Displayed when 'Auto' is selected and ship is circling");
+    const TCHAR final_glide_help[] = N_("For final glide mode.  Displayed when 'Auto' is selected and ship is above final glide altitude");
     const TCHAR *display_text = gettext(info_box_settings.panels[i].name);
-    const TCHAR *help_text = _T("A custom infobox set");
+    const TCHAR *help_text = N_("A custom infobox set");
     switch (i) {
     case 0:
       help_text = circling_help;
