@@ -551,6 +551,21 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
                       _T("$(AirspaceToggleActionName)"),
                       _("Hide"), _("Show"), Size);
 
+  CondReplaceInString(GetMapSettings().cruise_orientation ==
+      DisplayOrientation::NORTH_UP, OutBuffer,
+                      _T("$(OrientationNorthUp)"),
+                      _("* North up"), _("North up"), Size);
+
+  CondReplaceInString(GetMapSettings().cruise_orientation ==
+      DisplayOrientation::TARGET_UP, OutBuffer,
+                      _T("$(OrientationTargetUp)"),
+                      _("* Target up"), _("Target up"), Size);
+
+  CondReplaceInString(GetMapSettings().cruise_orientation ==
+      DisplayOrientation::TRACK_UP, OutBuffer,
+                      _T("$(OrientationTrackUp)"),
+                      _("* Track up"), _("Track up"), Size);
+
   if (_tcsstr(OutBuffer, _T("$(MapLabelsToggleActionName)"))) {
     static const TCHAR *const labels[] = {
       N_("All"),
