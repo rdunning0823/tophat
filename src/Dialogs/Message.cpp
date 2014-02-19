@@ -43,7 +43,7 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
 
   SingleWindow &main_window = UIGlobals::GetMainWindow();
 
-  UPixelScalar dialog_width = Layout::Scale(200);
+  UPixelScalar dialog_width = Layout::Scale(220);
   UPixelScalar dialog_height = Layout::Scale(160);
 
   UPixelScalar button_width = Layout::Scale(60);
@@ -108,10 +108,17 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
                     button_style, wf, IDOK);
 
   if (button_flags == MB_YESNO ||
-      button_flags == MB_YESNOCANCEL) {
+      button_flags == MB_YESNOCANCEL ||
+      button_flags == MB_YESNOALL) {
     buttons.append() =
       new WndButton(client_area, dialog_look.button, _("Yes"), button_rc,
                     button_style, wf, IDYES);
+
+    if (button_flags == MB_YESNOALL) {
+      buttons.append() =
+          new WndButton(client_area, dialog_look.button, _("All"), button_rc,
+                        button_style, wf, IDALL);
+    }
 
     buttons.append() =
       new WndButton(client_area, dialog_look.button, _("No"), button_rc,

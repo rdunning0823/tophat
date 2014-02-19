@@ -56,6 +56,14 @@ enum {
 
 #endif
 
+enum {
+  MB_YESNOALL = 0x8,
+};
+
+enum {
+  IDALL = 0x201,
+};
+
 /**
  * Displays a MessageBox and returns the pressed button
  * @param lpText Text displayed inside the MessageBox
