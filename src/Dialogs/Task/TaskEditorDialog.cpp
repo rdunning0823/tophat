@@ -331,15 +331,25 @@ ReadValues()
 static void 
 OnRemoveClicked(gcc_unused WndButton &Sender)
 {
-  if (ShowMessageBox(_("Remove task point?"), _("Task Point"),
-                     MB_YESNO | MB_ICONQUESTION) != IDYES)
+  unsigned result = ShowMessageBox(_("Remove task point?"), _("Task Point"),
+                                   MB_YESNOALL | MB_ICONQUESTION);
+
+  if (result != IDYES && result != IDALL)
     return;
 
-  if (!ordered_task->GetFactory().Remove(active_index))
-    return;
-  ordered_task->UpdateGeometry();
-  if (active_index >= ordered_task->TaskSize())
-    active_index = std::max(1u, active_index) - 1;
+  switch (result) {
+  case IDYES:
+    if (!ordered_task->GetFactory().Remove(active_index))
+      return;
+    ordered_task->UpdateGeometry();
+    if (active_index >= ordered_task->TaskSize())
+      active_index = std::max(1u, active_index) - 1;
+
+    break;
+  case IDALL:
+    ordered_task->RemoveAllPoints();
+    break;
+  }
 
   task_modified = true;
   RefreshView();
