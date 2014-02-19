@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-#include "Dialogs/Task/TaskPointDialogUs.hpp"
+#include "Dialogs/Task/TaskEditorDialog.hpp"
 #include "Dialogs/Task/TaskDialogs.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Dialogs/CallBackTable.hpp"

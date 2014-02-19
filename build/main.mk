@@ -132,7 +132,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/Manager/TaskCalculatorPanel.cpp \
 	$(SRC)/Dialogs/Task/OptionalStartsDialog.cpp \
 	$(SRC)/Dialogs/Task/TaskPointDialog.cpp \
-	$(SRC)/Dialogs/Task/TaskPointDialogUs.cpp \
+	$(SRC)/Dialogs/Task/TaskEditorDialog.cpp \
 	$(SRC)/Dialogs/Task/TaskPropertiesDialogUs.cpp \
 	$(SRC)/Dialogs/Task/TaskListDialogUs.cpp \
 	$(SRC)/Dialogs/Task/TaskManagerDialogUs.cpp \
