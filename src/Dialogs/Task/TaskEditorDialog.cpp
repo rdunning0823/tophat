@@ -516,8 +516,8 @@ dlgTaskEditorShowModal(OrderedTask** task_pointer,
   active_index = index;
 
   wf = LoadDialog(CallBackTable, UIGlobals::GetMainWindow(),
-                  Layout::landscape ? _T("IDR_XML_TASKPOINT_US_L") :
-                                      _T("IDR_XML_TASKPOINT_US"));
+                  Layout::landscape ? _T("IDR_XML_TASKEDITOR_L") :
+                                      _T("IDR_XML_TASKEDITOR"));
   assert(wf != nullptr);
 
   dock = (DockWindow *)wf->FindByName(_T("properties"));
