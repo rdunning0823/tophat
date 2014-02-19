@@ -48,6 +48,6 @@ enum TaskEditorReturn {
  * TASK_MODIFIED if task was modified by editor or TASK_NOT_MODIFIED
  */
 TaskEditorReturn
-dlgTaskPointUsShowModal(OrderedTask** task, const unsigned index);
+dlgTaskEditorShowModal(OrderedTask** task, const unsigned index);
 
 #endif

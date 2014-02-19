@@ -432,7 +432,7 @@ TaskManagerDialogUsShowModal()
   bool task_modified = false;
   while (editing) {
 
-    TaskEditorReturn task_editor_return = dlgTaskPointUsShowModal(&active_task, 0);
+    TaskEditorReturn task_editor_return = dlgTaskEditorShowModal(&active_task, 0);
 
     // invalid task
     if (task_editor_return == TaskEditorReturn::TASK_REVERT) {

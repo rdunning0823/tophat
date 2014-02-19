@@ -496,7 +496,7 @@ TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned Draw
 }
 
 TaskEditorReturn
-dlgTaskPointUsShowModal(OrderedTask** task_pointer,
+dlgTaskEditorShowModal(OrderedTask** task_pointer,
                       const unsigned index)
 {
   ordered_task = *task_pointer;
