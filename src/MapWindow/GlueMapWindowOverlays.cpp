@@ -417,21 +417,12 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
 void
 GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 {
-  const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *menu_bitmap = &icons.hBmpMenuButton;
-  const PixelSize menu_bitmap_size = menu_bitmap->GetSize();
-
-  PixelScalar offset = menu_bitmap_size.cx / 2;
-
   // draw logger status
   if (logger != NULL && logger->IsLoggerActive()) {
     bool flip = (Basic().date_time_utc.second % 2) == 0;
     const MaskedIcon &icon = flip ? look.logger_on_icon : look.logger_off_icon;
-    offset += icon.GetSize().cx;
-    icon.Draw(canvas, rc.right - offset, rc.bottom - icon.GetSize().cy);
+    icon.Draw(canvas, rc.right - Layout::Scale(3), rc.bottom - icon.GetSize().cy);
   }
-
-  return; // don't show the rest of this stuff.  We know if we're circling etc
 
   // draw flight mode
   const MaskedIcon *bmp;
@@ -445,11 +436,11 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   else
     bmp = &look.cruise_mode_icon;
 
-  offset += bmp->GetSize().cx + Layout::Scale(6);
-
+  unsigned offset = rc.right - rc_main_menu_button.left + Layout::Scale(2) + bmp->GetSize().cx;
   bmp->Draw(canvas, rc.right - offset,
-            rc.bottom - bmp->GetSize().cy - Layout::Scale(4));
+            rc.bottom - bmp->GetSize().cy - Layout::Scale(1));
 
+  return; // don't show rest of stuff
   // draw "Simulator/Replay & InfoBox name
   StaticString<80> buffer;
   const UIState &ui_state = GetUIState();
