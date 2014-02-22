@@ -10,7 +10,7 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
+   width="40"
    height="40"
    id="svg7255"
    version="1.1"
@@ -49,7 +49,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.9795104"
-     inkscape:cx="-12.541525"
+     inkscape:cx="-20.119156"
      inkscape:cy="25.134451"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -80,13 +80,13 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="16.039318"
+       x="3.5341427"
        y="26.590059"
        id="text3000"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3002"
-         x="16.039318"
+         x="3.5341427"
          y="26.590059">M</tspan></text>
   </g>
 </svg>
