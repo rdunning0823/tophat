@@ -651,7 +651,7 @@ GlueMapWindow::SetMainMenuButtonRect()
   PixelSize menu_button_size;
 
   menu_button_size.cx = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale();
+      * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
   menu_button_size.cy = menu_button_size.cx;
 
   UPixelScalar pen_width = Layout::Scale(2);
