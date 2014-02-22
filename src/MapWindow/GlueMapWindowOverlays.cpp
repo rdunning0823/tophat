@@ -26,6 +26,7 @@ Copyright_License {
 #include "Look/TaskLook.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Look/IconLook.hpp"
+#include "Look/InfoBoxLook.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Icon.hpp"
 #include "Language/Language.hpp"
@@ -424,6 +425,11 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
     icon.Draw(canvas, rc.right - Layout::Scale(3), rc.bottom - icon.GetSize().cy);
   }
 
+  PixelSize button_size;
+  button_size.cx = MapOverlayButton::GetStandardButtonHeight()
+      * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
+  button_size.cy = button_size.cx;
+
   // draw flight mode
   const MaskedIcon *bmp;
 
@@ -436,16 +442,14 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
   else
     bmp = &look.cruise_mode_icon;
 
-  unsigned offset = rc.right - rc_main_menu_button.left + Layout::Scale(2) + bmp->GetSize().cx;
+  unsigned offset = button_size.cx + Layout::Scale(2) + bmp->GetSize().cx;
   bmp->Draw(canvas, rc.right - offset,
             rc.bottom - bmp->GetSize().cy - Layout::Scale(1));
 
-  return; // don't show rest of stuff
-  // draw "Simulator/Replay & InfoBox name
+  // draw "Simulator/Replay
   StaticString<80> buffer;
   const UIState &ui_state = GetUIState();
 
-  canvas.Select(Fonts::title);
   canvas.SetBackgroundOpaque();
   canvas.SetBackgroundColor(COLOR_WHITE);
   canvas.SetTextColor(COLOR_BLACK);
@@ -458,6 +462,21 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
     buffer += _("Simulator");
   }
 
+  if (!buffer.empty()) {
+    TextInBoxMode mode;
+    mode.shape = LabelShape::ROUNDED_BLACK;
+
+    const Font &font = *UIGlobals::GetLook().info_box.value.font;
+    PixelSize text_size = font.TextSize(buffer.c_str());
+    canvas.Select(font);
+    unsigned x = rc.right - text_size.cx - Layout::Scale(2);
+    unsigned y = rc.bottom - button_size.cy - text_size.cy - 1;
+    TextInBox(canvas, buffer.c_str(), x, y, mode, rc, NULL);
+  }
+
+  return; // don't show rest of stuff
+
+  canvas.Select(Fonts::title);
   if (weather != NULL && weather->GetParameter() > 0) {
     const TCHAR *label = weather->ItemLabel(weather->GetParameter());
     if (label != NULL) {
