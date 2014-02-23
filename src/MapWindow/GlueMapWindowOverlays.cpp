@@ -418,13 +418,6 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
 void
 GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 {
-  // draw logger status
-  if (logger != NULL && logger->IsLoggerActive()) {
-    bool flip = (Basic().date_time_utc.second % 2) == 0;
-    const MaskedIcon &icon = flip ? look.logger_on_icon : look.logger_off_icon;
-    icon.Draw(canvas, rc.right - Layout::Scale(3), rc.bottom - icon.GetSize().cy);
-  }
-
   PixelSize button_size;
   button_size.cx = MapOverlayButton::GetStandardButtonHeight()
       * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
