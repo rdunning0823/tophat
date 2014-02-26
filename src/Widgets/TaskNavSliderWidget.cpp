@@ -76,6 +76,11 @@ TaskNavSliderWidget::RefreshTask()
   if (!GetList().IsDefined())
     return false;
 
+
+#ifdef _WIN32
+  GetList().Invalidate();
+#endif
+
   // only update if it's been changed
   if (TaskIsCurrent()) {
     if (!task_data_cache.AreTransistionsAndTargetsCurrent()) {
