@@ -213,7 +213,7 @@ SliderShape::PaintBackground(Canvas &canvas, unsigned idx,
   }
   if (idx == (list_length - 1)) {
     RasterPoint right_mid = GetPoint(3);
-    canvas.DrawFilledRectangle(x_offset + right_mid.x + 1, 0,
+    canvas.DrawFilledRectangle(x_offset + right_mid.x, 0,
         x_offset + right_mid.x + GetHintWidth() + 1,
         rc_outer.bottom,
         Brush(COLOR_WHITE));
@@ -267,7 +267,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                              buffer.c_str());
 #ifdef _WIN32
     if (HasDraggableScreen()) // PC or WM
-      PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
+      PaintBackground(canvas, idx, 1, dialog_look, rc_outer);
 #endif
     return;
   }
@@ -280,7 +280,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
 #ifdef _WIN32
   if (HasDraggableScreen()) // PC or WM
-    PaintBackground(canvas, idx, task_size, dialog_look, rc_outer);
+    PaintBackground(canvas, idx,
+                    (task_mode == TaskType::GOTO) ? 1 : task_size,
+                    dialog_look, rc_outer);
 #endif
 
   const unsigned line_one_y_offset = rc.top + GetLine1Y();
