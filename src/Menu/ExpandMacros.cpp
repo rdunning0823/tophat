@@ -85,6 +85,37 @@ CondReplaceInString(bool Condition, TCHAR *Buffer, const TCHAR *Macro,
     ReplaceInString(Buffer, Macro, FalseText, Size);
 }
 
+/**
+ * If Condition is true, Macro in Buffer will be replaced by TrueText,
+ * otherwise by FalseText.
+ * Allows an optional prefix to the true text, else leave blank
+ * @param condition Condition to be checked
+ * @param buffer Buffer string
+ * @param macro The string that will be replaced
+ * @param true_text_prefix. Prefix to text if Condition is true. not NULL
+ * @param true_textThe replacement if Condition is true
+ * @param false_text The replacement if Condition is false
+ * @param size (?)
+ */
+static void
+CondReplaceInString(bool condition, TCHAR *buffer, const TCHAR *macro,
+                    const TCHAR *true_text_prefix, const TCHAR *true_text,
+                    const TCHAR *false_text, size_t size)
+{
+  assert(true_text_prefix != nullptr);
+  assert(true_text != nullptr);
+
+  if (condition) {
+    static StaticString<256> buff2;
+    buff2.Format(_T("%s%s"), true_text_prefix, true_text);
+
+    ReplaceInString(buffer, macro, buff2.c_str(), size);
+  }
+  else
+    ReplaceInString(buffer, macro, false_text, size);
+}
+
+
 static bool
 ExpandTaskMacros(TCHAR *OutBuffer, size_t Size,
                  const DerivedInfo &calculated,
@@ -554,17 +585,17 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       DisplayOrientation::NORTH_UP, OutBuffer,
                       _T("$(OrientationNorthUp)"),
-                      _("* North up"), _("North up"), Size);
+                      _T("* "), _("North up"), _("North up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       DisplayOrientation::TARGET_UP, OutBuffer,
                       _T("$(OrientationTargetUp)"),
-                      _("* Target up"), _("Target up"), Size);
+                      _T("* "), _("Target up"), _("Target up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       DisplayOrientation::TRACK_UP, OutBuffer,
                       _T("$(OrientationTrackUp)"),
-                      _("* Track up"), _("Track up"), Size);
+                      _T("* "), _("Track up"), _("Track up"), Size);
 
   if (_tcsstr(OutBuffer, _T("$(MapLabelsToggleActionName)"))) {
     static const TCHAR *const labels[] = {
