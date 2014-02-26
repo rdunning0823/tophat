@@ -667,24 +667,21 @@ GlueMapWindow::SetZoomButtonsRect()
 
   rc_zoom_in_button.left = rc_map.left;
   if (Layout::landscape) {
-    rc_zoom_in_button.right = rc_zoom_in_button.left + button_size.cx;
     rc_zoom_in_button.bottom = rc_map.bottom;
-    rc_zoom_in_button.top = rc_zoom_in_button.bottom - button_size.cy;
   } else {
-    rc_zoom_in_button.right = rc_zoom_in_button.left;
     rc_zoom_in_button.bottom = rc_map.bottom - button_size.cy;
-    rc_zoom_in_button.top = rc_zoom_in_button.bottom - button_size.cy;
   }
+  rc_zoom_in_button.right = rc_zoom_in_button.left + button_size.cx;
+  rc_zoom_in_button.top = rc_zoom_in_button.bottom - button_size.cy;
 
   if (Layout::landscape) {
     rc_zoom_out_button.left = rc_map.left + button_size.cx;
-    rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx;
   } else {
     rc_zoom_out_button.left = rc_map.left;
-    rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx;
   }
   rc_zoom_out_button.bottom = rc_map.bottom;
-  rc_zoom_out_button.top = rc_zoom_out_button.bottom - button_size.cx;
+  rc_zoom_out_button.top = rc_zoom_out_button.bottom - button_size.cy;
+  rc_zoom_out_button.right = rc_zoom_out_button.left + button_size.cx;
 
   assert (rc_map.bottom >= rc_zoom_in_button.top);
   SetGPSStatusOffset(rc_map.bottom - rc_zoom_in_button.top);
