@@ -203,16 +203,14 @@ SliderShape::PaintBackground(Canvas &canvas, unsigned idx,
   if (idx == 0) {
     RasterPoint left_mid = GetPoint(7);
     canvas.DrawFilledRectangle(0, 0, x_offset + left_mid.x, rc_outer.bottom,
-        Brush(dialog_look.list.GetBackgroundColor(
-                false, true, false)));
+        Brush(COLOR_WHITE));
   }
   if (idx == (list_length - 1)) {
     RasterPoint right_mid = GetPoint(3);
     canvas.DrawFilledRectangle(x_offset + right_mid.x + 1, 0,
         x_offset + right_mid.x + GetHintWidth() + 1,
         rc_outer.bottom,
-        Brush(dialog_look.list.GetBackgroundColor(
-                false, true, false)));
+        Brush(COLOR_WHITE));
   }
 }
 #endif
