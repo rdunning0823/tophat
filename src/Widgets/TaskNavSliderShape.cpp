@@ -162,6 +162,12 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   if (visibility == None)
     return false;
 
+#ifdef _WIN32
+  canvas.Select(Pen(width, COLOR_BLACK));
+  canvas.DrawPolygon(poly, 8);
+  return true;
+#endif
+
   switch (visibility) {
   case Full:
   case LeftTipAndBody:
