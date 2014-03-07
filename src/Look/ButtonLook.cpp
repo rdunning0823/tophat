@@ -44,6 +44,22 @@ ButtonLook::Initialise(const Font &_font)
     standard.dark_border_pen.Set(1, DarkColor(standard.background_color));
   }
 
+  constexpr Color dimmed_dark = COLOR_DARK_GRAY;
+  dimmed.foreground_color = dimmed_dark;
+  dimmed.foreground_brush.Set(dimmed.foreground_color);
+
+  dimmed.background_color = IsDithered() ? COLOR_WHITE : COLOR_LIGHT_GRAY;
+  if (IsDithered()) {
+    dimmed.light_border_pen.Set(1, dimmed_dark);
+    dimmed.dark_border_pen.Set(1, dimmed_dark);
+  } else if (!HasColors()) {
+    dimmed.light_border_pen.Set(1, LightColor(COLOR_DARK_GRAY));
+    dimmed.dark_border_pen.Set(1, dimmed_dark);
+  } else {
+    dimmed.light_border_pen.Set(1, LightColor(dimmed.background_color));
+    dimmed.dark_border_pen.Set(1, dimmed_dark);
+  }
+
   focused.foreground_color = COLOR_WHITE;
   focused.foreground_brush.Set(focused.foreground_color);
   focused.background_color = IsDithered() ? COLOR_BLACK : COLOR_XCSOAR_DARK;

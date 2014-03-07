@@ -39,7 +39,8 @@ struct ButtonLook {
 
     Color background_color;
     Pen light_border_pen, dark_border_pen;
-  } standard, focused;
+  } standard, focused, dimmed;
+  /* dimmed used for less visible / obtrusive overlay buttons */
 
   struct {
     Color color;
