@@ -37,6 +37,7 @@ Copyright_License {
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
+#include "Pan.hpp"
 
 unsigned
 MapOverlayButton::GetScale()
@@ -74,6 +75,8 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     PixelScalar(canvas.GetHeight())
   };
 
+  bool dimmed = CommonInterface::Calculated().flight.flying && !IsPanning();
+
   bool pressed = IsDown();
 #ifdef ENABLE_OPENGL
   bool transparent = true;
@@ -83,7 +86,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     transparent = true;
 #endif
   //Todo fix the GDI rendering so it draws transparent correctly
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent);
+  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent, dimmed);
   rc = renderer.GetDrawingRect(rc, pressed);
 
   if (bmp != nullptr) {
@@ -106,7 +109,8 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     if (HasCursorKeys() ? (HasFocus() | pressed) : pressed)
       canvas.SetTextColor(button_look.focused.foreground_color);
     else
-      canvas.SetTextColor(button_look.standard.foreground_color);
+      canvas.SetTextColor(dimmed ? button_look.dimmed.foreground_color :
+          button_look.standard.foreground_color);
 
     PixelSize sz;
     sz.cx = rc.right - rc.left;
