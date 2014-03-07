@@ -133,15 +133,7 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
       canvas.SelectWhitePen();
 
     {
-#ifdef ENABLE_OPENGL
-        const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        if (!mode.opaque)
-          canvas.Select(Brush(COLOR_WHITE.WithAlpha(0xa0)));
-        else
-          canvas.SelectWhiteBrush();
-#else
       canvas.SelectWhiteBrush();
-#endif
 
       canvas.DrawRoundRectangle(rc.left, rc.top, rc.right, rc.bottom,
                                 Layout::SmallScale(8), Layout::SmallScale(8));
