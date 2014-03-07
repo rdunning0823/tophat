@@ -32,9 +32,11 @@ Copyright_License {
 
 void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
-                           bool pressed, bool transparent)
+                           bool pressed, bool transparent, bool dimmed)
 {
-  const ButtonLook::StateLook &_look = (focused || pressed) ? look.focused : look.standard;
+
+  const ButtonLook::StateLook &_look = (focused || pressed) ? look.focused :
+      (dimmed ? look.dimmed : look.standard);
 
   DrawButtonFancy(canvas, rc, _look.dark_border_pen, _look.light_border_pen,
                   _look.background_color, focused, pressed, transparent);
@@ -44,9 +46,10 @@ ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
 
 void
 ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
-                           bool pressed, bool transparent)
+                           bool pressed, bool transparent, bool dimmed)
 {
-  const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+  const ButtonLook::StateLook &_look = focused ? look.focused :
+      (dimmed ? look.dimmed : look.standard);
 
   if (!transparent)
     canvas.DrawFilledRectangle(rc, _look.background_color);

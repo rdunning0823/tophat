@@ -42,9 +42,11 @@ public:
   /**
    * @parm transparent. if True, the background is not drawn
    * so the button is transparent
+   * @param transparent does not draw the background
+   * @param dimmed
    */
   void DrawButton(Canvas &canvas, PixelRect rc, bool focused, bool pressed,
-                  bool transparent = false);
+                  bool transparent = false, bool dimmed = false);
   PixelRect GetDrawingRect(PixelRect rc, bool pressed);
 };
 
