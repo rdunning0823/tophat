@@ -102,7 +102,6 @@ MapOverlayButton::OnPaint(Canvas &canvas)
                     *bmp,
                     bitmap_size.cx / 2, 0);
   } else {
-
     canvas.SetBackgroundTransparent();
     if (HasCursorKeys() ? (HasFocus() | pressed) : pressed)
       canvas.SetTextColor(button_look.focused.foreground_color);
@@ -117,7 +116,6 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     PixelSize sz_line_two = GetMediumFont().TextSize(line_two_text.c_str());
     sz_main.cx *= 0.85;
     sz_subscript.cx *= 0.85;
-    sz_line_two.cx *= 0.85;
 
     PixelRect rc_main_text = rc;
     rc_main_text.left = rc.left + (sz.cx - sz_main.cx) / 2;
@@ -135,21 +133,28 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     canvas.TextAutoClipped(rc_main_text.left, rc_main_text.top, GetText().c_str());
 
     canvas.SetBackgroundOpaque();
-    canvas.SetBackgroundColor(COLOR_WHITE);
+    const ButtonLook::StateLook &_look =
+        (HasFocus() || pressed) ? button_look.focused :
+        (dimmed ? button_look.dimmed : button_look.standard);
+    canvas.SetBackgroundColor(pressed ? _look.background_color : COLOR_WHITE);
     if (sz_subscript.cx > 0) {
       PixelRect rc_subscript = rc_main_text;
       rc_subscript.left = rc_main_text.right + Layout::Scale(1);
       rc_subscript.top = rc_main_text.bottom - sz_subscript.cy - sz_main.cy / 10;
       canvas.Select(GetMediumFont());
-      canvas.TextAutoClipped(rc_subscript.left, rc_subscript.top, subscript_text.c_str());
+      canvas.DrawOpaqueText(rc_subscript.left, rc_subscript.top, rc_subscript,
+                            subscript_text.c_str());
     }
 
     if (sz_line_two.cx > 0) {
       PixelRect rc_line_two = rc;
       rc_line_two.left = rc.left + (sz.cx - sz_line_two.cx) / 2;
       rc_line_two.top = rc_line_two.bottom - sz_line_two.cy;
+      rc_line_two.right = rc_line_two.left + sz_line_two.cx;
+      rc_line_two.Offset(sz_line_two.cx * 0.15, 0);
       canvas.Select(GetMediumFont());
-      canvas.TextAutoClipped(rc_line_two.left, rc_line_two.top, line_two_text.c_str());
+      canvas.DrawOpaqueText(rc_line_two.left, rc_line_two.top, rc_line_two,
+                            line_two_text.c_str());
     }
 
   #else
