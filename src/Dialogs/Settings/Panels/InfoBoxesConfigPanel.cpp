@@ -84,7 +84,7 @@ InfoBoxesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
 
   AddBoolean(_("Use final glide mode"),
-             _("Controls whether the \"final glide\" InfoBox mode should be used on \"auto\" pages."),
+             _("Should Top Hat display the \"final glide\" Infoboxes when above final glide?  Affects only screens using the \"auto\" Infoboxes."),
              settings.use_final_glide);
 }
 
