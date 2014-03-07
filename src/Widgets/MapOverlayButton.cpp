@@ -134,6 +134,8 @@ MapOverlayButton::OnPaint(Canvas &canvas)
   #ifndef USE_GDI
     canvas.TextAutoClipped(rc_main_text.left, rc_main_text.top, GetText().c_str());
 
+    canvas.SetBackgroundOpaque();
+    canvas.SetBackgroundColor(COLOR_WHITE);
     if (sz_subscript.cx > 0) {
       PixelRect rc_subscript = rc_main_text;
       rc_subscript.left = rc_main_text.right + Layout::Scale(1);
