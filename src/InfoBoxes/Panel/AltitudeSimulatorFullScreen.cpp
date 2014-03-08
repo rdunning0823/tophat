@@ -197,9 +197,9 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
 
   // split content area into two columns, buttons on the right, fg on left
   content_right_rc.left += Layout::Scale(50);
-  content_left_rc.right = content_right_rc.left - 1;
 
   NumberButtonLayout::Prepare(parent, content_right_rc);
+  content_left_rc.right = big_plus_rc.left - 1;
 
   WindowStyle style;
   const Look &look = UIGlobals::GetLook();
