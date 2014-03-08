@@ -10,6 +10,11 @@ Top Hat Soaring 1.3.4d beta TBD
 * Option to show 'S' Screens button on map or menu (menu by default)
 * Map orientation menu indicates current orientation
 * Task editor has delete all option
+* Fix bug in MacCready popup where final glide altitude was trucated
+* Fix bug in Cambridge logger where crash if download flight if first time used
+* Improved readability of task point labels on map
+* Dim outline of Map overlay buttons when in flying mode
+* Use shadow in Map overlay button symbol so clearer on light and dark background
 
 Top Hat Soaring 1.3.4b beta 1/28/2014
 * fix bug with Waypoint list name search "magnifying glass" icon
