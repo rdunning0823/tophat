@@ -38,6 +38,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 #include "Pan.hpp"
+#include "Renderer/TextInBox.hpp"
 
 unsigned
 MapOverlayButton::GetScale()
@@ -134,7 +135,11 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     canvas.Select(GetLargeFont());
 
   #ifndef USE_GDI
-    canvas.TextAutoClipped(rc_main_text.left, rc_main_text.top, GetText().c_str());
+    TextInBoxMode mode;
+    mode.shape = LabelShape::OUTLINED;
+    mode.align = TextInBoxMode::Alignment::LEFT;
+    TextInBox(canvas, GetText().c_str(), rc_main_text.left, rc_main_text.top, mode,
+              rc.GetSize().cx, rc.GetSize().cy);
 
     canvas.SetBackgroundOpaque();
     const ButtonLook::StateLook &_look =
