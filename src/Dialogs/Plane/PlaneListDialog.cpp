@@ -296,6 +296,7 @@ PlaneListWidget::LoadWithDialog(unsigned i)
                   list[i].name.c_str());
       ShowMessageBox(text, title, MB_OK);
     }
+    GetList().Invalidate();
     return result;
   }
   return false;
