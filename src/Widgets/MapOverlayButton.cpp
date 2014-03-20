@@ -160,7 +160,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
       rc_line_two.left = rc.left + (sz.cx - sz_line_two.cx) / 2;
       rc_line_two.top = rc_line_two.bottom - sz_line_two.cy;
       rc_line_two.right = rc_line_two.left + sz_line_two.cx;
-      rc_line_two.Offset(sz_line_two.cx * 0.15, 0);
+      rc_line_two.Offset(sz_line_two.cx * 0.07, 0);
       canvas.Select(GetMediumFont());
       canvas.DrawOpaqueText(rc_line_two.left, rc_line_two.top, rc_line_two,
                             line_two_text.c_str());
