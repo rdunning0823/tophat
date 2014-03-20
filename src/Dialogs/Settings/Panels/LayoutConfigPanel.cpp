@@ -69,6 +69,7 @@ static constexpr StaticEnumChoice display_orientation_list[] = {
   { 0 }
 };
 
+#if defined(ENABLE_OPENGL) | defined(KOBO)
 static constexpr StaticEnumChoice screens_button_location_list[] = {
   { (unsigned)UISettings::ScreensButtonLocation::MAP,
     N_("On the map"),
@@ -78,6 +79,7 @@ static constexpr StaticEnumChoice screens_button_location_list[] = {
     N_("Show the Screens button on the menu.") },
   { 0 }
 };
+#endif
 
 static constexpr StaticEnumChoice info_box_geometry_list[] = {
   { (unsigned)InfoBoxSettings::Geometry::SPLIT_8,
@@ -163,9 +165,13 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
 
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  AddDummy();
+#else
   AddEnum(_("Screens button location"),
              _("Show the 'S' Screens button on the map or in the first menu."),
              screens_button_location_list, (unsigned)ui_settings.screens_button_location);
+#endif
 
   if (!quick_setup) {
     AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
@@ -217,8 +223,10 @@ LayoutConfigPanel::Save(bool &_changed)
 
   changed |= info_box_geometry_changed;
 
+#if defined(ENABLE_OPENGL) | defined(KOBO)
   changed |= SaveValueEnum(ScreensButtonLocation, ProfileKeys::ScreensButtonLocation,
                            ui_settings.screens_button_location);
+#endif
 
   if (!quick_setup)
     changed |= require_restart |=

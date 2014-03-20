@@ -126,7 +126,11 @@ Profile::Load(UISettings &settings)
 
   GetEnum(ProfileKeys::LatLonUnits, settings.coordinate_format);
 
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  settings.screens_button_location = UISettings::ScreensButtonLocation::MENU;
+#else
   GetEnum(ProfileKeys::ScreensButtonLocation, settings.screens_button_location);
+#endif
 
   LoadUnits(settings.units);
   Load(settings.map);
