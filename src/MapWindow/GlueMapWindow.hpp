@@ -253,7 +253,8 @@ private:
   void DrawGesture(Canvas &canvas) const;
   void DrawMapScale(Canvas &canvas, const PixelRect &rc,
                     const MapWindowProjection &projection) const;
-  void DrawFlightMode(Canvas &canvas, const PixelRect &rc) const;
+  void DrawFlightMode(Canvas &canvas, const PixelRect &rc,
+                      unsigned nav_slider_bar_visible_height) const;
   void DrawGPSStatus(Canvas &canvas, const PixelRect &rc,
                      const NMEAInfo &info) const;
   void DrawCrossHairs(Canvas &canvas) const;

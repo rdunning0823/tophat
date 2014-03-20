@@ -416,7 +416,8 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
 }
 
 void
-GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
+GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
+                              unsigned nav_slider_bar_visible_height) const
 {
   PixelSize button_size;
   button_size.cx = MapOverlayButton::GetStandardButtonHeight()
@@ -457,13 +458,13 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc) const
 
   if (!buffer.empty()) {
     TextInBoxMode mode;
-    mode.shape = LabelShape::ROUNDED_BLACK;
+    mode.shape = LabelShape::FILLED;
 
-    const Font &font = *UIGlobals::GetLook().info_box.value.font;
+    const Font &font = *UIGlobals::GetLook().dialog.button.font;
     PixelSize text_size = font.TextSize(buffer.c_str());
     canvas.Select(font);
-    unsigned x = rc.right - text_size.cx - Layout::Scale(2);
-    unsigned y = rc.bottom - button_size.cy - text_size.cy - 1;
+    unsigned x = (rc.right - rc.left - text_size.cx) / 2;
+    unsigned y = rc.top + nav_slider_bar_visible_height;
     TextInBox(canvas, buffer.c_str(), x, y, mode, rc, NULL);
   }
 

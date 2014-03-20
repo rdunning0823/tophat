@@ -435,7 +435,7 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   MapWindow::OnPaintBuffer(canvas);
 
   DrawMapScale(canvas, GetClientRect(), render_projection);
-  DrawFlightMode(canvas, GetClientRect());
+  DrawFlightMode(canvas, GetClientRect(), nav_slider_bar_visible_height);
   if (IsPanning())
     DrawPanInfo(canvas);
 
@@ -505,7 +505,7 @@ GlueMapWindow::Render(Canvas &canvas, const PixelRect &rc)
     if (GetMapSettings().show_thermal_profile)
       DrawThermalBand(canvas, rc, nav_slider_bar_visible_height);
     DrawStallRatio(canvas, rc);
-    DrawFlightMode(canvas, rc);
+    DrawFlightMode(canvas, rc, nav_slider_bar_visible_height);
     DrawFinalGlide(canvas, rc);
     DrawVario(canvas, rc);
     DrawGPSStatus(canvas, rc, Basic());
