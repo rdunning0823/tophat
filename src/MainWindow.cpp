@@ -344,7 +344,10 @@ MainWindow::ReinitialiseLayoutTA(PixelRect rc,
 {
   UPixelScalar sz = std::min(layout.control_size.cy,
                              layout.control_size.cx) * 2;
-  rc.top += widget_overlays.HeightFromTop();
+  sz = std::min((int)sz, (int)((rc.bottom - rc.top) / 2 - widget_overlays.HeightFromTop()
+                - Layout::Scale(1)));
+
+  rc.top += widget_overlays.HeightFromTop() + Layout::Scale(1);
   rc.bottom = rc.top + sz;
   rc.right = rc.left + sz;
   thermal_assistant.Move(rc);
