@@ -43,7 +43,7 @@ MainMenuButtonWidget::UpdateVisibility(const PixelRect &rc,
                                        bool is_main_window_widget,
                                        bool is_map)
 {
-  if (is_map && !is_main_window_widget && !is_panning)
+  if (!is_panning)
     Show(rc);
   else
     Hide();
