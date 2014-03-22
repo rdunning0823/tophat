@@ -353,6 +353,7 @@ RowFormWidget::UpdateLayout()
      determine the minimum total height */
   unsigned min_height = 0;
   unsigned n_elastic = 0;
+  unsigned n_available = 0;
   int caption_width = -1;
 
   for (const auto &i : rows) {
@@ -368,6 +369,7 @@ RowFormWidget::UpdateLayout()
       if (cw > caption_width)
         caption_width = cw;
     }
+    ++n_available;
   }
 
   if (caption_width * 3 > int(total_width * 2))
@@ -376,6 +378,11 @@ RowFormWidget::UpdateLayout()
   /* how much excess height in addition to the minimum height? */
   unsigned excess_height = min_height < total_height
     ? total_height - min_height
+    : 0;
+
+  /* how much does the minimum height exceed the total height? */
+  unsigned exceeded_height = min_height > total_height
+    ? min_height - total_height
     : 0;
 
   /* second row traversal: now move and resize the rows */
@@ -405,6 +412,19 @@ RowFormWidget::UpdateLayout()
       }
 
       --n_elastic;
+    } else if (exceeded_height > 0 ) {
+      assert(n_available > 0);
+
+      /* subtract exceeded height evenly from all available rows
+       * This may render a control that is smaller then GetMinimumHeight! */
+      unsigned shrink_height = exceeded_height / n_available;
+      if (shrink_height > 0) {
+        height -= shrink_height;
+        exceeded_height -= shrink_height;
+      }
+
+      --n_available;
+
     }
 
     NextControlRect(current_rect, height);
