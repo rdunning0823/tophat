@@ -17,7 +17,7 @@
     <Panel Name="frmType" X="0" Y="38" Width="150" Height="73" Border="1">
       <Button Name="butType" Caption="Change Type" X="2" Y="3" Width="145" Height="35" OnClick="OnTypeClicked"/>
 
-      <Widget Name="properties" X="2" Y="40" Width=145 Height="35"/>
+      <Widget Name="properties" X="2" Y="40" Width="145" Height="35"/>
 
     </Panel>
       
