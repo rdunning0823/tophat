@@ -28,6 +28,7 @@
 #include "Screen/AntiFlickerWindow.hpp"
 #include "Screen/Canvas.hpp"
 #include "Renderer/HorizonRenderer.hpp"
+#include "Input/InputEvents.hpp"
 
 /**
  * A Window which renders a terrain and airspace cross-section
@@ -61,6 +62,11 @@ protected:
       return;
 
     HorizonRenderer::Draw(canvas, canvas.GetRect(), look, attitude);
+  }
+
+  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) {
+    InputEvents::HideMenu();
+    return AntiFlickerWindow::OnMouseUp(x, y);
   }
 };
 
