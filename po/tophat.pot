@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-28 20:59-0400\n"
+"POT-Creation-Date: 2014-03-28 21:18-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8392,6 +8392,72 @@ msgstr ""
 
 #: src/Dialogs/Weather/RASPDialog.cpp:97
 msgid "Weather Forecast"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:71
+msgid "Audio vario"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:72
+msgid "Emulate the sound of an electronic vario."
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:75
+msgid "Volume"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:78
+msgid "Enable Deadband"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:79
+msgid ""
+"Mute the audio output in when the current lift is in a certain range around "
+"zero"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:85
+msgid "Min. Frequency"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:86
+msgid "The tone frequency that is played at maximum sink rate."
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:91
+msgid "Zero Frequency"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:92
+msgid "The tone frequency that is played at zero climb rate."
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:97
+msgid "Max. Frequency"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:98
+msgid "The tone frequency that is played at maximum climb rate."
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:106
+msgid "Deadband min. lift"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:107
+msgid ""
+"Below this lift threshold the vario will start to play sounds if the "
+"'Deadband' feature is enabled."
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:116
+msgid "Deadband max. lift"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:117
+msgid ""
+"Above this lift threshold the vario will start to play sounds if the "
+"'Deadband' feature is enabled."
 msgstr ""
 
 #: src/Dialogs/Weather/NOAAList.cpp:110 src/Dialogs/Weather/NOAADetails.cpp:74
