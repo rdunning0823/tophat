@@ -2,7 +2,7 @@
 
 <Form Caption="Waypoint">
   <Button Caption="Close" X="0" Y="-37" Width="150" Height="35" OnClick="OnCloseClicked"/>
-  <Button Name="butAdd" Caption="Insert after" X="157" Y="109" Width="73" Height="35" OnClick="OnAddClicked"/>
+  <Button Name="butAdd" Caption="Insert before" X="157" Y="109" Width="73" Height="35" OnClick="OnAddClicked"/>
   <Button Name="butTaskProperties" X="2" Y="2" Width="236" Height="35" OnClick="OnTaskPropertiesClicked"/>
   <Button Name="butBrowse" Caption="Browse" X="157" Y="38" Width="73" Height="35" OnClick="OnBrowseClicked"/>
   

@@ -78,7 +78,6 @@ Copyright_License {
 #include <assert.h>
 #include <stdio.h>
 
-
 static WndForm *wf = nullptr;
 static DockWindow *dock;
 static ObservationZoneEditWidget *properties_widget;
@@ -105,6 +104,11 @@ public:
   /* virtual methods from ListCursorHandler */
   virtual void OnCursorMoved(unsigned index) override;
 
+  virtual bool CanActivateItem(unsigned index) const override {
+    return true;
+  }
+
+  virtual void OnActivateItem(unsigned index) override;
 };
 
 class TPOZListenerUs : public ObservationZoneEditWidget::Listener {
@@ -207,7 +211,7 @@ ShowDetails(bool visible)
   assert (button_add != nullptr);
   button_add->SetVisible(!ordered_task->IsFull());
   if (visible)
-    button_add->SetCaption(_("Insert after"));
+    button_add->SetCaption(_("Insert before"));
   else
     button_add->SetCaption(_("Insert"));
 }
@@ -270,14 +274,26 @@ RefreshTaskProperties()
 static void
 RefreshView()
 {
-  wTaskPoints->SetLength(ordered_task->TaskSize());
+  wTaskPoints->SetLength(ordered_task->TaskSize() + 1);
 
   wTaskPoints->SetCursorIndex(active_index);
 
   RefreshTaskProperties();
 
   ShowDetails(ordered_task->TaskSize() != 0);
-  if (ordered_task->TaskSize() == 0)
+
+  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
+  assert (button_type != nullptr);
+
+  if (ordered_task->TaskSize() == 0 ||
+      active_index == ordered_task->TaskSize()) {
+    dock->SetWidget(nullptr);
+    button_type->SetVisible(false);
+    return;
+  }
+  button_type->SetVisible(true);
+
+  if (active_index == ordered_task->TaskSize())
     return;
 
   OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
@@ -305,9 +321,6 @@ RefreshView()
     }
   }
 
-  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
-  assert (button_type != nullptr);
-
   TrivialArray<TaskPointFactoryType, LegalPointSet::N> point_types;
   point_types.clear();
   ordered_task->GetFactory().GetValidTypes(active_index)
@@ -331,6 +344,8 @@ ReadValues()
 static void 
 OnRemoveClicked(gcc_unused WndButton &Sender)
 {
+  assert(active_index < ordered_task->TaskSize());
+
   unsigned result = ShowMessageBox(_("Remove task point?"), _("Task Point"),
                                    MB_YESNOALL | MB_ICONQUESTION);
 
@@ -348,6 +363,7 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
     break;
   case IDALL:
     ordered_task->RemoveAllPoints();
+    active_index = 0;
     break;
   }
 
@@ -374,24 +390,29 @@ OnBrowseClicked(gcc_unused WndButton &Sender)
 }
 
 /**
- * appends or inserts a task point after the current item
+ * inserts or appends to task
+ * @param insert_index point after new point.
+ * (also the index of the new point)
  */
 static void
-OnAddClicked(gcc_unused WndButton &Sender)
+AddInsertTurnpoint(const unsigned insert_index)
 {
+  assert(insert_index <= ordered_task->TaskSize());
   assert(!ordered_task->IsFull());
+
+  const unsigned task_size = ordered_task->TaskSize();
 
   OrderedTaskPoint* point = nullptr;
   AbstractTaskFactory &factory = ordered_task->GetFactory();
   const Waypoint* way_point =
-    ShowWaypointListDialog(ordered_task->TaskSize() > 0
-                           ? ordered_task->GetPoint(ordered_task->TaskSize() - 1).GetLocation()
+    ShowWaypointListDialog((insert_index != task_size)
+                           ? ordered_task->GetPoint(task_size - 1).GetLocation()
                            : CommonInterface::Basic().location,
                              ordered_task, active_index);
   if (!way_point)
     return;
 
-  if (ordered_task->TaskSize() == 0) {
+  if (task_size == 0) {
     point = (OrderedTaskPoint*)factory.CreateStart(*way_point);
     active_index = 0;
   } else {
@@ -401,15 +422,24 @@ OnAddClicked(gcc_unused WndButton &Sender)
     return;
 
   // insert after current index
-  if (factory.Insert(*point, active_index + 1, true)) {
+  if (factory.Insert(*point, insert_index, true)) {
     task_modified = true;
-    if (ordered_task->TaskSize() > 1)
-      active_index++;
+    if (insert_index + 1 == ordered_task->TaskSize())
+      active_index = insert_index;
     ordered_task->UpdateGeometry();
   }
 
   delete point;
   RefreshView();
+}
+/**
+ * appends or inserts a task point after the current item
+ */
+static void
+OnAddClicked(gcc_unused WndButton &Sender)
+{
+  assert(!ordered_task->IsFull());
+  AddInsertTurnpoint(active_index);
 }
 
 static void
@@ -459,10 +489,18 @@ TPOZListenerUs::OnModified(ObservationZoneEditWidget &widget)
 }
 
 void
+TaskPointUsDialog::OnActivateItem(unsigned i)
+{
+  if (i == ordered_task->TaskSize()) {
+    AddInsertTurnpoint(i);
+    return;
+  }
+}
+
+void
 TaskPointUsDialog::OnCursorMoved(unsigned i)
 {
-  if (i == ordered_task->TaskSize())
-    return;
+  assert(i <= ordered_task->TaskSize());
 
   active_index = i;
   RefreshView();
@@ -474,7 +512,7 @@ TaskPointUsDialog::OnCursorMoved(unsigned i)
 void
 TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned DrawListIndex)
 {
-  assert(DrawListIndex < ordered_task->TaskSize());
+  assert(DrawListIndex <= ordered_task->TaskSize());
 
   TCHAR buffer[120];
 
@@ -482,6 +520,18 @@ TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned Draw
 
   const Font &name_font = *look.button.font;
   const Font &text_font = *look.text_font;
+  const unsigned padding = Layout::GetTextPadding();
+  const PixelScalar line_height = rc.bottom - rc.top;
+
+  // Draw "Add turnpoint" label
+  if (DrawListIndex == ordered_task->TaskSize()) {
+    canvas.Select(name_font);
+    _stprintf(buffer, _T("  (%s)"), _("Append turnpoint"));
+    canvas.DrawText(rc.left + padding,
+                    rc.top + line_height / 2 - name_font.GetHeight() / 2,
+                    buffer);
+    return;
+  }
 
   const OrderedTaskPoint &tp = ordered_task->GetTaskPoint(DrawListIndex);
 
