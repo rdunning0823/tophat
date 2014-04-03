@@ -19,7 +19,7 @@
     </Panel>
 
     <Panel Name="frmButtons" X="155" Y="115" Width="76" Height="105" Border="0">
-      <Button Name="butRelocate" Caption="Move" X="0" Y="35" Width="73" Height="35" OnClick="OnRelocateClicked"/>
+      <Button Name="butRelocate" Caption="Replace" X="0" Y="35" Width="73" Height="35" OnClick="OnRelocateClicked"/>
       <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
     </Panel>
 
