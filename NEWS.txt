@@ -17,6 +17,7 @@ Top Hat Soaring 1.3.4d beta TBD
 * Use shadow in Map overlay button symbol so clearer on light and dark background
 * Fix bug in Plane polar setup - saving custom polars
 * Enumerate usb hub ports 1-4 for Kobo to support multiple devices (e.g. Flarm and vario)
+* Task editor: add "Append turnpoint" function
 
 Top Hat Soaring 1.3.4b beta 1/28/2014
 * fix bug with Waypoint list name search "magnifying glass" icon
