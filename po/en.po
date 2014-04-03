@@ -5330,11 +5330,11 @@ msgstr ""
 
 #: src/Dialogs/Plane/PlanePolarDialog.cpp:140
 msgid "Reference Mass"
-msgstr ""
+msgstr "Reference mass"
 
 #: src/Dialogs/Plane/PlanePolarDialog.cpp:145
 msgid "Dry Mass"
-msgstr ""
+msgstr "Flying mass"
 
 #. let the user select
 #: src/Dialogs/Plane/PlanePolarDialog.cpp:186
