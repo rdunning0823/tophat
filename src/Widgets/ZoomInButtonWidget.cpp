@@ -51,7 +51,13 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
 {
   PixelRect rc;
 
-  switch (s_but->GetButtonPosition()) {
+  // calc s_but position in case s_but not visible (e.g. on menu)
+  ScreensButtonWidget::ButtonPosition button_position;
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+  button_position = s_but->GetButtonPosition(ui_settings.info_boxes.geometry,
+                                             Layout::landscape);
+
+  switch (button_position) {
   case ScreensButtonWidget::ButtonPosition::Bottom:
     // must be landscape mode
     rc.bottom = rc_map.bottom;
