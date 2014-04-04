@@ -26,10 +26,16 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Form/Button.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "Form/ActionListener.hpp"
 #include "Plane/Plane.hpp"
 #include "Language/Language.hpp"
 #include "UIGlobals.hpp"
+#include "Widget/PagerWidget.hpp"
+#include "Screen/SingleWindow.hpp"
 
+/**
+ * a class that has more important (page 1) of the plane information
+ */
 class PlaneEditWidget final
   : public RowFormWidget, DataFieldListener, ActionListener {
   enum Controls {
@@ -37,19 +43,14 @@ class PlaneEditWidget final
     COMPETITION_ID,
     POLAR,
     TYPE,
-    HANDICAP,
-    WING_AREA,
-    MAX_BALLAST,
-    DUMP_TIME,
-    MAX_SPEED,
   };
 
   WndForm *dialog;
 
-  Plane plane;
+  Plane &plane;
 
 public:
-  PlaneEditWidget(const Plane &_plane, const DialogLook &_look,
+  PlaneEditWidget(Plane &_plane, const DialogLook &_look,
                   WndForm *_dialog)
     :RowFormWidget(_look), dialog(_dialog), plane(_plane) {}
 
@@ -112,25 +113,6 @@ PlaneEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddText(_("Comp. ID"), nullptr, plane.competition_id);
   AddButton(_("Polar"), *this, POLAR);
   AddText(_("Type"), nullptr, plane.type);
-  AddInteger(_("Handicap"), nullptr,
-             _T("%u %%"), _T("%u"),
-             50, 150, 1,
-             plane.handicap);
-  AddFloat(_("Wing Area"), nullptr,
-           _T("%.1f m²"), _T("%.1f"),
-           fixed(0), fixed(40), fixed(0.1),
-           false, plane.wing_area);
-  AddFloat(_("Max. Ballast"), nullptr,
-           _T("%.0f l"), _T("%.0f"),
-           fixed(0), fixed(500), fixed(5),
-           false, plane.max_ballast);
-  AddInteger(_("Dump Time"), nullptr,
-             _T("%u s"), _T("%u"),
-             10, 300, 5,
-             plane.dump_time);
-  AddFloat(_("Max. Cruise Speed"), nullptr,
-           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5),
-           false, UnitGroup::HORIZONTAL_SPEED, plane.max_speed);
 
   UpdateCaption();
   UpdatePolarButton();
@@ -146,12 +128,6 @@ PlaneEditWidget::Save(bool &_changed)
   changed |= SaveValue(COMPETITION_ID, plane.competition_id.buffer(),
                        plane.competition_id.MAX_SIZE);
   changed |= SaveValue(TYPE, plane.type.buffer(), plane.type.MAX_SIZE);
-  changed |= SaveValue(HANDICAP, plane.handicap);
-  changed |= SaveValue(WING_AREA, plane.wing_area);
-  changed |= SaveValue(MAX_BALLAST, plane.max_ballast);
-  changed |= SaveValue(DUMP_TIME, plane.dump_time);
-  changed |= SaveValue(MAX_SPEED, UnitGroup::HORIZONTAL_SPEED,
-                       plane.max_speed);
 
   _changed |= changed;
   return true;
@@ -178,28 +154,173 @@ PlaneEditWidget::PolarButtonClicked()
   UpdatePolarButton();
   if (plane.polar_name != _T("Custom"))
     LoadValue(TYPE, plane.polar_name.c_str());
+}
 
-  /* reload attributes that may have been modified */
+/**
+ * a class that has less important (page 2) of the plane information
+ */
+class PlaneEditMoreWidget final
+  : public RowFormWidget {
+  enum Controls {
+    HANDICAP,
+    WING_AREA,
+    MAX_BALLAST,
+    DUMP_TIME,
+    MAX_SPEED,
+  };
+
+  WndForm *dialog;
+
+  Plane &plane;
+
+public:
+  PlaneEditMoreWidget(Plane &_plane, const DialogLook &_look,
+                  WndForm *_dialog)
+    :RowFormWidget(_look), dialog(_dialog), plane(_plane) {}
+
+  const Plane &GetValue() const {
+    return plane;
+  }
+
+  /* virtual methods from Widget */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual bool Save(bool &changed) override;
+  virtual void Show(const PixelRect &rc) override;
+  virtual void Hide() override;
+};
+
+void
+PlaneEditMoreWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  AddInteger(_("Handicap"), nullptr,
+             _T("%u %%"), _T("%u"),
+             50, 150, 1,
+             plane.handicap);
+
+  AddFloat(_("Wing Area"), nullptr,
+           _T("%.1f m²"), _T("%.1f"),
+           fixed(0), fixed(40), fixed(0.1),
+           false, plane.wing_area);
+
+  AddFloat(_("Max. Ballast"), nullptr,
+           _T("%.0f l"), _T("%.0f"),
+           fixed(0), fixed(500), fixed(5),
+           false, plane.max_ballast);
+
+  AddInteger(_("Dump Time"), nullptr,
+               _T("%u s"), _T("%u"),
+               10, 300, 5,
+               plane.dump_time);
+
+  AddFloat(_("Max. Cruise Speed"), nullptr,
+           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5),
+           false, UnitGroup::HORIZONTAL_SPEED, plane.max_speed);
+}
+
+void
+PlaneEditMoreWidget::Show(const PixelRect &rc)
+{
+  RowFormWidget::Show(rc);
+  /* reload attributes that may have been modified by polar */
+  LoadValue(HANDICAP, (int)plane.handicap);
   LoadValue(WING_AREA, plane.wing_area);
   LoadValue(MAX_BALLAST, plane.max_ballast);
   LoadValue(MAX_SPEED, plane.max_speed, UnitGroup::HORIZONTAL_SPEED);
 }
 
+void
+PlaneEditMoreWidget::Hide()
+{
+  RowFormWidget::Hide();
+  /* save attributes that may have been modified by polar */
+  SaveValue(HANDICAP, plane.handicap);
+  SaveValue(WING_AREA, plane.wing_area);
+  SaveValue(MAX_BALLAST, plane.max_ballast);
+  SaveValue(MAX_SPEED, UnitGroup::HORIZONTAL_SPEED,
+            plane.max_speed);
+}
+
+bool
+PlaneEditMoreWidget::Save(bool &_changed)
+{
+  bool changed = false;
+
+  changed |= SaveValue(HANDICAP, plane.handicap);
+  changed |= SaveValue(WING_AREA, plane.wing_area);
+  changed |= SaveValue(MAX_BALLAST, plane.max_ballast);
+  changed |= SaveValue(DUMP_TIME, plane.dump_time);
+  changed |= SaveValue(MAX_SPEED, UnitGroup::HORIZONTAL_SPEED,
+                       plane.max_speed);
+
+  _changed |= changed;
+  return true;
+}
+
+static Plane
+MergeMorePlane(Plane plane, const Plane &plane_more)
+{
+  plane.handicap = plane_more.handicap;
+  plane.dump_time = plane_more.dump_time;
+
+  return plane;
+}
+class PlanesPager : ActionListener, public PagerWidget
+{
+protected:
+  enum PageButtons {
+    NEXT_PLANE_PAGE = 101,
+  };
+
+  WidgetDialog *dialog;
+
+public:
+
+  void SetDialog(WidgetDialog &_dialog) {
+    dialog = &_dialog;
+  }
+
+  virtual void OnAction(int id) override {
+    assert(dialog != nullptr);
+    switch (id) {
+    case NEXT_PLANE_PAGE:
+      this->Next(true);
+    }
+  }
+
+  void AddButtons() {
+    assert(dialog != nullptr);
+    dialog->AddButton(_("OK"), mrOK);
+    dialog->AddButton(_("Cancel"), mrCancel);
+    dialog->AddSymbolButton(_(">"), *this, NEXT_PLANE_PAGE);
+  }
+};
+
 bool
 dlgPlaneDetailsShowModal(Plane &_plane)
 {
+  Plane plane = _plane;
   const DialogLook &look = UIGlobals::GetDialogLook();
   WidgetDialog dialog(look);
-  PlaneEditWidget widget(_plane, look, &dialog);
-  dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Plane Details"), &widget);
-  dialog.AddButton(_("OK"), mrOK);
-  dialog.AddButton(_("Cancel"), mrCancel);
+
+  PlaneEditWidget *plane_edit_widget =
+      new PlaneEditWidget(_plane, look, &dialog);
+  PlaneEditMoreWidget *plane_edit_more_widget =
+      new PlaneEditMoreWidget(_plane, look, &dialog);
+
+  PlanesPager planes_pager;
+  planes_pager.SetDialog(dialog);
+  planes_pager.Add(plane_edit_widget);
+  planes_pager.Add(plane_edit_more_widget);
+
+  dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Plane Details"), &planes_pager);
+  planes_pager.AddButtons();
   const int result = dialog.ShowModal();
   dialog.StealWidget();
 
   if (result != mrOK)
     return false;
 
-  _plane = widget.GetValue();
+  plane = MergeMorePlane(plane_edit_widget->GetValue(),
+                         plane_edit_more_widget->GetValue());
   return true;
 }
