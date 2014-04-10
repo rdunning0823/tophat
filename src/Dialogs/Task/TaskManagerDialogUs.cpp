@@ -165,16 +165,16 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  fly_button = new WndButton(GetClientAreaWindow(), look.button, _T("Close"),
+  fly_button = new WndButton(GetClientAreaWindow(), look.button, _("Close"),
                              rc_fly_button,
                              button_style, *this, FLY);
 
   save_as_button = new WndButton(GetClientAreaWindow(), look.button,
-                                 _T("Save as"),
+                                 _("Save as"),
                              rc_save_as_button,
                              button_style, *this, SAVE_AS);
 
-  back_button = new WndButton(GetClientAreaWindow(), look.button, _T("Back"),
+  back_button = new WndButton(GetClientAreaWindow(), look.button, _("Back"),
                              rc_back_button,
                              button_style, *this, BACK);
 
