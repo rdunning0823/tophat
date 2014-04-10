@@ -300,7 +300,7 @@ SetupQuick::RefreshForm()
     text.append(port_name);
   }
   if (text.empty())
-    text = unconfigured;
+    text = gettext(unconfigured);
   device_text->SetCaption(text.c_str());
 
   text.clear();
@@ -323,13 +323,13 @@ SetupQuick::RefreshForm()
   if (name != nullptr)
     text_filename = name;
   if (text_filename.empty())
-    text_filename = unconfigured;
+    text_filename = gettext(unconfigured);
 
   site_files_text->SetCaption(text_filename.c_str());
 
   text = settings.plane.registration;
   if (text.empty())
-      text = unconfigured;
+      text = gettext(unconfigured);
   plane_text->SetCaption(text.c_str());
 
   const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
@@ -345,7 +345,7 @@ SetupQuick::RefreshForm()
   const LoggerSettings &logger = settings_computer.logger;
   text = logger.pilot_name;
   if (text.empty())
-    text = unconfigured;
+    text = gettext(unconfigured);
   pilot_text->SetCaption(text.c_str());
 }
 
