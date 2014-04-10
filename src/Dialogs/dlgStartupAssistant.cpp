@@ -194,7 +194,7 @@ StartupAssistant::SetTip(bool forward)
          ui_settings.last_startup_tip <= ARRAY_SIZE(tips));
 
   StaticString<512> tip;
-  tip.Format(_T("Tip %u:\n%s"), ui_settings.last_startup_tip, tips[ui_settings.last_startup_tip - 1]);
+  tip.Format(_T("Tip %u:\n%s"), ui_settings.last_startup_tip, gettext(tips[ui_settings.last_startup_tip - 1]));
 
   tip_text->SetCaption(tip.c_str());
 }
