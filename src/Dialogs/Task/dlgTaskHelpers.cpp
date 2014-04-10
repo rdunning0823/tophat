@@ -114,7 +114,7 @@ OrderedTaskSummary(const OrderedTask *task, TCHAR *text, bool linebreaks)
     FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
 
     gate_info.Format(_T("\n%s: %s %s. Finish Height: %s %s. "),
-                     N_("Start Height"),
+                     _("Start Height"),
                      start_height.c_str(),
                      (otb.start_constraints.max_height_ref == AltitudeReference::AGL)
                      ? _("AGL") : _("MSL"),
@@ -209,19 +209,19 @@ OrderedTaskPointLabelMapAction(TaskPointType type, const TCHAR *name,
 {
   switch (type) {
   case TaskPointType::START:
-    _stprintf(buffer, _T("%s %s: %s"), N_("Zoom to"), N_("Start"), name);
+    _stprintf(buffer, _T("%s %s: %s"), _("Zoom to"), _("Start"), name);
     break;
 
   case TaskPointType::AST:
-    _stprintf(buffer, _T("%s T%d: %s"), N_("Zoom to"), index, name);
+    _stprintf(buffer, _T("%s T%d: %s"), _("Zoom to"), index, name);
     break;
 
   case TaskPointType::AAT:
-    _stprintf(buffer, _T("%s %d: %s"), N_("Drag target"), index, name);
+    _stprintf(buffer, _T("%s %d: %s"), _("Drag target"), index, name);
     break;
 
   case TaskPointType::FINISH:
-    _stprintf(buffer, _T("%s finish:  %s"), N_("Zoom to"), name);
+    _stprintf(buffer, _T("%s finish:  %s"), _("Zoom to"), name);
     break;
 
   default:
