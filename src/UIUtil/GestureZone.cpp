@@ -110,8 +110,8 @@ GestureZone::DrawZoneHelp(Canvas &canvas, PixelRect rc)
 
   unsigned y_middle = rc.top + rc.GetSize().cy / 2;
   int arrow_tip = x_zone_width / 2;
-  const TCHAR *message1 = N_("Swipe from edge");
-  const TCHAR *message2 = N_("to switch screens");
+  const TCHAR *message1 = _("Swipe from edge");
+  const TCHAR *message2 = _("to switch screens");
 
   const PixelSize ts1 = canvas.CalcTextSize(message1);
   const PixelSize ts2 = canvas.CalcTextSize(message2);
