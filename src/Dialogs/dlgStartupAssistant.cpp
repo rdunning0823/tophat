@@ -194,7 +194,7 @@ StartupAssistant::SetTip(bool forward)
          ui_settings.last_startup_tip <= ARRAY_SIZE(tips));
 
   StaticString<512> tip;
-  tip.Format(_T("Tip %u:\n%s"), ui_settings.last_startup_tip, gettext(tips[ui_settings.last_startup_tip - 1]));
+  tip.Format(_T("%s %u:\n%s"), _("Tip"), ui_settings.last_startup_tip, gettext(tips[ui_settings.last_startup_tip - 1]));
 
   tip_text->SetCaption(tip.c_str());
 }
@@ -278,15 +278,15 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  close = new WndButton(GetClientAreaWindow(), button_look, _T("Close"),
+  close = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
                         rc_close,
                         button_style, *this, CloseDialogClick);
 
-  next_tip = new WndButton(GetClientAreaWindow(), button_look, _T("Next Tip"),
+  next_tip = new WndButton(GetClientAreaWindow(), button_look, _("Next tip"),
                            rc_next_tip,
                            button_style, *this, NextTipClick);
 
-  prev_tip = new WndButton(GetClientAreaWindow(), button_look, _T("Previous Tip"),
+  prev_tip = new WndButton(GetClientAreaWindow(), button_look, _("Previous tip"),
                            rc_prev_tip,
                            button_style, *this, PrevTipClick);
 
