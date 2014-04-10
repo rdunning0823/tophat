@@ -110,10 +110,10 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     canvas.DrawFilledRectangle(rc, Color(color));
 
     //draw search icon
-  } else if (caption == N_("Search") || caption == N_("SearchChecked")) {
+  } else if (caption == _("Search") || caption == _("SearchChecked")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const Bitmap *bmp;
-    bmp = caption == N_("Search") ? &icon_look.hBmpSearch :
+    bmp = caption == _("Search") ? &icon_look.hBmpSearch :
         &icon_look.hBmpSearchChecked;
 
     const PixelSize bitmap_size = bmp->GetSize();
@@ -137,7 +137,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   }
 
   //draw gear for set up icon
-  else if (caption == N_("Setup")) {
+  else if (caption == _("Setup")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const Bitmap &bmp = icon_look.hBmpTabSettings;
 
@@ -159,8 +159,8 @@ WndSymbolButton::OnPaint(Canvas &canvas)
                       bmp,
                       bitmap_size.cx / 2, 0);
 
-  } else if (caption == N_("More") || caption == N_("Less")) {
-    bool up = caption == N_("Less");
+  } else if (caption == _("More") || caption == _("Less")) {
+    bool up = caption == _("Less");
     // Draw arrow symbols instead of v and ^
     const Font &font = *look.font;
     canvas.Select(font);
