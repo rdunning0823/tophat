@@ -142,7 +142,7 @@ static_assert(ARRAY_SIZE(tp_factory_descriptions) == unsigned(TaskPointFactoryTy
 const TCHAR*
 OrderedTaskPointDescription(TaskPointFactoryType type)
 {
-  return tp_factory_descriptions[unsigned(type)];
+  return gettext(tp_factory_descriptions[unsigned(type)]);
 }
 
 static const TCHAR *const tp_factory_names[] = {
@@ -172,5 +172,5 @@ static_assert(ARRAY_SIZE(tp_factory_names) == unsigned(TaskPointFactoryType::COU
 const TCHAR*
 OrderedTaskPointName(TaskPointFactoryType type)
 {
-  return tp_factory_names[unsigned(type)];
+  return gettext(tp_factory_names[unsigned(type)]);
 }
