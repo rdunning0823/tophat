@@ -66,3 +66,9 @@ Top Hat repository.)
 	* Change ownership so you don't need to compile as root (as above)
 
 ------------
+Source code for Kobo uimage
+
+Starting with Top Hat 1.3.4d_beta, we are no longer archiving the source code for the Kobo uImage
+within the tarball file posted on the website.  However, it is included in the Top Hat git 
+repository.  Also, if you want to download it directly, look at Top Hat version 1.3.4c_beta which
+includes the current version of the uImage source in the tar archive.
