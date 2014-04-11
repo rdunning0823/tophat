@@ -5428,7 +5428,7 @@ msgstr "Ingen sjekkliste lastet inn"
 #: src/Dialogs/dlgChecklist.cpp:150
 # , fuzzy
 msgid "Create xcsoar-checklist.txt"
-msgstr "Opprett xcsoar-sjekkliste.txt\n"
+msgstr "Opprett xcsoar-sjekkliste.txt"
 
 #: src/Dialogs/Plane/PlaneListDialog.cpp:195
 #: Data/Dialogs/dlgConfigWaypoints_L.xml:6

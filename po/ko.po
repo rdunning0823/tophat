@@ -5230,7 +5230,7 @@ msgstr "체크 리스트가 읽혀지지 않았습니다."
 #: src/Dialogs/dlgChecklist.cpp:150
 # , fuzzy
 msgid "Create xcsoar-checklist.txt"
-msgstr "xcsoar-checklist.txt 생성\n"
+msgstr "xcsoar-checklist.txt 생성"
 
 #: src/Dialogs/Plane/PlaneListDialog.cpp:195
 #: Data/Dialogs/dlgConfigWaypoints_L.xml:6
