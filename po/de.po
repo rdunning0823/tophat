@@ -5896,7 +5896,7 @@ msgstr ""
 
 #: src/Dialogs/dlgStartupAssistant.cpp:197
 msgid "Tip"
-msgstr "Obergrenze"
+msgstr "Tipp"
 
 #: src/Dialogs/dlgStartupAssistant.cpp:268
 msgid "Top Hat Tips"
@@ -5904,11 +5904,11 @@ msgstr "Top Hat Tipps"
 
 #: src/Dialogs/dlgStartupAssistant.cpp:285
 msgid "Next tip"
-msgstr "Nächster WP"
+msgstr "Nächster Tipp"
 
 #: src/Dialogs/dlgStartupAssistant.cpp:289
 msgid "Previous tip"
-msgstr "Vorheriger Wendepunkt"
+msgstr "Vorheriger Tipp"
 
 #: src/Dialogs/dlgStartupAssistant.cpp:297
 msgid "Don't show tips at startup"
@@ -8891,7 +8891,7 @@ msgstr "Aufgabe ungültig. Änderungen gehen verloren. Weiter?"
 #: src/Dialogs/Task/TaskEditorDialog.cpp:214
 #: Data/Dialogs/dlgTaskEditor_L.xml:7 Data/Dialogs/dlgTaskEditor.xml:5
 msgid "Insert before"
-msgstr "In Aufgabe einfügen"
+msgstr "Einfügen"
 
 #: src/Dialogs/Task/TaskEditorDialog.cpp:349
 msgid "Task Point"
@@ -8899,7 +8899,7 @@ msgstr "Wendepunkt"
 
 #: src/Dialogs/Task/TaskEditorDialog.cpp:529
 msgid "Append turnpoint"
-msgstr "Wendepunkt hinzufügen"
+msgstr "Wendepunkt anfügen"
 
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:240
 msgid "Sets the behavior for the current task."
@@ -8939,7 +8939,7 @@ msgstr "Aufgabe speichern?"
 
 #: src/Dialogs/Task/TaskManagerDialogUs.cpp:177
 msgid "Back"
-msgstr ""
+msgstr "Zurück"
 
 #: src/Dialogs/Task/MutateTaskPointDialog.cpp:129
 msgid "Task Point Type"
