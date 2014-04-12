@@ -83,6 +83,7 @@ extern const char CircleZoom[];
 extern const char MaxAutoZoomDistance[];
 extern const char ATCReference[];
 extern const char HomeWaypoint[];
+extern const char HomeWaypointName[];
 extern const char HomeLocation[];
 extern const char HomeElevation[];
 extern const char HomeElevationAvailable[];

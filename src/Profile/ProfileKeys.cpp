@@ -55,6 +55,7 @@ const char FinalGlideTerrain[] = "FinalGlideTerrain";
 const char UserWindSource[] = "WindSourceFromUser";
 const char ATCReference[] = "ATCReference";
 const char HomeWaypoint[] = "HomeWaypoint";
+const char HomeWaypointName[] = "HomeWaypointName";
 const char HomeLocation[] = "HomeLocation";
 const char HomeElevation[] = "HomeElevation";
 const char HomeElevationAvailable[] = "HomeElevationAvailable";

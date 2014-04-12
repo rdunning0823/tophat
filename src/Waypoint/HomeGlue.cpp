@@ -28,6 +28,10 @@ Copyright_License {
 #include "Terrain/RasterTerrain.hpp"
 #include "Waypoint/Waypoints.hpp"
 #include "LastUsed.hpp"
+#include "Util/tstring.hpp"
+#include "Util/ConvertString.hpp"
+
+#include <stdlib.h>
 
 const Waypoint *
 WaypointGlue::FindHomeId(Waypoints &waypoints,
@@ -62,8 +66,6 @@ WaypointGlue::FindHomeLocation(Waypoints &waypoints,
   const Waypoint *wp = waypoints.LookupLocation(settings.home_location,
                                                 fixed(100));
   if (wp == NULL || !wp->IsAirport()) {
-    settings.home_location_available = false;
-    settings.home_elevation_available = false;
     return NULL;
   }
 
@@ -87,6 +89,49 @@ WaypointGlue::FindFlaggedHome(Waypoints &waypoints,
   return wp;
 }
 
+/**
+ * if the wp location in poi_settings is valid, and the name is stored
+ * in the profile, and we're flying, then create a new waypoint with this
+ * information and append it to the waypoint database
+ *
+ * @param waypoints the database
+ * @param poi_settings info about last home waypoint
+ * @param flying.  true if state of aircraft is flying
+ * @return pointer to waypoint in waypoint database or nullptr if not added
+ */
+static const Waypoint*
+CreateHomeAndAppend(Waypoints &waypoints,
+                    PlacesOfInterestSettings &poi_settings,
+                    bool flying)
+{
+  // if not flying, the don't save home if wp file is changed - recalc based on
+  // new wp file and/or new terrain
+  // but if flying, then retain home even when waypoint file changes
+  if (!poi_settings.home_location.IsValid() ||
+      !flying)
+    return nullptr;
+//  TCHAR blank[] = _T("");
+  tstring home_waypoint_name;
+  UTF8ToWideConverter text2(Profile::Get(ProfileKeys::HomeWaypointName, ""));
+  if (text2.IsValid())
+    home_waypoint_name = text2;
+
+  if (home_waypoint_name.length() == 0)
+    return nullptr;
+
+  Waypoint wp_temp(poi_settings.home_location);
+  wp_temp.name = home_waypoint_name;
+  if (poi_settings.home_elevation_available)
+    wp_temp.elevation = poi_settings.home_elevation;
+
+  const Waypoint wp_new = waypoints.Append(std::move(wp_temp));
+  poi_settings.home_waypoint = wp_new.id;
+  poi_settings.home_location_available = true;
+  waypoints.SetHome(wp_new.id);
+
+  return waypoints.GetHome();
+}
+
 void
 WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
                       PlacesOfInterestSettings &poi_settings,
@@ -103,7 +148,14 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
     /* fall back to HomeLocation, try to find it in the waypoint
        database */
     wp = FindHomeLocation(way_points, poi_settings);
+    // create a new waypoint if home exists but can't be found in the wp file
+    if (wp == nullptr)
+      wp = CreateHomeAndAppend(way_points, poi_settings,
+                               device_blackboard->Calculated().flight.flying);
+
     if (wp == NULL)
+      poi_settings.home_location_available = false;
+      poi_settings.home_elevation_available = false;
       // search for home in waypoint list, if we don't have a home
       wp = FindFlaggedHome(way_points, poi_settings);
   }
@@ -116,6 +168,15 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
       !way_points.LookupId(team_code_settings.team_code_reference_waypoint))
     // set team code reference waypoint if we don't have one
     team_code_settings.team_code_reference_waypoint = poi_settings.home_waypoint;
+
+  if (poi_settings.home_location_available) {
+    Profile::SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
+    const Waypoint *wp = way_points.LookupId(poi_settings.home_waypoint);
+    tstring name;
+    if (wp != nullptr)
+      name = wp->name.c_str();
+    Profile::Set(ProfileKeys::HomeWaypointName, name.c_str());
+  }
 
   if (device_blackboard != NULL) {
     if (wp != NULL) {
@@ -137,8 +198,12 @@ WaypointGlue::SaveHome(const PlacesOfInterestSettings &poi_settings,
                        const TeamCodeSettings &team_code_settings)
 {
   Profile::Set(ProfileKeys::HomeWaypoint, poi_settings.home_waypoint);
-  if (poi_settings.home_location_available)
+  if (poi_settings.home_location_available) {
     Profile::SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
+/*    const Waypoint *wp = way_points.LookupId(poi_settings.home_waypoint);
+    if (wp != nullptr)
+      Profile::Set(ProfileKeys::HomeWaypointName, wp->name.c_str());*/
+  }
 
   Profile::Set(ProfileKeys::HomeElevationAvailable, poi_settings.home_elevation_available);
   if (poi_settings.home_elevation_available)
