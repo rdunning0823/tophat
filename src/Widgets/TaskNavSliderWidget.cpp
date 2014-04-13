@@ -160,13 +160,27 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
   bool use_target =
       task_data_cache.GetTaskFactoryType() == TaskFactoryType::AAT &&
-      task_data_cache.GetTaskMode() == TaskType::ORDERED;
+      task_data_cache.GetTaskMode() == TaskType::ORDERED &&
+      idx > 0;
 
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
   const TerrainRendererSettings &terrain = settings_map.terrain;
   unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
   if (IsKobo())
     border_width /= 2;
+
+  void Draw(Canvas &canvas, const PixelRect rc_outer,
+            unsigned idx, bool selected, bool is_current_tp,
+            const TCHAR *tp_name,
+            bool has_entered, bool has_exited,
+            TaskType task_mode, TaskFactoryType task_factory_type,
+            unsigned task_size,
+            bool tp_valid, fixed tp_distance, bool distance_valid,
+            fixed tp_altitude_difference,
+            bool altitude_difference_valid,
+            Angle delta_bearing,
+            bool bearing_valid,
+            unsigned border_width);
 
   slider_shape.Draw(canvas, rc_outer,
                     idx, GetList().GetCursorDownIndex() == (int)idx,
