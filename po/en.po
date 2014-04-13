@@ -2744,7 +2744,7 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1326
 # , fuzzy, no-c-format
 msgid "Home arrival altitude AGL"
-msgstr "Altitude barometric"
+msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1327
 #, no-c-format
@@ -2813,7 +2813,7 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1368
 # , fuzzy, no-c-format
 msgid "Distance takeoff"
-msgstr "Home distance"
+msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1369
 #, no-c-format
@@ -6695,9 +6695,8 @@ msgid "Edit screens"
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:194
-# , fuzzy
 msgid "Edit infoboxes"
-msgstr "Infoboxes"
+msgstr ""
 
 #: src/Dialogs/Settings/Panels/LoggerConfigPanel.cpp:60
 msgid "Pilot name"
@@ -6981,7 +6980,6 @@ msgid "Specifies what should be displayed below the main area."
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:393
-# , fuzzy
 msgid "InfoBoxes"
 msgstr "Infoboxes"
 
@@ -7474,9 +7472,8 @@ msgid "Show FAI triangle areas on the map."
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/ScoringConfigPanel.cpp:137
-# , fuzzy
 msgid "FAI triangle threshold"
-msgstr "triangle"
+msgstr ""
 
 #: src/Dialogs/Settings/Panels/ScoringConfigPanel.cpp:138
 msgid "Specifies which threshold is used for \"large\" FAI triangles."
@@ -8314,7 +8311,7 @@ msgstr ""
 #: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:100
 # , fuzzy
 msgid "Distance remaining"
-msgstr "Home distance"
+msgstr ""
 
 #: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:102
 # , fuzzy
@@ -9406,9 +9403,8 @@ msgid "Scanning weather forecast"
 msgstr ""
 
 #: Data/Dialogs/WaypointListSimple.xml:3
-# , fuzzy
 msgid "By distance"
-msgstr "Dist"
+msgstr ""
 
 #: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:15
 #: Data/Dialogs/dlgFlarmTrafficDetails.xml:7
