@@ -1710,7 +1710,7 @@ msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:569
 #, no-c-format
-msgid "Flight Duration"
+msgid "Flight duration"
 msgstr "Temps de vol"
 
 #: src/InfoBoxes/Content/Factory.cpp:570

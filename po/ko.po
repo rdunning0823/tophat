@@ -1584,7 +1584,7 @@ msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:569
 # , fuzzy, no-c-format
-msgid "Flight Duration"
+msgid "Flight duration"
 msgstr "비행 파일 재생"
 
 #: src/InfoBoxes/Content/Factory.cpp:570

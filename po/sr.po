@@ -1582,7 +1582,7 @@ msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:569
 # , fuzzy, no-c-format
-msgid "Flight Duration"
+msgid "Flight duration"
 msgstr "Vreme letenja"
 
 #: src/InfoBoxes/Content/Factory.cpp:570
