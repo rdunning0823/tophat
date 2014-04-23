@@ -65,8 +65,8 @@ WaypointGlue::FindHomeLocation(Waypoints &waypoints,
 
   const Waypoint *wp = waypoints.LookupLocation(settings.home_location,
                                                 fixed(100));
-  if (wp == NULL || !wp->IsAirport()) {
-    return NULL;
+  if (wp == nullptr) {
+    return nullptr;
   }
 
   settings.home_elevation = wp->elevation;
