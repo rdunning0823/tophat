@@ -358,7 +358,7 @@ Startup()
   WaypointGlue::SetHome(way_points, terrain,
                         CommonInterface::SetComputerSettings().poi,
                         CommonInterface::SetComputerSettings().team_code,
-                        device_blackboard, false);
+                        device_blackboard, true);
 
   // ReSynchronise the blackboards here since SetHome touches them
   device_blackboard->Merge();
