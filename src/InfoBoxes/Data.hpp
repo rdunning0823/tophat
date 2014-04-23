@@ -81,6 +81,11 @@ struct InfoBoxData {
   void SetNotConfigured();
 
   /**
+   * clears value and notes in comment that user should click to configure
+   */
+  void SetClickToConfigure();
+
+  /**
    * Sets the InfoBox title to the given Value
    *
    * @param title New value of the InfoBox title

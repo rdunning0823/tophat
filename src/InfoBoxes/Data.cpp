@@ -40,6 +40,15 @@ InfoBoxData::SetNotConfigured()
 }
 
 void
+InfoBoxData::SetClickToConfigure()
+{
+  SetAllColors(0);
+  SetValue(_T(""));
+  SetValueUnit(Unit::UNDEFINED);
+  SetComment(_T("Click to configure"));
+}
+
+void
 InfoBoxData::SetInvalid()
 {
   SetAllColors(0);
