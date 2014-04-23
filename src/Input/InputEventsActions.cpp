@@ -86,6 +86,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Weather/Features.hpp"
 #include "MapWindow/GlueMapWindow.hpp"
 #include "Simulator.hpp"
+#include "Terrain/RasterTerrain.hpp"
 
 #include <assert.h>
 #include <tchar.h>
@@ -564,8 +565,29 @@ InputEvents::eventAddWaypoint(const TCHAR *misc)
       way_points.Optimise();
     }
   } else {
-    Waypoint edit_waypoint = way_points.Create(basic.location);
-    edit_waypoint.elevation = calculated.terrain_altitude;
+    Waypoint edit_waypoint;
+
+    if (StringIsEqual(misc, _T("panned_positing"))) {
+      GlueMapWindow *map_window = UIGlobals::GetMapIfActive();
+      if (map_window == NULL || !map_window->IsPanning())
+        return;
+
+      const WindowProjection &projection = map_window->VisibleProjection();
+      if (!projection.IsValid())
+        return;
+
+      GeoPoint location = projection.GetGeoScreenCenter();
+      edit_waypoint = way_points.Create(location);
+      short elevation = terrain->GetTerrainHeight(location);
+      if (!RasterBuffer::IsSpecial(elevation))
+        edit_waypoint.elevation = fixed(elevation);
+      else
+        edit_waypoint.elevation = fixed(0);
+
+    } else {
+      edit_waypoint = way_points.Create(basic.location);
+      edit_waypoint.elevation = calculated.terrain_altitude;
+    }
     if (!dlgWaypointEditShowModal(edit_waypoint) || edit_waypoint.name.empty()) {
       trigger_redraw();
       return;
