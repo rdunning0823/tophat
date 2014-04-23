@@ -117,6 +117,13 @@ event=Pan right
 
 mode=pan
 type=key
+data=APP2
+event=AddWaypoint panned_positing
+label=Add\nwaypoint
+location=25
+
+mode=pan
+type=key
 data=APP1
 event=Pan off
 label=Pan\nOff
@@ -1120,6 +1127,15 @@ event=Setup Wind
 event=Mode default
 label=Setup Wind
 location=23
+
+mode=Menu2
+type=key
+data=0
+event=AddWaypoint
+event=Mode default
+label=Add\nwaypoint
+location=24
+
 # -------------
 # mode=MenuLast
 # -------------
