@@ -418,7 +418,7 @@ RowFormWidget::UpdateLayout()
       /* subtract exceeded height evenly from all available rows
        * This may render a control that is smaller then GetMinimumHeight! */
       unsigned shrink_height = exceeded_height / n_available;
-      if (shrink_height > 0) {
+      if (shrink_height > 0 && shrink_height < height) {
         height -= shrink_height;
         exceeded_height -= shrink_height;
       }
