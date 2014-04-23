@@ -30,27 +30,6 @@ Copyright_License {
 #include "Formatter/Units.hpp"
 
 void
-UpdateInfoBoxHomeDistance(InfoBoxData &data)
-{
-  const NMEAInfo &basic = CommonInterface::Basic();
-  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
-
-  if (!common_stats.vector_home.IsValid()) {
-    data.SetInvalid();
-    return;
-  }
-
-  // Set Value
-  data.SetValueFromDistance(common_stats.vector_home.distance);
-
-  if (basic.track_available) {
-    Angle bd = common_stats.vector_home.bearing - basic.track;
-    data.SetCommentFromBearingDifference(bd);
-  } else
-    data.SetCommentInvalid();
-}
-
-void
 UpdateInfoBoxTakeoffDistance(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
