@@ -87,6 +87,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "MapWindow/GlueMapWindow.hpp"
 #include "Simulator.hpp"
 #include "Terrain/RasterTerrain.hpp"
+#include "Waypoint/WaypointGlue.hpp"
 
 #include <assert.h>
 #include <tchar.h>
@@ -597,6 +598,7 @@ InputEvents::eventAddWaypoint(const TCHAR *misc)
       way_points.Append(std::move(edit_waypoint));
       way_points.Optimise();
     }
+    WaypointGlue::SaveWaypoints(way_points);
   }
 
   trigger_redraw();
