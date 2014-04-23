@@ -43,7 +43,6 @@ Copyright_License {
 #include <tchar.h>
 #include <stdio.h>
 
-
 #ifdef __clang__
 /* gcc gives "redeclaration differs in 'constexpr'" */
 constexpr
@@ -573,7 +572,7 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
 
   if (!common_stats.vector_home.IsValid()) {
-    data.SetNotConfigured();
+    data.SetClickToConfigure();
     return;
   }
   // Set Value
@@ -597,8 +596,7 @@ InfoBoxContentHomeGR::Update(InfoBoxData &data)
   if (!common_stats.vector_home.IsValid() ||
       !settings.poi.home_location_available ||
       !settings.poi.home_elevation_available) {
-    data.SetNotConfigured();
-    data.SetCommentInvalid();
+    data.SetClickToConfigure();
     return;
   }
 
@@ -648,7 +646,7 @@ InfoBoxContentHomeAltitudeDiff::Update(InfoBoxData &data)
   if (!common_stats.vector_home.IsValid() ||
       !settings.poi.home_location_available ||
       !settings.poi.home_elevation_available) {
-    data.SetNotConfigured();
+    data.SetClickToConfigure();
     return;
   }
 
