@@ -66,6 +66,8 @@ WaypointGlue::FindHomeLocation(Waypoints &waypoints,
   const Waypoint *wp = waypoints.LookupLocation(settings.home_location,
                                                 fixed(100));
   if (wp == nullptr) {
+    settings.home_location_available = false;
+    settings.home_elevation_available = false;
     return nullptr;
   }
 
@@ -154,8 +156,6 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
                                device_blackboard->Calculated().flight.flying);
 
     if (wp == NULL)
-      poi_settings.home_location_available = false;
-      poi_settings.home_elevation_available = false;
       // search for home in waypoint list, if we don't have a home
       wp = FindFlaggedHome(way_points, poi_settings);
   }
