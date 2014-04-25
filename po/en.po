@@ -990,12 +990,12 @@ msgid "Height AGL"
 msgstr "Altitude AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:180
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "H AGL"
 msgstr "Altitude AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:181
-# , fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "This is the navigation altitude minus the terrain elevation obtained from "
 "the terrain file. The value is coloured red when the glider is below the "
@@ -1071,7 +1071,7 @@ msgid "GR Cruise"
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:226
-# , fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "The distance from the top of the last thermal, divided by the altitude lost "
 "since the top of the last thermal. Negative values indicate climbing cruise "
@@ -1256,9 +1256,9 @@ msgid "Final altitude difference"
 msgstr "Final arrival altitude AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:338
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Fin AltD"
-msgstr "WP AltA"
+msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:339
 #, no-c-format
@@ -1407,23 +1407,22 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:447
 #, no-c-format
 msgid "Wind speed"
-msgstr "Wind speed and bearing"
+msgstr "Wind"
 
 #: src/InfoBoxes/Content/Factory.cpp:448
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Wind V"
-msgstr "Wind speed and bearing"
+msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:449
-# , fuzzy, no-c-format
+#, no-c-format
 msgid ""
-"Wind speed estimated by XCSoar. Manual adjustment is possible with the "
+"Wind speed estimated by Top Hat. Manual adjustment is possible with the "
 "connected InfoBox dialogue. Pressing the up/down cursor keys to cycle "
 "through settings, adjust the values with left/right cursor keys."
 msgstr ""
-"Wind speed estimated by XCSoar. Manual adjustment is possible with the "
-"connected infobox dialogue. Pressing the up/down cursor keys to cycle "
-"through settings, adjust the values with left/right cursor keys."
+"Wind speed estimated by Top Hat. Manual adjustment is possible by clicking "
+"on the Infobox"
 
 #: src/InfoBoxes/Content/Factory.cpp:458
 #, no-c-format
@@ -1436,15 +1435,12 @@ msgid "Wind Brng"
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:460
-# , fuzzy, no-c-format
+#, no-c-format
 msgid ""
-"Wind bearing estimated by XCSoar. Manual adjustment is possible with the "
+"Wind bearing estimated by Top Hat. Manual adjustment is possible with the "
 "connected InfoBox dialogue. Pressing the up/down cursor keys to cycle "
 "through settings, adjust the values with left/right cursor keys."
 msgstr ""
-"Wind bearing estimated by XCSoar. Manual adjustment is possible with the "
-"connected infobox dialogue. Pressing the up/down cursor keys to cycle "
-"through settings, adjust the values with left/right cursor keys."
 
 #: src/InfoBoxes/Content/Factory.cpp:469
 #, no-c-format
@@ -1452,9 +1448,9 @@ msgid "AAT time"
 msgstr "Task time remaining"
 
 #: src/InfoBoxes/Content/Factory.cpp:470
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "AAT Time"
-msgstr "Task T rem"
+msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:471
 #, no-c-format
@@ -2522,9 +2518,9 @@ msgid "Next MC0 altitude difference"
 msgstr "Next MC0 arrival altitude AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:1186
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "WP MC0 AltD"
-msgstr "WP AltA"
+msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1187
 #, no-c-format
@@ -2742,7 +2738,7 @@ msgid ""
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1326
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Home arrival altitude AGL"
 msgstr ""
 
@@ -2811,7 +2807,7 @@ msgid ""
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1368
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Distance takeoff"
 msgstr ""
 
@@ -2821,10 +2817,9 @@ msgid "Takeoff Dist"
 msgstr ""
 
 #: src/InfoBoxes/Content/Factory.cpp:1370
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Distance to where take-off was detected."
 msgstr ""
-"Distance to home waypoint.  User can change the home waypoint by clicking."
 
 #: src/InfoBoxes/Content/Factory.cpp:1379
 #, no-c-format
@@ -4715,9 +4710,9 @@ msgid ""
 msgstr ""
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:66
-# , fuzzy
+#
 msgid "Wind source"
-msgstr "Wind speed and bearing"
+msgstr ""
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:67
 msgid "Select the source of the wind calculation."
@@ -4746,9 +4741,9 @@ msgstr ""
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:110
 #: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:184
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Map and Wind infobox"
-msgstr "Map and infoboxes"
+msgstr ""
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:110
 #: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:184
@@ -4931,7 +4926,7 @@ msgid "Pages"
 msgstr ""
 
 #: src/Dialogs/Settings/dlgConfiguration.cpp:113
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "InfoBox Sets"
 msgstr "Infobox Sets"
 
@@ -5026,9 +5021,9 @@ msgid "Device"
 msgstr ""
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:418
-# , fuzzy
+#
 msgid "Safety heights"
-msgstr "Start height"
+msgstr ""
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:428
 msgid "Screen"
@@ -5326,9 +5321,9 @@ msgid "Reference Mass"
 msgstr "Reference mass"
 
 #: src/Dialogs/Plane/PlanePolarDialog.cpp:140
-# , fuzzy
+#
 msgid "Reference mass of the polar"
-msgstr "Reference mass"
+msgstr ""
 
 #: src/Dialogs/Plane/PlanePolarDialog.cpp:145
 msgid "Dry Mass"
@@ -5596,9 +5591,8 @@ msgid "Top Hat Tips"
 msgstr ""
 
 #: src/Dialogs/dlgStartupAssistant.cpp:285
-# , fuzzy
 msgid "Next tip"
-msgstr "Next glide ratio"
+msgstr ""
 
 #: src/Dialogs/dlgStartupAssistant.cpp:289
 msgid "Previous tip"
@@ -5851,7 +5845,6 @@ msgid "Bearing and Distance"
 msgstr ""
 
 #: src/Dialogs/Waypoint/WaypointInfoWidget.cpp:128
-# , fuzzy
 msgid "Arrival altitude"
 msgstr "Arrival alt"
 
@@ -6638,9 +6631,8 @@ msgid "Set up screens"
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:144
-# , fuzzy
 msgid "Set up infoboxes"
-msgstr "Default infoboxes"
+msgstr ""
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:159
 msgid "Display orientation"
@@ -6927,9 +6919,8 @@ msgid "Show fullscreen (no infoboxes)"
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:215
-# , fuzzy
 msgid "Infobox sets"
-msgstr "Infobox Sets"
+msgstr ""
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:216
 msgid "Specifies which Infobox set should be displayed on this page."
@@ -8309,12 +8300,10 @@ msgid "Achieved speed"
 msgstr ""
 
 #: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:100
-# , fuzzy
 msgid "Distance remaining"
 msgstr ""
 
 #: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:102
-# , fuzzy
 msgid "AAT Time remaining"
 msgstr "Task T rem"
 
@@ -8383,9 +8372,8 @@ msgid "Sets the behavior for the current task."
 msgstr ""
 
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:248
-# , fuzzy
 msgid "Start max. height (MSL)"
-msgstr "Start height"
+msgstr ""
 
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:249
 msgid ""
@@ -8646,9 +8634,9 @@ msgid "InfoBox titles"
 msgstr "Infobox titles"
 
 #: src/Dialogs/Settings/dlgConfigFonts.cpp:209
-# , fuzzy, no-c-format
+#,no-c-format
 msgid "InfoBox values"
-msgstr "InfbBox values, small"
+msgstr ""
 
 #: src/Dialogs/Settings/dlgConfigFonts.cpp:213
 #, no-c-format
