@@ -53,14 +53,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568542"
+     inkscape:zoom="8"
      inkscape:cx="33.978502"
-     inkscape:cy="34.446658"
+     inkscape:cy="15.451709"
      inkscape:document-units="px"
      inkscape:current-layer="layer4"
      showgrid="false"
      inkscape:window-width="1600"
-     inkscape:window-height="787"
+     inkscape:window-height="789"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
@@ -106,9 +106,9 @@
      transform="translate(0,1)">
     <text
        xml:space="preserve"
-       style="font-size:14.39208126px;font-style:normal;font-weight:normal;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="75.117584"
-       y="11.463054"
+       style="font-size:15.47634888px;font-style:normal;font-weight:normal;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="74.029602"
+       y="11.901837"
        id="versionno"
        transform="scale(1.0503953,0.95202253)"
        inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
@@ -117,8 +117,8 @@
        inkscape:label="versionno"><tspan
          sodipodi:role="line"
          id="tspan9395-4-7-2"
-         x="75.117584"
-         y="11.463054"
-         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">1.3</tspan></text>
+         x="74.029602"
+         y="11.901837"
+         style="font-size:17.20540428px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">2.0</tspan></text>
   </g>
 </svg>
