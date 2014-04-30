@@ -2,6 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -9,14 +10,30 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="110"
-   height="15"
+   width="160"
+   height="32"
    id="svg3040"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="title_red.svg">
   <defs
      id="defs3042">
+    <linearGradient
+       id="linearGradient5887"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop5889" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5869"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0"
+         id="stop5871" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -53,11 +70,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="33.978502"
-     inkscape:cy="34.446658"
+     inkscape:zoom="4.0000001"
+     inkscape:cx="73.62075"
+     inkscape:cy="-3.0953009"
      inkscape:document-units="px"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1600"
      inkscape:window-height="789"
@@ -80,12 +97,12 @@
      inkscape:label="XCSoar"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-1037.3622)">
+     transform="translate(0,-1020.3622)">
     <text
        xml:space="preserve"
-       style="font-size:14.46361065px;font-style:normal;font-weight:normal;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="-0.40865782"
-       y="1096.8872"
+       style="font-size:14.46361065px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="0.069341868"
+       y="1079.6095"
        id="text9393-9-1"
        transform="scale(1.0452005,0.95675423)"
        inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
@@ -93,33 +110,32 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan9395-4-7"
-         x="-0.40865782"
-         y="1096.8872"
-         style="font-size:17.14970779px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"><tspan
-           style="fill:#000000"
-           id="tspan11171-4">Top Hat</tspan></tspan></text>
+         x="0.069341868"
+         y="1079.6095"
+         style="font-size:17.14970779px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"><tspan
+           style="fill:#000000;fill-opacity:1"
+           id="tspan11171-4">Top Hat Soaring</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14.46361065px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="61.978165"
+       y="1096.8558"
+       id="text5921"
+       transform="scale(1.0452005,0.95675423)"
+       inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan5923"
+         x="61.978165"
+         y="1096.8558"
+         style="font-size:17.14970779px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ff0000;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"><tspan
+           style="fill:#ff0000;fill-opacity:1"
+           id="tspan5925">2.0</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Version"
-     transform="translate(0,1)">
-    <text
-       xml:space="preserve"
-       style="font-size:15.14895725px;font-style:normal;font-weight:normal;line-height:125%;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="70.7267"
-       y="12.264181"
-       id="versionno"
-       transform="scale(1.0881894,0.91895768)"
-       inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"
-       inkscape:label="versionno"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan9395-4-7-2"
-         x="70.7267"
-         y="12.264181"
-         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">2.1</tspan></text>
-  </g>
+     transform="translate(0,18)" />
 </svg>

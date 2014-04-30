@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="110"
-   height="15"
+   width="160"
+   height="32"
    id="svg3040"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
@@ -54,10 +54,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="33.978502"
+     inkscape:cx="80.508078"
      inkscape:cy="15.451709"
      inkscape:document-units="px"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1600"
      inkscape:window-height="789"
@@ -80,12 +80,12 @@
      inkscape:label="XCSoar"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-1037.3622)">
+     transform="translate(0,-1020.3622)">
     <text
        xml:space="preserve"
        style="font-size:14.46361065px;font-style:normal;font-weight:normal;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="-0.40865782"
-       y="1096.7024"
+       x="-0.049874987"
+       y="1079.5869"
        id="text9393-9-1"
        transform="scale(1.0452005,0.95675423)"
        inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
@@ -93,22 +93,22 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan9395-4-7"
-         x="-0.40865782"
-         y="1096.7024"
+         x="-0.049874987"
+         y="1079.5869"
          style="font-size:17.14970779px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"><tspan
            style="fill:#000000"
-           id="tspan11171-4">Top Hat</tspan></tspan></text>
+           id="tspan11171-4">Top Hat Soaring</tspan></tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Version"
-     transform="translate(0,1)">
+     transform="translate(0,18)">
     <text
        xml:space="preserve"
        style="font-size:15.47634888px;font-style:normal;font-weight:normal;fill:#3f76a8;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="74.029602"
-       y="11.901837"
+       x="61.891315"
+       y="12.033136"
        id="versionno"
        transform="scale(1.0503953,0.95202253)"
        inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
@@ -117,8 +117,8 @@
        inkscape:label="versionno"><tspan
          sodipodi:role="line"
          id="tspan9395-4-7-2"
-         x="74.029602"
-         y="11.901837"
+         x="61.891315"
+         y="12.033136"
          style="font-size:17.20540428px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#3f76a8;fill-opacity:1;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold">2.0</tspan></text>
   </g>
 </svg>
