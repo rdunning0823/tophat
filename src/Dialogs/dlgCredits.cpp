@@ -125,6 +125,7 @@ static void
 OnLogoPaint(Canvas &canvas, const PixelRect &rc)
 {
   const unsigned width = rc.right - rc.left;
+  const unsigned height = rc.bottom - rc.top;
   int x = rc.left + Layout::FastScale(10);
   int y = rc.top + Layout::FastScale(10);
 
@@ -135,8 +136,15 @@ OnLogoPaint(Canvas &canvas, const PixelRect &rc)
   // Determine title image size
   PixelSize title_size = title.GetSize();
 
+  const unsigned magnification =
+      std::max(1u,
+               std::min((width - 16u) / unsigned(title_size.cx),
+                        (height - 16u) / unsigned(title_size.cy) / 3));
+  title_size.cx *= magnification;
+  title_size.cy *= magnification;
+
   // Draw 'XCSoar N.N' title
-  canvas.Copy(x, y, title_size.cx, title_size.cy, title, 0, 0);
+  canvas.Stretch(x, y, title_size.cx, title_size.cy, title);
   y += title_size.cy + Layout::FastScale(20);
 
   Font font;
