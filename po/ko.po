@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xcsoar\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-10 18:43-0400\n"
+"POT-Creation-Date: 2014-05-03 18:18-0400\n"
 "PO-Revision-Date: 2012-05-07 14:37+0000\n"
 "Last-Translator: Myungha Kuh <mikekuh147@gmail.com>\n"
 "Language-Team: Korean <ko@li.org>\n"
@@ -28,8 +28,8 @@ msgstr ""
 #: src/Input/InputEventsSettings.cpp:305
 #: src/MapWindow/GlueMapWindowOverlays.cpp:515 src/Dialogs/dlgAnalysis.cpp:355
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:78
-#: Data/Input/default.xci:426 Data/Input/default.xci:475
-#: Data/Input/default.xci:1270 Data/Input/default.xci:1308
+#: Data/Input/default.xci:433 Data/Input/default.xci:482
+#: Data/Input/default.xci:1286 Data/Input/default.xci:1324
 #, no-c-format
 msgid "Task"
 msgstr "타스크"
@@ -368,18 +368,21 @@ msgstr ""
 msgid "Area keyhole"
 msgstr ""
 
-#: src/Task/ValidationErrorStrings.cpp:32
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:32
+#, no-c-format
 msgid "No valid start"
 msgstr "유효한 출발이 없슴."
 
-#: src/Task/ValidationErrorStrings.cpp:33
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:33
+#, no-c-format
 msgid "No valid finish"
 msgstr "유효한 시합 종료가 없슴."
 
-#: src/Task/ValidationErrorStrings.cpp:34
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:34
+#, no-c-format
 msgid "Task not closed"
 msgstr "타스크가 종료되지 않음."
 
@@ -388,23 +391,27 @@ msgstr "타스크가 종료되지 않음."
 msgid "All turnpoints not the same type"
 msgstr ""
 
-#: src/Task/ValidationErrorStrings.cpp:36
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:36
+#, no-c-format
 msgid "Incorrect number of turnpoints"
 msgstr "충분하지 않은 턴포인트"
 
-#: src/Task/ValidationErrorStrings.cpp:37
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:37
+#, no-c-format
 msgid "Too many turnpoints"
 msgstr "충분하지 않은 턴포인트"
 
-#: src/Task/ValidationErrorStrings.cpp:38
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:38
+#, no-c-format
 msgid "Not enough turnpoints"
 msgstr "충분하지 않은 턴포인트"
 
-#: src/Task/ValidationErrorStrings.cpp:39
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:39
+#, no-c-format
 msgid "Turnpoints not unique"
 msgstr "턴포인트가 중복됨."
 
@@ -418,8 +425,9 @@ msgstr ""
 msgid "non-FAI turn points"
 msgstr ""
 
-#: src/Task/ValidationErrorStrings.cpp:42
 # , fuzzy, no-c-format
+#: src/Task/ValidationErrorStrings.cpp:42
+#, no-c-format
 msgid "non-MAT turn points"
 msgstr "턴 포인트"
 
@@ -457,13 +465,15 @@ msgstr ""
 msgid "Significant wind change"
 msgstr ""
 
-#: src/FLARM/Error.cpp:29
 # , fuzzy, no-c-format
+#: src/FLARM/Error.cpp:29
+#, no-c-format
 msgid "No error"
 msgstr "베가 에러"
 
-#: src/FLARM/Error.cpp:30
 # , fuzzy, no-c-format
+#: src/FLARM/Error.cpp:30
+#, no-c-format
 msgid "Information"
 msgstr "위치"
 
@@ -514,8 +524,9 @@ msgstr ""
 msgid "RF communication"
 msgstr ""
 
-#: src/FLARM/Error.cpp:53
 # , fuzzy, no-c-format
+#: src/FLARM/Error.cpp:53
+#, no-c-format
 msgid "Communication"
 msgstr "위치"
 
@@ -524,8 +535,9 @@ msgstr "위치"
 msgid "Flash memory"
 msgstr ""
 
-#: src/FLARM/Error.cpp:55
 # , fuzzy, no-c-format
+#: src/FLARM/Error.cpp:55
+#, no-c-format
 msgid "Pressure sensor"
 msgstr "기압"
 
@@ -534,8 +546,9 @@ msgstr "기압"
 msgid "Obstacle database"
 msgstr ""
 
-#: src/FLARM/Error.cpp:57
 # , fuzzy, no-c-format
+#: src/FLARM/Error.cpp:57
+#, no-c-format
 msgid "Flight recorder"
 msgstr "비행 파일 재생"
 
@@ -544,8 +557,9 @@ msgstr "비행 파일 재생"
 msgid "Transponder receiver"
 msgstr ""
 
-#: src/FLARM/Error.cpp:60
 # , fuzzy, no-c-format
+#: src/FLARM/Error.cpp:60
+#, no-c-format
 msgid "Other"
 msgstr "날씨"
 
@@ -634,7 +648,7 @@ msgstr "써클링 없슴"
 #: src/Dialogs/Airspace/dlgAirspace.cpp:172
 #: src/Dialogs/Airspace/dlgAirspaceDetails.cpp:111
 #: src/Dialogs/Airspace/AirspaceList.cpp:149
-#: src/Dialogs/Airspace/dlgAirspaceWarnings.cpp:589
+#: src/Dialogs/Airspace/dlgAirspaceWarnings.cpp:588
 #: src/Dialogs/Settings/WindSettingsDialog.cpp:36
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:432
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:371
@@ -696,7 +710,7 @@ msgstr "거리"
 msgid "Rel. Alt."
 msgstr "실고도"
 
-#: src/Gauge/BigTrafficWidget.cpp:905 src/InfoBoxes/Content/Task.cpp:52
+#: src/Gauge/BigTrafficWidget.cpp:905 src/InfoBoxes/Content/Task.cpp:51
 #: src/Dialogs/MapItemListDialog.cpp:229 src/Dialogs/MapItemListDialog.cpp:297
 #: src/Dialogs/Traffic/TrafficList.cpp:347
 #: src/Dialogs/Task/AlternatesListDialog.cpp:68
@@ -810,7 +824,7 @@ msgid ""
 msgstr ""
 
 #: src/Menu/ExpandMacros.cpp:357 src/Menu/ExpandMacros.cpp:361
-#: src/Dialogs/Device/PortMonitor.cpp:167 Data/Input/default.xci:382
+#: src/Dialogs/Device/PortMonitor.cpp:167 Data/Input/default.xci:389
 msgid "Resume"
 msgstr "다시시작"
 
@@ -931,9 +945,9 @@ msgstr ""
 msgid "Terrain Off"
 msgstr "지형 표시 끔"
 
+# , fuzzy
 #: src/Menu/ExpandMacros.cpp:574 src/Menu/ExpandMacros.cpp:577
 #: src/Menu/ExpandMacros.cpp:580 src/Menu/ExpandMacros.cpp:583
-# , fuzzy
 msgid "Hide"
 msgstr "인포 감추기"
 
@@ -972,18 +986,21 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: src/Menu/ExpandMacros.cpp:606 src/Input/InputEventsSettings.cpp:307
 # , fuzzy, no-c-format
+#: src/Menu/ExpandMacros.cpp:606 src/Input/InputEventsSettings.cpp:307
+#, no-c-format
 msgid "Task & Airfields"
 msgstr "타스크 종료"
 
-#: src/InfoBoxes/Content/Factory.cpp:168
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:168
+#, no-c-format
 msgid "Altitude GPS"
 msgstr "고도"
 
-#: src/InfoBoxes/Content/Factory.cpp:169
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:169
+#, no-c-format
 msgid "Alt GPS"
 msgstr "수직 고도"
 
@@ -1013,8 +1030,9 @@ msgid ""
 "terrain safety clearance height."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:190
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:190
+#, no-c-format
 msgid "Thermal climb, last 30 s"
 msgstr "30초 이상 지속된 써멀"
 
@@ -1030,8 +1048,9 @@ msgid ""
 "or vario if available."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:201
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:201
+#, no-c-format
 msgid "Next Bearing"
 msgstr "다음 시작 포인트"
 
@@ -1049,18 +1068,21 @@ msgid ""
 "to the target within the AAT sector."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:213
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:213
+#, no-c-format
 msgid "GR instantaneous"
 msgstr "순간 L/D"
 
-#: src/InfoBoxes/Content/Factory.cpp:214
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:214
+#, no-c-format
 msgid "GR Inst"
 msgstr "순간 L/D"
 
-#: src/InfoBoxes/Content/Factory.cpp:215
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:215
+#, no-c-format
 msgid ""
 "Instantaneous glide ratio over ground, given by the ground speed divided by "
 "the vertical speed (GPS speed) over the last 20 seconds. Negative values "
@@ -1071,18 +1093,21 @@ msgstr ""
 "이너스 값은 상승하며 비행하는 경우입니다. 만약 상승 속도가 거의 0에 가까워지"
 "면 표시되는 값은 `--'가 됩니다."
 
-#: src/InfoBoxes/Content/Factory.cpp:224
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:224
+#, no-c-format
 msgid "Glide ratio cruise"
 msgstr "순항 L/D"
 
-#: src/InfoBoxes/Content/Factory.cpp:225
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:225
+#, no-c-format
 msgid "GR Cruise"
 msgstr "순항"
 
-#: src/InfoBoxes/Content/Factory.cpp:226
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:226
+#, no-c-format
 msgid ""
 "The distance from the top of the last thermal, divided by the altitude lost "
 "since the top of the last thermal. Negative values indicate climbing cruise "
@@ -1182,7 +1207,7 @@ msgstr ""
 msgid "Next distance"
 msgstr "다음 거리"
 
-#: src/InfoBoxes/Content/Factory.cpp:291 src/InfoBoxes/Content/Task.cpp:188
+#: src/InfoBoxes/Content/Factory.cpp:291 src/InfoBoxes/Content/Task.cpp:187
 #, no-c-format
 msgid "WP Dist"
 msgstr "웨이포인트 거리"
@@ -1221,8 +1246,9 @@ msgstr "다음까지 필요한 고도"
 msgid "WP AltR"
 msgstr "다음 WP까지 필요한 고도"
 
-#: src/InfoBoxes/Content/Factory.cpp:316
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:316
+#, no-c-format
 msgid ""
 "Additional altitude required to reach the next turn point. For AAT tasks, "
 "the target within the AAT sector is used."
@@ -1234,8 +1260,9 @@ msgstr "다음 턴 포인트까지 필요한 추가 고도"
 msgid "Next waypoint"
 msgstr "다음 웨이포인트"
 
-#: src/InfoBoxes/Content/Factory.cpp:327
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:327
+#, no-c-format
 msgid "Next WP"
 msgstr "다음"
 
@@ -1285,8 +1312,9 @@ msgstr ""
 msgid "Speed task average"
 msgstr "타스크 평균 속도"
 
-#: src/InfoBoxes/Content/Factory.cpp:360
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:360
+#, no-c-format
 msgid "V Task Avg"
 msgstr "타스크 평균 속도"
 
@@ -1412,7 +1440,7 @@ msgstr "풍속"
 #: src/InfoBoxes/Content/Factory.cpp:449
 #, no-c-format
 msgid ""
-"Wind speed estimated by XCSoar. Manual adjustment is possible with the "
+"Wind speed estimated by Top Hat. Manual adjustment is possible with the "
 "connected InfoBox dialogue. Pressing the up/down cursor keys to cycle "
 "through settings, adjust the values with left/right cursor keys."
 msgstr ""
@@ -1422,15 +1450,16 @@ msgstr ""
 msgid "Wind bearing"
 msgstr "풍향"
 
-#: src/InfoBoxes/Content/Factory.cpp:459
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:459
+#, no-c-format
 msgid "Wind Brng"
 msgstr "풍향"
 
 #: src/InfoBoxes/Content/Factory.cpp:460
 #, no-c-format
 msgid ""
-"Wind bearing estimated by XCSoar. Manual adjustment is possible with the "
+"Wind bearing estimated by Top Hat. Manual adjustment is possible with the "
 "connected InfoBox dialogue. Pressing the up/down cursor keys to cycle "
 "through settings, adjust the values with left/right cursor keys."
 msgstr ""
@@ -1440,8 +1469,9 @@ msgstr ""
 msgid "AAT time"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:470
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:470
+#, no-c-format
 msgid "AAT Time"
 msgstr "시간"
 
@@ -1535,8 +1565,9 @@ msgstr ""
 msgid "Barometric altitude"
 msgstr "기압 고도"
 
-#: src/InfoBoxes/Content/Factory.cpp:536
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:536
+#, no-c-format
 msgid "Alt Baro"
 msgstr "기압 고도"
 
@@ -1582,8 +1613,9 @@ msgid ""
 "starting the task."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:569
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:569
+#, no-c-format
 msgid "Flight duration"
 msgstr "비행 파일 재생"
 
@@ -1614,8 +1646,9 @@ msgid ""
 "This value is negative for pitch-down manoeuvres."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:591
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:591
+#, no-c-format
 msgid "Next GR"
 msgstr "다음"
 
@@ -1879,13 +1912,15 @@ msgstr ""
 msgid "L/D vario"
 msgstr "L/D 바리오"
 
-#: src/InfoBoxes/Content/Factory.cpp:760
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:760
+#, no-c-format
 msgid "L/D Vario"
 msgstr "L/D 바리오"
 
-#: src/InfoBoxes/Content/Factory.cpp:761
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:761
+#, no-c-format
 msgid ""
 "Instantaneous lift/drag ratio, given by the indicated airspeed divided by "
 "the total energy vertical speed, when connected to an intelligent "
@@ -1934,8 +1969,9 @@ msgstr ""
 msgid "Team bearing"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:793
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:793
+#, no-c-format
 msgid "Team Brng"
 msgstr "팀"
 
@@ -1966,8 +2002,9 @@ msgstr ""
 msgid "Team range"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:815
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:815
+#, no-c-format
 msgid "Team Dist"
 msgstr "웨이포인트 거리"
 
@@ -1981,8 +2018,9 @@ msgstr ""
 msgid "Speed task instantaneous"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:826
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:826
+#, no-c-format
 msgid "V Task Inst"
 msgstr "타스크 시작"
 
@@ -1998,8 +2036,9 @@ msgstr ""
 msgid "Distance home"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:837
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:837
+#, no-c-format
 msgid "Home Dist"
 msgstr "웨이포인트 거리"
 
@@ -2013,8 +2052,9 @@ msgstr ""
 msgid "Speed task achieved"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:848
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:848
+#, no-c-format
 msgid "V Task Ach"
 msgstr "타스크 평균 속도"
 
@@ -2048,8 +2088,9 @@ msgstr ""
 msgid "Thermal average over all"
 msgstr "써멀 평균"
 
-#: src/InfoBoxes/Content/Factory.cpp:870
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:870
+#, no-c-format
 msgid "T Avg"
 msgstr "L/D 평균"
 
@@ -2179,13 +2220,15 @@ msgid ""
 "reference)."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:962
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:962
+#, no-c-format
 msgid "GR average"
 msgstr "L/D 평균"
 
-#: src/InfoBoxes/Content/Factory.cpp:963
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:963
+#, no-c-format
 msgid "GR Avg"
 msgstr "L/D 평균"
 
@@ -2218,8 +2261,9 @@ msgstr ""
 msgid "On-Line Contest distance"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:985
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:985
+#, no-c-format
 msgid "OLC Dist"
 msgstr "웨이포인트 거리"
 
@@ -2260,8 +2304,9 @@ msgstr "XCSoar에 의해 사용된 5초 평균 CPU 부하"
 msgid "Next altitude arrival"
 msgstr "다음 도착 고도"
 
-#: src/InfoBoxes/Content/Factory.cpp:1018
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1018
+#, no-c-format
 msgid "WP AltA"
 msgstr "다음 WP까지 필요한 고도"
 
@@ -2288,8 +2333,9 @@ msgstr ""
 msgid "Flight level"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1041
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1041
+#, no-c-format
 msgid "FL"
 msgstr "화씨"
 
@@ -2316,8 +2362,9 @@ msgstr "비행중 고도 괘적"
 msgid "Vario trace"
 msgstr "바리오 괘적"
 
-#: src/InfoBoxes/Content/Factory.cpp:1064
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1064
+#, no-c-format
 msgid "Vario Trace"
 msgstr "바리오 괘적"
 
@@ -2333,8 +2380,9 @@ msgstr ""
 msgid "Netto vario trace"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1075
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1075
+#, no-c-format
 msgid "Netto Trace"
 msgstr "온도 괘적"
 
@@ -2345,13 +2393,15 @@ msgid ""
 "estimated sink rate."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1085
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1085
+#, no-c-format
 msgid "Thermal climb trace"
 msgstr "써멀 써클링 괘적"
 
-#: src/InfoBoxes/Content/Factory.cpp:1086
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1086
+#, no-c-format
 msgid "TC Trace"
 msgstr "온도 괘적"
 
@@ -2367,8 +2417,9 @@ msgstr ""
 msgid "Climb band"
 msgstr "상승 구간"
 
-#: src/InfoBoxes/Content/Factory.cpp:1097
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1097
+#, no-c-format
 msgid "Climb Band"
 msgstr "상승 구간"
 
@@ -2521,8 +2572,9 @@ msgstr ""
 msgid "Head wind component"
 msgstr "정풍 성분"
 
-#: src/InfoBoxes/Content/Factory.cpp:1198
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1198
+#, no-c-format
 msgid "Head Wind"
 msgstr "정풍"
 
@@ -2552,13 +2604,15 @@ msgid ""
 "altitude."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1218
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1218
+#, no-c-format
 msgid "Altitude (Auto)"
 msgstr "고도"
 
-#: src/InfoBoxes/Content/Factory.cpp:1219
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1219
+#, no-c-format
 msgid "Alt Auto"
 msgstr "자동"
 
@@ -2575,8 +2629,9 @@ msgstr ""
 msgid "Thermal next leg equivalent"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1231
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1231
+#, no-c-format
 msgid "T Next Leg"
 msgstr "다음 L/D"
 
@@ -2587,13 +2642,15 @@ msgid ""
 "to the MacCready setting on current leg."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1241
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1241
+#, no-c-format
 msgid "Head wind component (simplified)"
 msgstr "정풍 성분"
 
-#: src/InfoBoxes/Content/Factory.cpp:1242
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1242
+#, no-c-format
 msgid "Head Wind *"
 msgstr "정풍"
 
@@ -2610,8 +2667,9 @@ msgstr ""
 msgid "Task cruise efficiency"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1252
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1252
+#, no-c-format
 msgid "Cruise Eff"
 msgstr "순항"
 
@@ -2628,7 +2686,7 @@ msgstr ""
 #: src/Dialogs/Settings/dlgConfiguration.cpp:103
 #: src/Dialogs/Settings/Panels/TerrainDisplayConfigPanel.cpp:234
 #: src/Weather/NOAAFormatter.cpp:95 src/Weather/NOAAFormatter.cpp:102
-#: Data/Input/default.xci:638
+#: Data/Input/default.xci:645
 #, no-c-format
 msgid "Wind"
 msgstr "바람"
@@ -2666,8 +2724,9 @@ msgstr ""
 msgid "Start open/close countdown"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1285
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1285
+#, no-c-format
 msgid "Start open"
 msgstr "로그 시작"
 
@@ -2681,8 +2740,9 @@ msgstr ""
 msgid "Start open/close countdown at reaching"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1295
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1295
+#, no-c-format
 msgid "Start reach"
 msgstr "시작 고도"
 
@@ -2693,8 +2753,9 @@ msgid ""
 "calculated time to reach it."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1304
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1304
+#, no-c-format
 msgid "Next radial"
 msgstr "다음 거리"
 
@@ -2709,10 +2770,11 @@ msgstr ""
 msgid "True bearing from the next waypoint to your position."
 msgstr ""
 
+# , fuzzy, no-c-format
 #: src/InfoBoxes/Content/Factory.cpp:1315
 #: src/InfoBoxes/Content/Factory.cpp:1316
 #: src/InfoBoxes/Panel/ATCReference.cpp:132
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "ATC radial"
 msgstr "다음 거리"
 
@@ -2723,13 +2785,15 @@ msgid ""
 "distance is displayed in nautical miles for communication with ATC."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1326
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1326
+#, no-c-format
 msgid "Home arrival altitude AGL"
 msgstr "도착 고도"
 
-#: src/InfoBoxes/Content/Factory.cpp:1327
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1327
+#, no-c-format
 msgid "Home AltA"
 msgstr "웨이포인트 거리"
 
@@ -2740,13 +2804,15 @@ msgid ""
 "can change the home waypoint by clicking.  Distance shown in comment."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1336
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1336
+#, no-c-format
 msgid "Speed task last hour"
 msgstr "타스크 평균 속도"
 
-#: src/InfoBoxes/Content/Factory.cpp:1337
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1337
+#, no-c-format
 msgid "V Task H"
 msgstr "타스크 평균 속도"
 
@@ -2757,18 +2823,21 @@ msgid ""
 "compensated for altitude."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1347
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1347
+#, no-c-format
 msgid "Next distance (nominal)"
 msgstr "다음 거리"
 
-#: src/InfoBoxes/Content/Factory.cpp:1348
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1348
+#, no-c-format
 msgid "WP Dist-N"
 msgstr "웨이포인트 거리"
 
-#: src/InfoBoxes/Content/Factory.cpp:1349
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1349
+#, no-c-format
 msgid ""
 "The distance to the currently selected waypoint. For AAT tasks, this is the "
 "distance to the origin of the AAT sector."
@@ -2779,8 +2848,9 @@ msgstr "다음 턴 포인트까지 필요한 추가 고도"
 msgid "Circle Diameter"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1359
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1359
+#, no-c-format
 msgid "Circle D"
 msgstr "써클링"
 
@@ -2792,18 +2862,21 @@ msgid ""
 "wing loading."
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1368
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1368
+#, no-c-format
 msgid "Distance takeoff"
 msgstr "거리"
 
-#: src/InfoBoxes/Content/Factory.cpp:1369
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1369
+#, no-c-format
 msgid "Takeoff Dist"
 msgstr "이륙"
 
-#: src/InfoBoxes/Content/Factory.cpp:1370
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1370
+#, no-c-format
 msgid "Distance to where take-off was detected."
 msgstr "이륙후 경과 시간"
 
@@ -2812,8 +2885,9 @@ msgstr "이륙후 경과 시간"
 msgid "On-Line Contest speed"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1380
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1380
+#, no-c-format
 msgid "OLC Speed"
 msgstr "속도"
 
@@ -2829,8 +2903,9 @@ msgstr ""
 msgid "Home glide ratio"
 msgstr ""
 
-#: src/InfoBoxes/Content/Factory.cpp:1390
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Factory.cpp:1390
+#, no-c-format
 msgid "Home GR"
 msgstr "홈"
 
@@ -2842,8 +2917,8 @@ msgid ""
 msgstr ""
 
 #: src/InfoBoxes/Content/Alternate.cpp:43
-#: src/Dialogs/Task/AlternatesListDialog.cpp:119 Data/Input/default.xci:456
-#: Data/Input/default.xci:1300
+#: src/Dialogs/Task/AlternatesListDialog.cpp:119 Data/Input/default.xci:463
+#: Data/Input/default.xci:1316
 #, no-c-format
 msgid "Alternates"
 msgstr ""
@@ -2865,8 +2940,9 @@ msgstr ""
 msgid "no QNH"
 msgstr ""
 
-#: src/InfoBoxes/Content/Glide.cpp:76
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Glide.cpp:76
+#, no-c-format
 msgid "Set average period"
 msgstr "L/D 평균"
 
@@ -2904,33 +2980,34 @@ msgstr ""
 msgid "DOLPHIN"
 msgstr ""
 
-#: src/InfoBoxes/Content/Task.cpp:117
+#: src/InfoBoxes/Content/Task.cpp:116
 msgid "Next"
 msgstr "다음"
 
-#: src/InfoBoxes/Content/Task.cpp:559
 # , fuzzy, no-c-format
+#: src/InfoBoxes/Content/Task.cpp:558
+#, no-c-format
 msgid "Set home"
 msgstr "바람 설정"
 
-#: src/InfoBoxes/Content/Task.cpp:867
+#: src/InfoBoxes/Content/Task.cpp:865
 msgid "Time Below"
 msgstr ""
 
-#: src/InfoBoxes/Content/Task.cpp:979 src/InfoBoxes/Content/Task.cpp:1024
 # , fuzzy
+#: src/InfoBoxes/Content/Task.cpp:977 src/InfoBoxes/Content/Task.cpp:1022
 msgid "Closed"
 msgstr "닫기"
 
-#: src/InfoBoxes/Content/Task.cpp:988 src/InfoBoxes/Content/Task.cpp:1033
+#: src/InfoBoxes/Content/Task.cpp:986 src/InfoBoxes/Content/Task.cpp:1031
 msgid "Open"
 msgstr ""
 
-#: src/InfoBoxes/Content/Task.cpp:993 src/InfoBoxes/Content/Task.cpp:1038
+#: src/InfoBoxes/Content/Task.cpp:991 src/InfoBoxes/Content/Task.cpp:1036
 msgid "Waiting"
 msgstr ""
 
-#: src/InfoBoxes/Content/Places.cpp:79
+#: src/InfoBoxes/Content/Places.cpp:58
 #, no-c-format
 msgid "Reference"
 msgstr ""
@@ -2946,8 +3023,8 @@ msgstr "온라인 컨테스트"
 #: src/Dialogs/dlgAnalysis.cpp:337 src/Dialogs/dlgAnalysis.cpp:346
 #: src/Dialogs/dlgAnalysis.cpp:354 src/Dialogs/dlgAnalysis.cpp:363
 #: src/Dialogs/dlgAnalysis.cpp:373 Data/Dialogs/dlgAnalysis_L.xml:3
-#: Data/Dialogs/dlgAnalysis.xml:3 Data/Input/default.xci:873
-#: Data/Input/default.xci:1179 Data/Input/default.xci:1491
+#: Data/Dialogs/dlgAnalysis.xml:3 Data/Input/default.xci:880
+#: Data/Input/default.xci:1195 Data/Input/default.xci:1507
 #, no-c-format
 msgid "Analysis"
 msgstr "분석"
@@ -2956,7 +3033,7 @@ msgstr "분석"
 #: src/Dialogs/Device/ManageFlarmDialog.cpp:82
 #: src/Dialogs/Device/LX/ManageV7Dialog.cpp:90
 #: src/Dialogs/Device/LX/ManageNanoDialog.cpp:84
-#: src/Dialogs/Settings/dlgConfiguration.cpp:91 Data/Input/default.xci:1097
+#: src/Dialogs/Settings/dlgConfiguration.cpp:91 Data/Input/default.xci:1104
 #, no-c-format
 msgid "Setup"
 msgstr "설정"
@@ -2993,13 +3070,13 @@ msgstr "홈"
 msgid "set to"
 msgstr ""
 
-#: src/InfoBoxes/Panel/Home.cpp:124
 # , fuzzy
+#: src/InfoBoxes/Panel/Home.cpp:124
 msgid "Not defined"
 msgstr "정의된 타스크가 없슴"
 
-#: src/InfoBoxes/Panel/Home.cpp:149 src/InfoBoxes/Panel/ATCReference.cpp:106
 # , fuzzy
+#: src/InfoBoxes/Panel/Home.cpp:149 src/InfoBoxes/Panel/ATCReference.cpp:106
 msgid "Select waypoint"
 msgstr "웨이포인트를 지우겠습니까?"
 
@@ -3013,9 +3090,9 @@ msgstr ""
 msgid "Suggested period for gliders."
 msgstr ""
 
+# , fuzzy
 #: src/InfoBoxes/Panel/GrAverage.cpp:94
 #: src/Dialogs/Settings/Panels/GlideComputerConfigPanel.cpp:106
-# , fuzzy
 msgid "GR average period"
 msgstr "L/D 평균"
 
@@ -3050,35 +3127,35 @@ msgstr "위치"
 msgid "Clear"
 msgstr "지우기"
 
-#: src/Input/InputEventsActions.cpp:151
+#: src/Input/InputEventsActions.cpp:153
 msgid "Screen Mode Full"
 msgstr "풀 스크린 모드"
 
-#: src/Input/InputEventsActions.cpp:153
+#: src/Input/InputEventsActions.cpp:155
 msgid "Auxiliary InfoBoxes"
 msgstr "보조 인포 박스"
 
-#: src/Input/InputEventsActions.cpp:155
+#: src/Input/InputEventsActions.cpp:157
 msgid "Default InfoBoxes"
 msgstr "인포 박스 초기 상태"
 
-#: src/Input/InputEventsActions.cpp:277
+#: src/Input/InputEventsActions.cpp:279
 msgid "No active waypoint!"
 msgstr "활성화된 WPT 없슴"
 
-#: src/Input/InputEventsActions.cpp:367
+#: src/Input/InputEventsActions.cpp:369
 msgid "NMEA log on"
 msgstr "NMEA 로그 켜기"
 
-#: src/Input/InputEventsActions.cpp:369
+#: src/Input/InputEventsActions.cpp:371
 msgid "NMEA log off"
 msgstr "NMEA 로그 끄기"
 
-#: src/Input/InputEventsActions.cpp:373
+#: src/Input/InputEventsActions.cpp:375
 msgid "Logger on"
 msgstr "로그 켜기"
 
-#: src/Input/InputEventsActions.cpp:375
+#: src/Input/InputEventsActions.cpp:377
 msgid "Logger off"
 msgstr "로그 끄기"
 
@@ -3258,8 +3335,8 @@ msgstr ""
 msgid "FLARM radar"
 msgstr ""
 
-#: src/PageSettings.cpp:75 Data/Input/default.xci:833
-#: Data/Input/default.xci:883 Data/Input/default.xci:933
+#: src/PageSettings.cpp:75 Data/Input/default.xci:840
+#: Data/Input/default.xci:890 Data/Input/default.xci:940
 msgid "Info"
 msgstr "정보"
 
@@ -3267,8 +3344,8 @@ msgstr "정보"
 msgid "Map and InfoBoxes"
 msgstr "지도 및 인포박스"
 
-#: src/PageSettings.cpp:95
 # , fuzzy
+#: src/PageSettings.cpp:95
 msgid "Full screen"
 msgstr "지도 (풀 스크린)"
 
@@ -3478,6 +3555,148 @@ msgstr "써멀 고도"
 msgid "Cloud base"
 msgstr "운저"
 
+#: src/Language/LanguageGlue.cpp:163
+#, no-c-format
+msgid "Czech"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:164
+#, no-c-format
+msgid "Danish"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:165
+#, fuzzy, no-c-format
+msgid "German"
+msgstr "써멀"
+
+#: src/Language/LanguageGlue.cpp:166
+#, no-c-format
+msgid "Greek"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:167
+#, no-c-format
+msgid "English"
+msgstr "영어"
+
+#: src/Language/LanguageGlue.cpp:168
+#, no-c-format
+msgid "Spanish"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:169
+#, no-c-format
+msgid "Finnish"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:170
+#, no-c-format
+msgid "French"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:171
+#, no-c-format
+msgid "Hebrew"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:172
+#, no-c-format
+msgid "Croatian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:173
+#, no-c-format
+msgid "Hungarian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:174
+#, fuzzy, no-c-format
+msgid "Italian"
+msgstr "호주인"
+
+#: src/Language/LanguageGlue.cpp:175
+#, no-c-format
+msgid "Japanese"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:176
+#, no-c-format
+msgid "Korean"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:177
+#, no-c-format
+msgid "Lithuanian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:178
+#, no-c-format
+msgid "Norwegian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:179
+#, no-c-format
+msgid "Dutch"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:180
+#, fuzzy, no-c-format
+msgid "Polish"
+msgstr "영어"
+
+#: src/Language/LanguageGlue.cpp:181
+#, no-c-format
+msgid "Brazilian Portuguese"
+msgstr ""
+
+#. our Portuguese translation is less advanced than Brazilian
+#. Portuguese
+#: src/Language/LanguageGlue.cpp:185
+#, no-c-format
+msgid "Portuguese"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:187
+#, no-c-format
+msgid "Romanian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:188
+#, no-c-format
+msgid "Russian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:189
+#, no-c-format
+msgid "Slovak"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:190
+#, no-c-format
+msgid "Serbian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:191
+#, no-c-format
+msgid "Swedish"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:192
+#, no-c-format
+msgid "Turkish"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:193
+#, no-c-format
+msgid "Ukranian"
+msgstr ""
+
+#: src/Language/LanguageGlue.cpp:194
+#, no-c-format
+msgid "Vietnamese"
+msgstr ""
+
 #: src/UIActions.cpp:52
 msgid "Quit program?"
 msgstr "프로그램 종료?"
@@ -3614,8 +3833,9 @@ msgstr ""
 msgid "GPS Intermediate Driver"
 msgstr ""
 
-#: src/Device/Config.cpp:285 src/Dialogs/Device/DeviceEditWidget.cpp:75
 # , fuzzy, no-c-format
+#: src/Device/Config.cpp:285 src/Dialogs/Device/DeviceEditWidget.cpp:75
+#, no-c-format
 msgid "Built-in GPS & sensors"
 msgstr "내장 GPS"
 
@@ -3630,7 +3850,7 @@ msgstr "내장 GPS"
 #: src/Dialogs/Settings/dlgConfigurationSingle.cpp:43
 #: src/Dialogs/Settings/dlgQNH.cpp:153
 #: src/Dialogs/Plane/PlaneDetailsDialog.cpp:292
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:298
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:299
 #: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:127
 #: src/Dialogs/Task/Widgets/ObservationZoneSummaryWidget.cpp:68
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:325
@@ -3665,7 +3885,7 @@ msgstr "재시도"
 #: src/Dialogs/Settings/dlgConfigurationSingle.cpp:44
 #: src/Dialogs/Traffic/TrafficList.cpp:789
 #: src/Dialogs/Plane/PlaneDetailsDialog.cpp:293
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:300
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:301
 #: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:128
 #: src/Dialogs/Waypoint/WaypointList.cpp:240
 #: src/Dialogs/Task/Widgets/ObservationZoneSummaryWidget.cpp:69
@@ -3692,8 +3912,8 @@ msgid "Select"
 msgstr ""
 
 #: src/Dialogs/ListPicker.cpp:192 src/Dialogs/HelpDialog.cpp:37
-#: src/Dialogs/TouchTextEntry.cpp:373 Data/Input/default.xci:1156
-#: Data/Input/default.xci:1163
+#: src/Dialogs/TouchTextEntry.cpp:373 Data/Input/default.xci:1172
+#: Data/Input/default.xci:1179
 msgid "Help"
 msgstr "도움말"
 
@@ -3713,10 +3933,10 @@ msgstr ""
 msgid "Queued"
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/FileManager.cpp:443 src/Dialogs/FileManager.cpp:449
 #: src/Dialogs/FilePickAndDownload.cpp:383
 #: src/Dialogs/FilePickAndDownload.cpp:389
-# , fuzzy
 msgid "Downloading"
 msgstr "내려받기"
 
@@ -3748,19 +3968,19 @@ msgstr "내려받기"
 msgid "Error"
 msgstr "오류"
 
-#: src/Dialogs/FileManager.cpp:547 src/Dialogs/FilePickAndDownload.cpp:552
 # , fuzzy
+#: src/Dialogs/FileManager.cpp:547 src/Dialogs/FilePickAndDownload.cpp:552
 msgid "Select a file"
 msgstr "파일 불러오기 실패"
 
-#: src/Dialogs/FileManager.cpp:686 src/Dialogs/FilePickAndDownload.cpp:738
 # , fuzzy
+#: src/Dialogs/FileManager.cpp:686 src/Dialogs/FilePickAndDownload.cpp:738
 msgid "Failed to download the repository index."
 msgstr "비행 리스트 다운로드 실패"
 
-#: src/Dialogs/FileManager.cpp:695 src/Dialogs/FileManager.cpp:722
-#: src/Dialogs/FilePickAndDownload.cpp:815 Data/Input/default.xci:680
 # , fuzzy
+#: src/Dialogs/FileManager.cpp:695 src/Dialogs/FileManager.cpp:722
+#: src/Dialogs/FilePickAndDownload.cpp:815 Data/Input/default.xci:687
 msgid "File Manager"
 msgstr "작업 관리자"
 
@@ -3778,8 +3998,8 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: src/Dialogs/FilePickAndDownload.cpp:137
 # , fuzzy
+#: src/Dialogs/FilePickAndDownload.cpp:137
 msgid "Downloading list of files"
 msgstr "비행 로그 다운로드"
 
@@ -3791,8 +4011,8 @@ msgstr ""
 msgid "The country or continent where you are flying"
 msgstr ""
 
-#: src/Dialogs/FilePickAndDownload.cpp:144
 # , fuzzy
+#: src/Dialogs/FilePickAndDownload.cpp:144
 msgid "State"
 msgstr "상태"
 
@@ -3804,18 +4024,18 @@ msgstr ""
 msgid "Where will you be flying?"
 msgstr ""
 
-#: src/Dialogs/FilePickAndDownload.cpp:763
 # , fuzzy
+#: src/Dialogs/FilePickAndDownload.cpp:763
 msgid "all"
 msgstr "전체"
 
-#: src/Dialogs/FilePickAndDownload.cpp:765
 # , fuzzy
+#: src/Dialogs/FilePickAndDownload.cpp:765
 msgid "airspace"
 msgstr "공역"
 
-#: src/Dialogs/FilePickAndDownload.cpp:767
 # , fuzzy
+#: src/Dialogs/FilePickAndDownload.cpp:767
 msgid "waypoint"
 msgstr "다음 웨이포인트"
 
@@ -3840,13 +4060,15 @@ msgstr ""
 msgid "IOIO switches and Nunchuk"
 msgstr ""
 
-#: src/Dialogs/Device/DeviceEditWidget.cpp:81
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/DeviceEditWidget.cpp:81
+#, no-c-format
 msgid "IOIO i2c pressure sensor"
 msgstr "기압"
 
-#: src/Dialogs/Device/DeviceEditWidget.cpp:82
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/DeviceEditWidget.cpp:82
+#, no-c-format
 msgid "IOIO voltage sensor"
 msgstr "기압"
 
@@ -3863,8 +4085,9 @@ msgstr ""
 msgid "TCP Port"
 msgstr "TCP 포트"
 
-#: src/Dialogs/Device/DeviceEditWidget.cpp:90
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/DeviceEditWidget.cpp:90
+#, no-c-format
 msgid "UDP Port"
 msgstr "TCP 포트"
 
@@ -3912,8 +4135,8 @@ msgid ""
 "used."
 msgstr ""
 
-#: src/Dialogs/Device/DeviceEditWidget.cpp:643
 # , fuzzy
+#: src/Dialogs/Device/DeviceEditWidget.cpp:643
 msgid "Pressure use"
 msgstr "기압"
 
@@ -3962,9 +4185,9 @@ msgid ""
 "to be used anyway."
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/Device/DeviceListDialog.cpp:260
 #: src/Dialogs/Device/DeviceListDialog.cpp:279
-# , fuzzy
 msgid "Disable"
 msgstr "사용 안함"
 
@@ -4061,9 +4284,9 @@ msgstr "연결되지 않음"
 msgid "Device is occupied"
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/Device/DeviceListDialog.cpp:485
 #: src/Dialogs/Device/DeviceListDialog.cpp:547
-# , fuzzy
 msgid "Device is not connected"
 msgstr "GPS가 연결되지 않음"
 
@@ -4076,8 +4299,8 @@ msgstr "장치 편집"
 msgid "Communication with this device will be logged for the next %u minutes."
 msgstr ""
 
-#: src/Dialogs/Device/DeviceListDialog.cpp:675 Data/Input/default.xci:672
-#: Data/Input/default.xci:1444
+#: src/Dialogs/Device/DeviceListDialog.cpp:675 Data/Input/default.xci:679
+#: Data/Input/default.xci:1460
 msgid "Devices"
 msgstr "장치들"
 
@@ -4192,8 +4415,8 @@ msgstr ""
 msgid "PDA baud rate"
 msgstr ""
 
-#: src/Dialogs/Device/LX/NanoConfigWidget.cpp:97
 # , fuzzy
+#: src/Dialogs/Device/LX/NanoConfigWidget.cpp:97
 msgid "Auto off"
 msgstr "자동 줌 끄기"
 
@@ -4205,8 +4428,8 @@ msgstr ""
 msgid "Always run"
 msgstr ""
 
-#: src/Dialogs/Device/LX/NanoConfigWidget.cpp:106
 # , fuzzy
+#: src/Dialogs/Device/LX/NanoConfigWidget.cpp:106
 msgid "Enable NMEA"
 msgstr "사용함"
 
@@ -4254,7 +4477,7 @@ msgstr ""
 #: src/Dialogs/Device/Vega/VoiceSettingsDialog.cpp:61
 #: src/Dialogs/Settings/dlgConfiguration.cpp:99
 #: src/Dialogs/Weather/RASPDialog.cpp:58 src/Terrain/RasterWeather.cpp:50
-#: Data/Input/default.xci:575 Data/Input/default.xci:1373
+#: Data/Input/default.xci:582 Data/Input/default.xci:1389
 #, no-c-format
 msgid "Terrain"
 msgstr ""
@@ -4282,7 +4505,7 @@ msgid ""
 msgstr ""
 
 #: src/Dialogs/Device/Vega/VoiceSettingsDialog.cpp:73
-#: Data/Input/default.xci:607 Data/Input/default.xci:614
+#: Data/Input/default.xci:614 Data/Input/default.xci:621
 msgid "MacCready"
 msgstr ""
 
@@ -4311,8 +4534,8 @@ msgstr ""
 #: src/Dialogs/Device/Vega/VoiceSettingsDialog.cpp:85
 #: src/Dialogs/Airspace/dlgAirspace.cpp:171
 #: src/Dialogs/Settings/dlgConfiguration.cpp:100
-#: src/Dialogs/dlgAnalysis.cpp:374 Data/Input/default.xci:589
-#: Data/Input/default.xci:721
+#: src/Dialogs/dlgAnalysis.cpp:374 Data/Input/default.xci:596
+#: Data/Input/default.xci:728
 #, no-c-format
 msgid "Airspace"
 msgstr "공역"
@@ -4355,8 +4578,9 @@ msgstr ""
 msgid "Middle"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/SwitchesDialog.cpp:47
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/SwitchesDialog.cpp:47
+#, no-c-format
 msgid "Down"
 msgstr "내려받기"
 
@@ -4365,8 +4589,9 @@ msgstr "내려받기"
 msgid "Locked"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/SwitchesDialog.cpp:54
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/SwitchesDialog.cpp:54
+#, no-c-format
 msgid "Not locked"
 msgstr "찾을 수 없음"
 
@@ -4482,8 +4707,9 @@ msgstr ""
 msgid "Balloon"
 msgstr ""
 
-#: src/Dialogs/Device/FLARM/ConfigWidget.cpp:135
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/FLARM/ConfigWidget.cpp:135
+#, no-c-format
 msgid "Airship"
 msgstr "공역"
 
@@ -4513,19 +4739,19 @@ msgstr ""
 msgid "Logger interval"
 msgstr ""
 
-#: src/Dialogs/MapItemListDialog.cpp:155
 # , fuzzy
+#: src/Dialogs/MapItemListDialog.cpp:155
 msgid "Terrain:"
 msgstr "지형 표시"
 
-#: src/Dialogs/MapItemListDialog.cpp:227
 # , fuzzy
+#: src/Dialogs/MapItemListDialog.cpp:227
 msgid "Drag Target"
 msgstr "대상"
 
 #: src/Dialogs/MapItemListDialog.cpp:295
-#: src/Dialogs/Task/AlternatesListDialog.cpp:67 Data/Input/default.xci:354
-#: Data/Input/default.xci:399
+#: src/Dialogs/Task/AlternatesListDialog.cpp:67 Data/Input/default.xci:361
+#: Data/Input/default.xci:406
 msgid "Goto"
 msgstr ""
 
@@ -4542,8 +4768,8 @@ msgstr ""
 msgid "Map Item List Settings"
 msgstr ""
 
-#: src/Dialogs/MapItemListSettingsPanel.cpp:40
 # , fuzzy
+#: src/Dialogs/MapItemListSettingsPanel.cpp:40
 msgid "Show Location row"
 msgstr "위치"
 
@@ -4553,8 +4779,8 @@ msgid ""
 "bearing to the location and the elevation."
 msgstr ""
 
-#: src/Dialogs/MapItemListSettingsPanel.cpp:45
 # , fuzzy
+#: src/Dialogs/MapItemListSettingsPanel.cpp:45
 msgid "Show Arrival Altitude"
 msgstr "도착 고도"
 
@@ -4574,8 +4800,8 @@ msgid "Warn"
 msgstr "경고"
 
 #: src/Dialogs/Airspace/dlgAirspace.cpp:97
-#: src/Dialogs/Airspace/dlgAirspace.cpp:123 Data/Input/default.xci:504
-#: Data/Input/default.xci:552
+#: src/Dialogs/Airspace/dlgAirspace.cpp:123 Data/Input/default.xci:511
+#: Data/Input/default.xci:559
 msgid "Display"
 msgstr "화면"
 
@@ -4611,7 +4837,7 @@ msgstr "방향"
 
 #: src/Dialogs/Airspace/AirspaceList.cpp:436
 #: src/Dialogs/Settings/dlgConfigInfoboxes.cpp:311
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:133
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:134
 #: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:70
 #: src/Dialogs/Waypoint/WaypointList.cpp:397
 msgid "Name"
@@ -4638,8 +4864,8 @@ msgstr ""
 msgid "Change Fill Brush"
 msgstr ""
 
-#: src/Dialogs/Airspace/AirspaceCRendererSettingsPanel.cpp:96
 # , fuzzy
+#: src/Dialogs/Airspace/AirspaceCRendererSettingsPanel.cpp:96
 msgid "Border Width"
 msgstr "게이트 너비"
 
@@ -4659,8 +4885,9 @@ msgstr ""
 msgid "Only padding"
 msgstr ""
 
-#: src/Dialogs/Airspace/AirspaceCRendererSettingsPanel.cpp:104
 # , fuzzy, no-c-format
+#: src/Dialogs/Airspace/AirspaceCRendererSettingsPanel.cpp:104
+#, no-c-format
 msgid "Not filled"
 msgstr "찾을 수 없음"
 
@@ -4721,8 +4948,8 @@ msgid ""
 "Top Hat's internal wind calculation."
 msgstr ""
 
-#: src/Dialogs/Settings/WindSettingsPanel.cpp:66
 # , fuzzy
+#: src/Dialogs/Settings/WindSettingsPanel.cpp:66
 msgid "Wind source"
 msgstr "풍속"
 
@@ -4751,9 +4978,10 @@ msgstr ""
 msgid "Manual adjustment of wind direction."
 msgstr ""
 
+# , fuzzy, no-c-format
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:110
 #: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:184
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Map and Wind infobox"
 msgstr "지도 및 인포박스"
 
@@ -4763,9 +4991,10 @@ msgstr "지도 및 인포박스"
 msgid "Show the wind arrow in both the Wind infobox and on the map."
 msgstr ""
 
+# , fuzzy, no-c-format
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:111
 #: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:185
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Map only"
 msgstr "지도 표시"
 
@@ -4809,8 +5038,8 @@ msgstr ""
 msgid "Determines where the wind arrow is shown."
 msgstr ""
 
-#: src/Dialogs/Settings/WindSettingsPanel.cpp:259
 # , fuzzy
+#: src/Dialogs/Settings/WindSettingsPanel.cpp:259
 msgid "Internal"
 msgstr "외부"
 
@@ -4822,8 +5051,8 @@ msgstr "외부"
 msgid "Wind Settings"
 msgstr ""
 
-#: src/Dialogs/TaskStatusDialog.cpp:36
 # , fuzzy
+#: src/Dialogs/TaskStatusDialog.cpp:36
 msgid "Task Status"
 msgstr "타스크 시작"
 
@@ -4851,9 +5080,9 @@ msgid ""
 "pick up bugs or gets wet.  50% indicates the glider's sink rate is doubled."
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/Settings/dlgBasicSettings.cpp:266
 #: src/Dialogs/dlgAnalysis.cpp:333
-# , fuzzy
 msgid "Bugs & ballast"
 msgstr "발라스트 %"
 
@@ -4880,8 +5109,9 @@ msgstr ""
 msgid "Gauges"
 msgstr "게이지"
 
-#: src/Dialogs/Settings/dlgConfiguration.cpp:89
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/dlgConfiguration.cpp:89
+#, no-c-format
 msgid "Contest"
 msgstr "내용"
 
@@ -4910,13 +5140,15 @@ msgstr "안전 요소"
 msgid "FLARM, Other"
 msgstr ""
 
-#: src/Dialogs/Settings/dlgConfiguration.cpp:106
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/dlgConfiguration.cpp:106
+#, no-c-format
 msgid "Audio Vario"
 msgstr "L/D 바리오"
 
-#: src/Dialogs/Settings/dlgConfiguration.cpp:108
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/dlgConfiguration.cpp:108
+#, no-c-format
 msgid "Competition rules"
 msgstr "알 수 없는 선수 번호"
 
@@ -4940,14 +5172,15 @@ msgstr "스크린 레이아웃"
 msgid "Pages"
 msgstr ""
 
-#: src/Dialogs/Settings/dlgConfiguration.cpp:113
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/dlgConfiguration.cpp:113
+#, no-c-format
 msgid "InfoBox Sets"
 msgstr "인포박스 페이지"
 
 #: src/Dialogs/Settings/dlgConfiguration.cpp:114
 #: src/Dialogs/StatusPanels/SystemStatusPanel.cpp:115
-#: Data/Input/default.xci:706 Data/Input/default.xci:1429
+#: Data/Input/default.xci:713 Data/Input/default.xci:1445
 #, no-c-format
 msgid "Logger"
 msgstr "로그"
@@ -4968,7 +5201,7 @@ msgid "Changes to configuration saved.  Restart Top Hat to apply changes."
 msgstr ""
 
 #: src/Dialogs/Settings/dlgQNH.cpp:120 src/Dialogs/Settings/dlgQNH.cpp:148
-#: Data/Input/default.xci:1105
+#: Data/Input/default.xci:1112
 msgid "QNH"
 msgstr ""
 
@@ -4987,14 +5220,14 @@ msgstr ""
 msgid "Nationality"
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:222
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:404
-# , fuzzy
 msgid "Site files"
 msgstr "사이트 파일들"
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:226
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:226
 msgid "Safety factors"
 msgstr "안전 요소"
 
@@ -5005,8 +5238,8 @@ msgstr "안전 요소"
 msgid "Pilot"
 msgstr ""
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:234
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:234
 msgid "Set up screen"
 msgstr "지도 (풀 스크린)"
 
@@ -5016,43 +5249,43 @@ msgid "*** Not configured ***"
 msgstr ""
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:340 src/Dialogs/dlgStatus.cpp:129
-#: Data/Input/default.xci:656
+#: Data/Input/default.xci:663
 msgid "System"
 msgstr ""
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:342
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:342
 msgid "US task rules"
 msgstr "타스크 규정"
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:342
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:342
 msgid "FAI task rules"
 msgstr "타스크 규정"
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:408 src/Dialogs/dlgStatus.cpp:126
 #: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:27
-#: Data/Dialogs/dlgFlarmTrafficDetails.xml:19 Data/Input/default.xci:664
+#: Data/Dialogs/dlgFlarmTrafficDetails.xml:19 Data/Input/default.xci:671
 msgid "Plane"
 msgstr ""
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:413
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:413
 msgid "Device"
 msgstr "장치들"
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:418
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:418
 msgid "Safety heights"
 msgstr "시작 고도"
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:428
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:428
 msgid "Screen"
 msgstr "스크린 레이아웃"
 
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:436
 # , fuzzy
+#: src/Dialogs/Settings/dlgSetupQuick.cpp:436
 msgid "Advanced"
 msgstr ""
 "고급 설정\n"
@@ -5095,8 +5328,8 @@ msgstr ""
 msgid "Map"
 msgstr ""
 
-#: src/Dialogs/Traffic/TrafficList.cpp:771
 # , fuzzy
+#: src/Dialogs/Traffic/TrafficList.cpp:771
 msgid "Traffic"
 msgstr "트래픽 없슴"
 
@@ -5115,8 +5348,8 @@ msgstr ""
 msgid "New Teammate"
 msgstr ""
 
-#: src/Dialogs/Traffic/TeamCodeDialog.cpp:89
 # , fuzzy
+#: src/Dialogs/Traffic/TeamCodeDialog.cpp:89
 msgid "Set code"
 msgstr "바람 설정"
 
@@ -5152,8 +5385,8 @@ msgstr "알 수 없는 선수 번호"
 msgid "Not Found"
 msgstr "찾을 수 없음"
 
-#: src/Dialogs/Traffic/TeamCodeDialog.cpp:223
 # , fuzzy
+#: src/Dialogs/Traffic/TeamCodeDialog.cpp:223
 msgid "Set new teammate"
 msgstr "새로운 팀메이트 설정"
 
@@ -5189,8 +5422,8 @@ msgstr "온도 괘적"
 msgid "Task Speed"
 msgstr "타스크 속도"
 
-#: src/Dialogs/dlgAnalysis.cpp:350 src/Dialogs/dlgAnalysis.cpp:359
 # , fuzzy
+#: src/Dialogs/dlgAnalysis.cpp:350 src/Dialogs/dlgAnalysis.cpp:359
 msgid "Task stats"
 msgstr "타스크 시작"
 
@@ -5227,8 +5460,8 @@ msgstr "체크 리스트"
 msgid "No checklist loaded"
 msgstr "체크 리스트가 읽혀지지 않았습니다."
 
-#: src/Dialogs/dlgChecklist.cpp:150
 # , fuzzy
+#: src/Dialogs/dlgChecklist.cpp:150
 msgid "Create xcsoar-checklist.txt"
 msgstr "xcsoar-checklist.txt 생성"
 
@@ -5248,8 +5481,8 @@ msgstr ""
 msgid "Delete"
 msgstr "삭제"
 
-#: src/Dialogs/Plane/PlaneListDialog.cpp:198
 # , fuzzy
+#: src/Dialogs/Plane/PlaneListDialog.cpp:198
 msgid "Activate"
 msgstr "활성"
 
@@ -5347,33 +5580,33 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:140
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:141
 msgid "Reference Mass"
 msgstr ""
 
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:140
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:141
 msgid "Reference mass of the polar"
 msgstr ""
 
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:145
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:146
 msgid "Dry Mass"
 msgstr ""
 
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:145
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:146
 msgid "Dry all-up flying mass of your plane"
 msgstr ""
 
 #. let the user select
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:186
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:187
 msgid "Load Polar"
 msgstr "폴라 불러오기"
 
 #. let the user select
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:239
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:240
 msgid "Load Polar From File"
 msgstr "파일에서 폴라 불러오기"
 
-#: src/Dialogs/Plane/PlanePolarDialog.cpp:292
+#: src/Dialogs/Plane/PlanePolarDialog.cpp:293
 msgid "Plane Polar"
 msgstr ""
 
@@ -5414,7 +5647,7 @@ msgid "Could not open IGC file!"
 msgstr "IGC파일을 열 수 없습니다."
 
 #: src/Dialogs/ReplayDialog.cpp:113 src/Dialogs/ReplayDialog.cpp:154
-#: Data/Input/default.xci:688 Data/Input/default.xci:1171
+#: Data/Input/default.xci:695 Data/Input/default.xci:1187
 msgid "Replay"
 msgstr ""
 
@@ -5620,13 +5853,13 @@ msgstr ""
 msgid "Top Hat Tips"
 msgstr ""
 
-#: src/Dialogs/dlgStartupAssistant.cpp:285
 # , fuzzy
+#: src/Dialogs/dlgStartupAssistant.cpp:285
 msgid "Next tip"
 msgstr "다음"
 
-#: src/Dialogs/dlgStartupAssistant.cpp:289
 # , fuzzy
+#: src/Dialogs/dlgStartupAssistant.cpp:289
 msgid "Previous tip"
 msgstr "이전 턴 포인트"
 
@@ -5634,13 +5867,13 @@ msgstr "이전 턴 포인트"
 msgid "Don't show tips at startup"
 msgstr ""
 
-#: src/Dialogs/dlgMatItemClick.cpp:119
 # , fuzzy
+#: src/Dialogs/dlgMatItemClick.cpp:119
 msgid "Add MAT point"
 msgstr "턴포인트 추가"
 
-#: src/Dialogs/dlgMatItemClick.cpp:121
 # , fuzzy
+#: src/Dialogs/dlgMatItemClick.cpp:121
 msgid "Delete MAT point"
 msgstr "웨이포인트를 지우겠습니까?"
 
@@ -5648,14 +5881,14 @@ msgstr "웨이포인트를 지우겠습니까?"
 msgid "Error: could not remove"
 msgstr ""
 
-#: src/Dialogs/dlgMatItemClick.cpp:310
 # , fuzzy
+#: src/Dialogs/dlgMatItemClick.cpp:310
 msgid "Removed"
 msgstr "제거"
 
+# , fuzzy
 #: src/Dialogs/dlgMatItemClick.cpp:311 src/Dialogs/dlgMatItemClick.cpp:315
 #: src/Dialogs/dlgMatItemClick.cpp:477
-# , fuzzy
 msgid "from task"
 msgstr "타스크 없슴"
 
@@ -5667,13 +5900,13 @@ msgstr "타스크 없슴"
 msgid "Success"
 msgstr "성공"
 
-#: src/Dialogs/dlgMatItemClick.cpp:314
 # , fuzzy
+#: src/Dialogs/dlgMatItemClick.cpp:314
 msgid "Could not remove"
 msgstr "IGC파일을 열 수 없습니다."
 
-#: src/Dialogs/dlgMatItemClick.cpp:406
 # , fuzzy
+#: src/Dialogs/dlgMatItemClick.cpp:406
 msgid "Calculating"
 msgstr "계산기"
 
@@ -5681,8 +5914,8 @@ msgstr "계산기"
 msgid "Est. Finish:"
 msgstr ""
 
-#: src/Dialogs/dlgMatItemClick.cpp:459
 # , fuzzy
+#: src/Dialogs/dlgMatItemClick.cpp:459
 msgid "to task after"
 msgstr "정의된 타스크가 없슴"
 
@@ -5730,13 +5963,13 @@ msgid "Failed to restore task"
 msgstr ""
 
 #: src/Dialogs/dlgStatus.cpp:49 src/Dialogs/dlgStatus.cpp:60
-#: Data/Input/default.xci:891 Data/Input/default.xci:1085
-#: Data/Input/default.xci:1499
+#: Data/Input/default.xci:898 Data/Input/default.xci:1092
+#: Data/Input/default.xci:1515
 msgid "Status"
 msgstr "상태"
 
-#: src/Dialogs/dlgStatus.cpp:136
 # , fuzzy
+#: src/Dialogs/dlgStatus.cpp:136
 msgid "Times"
 msgstr "시간"
 
@@ -5884,8 +6117,8 @@ msgstr ""
 msgid "Bearing and Distance"
 msgstr ""
 
-#: src/Dialogs/Waypoint/WaypointInfoWidget.cpp:128
 # , fuzzy
+#: src/Dialogs/Waypoint/WaypointInfoWidget.cpp:128
 msgid "Arrival altitude"
 msgstr "도착 고도"
 
@@ -5990,8 +6223,8 @@ msgstr ""
 msgid "Waypoints not editable"
 msgstr "편집 할 수 없는 웨이포인트"
 
-#: src/Dialogs/Waypoint/Manager.cpp:120
 # , fuzzy
+#: src/Dialogs/Waypoint/Manager.cpp:120
 msgid "Delete waypoint?"
 msgstr "웨이포인트를 지우겠습니까?"
 
@@ -6003,8 +6236,9 @@ msgstr "변경 사항을 웨이포인트 파일에 저장 하겠습니까?"
 msgid "Waypoints edited"
 msgstr "편집된 웨이포인트"
 
-#: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:61
 # , fuzzy, no-c-format
+#: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:61
+#, no-c-format
 msgid "Turnpoint"
 msgstr "턴포인트 추가"
 
@@ -6015,8 +6249,9 @@ msgstr "턴포인트 추가"
 msgid "Airport"
 msgstr ""
 
-#: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:63
 # , fuzzy, no-c-format
+#: src/Dialogs/Waypoint/dlgWaypointEdit.cpp:63
+#, no-c-format
 msgid "Landable"
 msgstr "사용함"
 
@@ -6123,8 +6358,9 @@ msgid ""
 "Draws a solid outline with a half transparent border around the airspace."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/AirspaceConfigPanel.cpp:77
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/AirspaceConfigPanel.cpp:77
+#, no-c-format
 msgid "No fill"
 msgstr "찾을 수 없음"
 
@@ -6608,33 +6844,39 @@ msgstr ""
 msgid "8 split"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:88
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:88
+#, no-c-format
 msgid "8 bottom or right"
 msgstr "우측 하단"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:90
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:90
+#, no-c-format
 msgid "8 bottom + vario (portrait)"
 msgstr "세로 방향"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:92
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:92
+#, no-c-format
 msgid "8 top or left"
 msgstr "왼쪽 위"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:94
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:94
+#, no-c-format
 msgid "8 top + vario (portrait)"
 msgstr "세로 방향"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:96
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:96
+#, no-c-format
 msgid "9 right + vario (landscape)"
 msgstr "가로 방향"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:98
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:98
+#, no-c-format
 msgid "9 left + right + vario (landscape)"
 msgstr "가로 방향"
 
@@ -6643,28 +6885,33 @@ msgstr "가로 방향"
 msgid "5 right (Square)"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:102
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:102
+#, no-c-format
 msgid "12 bottom or right"
 msgstr "우측 하단"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:104
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:104
+#, no-c-format
 msgid "12 top or left"
 msgstr "왼쪽 위"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:106
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:106
+#, no-c-format
 msgid "24 right (landscape)"
 msgstr "가로 방향"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:108
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:108
+#, no-c-format
 msgid "4 top or left"
 msgstr "왼쪽 위"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:110
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:110
+#, no-c-format
 msgid "4 bottom or right"
 msgstr "우측 하단"
 
@@ -6672,8 +6919,8 @@ msgstr "우측 하단"
 msgid "Set up screens"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:144
 # , fuzzy
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:144
 msgid "Set up infoboxes"
 msgstr "인포 박스 초기 상태"
 
@@ -6695,8 +6942,8 @@ msgid ""
 "screen size."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:171
 # , fuzzy
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:171
 msgid "Screens button location"
 msgstr "지금 위치의 공역"
 
@@ -6722,13 +6969,13 @@ msgid ""
 "waypoint InfoBox will be blue when the glider is above final glide."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:193
 # , fuzzy
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:193
 msgid "Edit screens"
 msgstr "장치 편집"
 
-#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:194
 # , fuzzy
+#: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:194
 msgid "Edit infoboxes"
 msgstr "인포 박스"
 
@@ -6752,8 +6999,8 @@ msgstr ""
 msgid "This is the time interval between logged points when circling."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/LoggerConfigPanel.cpp:72
 # , fuzzy
+#: src/Dialogs/Settings/Panels/LoggerConfigPanel.cpp:72
 msgid "NMEA logger"
 msgstr "NMEA 로그 켜기"
 
@@ -6781,8 +7028,9 @@ msgid ""
 "The moving map display will be rotated so the glider's track is oriented up."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:45
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:45
+#, no-c-format
 msgid "Heading up"
 msgstr "방향"
 
@@ -6807,8 +7055,9 @@ msgid ""
 "up."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:51
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:51
+#, no-c-format
 msgid "Wind up"
 msgstr "풍속"
 
@@ -6832,7 +7081,7 @@ msgstr ""
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:60
 #: src/Dialogs/Task/Manager/TaskManagerDialog.cpp:178
 #: Data/Dialogs/dlgTarget_L.xml:3 Data/Dialogs/dlgTarget.xml:3
-#: Data/Input/default.xci:493 Data/Input/default.xci:1324
+#: Data/Input/default.xci:500 Data/Input/default.xci:1340
 #, no-c-format
 msgid "Target"
 msgstr "대상"
@@ -6904,9 +7153,10 @@ msgstr ""
 msgid "Use FAI contest rules for flying contests."
 msgstr ""
 
+# , fuzzy, no-c-format
 #: src/Dialogs/Settings/Panels/NationalityConfigPanel.cpp:96
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:52
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "US rules"
 msgstr "규정"
 
@@ -6916,10 +7166,10 @@ msgstr "규정"
 msgid "Use US contest rules for flying contests."
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/Settings/Panels/NationalityConfigPanel.cpp:155
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:82
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:322
-# , fuzzy
 msgid "Task rules"
 msgstr "타스크 규정"
 
@@ -6962,8 +7212,8 @@ msgstr ""
 msgid "Show fullscreen (no infoboxes)"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:215
 # , fuzzy
+#: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:215
 msgid "Infobox sets"
 msgstr "인포박스 페이지"
 
@@ -7001,14 +7251,15 @@ msgstr ""
 msgid "Nothing"
 msgstr ""
 
+# , fuzzy, no-c-format
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:244
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:409
-# , fuzzy, no-c-format
+#, no-c-format
 msgid "Cross section"
 msgstr "방향"
 
-#: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:247
 # , fuzzy
+#: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:247
 msgid "Bottom area"
 msgstr "좌측 하단"
 
@@ -7016,8 +7267,8 @@ msgstr "좌측 하단"
 msgid "Specifies what should be displayed below the main area."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:393
 # , fuzzy
+#: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:393
 msgid "InfoBoxes"
 msgstr "인포 박스"
 
@@ -7123,8 +7374,9 @@ msgid ""
 "to height of the maximum climb). If considered, 0.3 is recommended."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:73
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:73
+#, no-c-format
 msgid "Download from internet"
 msgstr "비행 파일 다운로드"
 
@@ -7172,7 +7424,7 @@ msgid ""
 msgstr ""
 
 #: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:194
-#: Data/Input/default.xci:950
+#: Data/Input/default.xci:957
 msgid "Airspaces"
 msgstr ""
 
@@ -7200,8 +7452,8 @@ msgid ""
 "information about individual waypoints and airfields."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:212
 # , fuzzy
+#: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:212
 msgid "Edit waypoints"
 msgstr "다음 웨이포인트"
 
@@ -7302,8 +7554,9 @@ msgstr "간단 (크게)"
 msgid "Enlarged simple graphics."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:127
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:127
+#, no-c-format
 msgid "Detailed"
 msgstr "상세한"
 
@@ -7589,8 +7842,9 @@ msgstr ""
 msgid "Sandstone"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TerrainDisplayConfigPanel.cpp:218
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/TerrainDisplayConfigPanel.cpp:218
+#, no-c-format
 msgid "Pastel"
 msgstr "붙여넣기"
 
@@ -7868,13 +8122,15 @@ msgstr ""
 msgid "All waypoint labels will be displayed."
 msgstr "모든 웨이포인트 라벨이 표시됨"
 
-#: src/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp:133
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp:133
+#, no-c-format
 msgid "Task waypoints & airfields"
 msgstr "타스크 웨이포인트"
 
-#: src/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp:134
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp:134
+#, no-c-format
 msgid "All waypoints part of a task and all airfields will be displayed."
 msgstr "모든 웨이포인트 라벨이 표시됨"
 
@@ -7997,37 +8253,47 @@ msgstr ""
 msgid "Hot-air balloon"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:162
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:186
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:147
+#, no-c-format
+msgid "Hangglider (Flex/FAI1)"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:148
+#, no-c-format
+msgid "Hangglider (Rigid/FAI5)"
+msgstr ""
+
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:164
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:188
 msgid "Tracking Interval"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:166
 # , fuzzy
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:168
 msgid "Track friends"
 msgstr "트래킹"
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:167
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:169
 msgid "Download the position of your friends live from the SkyLines server."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:188
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:190
 msgid "Vehicle Type"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:188
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:190
 msgid "Type of vehicle used."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:191
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:193
 msgid "Server"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:195
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:197
 msgid "Username"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:196
+#: src/Dialogs/Settings/Panels/TrackingConfigPanel.cpp:198
 msgid "Password"
 msgstr ""
 
@@ -8185,13 +8451,13 @@ msgstr ""
 msgid "Configure whether the start must be armed manually or automatically."
 msgstr ""
 
-#: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:250
 # , fuzzy
+#: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:250
 msgid "Start open time"
 msgstr "스타트 라인"
 
-#: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:252
 # , fuzzy
+#: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:252
 msgid "Start close time"
 msgstr "스타트 라인"
 
@@ -8350,13 +8616,13 @@ msgstr ""
 msgid "Achieved speed"
 msgstr ""
 
-#: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:100
 # , fuzzy
+#: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:100
 msgid "Distance remaining"
 msgstr "거리"
 
-#: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:102
 # , fuzzy
+#: src/Dialogs/Task/Manager/TaskCalculatorPanel.cpp:102
 msgid "AAT Time remaining"
 msgstr "시간"
 
@@ -8385,9 +8651,9 @@ msgstr ""
 msgid "Edit Alternates"
 msgstr ""
 
+# , fuzzy
 #: src/Dialogs/Task/TaskPointDialog.cpp:173
 #: src/Dialogs/Task/TaskPointDialog.cpp:246
-# , fuzzy
 msgid "Task point"
 msgstr "타스크 포인트"
 
@@ -8413,13 +8679,13 @@ msgstr ""
 msgid "Insert before"
 msgstr ""
 
-#: src/Dialogs/Task/TaskEditorDialog.cpp:349
 # , fuzzy
+#: src/Dialogs/Task/TaskEditorDialog.cpp:349
 msgid "Task Point"
 msgstr "타스크 포인트"
 
-#: src/Dialogs/Task/TaskEditorDialog.cpp:529
 # , fuzzy
+#: src/Dialogs/Task/TaskEditorDialog.cpp:529
 msgid "Append turnpoint"
 msgstr "턴포인트 추가"
 
@@ -8427,8 +8693,8 @@ msgstr "턴포인트 추가"
 msgid "Sets the behavior for the current task."
 msgstr ""
 
-#: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:248
 # , fuzzy
+#: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:248
 msgid "Start max. height (MSL)"
 msgstr "시작 고도"
 
@@ -8448,8 +8714,8 @@ msgid ""
 "task.  Set to 0 for no limit."
 msgstr ""
 
-#: src/Dialogs/Task/TaskListDialogUs.cpp:59
 # , fuzzy
+#: src/Dialogs/Task/TaskListDialogUs.cpp:59
 msgid "Browse tasks"
 msgstr "타스크 없슴"
 
@@ -8511,10 +8777,10 @@ msgstr ""
 msgid "dist."
 msgstr "거리."
 
+# , fuzzy
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:212
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:216
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:224
-# , fuzzy
 msgid "Zoom to"
 msgstr "축소"
 
@@ -8554,8 +8820,8 @@ msgstr ""
 msgid "Enter a task name"
 msgstr ""
 
-#: src/Dialogs/TimeEntry.cpp:75 src/Dialogs/Weather/RASPDialog.cpp:70
 # , fuzzy
+#: src/Dialogs/TimeEntry.cpp:75 src/Dialogs/Weather/RASPDialog.cpp:70
 msgid "Now"
 msgstr "아니요"
 
@@ -8567,8 +8833,8 @@ msgstr ""
 msgid "Weather Forecast"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:71
 # , fuzzy
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:71
 msgid "Audio vario"
 msgstr "L/D 바리오"
 
@@ -8590,8 +8856,8 @@ msgid ""
 "zero"
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:85
 # , fuzzy
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:85
 msgid "Min. Frequency"
 msgstr "주파수"
 
@@ -8599,8 +8865,8 @@ msgstr "주파수"
 msgid "The tone frequency that is played at maximum sink rate."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:91
 # , fuzzy
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:91
 msgid "Zero Frequency"
 msgstr "주파수"
 
@@ -8608,8 +8874,8 @@ msgstr "주파수"
 msgid "The tone frequency that is played at zero climb rate."
 msgstr ""
 
-#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:97
 # , fuzzy
+#: src/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp:97
 msgid "Max. Frequency"
 msgstr "주파수"
 
@@ -8683,8 +8949,8 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: src/Monitor/MatTaskMonitor.cpp:54
 # , fuzzy
+#: src/Monitor/MatTaskMonitor.cpp:54
 msgid "Add this turn point?"
 msgstr "턴포인트 추가"
 
@@ -8698,8 +8964,9 @@ msgstr ""
 msgid "InfoBox titles"
 msgstr ""
 
-#: src/Dialogs/Settings/dlgConfigFonts.cpp:209
 # , fuzzy, no-c-format
+#: src/Dialogs/Settings/dlgConfigFonts.cpp:209
+#, no-c-format
 msgid "InfoBox values"
 msgstr "인포 박스"
 
@@ -8775,8 +9042,8 @@ msgstr ""
 msgid "Sky Conditions"
 msgstr "기상 상태"
 
-#: src/Weather/NOAAFormatter.cpp:203 Data/Input/default.xci:899
-#: Data/Input/default.xci:1140
+#: src/Weather/NOAAFormatter.cpp:203 Data/Input/default.xci:906
+#: Data/Input/default.xci:1156
 msgid "Weather"
 msgstr "날씨"
 
@@ -8813,13 +9080,15 @@ msgstr ""
 msgid "Radio com. max. delay"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AlertParameters.hpp:45
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AlertParameters.hpp:45
+#, no-c-format
 msgid "Battery low delay"
 msgstr "배터리 전원 부족"
 
-#: src/Dialogs/Device/Vega/AlertParameters.hpp:48
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AlertParameters.hpp:48
+#, no-c-format
 msgid "Battery empty delay"
 msgstr "배터리 전원 부족"
 
@@ -8848,8 +9117,9 @@ msgstr ""
 msgid "Type of dead band used in circling mode."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:45
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:45
+#, no-c-format
 msgid "Circling hi cutoff"
 msgstr "써클링 줌 끄기"
 
@@ -8858,8 +9128,9 @@ msgstr "써클링 줌 끄기"
 msgid "High limit of circling dead band"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:50
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:50
+#, no-c-format
 msgid "Circling low cutoff"
 msgstr "써클링 줌 끄기"
 
@@ -8878,8 +9149,9 @@ msgstr ""
 msgid "Type of dead band used in cruise mode."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:61
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:61
+#, no-c-format
 msgid "Cruise hi cutoff"
 msgstr "순항"
 
@@ -8888,8 +9160,9 @@ msgstr "순항"
 msgid "High limit of cruise dead band"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:66
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioDeadbandParameters.hpp:66
+#, no-c-format
 msgid "Cruise low cutoff"
 msgstr "순항"
 
@@ -8898,8 +9171,9 @@ msgstr "순항"
 msgid "Low limit of cruise dead band"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:72
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:72
+#, no-c-format
 msgid "Climb fast trigger"
 msgstr "상승 추이"
 
@@ -8950,8 +9224,9 @@ msgstr ""
 msgid "Time scale used for cruise speed command averager."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:91
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:91
+#, no-c-format
 msgid "Circling volume"
 msgstr "써클링 확대"
 
@@ -8960,8 +9235,9 @@ msgstr "써클링 확대"
 msgid "Mean volume level in circling modes."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:96
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:96
+#, no-c-format
 msgid "Cruise volume"
 msgstr "순항"
 
@@ -8971,8 +9247,9 @@ msgid ""
 "Mean volume level in cruise modes.  If set to zero, scales with airspeed."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:101
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:101
+#, no-c-format
 msgid "Base frequency"
 msgstr "주파수"
 
@@ -8981,8 +9258,9 @@ msgstr "주파수"
 msgid "Adjustment to base frequency of tones in all modes."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:106
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:106
+#, no-c-format
 msgid "Filter circling"
 msgstr "써클링 없슴"
 
@@ -8991,8 +9269,9 @@ msgstr "써클링 없슴"
 msgid "Variometer low pass filter time constant in circling mode."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:111
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/AudioModeParameters.hpp:111
+#, no-c-format
 msgid "Filter cruise"
 msgstr "순항 L/D"
 
@@ -9103,8 +9382,9 @@ msgstr ""
 msgid "Flarm interface"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/FlarmAlertParameters.hpp:48
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/FlarmAlertParameters.hpp:48
+#, no-c-format
 msgid "Disable circling"
 msgstr "사용 안함"
 
@@ -9218,8 +9498,9 @@ msgid ""
 "be set to 19200."
 msgstr ""
 
-#: src/Dialogs/Device/Vega/HardwareParameters.hpp:78
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/HardwareParameters.hpp:78
+#, no-c-format
 msgid "FLARM connected"
 msgstr "연결되지 않음"
 
@@ -9247,13 +9528,15 @@ msgstr ""
 msgid "VNE"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/LimitParameters.hpp:34
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/LimitParameters.hpp:34
+#, no-c-format
 msgid "V terrain"
 msgstr "지형 표시"
 
-#: src/Dialogs/Device/Vega/LimitParameters.hpp:36
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/LimitParameters.hpp:36
+#, no-c-format
 msgid "Height terrain"
 msgstr "비행 파일 재생"
 
@@ -9287,8 +9570,9 @@ msgstr ""
 msgid "Mute vario on radio"
 msgstr ""
 
-#: src/Dialogs/Device/Vega/MixerParameters.hpp:34
 # , fuzzy, no-c-format
+#: src/Dialogs/Device/Vega/MixerParameters.hpp:34
+#, no-c-format
 msgid "Vario muting"
 msgstr "바리오 괘적"
 
@@ -9455,37 +9739,63 @@ msgstr ""
 msgid "Scanning weather forecast"
 msgstr "날씨 예보 스캐닝"
 
-#: Data/Dialogs/WaypointListSimple.xml:3
-# , fuzzy
-msgid "By distance"
-msgstr "다음 거리"
-
-#: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:15
-#: Data/Dialogs/dlgFlarmTrafficDetails.xml:7
-msgid "Callsign"
-msgstr ""
-
-#: Data/Dialogs/dlgTarget_L.xml:36 Data/Dialogs/dlgTarget.xml:30
-msgid "Optimized"
-msgstr ""
-
 #: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:4
 #: Data/Dialogs/dlgFlarmTrafficDetails.xml:4
 msgid "Team"
 msgstr "팀"
 
+# , fuzzy
+#: Data/Dialogs/dlgTaskPoint_L.xml:25 Data/Dialogs/dlgTaskPoint.xml:21
+msgid "Score exit"
+msgstr "점수"
+
+# , fuzzy
+#: Data/Dialogs/WaypointListSimple.xml:3
+msgid "By distance"
+msgstr "다음 거리"
+
 #: Data/Dialogs/pnlTaskManagerClose.xml:6
 msgid "Revert Changes"
 msgstr ""
 
-#: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:16
-#: Data/Dialogs/dlgFlarmTrafficDetails.xml:8
-msgid "Change callsign"
+#: Data/Dialogs/dlgConfigWaypoints_L.xml:3
+#: Data/Dialogs/dlgConfigWaypoints.xml:3
+msgid "Waypoints Editor"
+msgstr ""
+
+#: Data/Dialogs/dlgTarget_L.xml:26 Data/Dialogs/dlgTarget.xml:8
+msgid "Delta T"
+msgstr ""
+
+#: Data/Dialogs/dlgTarget_L.xml:31 Data/Dialogs/dlgTarget.xml:13
+msgid "V rem."
 msgstr ""
 
 #: Data/Dialogs/dlgConfiguration_L.xml:11 Data/Dialogs/dlgConfiguration.xml:11
 msgid "Configuration Menu"
 msgstr ""
+
+#: Data/Dialogs/dlgAnalysis_L.xml:9 Data/Dialogs/dlgAnalysis.xml:9
+msgid "Calc"
+msgstr ""
+
+#: Data/Dialogs/dlgTarget_L.xml:21
+msgid "ETE"
+msgstr ""
+
+#: Data/Dialogs/dlgVario_L.xml:3 Data/Dialogs/dlgVario.xml:3
+msgid "Vario Configuration"
+msgstr ""
+
+#: Data/Dialogs/dlgWaypointDetails_L.xml:3
+#: Data/Dialogs/dlgWaypointDetails.xml:3
+msgid "Waypoint Info"
+msgstr ""
+
+# , fuzzy
+#: Data/Dialogs/WaypointListSimple_L.xml:3
+msgid "By dist."
+msgstr "거리."
 
 #: Data/Dialogs/dlgTarget_L.xml:11 Data/Dialogs/dlgTarget.xml:18
 msgid ""
@@ -9495,9 +9805,23 @@ msgid ""
 "task distances."
 msgstr ""
 
-#: Data/Dialogs/dlgWaypointDetails_L.xml:3
-#: Data/Dialogs/dlgWaypointDetails.xml:3
-msgid "Waypoint Info"
+#: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:16
+#: Data/Dialogs/dlgFlarmTrafficDetails.xml:8
+msgid "Change callsign"
+msgstr ""
+
+#: Data/Dialogs/dlgCredits_L.xml:3 Data/Dialogs/dlgCredits.xml:3
+msgid "Top Hat Soaring"
+msgstr ""
+
+#: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:6
+#: Data/Dialogs/dlgFlarmTrafficDetails.xml:21
+msgid "Friends"
+msgstr ""
+
+#: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:15
+#: Data/Dialogs/dlgFlarmTrafficDetails.xml:7
+msgid "Callsign"
 msgstr ""
 
 #: Data/Dialogs/dlgTaskEditor.xml:18 Data/Dialogs/dlgTaskPoint_L.xml:17
@@ -9505,37 +9829,17 @@ msgstr ""
 msgid "Change Type"
 msgstr ""
 
-#: Data/Dialogs/dlgTarget_L.xml:31 Data/Dialogs/dlgTarget.xml:13
-msgid "Speed remaining"
-msgstr ""
-
-#: Data/Dialogs/dlgCredits_L.xml:3 Data/Dialogs/dlgCredits.xml:3
-msgid "Top Hat Soaring"
-msgstr ""
-
-#: Data/Dialogs/dlgTarget_L.xml:26 Data/Dialogs/dlgTarget.xml:8
-msgid "Delta T"
-msgstr ""
-
-#: Data/Dialogs/dlgWaypointDetails_L.xml:4
-#: Data/Dialogs/dlgWaypointDetails.xml:8 Data/Input/default.xci:1316
-msgid "GoTo"
-msgstr ""
-
-#: Data/Dialogs/dlgTarget_L.xml:21
-msgid "ETE"
-msgstr ""
-
 #: Data/Dialogs/dlgTarget_L.xml:21
 msgid "Estimated time en-route to the next AAT target."
 msgstr ""
 
-#: Data/Dialogs/dlgConfiguration_L.xml:3 Data/Dialogs/dlgConfiguration.xml:3
-msgid "Configuration"
+#: Data/Dialogs/dlgWaypointDetails_L.xml:4
+#: Data/Dialogs/dlgWaypointDetails.xml:8 Data/Input/default.xci:1332
+msgid "GoTo"
 msgstr ""
 
-#: Data/Dialogs/dlgVario_L.xml:3 Data/Dialogs/dlgVario.xml:3
-msgid "Vario Configuration"
+#: Data/Dialogs/dlgTarget_L.xml:36 Data/Dialogs/dlgTarget.xml:30
+msgid "Optimized"
 msgstr ""
 
 #: Data/Dialogs/dlgTarget_L.xml:16 Data/Dialogs/dlgTarget.xml:23
@@ -9545,10 +9849,13 @@ msgid ""
 "values rotate the range line counterclockwise."
 msgstr ""
 
-#: Data/Dialogs/dlgTaskPoint_L.xml:25 Data/Dialogs/dlgTaskPoint.xml:21
-# , fuzzy
-msgid "Score exit"
-msgstr "점수"
+#: Data/Dialogs/dlgTarget_L.xml:31 Data/Dialogs/dlgTarget.xml:13
+msgid "Speed remaining"
+msgstr ""
+
+#: Data/Dialogs/dlgVario_L.xml:7 Data/Dialogs/dlgVario.xml:8
+msgid "Demo"
+msgstr ""
 
 #: Data/Dialogs/dlgTarget_L.xml:26 Data/Dialogs/dlgTarget.xml:8
 msgid ""
@@ -9558,303 +9865,34 @@ msgid ""
 "plus 5 minutes."
 msgstr ""
 
-#: Data/Dialogs/dlgVario_L.xml:7 Data/Dialogs/dlgVario.xml:8
-msgid "Demo"
+#: Data/Dialogs/dlgConfiguration_L.xml:3 Data/Dialogs/dlgConfiguration.xml:3
+msgid "Configuration"
 msgstr ""
 
-#: Data/Dialogs/dlgFlarmTrafficDetails_L.xml:6
-#: Data/Dialogs/dlgFlarmTrafficDetails.xml:21
-msgid "Friends"
+#: Data/Input/default.xci:735 Data/Input/default.xci:746
+#: Data/Input/default.xci:793
+msgid "Vega"
 msgstr ""
-
-#: Data/Dialogs/WaypointListSimple_L.xml:3
-# , fuzzy
-msgid "By dist."
-msgstr "거리."
-
-#: Data/Dialogs/dlgConfigWaypoints_L.xml:3
-#: Data/Dialogs/dlgConfigWaypoints.xml:3
-msgid "Waypoints Editor"
-msgstr ""
-
-#: Data/Dialogs/dlgTarget_L.xml:31 Data/Dialogs/dlgTarget.xml:13
-msgid "V rem."
-msgstr ""
-
-#: Data/Dialogs/dlgAnalysis_L.xml:9 Data/Dialogs/dlgAnalysis.xml:9
-msgid "Calc"
-msgstr ""
-
-#: Data/Input/default.xci:582 Data/Input/default.xci:1380
-msgid "Topo."
-msgstr ""
-
-#: Data/Input/default.xci:809
-msgid "Store"
-msgstr "저장"
-
-#: Data/Input/default.xci:841 Data/Input/default.xci:968
-#: Data/Input/default.xci:1459
-msgid "FLARM Radar"
-msgstr ""
-
-#: Data/Input/default.xci:338 Data/Input/default.xci:374
-# , fuzzy
-msgid "Edit Task"
-msgstr "타스크"
-
-#: Data/Input/default.xci:1187
-# , fuzzy
-msgid "Exit program"
-msgstr "프로그램 종료?"
-
-#: Data/Input/default.xci:70
-msgid "Final glide through terrain"
-msgstr ""
-
-#: Data/Input/default.xci:599 Data/Input/default.xci:648
-#: Data/Input/default.xci:698
-msgid "Config"
-msgstr ""
-
-#: Data/Input/default.xci:942
-msgid "Credits"
-msgstr "만든 사람들"
-
-#: Data/Input/default.xci:482 Data/Input/default.xci:1340
-msgid "Dropped marker"
-msgstr ""
-
-#: Data/Input/default.xci:775
-msgid "Accel"
-msgstr ""
-
-#: Data/Input/default.xci:519 Data/Input/default.xci:1237
-# , fuzzy
-msgid "Zoom -"
-msgstr "확대"
-
-#: Data/Input/default.xci:801
-msgid ""
-"Accel\n"
-"Zero"
-msgstr ""
-
-#: Data/Input/default.xci:330
-# , fuzzy
-msgid "Stats"
-msgstr "상태"
-
-#: Data/Input/default.xci:816
-msgid ""
-"Cruise\n"
-"Demo"
-msgstr ""
-
-#: Data/Input/default.xci:768
-msgid ""
-"Setup\n"
-"Stall"
-msgstr ""
-
-#: Data/Input/default.xci:418 Data/Input/default.xci:467
-msgid "Nav"
-msgstr "네비"
-
-#: Data/Input/default.xci:1013 Data/Input/default.xci:1065
-# , fuzzy
-msgid "Map orientation"
-msgstr "화면 방향"
-
-#: Data/Input/default.xci:754
-msgid "Setup Audio"
-msgstr ""
-
-#: Data/Input/default.xci:849 Data/Input/default.xci:1467
-msgid ""
-"METAR\n"
-"TAF"
-msgstr ""
-
-#: Data/Input/default.xci:346 Data/Input/default.xci:391
-# , fuzzy
-msgid "TP Details"
-msgstr "상세한"
-
-#: Data/Input/default.xci:1042
-msgid "Switch screen"
-msgstr ""
-
-#: Data/Input/default.xci:1421
-msgid ""
-"Settings\n"
-"Airspace"
-msgstr "공역 세팅"
-
-#: Data/Input/default.xci:485 Data/Input/default.xci:1343
-msgid ""
-"Mark\n"
-"Drop"
-msgstr ""
-
-#: Data/Input/default.xci:915
-# , fuzzy
-msgid "Traffic List"
-msgstr "교통 신호"
-
-#: Data/Input/default.xci:990 Data/Input/default.xci:1035
-# , fuzzy
-msgid "Set zoom"
-msgstr "자동 줌 켜기"
-
-#: Data/Input/default.xci:713 Data/Input/default.xci:1436
-msgid "Raw Logger"
-msgstr ""
-
-#: Data/Input/default.xci:1413
-msgid ""
-"Setup\n"
-"System"
-msgstr ""
-
-#: Data/Input/default.xci:823
-msgid ""
-"Climb\n"
-"Demo"
-msgstr ""
-
-#: Data/Input/default.xci:541 Data/Input/default.xci:1350
-msgid ""
-"Pan\n"
-"On"
-msgstr ""
-
-#: Data/Input/default.xci:865 Data/Input/default.xci:1483
-msgid ""
-"Check\n"
-"list"
-msgstr ""
-
-#: Data/Input/default.xci:560 Data/Input/default.xci:981
-#: Data/Input/default.xci:1026 Data/Input/default.xci:1358
-msgid "Labels"
-msgstr ""
-
-#: Data/Input/default.xci:1452
-msgid "Setup Plane"
-msgstr ""
-
-#: Data/Input/default.xci:1132
-# , fuzzy
-msgid "Check list"
-msgstr "체크 리스트"
-
-#: Data/Input/default.xci:1113
-# , fuzzy
-msgid "Bugs & Ballast"
-msgstr "발라스트 %"
-
-#: Data/Input/default.xci:794
-msgid ""
-"ASI\n"
-"Zero"
-msgstr ""
-
-#: Data/Input/default.xci:1258
-msgid "AVG/ALT"
-msgstr ""
-
-#: Data/Input/default.xci:808
-msgid "Stored to EEPROM"
-msgstr ""
-
-#: Data/Input/default.xci:630
-# , fuzzy
-msgid "Flight"
-msgstr "비행 파일 재생"
 
 #: Data/Input/default.xci:65
 msgid "Below final glide"
 msgstr ""
 
-#: Data/Input/default.xci:1121
-# , fuzzy
-msgid "Setup Wind"
-msgstr "바람 설정"
-
-#: Data/Input/default.xci:1148
-msgid "About"
-msgstr ""
-
-#: Data/Input/default.xci:568 Data/Input/default.xci:1366
-msgid "Trail"
-msgstr ""
-
-#: Data/Input/default.xci:48
-msgid "Takeoff"
-msgstr "이륙"
-
-#: Data/Input/default.xci:512 Data/Input/default.xci:1230
-# , fuzzy
-msgid "Zoom +"
-msgstr "확대"
-
-#: Data/Input/default.xci:122
-msgid ""
-"Pan\n"
-"Off"
-msgstr ""
-
-#: Data/Input/default.xci:957
-msgid ""
-"Message\n"
-"Repeat"
-msgstr "메시지 반복"
-
 #: Data/Input/default.xci:800
-msgid "Accelerometer leveled"
-msgstr ""
-
-#: Data/Input/default.xci:793
 msgid "Vario ASI zeroed"
 msgstr ""
 
-#: Data/Input/default.xci:527 Data/Input/default.xci:1244
-#: Data/Input/default.xci:1333
-msgid "Zoom"
-msgstr ""
+# , fuzzy
+#: Data/Input/default.xci:1148
+msgid "Check list"
+msgstr "체크 리스트"
 
-#: Data/Input/default.xci:362 Data/Input/default.xci:407
-#: Data/Input/default.xci:448 Data/Input/default.xci:1292
-msgid ""
-"Waypoint\n"
-"List"
-msgstr ""
+# , fuzzy
+#: Data/Input/default.xci:637
+msgid "Flight"
+msgstr "비행 파일 재생"
 
-#: Data/Input/default.xci:761
-msgid ""
-"Manual\n"
-"Demo"
-msgstr ""
-
-#: Data/Input/default.xci:1397
-msgid ""
-"Flight\n"
-"Setup"
-msgstr ""
-
-#: Data/Input/default.xci:1475
-msgid ""
-"Nearest\n"
-"Airspace"
-msgstr ""
-
-#: Data/Input/default.xci:728 Data/Input/default.xci:739
-#: Data/Input/default.xci:786
-msgid "Vega"
-msgstr ""
-
-#: Data/Input/default.xci:907
+#: Data/Input/default.xci:914
 msgid ""
 "Team\n"
 "Code"
@@ -9862,31 +9900,285 @@ msgstr ""
 "용어\n"
 "규정"
 
-#: Data/Input/default.xci:857
+#: Data/Input/default.xci:1421
 msgid ""
-"What's\n"
-"here?"
+"Setup\n"
+"Wind"
 msgstr ""
 
-#: Data/Input/default.xci:747
+# , fuzzy
+#: Data/Input/default.xci:353 Data/Input/default.xci:398
+msgid "TP Details"
+msgstr "상세한"
+
+#: Data/Input/default.xci:575 Data/Input/default.xci:1382
+msgid "Trail"
+msgstr ""
+
+# , fuzzy
+#: Data/Input/default.xci:1120
+msgid "Bugs & Ballast"
+msgstr "발라스트 %"
+
+#: Data/Input/default.xci:606 Data/Input/default.xci:655
+#: Data/Input/default.xci:705
+msgid "Config"
+msgstr ""
+
+#: Data/Input/default.xci:808
 msgid ""
-"Airframe\n"
-"Switches"
+"Accel\n"
+"Zero"
+msgstr ""
+
+#: Data/Input/default.xci:872 Data/Input/default.xci:1499
+msgid ""
+"Check\n"
+"list"
+msgstr ""
+
+#: Data/Input/default.xci:848 Data/Input/default.xci:975
+#: Data/Input/default.xci:1475
+msgid "FLARM Radar"
+msgstr ""
+
+#: Data/Input/default.xci:782
+msgid "Accel"
+msgstr ""
+
+#: Data/Input/default.xci:589 Data/Input/default.xci:1396
+msgid "Topo."
+msgstr ""
+
+#: Data/Input/default.xci:492 Data/Input/default.xci:1359
+msgid ""
+"Mark\n"
+"Drop"
+msgstr ""
+
+#: Data/Input/default.xci:720 Data/Input/default.xci:1452
+msgid "Raw Logger"
+msgstr ""
+
+#: Data/Input/default.xci:768
+msgid ""
+"Manual\n"
+"Demo"
 msgstr ""
 
 #: Data/Input/default.xci:60
 msgid "Above final glide"
 msgstr ""
 
-#: Data/Input/default.xci:1405
+#: Data/Input/default.xci:548 Data/Input/default.xci:1366
 msgid ""
-"Setup\n"
-"Wind"
+"Pan\n"
+"On"
 msgstr ""
 
-#: Data/Input/default.xci:923 Data/Input/default.xci:1077
-#: Data/Input/default.xci:1507
+# , fuzzy
+#: Data/Input/default.xci:1203
+msgid "Exit program"
+msgstr "프로그램 종료?"
+
+#: Data/Input/default.xci:567 Data/Input/default.xci:988
+#: Data/Input/default.xci:1033 Data/Input/default.xci:1374
+msgid "Labels"
+msgstr ""
+
+#: Data/Input/default.xci:964
+msgid ""
+"Message\n"
+"Repeat"
+msgstr "메시지 반복"
+
+#: Data/Input/default.xci:1429
+msgid ""
+"Setup\n"
+"System"
+msgstr ""
+
+#: Data/Input/default.xci:1164
+msgid "About"
+msgstr ""
+
+#: Data/Input/default.xci:775
+msgid ""
+"Setup\n"
+"Stall"
+msgstr ""
+
+#: Data/Input/default.xci:129
+msgid ""
+"Pan\n"
+"Off"
+msgstr ""
+
+#: Data/Input/default.xci:949
+msgid "Credits"
+msgstr "만든 사람들"
+
+#: Data/Input/default.xci:425 Data/Input/default.xci:474
+msgid "Nav"
+msgstr "네비"
+
+#: Data/Input/default.xci:1468
+msgid "Setup Plane"
+msgstr ""
+
+#: Data/Input/default.xci:1491
+msgid ""
+"Nearest\n"
+"Airspace"
+msgstr ""
+
+#: Data/Input/default.xci:815
+msgid "Stored to EEPROM"
+msgstr ""
+
+#: Data/Input/default.xci:534 Data/Input/default.xci:1260
+#: Data/Input/default.xci:1349
+msgid "Zoom"
+msgstr ""
+
+# , fuzzy
+#: Data/Input/default.xci:345 Data/Input/default.xci:381
+msgid "Edit Task"
+msgstr "타스크"
+
+# , fuzzy
+#: Data/Input/default.xci:922
+msgid "Traffic List"
+msgstr "교통 신호"
+
+# , fuzzy
+#: Data/Input/default.xci:1128
+msgid "Setup Wind"
+msgstr "바람 설정"
+
+#: Data/Input/default.xci:1049
+msgid "Switch screen"
+msgstr ""
+
+#: Data/Input/default.xci:489 Data/Input/default.xci:1356
+msgid "Dropped marker"
+msgstr ""
+
+#: Data/Input/default.xci:823
+msgid ""
+"Cruise\n"
+"Demo"
+msgstr ""
+
+#: Data/Input/default.xci:1413
+msgid ""
+"Flight\n"
+"Setup"
+msgstr ""
+
+#: Data/Input/default.xci:807
+msgid "Accelerometer leveled"
+msgstr ""
+
+# , fuzzy
+#: Data/Input/default.xci:122 Data/Input/default.xci:1136
+#, fuzzy
+msgid ""
+"Add\n"
+"waypoint"
+msgstr "다음 웨이포인트"
+
+# , fuzzy
+#: Data/Input/default.xci:1020 Data/Input/default.xci:1072
+msgid "Map orientation"
+msgstr "화면 방향"
+
+#: Data/Input/default.xci:1274
+msgid "AVG/ALT"
+msgstr ""
+
+# , fuzzy
+#: Data/Input/default.xci:526 Data/Input/default.xci:1253
+msgid "Zoom -"
+msgstr "확대"
+
+# , fuzzy
+#: Data/Input/default.xci:997 Data/Input/default.xci:1042
+msgid "Set zoom"
+msgstr "자동 줌 켜기"
+
+#: Data/Input/default.xci:830
+msgid ""
+"Climb\n"
+"Demo"
+msgstr ""
+
+#: Data/Input/default.xci:816
+msgid "Store"
+msgstr "저장"
+
+#: Data/Input/default.xci:856 Data/Input/default.xci:1483
+msgid ""
+"METAR\n"
+"TAF"
+msgstr ""
+
+# , fuzzy
+#: Data/Input/default.xci:519 Data/Input/default.xci:1246
+msgid "Zoom +"
+msgstr "확대"
+
+#: Data/Input/default.xci:761
+msgid "Setup Audio"
+msgstr ""
+
+#: Data/Input/default.xci:48
+msgid "Takeoff"
+msgstr "이륙"
+
+#: Data/Input/default.xci:754
+msgid ""
+"Airframe\n"
+"Switches"
+msgstr ""
+
+#: Data/Input/default.xci:930 Data/Input/default.xci:1084
+#: Data/Input/default.xci:1523
 msgid "Thermal Assistant"
+msgstr ""
+
+# , fuzzy
+#: Data/Input/default.xci:337
+msgid "Stats"
+msgstr "상태"
+
+#: Data/Input/default.xci:864
+msgid ""
+"What's\n"
+"here?"
+msgstr ""
+
+#: Data/Input/default.xci:369 Data/Input/default.xci:414
+#: Data/Input/default.xci:455 Data/Input/default.xci:1308
+msgid ""
+"Waypoint\n"
+"List"
+msgstr ""
+
+#: Data/Input/default.xci:801
+msgid ""
+"ASI\n"
+"Zero"
+msgstr ""
+
+#: Data/Input/default.xci:1437
+msgid ""
+"Settings\n"
+"Airspace"
+msgstr "공역 세팅"
+
+#: Data/Input/default.xci:70
+msgid "Final glide through terrain"
 msgstr ""
 
 # , fuzzy
@@ -10054,9 +10346,6 @@ msgstr ""
 
 #~ msgid "No further information"
 #~ msgstr "정보 없슴"
-
-#~ msgid "English"
-#~ msgstr "영어"
 
 #~ msgid "Delete Error"
 #~ msgstr "삭제 에러"
