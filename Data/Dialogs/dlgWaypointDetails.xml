@@ -5,7 +5,7 @@
   <SymbolButton Name="cmdMagnify" Caption="+" X="-35" Y="0" Width="35" Height="35" OnClick="OnMagnifyClicked" />
 
   <CloseButton X="0" Width="80" Y="-35" Height="35"/>
-  <Button Name="cmdGoto" Caption="GoTo" X="80" Y="-35" Width="80" Height="35" OnClick="OnGotoClicked" />
+  <Button Name="cmdGoto" Caption="Goto" X="80" Y="-35" Width="80" Height="35" OnClick="OnGotoClicked" />
   <SymbolButton Name="cmdNext" Caption="&gt;" X="-80" Y="-35" Width="80" Height="35" OnClick="OnNextClicked" />
 
   <Widget Name="info" Y="0" Height="-35"/>

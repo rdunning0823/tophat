@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <Form Caption="Waypoint Info">
-  <Button Name="cmdGoto" Caption="GoTo" Width="70" Height="35" OnClick="OnGotoClicked" />
+  <Button Name="cmdGoto" Caption="Goto" Width="70" Height="35" OnClick="OnGotoClicked" />
 
   <SymbolButton Name="cmdMagnify" Caption="+" X="17" Y="45" Width="35" Height="35" OnClick="OnMagnifyClicked" />
   <SymbolButton Name="cmdShrink" Caption="-" X="17" Y="82" Width="35" Height="35" OnClick="OnShrinkClicked" />
