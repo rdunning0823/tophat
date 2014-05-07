@@ -146,9 +146,9 @@ msgid ""
 "mile cylinder.  Pilot can add additional points as needed.  Minimum task "
 "time applies."
 msgstr ""
-"Modifizierte Area-Task. Aufgabe mit Start, Ziel und einem vordefiniertem 1-"
-"mile Zylinder. Der Pilot kann falls notwendig zusätzliche Punkte hinzufügen, "
-"die min. Aufgabenzeit gilt."
+"Modifizierte Area-Task. Aufgabe mit Start, Ziel und einem vordefiniertem "
+"1-mile Zylinder. Der Pilot kann falls notwendig zusätzliche Punkte "
+"hinzufügen, die min. Aufgabenzeit gilt."
 
 #: src/Task/TypeStrings.cpp:81 src/Task/TypeStrings.cpp:94
 #, no-c-format
@@ -186,9 +186,9 @@ msgid ""
 "turnpoint.  Pilot can add additional points as needed.  1-mile cylinders.  "
 "Minimum task time applies."
 msgstr ""
-"Modifizierte Gebietsaufgabe. Aufgabe mit Start, Ziel und vordefiniertem1-"
-"mile Zylinder. Der Pilot kann, wenn nötig, zusätzliche Punkte hinzufügen.  "
-"Die min. Aufgabenzeit gilt."
+"Modifizierte Gebietsaufgabe. Aufgabe mit Start, Ziel und vordefiniertem"
+"1-mile Zylinder. Der Pilot kann, wenn nötig, zusätzliche Punkte "
+"hinzufügen. Die min. Aufgabenzeit gilt."
 
 #: src/Task/TypeStrings.cpp:113
 #, no-c-format
@@ -629,12 +629,12 @@ msgstr "Kein Logger verbunden"
 
 #: src/Logger/ExternalLogger.cpp:273
 msgid "Failed to download flight list."
-msgstr "Herunterladen der Flugliste fehlgeschlagen."
+msgstr "Laden der Flugliste fehlgeschlagen."
 
 #: src/Logger/ExternalLogger.cpp:274 src/Logger/ExternalLogger.cpp:285
 #: src/Logger/ExternalLogger.cpp:309 src/Logger/ExternalLogger.cpp:341
 msgid "Download flight"
-msgstr "Flug herunterladen"
+msgstr "Flug laden"
 
 #: src/Logger/ExternalLogger.cpp:284
 msgid "Logger is empty."
@@ -642,11 +642,11 @@ msgstr "Der Logger ist leer."
 
 #: src/Logger/ExternalLogger.cpp:308
 msgid "Failed to download flight."
-msgstr "Flug herunterladen fehlgeschlagen"
+msgstr "Flug laden fehlgeschlagen"
 
 #: src/Logger/ExternalLogger.cpp:340
 msgid "Do you want to download another flight?"
-msgstr "Soll ein weiterer Flug herunter geladen werden?"
+msgstr "Soll ein weiterer Flug geladen werden?"
 
 #: src/Waypoint/WaypointGlue.cpp:109
 #: src/Dialogs/Device/CAI302/WaypointUploader.cpp:35
@@ -977,12 +977,12 @@ msgstr "Gelände aus"
 #: src/Menu/ExpandMacros.cpp:574 src/Menu/ExpandMacros.cpp:577
 #: src/Menu/ExpandMacros.cpp:580 src/Menu/ExpandMacros.cpp:583
 msgid "Hide"
-msgstr "Ausblenden"
+msgstr "Ausblenden:"
 
 #: src/Menu/ExpandMacros.cpp:574 src/Menu/ExpandMacros.cpp:577
 #: src/Menu/ExpandMacros.cpp:580 src/Menu/ExpandMacros.cpp:583
 msgid "Show"
-msgstr "Einblenden"
+msgstr "Einblenden:"
 
 #: src/Menu/ExpandMacros.cpp:593
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:49
@@ -1036,7 +1036,7 @@ msgid ""
 "PC only: In simulation mode, this value is adjustable with the up/down arrow "
 "keys and the right/left arrow keys also cause the glider to turn."
 msgstr ""
-"GPS Höhe über MSL. Nur Touch-screen/PC: Im Simulationsmodus kann der Wert "
+"GPS Höhe über MSL. Nur Touchscreen/PC: Im Simulationsmodus kann der Wert "
 "mit den Pfeiltasten Auf/Ab verändert werden. Pfeiltaste Links/Rechts "
 "ändertden Kurs."
 
@@ -1467,7 +1467,7 @@ msgid ""
 "is active in simulation mode, pressing the up and down  arrows adjusts the "
 "track."
 msgstr ""
-"Magnetischer Kurs vom GPS (Nur auf Touch-screen/PC). Wenn dieses Infofenster "
+"Magnetischer Kurs vom GPS (Nur auf Touchscreen/PC). Wenn dieses Infofenster "
 "im Simulatormodus aktiv ist, wird mit den Auf/Ab Pfeilen der Kurs verändert."
 
 #: src/InfoBoxes/Content/Factory.cpp:438
@@ -1776,8 +1776,8 @@ msgid ""
 "Estimated time required to complete task, assuming performance of ideal "
 "MacCready cruise/climb cycle."
 msgstr ""
-"Geschätzte verbleibende Aufgabenzeit bei idealem MacCready Vorflug-/Steig-"
-"Zyklus."
+"Geschätzte verbleibende Aufgabenzeit bei idealem MacCready "
+"Vorflug-/Steig-Zyklus."
 
 #: src/InfoBoxes/Content/Factory.cpp:636
 #, no-c-format
@@ -3498,11 +3498,11 @@ msgstr "Karte und Infofenster"
 
 #: src/PageSettings.cpp:95
 msgid "Full screen"
-msgstr "Ges. Bildschirm"
+msgstr "Ges. Anzeige"
 
 #: src/PageSettings.cpp:97
 msgid "Map (Full screen)"
-msgstr "Karte (Ges. Bildschirm)"
+msgstr "Karte (Ges. Anzeige)"
 
 #: src/Renderer/ChartRenderer.cpp:168
 #: src/Dialogs/Device/DeviceListDialog.cpp:377
@@ -3624,7 +3624,7 @@ msgstr "Über Kante streichen"
 
 #: src/UIUtil/GestureZone.cpp:114
 msgid "to switch screens"
-msgstr "zum wechseln der Anzeige"
+msgstr "zum wechseln der Anzeigen"
 
 #: src/Topography/TopographyGlue.cpp:71
 msgid "Loading Topography File..."
@@ -3965,7 +3965,7 @@ msgstr "Lese Flugliste"
 
 #: src/Device/Descriptor.cpp:987
 msgid "Downloading flight log"
-msgstr "Lade Fluglog herunter"
+msgstr "Lade Flugaufzeichnung"
 
 #: src/Device/Config.cpp:241 src/Dialogs/Device/DeviceEditWidget.cpp:70
 #: src/Dialogs/Device/DeviceListDialog.cpp:373
@@ -4071,7 +4071,7 @@ msgstr "Hilfe"
 #: src/Dialogs/Weather/NOAAList.cpp:186 src/Dialogs/Weather/NOAAList.cpp:198
 #: src/Dialogs/Weather/NOAADetails.cpp:105
 msgid "Download"
-msgstr "Herunterladen"
+msgstr "Laden"
 
 #: src/Dialogs/FileManager.cpp:408 src/Dialogs/dlgMatItemClick.cpp:457
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:122
@@ -4081,13 +4081,13 @@ msgstr "Hinzufügen"
 
 #: src/Dialogs/FileManager.cpp:441 src/Dialogs/FilePickAndDownload.cpp:380
 msgid "Queued"
-msgstr "In der Warteschlange"
+msgstr "Warteschlange"
 
 #: src/Dialogs/FileManager.cpp:443 src/Dialogs/FileManager.cpp:449
 #: src/Dialogs/FilePickAndDownload.cpp:383
 #: src/Dialogs/FilePickAndDownload.cpp:389
 msgid "Downloading"
-msgstr "Lade herunter"
+msgstr "Lade"
 
 #: src/Dialogs/FileManager.cpp:455 src/Dialogs/FileManager.cpp:687
 #: src/Dialogs/FilePickAndDownload.cpp:392
@@ -4123,7 +4123,7 @@ msgstr "Datei auswählen"
 
 #: src/Dialogs/FileManager.cpp:686 src/Dialogs/FilePickAndDownload.cpp:738
 msgid "Failed to download the repository index."
-msgstr "Herunterladen vom Quellindex fehlgeschlagen."
+msgstr "Laden vom Quellindex fehlgeschlagen."
 
 #: src/Dialogs/FileManager.cpp:695 src/Dialogs/FileManager.cpp:722
 #: src/Dialogs/FilePickAndDownload.cpp:815 Data/Input/default.xci:687
@@ -4195,7 +4195,7 @@ msgid ""
 "Internet download is not available on this device.  Go to tophatsoaring.org/"
 "data%20files"
 msgstr ""
-"Herunterladen aus dem Internet auf diesem Gerät nicht möglich.  Gehe zu "
+"Laden aus dem Internet auf diesem Gerät nicht möglich.  Gehe zu "
 "tophatsoaring.org/data%20files"
 
 #: src/Dialogs/Device/DeviceEditWidget.cpp:79
@@ -4251,7 +4251,7 @@ msgid ""
 "download."
 msgstr ""
 "Die Baudrate für die gebündelte Übertragung, wie die Aufgabendeklaration "
-"oder dem Herunterladen von Flügen."
+"oder dem Laden von Flügen."
 
 #: src/Dialogs/Device/DeviceEditWidget.cpp:619
 msgid "IP Address"
@@ -4351,7 +4351,7 @@ msgstr "Wiederverbinden"
 
 #: src/Dialogs/Device/DeviceListDialog.cpp:262
 msgid "Flight download"
-msgstr "Flug herunterladen"
+msgstr "Flug laden"
 
 #: src/Dialogs/Device/DeviceListDialog.cpp:264
 #: src/Dialogs/Device/DeviceListDialog.cpp:485
@@ -5322,7 +5322,7 @@ msgstr "Sprache, Eingabe"
 #: src/Dialogs/Settings/dlgConfiguration.cpp:111
 #, no-c-format
 msgid "Screen Layout"
-msgstr "Anordnung"
+msgstr "Anzeigeanordnung"
 
 #: src/Dialogs/Settings/dlgConfiguration.cpp:112
 #, no-c-format
@@ -5398,7 +5398,7 @@ msgstr "Pilot"
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:234
 msgid "Set up screen"
-msgstr "Einstellungen Bildschirm"
+msgstr "Einstellungen Anzeige"
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:285
 #, no-c-format
@@ -5434,7 +5434,7 @@ msgstr "Sicherheitshöhe"
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:428
 msgid "Screen"
-msgstr "Bildschirm"
+msgstr "Anzeige"
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:436
 msgid "Advanced"
@@ -5598,7 +5598,7 @@ msgstr ""
 
 #: src/Dialogs/dlgBrightness.cpp:141
 msgid "Screen Brightness"
-msgstr "Bildschirm-Helligkeit"
+msgstr "Anzeige-Helligkeit"
 
 #: src/Dialogs/dlgChecklist.cpp:68 Data/Dialogs/dlgChecklist_L.xml:3
 #: Data/Dialogs/dlgChecklist.xml:3
@@ -5832,7 +5832,7 @@ msgstr ""
 #: src/Dialogs/dlgStartupAssistant.cpp:56
 #, no-c-format
 msgid "Click the 'M' button to show the Main menu.  Try clicking it again."
-msgstr "Wähle 'M' taste für Hauptmenü, dann weiterklicken."
+msgstr "Wähle die 'M' Taste für das Hauptmenü, dann weiterklicken."
 
 #: src/Dialogs/dlgStartupAssistant.cpp:57
 #, no-c-format
@@ -5850,7 +5850,7 @@ msgid ""
 "the internet."
 msgstr ""
 "Wird eine Karte, Wegpunkte oder Luftraumdatei benötigt? Unter 'Top Hat "
-"Einstellungen' werden diese aus dem Internet heruntergeladen."
+"Einstellungen' werden diese aus dem Internet geladen."
 
 #: src/Dialogs/dlgStartupAssistant.cpp:59
 #, no-c-format
@@ -6024,7 +6024,7 @@ msgid ""
 "Too many buttons on the screen? Move the 'S' button to the menu in Setup > "
 "Screens"
 msgstr ""
-"Werden viele Tasten angezeigt? Verschieben der 'S' Taste ins Menü über "
+"Werden zu viele Tasten angezeigt? Verschieben der 'S' Taste ins Menü über "
 "Einstellungen > Anzeige"
 
 #: src/Dialogs/dlgStartupAssistant.cpp:81
@@ -6033,7 +6033,7 @@ msgid ""
 "Clean up the screen?  Click the Wind infobox and select to show the Wind "
 "arrow only in the infobox"
 msgstr ""
-"Bildschirm zu voll?  Tippe Wind-Infofenster und wähle Windpfeil nur in der "
+"Anzeige zu voll?  Tippe Wind-Infofenster und wähle Windpfeil nur in der "
 "Wind-Infofenster anzeigen"
 
 #: src/Dialogs/dlgStartupAssistant.cpp:197
@@ -6818,10 +6818,10 @@ msgid ""
 "adjusted in order to cover the greatest distance in the remaining time and "
 "reach the finish height."
 msgstr ""
-"Stellt MacCready auf die schnellstmögliche Ankunft ein. Bei den OLC Sprint-"
-"Aufgaben sind die Einstellungen so, dass eine möglichst große Strecke "
-"innerhalb der verbleibenden Zeit zurückgelegt wird und die Ankunftshöhe "
-"eingehalten wird."
+"Stellt MacCready auf die schnellstmögliche Ankunft ein. Bei den OLC "
+"Sprint-Aufgaben sind die Einstellungen so, dass eine möglichst große "
+"Strecke innerhalb der verbleibenden Zeit zurückgelegt wird und die "
+"Ankunftshöhe eingehalten wird."
 
 #: src/Dialogs/Settings/Panels/GlideComputerConfigPanel.cpp:65
 #, no-c-format
@@ -6867,9 +6867,9 @@ msgid ""
 "vertical air-mass movement."
 msgstr ""
 "Wenn aktiviert wird im Vorflug die MacCready Geschwindigkeit empfohlen "
-"welche ohne vertikale Luftbewegung gilt. Andernfalls wird die Delphin-"
-"Vorfluggeschwindigkeit empfohlen. Das heißt, die MacCready Geschwindigkeit, "
-"die unter Berücksichtigung der vertikalen Luftbewegung gilt."
+"welche ohne vertikale Luftbewegung gilt. Andernfalls wird die "
+"Delphin-Vorfluggeschwindigkeit empfohlen. Das heißt, die MacCready "
+"Geschwindigkeit, die unter Berücksichtigung der vertikalen Luftbewegung gilt."
 
 #: src/Dialogs/Settings/Panels/GlideComputerConfigPanel.cpp:84
 msgid "Nav. by baro altitude"
@@ -6952,7 +6952,7 @@ msgid ""
 "This determines whether to blank the display after a long period of "
 "inactivity when operating on internal battery power."
 msgstr ""
-"Zeit nach der der Bildschirm im Batteriebetrieb ohne Interaktion "
+"Zeit nach dem die Anzeige im Batteriebetrieb ohne Interaktion "
 "ausgeschaltet wird."
 
 #: src/Dialogs/Settings/Panels/InterfaceConfigPanel.cpp:140
@@ -7175,11 +7175,11 @@ msgid ""
 "screen size."
 msgstr ""
 "Eine Liste aller Infofenster Anordnungen. Probiere welche Variante für Deine "
-"Bildschirmgröße am besten passt."
+"Anzeige am besten passt."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:171
 msgid "Screens button location"
-msgstr "Kartenelemente an diesem Ort"
+msgstr "Anzeigetastenzuordnung"
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:172
 msgid "Show the 'S' Screens button on the map or in the first menu."
@@ -7442,11 +7442,11 @@ msgstr "Meine eigenen Maßeinheiten."
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:203
 msgid "Main area"
-msgstr "Zentral"
+msgstr "Hauptbereich"
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:204
 msgid "Specifies what should be displayed in the main area."
-msgstr "Festlegen was zentral dargestellt werden soll."
+msgstr "Festlegen was im Hauptbereich dargestellt werden soll."
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:210
 #, no-c-format
@@ -7456,7 +7456,7 @@ msgstr "Zeigt die Kreisflug-, Strecken- und Endanflug-Infofenster"
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:211
 #, no-c-format
 msgid "Show fullscreen (no infoboxes)"
-msgstr "Auto (folge Infofenster)"
+msgstr "Zeige Vollanzeige (keine Infofenster)"
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:215
 msgid "Infobox sets"
@@ -7464,7 +7464,7 @@ msgstr "Infofenster"
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:216
 msgid "Specifies which Infobox set should be displayed on this page."
-msgstr "Diese Infofenster sollen auf der Seite angezeigt werden."
+msgstr "Auswahl welche Infofenster auf der Seite angezeigt werden sollen."
 
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:220
 #, no-c-format
@@ -7646,7 +7646,7 @@ msgstr ""
 #: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:73
 #, no-c-format
 msgid "Download from internet"
-msgstr "Flug herunterladen"
+msgstr "Vom Internet laden"
 
 #: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:140
 msgid "Waypts."
@@ -8930,7 +8930,7 @@ msgstr "Anmelden"
 #: src/Dialogs/Task/Manager/TaskActionsPanel.cpp:116
 #: Data/Dialogs/dlgTaskEditor_L.xml:9 Data/Dialogs/dlgTaskEditor.xml:7
 msgid "Browse"
-msgstr "Blättern"
+msgstr "Auswählen"
 
 #: src/Dialogs/Task/Manager/TaskActionsPanel.cpp:117
 #: Data/Dialogs/dlgConfigWaypoints_L.xml:8
@@ -9666,19 +9666,19 @@ msgstr "Piepston Typ"
 
 #: src/Dialogs/Device/Vega/AudioParameters.hpp:108
 msgid "Pitch scheme"
-msgstr "Neigungs Schema"
+msgstr "Tontyp"
 
 #: src/Dialogs/Device/Vega/AudioParameters.hpp:111
 msgid "Pitch scale"
-msgstr "Änderung"
+msgstr "Tonabstand"
 
 #: src/Dialogs/Device/Vega/AudioParameters.hpp:114
 msgid "Period scheme"
-msgstr "Periodenschema"
+msgstr "Periodentyp"
 
 #: src/Dialogs/Device/Vega/AudioParameters.hpp:117
 msgid "Period scale"
-msgstr "Periode"
+msgstr "Periodenabstand"
 
 #: src/Dialogs/Device/Vega/CalibrationParameters.hpp:33
 #, no-c-format
@@ -10222,7 +10222,7 @@ msgstr "Wegpunkt Info"
 
 #: Data/Dialogs/WaypointListSimple_L.xml:3
 msgid "By dist."
-msgstr "Nach Dist."
+msgstr "Nach Distanz"
 
 #: Data/Dialogs/dlgTarget_L.xml:11 Data/Dialogs/dlgTarget.xml:18
 msgid ""
@@ -10498,7 +10498,9 @@ msgstr "Zoom"
 
 #: Data/Input/default.xci:345 Data/Input/default.xci:381
 msgid "Edit Task"
-msgstr "Text bearbeiten"
+msgstr ""
+"Aufgabe\n"
+"bearbeiten"
 
 #: Data/Input/default.xci:922
 msgid "Traffic List"
@@ -10510,7 +10512,7 @@ msgstr "Wind Konfig."
 
 #: Data/Input/default.xci:1049
 msgid "Switch screen"
-msgstr "Neigungs Schema"
+msgstr "Wechsel Anzeige"
 
 #: Data/Input/default.xci:489 Data/Input/default.xci:1356
 msgid "Dropped marker"
@@ -10558,7 +10560,7 @@ msgstr "Zoom -"
 
 #: Data/Input/default.xci:997 Data/Input/default.xci:1042
 msgid "Set zoom"
-msgstr "Auto. Zoom"
+msgstr "Setze Zoom"
 
 #: Data/Input/default.xci:830
 msgid ""
@@ -10693,8 +10695,9 @@ msgstr "Endanflug würde durchs Gelände führen"
 #~ "Set to forecast ground temperature.  Used by convection estimator "
 #~ "(temperature trace page of Analysis dialog)"
 #~ msgstr ""
-#~ "Setze die vorhergesagt max. Bodentemp. Sie wird für die Konvektions- "
-#~ "abschätzung verwendet (Auf der Seite Temperaturverlauf unter Analyse)."
+#~ "Setze die vorhergesagt max. Bodentemp. Sie wird für die "
+#~ "Konvektionsabschätzung verwendet (Auf der Seite Temperaturverlauf "
+#~ "unter Analyse)."
 
 #~ msgid "Flight Setup"
 #~ msgstr "Flug Einstellungen"
@@ -10873,7 +10876,7 @@ msgstr "Endanflug würde durchs Gelände führen"
 #~ "Defines the location of the glider drawn on the screen in percent from "
 #~ "the screen edge."
 #~ msgstr ""
-#~ "Bestimmt die Position des auf dem Bildschirm dargestellten Seglers in "
+#~ "Bestimmt die Position des auf dem Anzeige dargestellten Seglers in "
 #~ "Prozent vom Bildrand."
 
 #~ msgid ""
@@ -11277,7 +11280,7 @@ msgstr "Endanflug würde durchs Gelände führen"
 #~ msgstr ""
 #~ "Automatisches QFE. Diese Höhenangabe wird BIS ZUM Start permanent auf 0 "
 #~ "gesetzt. Danach wird sie in keinem Fall mehr automatisch auf 0 gesetzt, "
-#~ "selbst auf Grund. Während des Flugs kann die QFE Anzeige mit der Hoch- "
+#~ "selbst auf Grund. Während des Flugs kann die QFE Anzeige mit der Hoch-/ "
 #~ "Runtertaste geändert werden. Darunter steht die QNH Höhe. Eine Änderung "
 #~ "der QFE Anzeige lässt die QNH Höhe unberührt."
 
@@ -11529,7 +11532,7 @@ msgstr "Endanflug würde durchs Gelände führen"
 #~ "PC only: In simulation mode, this value is adjustable with the up/down "
 #~ "arrow keys and the right/left arrow keys also cause the glider to turn."
 #~ msgstr ""
-#~ "Die GPS Höhe über MSL. Nur für Touch-screen und PC: Im Simulationsmodus "
+#~ "Die GPS Höhe über MSL. Nur für Touchscreen und PC: Im Simulationsmodus "
 #~ "ist dieser Wert veränderbar über die Auf/Ab Pfeiltasten. Die links/rechts "
 #~ "Tasten bewirken ein Drehen des Flugzeuges."
 
