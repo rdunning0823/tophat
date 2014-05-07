@@ -208,6 +208,7 @@ const char EnableNMEALogger[] = "EnableNMEALogger";
 const char MapFile[] = "MapFile"; // pL
 const char BallastSecsToEmpty[] = "BallastSecsToEmpty";
 const char StartupTipDeclineVersion[] = "StartupTipDeclineVersion";
+const char ShowWaypointListWarning[] = "ShowWaypointListWarning";
 const char StartupTipId[] = "StartupTipId";
 const char UseCustomFonts[] = "UseCustomFonts";
 const char DialogFont[] = "DialogFont";

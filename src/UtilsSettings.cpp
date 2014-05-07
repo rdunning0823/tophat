@@ -55,6 +55,7 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Audio/VarioGlue.hpp"
 #include "PageActions.hpp"
+#include "Profile/Profile.hpp"
 
 #if defined(__BORLANDC__)  // due to compiler bug
   #include "Waypoint/Waypoints.hpp"
@@ -163,6 +164,11 @@ SettingsLeave(const UISettings &old_ui_settings)
                           device_blackboard, WaypointFileChanged);
     WaypointGlue::SaveHome(CommonInterface::GetComputerSettings().poi,
                            CommonInterface::GetComputerSettings().team_code);
+
+    UISettings &ui_settings_set = CommonInterface::SetUISettings();
+    ui_settings_set.show_waypoints_list_warning =  true;
+    Profile::Set(ProfileKeys::ShowWaypointListWarning,
+                 ui_settings_set.show_waypoints_list_warning);
   }
 
   if (TopographyFileChanged) {

@@ -30,6 +30,8 @@ UISettings::SetDefaults()
 
   menu_timeout = 8 * 4;
 
+  show_waypoints_list_warning = true;
+
 #ifndef GNAV
   custom_fonts = false;
 #endif

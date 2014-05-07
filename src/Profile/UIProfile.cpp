@@ -111,6 +111,8 @@ Profile::Load(UISettings &settings)
 // hard code to default
 //  Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 
+  Get(ProfileKeys::ShowWaypointListWarning,
+      settings.show_waypoints_list_warning);
   Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
 #ifndef GNAV

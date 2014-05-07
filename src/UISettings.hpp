@@ -55,6 +55,11 @@ struct UISettings {
   /** last startup tip display. 1 is first tip, 0 means never shown */
   unsigned last_startup_tip;
 
+  /** if too many waypoints are in the list,
+   * warn user when list is diaplsyed
+   */
+  bool show_waypoints_list_warning;
+
   /** show the Screens map overlay button instead of the menu with Screens */
   enum class ScreensButtonLocation : uint8_t {
     MAP,

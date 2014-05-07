@@ -55,6 +55,7 @@ Copyright_License {
 #include "GlideSolvers/GlideState.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "Math/SunEphemeris.hpp"
+#include "Dialogs/Message.hpp"
 
 #include <algorithm>
 #include <list>
@@ -167,6 +168,15 @@ FillList(WaypointList &list, const Waypoints &src,
     list.erase(list.begin() + MAX_LIST_SIZE, list.end());
     if (sort_direction == SortDirection::NAME)
       list.SortByName();
+    UISettings &ui_settings = CommonInterface::SetUISettings();
+    if (ui_settings.show_waypoints_list_warning) {
+      StaticString<99> message;
+      message.Format(_T("%s %u %s"), _("Only the nearest"), MAX_LIST_SIZE, _("waypoints will be displayed"));
+      ShowMessageBox(message.buffer(),  _("Too many waypoints"), MB_OK);
+      ui_settings.show_waypoints_list_warning = false;
+      Profile::Set(ProfileKeys::ShowWaypointListWarning,
+                   ui_settings.show_waypoints_list_warning);
+    }
   } else {
 
     switch (sort_direction) {
