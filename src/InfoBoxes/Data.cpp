@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "Data.hpp"
+#include "Language/Language.hpp"
 
 void
 InfoBoxData::Clear()
@@ -36,7 +37,7 @@ InfoBoxData::SetNotConfigured()
   SetAllColors(0);
   SetValue(_T("N/A"));
   SetValueUnit(Unit::UNDEFINED);
-  SetComment(_T("Not configured"));
+  SetComment(_("Not configured"));
 }
 
 void
@@ -45,7 +46,7 @@ InfoBoxData::SetClickToConfigure()
   SetAllColors(0);
   SetValue(_T(""));
   SetValueUnit(Unit::UNDEFINED);
-  SetComment(_T("Click to configure"));
+  SetComment(_("Click to configure"));
 }
 
 void
