@@ -37,6 +37,27 @@ msgstr ""
 msgid "FAI badges/records"
 msgstr ""
 
+#: src/InfoBoxes/Data.cpp:48
+msgid "Click to configure"
+msgstr ""
+
+#: src/InfoBoxes/Data.cpp:40
+msgid "Not configured"
+msgstr ""
+
+#: src/Dialogs/Waypoint/WaypointListSimple.cpp:172
+msgid "Only the nearest"
+msgstr ""
+
+#: src/Dialogs/Waypoint/WaypointListSimple.cpp:172
+msgid "waypoints will be displayed"
+msgstr ""
+
+#: src/Dialogs/Waypoint/WaypointListSimple.cpp:173
+msgid "Too many waypoints"
+msgstr ""
+
+
 #: src/Task/TypeStrings.cpp:34 src/Task/TypeStrings.cpp:46
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:89
 #, no-c-format

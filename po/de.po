@@ -3937,6 +3937,28 @@ msgstr "Abschalten, speichere Aufgabe..."
 msgid "Click to navigate"
 msgstr "Klicke für Navigation"
 
+#: src/InfoBoxes/Data.cpp:40
+#, no-c-format
+msgid "Not configured"
+msgstr "Nicht konfiguriert"
+
+#: src/InfoBoxes/Data.cpp:48
+msgid "Click to configure"
+msgstr "Klicke für Konfiguration"
+
+#: src/Dialogs/Waypoint/WaypointListSimple.cpp:172
+msgid "Only the nearest"
+msgstr "Nur die nähesten"
+
+#: src/Dialogs/Waypoint/WaypointListSimple.cpp:172
+msgid "waypoints will be displayed"
+msgstr "Wegpunkte werden angezeigt"
+
+#: src/Dialogs/Waypoint/WaypointListSimple.cpp:173
+#, fuzzy
+msgid "Too many waypoints"
+msgstr "Zu viele Wegpunkte"
+
 #: src/Widgets/TaskNavSliderShape.cpp:301
 #: src/Widgets/TaskNavSliderShape.cpp:319
 msgid "Go'n home:"
@@ -3949,7 +3971,7 @@ msgstr "Ziellinie"
 
 #: src/Widgets/TaskNavSliderShape.cpp:315
 msgid "Goto:"
-msgstr "Ziele auf"
+msgstr "Gehe zu"
 
 #: src/Device/Descriptor.cpp:407
 msgid "Unable to open port"
@@ -4905,7 +4927,7 @@ msgstr "Zielpunkt"
 #: src/Dialogs/Task/AlternatesListDialog.cpp:67 Data/Input/default.xci:361
 #: Data/Input/default.xci:406
 msgid "Goto"
-msgstr "Ziele auf"
+msgstr "Gehe zu"
 
 #: src/Dialogs/MapItemListDialog.cpp:296
 #: src/Dialogs/Airspace/dlgAirspaceDetails.cpp:116
@@ -10267,7 +10289,7 @@ msgstr "Geschätzte Zeit bis zum nächsten AAT Punkt."
 #: Data/Dialogs/dlgWaypointDetails_L.xml:4
 #: Data/Dialogs/dlgWaypointDetails.xml:8 Data/Input/default.xci:1332
 msgid "GoTo"
-msgstr "Ziele auf"
+msgstr "Gehe zu"
 
 #: Data/Dialogs/dlgTarget_L.xml:36 Data/Dialogs/dlgTarget.xml:30
 msgid "Optimized"
