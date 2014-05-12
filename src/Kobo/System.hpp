@@ -57,4 +57,10 @@ KoboRunTelnetd();
 bool
 IsKoboUsbHostKernel();
 
+/**
+ * Writes uname -a info and dd if=/dev/mmcblk0 bs=8 count=1 skip=64
+ * results to /tmp/TophatSystemInfo.txt
+ */
+void WriteSystemInfo();
+
 #endif
