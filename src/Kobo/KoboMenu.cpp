@@ -199,8 +199,10 @@ KoboMenuWidget::OnAction(int id)
     if (ShowMessageBox(_("Connect to PC with USB cable?  \n\nThis takes a minute.  "
         "The screen will flash. Then click 'Computer Setup' and connect the cable"), _("USB cable connect"),
                        MB_YESNO | MB_ICONQUESTION) == IDYES)
-      dialog.OnAction(LAUNCH_NICKEL);
-
+      if (ShowMessageBox(_("Important!\n\n"
+          "Do not use the 'Wireless setup' option.  You cannot use the Kobo as an Book reader.  Doing so will break Top Hat!"), _("Warning!"),
+                         MB_OKCANCEL | MB_ICONWARNING) != IDCANCEL)
+        dialog.OnAction(LAUNCH_NICKEL);
   }
 }
 
