@@ -1107,6 +1107,14 @@ location=16
 mode=Menu2
 type=key
 data=0
+event=AddWaypoint
+event=Mode default
+label=Add\nwaypoint
+location=17
+
+mode=Menu2
+type=key
+data=0
 event=Setup QNH
 event=Mode default
 label=QNH
@@ -1127,14 +1135,6 @@ event=Setup Wind
 event=Mode default
 label=Setup Wind
 location=23
-
-mode=Menu2
-type=key
-data=0
-event=AddWaypoint
-event=Mode default
-label=Add\nwaypoint
-location=24
 
 # -------------
 # mode=MenuLast
