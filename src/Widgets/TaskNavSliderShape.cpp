@@ -412,8 +412,10 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   // draw checkmark next to name if oz entered
   if (draw_checkmark) {
-    const int offsety = line_two_y_offset +
-        (rc.bottom - line_two_y_offset - bitmap_size.cy) / 2;
+
+    const int offsety = ((PixelScalar)line_two_y_offset + bitmap_size.cy <= rc.bottom) ?
+        (line_two_y_offset + (rc.bottom - line_two_y_offset - bitmap_size.cy)
+            / 2 - Layout::Scale(1)) : rc.bottom - bitmap_size.cy - Layout::Scale(1);
     RasterPoint upper_left(left_bitmap, rc.top + offsety);
     RasterPoint lower_right(upper_left.x + bitmap_size.cx / 2,
                             upper_left.y + bitmap_size.cy);
