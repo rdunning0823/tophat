@@ -579,7 +579,11 @@ InputEvents::eventAddWaypoint(const TCHAR *misc)
 
       GeoPoint location = projection.GetGeoScreenCenter();
       edit_waypoint = way_points.Create(location);
-      short elevation = terrain->GetTerrainHeight(location);
+
+      short elevation = 0;
+      if (terrain != NULL)
+        elevation = terrain->GetTerrainHeight(location);
+
       if (!RasterBuffer::IsSpecial(elevation))
         edit_waypoint.elevation = fixed(elevation);
       else
