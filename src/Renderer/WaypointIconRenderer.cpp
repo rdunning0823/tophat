@@ -35,7 +35,9 @@ static const MaskedIcon &
 GetWaypointIcon(const WaypointLook &look, const Waypoint &wp,
                 bool small_icons, const bool in_task)
 {
-  if (small_icons && !in_task)
+
+
+  if (small_icons && !in_task && wp.type != Waypoint::Type::NORMAL)
     return look.small_icon;
 
   switch (wp.type) {
