@@ -198,12 +198,12 @@ bool IsKoboUsbHostKernel()
 #endif
 }
 
-static char cmd_kobo_kernel_info[] = "dd if=/dev/mmcblk0 bs=8 count=1 skip=64";
-static char cmd_uname_all[] = "uname -a";
-
 void
 WriteSystemInfo()
 {
+#ifdef KOBO
+  static char cmd_kobo_kernel_info[] = "dd if=/dev/mmcblk0 bs=8 count=1 skip=64";
+  static char cmd_uname_all[] = "uname -a";
 
   const char *local_path = "/TophatSystemInfo.txt";
   TCHAR command[256];
@@ -211,5 +211,5 @@ WriteSystemInfo()
   system(command);
   _stprintf(command, _T(" %s >> %s"), cmd_uname_all, local_path);
   system(command);
-
+#endif
 }
