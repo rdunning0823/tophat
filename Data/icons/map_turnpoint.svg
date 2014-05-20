@@ -38,15 +38,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1280"
-     inkscape:window-height="774"
+     inkscape:window-width="1600"
+     inkscape:window-height="789"
      id="namedview7"
      showgrid="true"
      inkscape:zoom="31.999999"
-     inkscape:cx="0.051117835"
+     inkscape:cx="-5.4957573"
      inkscape:cy="3.1249997"
-     inkscape:window-x="314"
-     inkscape:window-y="43"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer5"
      inkscape:snap-global="false">
@@ -70,7 +70,7 @@
      transform="translate(0,-14)">
     <path
        sodipodi:type="star"
-       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#624e90;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="opacity:1;fill:#624e90;fill-opacity:1;fill-rule:evenodd;stroke:#624e90;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path2394"
        sodipodi:sides="4"
        sodipodi:cx="2"
@@ -82,7 +82,7 @@
        inkscape:flatsided="false"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       d="M 2.0312501,4.3124999 L 1.0544535,1.9635569 L -1.3124999,1.0312501 L 1.0364431,0.054453517 L 1.9687499,-2.3124999 L 2.9455465,0.036443093 L 5.3124999,0.96874985 L 2.9635569,1.9455465 L 2.0312501,4.3124999 z"
+       d="M 2.0312501,4.3124999 1.0544535,1.9635569 -1.3124999,1.0312501 1.0364431,0.05445352 1.9687499,-2.3124999 2.9455465,0.03644309 5.3124999,0.96874985 2.9635569,1.9455465 z"
        transform="translate(1.5,16.5)" />
   </g>
 </svg>
