@@ -36,10 +36,13 @@ class MenuItem {
 public:
   const TCHAR *label;
   unsigned event;
+  /* this button in the selected state */
+  bool down;
 
   void Clear() {
     label = NULL;
     event = 0;
+    down = false;
   }
 
   constexpr

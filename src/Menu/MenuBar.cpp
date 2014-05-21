@@ -215,12 +215,13 @@ MenuBar::SetFont(const Font &font)
 
 void
 MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
-                    unsigned event)
+                    unsigned event, bool down)
 {
   assert(i < MAX_BUTTONS);
 
   Button &button = *buttons[i];
 
+  buttons[i]->SetDown(down);
   button.SetText(text);
   button.SetEnabled(enabled && event > 0);
   button.SetEvent(event);
@@ -233,6 +234,7 @@ MenuBar::HideButton(unsigned i)
   assert(i < MAX_BUTTONS);
 
   buttons[i]->Hide();
+  buttons[i]->SetDown(false);
 }
 
 void

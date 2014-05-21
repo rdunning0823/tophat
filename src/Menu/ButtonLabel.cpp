@@ -138,12 +138,13 @@ ButtonLabel::Expand(const TCHAR *text, TCHAR *buffer, size_t size)
 }
 
 void
-ButtonLabel::SetLabelText(unsigned index, const TCHAR *text, unsigned event)
+ButtonLabel::SetLabelText(unsigned index, const TCHAR *text, unsigned event,
+                          bool down)
 {
   TCHAR buffer[100];
   Expanded expanded = Expand(text, buffer, ARRAY_SIZE(buffer));
   if (expanded.visible)
-    bar->ShowButton(index, expanded.enabled, expanded.text, event);
+    bar->ShowButton(index, expanded.enabled, expanded.text, event, down);
   else
     bar->HideButton(index);
 }
@@ -157,7 +158,7 @@ ButtonLabel::Set(const Menu &menu, const Menu *overlay, bool full)
       : menu[i];
 
     if (full || item.IsDynamic())
-      SetLabelText(i, item.label, item.event);
+      SetLabelText(i, item.label, item.event, item.down);
   }
 }
 
