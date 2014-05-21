@@ -80,6 +80,10 @@ public:
     return items[i];
   }
 
+  MenuItem &SetMenuItem(unsigned i) {
+    return items[i];
+  }
+
   void Add(const TCHAR *label, int location, unsigned event_id);
 
   gcc_pure
