@@ -118,6 +118,7 @@ namespace InputEvents
   void sub_AutoZoom(int vswitch);
   void sub_ScaleZoom(int vswitch);
   void sub_SetZoom(fixed value);
+  void findNextActiveLabel(int direction);
 
   // -------
 
@@ -191,6 +192,8 @@ namespace InputEvents
   void eventWeather(const TCHAR *misc);
   void eventQuickMenu(const TCHAR *misc);
   void eventFileManager(const TCHAR *misc);
+  void eventChangeActiveLabel(const TCHAR *misc);
+  void eventDoActiveLabel(gcc_unused const TCHAR *misc);
 
   // -------
 };
