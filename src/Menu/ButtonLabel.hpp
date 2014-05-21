@@ -47,7 +47,13 @@ namespace ButtonLabel {
   gcc_pure
   Expanded Expand(const TCHAR *text, TCHAR *buffer, size_t size);
 
-  void SetLabelText(unsigned i, const TCHAR *text, unsigned event);
+  /**
+   * @param i
+   * @param text label
+   * @param event
+   * @param down.  renders button in down state if true
+   */
+  void SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool down);
   bool IsEnabled(unsigned i);
 
   bool ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size);

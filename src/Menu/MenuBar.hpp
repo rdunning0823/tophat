@@ -57,6 +57,13 @@ protected:
 
     virtual bool OnClicked();
 
+    /** sets the down flag that renders the button as such.
+     * @param _down
+     */
+    virtual void SetDown(bool _down) {
+      ButtonWindow::SetDown(_down);
+    }
+
 #ifdef USE_GDI
   protected:
     virtual LRESULT OnMessage(HWND hWnd, UINT message,
@@ -71,8 +78,15 @@ public:
 
 public:
   void SetFont(const Font &font);
+  /**
+   * @param i
+   * @param enabled
+   * @param text
+   * @param event
+   * @param down.  renders button as down
+   */
   void ShowButton(unsigned i, bool enabled, const TCHAR *text,
-                  unsigned event);
+                  unsigned event, bool down);
   void HideButton(unsigned i);
 
   bool IsButtonEnabled(unsigned i) const {
