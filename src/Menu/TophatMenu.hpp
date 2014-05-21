@@ -35,6 +35,10 @@ namespace TophatMenu {
   const TCHAR menu_last[] = _T("MenuLast");
 
   void ShowMenu(const TCHAR *menu_name);
+
+  /**
+   * Rotates the main "M" menu between menu, menu_1, menu_2, menu_last, none
+   */
   void RotateMenu();
 }
 #endif /* TOPHATMENU_HPP_ */
