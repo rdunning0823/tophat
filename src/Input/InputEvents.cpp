@@ -114,9 +114,15 @@ static InputConfig input_config;
 void InputEvents::findNextActiveLabel(int direction)
 {
     assert(direction == 1 || direction == -1); // prevent abuse - a better name might help, definitely kludge
-    const Menu *const menu = &input_config.menus[getModeID()];
-    const Menu *const overlay_menu = &input_config.menus[overlay_mode];
+    Menu *const menu = &input_config.menus[getModeID()];
+    Menu *const overlay_menu = &input_config.menus[overlay_mode];
     int max_label = (*menu).MAX_ITEMS ; //?? but it's not menu.MAX_ITEMS , or at least i think so
+
+    MenuItem &item_old = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+        ? (*overlay_menu).SetMenuItem(active_label)
+        : (*menu).SetMenuItem(active_label);
+    if (item_old.event)
+      item_old.down = false;
 
     int old_active_label = active_label;
     bool looped = 0;
@@ -130,13 +136,16 @@ void InputEvents::findNextActiveLabel(int direction)
             active_label = max_label;
             looped = 1;
         }
-        const MenuItem &item = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
-            ? (*overlay_menu)[active_label]
-            : (*menu)[active_label];
-        if (item.event)
+        MenuItem &item = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+            ? (*overlay_menu).SetMenuItem(active_label)
+            : (*menu).SetMenuItem(active_label);
+        if (item.event) {
+          item.down = true;
             break;
+        }
     }
     std::cout << "next active label found = " << active_label << std::endl;
+    drawButtons(getModeID(), true);
 }
 
 // Read the data files
