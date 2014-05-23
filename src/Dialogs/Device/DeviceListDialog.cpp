@@ -62,7 +62,7 @@ Copyright_License {
 #endif
 
 class DeviceListWidget final
-  : public ListWidget, private ActionListener,
+  : public ListWidget, private ActionListener, public Timer,
     private NullBlackboardListener {
   enum Buttons {
     DISABLE,
@@ -170,12 +170,14 @@ public:
   void CreateButtons(WidgetDialog &dialog);
 
 protected:
-  bool RefreshList();
+  bool RefreshList(bool force);
 
   void UpdateButtons();
 
   void EnableDisableCurrent();
+  void ReconnectAll();
   void ReconnectCurrent();
+  void ReconnectDevice(unsigned i, bool quiet);
   void DownloadFlightFromCurrent();
   void EditCurrent();
   void ManageCurrent();
@@ -186,6 +188,7 @@ public:
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual void Unprepare() override {
+    Timer::Cancel();
     DeleteWindow();
   }
 
@@ -194,7 +197,7 @@ public:
 
     CommonInterface::GetLiveBlackboard().AddListener(*this);
 
-    RefreshList();
+    RefreshList(false);
     UpdateButtons();
   }
 
@@ -208,6 +211,11 @@ public:
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
                            unsigned idx) override;
   virtual void OnCursorMoved(unsigned index) override;
+
+  /* virtual methods from class Timer */
+  virtual void OnTimer() {
+    ReconnectAll();
+  }
 
 private:
   /* virtual methods from class ActionListener */
@@ -230,10 +238,11 @@ DeviceListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     items[i].Clear();
 
   UpdateButtons();
+  Timer::Schedule(5000);
 }
 
 bool
-DeviceListWidget::RefreshList()
+DeviceListWidget::RefreshList(bool force)
 {
   bool modified = false;
   for (unsigned i = 0; i < NUMDEV; ++i) {
@@ -249,7 +258,7 @@ DeviceListWidget::RefreshList()
     }
   }
 
-  if (modified)
+  if (force || modified)
     GetList().Invalidate();
   return modified;
 }
@@ -439,29 +448,60 @@ DeviceListWidget::EnableDisableCurrent()
 }
 
 inline void
+DeviceListWidget::ReconnectAll()
+{
+  if (is_simulator())
+    return;
+
+  for (unsigned i = 0; i < NUMDEV; i++) {
+    const auto &config = CommonInterface::GetSystemSettings().devices[i];
+
+    if (config.port_type == DeviceConfig::PortType::DISABLED)
+      continue;
+
+    ReconnectDevice(i, false);
+  }
+  RefreshList(true);
+  UpdateButtons();
+}
+
+inline void
 DeviceListWidget::ReconnectCurrent()
 {
   const unsigned current = GetList().GetCursorIndex();
   if (current >= NUMDEV)
     return;
 
+  ReconnectDevice(current, false);
+}
+
+inline void
+DeviceListWidget::ReconnectDevice(unsigned i, bool quiet)
+{
+  assert (i < NUMDEV);
+
 #ifdef ANDROID
   const DeviceConfig &config =
-    CommonInterface::SetSystemSettings().devices[current];
+    CommonInterface::SetSystemSettings().devices[i];
   if ((config.port_type == DeviceConfig::PortType::RFCOMM ||
        config.port_type == DeviceConfig::PortType::RFCOMM_SERVER) &&
       !BluetoothHelper::isEnabled(Java::GetEnv())) {
-    ShowMessageBox(_("Bluetooth is disabled"), _("Reconnect"),
-                   MB_OK | MB_ICONERROR);
+    if (!quiet)
+      ShowMessageBox(_("Bluetooth is disabled"), _("Reconnect"),
+                     MB_OK | MB_ICONERROR);
     return;
   }
 #endif
 
-  DeviceDescriptor &device = *device_list[current];
+  DeviceDescriptor &device = *device_list[i];
   if (device.IsBorrowed()) {
-    ShowMessageBox(_("Device is occupied"), _("Reconnect"), MB_OK | MB_ICONERROR);
+    if (!quiet)
+      ShowMessageBox(_("Device is occupied"), _("Reconnect"), MB_OK | MB_ICONERROR);
     return;
   }
+
+  if (device.IsOccupied())
+    return;
 
   /* this OperationEnvironment instance must be persistent, because
      DeviceDescriptor::Open() is asynchronous */
@@ -617,7 +657,7 @@ DeviceListWidget::DebugCurrent()
   static constexpr unsigned MINUTES = 10;
 
   device.EnableDumpTemporarily(MINUTES * 60000);
-  RefreshList();
+  RefreshList(false);
 
   StaticString<256> msg;
   msg.Format(_("Communication with this device will be logged for the next %u minutes."),
@@ -662,7 +702,7 @@ DeviceListWidget::OnAction(int id)
 void
 DeviceListWidget::OnGPSUpdate(const MoreData &basic)
 {
-  if (RefreshList())
+  if (RefreshList(false))
     UpdateButtons();
 }
 
