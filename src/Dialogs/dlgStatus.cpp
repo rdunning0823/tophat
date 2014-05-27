@@ -31,7 +31,6 @@ Copyright_License {
 #include "StatusPanels/FlightStatusPanel.hpp"
 #include "StatusPanels/RulesStatusPanel.hpp"
 #include "StatusPanels/SystemStatusPanel.hpp"
-#include "Task/Manager/TaskCalculatorPanel.hpp"
 #include "StatusPanels/TimesStatusPanel.hpp"
 #include "Screen/Layout.hpp"
 #include "Components.hpp"
