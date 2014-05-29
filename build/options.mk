@@ -25,6 +25,10 @@ ifeq ($(STOP_WATCH),y)
 TARGET_CPPFLAGS += -DSTOP_WATCH
 endif
 
+ifeq ($(NO_HORIZON),y)
+TARGET_CPPFLAGS += -DNO_HORIZON
+endif
+
 # compile without UI?
 HEADLESS ?= n
 

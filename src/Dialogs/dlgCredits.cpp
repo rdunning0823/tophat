@@ -38,6 +38,7 @@ Copyright_License {
 #include "Inflate.hpp"
 #include "Util/ConvertString.hpp"
 #include "Resources.hpp"
+#include "Language/Language.hpp"
 
 #include <assert.h>
 #if defined(KOBO)
@@ -170,6 +171,10 @@ OnLogoPaint(Canvas &canvas, const PixelRect &rc)
   struct utsname buf;
   uname(&buf);
   canvas.DrawText(x + Layout::FastScale(70), y, _T(buf.release));
+#endif
+#ifdef NO_HORIZON
+  y += Layout::FastScale(22);
+  canvas.DrawText(x, y, _("Horizon: disabled"));
 #endif
 
   y += Layout::FastScale(37);

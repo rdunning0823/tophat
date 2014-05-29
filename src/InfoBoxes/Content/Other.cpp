@@ -168,6 +168,12 @@ InfoBoxContentHorizon::OnCustomPaint(Canvas &canvas, const PixelRect &rc)
 void
 InfoBoxContentHorizon::Update(InfoBoxData &data)
 {
+#ifdef NO_HORIZON
+  data.SetInvalid();
+  data.SetComment(_("Disabled"));
+  return;
+#endif
+
   if (!CommonInterface::Basic().attitude.bank_angle_available &&
       !CommonInterface::Basic().attitude.pitch_angle_available) {
     data.SetInvalid();

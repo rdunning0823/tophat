@@ -26,6 +26,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Resources.hpp"
 #include "Version.hpp"
+#include "Language/Language.hpp"
 #ifdef KOBO
 #include "Kobo/System.hpp"
 #endif
@@ -138,6 +139,11 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
     canvas.DrawText(2, y, _T("USB host supported"));
   }
 #endif
+#ifdef NO_HORIZON
+  y += 2 + text_height;
+  canvas.DrawText(2, y, _("Horizon: disabled"));
+#endif
+
 #ifndef NDEBUG
   y += 2 + text_height;
   canvas.DrawText(2, y, _T("DEBUG"));
