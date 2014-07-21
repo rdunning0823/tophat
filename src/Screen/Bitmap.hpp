@@ -84,9 +84,6 @@ protected:
 #ifdef ANDROID
   /** resource id */
   ResourceId id;
-
-  Type type;
-
   /** filename for external images (id=0) */
   tstring pathName;
 #endif

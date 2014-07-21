@@ -291,13 +291,11 @@ class NativeView extends SurfaceView
   /**
    * Loads the specified bitmap resource as OpenGL texture.
    *
-   * @param alpha expect a GL_ALPHA texture?
    * @param result an array of 5 integers: texture id, width, height,
    * allocated width, allocated height (all output)
    * @return true on success
    */
-  private boolean loadResourceTexture(String name, boolean alpha,
-                                      int[] result) {
+  private boolean loadResourceTexture(String name, int[] result) {
     /* find the resource */
     int resourceId = resources.getIdentifier(name, "drawable", "org.tophat");
     if (resourceId == 0) {
@@ -313,7 +311,7 @@ class NativeView extends SurfaceView
 
     Bitmap bmp = BitmapFactory.decodeResource(resources, resourceId, opts);
 
-    return BitmapUtil.bitmapToOpenGL(bmp, alpha, result);
+    return BitmapUtil.bitmapToOpenGL(bmp, result);
   }
 
   /**
@@ -330,7 +328,7 @@ class NativeView extends SurfaceView
 
     Bitmap bmp = BitmapFactory.decodeFile(pathName, opts);
 
-    return BitmapUtil.bitmapToOpenGL(bmp, false, result);
+    return BitmapUtil.bitmapToOpenGL(bmp, result);
   }
 
   /**
