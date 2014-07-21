@@ -146,7 +146,8 @@ GestureZone::DrawZoneHelp(Canvas &canvas, PixelRect rc)
   canvas.Select(gesture_look.pen);
   canvas.DrawLine( {x_base, y_arrow },
                    {x_tip, y_arrow });
-  canvas.CopyOr(x_tip - 0.2 * bmp_hand_size.cx, y_arrow,
+  // changing CopyOr to CopyNotOr for 6.7.2 merge where UNIX does not have this method
+  canvas.CopyNotOr(x_tip - 0.2 * bmp_hand_size.cx, y_arrow,
                 bmp_hand_size.cx / 2, bmp_hand_size.cy,
                 *bmp_hand,
                 0, 0);

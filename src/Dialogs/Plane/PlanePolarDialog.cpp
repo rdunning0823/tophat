@@ -122,6 +122,7 @@ void
 PlanePolarWidget::Update()
 {
   LoadPolarShape(plane.polar_shape);
+  UpdatePolarLabel();
 
   LoadValue(REFERENCE_MASS, plane.reference_mass);
   LoadValue(DRY_MASS, plane.dry_mass);
@@ -160,6 +161,7 @@ bool
 PlanePolarWidget::Save(bool &_changed)
 {
   bool changed = false;
+
   PolarShapeEditWidget &widget = GetShapeEditor();
   if (widget.Save(changed)) {
     if (widget.GetPolarShape().IsValid())

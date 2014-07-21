@@ -35,6 +35,8 @@ Copyright_License {
 
 #ifdef KOBO
 
+#include <sys/mount.h>
+
 static bool
 InsMod(const char *path)
 {
@@ -176,6 +178,10 @@ void
 KoboRunTelnetd()
 {
 #ifdef KOBO
+  /* telnetd requires /dev/pts - mount it (if it isn't already) */
+  if (mkdir("/dev/pts", 0777) == 0)
+    mount("none", "/dev/pts", "devpts", MS_RELATIME, NULL);
+
   Run("/usr/sbin/telnetd", "-l", "/bin/sh");
 #endif
 }

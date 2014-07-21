@@ -441,7 +441,7 @@ DigitEntry::SetLatitude(Angle value)
 {
   // TODO: support all CoordinateFormats
 
-  value = value.AsBearing();
+  value = value.AsDelta();
 
   assert(length == 9);
   assert(columns[0].type == Column::Type::NORTH_SOUTH);
@@ -478,7 +478,7 @@ DigitEntry::SetLongitude(Angle value)
 {
   // TODO: support all CoordinateFormats
 
-  value = value.AsBearing();
+  value = value.AsDelta();
 
   assert(length == 9);
   assert(columns[0].type == Column::Type::EAST_WEST);
