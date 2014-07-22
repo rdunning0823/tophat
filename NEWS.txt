@@ -1,6 +1,9 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Top Hat Soaring 2.0.0.2 TBD
+* Merged XCSoar 6.7.3
+
 Top Hat Soaring 2.0 - 5/20/2014
 * Fix NavBar checkmark with 12-Infobox geometry
 * Fix bug adding turnpoint in pan mode if no terrain file
