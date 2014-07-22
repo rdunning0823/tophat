@@ -29,6 +29,7 @@
 #include "LogFile.hpp"
 
 #include <map>
+#include <cstdlib>
 
 /**
  * Specialisation of AbstractContest for OLC Triangle (triangle) rules
@@ -145,7 +146,7 @@ private:
       const int lon = point->GetFlatLocation().longitude;
       const int lat = point->GetFlatLocation().latitude;
 
-      return std::max(fabs(lon), fabs(lat));
+      return std::max(std::abs(lon), std::abs(lat));
     }
   };
 

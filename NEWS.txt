@@ -2,6 +2,22 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 
+Top Hat Soaring 2.0.0.4
+* Merged XCSoar 6.7.5
+* work around crash on Windows (PC) (#3284)
+* devices
+  - fixed attitude data handling
+  - properly detect LXNAV Nano 3
+  - FLARM: fix declaration with asterisk in task point name (#3323)
+* airspace
+  - assume all airspaces are active if day of week is not known
+  - restore "Repetitive Sound" setting on startup (#3308)
+* Android
+  - fix crash when opening IOIO port (#3309)
+  - allow reconnecting IOIO sensors
+* tasks
+  - fix loading of some tasks from .cup files
+
 Top Hat Soaring 2.0.0.3
 * Merged XCSoar 6.7.4
 * map
