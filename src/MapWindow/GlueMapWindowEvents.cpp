@@ -435,7 +435,6 @@ GlueMapWindow::OnPaintBuffer(Canvas &canvas)
   MapWindow::OnPaintBuffer(canvas);
 
   DrawMapScale(canvas, GetClientRect(), render_projection);
-  DrawFlightMode(canvas, GetClientRect(), nav_slider_bar_visible_height);
   if (IsPanning())
     DrawPanInfo(canvas);
 
