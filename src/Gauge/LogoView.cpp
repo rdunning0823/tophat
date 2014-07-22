@@ -107,6 +107,13 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
     titlex = (width - title_size.cx) / 2;
     titley = logoy + logo_size.cy + title_size.cy;
     break;
+  case SQUARE:
+    logox = (width - logo_size.cx) / 2;
+    logoy = (height - logo_size.cy) / 2;
+    // not needed - silence compiler "may be used uninitialized"
+    titlex = 0;
+    titley = 0;
+    break;
   }
 
   // Draw 'XCSoar N.N' title
