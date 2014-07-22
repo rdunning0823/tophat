@@ -113,9 +113,9 @@ LinuxInputDevice::Read()
         if (new_down != down) {
           down = new_down;
           if (new_down)
-            pressing = true;
+            pressed = true;
           else
-            releasing = true;
+            released = true;
         }
       } else
         queue.Push(Event(e.value ? Event::KEY_DOWN : Event::KEY_UP,

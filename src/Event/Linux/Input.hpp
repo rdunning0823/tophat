@@ -70,15 +70,6 @@ class LinuxInputDevice final : private FileEventHandler {
    */
   bool moved;
 
-  /**
-   * Was the finger pressed or released, but not yet committed with
-   * EV_SYN/SYN_REPORT?
-   */
-  bool pressing, releasing;
-
-  /**
-   * Copy of #pressing / #releasing after EV_SYN/SYN_REPORT.
-   */
   bool pressed, released;
 
   FileDescriptor fd;
