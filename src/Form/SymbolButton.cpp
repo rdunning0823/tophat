@@ -34,6 +34,65 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "UIGlobals.hpp"
 
+#ifdef ENABLE_OPENGL
+#include "Screen/OpenGL/Texture.hpp"
+#include "Screen/OpenGL/Scope.hpp"
+#include "Screen/OpenGL/Compatibility.hpp"
+#endif
+
+static void
+DrawIcon(Canvas &canvas, PixelRect rc, const Bitmap &bmp, bool pressed)
+{
+
+  const PixelSize bitmap_size = bmp.GetSize();
+  const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
+
+#ifdef ENABLE_OPENGL
+    const int offsetx = (rc.right - rc.left - bitmap_size.cx) / 2;
+
+    if (pressed) {
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+
+      /* invert the texture color */
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
+
+      /* copy the texture alpha */
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_TEXTURE);
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+    } else
+      /* simple copy */
+      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    const GLEnable scope(GL_TEXTURE_2D);
+    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    GLTexture &texture = *bmp.GetNative();
+    texture.Bind();
+    texture.Draw(rc.left + offsetx, rc.top + offsety);
+
+#else
+    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
+    if (pressed) // black background
+      canvas.CopyNotOr(rc.left + offsetx,
+                       rc.top + offsety,
+                       bitmap_size.cx / 2,
+                       bitmap_size.cy,
+                       bmp,
+                       bitmap_size.cx / 2, 0);
+
+    else
+      canvas.CopyAnd(rc.left + offsetx,
+                      rc.top + offsety,
+                      bitmap_size.cx / 2,
+                      bitmap_size.cy,
+                      bmp,
+                      bitmap_size.cx / 2, 0);
+#endif
+}
+
 void
 WndSymbolButton::OnPaint(Canvas &canvas)
 {
@@ -116,48 +175,14 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     bmp = caption == _("Search") ? &icon_look.hBmpSearch :
         &icon_look.hBmpSearchChecked;
 
-    const PixelSize bitmap_size = bmp->GetSize();
-    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
-    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
-    if (IsDown())
-      canvas.CopyNotOr(rc.left + offsetx,
-                       rc.top + offsety,
-                       bitmap_size.cx / 2,
-                       bitmap_size.cy,
-                       *bmp,
-                       bitmap_size.cx / 2, 0);
-    else
-      canvas.CopyAnd(rc.left + offsetx,
-                      rc.top + offsety,
-                      bitmap_size.cx / 2,
-                      bitmap_size.cy,
-                      *bmp,
-                      bitmap_size.cx / 2, 0);
-
+    DrawIcon(canvas, rc, *bmp, pressed);
   }
 
   //draw gear for set up icon
   else if (caption == _("Setup")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const Bitmap &bmp = icon_look.hBmpTabSettings;
-
-    const PixelSize bitmap_size = bmp.GetSize();
-    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
-    const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
-    if (pressed)
-      canvas.CopyNotOr(rc.left + offsetx,
-                       rc.top + offsety,
-                       bitmap_size.cx / 2,
-                       bitmap_size.cy,
-                       bmp,
-                       bitmap_size.cx / 2, 0);
-    else
-      canvas.CopyAnd(rc.left + offsetx,
-                      rc.top + offsety,
-                      bitmap_size.cx / 2,
-                      bitmap_size.cy,
-                      bmp,
-                      bitmap_size.cx / 2, 0);
+    DrawIcon(canvas, rc, bmp, pressed);
 
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
