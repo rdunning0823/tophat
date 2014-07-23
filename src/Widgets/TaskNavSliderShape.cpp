@@ -42,6 +42,12 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Asset.hpp"
 
+#ifdef ENABLE_OPENGL
+#include "Screen/OpenGL/Texture.hpp"
+#include "Screen/OpenGL/Scope.hpp"
+#include "Screen/OpenGL/Compatibility.hpp"
+#endif
+
 const Font &
 SliderShape::GetLargeFont()
 {
@@ -388,6 +394,10 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   const Bitmap *bmp = &icon_look.hBmpCheckMark;
   if (draw_checkmark) {
     bitmap_size = bmp->GetSize();
+#ifdef ENABLE_OPENGL
+    /* this seams to be a is this a bug? */
+    bitmap_size.cx *= 2;
+#endif
   }
   PixelRect rc_name(rc_outer.left + GetHintWidth(), rc_outer.top,
                     rc_outer.right - GetHintWidth(), rc_outer.bottom);
@@ -419,13 +429,26 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     RasterPoint upper_left(left_bitmap, rc.top + offsety);
     RasterPoint lower_right(upper_left.x + bitmap_size.cx / 2,
                             upper_left.y + bitmap_size.cy);
-    if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right))
-      canvas.CopyAnd(upper_left.x,
-                     upper_left.y,
-                     bitmap_size.cx / 2,
-                     bitmap_size.cy,
-                     *bmp,
-                     bitmap_size.cx / 2, 0);
+    if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right)) {
+#ifdef ENABLE_OPENGL
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    const GLEnable scope(GL_TEXTURE_2D);
+    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    GLTexture &texture = *bmp->GetNative();
+    texture.Bind();
+    texture.Draw(upper_left.x, upper_left.y);
+#else
+    canvas.CopyAnd(upper_left.x,
+                   upper_left.y,
+                   bitmap_size.cx / 2,
+                   bitmap_size.cy,
+                   *bmp,
+                   bitmap_size.cx / 2, 0);
+#endif
+    }
+
   }
 }
 
@@ -472,19 +495,36 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
   const PixelScalar vert_margin = points[2].y - bmp_bearing_size.cy / 2;
 
   UPixelScalar x_offset = (direction == -1) ? bearing_icon_hor_margin + 1 :
-      GetWidth() - bearing_icon_hor_margin -bmp_bearing_size.cx / 2;
+      GetWidth() - bearing_icon_hor_margin -
+#ifdef ENABLE_OPENGL
+      bmp_bearing_size.cx; // not sure why this bug exists 672 introduced
+#else
+  bmp_bearing_size.cx / 2;
+#endif
 
   RasterPoint upper_left(rc_outer.left + x_offset, vert_margin);
   RasterPoint lower_right(upper_left.x + bmp_bearing_size.cx / 2,
                           upper_left.y + bmp_bearing_size.cy);
 
   if (canvas.GetRect().IsInside(upper_left) &&
-      canvas.GetRect().IsInside(lower_right))
+      canvas.GetRect().IsInside(lower_right)) {
+#ifdef ENABLE_OPENGL
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    const GLEnable scope(GL_TEXTURE_2D);
+    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    GLTexture &texture = *bmp_bearing->GetNative();
+    texture.Bind();
+    texture.Draw(upper_left.x, upper_left.y);
+#else
     canvas.CopyAnd(upper_left.x,
                    upper_left.y,
                    bmp_bearing_size.cx / 2, bmp_bearing_size.cy,
                    *bmp_bearing,
                    bmp_bearing_size.cx / 2, 0);
+#endif
+  }
   return direction;
 }
 
