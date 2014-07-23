@@ -2,7 +2,8 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 
-Top Hat Soaring 2.0.0.4
+Top Hat 2.0.1 TBD
+* Fixed landing detection bug (not detecting landing)
 * Merged XCSoar 6.7.5
 * work around crash on Windows (PC) (#3284)
 * devices
@@ -17,8 +18,6 @@ Top Hat Soaring 2.0.0.4
   - allow reconnecting IOIO sensors
 * tasks
   - fix loading of some tasks from .cup files
-
-Top Hat Soaring 2.0.0.3
 * Merged XCSoar 6.7.4
 * map
   - fix topography rendering for polygon shapes (#3245)
@@ -33,8 +32,6 @@ Top Hat Soaring 2.0.0.3
   - relax parsing of TNP airspace files (#3272)
 * infoboxes
   - don't use depreciated content in default configuration (#3278)
-
-Top Hat Soaring 2.0.0.2
 * Merged XCSoar 6.7.3
 * tracking
   - changed host for DHV tracking server (#3208)
