@@ -69,7 +69,12 @@ static WndForm *dialog = nullptr;
 static ListControl *waypoint_list_control = nullptr;
 static CheckBox *distance_sort_checkbox;
 static WndSymbolButton *search_button;
-
+static WndFrame *name_header;
+static WndFrame *elevation_header;
+static WndFrame *distance_header;
+static PixelRect rc_name_header;
+static PixelRect rc_elevation_header;
+static PixelRect rc_distance_header;
 static OrderedTask *ordered_task;
 static unsigned ordered_task_index;
 
@@ -195,6 +200,50 @@ UpdateButtons()
     search_button->SetCaption(_T("SearchChecked"));
 }
 
+/**
+ * updates text and placement of list headers
+ * - Name
+ * - Elevation
+ * - Dist / Bearing
+ */
+static void
+UpdateHeaders()
+{
+  PixelRect rc_list = waypoint_list_control->GetPosition();
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const unsigned padding = Layout::GetTextPadding();
+
+  const TCHAR *elevation_header_text = _("Elevation");
+  PixelSize sz_elevation_header = dialog_look.text_font->TextSize(elevation_header_text);
+  const TCHAR *distance_header_text = _("Distance");
+  PixelSize sz_distance_header = dialog_look.text_font->TextSize(distance_header_text);
+
+  rc_name_header = name_header->GetPosition();
+  rc_elevation_header = elevation_header->GetPosition();
+  rc_distance_header = distance_header->GetPosition();
+
+  rc_name_header.left = rc_list.left + waypoint_list_control->GetItemHeight();
+  rc_name_header.right = rc_name_header.left + rc_list.GetSize().cx / 2;
+
+  rc_elevation_header.left = rc_list.left +
+      (rc_list.GetSize().cx - waypoint_list_control->GetScrollBarWidth()) / 2;
+  rc_elevation_header.right = rc_elevation_header.left + sz_elevation_header.cx + padding;
+
+  rc_distance_header.right = rc_list.right - waypoint_list_control->GetScrollBarWidth();
+  rc_distance_header.left = rc_distance_header.right - sz_distance_header.cx - padding * 2;
+
+  rc_name_header.top = rc_elevation_header.top = rc_distance_header.top =
+      rc_list.top - padding - sz_elevation_header.cy;
+
+  name_header->Move(rc_name_header);
+  elevation_header->Move(rc_elevation_header);
+  distance_header->Move(rc_distance_header);
+
+  name_header->SetCaption(_("Name"));
+  elevation_header->SetCaption(elevation_header_text);
+  distance_header->SetCaption(distance_header_text);
+}
+
 static void
 UpdateList()
 {
@@ -209,6 +258,7 @@ UpdateList()
   waypoint_list_control->SetCursorIndex(0);
   UpdateButtons();
   waypoint_list_control->Invalidate();
+  UpdateHeaders();
 }
 
 static const TCHAR *
@@ -276,11 +326,13 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
 
   const struct WaypointListItem &info = waypoint_list[i];
 
-  WaypointListRenderer::Draw(canvas, rc, *info.waypoint,
-                             info.GetVector(location),
-                             UIGlobals::GetDialogLook(),
-                             UIGlobals::GetMapLook().waypoint,
-                             CommonInterface::GetMapSettings().waypoint);
+  WaypointListRenderer::Draw2(canvas, rc, *info.waypoint,
+                              info.GetVector(location),
+                              UIGlobals::GetDialogLook(),
+                              UIGlobals::GetMapLook().waypoint,
+                              CommonInterface::GetMapSettings().waypoint,
+                              rc_elevation_header.GetSize().cx,
+                              rc_distance_header.GetSize().cx);
 }
 
 void
@@ -355,6 +407,13 @@ ShowWaypointListSimpleDialog(const GeoPoint &_location,
     assert (button_select != nullptr);
     button_select->SetCaption(_T("Goto"));
   }
+
+  name_header = (WndFrame *)dialog->FindByName(_T("frmNameHeader"));
+  elevation_header = (WndFrame *)dialog->FindByName(_T("frmElevationHeader"));
+  distance_header = (WndFrame *)dialog->FindByName(_T("frmDistanceHeader"));
+  assert(name_header != nullptr);
+  assert(elevation_header != nullptr);
+  assert(distance_header != nullptr);
 
   distance_sort_checkbox = (CheckBox*)dialog->FindByName(_T("chkbByDistance"));
   search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));

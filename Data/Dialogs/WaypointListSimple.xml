@@ -1,5 +1,9 @@
 <Form Caption="Select Waypoint">
-  <List Name="frmWaypointList" X="0" Y="35" Height="-35" />
+  <List Name="frmWaypointList" X="0" Y="55" Height="-35" />
+  <Label Name="frmNameHeader" X="40" Width="50" Y="35" Height="20"/>
+  <Label Name="frmElevationHeader" X="100" Width="50" Y="35" Height="20"/>
+  <Label Name="frmDistanceHeader" X="-100" Width="100" Y="35" Height="20"/>
+
   <CheckBox Name="chkbByDistance" Caption="By distance" X="0" Y="0" Height="25" Width="160" OnClick="OnByDistanceClicked"/>
   <SymbolButton Name="cmdSearch" Caption="Search" X="160" Y="0" Width="80" Height="35" OnClick="OnSearchClicked" />
   
