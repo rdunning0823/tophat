@@ -211,7 +211,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   // Draw distance and arrival altitude
   StaticString<256> buffer;
   TCHAR dist[20], alt[20];
-  FormatUserDistanceSmart(distance, dist, true);
+  FormatUserDistance(distance, dist, true, 0);
   FormatRelativeUserAltitude(arrival_altitude, alt, true);
 
   canvas.DrawClippedText(rc_info.left, middle, rc_info, dist);
@@ -337,7 +337,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   // Draw leg distance
   UPixelScalar leg_info_width = 0;
   if (vector) {
-    FormatUserDistanceSmart(vector->distance, buffer.buffer(), true);
+    FormatUserDistance(vector->distance, buffer.buffer(), true, 0);
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer.c_str());
     canvas.DrawText(rc.right - padding - width,
                     rc.top + padding +
