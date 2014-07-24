@@ -47,7 +47,7 @@ namespace WaypointListRenderer
             const WaypointRendererSettings &renderer_settings);
 
   /**
-   * Calls Draw() that is used by main waypoint list
+   * Deprecated.  Replaced by Draw2 with columns for main waypoint list
    */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             const GeoVector &vector,
@@ -63,13 +63,24 @@ namespace WaypointListRenderer
             const WaypointRendererSettings &settings);
 
   /**
+   * Calls Draw() that is used by main waypoint list
+   * Uses 3 columns
+   */
+  void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
+             const GeoVector &vector,
+             const DialogLook &dialog_look, const WaypointLook &look,
+             const WaypointRendererSettings &settings,
+             unsigned col_2_width,
+             unsigned col_3_width);
+
+  /**
    * draws version used for AlternatesList in columns
    */
   void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-            fixed distance, fixed arrival_altitude,
-            const DialogLook &dialog_look, const WaypointLook &look,
-            const WaypointRendererSettings &settings,
-            unsigned col_2_width);
+             fixed distance, fixed arrival_altitude,
+             const DialogLook &dialog_look, const WaypointLook &look,
+             const WaypointRendererSettings &settings,
+             unsigned col_2_width);
 }
 
 #endif

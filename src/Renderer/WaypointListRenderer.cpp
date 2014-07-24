@@ -38,10 +38,23 @@ Copyright_License {
 
 namespace WaypointListRenderer
 {
+/**
+ * Used for main waypoint list renderer
+ */
+  void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
+             const GeoVector *vector,
+             const DialogLook &dialog_look, const WaypointLook &look,
+             const WaypointRendererSettings &settings, unsigned col_2_width,
+             unsigned col_3_width);
+
+  /**
+   * Deprecated.  replaced by Draw2 for main waypoint list
+   */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             const GeoVector *vector,
             const DialogLook &dialog_look, const WaypointLook &look,
             const WaypointRendererSettings &settings);
+
 }
 
 typedef StaticString<256u> Buffer;
@@ -51,7 +64,7 @@ FormatWaypointDetails(Buffer &buffer, const Waypoint &waypoint)
 {
   TCHAR alt[16];
   FormatUserAltitude(waypoint.elevation, alt, 16);
-  buffer.Format(_T("%s: %s"), _("Elevation"), alt);
+  buffer = alt;
 
   if (waypoint.radio_frequency.IsDefined()) {
     TCHAR radio[16];
@@ -82,6 +95,23 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
 /**
  * Calls Draw() that is used by main waypoint list
+ */
+void
+WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
+                            const Waypoint &waypoint, const GeoVector &vector,
+                            const DialogLook &dialog_look,
+                            const WaypointLook &look,
+                            const WaypointRendererSettings &settings,
+                            unsigned col_2_width,
+                            unsigned col_3_width)
+{
+  Draw2(canvas, rc, waypoint, &vector, dialog_look, look, settings,
+       col_2_width, col_3_width);
+}
+
+/**
+ * Deprecated: Calls Draw() that is used by main waypoint list
+ * Replaced by Draw()
  */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
@@ -204,8 +234,9 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   wir.Draw(waypoint, pt, reachable);
 }
 
+
 /**
- * Used by main waypoint list
+ * Deprecated.  Replaced by Draw2() for main waypoint list screen
  */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
@@ -261,6 +292,80 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   canvas.Select(name_font);
   canvas.DrawClippedText(left, rc.top + padding,
                          rc.right - leg_info_width - left,
+                         waypoint.name.c_str());
+
+  // Draw icon
+  RasterPoint pt = { (PixelScalar)(rc.left + line_height / 2),
+                     (PixelScalar)(rc.top + line_height / 2) };
+  WaypointIconRenderer wir(settings, look, canvas);
+  wir.Draw(waypoint, pt);
+}
+
+/**
+ * Used by main waypoint list
+ */
+void
+WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
+                            const Waypoint &waypoint, const GeoVector *vector,
+                            const DialogLook &dialog_look,
+                            const WaypointLook &look,
+                            const WaypointRendererSettings &settings,
+                            unsigned col_2_width,
+                            unsigned col_3_width)
+{
+  const unsigned padding = Layout::GetTextPadding();
+  const PixelScalar line_height = rc.bottom - rc.top;
+
+  const Font &name_font = *dialog_look.list.font_bold;
+  const Font &text_font = *dialog_look.text_font;
+
+  PixelScalar middle = rc.GetSize().cy > (int)name_font.GetHeight() ?
+      rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2 : rc.top;
+
+  PixelRect rc_elevation = rc;
+  rc_elevation.left = rc.left + rc.GetSize().cx / 2;
+  rc_elevation.right = rc.right - col_3_width - padding;
+
+  Buffer buffer;
+
+  // Y-Coordinate of the second row
+  PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
+
+  // Use small font for details
+  canvas.Select(text_font);
+
+  // Draw leg distance
+  UPixelScalar leg_info_width = 0;
+  if (vector) {
+    FormatUserDistanceSmart(vector->distance, buffer.buffer(), true);
+    UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer.c_str());
+    canvas.DrawText(rc.right - padding - width,
+                    rc.top + padding +
+                    (name_font.GetHeight() - text_font.GetHeight()) / 2,
+                    buffer.c_str());
+
+    // Draw leg bearing
+    FormatBearing(buffer.buffer(), buffer.MAX_SIZE, vector->bearing);
+    width = canvas.CalcTextWidth(buffer.c_str());
+    canvas.DrawText(rc.right - padding - width, top2,
+                    buffer.c_str());
+
+    if (width > leg_info_width)
+      leg_info_width = width;
+
+    leg_info_width += padding;
+  }
+
+  // Draw elevation (& possibly freq)
+  FormatWaypointDetails(buffer, waypoint);
+  canvas.DrawClippedText(rc_elevation.left, middle, rc_elevation.GetSize().cx,
+                         buffer.c_str());
+
+  // Draw waypoint name
+  PixelScalar left = rc.left + line_height;
+  canvas.Select(name_font);
+  canvas.DrawClippedText(left, middle,
+                         rc.GetSize().cx / 2 - line_height - padding,
                          waypoint.name.c_str());
 
   // Draw icon
