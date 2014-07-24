@@ -39,15 +39,24 @@ namespace WaypointListRenderer
   gcc_pure
   UPixelScalar GetHeight(const DialogLook &dialog_look);
 
+  /**
+   * Used by the map items list
+   */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             const DialogLook &dialog_look, const WaypointLook &look,
             const WaypointRendererSettings &renderer_settings);
 
+  /**
+   * Calls Draw() that is used by main waypoint list
+   */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             const GeoVector &vector,
             const DialogLook &dialog_look, const WaypointLook &look,
             const WaypointRendererSettings &settings);
 
+  /**
+   * Deprecated.  Replaced by Draw2 with columns in Alternates list.
+   */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             fixed distance, fixed arrival_altitude,
             const DialogLook &dialog_look, const WaypointLook &look,

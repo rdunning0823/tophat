@@ -71,6 +71,9 @@ WaypointListRenderer::GetHeight(const DialogLook &look)
     + look.text_font->GetHeight();
 }
 
+/**
+ * Used by the map items list
+ */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const Waypoint &waypoint,
@@ -81,6 +84,9 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   Draw(canvas, rc, waypoint, NULL, dialog_look, look, renderer_settings);
 }
 
+/**
+ * Calls Draw() that is used by main waypoint list
+ */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const Waypoint &waypoint, const GeoVector &vector,
@@ -91,6 +97,9 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   Draw(canvas, rc, waypoint, &vector, dialog_look, look, settings);
 }
 
+/**
+ * Deprecated.  Replaced by Draw2 with columns in Alternates list.
+ */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const Waypoint &waypoint, fixed distance,
@@ -144,6 +153,9 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   wir.Draw(waypoint, pt, reachable);
 }
 
+/**
+ * Used by Alternates screen.  Draws data in columns
+ */
 void
 WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
                             const Waypoint &waypoint, fixed distance,
@@ -196,6 +208,9 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   wir.Draw(waypoint, pt, reachable);
 }
 
+/**
+ * Used by main waypoint list
+ */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const Waypoint &waypoint, const GeoVector *vector,
