@@ -73,3 +73,18 @@ void WaypointList::SortByName() {
   std::sort(begin(), end(), WaypointNameCompare());
 }
 
+class WaypointElevationCompare
+{
+public:
+  WaypointElevationCompare() {}
+
+  bool operator()(const WaypointListItem &a,
+                  const WaypointListItem &b) const {
+    return a.waypoint->elevation < b.waypoint->elevation;
+  }
+};
+
+void WaypointList::SortByElevation() {
+  std::sort(begin(), end(), WaypointElevationCompare());
+}
+

@@ -56,6 +56,7 @@ class WaypointList: public std::vector<WaypointListItem>
 public:
   void SortByDistance(const GeoPoint &location);
   void SortByName();
+  void SortByElevation();
 };
 
 #endif
