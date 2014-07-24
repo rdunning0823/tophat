@@ -184,6 +184,59 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     const Bitmap &bmp = icon_look.hBmpTabSettings;
     DrawIcon(canvas, rc, bmp, pressed);
 
+  } else if (caption.compare(0, 9, _T("_chkmark_")) == 0) { // new
+    const Font &font = *look.font;
+    tstring text = caption.substr(9, 99).c_str();
+    PixelSize sz_text = font.TextSize(text.c_str());
+    UPixelScalar padding = Layout::GetTextPadding();
+
+
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const Bitmap &bmp = icon_look.hBmpCheckMark;
+    PixelSize sz_icon = bmp.GetSize();
+    PixelRect rc_icon = rc;
+    rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
+    rc_icon.right = rc_icon.left + sz_icon.cx;
+
+    PixelRect rc_caption = rc;
+    rc_caption.left = rc_icon.right + padding;
+    rc_caption.right = rc_caption.left + sz_text.cx + padding;
+
+    DrawIcon(canvas, rc_icon, bmp, pressed);
+
+    canvas.SetBackgroundTransparent();
+    if (!IsEnabled())
+      canvas.SetTextColor(look.disabled.color);
+    else if (focused)
+      canvas.SetTextColor(look.focused.foreground_color);
+    else
+      canvas.SetTextColor(look.standard.foreground_color);
+
+    canvas.Select(*look.font);
+
+#ifndef USE_GDI
+  unsigned style = GetTextStyle();
+
+  canvas.DrawFormattedText(&rc_caption, text.c_str(), style);
+#else
+  unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
+
+  PixelRect text_rc = rc_caption;
+  canvas.DrawFormattedText(&text_rc, text.c_str(), style | DT_CALCRECT);
+  text_rc.right = rc.right;
+
+  PixelScalar offset = rc.bottom - text_rc.bottom;
+  if (offset > 0) {
+    offset /= 2;
+    text_rc.top += offset;
+    text_rc.bottom += offset;
+  }
+
+  canvas.DrawFormattedText(&text_rc, text.c_str(), style);
+#endif
+
+
+
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
     // Draw arrow symbols instead of v and ^
