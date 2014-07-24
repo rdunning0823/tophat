@@ -259,6 +259,15 @@ ListControl::SetLength(unsigned n)
   SetCursorIndex(cursor);
 }
 
+int
+ListControl::GetScrollBarWidth() const {
+  if (has_scroll_bar == false)
+    return 0;
+
+  return scroll_bar.GetWidth();
+
+}
+
 void
 ListControl::EnsureVisible(unsigned i)
 {

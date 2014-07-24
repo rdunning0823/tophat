@@ -230,6 +230,10 @@ public:
   void SetLength(unsigned n);
 
   /**
+   * returns width of scrollbar or 0 if none exists
+   */
+  int GetScrollBarWidth() const;
+  /**
    * Check whether the length of the list is below a certain
    * threshold.  Small lists may have different behaviour on some
    * platforms (e.g. Altair).
