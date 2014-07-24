@@ -67,10 +67,6 @@ Copyright_License {
 static GeoPoint location;
 static WndForm *dialog = nullptr;
 static ListControl *waypoint_list_control = nullptr;
-static WndFrame *summary_labels1;
-static WndFrame *summary_values1;
-static WndFrame *summary_labels2;
-static WndFrame *summary_values2;
 static CheckBox *distance_sort_checkbox;
 static WndSymbolButton *search_button;
 
@@ -135,9 +131,6 @@ public:
   }
 
   virtual void OnActivateItem(unsigned index) override;
-
-  virtual void OnCursorMoved(unsigned index) override;
-
 };
 
 static WaypointListDialogState dialog_state;
@@ -200,56 +193,6 @@ UpdateButtons()
     search_button->SetCaption(_T("Search"));
   else
     search_button->SetCaption(_T("SearchChecked"));
-}
-
-void
-WaypointListSimpleDialog::OnCursorMoved(gcc_unused unsigned i)
-{
-  StaticString<100> sunset_buffer;
-  StaticString<100> alt_buffer;
-
-  if (waypoint_list.size() == 0)
-    return;
-
-  const MoreData &more_data = CommonInterface::Basic();
-  const DerivedInfo &calculated = CommonInterface::Calculated();
-  const NMEAInfo &basic = CommonInterface::Basic();
-  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-  const struct WaypointListItem &info = waypoint_list[i];
-
-  alt_buffer.clear();
-  sunset_buffer.clear();
-  if (basic.location_available && more_data.NavAltitudeAvailable() &&
-      settings.polar.glide_polar_task.IsValid()) {
-    const GlideState glide_state(
-      basic.location.DistanceBearing(info.waypoint->location),
-      info.waypoint->elevation + settings.task.safety_height_arrival,
-      more_data.nav_altitude,
-      calculated.GetWindOrZero());
-
-    const GlideResult &result =
-      MacCready::Solve(settings.task.glide,
-                       settings.polar.glide_polar_task,
-                       glide_state);
-    FormatRelativeUserAltitude(result.pure_glide_altitude_difference,
-                               alt_buffer.buffer(), true);
-  }
-
-  if (basic.time_available && basic.date_time_utc.IsDatePlausible()) {
-    const SunEphemeris::Result sun =
-      SunEphemeris::CalcSunTimes(info.waypoint->location, basic.date_time_utc,
-                                 settings.utc_offset);
-
-    const unsigned sunset_hour = (int)sun.time_of_sunset;
-    const unsigned sunset_minute = (int)((sun.time_of_sunset - fixed(sunset_hour)) * 60);
-
-    sunset_buffer.UnsafeFormat(_T("%02u:%02u"), sunset_hour, sunset_minute);
-  }
-
-  summary_labels1->SetCaption(_T("Alt. diff:"));
-  summary_values1->SetCaption(alt_buffer.c_str());
-  summary_labels2->SetCaption(_T("Sunset:"));
-  summary_values2->SetCaption(sunset_buffer.c_str());
 }
 
 static void
@@ -412,15 +355,6 @@ ShowWaypointListSimpleDialog(const GeoPoint &_location,
     assert (button_select != nullptr);
     button_select->SetCaption(_T("Goto"));
   }
-
-  summary_labels1 = (WndFrame *)dialog->FindByName(_T("frmSummaryLabels1"));
-  summary_values1 = (WndFrame *)dialog->FindByName(_T("frmSummaryValues1"));
-  summary_labels2 = (WndFrame *)dialog->FindByName(_T("frmSummaryLabels2"));
-  summary_values2 = (WndFrame *)dialog->FindByName(_T("frmSummaryValues2"));
-  assert(summary_labels1 != nullptr);
-  assert(summary_values1 != nullptr);
-  assert(summary_labels2 != nullptr);
-  assert(summary_values2 != nullptr);
 
   distance_sort_checkbox = (CheckBox*)dialog->FindByName(_T("chkbByDistance"));
   search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));
