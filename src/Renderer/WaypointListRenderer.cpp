@@ -58,10 +58,6 @@ FormatWaypointDetails(Buffer &buffer, const Waypoint &waypoint)
     waypoint.radio_frequency.Format(radio, 16);
     buffer.AppendFormat(_T(" - %s MHz"), radio);
   }
-
-  if (!waypoint.comment.empty()) {
-    buffer.AppendFormat(_T(" - %s"), waypoint.comment.c_str());
-  }
 }
 
 UPixelScalar
