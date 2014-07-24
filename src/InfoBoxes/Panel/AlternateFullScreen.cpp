@@ -25,11 +25,14 @@ Copyright_License {
 #include "Base.hpp"
 #include "UIGlobals.hpp"
 #include "Form/Button.hpp"
+#include "Form/Frame.hpp"
 #include "Screen/Timer.hpp"
 #include "Form/List.hpp"
 #include "Form/ActionListener.hpp"
 #include "Widget/DockWindow.hpp"
 #include "Widget/ListWidget.hpp"
+#include "Widget/TwoWidgets.hpp"
+#include "Widget/TextWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Dialogs/Task/AlternatesListDialog.hpp"
 #include "Components.hpp"
@@ -40,11 +43,69 @@ Copyright_License {
 #include "Renderer/WaypointListRenderer.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
+#include "Screen/Layout.hpp"
+#include "Language/Language.hpp"
+#include "Screen/Font.hpp"
 
 enum Buttons {
   Goto = 100,
   Details,
 };
+
+const TCHAR *distance_label_text = N_("Distance");
+const TCHAR *arrival_alt_label_text = N_("Arrival alt");
+
+/* used by item Draw() to match column headers with row data */
+static unsigned distance_label_width;
+
+/**
+ * A widget class that displays header rows above the List Widget
+ * when used with TwoWidgets
+ */
+class AlternatesListHeaderWidget : public TextWidget
+{
+protected:
+  WndFrame *distance_label, *arrival_alt_label;
+  PixelRect rc_distance, rc_arrival_alt;
+
+public:
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
+  virtual PixelSize GetMinimumSize() const {
+    return PixelSize { 25u, Layout::GetMinimumControlHeight() / 2 };
+  }
+  virtual PixelSize GetMaximumSize() const {
+    return PixelSize { 25u, Layout::GetMaximumControlHeight() };
+  }
+};
+
+void
+AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
+                                    const PixelRect &rc)
+{
+  TextWidget::Prepare(parent, rc);
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  PixelSize sz_space = dialog_look.text_font->TextSize(_T(" "));
+  distance_label_width =
+      dialog_look.text_font->TextSize(distance_label_text).cx + 5 * sz_space.cx;
+
+  unsigned spaces_needed = rc.GetSize().cx / 2 / sz_space.cx;
+  StaticString<100> spaces (_T("                                                                                                    "));
+  if (spaces_needed < spaces.length())
+    spaces.Truncate(spaces_needed);
+  StaticString<1000> caption;
+  caption.Format(_T("%s%s     %s"),spaces.c_str(), distance_label_text,
+                       arrival_alt_label_text);
+  TextWidget::SetText(caption.c_str());
+}
+
+void
+AlternatesListHeaderWidget::Unprepare()
+{
+  delete distance_label;
+  delete arrival_alt_label;
+  TextWidget::Unprepare();
+}
 
 /**
  * a widget that lists the alternates and executes the actions
@@ -63,6 +124,11 @@ public:
     form = _form;
   }
 
+  /* virtual methods from class Widget */
+  virtual PixelSize GetMinimumSize() const {
+    return GetMaximumSize();
+  }
+
   bool DoDetails();
   bool DoGoto();
   const Waypoint* GetWaypoint();
@@ -70,7 +136,32 @@ public:
   virtual void OnActivateItem(unsigned index) override;
 
   void Refresh();
+
+  /* virtual methods from class List::Handler */
+  /**
+   * paints a list that lines up with the column headers
+   */
+  virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
+                           unsigned index) override;
 };
+
+void
+AlternatesListWidget2::OnPaintItem(Canvas &canvas, const PixelRect rc,
+                                  unsigned index)
+{
+  assert(index < alternates.size());
+
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const Waypoint &waypoint = alternates[index].waypoint;
+  const GlideResult& solution = alternates[index].solution;
+
+  WaypointListRenderer::Draw2(canvas, rc, waypoint, solution.vector.distance,
+                             solution.SelectAltitudeDifference(settings.task.glide),
+                             UIGlobals::GetDialogLook(),
+                             UIGlobals::GetMapLook().waypoint,
+                             CommonInterface::GetMapSettings().waypoint,
+                             distance_label_width);
+}
 
 void
 AlternatesListWidget2::Refresh()
@@ -185,7 +276,9 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   alternates_list_widget2 = new AlternatesListWidget2(dialog_look);
   alternates_list_widget2->Update();
   alternates_list_widget2->SetForm(this);
-  list_dock.SetWidget(alternates_list_widget2);
+  TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
+                                           alternates_list_widget2);
+  list_dock.SetWidget(two_widgets);
 
   ButtonWindowStyle button_style;
   button_style.TabStop();
