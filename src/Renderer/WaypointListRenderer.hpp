@@ -52,6 +52,15 @@ namespace WaypointListRenderer
             fixed distance, fixed arrival_altitude,
             const DialogLook &dialog_look, const WaypointLook &look,
             const WaypointRendererSettings &settings);
+
+  /**
+   * draws version used for AlternatesList in columns
+   */
+  void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
+            fixed distance, fixed arrival_altitude,
+            const DialogLook &dialog_look, const WaypointLook &look,
+            const WaypointRendererSettings &settings,
+            unsigned col_2_width);
 }
 
 #endif

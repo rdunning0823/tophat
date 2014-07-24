@@ -145,6 +145,58 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 }
 
 void
+WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
+                            const Waypoint &waypoint, fixed distance,
+                            fixed arrival_altitude,
+                            const DialogLook &dialog_look,
+                            const WaypointLook &look,
+                            const WaypointRendererSettings &settings,
+                            unsigned col_2_width)
+{
+  const unsigned padding = Layout::GetTextPadding();
+  const PixelScalar line_height = rc.bottom - rc.top;
+
+  const Font &name_font = *dialog_look.list.font_bold;
+  const Font &text_font = *dialog_look.text_font;
+
+  PixelScalar middle = rc.GetSize().cy > (int)name_font.GetHeight() ?
+      rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2 : rc.top;
+
+  PixelRect rc_name = rc;
+  rc_name.right = rc_name.left + rc_name.GetSize().cx / 2 - padding;
+  PixelRect rc_info = rc;
+  rc_info.left = rc_name.right + padding;
+
+  // Use small font for details
+  canvas.Select(text_font);
+
+  // Draw distance and arrival altitude
+  StaticString<256> buffer;
+  TCHAR dist[20], alt[20];
+  FormatUserDistanceSmart(distance, dist, true);
+  FormatRelativeUserAltitude(arrival_altitude, alt, true);
+
+  canvas.DrawClippedText(rc_info.left, middle, rc_info, dist);
+  canvas.DrawClippedText(rc_info.left + col_2_width, middle, rc_info, alt);
+
+  // Draw waypoint name
+  canvas.Select(name_font);
+  UPixelScalar left = rc.left + line_height + padding;
+  canvas.DrawClippedText(left, middle, rc_name, waypoint.name.c_str());
+
+  // Draw icon
+  const RasterPoint pt(rc.left + line_height / 2,
+                       rc.top + line_height / 2);
+
+  WaypointIconRenderer::Reachability reachable =
+      positive(arrival_altitude) ?
+      WaypointIconRenderer::ReachableTerrain : WaypointIconRenderer::Unreachable;
+
+  WaypointIconRenderer wir(settings, look, canvas);
+  wir.Draw(waypoint, pt, reachable);
+}
+
+void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const Waypoint &waypoint, const GeoVector *vector,
                            const DialogLook &dialog_look,
