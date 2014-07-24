@@ -67,11 +67,10 @@ Copyright_License {
 static GeoPoint location;
 static WndForm *dialog = nullptr;
 static ListControl *waypoint_list_control = nullptr;
-static CheckBox *distance_sort_checkbox;
 static WndSymbolButton *search_button;
-static WndFrame *name_header;
-static WndFrame *elevation_header;
-static WndFrame *distance_header;
+static WndSymbolButton *name_header;
+static WndSymbolButton *elevation_header;
+static WndSymbolButton *distance_header;
 static PixelRect rc_name_header;
 static PixelRect rc_elevation_header;
 static PixelRect rc_distance_header;
@@ -92,6 +91,7 @@ enum SortDirection {
   NAME,
   DISTANCE,
   BEARING,
+  ELEVATION,
 };
 
 static SortDirection sort_direction;
@@ -183,6 +183,9 @@ FillList(WaypointList &list, const Waypoints &src,
     case SortDirection::DISTANCE:
       list.SortByDistance(location);
       break;
+    case SortDirection::ELEVATION:
+      list.SortByElevation();
+      break;
     case SortDirection::BEARING:
       break;
     }
@@ -192,8 +195,6 @@ FillList(WaypointList &list, const Waypoints &src,
 static void
 UpdateButtons()
 {
-  distance_sort_checkbox->SetState(sort_direction == SortDirection::DISTANCE);
-
   if (dialog_state.name.empty())
     search_button->SetCaption(_T("Search"));
   else
@@ -210,38 +211,36 @@ static void
 UpdateHeaders()
 {
   PixelRect rc_list = waypoint_list_control->GetPosition();
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const unsigned padding = Layout::GetTextPadding();
 
-  const TCHAR *elevation_header_text = _("Elevation");
-  PixelSize sz_elevation_header = dialog_look.text_font->TextSize(elevation_header_text);
-  const TCHAR *distance_header_text = _("Distance");
-  PixelSize sz_distance_header = dialog_look.text_font->TextSize(distance_header_text);
+  const TCHAR *elevation_header_text = _("Elev.");
+  const TCHAR *distance_header_text = _("Dist.");
 
   rc_name_header = name_header->GetPosition();
   rc_elevation_header = elevation_header->GetPosition();
   rc_distance_header = distance_header->GetPosition();
 
-  rc_name_header.left = rc_list.left + waypoint_list_control->GetItemHeight();
-  rc_name_header.right = rc_name_header.left + rc_list.GetSize().cx / 2;
+  rc_name_header.left = rc_list.left;
+  rc_name_header.right = rc_list.left
+      + (rc_list.GetSize().cx - waypoint_list_control->GetScrollBarWidth()) / 2
+      - padding;
 
-  rc_elevation_header.left = rc_list.left +
-      (rc_list.GetSize().cx - waypoint_list_control->GetScrollBarWidth()) / 2;
-  rc_elevation_header.right = rc_elevation_header.left + sz_elevation_header.cx + padding;
+  rc_distance_header.right = rc_list.right;
+  rc_distance_header.left = (rc_name_header.right + rc_distance_header.right) / 2;
 
-  rc_distance_header.right = rc_list.right - waypoint_list_control->GetScrollBarWidth();
-  rc_distance_header.left = rc_distance_header.right - sz_distance_header.cx - padding * 2;
-
-  rc_name_header.top = rc_elevation_header.top = rc_distance_header.top =
-      rc_list.top - padding - sz_elevation_header.cy;
+  rc_elevation_header.left = rc_name_header.right;
+  rc_elevation_header.right = rc_distance_header.left;
 
   name_header->Move(rc_name_header);
   elevation_header->Move(rc_elevation_header);
   distance_header->Move(rc_distance_header);
 
-  name_header->SetCaption(_("Name"));
-  elevation_header->SetCaption(elevation_header_text);
-  distance_header->SetCaption(distance_header_text);
+  name_header->SetCaption(sort_direction == SortDirection::NAME ?
+      _("_chkmark_Name") : _("Name"));
+  elevation_header->SetCaption(sort_direction == SortDirection::ELEVATION ?
+      _("_chkmark_Elev.") : elevation_header_text);
+  distance_header->SetCaption(sort_direction == SortDirection::DISTANCE ?
+      _("_chkmark_Dist.") : distance_header_text);
 }
 
 static void
@@ -342,12 +341,9 @@ WaypointListSimpleDialog::OnActivateItem(unsigned index)
 }
 
 static void
-OnByDistanceClicked(CheckBoxControl &control)
+OnByDistanceClicked(gcc_unused WndButton &button)
 {
-  if (control.GetState())
-    sort_direction = SortDirection::DISTANCE;
-  else
-    sort_direction = SortDirection::NAME;
+  sort_direction = SortDirection::DISTANCE;
   UpdateList();
 }
 
@@ -355,6 +351,20 @@ static void
 OnByBearingClicked(gcc_unused WndButton &button)
 {
   sort_direction = SortDirection::BEARING;
+  UpdateList();
+}
+
+static void
+OnByElevationClicked(gcc_unused WndButton &button)
+{
+  sort_direction = SortDirection::ELEVATION;
+  UpdateList();
+}
+
+static void
+OnByNameClicked(gcc_unused WndButton &button)
+{
+  sort_direction = SortDirection::NAME;
   UpdateList();
 }
 
@@ -374,6 +384,8 @@ static constexpr CallBackTableEntry callback_table[] = {
   DeclareCallBackEntry(OnCloseClicked),
   DeclareCallBackEntry(OnSelectClicked),
   DeclareCallBackEntry(OnByDistanceClicked),
+  DeclareCallBackEntry(OnByNameClicked),
+  DeclareCallBackEntry(OnByElevationClicked),
   DeclareCallBackEntry(OnByBearingClicked),
   DeclareCallBackEntry(OnSearchClicked),
   DeclareCallBackEntry(nullptr)
@@ -408,16 +420,14 @@ ShowWaypointListSimpleDialog(const GeoPoint &_location,
     button_select->SetCaption(_T("Goto"));
   }
 
-  name_header = (WndFrame *)dialog->FindByName(_T("frmNameHeader"));
-  elevation_header = (WndFrame *)dialog->FindByName(_T("frmElevationHeader"));
-  distance_header = (WndFrame *)dialog->FindByName(_T("frmDistanceHeader"));
+  name_header = (WndSymbolButton *)dialog->FindByName(_T("btnNameHeader"));
+  elevation_header = (WndSymbolButton *)dialog->FindByName(_T("btnElevationHeader"));
+  distance_header = (WndSymbolButton *)dialog->FindByName(_T("btnDistanceHeader"));
   assert(name_header != nullptr);
   assert(elevation_header != nullptr);
   assert(distance_header != nullptr);
 
-  distance_sort_checkbox = (CheckBox*)dialog->FindByName(_T("chkbByDistance"));
   search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));
-  assert(distance_sort_checkbox != nullptr);
   assert(search_button != nullptr);
 
   dialog_state.name = _T("");
