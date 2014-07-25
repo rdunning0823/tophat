@@ -77,6 +77,10 @@ enum MatMode {
   MAT_DELETE,
 };
 
+enum WpLength {
+  Waypoint_length = 10,
+};
+
 /**
  * a struct that tracks status of the task and the changes made to it
  * not valid for delete mode
@@ -177,7 +181,7 @@ private:
   /**
    * name of current wp in current task
    */
-  const TCHAR *current_wp_name;
+  tstring current_wp_name;
 
   /**
    * the return state of the widget
@@ -195,13 +199,12 @@ private:
   const ModifiedTask modified_task;
 
   PixelRect rc_add, rc_delete, rc_replace, rc_cancel, rc_more;
+  PixelRect rc_add_info, rc_estimate, rc_header, rc_replace_info;
 
   WndButton *add_button, *delete_button, *replace_button, *cancel, *more;
 
-  /**
-   *  base text (either with "calculating..." or with details appended later)
-   */
-  StaticString<255> add_base_text;
+  WndFrame *add_info_frame, *estimate_frame, *replace_info_frame,
+      *header_frame;
 
 public:
   MatClickPanel(const Waypoint &_wp_clicked, const ModifiedTask _modified_task)
@@ -307,11 +310,11 @@ MatClickPanel::RemovePoint()
   }
 
   if (success) {
-    remove_prompt.Format(_T("%s %s %s"),_("Removed"), wp_clicked.name.c_str(),
+    remove_prompt.Format(_T("%s %s %s"),_("Removed"), wp_clicked.name.substr(0, Waypoint_length).c_str(),
                          _("from task"));
     ShowMessageBox(remove_prompt.c_str(), _("Success"), MB_OK);
   } else {
-    remove_prompt.Format(_T("%s %s %s"),_("Could not remove"), wp_clicked.name.c_str(),
+    remove_prompt.Format(_T("%s %s %s"),_("Could not remove"), wp_clicked.name.substr(0, Waypoint_length).c_str(),
                          _("from task"));
     ShowMessageBox(remove_prompt.c_str(), _("Error"), MB_OK | MB_ICONERROR);
   }
@@ -333,24 +336,45 @@ MatClickPanel::SetRectangles(const PixelRect &rc_outer)
 {
   PixelRect rc;
   UPixelScalar side_margin = Layout::landscape ? Layout::Scale(10) : Layout::Scale(4);
-  unsigned line_height = Fonts::infobox_small.GetHeight();
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  unsigned line_height = dialog_look.text_font->TextSize(_T("A")).cy * 1.5;
+
   rc.left = side_margin;
   rc.top = Layout::Scale(2);
   rc.right = rc_outer.right - rc_outer.left - side_margin;
   rc.bottom = rc_outer.bottom - rc_outer.top -
       Layout::Scale(2) - GetTitleHeight();
 
-  rc_cancel = rc_more = rc_add = rc_delete = rc_replace = rc;
-  rc_cancel.top = rc_more.top = rc.bottom - GetNavSliderHeight();
-  rc_cancel.right = (rc.right - rc.left) / 2;
-  rc_more.left = rc_cancel.right + 1;
+  const PixelSize sz_button { (unsigned)(rc.right - rc.left) / 2,
+    (unsigned)GetNavSliderHeight() };
 
-  rc_add.top = line_height;
-  rc_add.bottom = rc_add.top + 3 * line_height;
+  rc_cancel = rc_more = rc_add = rc_add_info = rc_estimate = rc_delete =
+      rc_replace = rc_replace_info = rc_header = rc;
+
+  rc_header.top = line_height;
+  rc_header.bottom = rc_header.top + line_height;
+
+  rc_add.top = rc_header.bottom + line_height;
+  rc_add.bottom = rc_add.top + sz_button.cy;
+  rc_add.right = sz_button.cx;
   rc_delete = rc_add;
 
-  rc_replace.top = rc_add.bottom + line_height;
-  rc_replace.bottom = rc_replace.top + 3 * line_height;
+  rc_add_info.top = rc_add.bottom;
+  rc_add_info.bottom = rc_add_info.top + line_height;
+
+  rc_estimate.top = rc_add_info.bottom;
+  rc_estimate.bottom = rc_estimate.top + 2 * line_height;
+
+  rc_replace.top = rc_estimate.bottom + 2 * line_height;
+  rc_replace.bottom = rc_replace.top + sz_button.cy;
+  rc_replace.right = sz_button.cx;
+
+  rc_replace_info.top = rc_replace.bottom;
+  rc_replace_info.bottom = rc_replace_info.top + line_height;
+
+  rc_cancel.top = rc_more.top = rc.bottom - sz_button.cy;
+  rc_cancel.right = sz_button.cx;
+  rc_more.left = rc_cancel.right + 1;
 }
 
 void
@@ -388,8 +412,6 @@ MatClickPanel::OnAction(int id)
 void
 MatClickPanel::RefreshFormForAdd()
 {
-  assert (modified_task.mat_mode != MAT_DELETE);
-
   if (!dialog_timer.IsActive())
     dialog_timer.Schedule(1000);
 
@@ -398,15 +420,17 @@ MatClickPanel::RefreshFormForAdd()
   FormatTimespanSmart(time_remaining.buffer(),
                       (int)common_stats.aat_time_remaining, 2);
 
+  StaticString<255> prompt;
+  prompt.Format(_T("%s: %s"),
+                _("Time remaining"),
+                time_remaining.c_str());
+  header_frame->SetCaption(prompt.c_str());
+
   if (++delay_counter < DELAY_COUNTER_WAIT) {
-    StaticString<255> prompt;
-    prompt.Format(_T("%s\n%s: %s\n%s "), add_base_text.c_str(),
-                  ("Time remaining"),
-                  time_remaining.c_str(),
-                  _("Calculating"));
+    prompt = _T("");
     for (unsigned i = 0; i <= delay_counter; i++)
       prompt.append(_T(".."));
-    add_button->SetCaption(prompt.c_str());
+    estimate_frame->SetCaption(prompt.c_str());
     return;
   }
 
@@ -420,19 +444,17 @@ MatClickPanel::RefreshFormForAdd()
   if (task_stats.total.solution_remaining.IsDefined())
     FormatRelativeUserAltitude(altitude_difference, altitude_text.buffer(), true);
 
-  StaticString<255> prompt;
-  prompt.Format(_T("%s\n%s: %s\n%s %s     %s"), add_base_text.c_str(),
-                ("Time remaining"),
-                time_remaining.c_str(),
-                _("Est. Finish:"), time.c_str(),
+  prompt.Format(_T("%s: %s\n%s: %s"),
+                _("Est. Finish"), time.c_str(),
+                _("Final glide"),
                 altitude_text.c_str());
-  add_button->SetCaption(prompt.c_str());
+  estimate_frame->SetCaption(prompt.c_str());
 }
 
 bool
 MatClickPanel::OnTimer(WindowTimer &timer)
 {
-  if (timer == dialog_timer && modified_task.mat_mode != MAT_DELETE) {
+  if (timer == dialog_timer) {
     RefreshFormForAdd();
     return true;
   }
@@ -447,63 +469,89 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WndForm::Move(rc_form);
 
   SetRectangles(rc_form);
+  StaticString<255> add_del_info_text(_T(""));
+  StaticString<255> add_del_button_text(_T(""));
   StaticString<255> replace_text(_T(""));
-  StaticString<255> delete_text;
+  StaticString<255> replace_button_text(_T(""));
 
   switch (modified_task.mat_mode) {
   case MAT_ADD_AFTER_OR_REPLACE_FIRST:
   case MAT_ADD_AFTER_OR_REPLACE_INDEX:
-    add_base_text.Format(_T("%s '%s' %s '%s?'"),
-                         _("Add"),
-                         wp_clicked.name.c_str(),
-                         _("to task after"),
-                         current_wp_name);
-    replace_text.Format(_T("%s '%s' %s\n'%s?'"),
-                        _("Replace"),
-                        current_wp_name,
-                        _("with"),
-                        wp_clicked.name.c_str());
+    add_del_button_text = _("Append");
+    add_del_info_text.Format(_("%s   %s   %s   %s"), _("Append"),
+                             wp_clicked.name.substr(0,Waypoint_length).c_str(),
+                             _("after"),
+                             current_wp_name.substr(0,Waypoint_length).c_str());
+
+    replace_button_text = _("Goto");
+    replace_text.Format(_T("%s   %s   %s   %s"),
+                        _("Goto"),
+                        wp_clicked.name.substr(0,Waypoint_length).c_str(),
+                        _("instead of"),
+                        current_wp_name.substr(0, Waypoint_length).c_str());
     break;
 
   case MAT_INSERT_BEFORE_FINISH:
-    add_base_text.Format(_T("%s '%s' %s '%s?'"),
-                         _("Insert"),
-                         wp_clicked.name.c_str(),
-                         _("before"),
-                         current_wp_name);
+    add_del_info_text.Format(_T("%s   %s   %s   %s"),
+                             _("Insert"),
+                             wp_clicked.name.substr(0, Waypoint_length).c_str(),
+                             _("before"),
+                             current_wp_name.substr(0,Waypoint_length).c_str());
+    add_del_button_text = _("Insert");
     break;
   case MAT_DELETE:
-    delete_text.Format(_T("%s '%s' %s?"), _("Remove"), wp_clicked.name.c_str(),
-                       _("from task"));
+    add_del_button_text = _("Delete");
+    add_del_info_text.Format(_T("%s   %s"), _("Delete"),
+                             wp_clicked.name.substr(0, Waypoint_length).c_str());
     break;
   }
 
-  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = dialog_look.button;
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
+  WindowStyle style_frame;
 
   if (modified_task.mat_mode == MAT_DELETE) {
     delete_button = new WndButton(GetClientAreaWindow(), button_look,
-                                  delete_text.c_str(),
+                                  add_del_button_text.c_str(),
                                   rc_delete,
                                   button_style, *this, DeletePointClick);
     AddDestruct(delete_button);
   } else {
     add_button = new WndButton(GetClientAreaWindow(), button_look,
-                               add_base_text.c_str(),
+                               add_del_button_text.c_str(),
                                rc_add,
                                button_style, *this, AddPointClick);
     AddDestruct(add_button);
 
     if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
       replace_button = new WndButton(GetClientAreaWindow(), button_look,
-                                     replace_text.c_str(),
+                                     replace_button_text.c_str(),
                                      rc_replace,
                                      button_style, *this, ReplacePointClick);
       AddDestruct(replace_button);
+
+      replace_info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
+                                        rc_replace_info, style_frame);
+      AddDestruct(replace_info_frame);
+      replace_info_frame->SetCaption(replace_text.c_str());
     }
   }
+
+  header_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
+                              rc_header, style_frame);
+  AddDestruct(header_frame);
+
+  estimate_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
+                                rc_estimate, style_frame);
+  AddDestruct(estimate_frame);
+
+  add_info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
+                                rc_add_info, style_frame);
+  AddDestruct(add_info_frame);
+  add_info_frame->SetCaption(add_del_info_text.c_str());
 
   more = new WndButton(GetClientAreaWindow(), button_look, _T("More"),
                        rc_more,
