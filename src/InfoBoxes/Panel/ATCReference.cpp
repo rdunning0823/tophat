@@ -37,6 +37,7 @@ Copyright_License {
 #include "Waypoint/WaypointGlue.hpp"
 #include "Protection.hpp"
 #include "Message.hpp"
+#include "Screen/SingleWindow.hpp"
 
 enum Controls {
   WAYPOINT,
@@ -64,11 +65,21 @@ public:
   /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override;
+  /* Move() uses the passed rc for the RowFormWidget, but most move the form to
+   * the fullscreen using GetMainWindow()'s rect */
+  virtual void Move(const PixelRect &rc) override;
 
 private:
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
 };
+
+void
+ATCReferencePanel::Move(const PixelRect &rc)
+{
+  RowFormWidget::Move(rc);
+  form->Move(UIGlobals::GetMainWindow().GetClientRect());
+}
 
 void
 ATCReferencePanel::UpdateValues()
