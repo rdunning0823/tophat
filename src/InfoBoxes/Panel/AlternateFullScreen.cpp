@@ -46,6 +46,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Font.hpp"
+#include "Screen/SingleWindow.hpp"
 
 enum Buttons {
   Goto = 100,
@@ -67,19 +68,20 @@ class AlternatesListHeaderWidget : public TextWidget
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
+  virtual void Move(const PixelRect &rc) override;
+
   virtual PixelSize GetMinimumSize() const {
     return PixelSize { 25u, Layout::GetMinimumControlHeight() / 2 };
   }
   virtual PixelSize GetMaximumSize() const {
     return PixelSize { 25u, Layout::GetMaximumControlHeight() };
   }
+  void CalculateLayout(const PixelRect &rc);
 };
 
 void
-AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
-                                    const PixelRect &rc)
+AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
 {
-  TextWidget::Prepare(parent, rc);
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   PixelSize sz_space = dialog_look.text_font->TextSize(_T(" "));
   distance_label_width =
@@ -93,6 +95,21 @@ AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
   caption.Format(_T("%s%s     %s"),spaces.c_str(), distance_label_text,
                        arrival_alt_label_text);
   TextWidget::SetText(caption.c_str());
+}
+
+void
+AlternatesListHeaderWidget::Move(const PixelRect &rc)
+{
+  TextWidget::Move(rc);
+  CalculateLayout(rc);
+}
+
+void
+AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
+                                    const PixelRect &rc)
+{
+  TextWidget::Prepare(parent, rc);
+  CalculateLayout(rc);
 }
 
 void
@@ -122,7 +139,7 @@ public:
   virtual PixelSize GetMinimumSize() const {
     return GetMaximumSize();
   }
-
+  virtual void Move(const PixelRect &rc) override;
   bool DoDetails();
   bool DoGoto();
   const Waypoint* GetWaypoint();
@@ -138,6 +155,12 @@ public:
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
                            unsigned index) override;
 };
+
+void
+AlternatesListWidget2::Move(const PixelRect &rc)
+{
+  AlternatesListWidget::Move(rc);
+}
 
 void
 AlternatesListWidget2::OnPaintItem(Canvas &canvas, const PixelRect rc,
@@ -217,6 +240,7 @@ protected:
   DockWindow list_dock;
 
   AlternatesListWidget2 *alternates_list_widget2;
+  TwoWidgets *two_widgets;
 
   WndButton *details_button, *goto_button;
 
@@ -227,6 +251,8 @@ public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc);
+  /* This is a hack because Move() must discard rc and use GetMainWindow() */
+  virtual void Move(const PixelRect &rc) override;
 
 protected:
   /**
@@ -256,6 +282,21 @@ AlternateFullScreen::OnTimer(WindowTimer &timer)
 }
 
 void
+AlternateFullScreen::Move(const PixelRect &rc_unused)
+{
+
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  BaseAccessPanel::Move(rc);
+  TwoCommandButtonListLayout::CalculateLayout(content_rc);
+  list_dock.Move(list_rc);
+  PixelRect list_rc_adj = list_rc;
+  list_rc_adj.Offset(-list_rc.left, -list_rc.top);
+  two_widgets->Move(list_rc_adj);
+  goto_button->Move(left_button_rc);
+  details_button->Move(right_button_rc);
+}
+
+void
 AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
@@ -270,9 +311,11 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   alternates_list_widget2 = new AlternatesListWidget2(dialog_look);
   alternates_list_widget2->Update();
   alternates_list_widget2->SetForm(this);
-  TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
-                                           alternates_list_widget2);
+  two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
+                               alternates_list_widget2);
+  // dock prepares/ unprepares/ deletes widget
   list_dock.SetWidget(two_widgets);
+  list_dock.Move(list_rc);
 
   ButtonWindowStyle button_style;
   button_style.TabStop();
