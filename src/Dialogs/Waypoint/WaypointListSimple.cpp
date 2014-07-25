@@ -164,8 +164,6 @@ FillList(WaypointList &list, const Waypoints &src,
   if (!state.IsDefined() && size >= MAX_LIST_SIZE) {
     list.SortByDistance(location);
     list.erase(list.begin() + MAX_LIST_SIZE, list.end());
-    if (sort_direction == SortDirection::NAME)
-      list.SortByName();
     UISettings &ui_settings = CommonInterface::SetUISettings();
     if (ui_settings.show_waypoints_list_warning) {
       StaticString<99> message;
@@ -175,20 +173,22 @@ FillList(WaypointList &list, const Waypoints &src,
       Profile::Set(ProfileKeys::ShowWaypointListWarning,
                    ui_settings.show_waypoints_list_warning);
     }
-  } else {
+  }
 
-    switch (sort_direction) {
-    case SortDirection::NAME:
-      break;
-    case SortDirection::DISTANCE:
+  switch (sort_direction) {
+  case SortDirection::NAME:
+    if (size >= MAX_LIST_SIZE)
+      list.SortByName();
+    break;
+  case SortDirection::DISTANCE:
+    if (size < MAX_LIST_SIZE)
       list.SortByDistance(location);
-      break;
-    case SortDirection::ELEVATION:
-      list.SortByElevation();
-      break;
-    case SortDirection::BEARING:
-      break;
-    }
+    break;
+  case SortDirection::ELEVATION:
+    list.SortByElevation();
+    break;
+  case SortDirection::BEARING:
+    break;
   }
 }
 
