@@ -33,7 +33,7 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Layout.hpp"
-
+#include "Screen/SingleWindow.hpp"
 
 enum ControlIndex {
   Spacer,
@@ -51,7 +51,9 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed);
-
+  /* Move() uses the passed rc for the RowFormWidget, but most move the form to
+   * the fullscreen using GetMainWindow()'s rect */
+  virtual void Move(const PixelRect &rc) override;
   void SetForm(WndForm *_form) {
     assert(_form != nullptr);
     form = _form;
@@ -61,6 +63,13 @@ protected:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
 };
+
+void
+GrAverageConfigPanel::Move(const PixelRect &rc)
+{
+  RowFormWidget::Move(rc);
+  form->Move(UIGlobals::GetMainWindow().GetClientRect());
+}
 
 void
 GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
