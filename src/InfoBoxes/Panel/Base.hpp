@@ -50,6 +50,8 @@ protected:
   WndFrame *header_text;
   ManagedWidget managed_widget;
 
+  /* rectangles for items on the base page */
+  PixelRect base_rc, close_button_rc, setup_button_rc, frame_rc;
   /**
    * Follow widget API for calling.
    */
@@ -66,6 +68,9 @@ protected:
    * because this starts the dialog loop.
    */
   virtual void Show(const PixelRect &rc);
+
+  /* this is a hack.  The derived class must discard rc and use GetMainWindow() */
+  virtual void Move(const PixelRect &rc) override;
 
   /**
    * Called by a derived class at the beginning of its OnPaint
@@ -94,6 +99,11 @@ public:
    * Unprepares and deletes the managed widget
    */
   virtual void Unprepare();
+
+  /**
+   * calculates the rectangles on the base class itself
+   */
+  void CalculateLayout(const PixelRect &rc);
 
   gcc_pure PixelScalar GetHeaderHeight();
 
@@ -238,6 +248,7 @@ protected:
    * @param parent_rc The rc of the parent window's usable area
    */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void CalculateLayout(const PixelRect &rc);
 };
 
 /**

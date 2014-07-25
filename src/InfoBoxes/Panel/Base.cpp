@@ -127,6 +127,50 @@ BaseAccessPanel::Unprepare()
 }
 
 void
+BaseAccessPanel::Move(const PixelRect &rc_unused)
+{
+  const PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  WndForm::Move(rc);
+
+  CalculateLayout(rc);
+
+  close_button->Move(close_button_rc);
+  setup_button->Move(setup_button_rc);
+  header_text->Move(frame_rc);
+
+  managed_widget.Move(content_rc);
+
+
+}
+
+void
+BaseAccessPanel::CalculateLayout(const PixelRect &rc)
+{
+  base_rc.left = base_rc.top = 0;
+  base_rc.right = rc.right - rc.left;
+  base_rc.bottom = rc.bottom - rc.top;
+
+  close_button_rc = base_rc;
+  close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
+  close_button_rc.bottom -= Layout::Scale(2);
+  close_button_rc.left += Layout::Scale(2);
+  close_button_rc.right -= Layout::Scale(2);
+
+  PixelScalar setup_button_width = 0.2 * (rc.right - rc.left);
+  setup_button_rc = base_rc;
+  setup_button_rc.left = setup_button_rc.right - setup_button_width;
+  setup_button_rc.bottom = setup_button_rc.top + GetHeaderHeight();
+
+  frame_rc = base_rc;
+  frame_rc.right = setup_button_rc.left - 1;
+  frame_rc.bottom = setup_button_rc.bottom;
+
+  content_rc = base_rc;
+  content_rc.top += GetHeaderHeight();
+  content_rc.bottom -= GetFooterHeight();
+}
+
+void
 BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   NullWidget::Prepare(parent, rc);
@@ -134,49 +178,29 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const DialogLook &look = UIGlobals::GetDialogLook();
 
-  PixelRect base_rc;
-  base_rc.left = base_rc.top = 0;
-  base_rc.right = rc.right - rc.left;
-  base_rc.bottom = rc.bottom - rc.top;
-
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 
-
-  PixelRect close_button_rc = base_rc;
-  close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
-  close_button_rc.bottom -= Layout::Scale(2);
-  close_button_rc.left += Layout::Scale(2);
-  close_button_rc.right -= Layout::Scale(2);
+  CalculateLayout(rc);
 
   close_button = new WndButton(GetClientAreaWindow(), look.button,
                                _("Close"), close_button_rc,
                                button_style,
                                *this, CloseButton);
 
-  PixelScalar setup_button_width = 0.2 * (rc.right - rc.left);
-  PixelRect setup_button_rc = base_rc;
-  setup_button_rc.left = setup_button_rc.right - setup_button_width;
-  setup_button_rc.bottom = setup_button_rc.top + GetHeaderHeight();
   setup_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
                                      _("Setup"), setup_button_rc,
                                      button_style,
                                      *this, SetUp);
 
   WindowStyle style_frame;
-  PixelRect frame_rc = base_rc;
-  frame_rc.right = setup_button_rc.left - 1;
-  frame_rc.bottom = setup_button_rc.bottom;
   header_text = new WndFrame(GetClientAreaWindow(), look,
                              frame_rc, style_frame);
   header_text->SetVAlignCenter();
   header_text->SetFont(Fonts::infobox_small);
   SetCaption();
 
-  content_rc = base_rc;
-  content_rc.top += GetHeaderHeight();
-  content_rc.bottom -= GetFooterHeight();
   managed_widget.Move(content_rc);
 }
 
@@ -260,7 +284,7 @@ RatchetListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
 }
 
 void
-TwoCommandButtonListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
+TwoCommandButtonListLayout::CalculateLayout(const PixelRect &rc)
 {
   const UPixelScalar height = GetFooterHeight();
   list_rc = left_button_rc = right_button_rc = rc;
@@ -269,6 +293,12 @@ TwoCommandButtonListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc
   left_button_rc.right = right_button_rc.left = (rc.right - rc.left) / 2;
 
   list_rc.bottom = rc.bottom - height;
+}
+
+void
+TwoCommandButtonListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  CalculateLayout(rc);
 }
 
 void
