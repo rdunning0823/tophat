@@ -309,11 +309,7 @@ MatClickPanel::RemovePoint()
     success = task_manager->Commit(*task);
   }
 
-  if (success) {
-    remove_prompt.Format(_T("%s %s %s"),_("Removed"), wp_clicked.name.substr(0, Waypoint_length).c_str(),
-                         _("from task"));
-    ShowMessageBox(remove_prompt.c_str(), _("Success"), MB_OK);
-  } else {
+  if (!success) {
     remove_prompt.Format(_T("%s %s %s"),_("Could not remove"), wp_clicked.name.substr(0, Waypoint_length).c_str(),
                          _("from task"));
     ShowMessageBox(remove_prompt.c_str(), _("Error"), MB_OK | MB_ICONERROR);
