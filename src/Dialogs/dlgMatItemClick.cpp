@@ -114,18 +114,6 @@ struct ModifiedTask {
   bool IsValid() const {
     return task != nullptr;
   }
-
-  const TCHAR *GetCaption() const {
-    switch (mat_mode) {
-    case MAT_ADD_AFTER_OR_REPLACE_FIRST:
-    case MAT_ADD_AFTER_OR_REPLACE_INDEX:
-    case MAT_INSERT_BEFORE_FINISH:
-      return _("Add MAT point");
-    case MAT_DELETE:
-      return _("Delete MAT point");
-    }
-    return _T("");
-  }
 };
 
 gcc_const
@@ -210,7 +198,7 @@ public:
   MatClickPanel(const Waypoint &_wp_clicked, const ModifiedTask _modified_task)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            UIGlobals::GetMainWindow().GetClientRect(),
-           _modified_task.GetCaption(),
+           _wp_clicked.name.c_str(),
            GetDialogStyle()),
    dialog_timer(*this),
    wp_clicked(_wp_clicked),
