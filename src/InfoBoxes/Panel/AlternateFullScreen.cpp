@@ -64,10 +64,6 @@ static unsigned distance_label_width;
  */
 class AlternatesListHeaderWidget : public TextWidget
 {
-protected:
-  WndFrame *distance_label, *arrival_alt_label;
-  PixelRect rc_distance, rc_arrival_alt;
-
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
@@ -102,8 +98,6 @@ AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
 void
 AlternatesListHeaderWidget::Unprepare()
 {
-  delete distance_label;
-  delete arrival_alt_label;
   TextWidget::Unprepare();
 }
 
