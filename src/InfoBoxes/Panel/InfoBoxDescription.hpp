@@ -40,11 +40,16 @@ protected:
    * the Description of the InfoBox is displayed in the content area
    */
   WndFrame *description_text;
+  PixelRect frame_rc;
 
 public:
   InfoBoxDescriptionPanel(int _id)
     :BaseAccessPanel(_id) {}
 
  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+
+ /* Move must discard rc and use GetMainWindow()'s ClientRect */
+ virtual void Move(const PixelRect &rc) override;
+ virtual void CalculateLayout(const PixelRect &rc);
 };
 #endif

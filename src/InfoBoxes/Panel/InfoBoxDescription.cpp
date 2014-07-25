@@ -31,19 +31,33 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "InfoBoxes/Content/Factory.hpp"
 #include "Interface.hpp"
+#include "Screen/SingleWindow.hpp"
 
+void
+InfoBoxDescriptionPanel::Move(const PixelRect &rc_unused)
+{
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+  BaseAccessPanel::Move(rc);
+  CalculateLayout(rc);
+  description_text->Move(frame_rc);
+}
+
+void
+InfoBoxDescriptionPanel::CalculateLayout(const PixelRect &rc)
+{
+  frame_rc = content_rc;
+  frame_rc.right = content_rc.right - Layout::Scale(10);
+  frame_rc.left = content_rc.left + Layout::Scale(10);
+  frame_rc.top = content_rc.top + Layout::Scale(10);
+}
 
 void
 InfoBoxDescriptionPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-
+  CalculateLayout(rc);
   const DialogLook &look = UIGlobals::GetDialogLook();
   WindowStyle style_frame;
-  PixelRect frame_rc = content_rc;
-  frame_rc.right = content_rc.right - Layout::Scale(10);
-  frame_rc.left = content_rc.left + Layout::Scale(10);
-  frame_rc.top = content_rc.top + Layout::Scale(10);
   description_text = new WndFrame(GetClientAreaWindow(), look,
                                   frame_rc, style_frame);
 
