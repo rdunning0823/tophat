@@ -112,6 +112,7 @@ public:
    */
   bool RefreshTask();
 
+protected:
   /**
    * returns true if active task has not changed since it was last cached into
    * the TaskNavDataCache
@@ -124,7 +125,6 @@ public:
    */
   void ReadWaypointIndex();
 
-protected:
   /**
    * refreshes length and cursor index of list
    * does not lock task manager
