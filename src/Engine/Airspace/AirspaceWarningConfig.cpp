@@ -34,7 +34,7 @@ AirspaceWarningConfig::SetDefaults()
 
   std::fill_n(class_warnings, unsigned(AIRSPACECLASSCOUNT), true);
   class_warnings[CLASSE] = false;
-  class_warnings[CLASSF] = false;
+  class_warnings[CLASSF] = true;
   class_warnings[CLASSG] = false;
   class_warnings[AATASK] = false;
 }
