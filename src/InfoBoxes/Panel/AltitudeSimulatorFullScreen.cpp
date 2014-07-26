@@ -45,6 +45,7 @@ Copyright_License {
 #include "Task/Points/TaskWaypoint.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Screen/SingleWindow.hpp"
 
 enum ControlIndex {
   BigPlus,
@@ -119,7 +120,9 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
-
+  /* Move must discard rc and use GetMainWindow()'s ClientRect */
+  virtual void Move(const PixelRect &rc) override;
+  void CalculateLayout(const PixelRect &rc);
   void Refresh();
 
 protected:
@@ -187,9 +190,23 @@ AltitudeSimulatorFullScreenPanel::Refresh()
 }
 
 void
-AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
+AltitudeSimulatorFullScreenPanel::Move(const PixelRect &rc_unused)
 {
-  BaseAccessPanel::Prepare(parent, rc);
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+
+  BaseAccessPanel::Move(rc);
+  CalculateLayout(rc);
+  final_glide_chart->Move(fg_rc);
+  big_plus->Move(big_plus_rc);
+  little_plus->Move(little_plus_rc);
+  big_minus->Move(big_minus_rc);
+  little_minus->Move(little_minus_rc);
+  altitude_value->Move(value_rc);
+}
+
+void
+AltitudeSimulatorFullScreenPanel::CalculateLayout(const PixelRect &rc)
+{
   NumberButtonLayout::CalculateLayout(content_rc);
 
   PixelRect content_right_rc = content_rc;
@@ -200,10 +217,17 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
 
   NumberButtonLayout::CalculateLayout(content_right_rc);
   content_left_rc.right = big_plus_rc.left - 1;
+  fg_rc = content_left_rc;
+}
+
+void
+AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  BaseAccessPanel::Prepare(parent, rc);
+  CalculateLayout(rc);
 
   WindowStyle style;
   const Look &look = UIGlobals::GetLook();
-  fg_rc = content_left_rc;
 
   final_glide_chart =
       new FinalGlideChart(GetClientAreaWindow(),
