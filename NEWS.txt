@@ -3,7 +3,12 @@ SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 
 Top Hat 2.0.1 TBD
+* Fixed occasional "double turnpoint advance" bug
+* Simplified waypoints list, added column header sort
+* Simplified alternates list.  Put data in columns.
 * Fixed landing detection bug (not detecting landing)
+* Simplified MAT Task popup
+* Show and warn Class F airspace by default
 * Merged XCSoar 6.7.5
 * devices
   - fixed attitude data handling
