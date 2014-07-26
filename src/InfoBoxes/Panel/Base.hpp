@@ -181,7 +181,7 @@ protected:
    * of the rc
    * @param parent_rc The rc of the parent window's usable area
    */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &parent_rc);
+  void CalculateLayout(const PixelRect &parent_rc);
 };
 
 
@@ -217,7 +217,7 @@ protected:
    * of the rc
    * @param parent_rc The rc of the parent window's usable area
    */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  void CalculateLayout(const PixelRect &rc);
 };
 
 /**
@@ -247,8 +247,7 @@ protected:
    * of the rc
    * @param parent_rc The rc of the parent window's usable area
    */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void CalculateLayout(const PixelRect &rc);
+  void CalculateLayout(const PixelRect &rc);
 };
 
 /**
@@ -273,9 +272,9 @@ protected:
   /*
    * Sizes the rectangles for the layout in the center
    * of the rc
-   * @param parent_rc The rc of the parent window's usable area
+   * @param rc The rc of the parent window's usable area
    */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  void CalculateLayout(const PixelRect &rc);
 };
 
 #endif

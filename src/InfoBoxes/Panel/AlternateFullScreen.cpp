@@ -300,7 +300,7 @@ void
 AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  TwoCommandButtonListLayout::Prepare(parent, content_rc);
+  TwoCommandButtonListLayout::CalculateLayout(content_rc);
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;

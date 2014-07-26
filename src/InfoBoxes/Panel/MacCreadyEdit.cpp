@@ -206,14 +206,14 @@ void
 MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  NumberButtonLayout::Prepare(parent, content_rc);
+  NumberButtonLayout::CalculateLayout(content_rc);
 
   PixelRect content_right_rc = content_rc;
   PixelRect content_left_rc = content_rc;
 
   // split content area into two columns, buttons on the right, fg on left
   content_right_rc.left += Layout::Scale(50);
-  NumberButtonLayout::Prepare(parent, content_right_rc);
+  NumberButtonLayout::CalculateLayout(content_right_rc);
   content_left_rc.right = big_plus_rc.left - 1;
 
   WindowStyle style;

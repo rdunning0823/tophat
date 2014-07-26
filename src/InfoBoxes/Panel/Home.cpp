@@ -132,7 +132,7 @@ void
 HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  TwoButtonLayout::Prepare(parent, content_rc);
+  TwoButtonLayout::CalculateLayout(content_rc);
 
   /**
    * make Change button smaller easily distinguishable from the full-width

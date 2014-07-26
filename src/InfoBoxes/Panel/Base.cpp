@@ -218,7 +218,7 @@ BaseAccessPanel::SetCaption()
 }
 
 void
-NumberButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &parent_rc)
+NumberButtonLayout::CalculateLayout(const PixelRect &parent_rc)
 {
   fixed ratio = Layout::landscape ? fixed(0.65) : fixed(0.6);
   PixelRect rc_bound = parent_rc;
@@ -265,7 +265,7 @@ NumberButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &parent_rc)
 }
 
 void
-RatchetListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
+RatchetListLayout::CalculateLayout(const PixelRect &rc)
 {
   PixelScalar right_buttons_width;
   right_buttons_width = 0.2 * (rc.right - rc.left);
@@ -296,13 +296,7 @@ TwoCommandButtonListLayout::CalculateLayout(const PixelRect &rc)
 }
 
 void
-TwoCommandButtonListLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
-{
-  CalculateLayout(rc);
-}
-
-void
-TwoButtonLayout::Prepare(ContainerWindow &parent, const PixelRect &rc)
+TwoButtonLayout::CalculateLayout(const PixelRect &rc)
 {
   upper_rc = rc;
   upper_rc.Grow(-2, 0);
