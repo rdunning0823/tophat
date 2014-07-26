@@ -38,6 +38,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Screen/Timer.hpp"
 #include "Screen/Canvas.hpp"
+#include "Screen/SingleWindow.hpp"
 
 /**
  * Class to draw the chart of the OLC progress
@@ -59,6 +60,9 @@ class OnlineContestPanel : public BaseAccessPanel {
      */
     virtual void OnPaint(Canvas &canvas);
   };
+
+    PixelRect graph_rc;
+    PixelRect info_rc;
 
 protected:
 
@@ -89,7 +93,9 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
-
+  /* Move must discard rc and use GetMainWindow()'s ClientRect */
+  virtual void Move(const PixelRect &rc) override;
+  void CalculateLayout(const PixelRect &rc);
   void Refresh();
 };
 
@@ -119,14 +125,32 @@ OnlineContestPanel::Refresh()
 }
 
 void
+OnlineContestPanel::Move(const PixelRect &rc_unused)
+{
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+
+  BaseAccessPanel::Move(rc);
+  CalculateLayout(rc);
+
+  online_contest_chart->Move(graph_rc);
+  info_frame->Move(info_rc);
+}
+
+void
+OnlineContestPanel::CalculateLayout(const PixelRect &rc)
+{
+  graph_rc = content_rc;
+  info_rc = content_rc;
+
+  graph_rc.bottom -= Layout::Scale(50);
+  info_rc.top = graph_rc.bottom + 1;
+}
+
+void
 OnlineContestPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-
-  PixelRect graph_rc = content_rc;
-  PixelRect info_rc = content_rc;
-  graph_rc.bottom -= Layout::Scale(50);
-  info_rc.top = graph_rc.bottom + 1;
+  CalculateLayout(rc);
 
   WindowStyle style;
 
