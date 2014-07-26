@@ -56,6 +56,10 @@ protected:
 
   /**
    * index of list
+   * This is updated immediately when the TaskManager refreshes
+   * the task in the NavBar and the animation starts to scroll.
+   * It is also updated immediately in OnCursorMove at the same
+   * time the TaskManager is updated.
    */
   unsigned waypoint_index;
 
