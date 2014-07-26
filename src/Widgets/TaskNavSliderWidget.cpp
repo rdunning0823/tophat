@@ -76,7 +76,6 @@ TaskNavSliderWidget::RefreshTask()
   if (!GetList().IsDefined())
     return false;
 
-
 #ifdef _WIN32
   GetList().Invalidate();
 #endif
@@ -230,8 +229,10 @@ TaskNavSliderWidget::ReadWaypointIndex()
   }
 
   if ((task_manager_current_index != (int)waypoint_index)
-      && GetList().IsSteady())
+      && GetList().IsSteady()) {
     GetList().ScrollToItem(task_manager_current_index);
+    waypoint_index = (unsigned)task_manager_current_index;
+  }
 }
 
 HorizontalListControl &
