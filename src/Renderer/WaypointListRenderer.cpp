@@ -48,7 +48,7 @@ namespace WaypointListRenderer
              unsigned col_3_width);
 
   /**
-   * Deprecated.  replaced by Draw2 for main waypoint list
+   *  * Used by MapItemList
    */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             const GeoVector *vector,
@@ -236,7 +236,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
 
 
 /**
- * Deprecated.  Replaced by Draw2() for main waypoint list screen
+ * Used by MapItemList
  */
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
