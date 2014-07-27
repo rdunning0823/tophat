@@ -110,62 +110,6 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
 }
 
 /**
- * Deprecated.  Replaced by Draw2 with columns in Alternates list.
- */
-void
-WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
-                           const Waypoint &waypoint, fixed distance,
-                           fixed arrival_altitude,
-                           const DialogLook &dialog_look,
-                           const WaypointLook &look,
-                           const WaypointRendererSettings &settings)
-{
-  const unsigned padding = Layout::GetTextPadding();
-  const PixelScalar line_height = rc.bottom - rc.top;
-
-  const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
-
-  // Y-Coordinate of the second row
-  PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
-
-  // Use small font for details
-  canvas.Select(text_font);
-
-  // Draw distance and arrival altitude
-  StaticString<256> buffer;
-  TCHAR dist[20], alt[20], radio[20];
-  FormatUserDistanceSmart(distance, dist, true);
-  FormatRelativeUserAltitude(arrival_altitude, alt, true);
-  buffer.Format(_T("%s: %s, %s: %s"), _("Distance"), dist,
-                _("Arrival Alt"), alt);
-
-  if (waypoint.radio_frequency.IsDefined()) {
-    waypoint.radio_frequency.Format(radio, ARRAY_SIZE(radio));
-    buffer.AppendFormat(_T(" - %s MHz"), radio);
-  }
-
-  UPixelScalar left = rc.left + line_height + padding;
-  canvas.DrawClippedText(left, top2, rc, buffer);
-
-  // Draw waypoint name
-  canvas.Select(name_font);
-  canvas.DrawClippedText(left, rc.top + padding, rc,
-                         waypoint.name.c_str());
-
-  // Draw icon
-  const RasterPoint pt(rc.left + line_height / 2,
-                       rc.top + line_height / 2);
-
-  WaypointIconRenderer::Reachability reachable =
-      positive(arrival_altitude) ?
-      WaypointIconRenderer::ReachableTerrain : WaypointIconRenderer::Unreachable;
-
-  WaypointIconRenderer wir(settings, look, canvas);
-  wir.Draw(waypoint, pt, reachable);
-}
-
-/**
  * Used by Alternates screen.  Draws data in columns
  */
 void
