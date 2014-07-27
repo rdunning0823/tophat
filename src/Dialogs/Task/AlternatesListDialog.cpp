@@ -73,9 +73,9 @@ AlternatesListWidget::Update()
 void
 AlternatesListWidget::CreateButtons(WidgetDialog &dialog)
 {
+  cancel_button = dialog.AddButton(_("Close"), mrCancel);
   goto_button = dialog.AddButton(_("Goto"), *this, GOTO);
   details_button = dialog.AddButton(_("Details"), mrOK);
-  cancel_button = dialog.AddButton(_("Close"), mrCancel);
 }
 
 void
