@@ -47,14 +47,6 @@ namespace WaypointListRenderer
             const WaypointRendererSettings &renderer_settings);
 
   /**
-   * Deprecated.  Replaced by Draw2 with columns for main waypoint list
-   */
-  void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-            const GeoVector &vector,
-            const DialogLook &dialog_look, const WaypointLook &look,
-            const WaypointRendererSettings &settings);
-
-  /**
    * Deprecated.  Replaced by Draw2 with columns in Alternates list.
    */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,

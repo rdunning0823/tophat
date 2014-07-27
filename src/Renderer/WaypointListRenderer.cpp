@@ -110,20 +110,6 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
 }
 
 /**
- * Deprecated: Calls Draw() that is used by main waypoint list
- * Replaced by Draw()
- */
-void
-WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
-                           const Waypoint &waypoint, const GeoVector &vector,
-                           const DialogLook &dialog_look,
-                           const WaypointLook &look,
-                           const WaypointRendererSettings &settings)
-{
-  Draw(canvas, rc, waypoint, &vector, dialog_look, look, settings);
-}
-
-/**
  * Deprecated.  Replaced by Draw2 with columns in Alternates list.
  */
 void
