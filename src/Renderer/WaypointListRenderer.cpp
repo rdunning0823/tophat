@@ -183,8 +183,12 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   Buffer buffer;
 
+  // Y-Coordinate of the first row
+  PixelScalar top1 = rc.top;
   // Y-Coordinate of the second row
   PixelScalar top2 = rc.top + name_font.GetHeight() + Layout::FastScale(4);
+  // Y-Coordinate of the only row where there is only one row
+  PixelScalar top_middle = rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2;
 
   // Use small font for details
   canvas.Select(text_font);
@@ -209,19 +213,24 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
       leg_info_width = width;
 
     leg_info_width += padding;
+  } else {
+    // draw everything on one row
+    top1 = top2 = top_middle;
   }
+
 
   // Draw details line
   FormatWaypointDetails(buffer, waypoint);
+  PixelSize sz_details = text_font.TextSize(buffer.c_str());
 
-  PixelScalar left = rc.left + line_height + padding;
-  canvas.DrawClippedText(left, top2, rc.right - leg_info_width - left,
+  PixelScalar details_left = rc.right - sz_details.cx - padding - leg_info_width;
+  canvas.DrawClippedText(details_left, top2, sz_details.cx,
                          buffer.c_str());
 
   // Draw waypoint name
   canvas.Select(name_font);
-  canvas.DrawClippedText(left, rc.top + padding,
-                         rc.right - leg_info_width - left,
+  canvas.DrawClippedText(rc.left + line_height, top1,
+                         rc.left + (rc.right + rc.left) / 2,
                          waypoint.name.c_str());
 
   // Draw icon
