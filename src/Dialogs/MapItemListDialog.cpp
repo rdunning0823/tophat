@@ -50,7 +50,6 @@ Copyright_License {
 #include "Dialogs/Dialogs.h"
 #include "Terrain/TerrainSettings.hpp"
 
-
 #ifdef HAVE_NOAA
 #include "Dialogs/Weather/WeatherDialogs.hpp"
 #endif
@@ -407,17 +406,13 @@ SplitMapItemList(const MapItemList &full_list,
 
 static int
 ShowMapItemListDialog(const MapItemList &list,
+                      MapItemList &footer_list,
+                      MapItemList &list_list,
                       const DialogLook &dialog_look, const MapLook &look,
                       const TrafficLook &traffic_look,
                       const FinalGlideBarLook &final_glide_look,
                       const MapSettings &settings)
 {
-  MapItemList list_list;
-  MapItemList footer_list;
-  list_list.clear();
-  footer_list.clear();
-  SplitMapItemList(list, footer_list, list_list);
-
   UPixelScalar item_height = dialog_look.list.font->GetHeight()
     + Layout::Scale(6) + dialog_look.text_font->GetHeight();
   assert(item_height > 0);
@@ -437,11 +432,9 @@ ShowMapItemListDialog(const MapItemList &list,
   widget.CreateButtons(dialog);
 
   int result = dialog.ShowModal() == mrOK
-    ? (int)widget.GetCursorIndex() + footer_list.size()
+    ? (int)widget.GetCursorIndex()
     : -1;
   dialog.StealWidget();
-  list_list.clear();
-  footer_list.clear();
   return result;
 }
 
@@ -491,24 +484,33 @@ ShowMapItemListDialog(const MapItemList &list,
                       const MapSettings &settings,
                       ProtectedAirspaceWarningManager *airspace_warnings)
 {
-  unsigned list_list_count = 0;
-  for (auto i = list.begin(); i != list.end(); i++) {
-    if (HasDetails(**i))
-        list_list_count++;
-  }
-  if (list_list_count == 1)
+  /* list of items in the big list that are not in the footer */
+  MapItemList list_list;
+  /* list of items in the big list that are in the footer */
+  MapItemList footer_list;
+
+  //list_list.clear();
+  //footer_list.clear();
+  SplitMapItemList(list, footer_list, list_list);
+
+  if (list_list.size() == 1)
     /* only one map item without details, show it.
      * non-details items are at start of list) */
-    ShowMapItemDialog(*list[list.size() - 1], airspace_warnings);
+    ShowMapItemDialog(*list_list[0], airspace_warnings);
   //don't show terrain-only info if terrain is disabled
-  else if (list_list_count == 0 && !settings.terrain.enable)
+  else if (list_list.size() == 0 && !settings.terrain.enable) {
+    footer_list.clear();
     return;
-  else {
+  } else {
+
     /* more than one map item: show a list */
-    int i = ShowMapItemListDialog(list, dialog_look, look,
+    int i = ShowMapItemListDialog(list, footer_list, list_list,
+                                  dialog_look, look,
                                   traffic_look, final_glide_look, settings);
     assert(i >= -1 && i < (int)list.size());
     if (i >= 0)
-      ShowMapItemDialog(*list[i], airspace_warnings);
+      ShowMapItemDialog(*list_list[i], airspace_warnings);
   }
+  list_list.clear();
+  footer_list.clear();
 }
