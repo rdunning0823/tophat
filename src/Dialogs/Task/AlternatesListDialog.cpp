@@ -35,7 +35,15 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Renderer/WaypointListRenderer.hpp"
 #include "Language/Language.hpp"
+#include "Form/Form.hpp"
+#include "Widget/TwoWidgets.hpp"
 
+
+const TCHAR *distance_label_text = N_("Distance");
+const TCHAR *arrival_alt_label_text = N_("Arrival alt");
+
+/* used by item Draw() to match column headers with row data */
+static unsigned distance_label_width;
 
 void
 AlternatesListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
@@ -47,11 +55,12 @@ AlternatesListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   const Waypoint &waypoint = alternates[index].waypoint;
   const GlideResult& solution = alternates[index].solution;
 
-  WaypointListRenderer::Draw(canvas, rc, waypoint, solution.vector.distance,
-                             solution.SelectAltitudeDifference(settings.task.glide),
-                             UIGlobals::GetDialogLook(),
-                             UIGlobals::GetMapLook().waypoint,
-                             CommonInterface::GetMapSettings().waypoint);
+  WaypointListRenderer::Draw2(canvas, rc, waypoint, solution.vector.distance,
+                              solution.SelectAltitudeDifference(settings.task.glide),
+                              UIGlobals::GetDialogLook(),
+                              UIGlobals::GetMapLook().waypoint,
+                              CommonInterface::GetMapSettings().waypoint,
+                              distance_label_width);
 }
 
 void
@@ -105,6 +114,99 @@ AlternatesListWidget::OnAction(int id)
 }
 
 void
+AlternatesListWidget2::Move(const PixelRect &rc)
+{
+  AlternatesListWidget::Move(rc);
+}
+
+void
+AlternatesListWidget2::Refresh()
+{
+  AlternatesListWidget::Update();
+  GetList().SetLength(alternates.size());
+  GetList().Invalidate();
+}
+
+void
+AlternatesListWidget2::OnActivateItem(unsigned index)
+{
+  if (DoDetails())
+    form->SetModalResult(mrOK);
+}
+
+const Waypoint*
+AlternatesListWidget2::GetWaypoint()
+{
+  unsigned index = GetCursorIndex();
+  if (index >= alternates.size())
+    return nullptr;
+  auto const &item = alternates[index];
+  auto const &waypoint = item.waypoint;
+  return &waypoint;
+}
+
+bool
+AlternatesListWidget2::DoGoto()
+{
+  const Waypoint *waypoint = GetWaypoint();
+  if (waypoint != nullptr) {
+    protected_task_manager->DoGoto(*waypoint);
+    return true;
+  }
+  return false;
+}
+
+bool
+AlternatesListWidget2::DoDetails()
+{
+  const Waypoint *waypoint = GetWaypoint();
+  if (waypoint != nullptr) {
+    dlgWaypointDetailsShowModal(*waypoint, true, false);
+    return true;
+  }
+  return false;
+}
+
+void
+AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
+{
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  PixelSize sz_space = dialog_look.text_font->TextSize(_T(" "));
+  distance_label_width =
+      dialog_look.text_font->TextSize(distance_label_text).cx + 5 * sz_space.cx;
+
+  unsigned spaces_needed = rc.GetSize().cx / 2 / sz_space.cx;
+  StaticString<100> spaces (_T("                                                                                                    "));
+  if (spaces_needed < spaces.length())
+    spaces.Truncate(spaces_needed);
+  StaticString<1000> caption;
+  caption.Format(_T("%s%s     %s"),spaces.c_str(), distance_label_text,
+                       arrival_alt_label_text);
+  TextWidget::SetText(caption.c_str());
+}
+
+void
+AlternatesListHeaderWidget::Move(const PixelRect &rc)
+{
+  TextWidget::Move(rc);
+  CalculateLayout(rc);
+}
+
+void
+AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
+                                    const PixelRect &rc)
+{
+  TextWidget::Prepare(parent, rc);
+  CalculateLayout(rc);
+}
+
+void
+AlternatesListHeaderWidget::Unprepare()
+{
+  TextWidget::Unprepare();
+}
+
+void
 dlgAlternatesListShowModal()
 {
   if (protected_task_manager == nullptr)
@@ -112,20 +214,28 @@ dlgAlternatesListShowModal()
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
+  AlternatesListWidget2 *widget = new AlternatesListWidget2(dialog_look);
+  widget->Update();
+  TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
+                                           widget);
+
+/*
   AlternatesListWidget widget(dialog_look);
-  widget.Update();
+  widget.Update();*/
 
   WidgetDialog dialog(dialog_look);
-  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Alternates"), &widget);
-  widget.CreateButtons(dialog);
+  widget->SetForm(&dialog);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Alternates"), two_widgets);
+  widget->CreateButtons(dialog);
 
   int i = dialog.ShowModal() == mrOK
-    ? (int)widget.GetCursorIndex()
+    ? (int)widget->GetCursorIndex()
     : -1;
   dialog.StealWidget();
 
-  if (i < 0 || (unsigned)i >= widget.alternates.size())
+  if (i < 0 || (unsigned)i >= widget->alternates.size())
     return;
 
-  dlgWaypointDetailsShowModal(widget.alternates[i].waypoint);
+  dlgWaypointDetailsShowModal(widget->alternates[i].waypoint);
+  delete two_widgets;
 }

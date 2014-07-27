@@ -25,14 +25,22 @@ Copyright_License {
 #define DIALOG_ALTERNATES_LIST_HPP
 
 #include "Widget/ListWidget.hpp"
+#include "Widget/TextWidget.hpp"
 #include "Engine/Task/Unordered/AlternateList.hpp"
 #include "Form/ActionListener.hpp"
-
+#include "Screen/Layout.hpp"
 
 class WndButton;
 class WidgetDialog;
 class Canvas;
+class WndForm;
+
 struct DialogLook;
+
+enum Buttons {
+  Goto = 100,
+  Details,
+};
 
 class AlternatesListWidget
   : public ListWidget, private ActionListener {
@@ -70,7 +78,7 @@ public:
 
   /* virtual methods from class List::Handler */
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
-                           unsigned index) override;
+                           unsigned index);
 
   virtual bool CanActivateItem(unsigned index) const {
     return true;
@@ -81,6 +89,60 @@ public:
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
 };
+
+/**
+ * a widget that lists the alternates and executes the actions
+ * but has no buttons visible
+ */
+class AlternatesListWidget2 : public AlternatesListWidget
+{
+protected:
+  WndForm *form;
+public:
+  AlternatesListWidget2(const DialogLook &_dialog_look)
+    :AlternatesListWidget(_dialog_look) {}
+
+  void SetForm(WndForm *_form) {
+    assert(_form != nullptr);
+    form = _form;
+  }
+
+  /* virtual methods from class Widget */
+  virtual PixelSize GetMinimumSize() const {
+    return GetMaximumSize();
+  }
+  virtual void Move(const PixelRect &rc) override;
+  bool DoDetails();
+  bool DoGoto();
+  const Waypoint* GetWaypoint();
+
+  virtual void OnActivateItem(unsigned index) override;
+
+  void Refresh();
+};
+
+
+/**
+ * A widget class that displays header rows above the List Widget
+ * when used with TwoWidgets
+ */
+class AlternatesListHeaderWidget : public TextWidget
+{
+public:
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
+  virtual void Move(const PixelRect &rc) override;
+
+  virtual PixelSize GetMinimumSize() const {
+    return PixelSize { 25u, Layout::GetMinimumControlHeight() / 2 };
+  }
+  virtual PixelSize GetMaximumSize() const {
+    return PixelSize { 25u, Layout::GetMaximumControlHeight() };
+  }
+  void CalculateLayout(const PixelRect &rc);
+};
+
+
 
 #endif
 
