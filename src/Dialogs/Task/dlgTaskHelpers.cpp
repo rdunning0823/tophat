@@ -217,7 +217,7 @@ OrderedTaskPointLabelMapAction(TaskPointType type, const TCHAR *name,
     break;
 
   case TaskPointType::AAT:
-    _stprintf(buffer, _T("%s %d: %s"), _("Drag target"), index, name);
+    _stprintf(buffer, _T("%s: %s"), _("Drag target"), name);
     break;
 
   case TaskPointType::FINISH:
