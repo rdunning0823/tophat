@@ -441,7 +441,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const AirspaceRendererSettings &airspace_settings)
 {
   const unsigned line_height = rc.bottom - rc.top;
-  const unsigned text_padding = Layout::GetTextPadding();
+  const unsigned padding = Layout::GetTextPadding();
 
   const ObservationZonePoint &oz = *item.oz;
   const Waypoint &waypoint = item.waypoint;
@@ -451,29 +451,33 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   TCHAR buffer[256];
 
-  // Y-Coordinate of the second row
-  int top2 = rc.top + name_font.GetHeight() + 2 * text_padding;
+  // Y-Coordinate of the single row of text
+  PixelScalar top_middle = rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2;
+
 
   // Use small font for details
   canvas.Select(text_font);
 
   // Draw details line
-  UPixelScalar left = rc.left + line_height + text_padding;
   OrderedTaskPointRadiusLabel(*item.oz, buffer);
+  PixelScalar radius_text_width = text_font.TextSize(buffer).cx;
+  PixelScalar radius_text_left = rc.right - radius_text_width - padding;
   if (!StringIsEmpty(buffer))
-    canvas.DrawClippedText(left, top2, rc.right - left, buffer);
+    canvas.DrawClippedText(radius_text_left, top_middle,
+                           rc.right - radius_text_width, buffer);
 
   // Draw waypoint name
   canvas.Select(name_font);
+  UPixelScalar left = rc.left + line_height + padding;
   OrderedTaskPointLabelMapAction(item.tp_type, waypoint.name.c_str(),
                                  item.index, buffer);
-  canvas.DrawClippedText(left, rc.top + text_padding,
-                         rc.right - left, buffer);
+  canvas.DrawClippedText(left, top_middle,
+                         rc.right - left - radius_text_width - 2 * padding, buffer);
 
   const RasterPoint pt(rc.left + line_height / 2,
                        rc.top + line_height / 2);
   PixelScalar radius = std::min(PixelScalar(line_height / 2
-                                            - 2 * text_padding),
+                                            - 2 * padding),
                                 Layout::FastScale(10));
   OZPreviewRenderer::Draw(canvas, oz, pt, radius, look,
                           airspace_settings, airspace_look,
