@@ -86,7 +86,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Waypoint/dlgWaypointDetails.cpp \
 	$(SRC)/Dialogs/Waypoint/Manager.cpp \
 	$(SRC)/Dialogs/Waypoint/dlgWaypointEdit.cpp \
-	$(SRC)/Dialogs/Waypoint/WaypointList.cpp \
 	$(SRC)/Dialogs/Waypoint/WaypointListSimple.cpp \
 	$(SRC)/Dialogs/Waypoint/NearestWaypoint.cpp \
 	\

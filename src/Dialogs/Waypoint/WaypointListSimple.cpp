@@ -392,9 +392,9 @@ static constexpr CallBackTableEntry callback_table[] = {
 };
 
 const Waypoint*
-ShowWaypointListSimpleDialog(const GeoPoint &_location,
-                             OrderedTask *_ordered_task, unsigned _ordered_task_index,
-                             bool goto_button)
+ShowWaypointListDialog(const GeoPoint &_location,
+                       OrderedTask *_ordered_task, unsigned _ordered_task_index,
+                       bool goto_button)
 {
   dialog = LoadDialog(callback_table, UIGlobals::GetMainWindow(),
                       Layout::landscape ?
