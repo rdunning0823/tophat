@@ -238,7 +238,8 @@ MapItemListBuilder::AddTaskOZs(const ProtectedTaskManager &task)
   AircraftState a;
   a.location = location;
 
-  for (unsigned i = 0, size = ordered_task.TaskSize(); i < size; i++) {
+  for (unsigned i = task_manager->GetActiveTaskPointIndex(),
+      size = ordered_task.TaskSize(); i < size; i++) {
     if (list.full())
       break;
 
