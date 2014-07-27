@@ -79,6 +79,7 @@ const TCHAR* tips [] = {
     N_("Enter the pilot's name for the .IGC file with the Setup menu"),
     N_("Too many buttons on the screen? Move the 'S' button to the menu in Setup > Screens"),
     N_("Clean up the screen?  Click the Wind infobox and select to show the Wind arrow only in the infobox"),
+    N_("To EXIT Top Hat, click the 'M' menu button four times"),
 
 };
 
