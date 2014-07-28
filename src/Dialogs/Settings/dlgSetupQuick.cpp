@@ -63,16 +63,17 @@ Copyright_License {
 #include <math.h>
 #include <assert.h>
 
+// TODO: not sure i needed to change the order here
   enum ControlIndex {
     NATIONALITY,
-    SITE_FILES,
     DEVICE,
-    PLANE,
+    SITE_FILES,
     SAFETY,
+    PLANE,
     PILOT,
+    OK,
     SCREENS,
     ADVANCED,
-    OK,
   };
 
 gcc_const
@@ -349,6 +350,7 @@ SetupQuick::RefreshForm()
   pilot_text->SetCaption(text.c_str());
 }
 
+// TODO : needs to depend on landscape and maybe device to get order right
 void
 SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
@@ -400,38 +402,38 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                 rc_nationality_button,
                                 button_style, *this, NATIONALITY);
 
-  site_files_button = new WndButton(GetClientAreaWindow(), button_look,
-                                    _("Site files"),
-                                    rc_site_files_button,
-                                    button_style, *this, SITE_FILES);
-
-  plane_button = new WndButton(GetClientAreaWindow(), button_look, _("Plane"),
-                               rc_plane_button,
-                               button_style, *this, PLANE);
-
   device_button = new WndButton(GetClientAreaWindow(), button_look,
                                 _("Device"),
                                 rc_device_button,
                                 button_style, *this, DEVICE);
+
+  site_files_button = new WndButton(GetClientAreaWindow(), button_look,
+                                    _("Site files"),
+                                    rc_site_files_button,
+                                    button_style, *this, SITE_FILES);
 
   safety_button = new WndButton(GetClientAreaWindow(), button_look,
                                 _("Safety heights"),
                                 rc_safety_button,
                                 button_style, *this, SAFETY);
 
+  plane_button = new WndButton(GetClientAreaWindow(), button_look, _("Plane"),
+                               rc_plane_button,
+                               button_style, *this, PLANE);
+
   pilot_button = new WndButton(GetClientAreaWindow(), button_look,
                                _("Pilot"),
                                rc_pilot_button,
                                button_style, *this, PILOT);
 
+  ok = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
+                     rc_ok,
+                     button_style, *this, OK);
+
   screens_button = new WndButton(GetClientAreaWindow(), button_look,
                                  _("Screen"),
                                  rc_screens_button,
                                  button_style, *this, SCREENS);
-
-  ok = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
-                     rc_ok,
-                     button_style, *this, OK);
 
   advanced = new WndButton(GetClientAreaWindow(), button_look, _("Advanced"),
                            rc_advanced,
