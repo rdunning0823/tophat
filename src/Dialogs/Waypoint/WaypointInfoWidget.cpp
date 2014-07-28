@@ -38,6 +38,7 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/AngleFormatter.hpp"
 #include "Formatter/UserGeoPointFormatter.hpp"
+#include "Formatter/GlideRatioFormatter.hpp"
 
 static const TCHAR *
 FormatGlideResult(TCHAR *buffer, size_t size,
@@ -136,6 +137,26 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                      buffer.buffer(), buffer.MAX_SIZE);
   AddReadOnly(_("Elevation"), NULL, buffer);
 
+  if (basic.location_available && basic.NavAltitudeAvailable()) {
+    const TaskBehaviour &task_behaviour =
+      CommonInterface::GetComputerSettings().task;
+
+    StaticString<10> gr_text(_T("+++"));
+    const fixed safety_height = task_behaviour.safety_height_arrival;
+    const fixed target_altitude = waypoint.elevation + safety_height;
+    const fixed delta_h = basic.nav_altitude - target_altitude;
+    if (positive(delta_h)) {
+      const fixed distance = basic.location.Distance(waypoint.location);
+      const fixed gr = distance / delta_h;
+      if (GradientValid(gr)) {
+        ::FormatGlideRatio(gr_text.buffer(), gr_text.MAX_SIZE, gr);
+      }
+    }
+    AddReadOnly(_("Glide ratio"), nullptr, gr_text.c_str());
+  }
+
+  AddSpacer();
+
   if (basic.time_available && basic.date_time_utc.IsDatePlausible()) {
     const SunEphemeris::Result sun =
       SunEphemeris::CalcSunTimes(waypoint.location, basic.date_time_utc,
@@ -175,23 +196,6 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
   if (!buffer.empty())
     AddReadOnly(_("Runway"), NULL, buffer);
-
-  if (basic.location_available && basic.NavAltitudeAvailable()) {
-    const TaskBehaviour &task_behaviour =
-      CommonInterface::GetComputerSettings().task;
-
-    const fixed safety_height = task_behaviour.safety_height_arrival;
-    const fixed target_altitude = waypoint.elevation + safety_height;
-    const fixed delta_h = basic.nav_altitude - target_altitude;
-    if (positive(delta_h)) {
-      const fixed distance = basic.location.Distance(waypoint.location);
-      const fixed gr = distance / delta_h;
-      if (GradientValid(gr)) {
-        buffer.UnsafeFormat(_T("%.0f"), (double)gr);
-        AddReadOnly(_("Required glide ratio"), nullptr, buffer);
-      }
-    }
-  }
 
   AddReadOnly(_(" "), NULL, waypoint.comment.c_str());
 }
