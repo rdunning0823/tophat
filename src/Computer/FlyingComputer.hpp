@@ -102,6 +102,9 @@ public:
                const DerivedInfo &calculated,
                FlyingState &flying);
 
+  /**
+   * used by test_replay
+   */
   void Compute(fixed takeoff_speed,
                const AircraftState &state, fixed dt,
                FlyingState &flying);
