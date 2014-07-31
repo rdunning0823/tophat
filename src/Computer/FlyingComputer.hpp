@@ -79,6 +79,9 @@ class FlyingComputer {
 
   fixed climbing_altitude;
 
+  /* we limit updates to the climbing_clock to reduce noise */
+  fixed climbing_clock_dt_since_update;
+
   fixed sinking_since;
 
   GeoPoint sinking_location;
@@ -124,6 +127,7 @@ protected:
    * Check for monotonic climb.  This check is used for "flying"
    * detection in a wave, when ground speed is low, no airspeed is
    * available and no map was loaded.
+   * Only measures every few seconds to avoid noise.
    *
    * @return true if the aircraft has been climbing for more than 10
    * seconds

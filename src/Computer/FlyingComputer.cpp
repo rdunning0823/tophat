@@ -37,6 +37,7 @@ FlyingComputer::Reset()
   moving_since = fixed(-1);
   stationary_since = fixed(-1);
   climbing_altitude = fixed(0);
+  climbing_clock_dt_since_update = fixed(0);
   sinking_since = fixed(-1);
   last_ground_altitude = fixed(-1);
 }
@@ -197,12 +198,25 @@ CheckAltitudeAGL(const DerivedInfo &calculated)
 inline bool
 FlyingComputer::CheckClimbing(fixed dt, fixed altitude)
 {
-  if (altitude > climbing_altitude + fixed(0.1))
-    climbing_clock.Add(dt);
-  else
-    climbing_clock.Subtract(dt);
+  enum Constants {
+    DeltaInterval = 4,
+    DeltaHeight = 2,
+  };
+  climbing_clock_dt_since_update += dt;
 
-  climbing_altitude = altitude;
+  if (climbing_clock_dt_since_update > fixed(DeltaInterval)) {
+    dt = climbing_clock_dt_since_update;
+    climbing_clock_dt_since_update = fixed(0);
+
+    /* is fix DeltaHeight m above low point during DeltaInterval? */
+    if (altitude > climbing_altitude + fixed(DeltaHeight))
+      climbing_clock.Add(dt);
+    else
+      climbing_clock.Subtract(dt);
+
+    climbing_altitude = altitude;
+  } else
+    climbing_altitude = std::min(altitude, climbing_altitude);
 
   return climbing_clock >= dt + fixed(1);
 }
