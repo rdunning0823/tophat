@@ -131,6 +131,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
       rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2 : rc.top;
 
   PixelRect rc_name = rc;
+  rc_name.left = rc.left + line_height + padding;
   rc_name.right = rc_name.left + rc_name.GetSize().cx / 2 - padding;
   PixelRect rc_info = rc;
   rc_info.left = rc_name.right + padding;
@@ -149,8 +150,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
 
   // Draw waypoint name
   canvas.Select(name_font);
-  UPixelScalar left = rc.left + line_height + padding;
-  canvas.DrawClippedText(left, middle, rc_name, waypoint.name.c_str());
+  canvas.DrawClippedText(rc_name.left, middle, rc_name, waypoint.name.c_str());
 
   // Draw icon
   const RasterPoint pt(rc.left + line_height / 2,
