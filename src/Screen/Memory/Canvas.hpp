@@ -338,14 +338,13 @@ public:
 
   void DrawOpaqueText(int x, int y, const PixelRect &rc, const TCHAR *text);
 
-  void DrawClippedText(int x, int y, const PixelRect &rc, const TCHAR *text) {
-    // XXX
-    DrawText(x, y, text);
-  }
+  /**
+   * Clip text based on rough estimate of characters in string
+   */
+  void DrawClippedText(int x, int y, unsigned width, const TCHAR *text);
 
-  void DrawClippedText(int x, int y, unsigned width, const TCHAR *text) {
-    // XXX
-    DrawText(x, y, text);
+  void DrawClippedText(int x, int y, const PixelRect &rc, const TCHAR *text) {
+    DrawClippedText(x, y, rc.right - rc.left, text);
   }
 
   /**
