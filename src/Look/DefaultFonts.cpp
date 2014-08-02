@@ -121,7 +121,7 @@ InitialiseLogFonts(FontSettings &settings)
   settings.infobox_small.lfHeight = settings.infobox_small.lfHeight * 4 / 5;
   settings.infobox_small.lfWeight = FW_MEDIUM;
 
-  InitialiseLogfont(&settings.title, GetStandardFontFace(), font_height / 3);
+  InitialiseLogfont(&settings.title, GetStandardFontFace(), (font_height * 5) / 12);
   InitialiseLogfont(&settings.comment, GetStandardFontFace(), font_height / 2);
 
   // new font for CDI Scale
