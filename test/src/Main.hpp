@@ -178,6 +178,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifndef GNAV
                                small_font,
 #endif
+                               small_font,
                                small_font);
   }
 

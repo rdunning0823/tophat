@@ -62,7 +62,8 @@ struct InfoBoxLook {
 #ifndef GNAV
                   const Font &unit_font,
 #endif
-                  const Font &title_font);
+                  const Font &title_font,
+                  const Font &comment_font);
 
   Color GetColor(int i, Color default_color) const {
     if (i < 0)

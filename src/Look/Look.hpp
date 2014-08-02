@@ -85,7 +85,8 @@ struct Look {
 #ifndef GNAV
                             const Font &infobox_unit_font,
 #endif
-                            const Font &infobox_title_font);
+                            const Font &infobox_title_font,
+                            const Font &infobox_comment_font);
 };
 
 #endif

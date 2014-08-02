@@ -250,7 +250,8 @@ MainWindow::InitialiseConfigured()
 #ifndef GNAV
                              Fonts::infobox_units,
 #endif
-                             Fonts::title);
+                             Fonts::title,
+                             Fonts::comment);
 
   InfoBoxManager::Create(*this, ib_layout, look->info_box, look->units);
   map_rect = ib_layout.remaining;

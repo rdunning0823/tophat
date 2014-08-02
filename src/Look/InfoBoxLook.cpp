@@ -39,7 +39,8 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 #ifndef GNAV
                         const Font &_unit_font,
 #endif
-                        const Font &title_font)
+                        const Font &title_font,
+                        const Font &comment_font)
 {
   inverse = _inverse;
 
@@ -58,7 +59,7 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 
   value.font = &value_font;
   title.font = &title_font;
-  comment.font = &title_font;
+  comment.font = &comment_font;
   small_font = &_small_font;
 #ifndef GNAV
   unit_font = &_unit_font;

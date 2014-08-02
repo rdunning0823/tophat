@@ -72,6 +72,7 @@ LoadAltairLogFonts(FontSettings &settings)
   InitialiseLogfont(&settings.infobox,
                     _T("RasterGothicTwentyFourCond"), 24, true);
   InitialiseLogfont(&settings.title, _T("RasterGothicNineCond"), 10);
+  InitialiseLogfont(&settings.comment, _T("RasterGothicNineCond"), 10);
   InitialiseLogfont(&settings.cdi, _T("RasterGothicEighteenCond"), 19, true);
   InitialiseLogfont(&settings.map_label, _T("RasterGothicTwelveCond"), 13);
   InitialiseLogfont(&settings.map_label_important,
@@ -121,6 +122,7 @@ InitialiseLogFonts(FontSettings &settings)
   settings.infobox_small.lfWeight = FW_MEDIUM;
 
   InitialiseLogfont(&settings.title, GetStandardFontFace(), font_height / 3);
+  InitialiseLogfont(&settings.comment, GetStandardFontFace(), font_height / 2);
 
   // new font for CDI Scale
   InitialiseLogfont(&settings.cdi, GetStandardFontFace(),

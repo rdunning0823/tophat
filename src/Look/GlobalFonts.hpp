@@ -58,6 +58,7 @@ namespace Fonts
 #endif
 
   extern Font title;
+  extern Font comment;
   extern Font cdi;
   extern Font monospace;
 

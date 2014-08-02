@@ -41,6 +41,7 @@ struct FontSettings {
 #endif
 
   LOGFONT title;
+  LOGFONT comment;
   LOGFONT cdi;
   LOGFONT monospace;
 

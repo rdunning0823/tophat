@@ -43,6 +43,8 @@ Font Fonts::infobox_units;
 #endif
 /// Titles of infoboxes like Next, WP L/D etc.
 Font Fonts::title;
+/// Footers of infoboxes
+Font Fonts::comment;
 /// vario display, runway informations
 Font Fonts::cdi;
 Font Fonts::monospace;
@@ -75,6 +77,7 @@ Fonts::Load(const FontSettings &settings)
 #endif
 
   title.Load(settings.title);
+  comment.Load(settings.comment);
   cdi.Load(settings.cdi);
   map_label.Load(settings.map_label);
   map_label_important.Load(settings.map_label_important);
@@ -83,7 +86,7 @@ Fonts::Load(const FontSettings &settings)
   map_overlay_button.Load(settings.map_overlay_button);
   monospace.Load(settings.monospace);
 
-  return title.IsDefined() && cdi.IsDefined() &&
+  return title.IsDefined() && comment.IsDefined() && cdi.IsDefined() &&
     map_label.IsDefined() && map_label_important.IsDefined() &&
     map.IsDefined() && map_bold.IsDefined() &&
     map_overlay_button.IsDefined() &&
@@ -102,6 +105,7 @@ Fonts::Deinitialize()
   infobox_units.Destroy();
 #endif
   title.Destroy();
+  comment.Destroy();
   map.Destroy();
   map_bold.Destroy();
   cdi.Destroy();

@@ -52,7 +52,8 @@ Look::InitialiseConfigured(const UISettings &settings,
 #ifndef GNAV
                            const Font &infobox_unit_font,
 #endif
-                           const Font &infobox_title_font)
+                           const Font &infobox_title_font,
+                           const Font &infobox_comment_font)
 {
   dialog.Initialise(dialog_bold_font, dialog_font, dialog_small_font,
                     dialog_bold_font, dialog_font, dialog_bold_font);
@@ -73,7 +74,8 @@ Look::InitialiseConfigured(const UISettings &settings,
 #ifndef GNAV
                       infobox_unit_font,
 #endif
-                      infobox_title_font);
+                      infobox_title_font,
+                      infobox_comment_font);
   wind_arrow_info_box.Initialise(map_bold_font, settings.info_boxes.inverse);
   flarm_gauge.Initialise(traffic, true, settings.info_boxes.inverse);
   thermal_assistant_gauge.Initialise(true, settings.info_boxes.inverse);
