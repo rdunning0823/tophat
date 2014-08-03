@@ -71,7 +71,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/SimulatorPromptWindow.cpp \
 	$(SRC)/Dialogs/dlgStartup.cpp \
 	$(SRC)/Dialogs/dlgStartupAssistant.cpp \
-	$(SRC)/Dialogs/dlgMatItemClick.cpp \
 	\
 	$(SRC)/Dialogs/dlgStatus.cpp \
 	$(SRC)/Dialogs/StatusPanels/StatusPanel.cpp \
@@ -139,6 +138,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/dlgTaskHelpers.cpp \
 	$(SRC)/Dialogs/Task/TargetDialog.cpp \
 	$(SRC)/Dialogs/Task/AlternatesListDialog.cpp \
+	$(SRC)/Dialogs/Task/dlgMatItemClick.cpp \
 	\
 	$(SRC)/Dialogs/NumberEntry.cpp \
 	$(SRC)/Dialogs/TextEntry.cpp \
