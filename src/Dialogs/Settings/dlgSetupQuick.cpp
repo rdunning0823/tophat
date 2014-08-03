@@ -37,6 +37,7 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
 #include "Widget/Widget.hpp"
+#include "Widget/ManagedWidget.hpp"
 #include "Interface.hpp"
 #include "SystemSettings.hpp"
 #include "Language/Language.hpp"
@@ -497,13 +498,10 @@ ShowDialogSetupQuick()
   // add point to task
   ContainerWindow &w = UIGlobals::GetMainWindow();
   instance = new SetupQuick();
-  instance->Initialise(w, w.GetClientRect());
-  instance->Prepare(w, w.GetClientRect());
-
+  ManagedWidget managed_widget(w, instance);
+  managed_widget.Move(w.GetClientRect());
+  managed_widget.Show();
   instance->ShowModal();
 
-  instance->Hide();
-  instance->Unprepare();
-  delete instance;
   Profile::Save();
 }
