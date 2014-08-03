@@ -152,7 +152,30 @@ public:
    * @param rc. rect of dialog
    */
   void SetRectangles(const PixelRect &rc);
+
+  /* overrides from WndForm */
+  virtual void OnResize(PixelSize new_size) override;
+  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
 };
+
+void
+StartupAssistant::ReinitialiseLayout(const PixelRect &parent_rc)
+{
+  WndForm::Move(parent_rc);
+}
+
+void
+StartupAssistant::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+  SetRectangles(GetClientRect());
+
+  tip_text->Move(rc_tip_text);
+  close->Move(rc_close);
+  next_tip->Move(rc_next_tip);
+  prev_tip->Move(rc_prev_tip);
+  chkb_decline->Move(rc_chkb_decline);
+}
 
 void
 StartupAssistant::Move(const PixelRect &rc)
