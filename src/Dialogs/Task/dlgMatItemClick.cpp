@@ -27,6 +27,7 @@ Copyright_License {
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/Message.hpp"
 #include "Widget/Widget.hpp"
+#include "Widget/ManagedWidget.hpp"
 #include "Dialogs/Task/dlgTaskHelpers.hpp"
 #include "Form/Button.hpp"
 #include "Form/DataField/Float.hpp"
@@ -733,14 +734,12 @@ ShowDialog(const Waypoint &wp, const ModifiedTask modified_task)
   ContainerWindow &w = UIGlobals::GetMainWindow();
   instance = new MatClickPanel(wp, modified_task);
 
-  instance->Initialise(w, w.GetClientRect());
-  instance->Prepare(w, w.GetClientRect());
+  ManagedWidget managed_widget(w, instance);
+  managed_widget.Move(w.GetClientRect());
+  managed_widget.Show();
+
   instance->ShowModal();
   MatClickPanel::ReturnState return_state = instance->GetReturnState();
-
-  instance->Hide();
-  instance->Unprepare();
-  delete instance;
 
   return return_state;
 }
