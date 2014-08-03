@@ -42,6 +42,7 @@ Copyright_License {
 #include "Form/CheckBox.hpp"
 #include "Version.hpp"
 #include "Widget/Widget.hpp"
+#include "Widget/ManagedWidget.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Util/StaticString.hpp"
 #include "Util/ConvertString.hpp"
@@ -355,10 +356,8 @@ dlgStartupAssistantShowModal(bool conditional)
 
   ContainerWindow &w = UIGlobals::GetMainWindow();
   StartupAssistant *instance = new StartupAssistant();
-  instance->Initialise(w, w.GetClientRect());
-  instance->Prepare(w, w.GetClientRect());
+  ManagedWidget managed_widget(w, instance);
+  managed_widget.Move(w.GetClientRect());
+  managed_widget.Show();
   instance->ShowModal();
-  instance->Hide();
-  instance->Unprepare();
-  delete instance;
 }
