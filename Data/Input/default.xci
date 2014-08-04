@@ -386,7 +386,7 @@ type=key
 data=6
 event=Mode default
 event=AbortTask toggle
-label=Resume$(CheckTask)
+label=Resume task$(CheckTask)
 location=21
 
 
