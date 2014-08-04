@@ -10,6 +10,7 @@ Top Hat 2.0.1 TBD
 * Show and warn Class F airspace by default
 * Fixed occasional "double turnpoint advance" bug
 * Android - fix crash when switching to other apps
+* Show distance to pan crosshairs
 * Merged XCSoar 6.7.5
 * devices
   - fixed attitude data handling
