@@ -195,6 +195,7 @@ DigitEntry::CalculateLayout()
   const UPixelScalar min_value_height = control_height * 3 / 2;
 
   PixelSize digit_size = look.text_font->TextSize(_T("8"));
+  PixelSize colon_size = look.text_font->TextSize(_T(":"));
   digit_size.cy += 2 * padding;
   if (digit_size.cy < (PixelScalar)min_value_height)
     digit_size.cy = min_value_height;
@@ -205,11 +206,17 @@ DigitEntry::CalculateLayout()
   unsigned last_right = 0;
   for (unsigned i = 0; i < length; ++i) {
     Column &digit = columns[i];
+    PixelScalar value_width;
 
-    PixelScalar value_width = digit.GetWidth() * digit_size.cx;
-    value_width += 2 * padding;
-    if (value_width < (PixelScalar)control_height)
-      value_width = control_height;
+    if (digit.type == Column::Type::COLON) {
+      value_width = colon_size.cx;
+      value_width += 2 * padding;
+    } else {
+      value_width = digit.GetWidth() * digit_size.cx;
+      value_width += 2 * padding;
+      if (value_width < (PixelScalar)control_height)
+        value_width = control_height;
+    }
 
     digit.left = last_right;
     last_right = digit.right = digit.left + value_width;
