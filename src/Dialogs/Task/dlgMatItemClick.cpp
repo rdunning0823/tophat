@@ -224,6 +224,9 @@ public:
   virtual void Hide() {};
   virtual void Move(const PixelRect &rc) {};
 
+  /* overrides from WndForm */
+  virtual void OnResize(PixelSize new_size) override;
+  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
   /**
    * returns true if the "Show other options" button was clicked
    */
@@ -314,6 +317,35 @@ MatClickPanel::GetNavSliderHeight()
   UPixelScalar small_font_height = UIGlobals::GetDialogLook().list.font->GetHeight();
 
   return large_font_height + 2 * small_font_height - Layout::Scale(3);
+}
+
+void
+MatClickPanel::ReinitialiseLayout(const PixelRect &parent_rc)
+{
+  WndForm::Move(parent_rc);
+}
+
+void
+MatClickPanel::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+  SetRectangles(GetClientRect());
+
+  if (modified_task.mat_mode == MAT_DELETE)
+    delete_button->Move(rc_delete);
+  else {
+    add_button->Move(rc_add);
+    if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
+      replace_button->Move(rc_replace);
+      replace_info_frame->Move(rc_replace_info);
+    }
+  }
+
+  header_frame->Move(rc_header);
+  estimate_frame->Move(rc_estimate);
+  add_info_frame->Move(rc_add_info);
+  more->Move(rc_more);
+  cancel->Move(rc_cancel);
 }
 
 void
