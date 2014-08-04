@@ -342,7 +342,7 @@ type=key
 data=6
 event=Calculator
 event=Mode default
-label=Edit Task
+label=Edit task
 location=18
 
 mode=NavOrdered
@@ -350,7 +350,7 @@ type=key
 data=0
 event=WaypointDetails current
 event=Mode default
-label=TP Details$(CheckTask)
+label=TP details$(CheckTask)
 location=22
 
 mode=NavOrdered
@@ -366,7 +366,7 @@ type=key
 data=9
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nList$(CheckWaypointFile)
+label=Waypoint\nlist$(CheckWaypointFile)
 location=24
 
 # -------------
@@ -378,7 +378,7 @@ type=key
 data=6
 event=Calculator
 event=Mode default
-label=Edit Task
+label=Edit task
 location=18
 
 mode=NavGoto
@@ -395,7 +395,7 @@ type=key
 data=0
 event=WaypointDetails current
 event=Mode default
-label=TP Details$(CheckTask)
+label=TP details$(CheckTask)
 location=22
 
 mode=NavGoto
@@ -411,7 +411,7 @@ type=key
 data=9
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nList$(CheckWaypointFile)
+label=Waypoint\nlist$(CheckWaypointFile)
 location=24
 
 # -------------
@@ -927,7 +927,7 @@ type=key
 data=0
 event=ThermalAssistant
 event=Mode default
-label=Thermal Assistant
+label=Thermal assistant
 location=9
 
 # -------------
@@ -1081,7 +1081,7 @@ type=key
 data=0
 event=ThermalAssistant
 event=Mode default
-label=Thermal Assistant
+label=Thermal assistant
 location=16
 
 mode=Menu1
@@ -1125,7 +1125,7 @@ type=key
 data=9
 event=Setup Basic
 event=Mode default
-label=Bugs & Ballast
+label=Bugs & ballast
 location=22
 
 mode=Menu2
@@ -1133,7 +1133,7 @@ type=key
 data=0
 event=Setup Wind
 event=Mode default
-label=Setup Wind
+label=Wind
 location=23
 
 # -------------
@@ -1418,7 +1418,7 @@ type=key
 data=0
 event=Setup Wind
 event=Mode default
-label=Setup\nWind
+label=Wind
 location=18
 
 mode=RemoteStick
@@ -1520,5 +1520,5 @@ type=key
 data=0
 event=ThermalAssistant
 event=Mode default
-label=Thermal Assistant$(CheckCircling)
+label=Thermal assistant$(CheckCircling)
 location=31
