@@ -128,6 +128,12 @@ TaskManager::GetActiveTaskPointIndex() const
 }
 
 void
+TaskManager::OverrideStartTime(AircraftState default_state, fixed time)
+{
+  ordered_task->OverrideStartTime(default_state, time);
+}
+
+void
 TaskManager::IncrementActiveTaskPoint(int offset)
 {
   if (active_task) {

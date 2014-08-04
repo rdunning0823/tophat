@@ -72,6 +72,13 @@ public:
   }
 
   /**
+   * Manually sets the start time
+   */
+  void SetHasExitedOverride () {
+    ScoredTaskPoint::SetHasExited(true);
+  }
+
+  /**
    * Search for the min point on the boundary from
    * the aircraft state to the next point.  Should only
    * be performed when the aircraft state is inside the sector

@@ -123,6 +123,14 @@ public:
   unsigned GetActiveTaskPointIndex() const;
 
   /**
+   * Overrides the start time
+   * Updates task start information.
+   * If not already started, uses default_state information
+   * @param default_state: state used if none exists
+   * @param time time of new start
+   */
+  void OverrideStartTime(AircraftState default_state, fixed time);
+  /**
    * Accessor of current task point of active task
    *
    * @return TaskPoint of active task point, and 0 if no active task

@@ -682,6 +682,18 @@ public:
   virtual void SetActiveTaskPoint(unsigned desired) override;
   virtual TaskWaypoint *GetActiveTaskPoint() const override;
   virtual bool IsValidTaskPoint(const int index_offset=0) const override;
+
+  /**
+   * Change the time the task was started.
+   * If task was already started, do not update aircraft info.
+   * If task was not started, update task_started to true
+   * and set aircraft information and set the HasEntered() property
+   * of the start point
+   * @AircraftState used for start stats if none already present
+   * @time of start
+   */
+  void OverrideStartTime(const AircraftState state, fixed time);
+
   virtual bool UpdateIdle(const AircraftState& state_now,
                           const GlidePolar &glide_polar) override;
 

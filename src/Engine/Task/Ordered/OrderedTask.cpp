@@ -624,6 +624,18 @@ OrderedTask::CheckTransitionPoint(OrderedTaskPoint &point,
     : point.UpdateSampleFar(state, task_projection);
 }
 
+void
+OrderedTask::OverrideStartTime(const AircraftState default_state, fixed time)
+{
+  AircraftState new_state = default_state;
+  if (stats.start.task_started)
+    new_state = taskpoint_start->GetEnteredState();
+
+  new_state.time = time;
+  taskpoint_start->SetHasExitedOverride();
+  taskpoint_start->SetStateEntered(new_state);
+}
+
 // ADDITIONAL FUNCTIONS
 
 bool
