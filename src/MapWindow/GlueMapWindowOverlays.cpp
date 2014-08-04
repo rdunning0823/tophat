@@ -319,6 +319,19 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
     }
   }
 
+  if (Basic().location_available) {
+    fixed dist = location.Distance(Basic().location);
+    StaticString<64> distance_short;
+    StaticString<64> distance_long;
+    FormatUserDistance(dist, distance_short.buffer(), true, 1);
+    distance_long.Format(_T("%s: %s"), _("Distance"), distance_short.c_str());
+    TextInBox(canvas, distance_long, x, y, mode,
+              render_projection.GetScreenWidth(),
+              render_projection.GetScreenHeight());
+
+    y += height;
+  }
+
   TCHAR buffer[256];
   FormatGeoPoint(location, buffer, ARRAY_SIZE(buffer), _T('\n'));
 
