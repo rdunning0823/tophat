@@ -9,6 +9,7 @@ Top Hat 2.0.1 TBD
 * Simplified MAT Task popup
 * Show and warn Class F airspace by default
 * Fixed occasional "double turnpoint advance" bug
+* Android - fix crash when switching to other apps
 * Merged XCSoar 6.7.5
 * devices
   - fixed attitude data handling
