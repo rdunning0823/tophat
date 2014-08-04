@@ -125,6 +125,7 @@ namespace InputEvents
   void eventAdjustForecastTemperature(const TCHAR *misc);
   void eventAdjustVarioFilter(const TCHAR *misc);
   void eventAdjustWaypoint(const TCHAR *misc);
+  void eventEditTaskStart(const TCHAR *misc);
   void eventAnalysis(const TCHAR *misc);
   void eventArmAdvance(const TCHAR *misc);
   void eventAudioDeadband(const TCHAR *misc);

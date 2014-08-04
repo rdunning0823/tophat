@@ -42,6 +42,7 @@ Copyright_License {
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Engine/Navigation/Aircraft.hpp"
+#include "Dialogs/Task/StartTimeEntry.hpp"
 
 #include <windef.h> /* for MAX_PATH */
 
@@ -205,6 +206,18 @@ InputEvents::eventAdjustWaypoint(const TCHAR *misc)
 
   trigger_redraw();
 }
+
+/**
+ * Edit task start time
+ * Displays a dialog that allows the pilot to edit the start
+ * of the task
+ */
+void
+InputEvents::eventEditTaskStart(const TCHAR *misc)
+{
+  StartTimeEntryDialog();
+}
+
 
 // AbortTask
 // Allows aborting and resuming of tasks

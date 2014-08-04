@@ -139,6 +139,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/TargetDialog.cpp \
 	$(SRC)/Dialogs/Task/AlternatesListDialog.cpp \
 	$(SRC)/Dialogs/Task/dlgMatItemClick.cpp \
+	$(SRC)/Dialogs/Task/StartTimeEntry.cpp \
 	\
 	$(SRC)/Dialogs/NumberEntry.cpp \
 	$(SRC)/Dialogs/TextEntry.cpp \

@@ -347,6 +347,14 @@ location=18
 
 mode=NavOrdered
 type=key
+data=6
+event=EditTaskStart
+event=Mode default
+label=Edit start
+location=19
+
+mode=NavOrdered
+type=key
 data=0
 event=WaypointDetails current
 event=Mode default
