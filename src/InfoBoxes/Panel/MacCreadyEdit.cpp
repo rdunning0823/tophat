@@ -261,6 +261,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           (UPixelScalar)(fg_rc.right - fg_rc.left),
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
+  WndForm::AddDestruct(final_glide_chart);
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
@@ -270,18 +271,22 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   big_plus = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("^"),
                                  big_plus_rc,
                                  button_style, *this, BigPlus);
+  WndForm::AddDestruct(big_plus);
 
   little_plus = new WndSymbolButton(GetClientAreaWindow(), button_look,
                                     _T("^"), little_plus_rc,
                                     button_style, *this, LittlePlus);
+  WndForm::AddDestruct(little_plus);
 
   big_minus = new WndSymbolButton(GetClientAreaWindow(), button_look,
                                   _T("v"), big_minus_rc,
                                   button_style, *this, BigMinus);
+  WndForm::AddDestruct(big_minus);
 
   little_minus = new WndSymbolButton(GetClientAreaWindow(), button_look,
                                      _T("v"), little_minus_rc,
                                      button_style, *this, LittleMinus);
+  WndForm::AddDestruct(little_minus);
 
   WindowStyle style_frame;
   big_dialog_look.Initialise(Fonts::map_bold, Fonts::infobox, Fonts::map_label,
@@ -289,6 +294,8 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              Fonts::map_bold);
   mc_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
                           value_rc, style_frame);
+  WndForm::AddDestruct(mc_value);
+
   mc_value->SetAlignCenter();
   mc_value->SetVAlignCenter();
 
@@ -298,6 +305,8 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   auto_mc = new CheckBoxControl(GetClientAreaWindow(), dialog_look, _T("Auto MC"),
                                 checkbox_rc, checkbox_style,
                                 this, AutoMc);
+  WndForm::AddDestruct(auto_mc);
+
   dialog_timer.Schedule(500);
   Refresh();
 }
@@ -305,13 +314,6 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 void
 MacCreadyEditPanel::Unprepare()
 {
-  delete big_plus;
-  delete big_minus;
-  delete little_plus;
-  delete little_minus;
-  delete mc_value;
-  delete auto_mc;
-  delete final_glide_chart;
   dialog_timer.Cancel();
 }
 

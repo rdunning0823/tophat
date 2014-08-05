@@ -140,10 +140,12 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   goto_button = new WndButton(GetClientAreaWindow(), button_look, _T("Goto"),
                               left_button_rc,
                               button_style, *this, Goto);
+  WndForm::AddDestruct(goto_button);
 
   details_button = new WndButton(GetClientAreaWindow(), button_look, _T("Details"),
                                  right_button_rc,
                                  button_style, *this, Details);
+  WndForm::AddDestruct(details_button);
   dialog_timer.Schedule(1000);
 }
 
@@ -163,8 +165,6 @@ AlternateFullScreen::OnAction(int id)
 void
 AlternateFullScreen::Unprepare()
 {
-  delete details_button;
-  delete goto_button;
   dialog_timer.Cancel();
 }
 

@@ -235,6 +235,7 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
                           (UPixelScalar)(fg_rc.right - fg_rc.left),
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
+  WndForm::AddDestruct(final_glide_chart);
 
   big_button_look.Initialise(Fonts::map_bold);
 
@@ -247,23 +248,29 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
   big_plus = new WndButton(GetClientAreaWindow(), big_button_look, _T("+100"),
                            big_plus_rc,
                            button_style, *this, BigPlus);
+  WndForm::AddDestruct(big_plus);
 
   little_plus = new WndButton(GetClientAreaWindow(), big_button_look,
                               _T("+10"), little_plus_rc,
                               button_style, *this, LittlePlus);
+  WndForm::AddDestruct(little_plus);
 
   big_minus = new WndButton(GetClientAreaWindow(), big_button_look,
                             _T("-100"), big_minus_rc,
                             button_style, *this, BigMinus);
+  WndForm::AddDestruct(big_minus);
 
   little_minus = new WndButton(GetClientAreaWindow(), big_button_look,
                                _T("-10"), little_minus_rc,
                                button_style, *this, LittleMinus);
+  WndForm::AddDestruct(little_minus);
 
   WindowStyle style_frame;
 
   altitude_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
                                 value_rc, style_frame);
+  WndForm::AddDestruct(altitude_value);
+
   altitude_value->SetAlignCenter();
   altitude_value->SetVAlignCenter();
 
@@ -274,12 +281,6 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
 void
 AltitudeSimulatorFullScreenPanel::Unprepare()
 {
-  delete big_plus;
-  delete big_minus;
-  delete little_plus;
-  delete little_minus;
-  delete altitude_value;
-  delete final_glide_chart;
   dialog_timer.Cancel();
 }
 
