@@ -91,7 +91,6 @@ UpdateInfoBoxAltitudeNav(InfoBoxData &data)
     data.SetTitle(InfoBoxFactory::GetCaption(InfoBoxFactory::e_HeightGPS));
 
   data.SetValueFromAltitude(basic.nav_altitude);
-  data.SetCommentFromAlternateAltitude(basic.nav_altitude);
 }
 
 void
@@ -105,7 +104,6 @@ InfoBoxContentAltitudeGPS::Update(InfoBoxData &data)
   }
 
   data.SetValueFromAltitude(basic.gps_altitude);
-  data.SetCommentFromAlternateAltitude(basic.gps_altitude);
 }
 
 static void
@@ -163,7 +161,6 @@ InfoBoxContentAltitudeAGL::Update(InfoBoxData &data)
   }
 
   data.SetValueFromAltitude(calculated.altitude_agl);
-  data.SetCommentFromAlternateAltitude(calculated.altitude_agl);
 
   // Set Color (red/black)
   data.SetValueColor(calculated.altitude_agl <
@@ -185,7 +182,6 @@ UpdateInfoBoxAltitudeBaro(InfoBoxData &data)
   }
 
   data.SetValueFromAltitude(basic.baro_altitude);
-  data.SetCommentFromAlternateAltitude(basic.baro_altitude);
 }
 
 void
@@ -205,7 +201,6 @@ UpdateInfoBoxAltitudeQFE(InfoBoxData &data)
     Value -= home_waypoint->elevation;
 
   data.SetValueFromAltitude(Value);
-  data.SetCommentFromAlternateAltitude(Value);
 }
 
 void
