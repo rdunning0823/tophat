@@ -313,7 +313,6 @@ MacCreadyEditPanel::Unprepare()
   delete auto_mc;
   delete final_glide_chart;
   dialog_timer.Cancel();
-  BaseAccessPanel::Unprepare();
 }
 
 Widget *

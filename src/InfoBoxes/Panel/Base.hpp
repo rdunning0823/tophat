@@ -93,13 +93,6 @@ public:
    */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
 
-  /*
-   * Called at the end of derived class Unprepare()
-   * Unprepares the header and tells InfoBox window that the popup is closed.
-   * Unprepares and deletes the managed widget
-   */
-  virtual void Unprepare();
-
   /**
    * calculates the rectangles on the base class itself
    */

@@ -176,7 +176,6 @@ OnlineContestPanel::Unprepare()
   delete info_frame;
   delete online_contest_chart;
   dialog_timer.Cancel();
-  BaseAccessPanel::Unprepare();
 }
 
 Widget *

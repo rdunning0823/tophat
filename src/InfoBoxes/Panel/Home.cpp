@@ -65,7 +65,6 @@ public:
     :BaseAccessPanel(_id) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
 
   void Refresh();
 
@@ -158,12 +157,6 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddDestruct(home_name);
 
   Refresh();
-}
-
-void
-HomePanel::Unprepare()
-{
-  BaseAccessPanel::Unprepare();
 }
 
 Widget *

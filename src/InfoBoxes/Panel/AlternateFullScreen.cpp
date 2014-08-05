@@ -166,7 +166,6 @@ AlternateFullScreen::Unprepare()
   delete details_button;
   delete goto_button;
   dialog_timer.Cancel();
-  BaseAccessPanel::Unprepare();
 }
 
 Widget *

@@ -117,16 +117,6 @@ BaseAccessPanel::Show(const PixelRect &rc)
 }
 
 void
-BaseAccessPanel::Unprepare()
-{
-  delete header_text;
-  delete setup_button;
-  delete close_button;
-  NullWidget::Unprepare();
-  managed_widget.Clear();
-}
-
-void
 BaseAccessPanel::Move(const PixelRect &rc_unused)
 {
   const PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
@@ -188,15 +178,16 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                _("Close"), close_button_rc,
                                button_style,
                                *this, CloseButton);
-
+  AddDestruct(close_button);
   setup_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
                                      _("Setup"), setup_button_rc,
                                      button_style,
                                      *this, SetUp);
-
+  AddDestruct(setup_button);
   WindowStyle style_frame;
   header_text = new WndFrame(GetClientAreaWindow(), look,
                              frame_rc, style_frame);
+  AddDestruct(header_text);
   header_text->SetVAlignCenter();
   header_text->SetFont(Fonts::infobox_small);
   SetCaption();

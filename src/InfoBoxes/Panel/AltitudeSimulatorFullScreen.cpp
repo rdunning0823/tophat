@@ -281,7 +281,6 @@ AltitudeSimulatorFullScreenPanel::Unprepare()
   delete altitude_value;
   delete final_glide_chart;
   dialog_timer.Cancel();
-  BaseAccessPanel::Unprepare();
 }
 
 AltitudeSimulatorFullScreenPanel::FinalGlideChart::FinalGlideChart(
