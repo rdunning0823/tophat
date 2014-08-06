@@ -46,8 +46,6 @@ public:
   class DialogFooter: public PaintWindow
   {
   public:
-    DialogFooter()
-      :height(0){}
     /**
      * A class that listens to the OnPaintFooter() method of the DialogFooter class
      */
@@ -65,6 +63,10 @@ public:
      * height of footer
      */
     UPixelScalar height;
+
+  public:
+    DialogFooter()
+      :height(0){}
 
   public:
     void Create(ContainerWindow &parent,
