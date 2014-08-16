@@ -128,7 +128,7 @@ ContestManager::UpdateIdle(bool exhaustive)
     return false;
 
   PeriodClock clock;
-  const unsigned timeout_threshold = 6000;
+  const unsigned timeout_threshold = 900;
   clock.Update();
 
   bool retval = false;
