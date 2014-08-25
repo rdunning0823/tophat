@@ -251,10 +251,12 @@ protected:
       if (!GradientValid(gr))
         return;
 
-      size_t length = _tcslen(buffer);
-      if (length > 0)
-        buffer[length++] = _T(' ');
-      _stprintf(buffer + length, _T("%.0f:1"), (double) gr);
+      if (gr > fixed(1)) {
+        size_t length = _tcslen(buffer);
+        if (length > 0)
+          buffer[length++] = _T(' ');
+        _stprintf(buffer + length, _T("%.0f:1"), (double) gr);
+      }
       return;
     }
 
