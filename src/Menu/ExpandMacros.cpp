@@ -704,6 +704,15 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
                       _T("$(ZoomAutoToggleActionName)"),
                       _("Manual"), _("Auto"), Size);
 
+  bool show_screens_button =
+      (CommonInterface::GetUISettings().screens_button_location ==
+      UISettings::ScreensButtonLocation::MAP) ||
+      (CommonInterface::SetUISettings().pages.n_pages < 2);
+
+  CondReplaceInString(show_screens_button, OutBuffer,
+                      _T("$(SwitchScreen)"),
+                      _(""), _("Switch Screens"), Size);
+
   if (_tcsstr(OutBuffer, _T("$(NextPageName)"))) {
     TCHAR label[30];
     const PageLayout &page =
