@@ -991,9 +991,8 @@ location=18
 mode=Menu
 type=key
 data=6
-event=DeclutterLabels show
-event=DeclutterLabels toggle
-label=Labels\n$(MapLabelsToggleActionName)
+event=Mode DeclutterLabels
+label=Map labels
 location=16
 
 mode=Menu
@@ -1036,9 +1035,8 @@ location=23
 mode=MenuWithScreens
 type=key
 data=6
-event=DeclutterLabels show
-event=DeclutterLabels toggle
-label=Labels\n$(MapLabelsToggleActionName)
+event=Mode DeclutterLabels
+label=Map labels
 location=16
 
 mode=MenuWithScreens
@@ -1238,6 +1236,50 @@ event=Orientation targetup
 event=Mode default
 label=$(OrientationTargetUp)
 location=18
+
+# -------------
+# mode=DeclutterLabels
+# -------------
+    
+mode=DeclutterLabels
+type=key
+data=6
+event=DeclutterLabels all
+event=Mode default
+label=$(DeclutterLabelsAll)
+location=16
+
+mode=DeclutterLabels
+type=key
+data=7
+event=DeclutterLabels task+landables
+event=Mode default
+label=$(DeclutterLabelsTaskLandables)
+location=17
+
+mode=DeclutterLabels
+type=key
+data=8
+event=DeclutterLabels task
+event=Mode default
+label=$(DeclutterLabelsTask)
+location=18
+
+mode=DeclutterLabels
+type=key
+data=9
+event=DeclutterLabels task+airfields
+event=Mode default
+label=$(DeclutterLabelsTaskAirfields)
+location=19
+
+mode=DeclutterLabels
+type=key
+data=5
+event=DeclutterLabels none
+event=Mode default
+label=$(DeclutterLabelsNone)
+location=20
 
 # ----------------------------------
 # mode=default.TA (ThermalAssistant)

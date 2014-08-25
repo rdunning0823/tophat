@@ -612,18 +612,9 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
                     gettext(labels[(i + 1) % n]), Size);
   }
 
-  //const WaypointRendererSettings &settings = CommonInterface::GetMapSettings().waypoint;
-  //WaypointRendererSettings::DisplayTextType::NAME
   WaypointRendererSettings::LabelSelection &wls =
     CommonInterface::SetMapSettings().waypoint.label_selection;
 
-/*  ALL,
-  TASK_AND_LANDABLE,
-  TASK,
-  NONE,
-  TASK_AND_AIRFIELD,
-
-  */
   CondReplaceInString(wls ==
       WaypointRendererSettings::LabelSelection::ALL, OutBuffer,
                       _T("$(DeclutterLabelsAll)"),
@@ -648,7 +639,6 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
       WaypointRendererSettings::LabelSelection::TASK_AND_AIRFIELD, OutBuffer,
                       _T("$(DeclutterLabelsTaskAirfields)"),
                       _T("* "), _("Task, Airfields"), _("Task, Airfields"), Size);
-
 
   CondReplaceInString(GetComputerSettings().task.auto_mc,
                       OutBuffer, _T("$(MacCreadyToggleActionName)"),
