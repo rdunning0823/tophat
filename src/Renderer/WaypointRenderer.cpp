@@ -253,8 +253,8 @@ protected:
 
       size_t length = _tcslen(buffer);
       if (length > 0)
-        buffer[length++] = _T(':');
-      _stprintf(buffer + length, _T("%.1f"), (double) gr);
+        buffer[length++] = _T(' ');
+      _stprintf(buffer + length, _T("%.0f:1"), (double) gr);
       return;
     }
 
