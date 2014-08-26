@@ -523,6 +523,11 @@ GlueMapWindow::DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const
 {
   StaticString<64> description;
 
+  if (GetMapSettings().final_glide_bar_display_mode ==
+      FinalGlideBarDisplayMode::OFF)
+    return;
+
+
   ProtectedTaskManager::Lease task_manager(*task);
   if (task_manager->GetMode() == TaskType::ORDERED)
     description = _("Task");

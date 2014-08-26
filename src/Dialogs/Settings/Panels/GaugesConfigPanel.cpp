@@ -97,7 +97,13 @@ GaugesConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Thermal band"),
              _("This enables the display of the thermal profile (climb band) display on the map."),
              map_settings.show_thermal_profile);
-  AddDummy();
+
+  AddEnum(_("Final glide bar"),
+          _("If set to \"On\" the final glide will always be shown, if set to \"Auto\" it will be shown when approaching the final glide possibility."),
+          final_glide_bar_display_mode_list,
+          (unsigned)map_settings.final_glide_bar_display_mode,
+          this);
+
   AddDummy();
   AddDummy();
 }
@@ -122,6 +128,9 @@ GaugesConfigPanel::Save(bool &_changed)
   changed |= SaveValue(EnableThermalProfile, ProfileKeys::EnableThermalProfile,
                        map_settings.show_thermal_profile);
 
+  changed |= SaveValueEnum(FinalGlideBarDisplayModeControl,
+                           ProfileKeys::FinalGlideBarDisplayMode,
+                           map_settings.final_glide_bar_display_mode);
   _changed |= changed;
 
   return true;
