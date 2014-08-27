@@ -180,12 +180,16 @@ CheckTakeOffSpeed(fixed takeoff_speed, const NMEAInfo &basic)
  * below a certain threshold that indicates the aircraft has ceased
  * flying.  To avoid false positives while wave/ridge soaring, this
  * threshold is half of the given take-off speed.
+ * Don't use ASI because a breeze on the ground can easily trigger
+ * false motion
  */
 gcc_pure
 static bool
 CheckLandingSpeed(fixed takeoff_speed, const NMEAInfo &basic)
 {
-  return !CheckTakeOffSpeed(Half(takeoff_speed), basic);
+  const fixed speed = basic.ground_speed;
+  // Speed too high for being on the ground
+  return speed < Half(takeoff_speed);
 }
 
 gcc_pure
