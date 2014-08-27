@@ -49,7 +49,11 @@ namespace Layout {
   unsigned text_padding = 3;
 };
 
-static void
+/*
+ * Draws logo and footer
+ * @return remaining rectangle unused
+ */
+static PixelRect
 DrawBanner(Canvas &canvas, PixelRect &rc)
 {
   const unsigned padding = 10;
@@ -58,6 +62,7 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
 
   const Bitmap logo(IDB_LOGO);
   const unsigned banner_height = logo.GetHeight();
+  PixelRect rc_remaining = rc;
 
   /* draw the XCSoar logo */
   int x = rc.left + left_margin;
@@ -86,8 +91,9 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   x = rc.left + left_margin;
   const TCHAR *const website = _T("www.tophatsoaring.org");
   canvas.Select(bold_font);
-  canvas.DrawText(x, rc.top + banner_height + padding + top_logo_margin,
-                  website);
+  unsigned website_top = rc.top + banner_height + padding + top_logo_margin;
+  canvas.DrawText(x, website_top, website);
+  rc_remaining.top = website_top + bold_font.GetHeight();
 
   /* Version at bottom right */
   x = rc.right - canvas.CalcTextSize(TopHat_Version).cx - padding;
@@ -97,12 +103,17 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   x -= canvas.CalcTextSize(version).cx;
   canvas.DrawText(x, y, version);
 
+  rc_remaining.bottom = y + padding;
+  rc_remaining.left = rc.left + left_margin;
+
   /* power off message */
   const TCHAR *const comment = _T("powered off");
   canvas.DrawText(rc.right - canvas.CalcTextWidth(comment) - padding,
                   rc.top + padding, comment);
 
   rc.top += banner_height + 8;
+
+  return rc_remaining;
 }
 
 static void
@@ -128,8 +139,8 @@ Draw(Canvas &canvas)
   PixelRect rc = canvas.GetRect();
   rc.Grow(-16);
 
-  DrawBanner(canvas, rc);
-  DrawFlights(canvas, rc);
+  PixelRect rc_remaining = DrawBanner(canvas, rc);
+  DrawFlights(canvas, rc_remaining);
 }
 
 int main(int argc, char **argv)
