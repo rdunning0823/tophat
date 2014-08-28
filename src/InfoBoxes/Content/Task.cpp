@@ -109,8 +109,7 @@ InfoBoxContentBearingDiff::Update(InfoBoxData &data)
     return;
   }
 
-  Angle Value = vector_remaining.bearing - basic.track;
-  data.SetCommentFromBearingDifference(Value);
+  data.SetCommentFromDistance(vector_remaining.distance);
 }
 
 void
