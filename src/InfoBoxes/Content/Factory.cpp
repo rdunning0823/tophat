@@ -696,7 +696,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentBearingDiff>::Create,
     e_Speed, // V TAS
     e_Load_G, // G load
-    DEPRECATED,
+    STANDARD,
   },
 
   // e_Temperature
