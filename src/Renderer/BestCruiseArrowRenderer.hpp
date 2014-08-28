@@ -35,8 +35,13 @@ namespace BestCruiseArrowRenderer
   void Draw(Canvas &canvas, const TaskLook &look, const Angle screen_angle,
             const Angle best_cruise_angle, const RasterPoint pos);
 
+  void DrawInfoBox(Canvas &canvas, const TaskLook &look,
+                   const Angle screen_angle, const Angle best_cruise_angle,
+                   const RasterPoint pos);
+
   void Draw(Canvas &canvas, const TaskLook &look, const Angle screen_angle,
-            const RasterPoint pos, const DerivedInfo &calculated);
+            const RasterPoint pos, const DerivedInfo &calculated,
+            bool draw_infobox = false);
 }
 
 #endif

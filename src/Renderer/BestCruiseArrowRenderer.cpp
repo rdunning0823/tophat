@@ -47,9 +47,28 @@ BestCruiseArrowRenderer::Draw(Canvas &canvas, const TaskLook &look,
 }
 
 void
+BestCruiseArrowRenderer::DrawInfoBox(Canvas &canvas,
+                                     const TaskLook &look,
+                                     const Angle screen_angle,
+                                     const Angle best_cruise_angle,
+                                     const RasterPoint pos)
+{
+  canvas.Select(look.best_cruise_track_pen);
+  canvas.Select(look.best_cruise_track_brush);
+
+  RasterPoint arrow[] = { { -1, 12 }, { -1, -4 }, { -6, -4 }, {  0, -12 },
+                          {  6, -4 }, {  1, -4 }, {  1, 12 }, { -1, 12 } };
+
+  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pos.x, pos.y,
+                     best_cruise_angle - screen_angle);
+  canvas.DrawPolygon(arrow, ARRAY_SIZE(arrow));
+}
+
+void
 BestCruiseArrowRenderer::Draw(Canvas &canvas, const TaskLook &look,
                               const Angle screen_angle, const RasterPoint pos,
-                              const DerivedInfo &calculated)
+                              const DerivedInfo &calculated,
+                              bool draw_infobox)
 {
   if (calculated.turn_mode == CirclingMode::CLIMB ||
       !calculated.task_stats.task_valid)
@@ -62,6 +81,10 @@ BestCruiseArrowRenderer::Draw(Canvas &canvas, const TaskLook &look,
       solution.vector.distance < fixed(0.010))
     return;
 
-  BestCruiseArrowRenderer::Draw(canvas, look, screen_angle,
-                                solution.cruise_track_bearing, pos);
+  if (draw_infobox)
+    BestCruiseArrowRenderer::DrawInfoBox(canvas, look, screen_angle,
+                                         solution.cruise_track_bearing, pos);
+  else
+    BestCruiseArrowRenderer::Draw(canvas, look, screen_angle,
+                                  solution.cruise_track_bearing, pos);
 }

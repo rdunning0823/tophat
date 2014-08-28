@@ -28,11 +28,16 @@ Copyright_License {
 
 extern const InfoBoxPanel next_waypoint_infobox_panels[];
 
-void
-UpdateInfoBoxBearing(InfoBoxData &data);
+class InfoBoxContentBearingDiff: public InfoBoxContent
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+  virtual const InfoBoxPanel *GetDialogContent() override;
+  virtual void OnCustomPaint(Canvas &canvas, const PixelRect &rc) override;
+};
 
 void
-UpdateInfoBoxBearingDiff(InfoBoxData &data);
+UpdateInfoBoxBearing(InfoBoxData &data);
 
 void
 UpdateInfoBoxRadial(InfoBoxData &data);
