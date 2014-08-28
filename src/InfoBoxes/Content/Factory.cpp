@@ -692,7 +692,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Bearing difference"),
     N_("Brng D"),
-    N_("The difference between the glider's track bearing, to the bearing of the next waypoint, or for AAT tasks, to the bearing to the target within the AAT sector. GPS navigation is based on the track bearing across the ground, and this track bearing may differ from the glider's heading when there is wind present. Chevrons point to the direction the glider needs to alter course to correct the bearing difference, that is, so that the glider's course made good is pointing directly at the next waypoint. This bearing takes into account the curvature of the Earth."),
+    N_("The difference between the glider's track, to the bearing of the next waypoint or Target."),
     IBFHelper<InfoBoxContentBearingDiff>::Create,
     e_Speed, // V TAS
     e_Load_G, // G load
