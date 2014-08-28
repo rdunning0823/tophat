@@ -690,9 +690,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_WP_BearingDiff
   {
-    N_("Bearing difference"),
-    N_("Brng D"),
-    N_("The difference between the glider's track, to the bearing of the next waypoint or Target."),
+    N_("Next target arrow"),
+    N_("Target"),
+    N_("Draws arrow of difference between the glider's track, to the bearing of the next waypoint or Target."),
     IBFHelper<InfoBoxContentBearingDiff>::Create,
     e_Speed, // V TAS
     e_Load_G, // G load
