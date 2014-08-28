@@ -157,7 +157,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   }
 
   TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
-  bool use_target =
+  // always navigate to center!
+  bool use_target = false &&
       task_data_cache.GetTaskFactoryType() == TaskFactoryType::AAT &&
       task_data_cache.GetTaskMode() == TaskType::ORDERED &&
       idx > 0;

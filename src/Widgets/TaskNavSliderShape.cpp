@@ -311,7 +311,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     else if (idx + 1 == task_size)
         buffer = _("Finish");
     else if (task_factory_type ==  TaskFactoryType::AAT)
-      _stprintf(buffer.buffer(), _T("Target %u"), idx);
+      _stprintf(buffer.buffer(), _T("Center %u"), idx);
     else
       _stprintf(buffer.buffer(), _T("TP %u"), idx);
 
