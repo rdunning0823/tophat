@@ -37,6 +37,7 @@ runlevel=S
 prevlevel=N
 umask 022
 export PATH runlevel prevlevel
+DotKobo=/mnt/onboard/.kobo
 
 for i in /proc /dev /root /tmp /sys /mnt/sd /mnt/onboard /mnt/user /var/lib /var/log /var/run /lib/modules/`uname -r`; do
 	[ ! -d $i ] && mkdir -p $i
@@ -98,7 +99,7 @@ fi
 if [ -e /mnt/onboard/.kobo/KoboRoot.tgz ]; then
 	zcat /mnt/onboard/.kobo/KoboRoot.tgz > /dev/null && tar zxf /mnt/onboard/.kobo/KoboRoot.tgz -C /
 	if [ -e /mnt/onboard/.kobo/upgrade ]; then
-		/etc/init.d/upgrade-wifi.sh
+		/etc/init.d/upgrade-generic.sh null null ${DotKobo}/upgrade/uImage mmcblk0
 		rm -rf /mnt/onboard/.kobo/upgrade
 	fi
 	rm /mnt/onboard/.kobo/KoboRoot.tgz
@@ -147,7 +148,6 @@ mkdir /dev/pts
 /bin/mount -t devpts devpts /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
-DotKobo=/mnt/onboard/.kobo
 uImageValid=N
 if [ -f ${DotKobo}/uImage-KoboLabs ] &&
    [ -f ${DotKobo}/uImage-USB-hot-plug ]; then
