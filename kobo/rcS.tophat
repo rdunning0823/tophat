@@ -166,7 +166,14 @@ if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     fi
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     /usr/local/Kobo/hindenburg &
-    /usr/local/Kobo/nickel -qws -skipFontLoad &
+    case $PRODUCT in
+    pixie) # Mini
+        /usr/local/Kobo/nickel -qws -skipFontLoad &;;
+    kraken) # Glo
+        /usr/local/Kobo/nickel -platform kobo -skipFontLoad &;;
+    *)
+        /usr/local/Kobo/nickel -qws -skipFontLoad &;;
+    esac
 else
     if [ "$uImageValid" == "Y" ] && ! /bin/dd if=/dev/mmcblk0 bs=1M bs=512 \
         skip=2048 count=1 2>/dev/null | strings | grep -q USB-hot-plug; then
