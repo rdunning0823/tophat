@@ -80,31 +80,20 @@ KOBO_SYS_LIB_NAMES = libc.so.6 libm.so.6 libpthread.so.0 librt.so.1 \
 	ld-linux-armhf.so.3
 KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 
-# Optionally, two uImage files are created
-# One supports PC Connect, on supports USB HOST mode
-# Their installation is managed by the KoboMenu and rcS.tophat
+# Optionally, uImage files which supports USB HOST mode are created
+# The installation is managed by the KoboMenu and rcS.tophat
 UIMAGE_BASE_DIR=$(topdir)/kobo/uimage/hw/imx507/linux-2.6.35.3-USBHOST
-UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage-USB-hot-plug
-UIMAGE_KOBO_LABS=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage-KoboLabs
+UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage
 ifeq ($(KOBO_UIMAGE),y)
-	UIMAGE_PREREQUISITES=UIMAGES
-	UIMAGE_CMD_ONE=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/
-	UIMAGE_CMD_TWO=$(Q)install -m 0644 $(UIMAGE_KOBO_LABS) $(@D)/KoboRoot/mnt/onboard/.kobo/
+	UIMAGE_PREREQUISITES=UIMAGE
+	UIMAGE_CMD=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
 endif
 
-UIMAGES:
-	cd $(UIMAGE_BASE_DIR) && \
-	git checkout remotes/origin/KoboLabs && \
-	make CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage -j3 && \
-	cp arch/arm/boot/uImage arch/arm/boot/uImage-KoboLabs
+$(UIMAGE_BASE_DIR)/COPYING:
+	git submodule update --init kobo/uimage
 
-	cd $(UIMAGE_BASE_DIR) && \
-	git checkout remotes/origin/USB-hot-plug && \
-	make CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage && \
-	cp arch/arm/boot/uImage arch/arm/boot/uImage-USB-hot-plug
-
-#	make clean && \
-
+UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
+	make -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
 
 # /mnt/onboard/.kobo/KoboRoot.tgz is a file that is picked up by
 # /etc/init.d/rcS, extracted to / on each boot; we can use it to
@@ -121,8 +110,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc $(@D)/KoboRoot/opt/tophat/bin $(@D)/KoboRoot/opt/tophat/share/fonts $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/mnt/onboard/.kobo
 	$(Q)install -m 0755 $(XCSOAR_BIN) $(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) $(@D)/KoboRoot/opt/tophat/bin
-	$(Q)$(UIMAGE_CMD_ONE)
-	$(Q)$(UIMAGE_CMD_TWO)
+	$(Q)$(UIMAGE_CMD)
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
 	$(Q)install -m 0644 $(topdir)/kobo/inetd.conf $(@D)/KoboRoot/etc

@@ -148,17 +148,18 @@ mkdir /dev/pts
 /bin/mount -t devpts devpts /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
-uImageValid=N
-if [ -f ${DotKobo}/uImage-KoboLabs ] &&
-   [ -f ${DotKobo}/uImage-USB-hot-plug ]; then
-    uImageValid=Y
+if /bin/dd if=/dev/mmcblk0 bs=512 skip=2048 count=1 2>/dev/null | \
+  strings | grep -q USB-hot-plug; then
+    USB_hot_plug=Y
+else
+    USB_hot_plug=N
+    # save original uImage as uImage-KoboLabs
+    dd if=/dev/mmcblk0 bs=512 skip=2048 count=4000 of=${DotKobo}/uImage-KoboLabs
 fi
-
 
 if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
-    if [ "$uImageValid" == "Y" ] && /bin/dd if=/dev/mmcblk0 bs=1M bs=512 \
-        skip=2048 count=1 2>/dev/null | strings | grep -q USB-hot-plug; then
+    if [ "${USB_hot_plug}" == "Y" -a -f ${DotKobo}/uImage-KoboLabs ]; then
 	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
 	cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
 	touch ${DotKobo}/KoboRoot.tgz
@@ -175,8 +176,7 @@ if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
         /usr/local/Kobo/nickel -qws -skipFontLoad &;;
     esac
 else
-    if [ "$uImageValid" == "Y" ] && ! /bin/dd if=/dev/mmcblk0 bs=1M bs=512 \
-        skip=2048 count=1 2>/dev/null | strings | grep -q USB-hot-plug; then
+    if [ "${USB_hot_plug}" != "Y" -a -f ${DotKobo}/uImage-USB-hot-plug ]; then
 	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
 	cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
 	touch ${DotKobo}/KoboRoot.tgz
