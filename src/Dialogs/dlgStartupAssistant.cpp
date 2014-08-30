@@ -81,6 +81,8 @@ const TCHAR* tips [] = {
     N_("Too many buttons on the screen? Move the 'S' button to the menu in Setup > Screens"),
     N_("Clean up the screen?  Click the Wind Infobox and select to show the Wind arrow only in the Infobox"),
     N_("To EXIT Top Hat, click the 'M' menu button four times"),
+    N_("Task: to fly a TAT/AAT task with big cylinders, the Nav Bar points to the CENTER of the TP.  The arrow on the map points to the target."),
+    N_("Task: when flying a TAT/AAT task with big cylinders, consider the 'Target arrow' Infobox to help navigate to the target."),
 
 };
 
