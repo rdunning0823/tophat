@@ -462,7 +462,7 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
     fourth = 30,
   };
   const IconLook &icon_look = UIGlobals::GetIconLook();
-  const Bitmap *bmp_bearing;
+  const Bitmap *bmp_bearing = nullptr;
   int direction = 0;
   if (bearing.AsDelta().Degrees() > fixed(first)) {
     if (bearing.AsDelta().Degrees() > fixed(fourth))
