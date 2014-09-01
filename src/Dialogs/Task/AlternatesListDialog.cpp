@@ -219,10 +219,6 @@ dlgAlternatesListShowModal()
   TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
                                            widget);
 
-/*
-  AlternatesListWidget widget(dialog_look);
-  widget.Update();*/
-
   WidgetDialog dialog(dialog_look);
   widget->SetForm(&dialog);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Alternates"), two_widgets);
