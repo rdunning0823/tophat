@@ -56,7 +56,7 @@ protected:
 
   DockWindow list_dock;
 
-  AlternatesListWidget2 *alternates_list_widget2;
+  AlternatesListWidgetNoButtons *alternates_list_widget2;
   TwoWidgets *two_widgets;
 
   WndButton *details_button, *goto_button;
@@ -125,7 +125,7 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WindowStyle style;
   style.ControlParent();
   list_dock.Create(*this, list_rc, style);
-  alternates_list_widget2 = new AlternatesListWidget2(dialog_look);
+  alternates_list_widget2 = new AlternatesListWidgetNoButtons(dialog_look);
   alternates_list_widget2->Update();
   alternates_list_widget2->SetForm(this);
   two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),

@@ -94,12 +94,12 @@ public:
  * a widget that lists the alternates and executes the actions
  * but has no buttons visible
  */
-class AlternatesListWidget2 : public AlternatesListWidget
+class AlternatesListWidgetNoButtons : public AlternatesListWidget
 {
 protected:
   WndForm *form;
 public:
-  AlternatesListWidget2(const DialogLook &_dialog_look)
+  AlternatesListWidgetNoButtons(const DialogLook &_dialog_look)
     :AlternatesListWidget(_dialog_look) {}
 
   void SetForm(WndForm *_form) {

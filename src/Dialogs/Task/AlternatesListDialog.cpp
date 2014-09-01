@@ -114,13 +114,13 @@ AlternatesListWidget::OnAction(int id)
 }
 
 void
-AlternatesListWidget2::Move(const PixelRect &rc)
+AlternatesListWidgetNoButtons::Move(const PixelRect &rc)
 {
   AlternatesListWidget::Move(rc);
 }
 
 void
-AlternatesListWidget2::Refresh()
+AlternatesListWidgetNoButtons::Refresh()
 {
   AlternatesListWidget::Update();
   GetList().SetLength(alternates.size());
@@ -128,14 +128,14 @@ AlternatesListWidget2::Refresh()
 }
 
 void
-AlternatesListWidget2::OnActivateItem(unsigned index)
+AlternatesListWidgetNoButtons::OnActivateItem(unsigned index)
 {
   if (DoDetails())
     form->SetModalResult(mrOK);
 }
 
 const Waypoint*
-AlternatesListWidget2::GetWaypoint()
+AlternatesListWidgetNoButtons::GetWaypoint()
 {
   unsigned index = GetCursorIndex();
   if (index >= alternates.size())
@@ -146,7 +146,7 @@ AlternatesListWidget2::GetWaypoint()
 }
 
 bool
-AlternatesListWidget2::DoGoto()
+AlternatesListWidgetNoButtons::DoGoto()
 {
   const Waypoint *waypoint = GetWaypoint();
   if (waypoint != nullptr) {
@@ -157,7 +157,7 @@ AlternatesListWidget2::DoGoto()
 }
 
 bool
-AlternatesListWidget2::DoDetails()
+AlternatesListWidgetNoButtons::DoDetails()
 {
   const Waypoint *waypoint = GetWaypoint();
   if (waypoint != nullptr) {
@@ -214,7 +214,7 @@ dlgAlternatesListShowModal()
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
-  AlternatesListWidget2 *widget = new AlternatesListWidget2(dialog_look);
+  AlternatesListWidgetNoButtons *widget = new AlternatesListWidgetNoButtons(dialog_look);
   widget->Update();
   TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
                                            widget);
