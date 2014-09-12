@@ -285,7 +285,8 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
   GeoPoint location = render_projection.GetGeoLocation();
 
   TextInBoxMode mode;
-  mode.shape = LabelShape::OUTLINED;
+//  mode.shape = LabelShape::OUTLINED;
+  mode.shape = LabelShape::FILLED;
   mode.align = TextInBoxMode::Alignment::RIGHT;
 
   const Font &font = *look.overlay_font;
