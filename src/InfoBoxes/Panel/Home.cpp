@@ -54,8 +54,8 @@ class HomePanel : public BaseAccessPanel, TwoButtonLayout {
 
 protected:
   /**
-   * These 4 buttons and the mc_value frame use the layout rectangles
-   * calculated in NumberButtonLayout
+   * These 2 buttons use the layout rectangles
+   * calculated in TwoButtonLayout
    */
   WndButton *change;
   WndFrame *home_name;
