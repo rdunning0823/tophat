@@ -38,6 +38,7 @@ Copyright_License {
 #include "Engine/Task/AbstractTask.hpp"
 #include "Engine/Task/Unordered/UnorderedTaskPoint.hpp"
 #include "Engine/Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/ProtectedRoutePlanner.hpp"
 #include "Screen/Canvas.hpp"
@@ -50,6 +51,7 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "UIGlobals.hpp"
 #include "Look/WaypointLook.hpp"
+
 
 #include <assert.h>
 #include <stdio.h>
@@ -315,7 +317,6 @@ protected:
     vwp.DrawSymbol(settings, look, canvas,
                    projection.GetMapScale() > fixed(4000),
                    projection.GetScreenAngle());
-
     if (is_mat & vwp.in_task) {
       DrawMatTaskpointOz(canvas, vwp);
     }
@@ -504,7 +505,8 @@ WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
 
     const TaskStats &task_stats = task_manager->GetStats();
 
-    v.SetIsMat(task_stats.is_mat);
+    const OrderedTask &ordered_task = task_manager->GetOrderedTask();
+    v.SetIsMat(ordered_task.GetFactoryType() == TaskFactoryType::MAT);
 
     // task items come first, this is the only way we know that an item is in task,
     // and we won't add it if it is already there
