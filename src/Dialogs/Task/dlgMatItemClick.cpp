@@ -495,13 +495,13 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   case MAT_ADD_AFTER_OR_REPLACE_FIRST:
   case MAT_ADD_AFTER_OR_REPLACE_INDEX:
     add_del_button_text = _("Append");
-    add_del_info_text.Format(_("%s   %s   %s   %s"), _("Append"),
+    add_del_info_text.Format(_("%s (%s) %s (%s)"), _("Append"),
                              wp_clicked.name.substr(0,Waypoint_length).c_str(),
                              _("after"),
                              current_wp_name.substr(0,Waypoint_length).c_str());
 
     replace_button_text = _("Replace");
-    replace_text.Format(_T("%s   %s   %s   %s"),
+    replace_text.Format(_T("%s (%s) %s (%s)"),
                         _("Replace"),
                         current_wp_name.substr(0, Waypoint_length).c_str(),
                         _("with"),
@@ -509,7 +509,7 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     break;
 
   case MAT_INSERT_BEFORE_FINISH:
-    add_del_info_text.Format(_T("%s   %s   %s   %s"),
+    add_del_info_text.Format(_T("%s (%s) %s (%s)"),
                              _("Insert"),
                              wp_clicked.name.substr(0, Waypoint_length).c_str(),
                              _("before"),
@@ -518,7 +518,7 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     break;
   case MAT_DELETE:
     add_del_button_text = _("Delete");
-    add_del_info_text.Format(_T("%s   %s"), _("Delete"),
+    add_del_info_text.Format(_T("%s (%s)"), _("Delete"),
                              wp_clicked.name.substr(0, Waypoint_length).c_str());
     break;
   }
