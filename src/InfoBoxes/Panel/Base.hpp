@@ -270,4 +270,34 @@ protected:
   void CalculateLayout(const PixelRect &rc);
 };
 
+/**
+ *  Base class that sizes the rectangles needed to layout
+ *  three buttons in two rows.
+ *  Vertically in the center of the screen.
+ *  Upper button is full width.
+ *  Lower two buttons are left/right half width bdlow upper button
+ */
+class ThreeButtonLayout {
+protected:
+  /**
+   * upper rect, full width
+   */
+  PixelRect upper_rc;
+
+  /**
+   * lower two rects, half screen width
+   */
+  PixelRect lower_left_rc;
+  PixelRect lower_right_rc;
+
+
+protected:
+  /*
+   * Sizes the rectangles for the layout in the center
+   * of the rc
+   * @param rc The rc of the parent window's usable area
+   */
+  void CalculateLayout(const PixelRect &rc);
+};
+
 #endif

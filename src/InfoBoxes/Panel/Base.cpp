@@ -299,3 +299,21 @@ TwoButtonLayout::CalculateLayout(const PixelRect &rc)
   lower_rc.top = upper_rc.bottom + 1;
   lower_rc.bottom = lower_rc.top + height;
 }
+
+void
+ThreeButtonLayout::CalculateLayout(const PixelRect &rc)
+{
+  upper_rc = rc;
+  upper_rc.Grow(-2, 0);
+  lower_left_rc = upper_rc;
+  lower_left_rc.right = lower_left_rc.left +
+      (upper_rc.right - upper_rc.left) / 2;
+  lower_right_rc = lower_left_rc;
+  lower_right_rc.Offset(lower_left_rc.GetSize().cx, 0);
+  const UPixelScalar height = GetFooterHeight();
+  upper_rc.top = rc.top + (rc.bottom - rc.top - 2 * height) / 2;
+  upper_rc.bottom = upper_rc.top + height;
+
+  lower_left_rc.top = lower_right_rc.top = upper_rc.bottom + 1;
+  lower_left_rc.bottom = lower_right_rc.bottom = lower_left_rc.top + height;
+}
