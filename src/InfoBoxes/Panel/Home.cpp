@@ -40,6 +40,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Computer/Settings.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
+#include "Engine/Waypoint/Waypoints.hpp"
 #include "Message.hpp"
 #include "Look/DialogLook.hpp"
 
@@ -47,16 +48,18 @@ Copyright_License {
 enum ControlIndex {
   HomeName = 100,
   Change,
+  GotoHome,
 };
 
 
-class HomePanel : public BaseAccessPanel, TwoButtonLayout {
+class HomePanel : public BaseAccessPanel, ThreeButtonLayout {
 
 protected:
   /**
-   * These 2 buttons use the layout rectangles
-   * calculated in TwoButtonLayout
+   * These 3 items use the layout rectangles
+   * calculated in ThreeButtonLayout
    */
+  WndButton *goto_home;
   WndButton *change;
   WndFrame *home_name;
 
@@ -104,6 +107,16 @@ HomePanel::OnAction(int action_id)
     Message::AddMessage(message.c_str());
     break;
   }
+  case GotoHome:
+  {
+    ComputerSettings &settings_computer =
+      CommonInterface::SetComputerSettings();
+    const Waypoint *wp = way_points.LookupId(settings_computer.poi.home_waypoint);
+    if (wp != nullptr) {
+      protected_task_manager->DoGoto(*wp);
+      BaseAccessPanel::Close();
+    }
+  }
   default:
     BaseAccessPanel::OnAction(action_id);
     return;
@@ -131,13 +144,7 @@ void
 HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  TwoButtonLayout::CalculateLayout(content_rc);
-
-  /**
-   * make Change button smaller easily distinguishable from the full-width
-   * Close button
-   */
-  lower_rc.right /= 2;
+  ThreeButtonLayout::CalculateLayout(content_rc);
 
   WindowStyle style;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
@@ -146,7 +153,11 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   button_style.multiline();
   change = new WndButton(GetClientAreaWindow(), dialog_look.button,
                          _("Select waypoint"),
-                         lower_rc, button_style, *this, Change);
+                         lower_left_rc, button_style, *this, Change);
+
+  goto_home = new WndButton(GetClientAreaWindow(), dialog_look.button,
+                         _("Goto"),
+                         lower_right_rc, button_style, *this, GotoHome);
 
   WindowStyle style_frame;
   home_name = new WndFrame(GetClientAreaWindow(), dialog_look,
