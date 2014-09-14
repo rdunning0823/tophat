@@ -62,7 +62,7 @@ const TCHAR* tips [] = {
     N_("You can suspend your task by clicking on a waypoint and selecting 'Goto.'"),
     N_("While you are in 'Goto' mode, the Nav Bar and all your Infoboxes provide information solely about getting to the waypoint."),
     N_("While in 'Goto' mode, click the Nav Bar and 'Resume' to navigate your task again."),
-    N_("If you are flying a MAT task, just create the start and finish.  Task points will be added as you fly over them."),
+    N_("If you are flying a MAT task, just create the start and finish.  Add or remove task points to the task by clicking them on the map."),
     N_("Create tasks in See You desktop and save them as a .CUP file.  Copy the .CUP file to XCSoarData.  Load using Top Hat's task manager."),
     N_("Click on an item in the map to show its details."),
     N_("Click on a waypoint on the map to Goto it."),
