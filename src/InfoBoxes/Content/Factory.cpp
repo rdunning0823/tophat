@@ -424,7 +424,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Track"),
     N_("Track"),
-    N_("Magnetic track reported by the GPS. (Touch-screen/PC only) If this InfoBox is active in simulation mode, pressing the up and down  arrows adjusts the track."),
+    N_("Track direction of the ship, true north."),
     IBFHelper<InfoBoxContentTrack>::Create,
     e_AirSpeed_Ext, // V IAS
     e_Speed_GPS, // V GND
