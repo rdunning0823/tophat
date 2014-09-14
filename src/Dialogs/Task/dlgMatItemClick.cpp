@@ -500,12 +500,12 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                              _("after"),
                              current_wp_name.substr(0,Waypoint_length).c_str());
 
-    replace_button_text = _("Goto");
+    replace_button_text = _("Replace");
     replace_text.Format(_T("%s   %s   %s   %s"),
-                        _("Goto"),
-                        wp_clicked.name.substr(0,Waypoint_length).c_str(),
-                        _("instead of"),
-                        current_wp_name.substr(0, Waypoint_length).c_str());
+                        _("Replace"),
+                        current_wp_name.substr(0, Waypoint_length).c_str(),
+                        _("with"),
+                        wp_clicked.name.substr(0,Waypoint_length).c_str());
     break;
 
   case MAT_INSERT_BEFORE_FINISH:
