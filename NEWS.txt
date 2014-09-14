@@ -8,6 +8,10 @@ Top Hat Soaring 2.0.2 beta
 * Allow hiding of Final glide bar in advanced settings
 * Italian translation
 * Waypoint labels menu option
+* Simplify MAT task dialog
+* MAT task display labels & OZs during "Goto/abort"
+* Home Infoboxes: add Goto button
+* Pan mode: add white background when drawing coordinates
 
 Top Hat Soaring 2.0.1 July 28, 2014
 * Simplified waypoints list, added column header sort
