@@ -183,9 +183,12 @@ echo start nickel >>${DotKobo}/rcS.tophat.log
 echo PRODUCT=${PRODUCT} >>${DotKobo}/rcS.tophat.log
     case $PRODUCT in
     pixie) # Mini
+date >>${DotKobo}/rcS.tophat.log
 echo start nickel for Mini >>${DotKobo}/rcS.tophat.log
         /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
     kraken) # Glo
+date >>${DotKobo}/rcS.tophat.log
+echo start nickel for Glo >>${DotKobo}/rcS.tophat.log
         /usr/local/Kobo/nickel -platform kobo -skipFontLoad & ;;
     *)
         /usr/local/Kobo/nickel -platform kobo -skipFontLoad & ;;
@@ -195,6 +198,8 @@ else
 	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
 	cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
 	touch ${DotKobo}/KoboRoot.tgz
+date >>${DotKobo}/rcS.tophat.log
+echo copy uImage-USB-hot-plug and reboot >>${DotKobo}/rcS.tophat.log
 	reboot
     fi
     # disable the flashing led
@@ -223,6 +228,8 @@ else
     fi
 
     echo 3 > /sys/class/graphics/fb0/rotate
+date >>${DotKobo}/rcS.tophat.log
+echo start KoboMenu >>${DotKobo}/rcS.tophat.log
     /opt/tophat/bin/KoboMenu &
     /sbin/udevadm control --env=STARTUP=1
     killall plug
