@@ -154,7 +154,9 @@ if /bin/dd if=/dev/mmcblk0 bs=512 skip=2048 count=1 2>/dev/null | \
 else
     USB_hot_plug=N
     # save original uImage as uImage-KoboLabs
-    dd if=/dev/mmcblk0 bs=512 skip=2048 count=4000 of=${DotKobo}/uImage-KoboLabs
+    if [ ! -f ${DotKobo}/uImage-KoboLabs ]; then
+        dd if=/dev/mmcblk0 bs=512 skip=2048 count=4000 of=${DotKobo}/uImage-KoboLabs
+    fi
 fi
 
 if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
