@@ -24,9 +24,11 @@ Copyright_License {
 #include "Message.hpp"
 #include "MainWindow.hpp"
 #include "Interface.hpp"
+#include "LogFile.hpp"
 
 void
 Message::AddMessage(const TCHAR* text, const TCHAR *data)
 {
   CommonInterface::main_window->popup.AddMessage(text, data);
+  LogFormat(_T("%s, %s"), text, data == nullptr ? _T("") : data);
 }
