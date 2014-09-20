@@ -181,17 +181,21 @@ echo copy uImage-KoboLabs and reboot >>${DotKobo}/rcS.tophat.log
 date >>${DotKobo}/rcS.tophat.log
 echo start nickel >>${DotKobo}/rcS.tophat.log
 echo PRODUCT=${PRODUCT} >>${DotKobo}/rcS.tophat.log
-    case $PRODUCT in
-    pixie) # Mini
-date >>${DotKobo}/rcS.tophat.log
-echo start nickel for Mini >>${DotKobo}/rcS.tophat.log
+
+#    case `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` in
+    SERIAL=`dd if=/dev/mmcblk0 bs=8 count=1 skip=64`
+echo SERIAL=${SERIAL} >>${DotKobo}/rcS.tophat.log
+    case ${SERIAL} in
+    "SN-N7052") # Mini
         /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
-    kraken) # Glo
-date >>${DotKobo}/rcS.tophat.log
-echo start nickel for Glo >>${DotKobo}/rcS.tophat.log
+    "SN-613A4") # Caz's Glo which acquired in Japan
         /usr/local/Kobo/nickel -platform kobo -skipFontLoad & ;;
-    *)
-        /usr/local/Kobo/nickel -platform kobo -skipFontLoad & ;;
+    "SN-613A3") # Rob's Glo
+        /usr/local/Kobo/nickel -qws & ;;
+    "SN-N905B") # Touch
+        /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
+    *) # for safety
+        /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
     esac
 else
     if [ "${USB_hot_plug}" != "Y" -a -f ${DotKobo}/uImage-USB-hot-plug ]; then
