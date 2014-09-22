@@ -150,7 +150,7 @@ MapWidgetOverlays::UpdateVisibility(const PixelRect &rc_full_screen,
     widget->UpdateVisibility(rc_current, is_panning, is_main_window_widget,
                              is_map);
     if (widget->IsVisible())
-      Move(rc_current);
+      widget->Move(rc_current);
   }
 }
 
