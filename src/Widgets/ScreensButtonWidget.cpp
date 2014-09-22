@@ -132,8 +132,7 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
     rc.top = rc.bottom - GetHeight();
   break;
 }
-  WindowWidget::Move(rc);
-  GetWindow().Move(rc);
+  OverlayButtonWidget::Move(rc);
 }
 
 void

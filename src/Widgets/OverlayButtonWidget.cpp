@@ -64,6 +64,15 @@ OverlayButtonWidget::Unprepare()
 }
 
 void
+OverlayButtonWidget::Move(const PixelRect &rc)
+{
+  PixelRect rc_old = GetWindow().GetPosition();
+  if (rc.left != rc_old.left || rc.right != rc_old.right ||
+      rc.bottom != rc_old.bottom || rc.top != rc_old.top)
+    WindowWidget::Move(rc);
+}
+
+void
 OverlayButtonWidget::Show(const PixelRect &rc)
 {
   GetWindow().Show();

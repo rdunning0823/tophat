@@ -89,7 +89,7 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
     }
     break;
   }
-  WindowWidget::Move(rc);
+  OverlayButtonWidget::Move(rc);
 }
 
 void

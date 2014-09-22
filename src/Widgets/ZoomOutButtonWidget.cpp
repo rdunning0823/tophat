@@ -62,7 +62,7 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
     rc.top = rc.bottom - GetHeight();
   }
 
-  WindowWidget::Move(rc);
+  OverlayButtonWidget::Move(rc);
 }
 
 void

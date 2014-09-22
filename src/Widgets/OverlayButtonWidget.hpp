@@ -69,7 +69,12 @@ public:
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc);
   virtual void Hide();
-  virtual void Move(const PixelRect &rc) = 0;
+
+  /* moves the widget only if it needs to be moved
+   * This eliminates performance issues
+   * @param rc new position
+   */
+  virtual void Move(const PixelRect &rc);
   MapOverlayButton& CreateButton(ContainerWindow &parent,
                                  const ButtonLook &button_look,
                                  const IconLook &icon_look,

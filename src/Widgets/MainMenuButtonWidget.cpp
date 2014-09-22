@@ -66,8 +66,7 @@ MainMenuButtonWidget::Move(const PixelRect &rc_map)
   rc.bottom = rc_map.bottom;
   rc.top = rc.bottom - GetHeight();
 
-  WindowWidget::Move(rc);
-  GetWindow().Move(rc);
+  OverlayButtonWidget::Move(rc);
 }
 
 void
