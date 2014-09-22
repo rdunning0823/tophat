@@ -32,8 +32,6 @@ Copyright_License {
 #include <stdlib.h>
 #include <assert.h>
 
-#include "LogFile.hpp" //debug
-
 MapWidgetOverlays::~MapWidgetOverlays()
 {
    for (const auto i : widget_list) {
@@ -137,7 +135,6 @@ MapWidgetOverlays::UpdateVisibility(const PixelRect &rc_full_screen,
                                     bool is_map,
                                     bool is_full_screen)
 {
-
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   const InfoBoxLayout::Layout ib_layout =
     InfoBoxLayout::Calculate(rc_full_screen, ui_settings.info_boxes.geometry);
