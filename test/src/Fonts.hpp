@@ -25,11 +25,15 @@ Copyright_License {
 #define XCSOAR_TEST_FONTS_HPP
 
 class Font;
+struct PixelSize;
 
 extern Font normal_font, small_font, bold_font, monospace_font;
+extern Font large_font, large_bold_font;
 
 void
-InitialiseFonts();
+InitialiseFonts(PixelSize screen_size);
+
+void InitialiseFonts();
 
 void
 DeinitialiseFonts();

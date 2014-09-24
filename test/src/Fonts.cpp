@@ -29,6 +29,7 @@ Copyright_License {
 #include <string.h>
 
 Font normal_font, small_font, bold_font, monospace_font;
+Font large_font, large_bold_font;
 
 static const TCHAR *
 GetStandardMonospaceFontFace()
@@ -66,7 +67,12 @@ InitialiseLogfont(LOGFONT* font, const TCHAR* facename, int height,
 }
 
 void
-InitialiseFonts()
+InitialiseFonts() {
+  InitialiseFonts({600, 800});
+}
+
+void
+InitialiseFonts(PixelSize screen_size)
 {
   const TCHAR *face = _T("Tahoma");
 
@@ -76,15 +82,24 @@ InitialiseFonts()
   UPixelScalar font_height = Layout::SmallScale(35);
 #endif
 
+  if (IsKobo()) {
+    font_height = (font_height * screen_size.cx) / 600;
+  }
   LOGFONT lf;
   InitialiseLogfont(&lf, face, font_height / 2);
   normal_font.Load(lf);
 
-  InitialiseLogfont(&lf, face, font_height / 2 - Layout::Scale(2));
+  InitialiseLogfont(&lf, face, (font_height * 6) / 10);
+  large_font.Load(lf);
+
+  InitialiseLogfont(&lf, face, font_height / 2 - 2 * Layout::Scale(2));
   small_font.Load(lf);
 
   InitialiseLogfont(&lf, face, font_height / 2, true);
   bold_font.Load(lf);
+
+  InitialiseLogfont(&lf, face, (font_height * 6) / 10, true);
+  large_bold_font.Load(lf);
 
   InitialiseLogfont(&lf, GetStandardMonospaceFontFace(),
                     10, false, false, false);
@@ -98,4 +113,6 @@ DeinitialiseFonts()
   bold_font.Destroy();
   small_font.Destroy();
   normal_font.Destroy();
+  large_font.Destroy();
+  large_bold_font.Destroy();
 }
