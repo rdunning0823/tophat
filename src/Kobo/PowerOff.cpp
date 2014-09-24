@@ -96,8 +96,12 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   rc_remaining.top = website_top + bold_font.GetHeight();
 
   /* Version at bottom right */
+  const unsigned line_height = canvas.CalcTextSize(TopHat_Version).cy;
+  rc_remaining.left = rc.left + left_margin;
+  rc_remaining.bottom = rc.bottom - 2.5 * line_height;
+
+  int y = rc_remaining.bottom + padding;
   x = rc.right - canvas.CalcTextSize(TopHat_Version).cx - padding;
-  int y = rc.bottom - 2.5 * canvas.CalcTextSize(TopHat_Version).cy;
   canvas.DrawText(x, y, TopHat_Version);
   const TCHAR *const version = _T("version ");
   x -= canvas.CalcTextSize(version).cx;
@@ -105,12 +109,9 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
 
   /* power off message */
   const TCHAR *const comment = _T("powered off");
-  y += padding + canvas.CalcTextSize(TopHat_Version).cy;
+  y += padding + line_height;
   canvas.DrawText(rc.right - canvas.CalcTextWidth(comment) - padding,
                   y, comment);
-
-  rc_remaining.bottom = y - 2 * canvas.CalcTextSize(TopHat_Version).cy;
-  rc_remaining.left = rc.left + left_margin;
 
   rc.top += banner_height + 8;
 
