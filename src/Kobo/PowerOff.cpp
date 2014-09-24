@@ -90,26 +90,27 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   /* some more text */
   x = rc.left + left_margin;
   const TCHAR *const website = _T("www.tophatsoaring.org");
-  canvas.Select(bold_font);
+  canvas.Select(normal_font);
   unsigned website_top = rc.top + banner_height + padding + top_logo_margin;
   canvas.DrawText(x, website_top, website);
   rc_remaining.top = website_top + bold_font.GetHeight();
 
   /* Version at bottom right */
   x = rc.right - canvas.CalcTextSize(TopHat_Version).cx - padding;
-  int y = rc.bottom - 2 * canvas.CalcTextSize(TopHat_Version).cy;
+  int y = rc.bottom - 2.5 * canvas.CalcTextSize(TopHat_Version).cy;
   canvas.DrawText(x, y, TopHat_Version);
   const TCHAR *const version = _T("version ");
   x -= canvas.CalcTextSize(version).cx;
   canvas.DrawText(x, y, version);
 
-  rc_remaining.bottom = y + padding;
-  rc_remaining.left = rc.left + left_margin;
-
   /* power off message */
   const TCHAR *const comment = _T("powered off");
+  y += padding + canvas.CalcTextSize(TopHat_Version).cy;
   canvas.DrawText(rc.right - canvas.CalcTextWidth(comment) - padding,
-                  rc.top + padding, comment);
+                  y, comment);
+
+  rc_remaining.bottom = y - 2 * canvas.CalcTextSize(TopHat_Version).cy;
+  rc_remaining.left = rc.left + left_margin;
 
   rc.top += banner_height + 8;
 
