@@ -45,7 +45,7 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
 
   const unsigned height = rc.bottom - rc.top;
 
-  const unsigned padding = Layout::GetTextPadding();
+  const unsigned padding = Layout::GetTextPadding() * 3;
   const unsigned font_height = font.GetHeight();
   const unsigned header_height = header_font.GetHeight() + padding;
   if (height <= header_height)
@@ -55,12 +55,26 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
   const unsigned date_width = canvas.CalcTextWidth(_T("2222-22-22")) + padding * 4;
   const unsigned time_width = canvas.CalcTextWidth(_T("22:22")) + padding * 4;
 
+  int y = rc.top + 2 * padding + row_height;
   canvas.Select(header_font);
+  {
+    int x = rc.left + padding;
+    canvas.DrawText(x, y, _T("Date"));
+    x += date_width;
 
-  int y = rc.bottom - row_height * 2;
+    canvas.DrawText(x, y, _T("Start"));
+    x += time_width;
+
+    canvas.DrawText(x, y, _T("End"));
+    x += time_width;
+
+    canvas.DrawText(x, y, _T("Duration"));
+  }
+  y += row_height;
+
   canvas.Select(font);
 
-  while (!flights.empty() && y > (int) rc.top + (int) header_height + (int) row_height) {
+  while (!flights.empty() && y < (int) rc.bottom - (int) row_height) {
     const FlightInfo flight = flights.pop();
     int x = rc.left + padding;
 
@@ -98,19 +112,6 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
       canvas.DrawText(x, y, _T("--:--"));
     x += time_width;
 
-    y -= row_height;
-  }
-
-
-  {
-    int x = rc.left + padding;
-    canvas.DrawText(x, y, _T("Date"));
-    x += date_width;
-
-    canvas.DrawText(x, y, _T("Time"));
-    x += time_width;
-
-    x += time_width;
-    canvas.DrawText(x, y, _T("Duration"));
+    y += row_height;
   }
 }
