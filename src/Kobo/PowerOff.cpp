@@ -157,8 +157,6 @@ int main(int argc, char **argv)
   Font::Initialise();
   Display::Rotate(DisplaySettings::Orientation::PORTRAIT);
 
-  InitialiseFonts();
-
   {
     TopCanvas screen;
     screen.Create(PixelSize{100, 100}, true, false);
@@ -176,6 +174,7 @@ int main(int argc, char **argv)
 
       /* draw the pictuer */
       canvas.ClearWhite();
+      InitialiseFonts({canvas.GetWidth(), canvas.GetHeight()});
       Draw(canvas);
 
       /* finish */
