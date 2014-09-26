@@ -154,9 +154,15 @@ struct FeaturesSettings {
 
 struct CirclingSettings {
   bool external_trigger_cruise_enabled;
+  Angle min_turn_rate;
+  fixed cruise_climb_switch;
+  fixed climb_cruise_switch;
 
   void SetDefaults() {
     external_trigger_cruise_enabled = false;
+    min_turn_rate = Angle::Degrees(4);
+    cruise_climb_switch = fixed(15);
+    climb_cruise_switch = fixed(10);
   }
 };
 

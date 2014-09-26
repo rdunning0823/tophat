@@ -129,6 +129,12 @@ Profile::Load(CirclingSettings &settings)
 {
   Get(ProfileKeys::EnableExternalTriggerCruise,
       settings.external_trigger_cruise_enabled);
+
+  fixed min_turn_rate;
+  if (Get(ProfileKeys::CirclingMinTurnRate, min_turn_rate))
+    settings.min_turn_rate = settings.min_turn_rate.Degrees(min_turn_rate);
+  Get(ProfileKeys::CirclingCruiseClimbSwitch, settings.cruise_climb_switch);
+  Get(ProfileKeys::CirclingClimbCruiseSwitch, settings.climb_cruise_switch);
 }
 
 static bool

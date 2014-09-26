@@ -32,10 +32,6 @@ Copyright_License {
 #include <assert.h> //debug
 #include "LogFile.hpp" //debug
 
-static constexpr Angle MIN_TURN_RATE = Angle::Degrees(4);
-static constexpr fixed CRUISE_CLIMB_SWITCH(15);
-static constexpr fixed CLIMB_CRUISE_SWITCH(10);
-
 void
 CirclingComputer::Reset()
 {
@@ -121,12 +117,12 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     return;
   }
   LogDebug("CirclingComputer::Turning old c_i.turning:%u ci.turning:%u dt:%.0f turn_rate_smothed:%.1f",
-           circling_info.turning, circling_info.turn_rate_smoothed.Absolute() >= MIN_TURN_RATE,
+           circling_info.turning, circling_info.turn_rate_smoothed.Absolute() >= settings.min_turn_rate,
            (double)dt,
            (double)circling_info.turn_rate_smoothed.Absolute().Native());
 
   circling_info.turning =
-    circling_info.turn_rate_smoothed.Absolute() >= MIN_TURN_RATE;
+    circling_info.turn_rate_smoothed.Absolute() >= settings.min_turn_rate;
 
   // Force cruise or climb mode if external device says so
   bool force_cruise = false;
@@ -176,7 +172,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     LogDebug("CirclingComputer::Turning switch turn_mode POSSIBLE_CLIMB");
 
     if (circling_info.turning || force_circling) {
-      if (((basic.time - turn_start_time) > CRUISE_CLIMB_SWITCH)
+      if (((basic.time - turn_start_time) > settings.cruise_climb_switch)
           || force_circling) {
         // yes, we are certain now that we are circling
         circling_info.circling = true;
@@ -218,7 +214,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     }
 
     if (!circling_info.turning || force_cruise) {
-      if (basic.time - turn_start_time > CLIMB_CRUISE_SWITCH || force_cruise) {
+      if (basic.time - turn_start_time > settings.climb_cruise_switch || force_cruise) {
         // yes, we are certain now that we are cruising again
         circling_info.circling = false;
 
