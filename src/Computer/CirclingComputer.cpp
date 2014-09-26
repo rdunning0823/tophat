@@ -29,6 +29,9 @@ Copyright_License {
 #include "Math/LowPassFilter.hpp"
 #include "Util/Clamp.hpp"
 
+#include <assert.h> //debug
+#include "LogFile.hpp" //debug
+
 static constexpr Angle MIN_TURN_RATE = Angle::Degrees(4);
 static constexpr fixed CRUISE_CLIMB_SWITCH(15);
 static constexpr fixed CLIMB_CRUISE_SWITCH(10);
@@ -113,8 +116,14 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
 
   const fixed dt = turning_delta_time.Update(basic.time,
                                              fixed(0), fixed(0));
-  if (!positive(dt))
+  if (!positive(dt)) {
+    LogDebug("CirclingComputer::Turning ******* dt negative!");
     return;
+  }
+  LogDebug("CirclingComputer::Turning old c_i.turning:%u ci.turning:%u dt:%.0f turn_rate_smothed:%.1f",
+           circling_info.turning, circling_info.turn_rate_smoothed.Absolute() >= MIN_TURN_RATE,
+           (double)dt,
+           (double)circling_info.turn_rate_smoothed.Absolute().Native());
 
   circling_info.turning =
     circling_info.turn_rate_smoothed.Absolute() >= MIN_TURN_RATE;
@@ -123,6 +132,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
   bool force_cruise = false;
   bool force_circling = false;
   if (settings.external_trigger_cruise_enabled && !basic.gps.replay) {
+    assert(false);
     switch (basic.switch_state.flight_mode) {
     case SwitchState::FlightMode::UNKNOWN:
       break;
@@ -137,25 +147,34 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     }
   }
 
+  assert(!force_cruise && !force_circling);
+
   switch (circling_info.turn_mode) {
   case CirclingMode::CRUISE:
     // If (in cruise mode and beginning of circling detected)
     if (circling_info.turning || force_circling) {
+      LogDebug("CirclingComputer::Turning switch turn_mode CRUISE turning:TRUE setting mode POSSIBLE CLIMB");
       // Remember the start values of the turn
       turn_start_time = basic.time;
       turn_start_location = basic.location;
       turn_start_altitude = basic.nav_altitude;
       turn_start_energy_height = basic.energy_height;
       circling_info.turn_mode = CirclingMode::POSSIBLE_CLIMB;
+    } else {
+      LogDebug("CirclingComputer::Turning switch turn_mode CRUISE turning:false");
     }
+
     if (!force_circling)
       break;
 
   case CirclingMode::POSSIBLE_CLIMB:
     if (force_cruise) {
+      assert(false);
       circling_info.turn_mode = CirclingMode::CRUISE;
       break;
     }
+    LogDebug("CirclingComputer::Turning switch turn_mode POSSIBLE_CLIMB");
+
     if (circling_info.turning || force_circling) {
       if (((basic.time - turn_start_time) > CRUISE_CLIMB_SWITCH)
           || force_circling) {
