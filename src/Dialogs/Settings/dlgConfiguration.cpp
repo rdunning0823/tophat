@@ -74,6 +74,10 @@ Copyright_License {
 #include "Panels/ExperimentalConfigPanel.hpp"
 #endif
 
+#ifdef BETA_FEATURE
+#include "Panels/BetaFeatureConfigPanel.hpp"
+#endif
+
 #include <assert.h>
 
 static unsigned current_page;
@@ -100,6 +104,9 @@ static constexpr TabMenuControl::PageItem pages[] = {
   {N_("Airspace"), 1, CreateAirspaceConfigPanel },
   {N_("Safety Factors"), 2, CreateSafetyFactorsConfigPanel },
   {N_("Glide Computer"), 2, CreateGlideComputerConfigPanel },
+#ifdef BETA_FEATURE
+  {N_("Beta feature"), 2, CreateBetaFeatureConfigPanel },
+#endif
   {N_("Wind"), 2, CreateWindConfigPanel },
   {N_("FLARM, Other"), 3, CreateGaugesConfigPanel },
 #ifdef HAVE_PCM_PLAYER
