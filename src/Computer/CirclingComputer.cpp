@@ -117,7 +117,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     return;
 
   circling_info.turning =
-    circling_info.turn_rate_smoothed.Absolute() >= MIN_TURN_RATE;
+    circling_info.turn_rate_smoothed.Absolute() >= settings.min_turn_rate;
 
   // Force cruise or climb mode if external device says so
   bool force_cruise = false;
@@ -157,7 +157,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
       break;
     }
     if (circling_info.turning || force_circling) {
-      if (((basic.time - turn_start_time) > CRUISE_CLIMB_SWITCH)
+      if (((basic.time - turn_start_time) > settings.cruise_climb_switch)
           || force_circling) {
         // yes, we are certain now that we are circling
         circling_info.circling = true;
@@ -199,7 +199,7 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     }
 
     if (!circling_info.turning || force_cruise) {
-      if (basic.time - turn_start_time > CLIMB_CRUISE_SWITCH || force_cruise) {
+      if (basic.time - turn_start_time > settings.climb_cruise_switch || force_cruise) {
         // yes, we are certain now that we are cruising again
         circling_info.circling = false;
 
