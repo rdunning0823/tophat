@@ -77,7 +77,8 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
 
   /* draw the XCSoar banner text with a larger font */
   Font logo_font;
-  logo_font.LoadFile("/opt/tophat/share/fonts/VeraBd.ttf", 40);
+  logo_font.LoadFile("/opt/tophat/share/fonts/VeraBd.ttf",
+                     (canvas.GetSize().cx * 40)/ 600);
   canvas.Select(logo_font);
   const unsigned name_y = rc.top + top_logo_margin
     + (banner_height - logo_font.GetHeight()) / 2;
