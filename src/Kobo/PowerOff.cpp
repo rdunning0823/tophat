@@ -72,16 +72,15 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
 
   x += logo.GetWidth() + 8;
 
-  canvas.Select(bold_font);
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
 
   /* draw the XCSoar banner text with a larger font */
-  Font large_font;
-  large_font.LoadFile("/opt/tophat/share/fonts/VeraBd.ttf", 40);
-  canvas.Select(large_font);
+  Font logo_font;
+  logo_font.LoadFile("/opt/tophat/share/fonts/VeraBd.ttf", 40);
+  canvas.Select(logo_font);
   const unsigned name_y = rc.top + top_logo_margin
-    + (banner_height - large_font.GetHeight()) / 2;
+    + (banner_height - logo_font.GetHeight()) / 2;
 
   const TCHAR *const name1 = _T("Top Hat Soaring");
   canvas.DrawText(x, name_y, name1);
@@ -90,10 +89,10 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   /* some more text */
   x = rc.left + left_margin;
   const TCHAR *const website = _T("www.tophatsoaring.org");
-  canvas.Select(normal_font);
+  canvas.Select(large_font);
   unsigned website_top = rc.top + banner_height + padding + top_logo_margin;
   canvas.DrawText(x, website_top, website);
-  rc_remaining.top = website_top + bold_font.GetHeight();
+  rc_remaining.top = website_top + large_bold_font.GetHeight();
 
   /* Version at bottom right */
   const unsigned line_height = canvas.CalcTextSize(TopHat_Version).cy;
@@ -125,7 +124,7 @@ DrawFlights(Canvas &canvas, const PixelRect &rc)
   if (file.error())
     return;
 
-  FlightListRenderer renderer(normal_font, bold_font);
+  FlightListRenderer renderer(large_font, large_bold_font);
 
   FlightParser parser(file);
   FlightInfo flight;
