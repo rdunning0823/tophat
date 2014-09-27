@@ -172,12 +172,9 @@ gcc_pure
 static bool
 CheckTakeOffSpeed(fixed takeoff_speed, const NMEAInfo &basic)
 {
-  const fixed speed = basic.airspeed_available
-    ? std::max(basic.true_airspeed, basic.ground_speed)
-    : basic.ground_speed;
-
   // Speed too high for being on the ground
-  return speed >= takeoff_speed;
+  // don't use airspeed b/c CAI302's TAS does not fall below 5-10 m/s
+  return basic.ground_speed >= takeoff_speed;
 }
 
 /**
