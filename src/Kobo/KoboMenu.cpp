@@ -35,6 +35,7 @@ Copyright_License {
 #include "../test/src/Fonts.hpp"
 #include "Language/Language.hpp"
 #include "Form/ActionListener.hpp"
+#include "Screen/Custom/TopCanvas.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Canvas.hpp"
 #include "System.hpp"
@@ -221,14 +222,33 @@ Main(SingleWindow &main_window, const DialogLook &dialog_look)
   return dialog.ShowModal();
 }
 
+static PixelSize
+GetScreenSize()
+{
+  TopCanvas screen;
+  screen.Create(PixelSize{100, 100}, true, false);
+
+  PixelSize size(600, 800);
+  {
+    Canvas canvas = screen.Lock();
+    if (canvas.IsDefined()) {
+      size = canvas.GetSize();
+      screen.Unlock();
+    }
+  }
+
+  return size;
+}
+
 static int
 Main()
 {
   dialog_settings.SetDefaults();
 
   ScreenGlobalInit screen_init;
-  Layout::Initialize({600, 800});
-  InitialiseFonts();
+  PixelSize screen_size = GetScreenSize();
+  Layout::Initialize(screen_size);
+  InitialiseFonts(screen_size);
 
   DialogLook dialog_look;
   dialog_look.Initialise(bold_font, normal_font, small_font,
