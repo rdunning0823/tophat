@@ -158,13 +158,6 @@ else
         dd if=/dev/mmcblk0 bs=512 skip=2048 count=4000 of=${DotKobo}/uImage-KoboLabs
     fi
 fi
-date >>${DotKobo}/rcS.tophat.log
-echo USB_hot_plug=${USB_hot_plug} >>${DotKobo}/rcS.tophat.log
-if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel ]; then
-    echo start_nickel: yes >>${DotKobo}/rcS.tophat.log
-else
-    echo start_nickel: no >>${DotKobo}/rcS.tophat.log
-fi
 
 if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
@@ -172,20 +165,12 @@ if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
 	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
 	cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
 	touch ${DotKobo}/KoboRoot.tgz
-date >>${DotKobo}/rcS.tophat.log
-echo copy uImage-KoboLabs and reboot >>${DotKobo}/rcS.tophat.log
 	reboot
     fi
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     /usr/local/Kobo/hindenburg &
-date >>${DotKobo}/rcS.tophat.log
-echo start nickel >>${DotKobo}/rcS.tophat.log
-echo PRODUCT=${PRODUCT} >>${DotKobo}/rcS.tophat.log
 
-#    case `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` in
-    SERIAL=`dd if=/dev/mmcblk0 bs=8 count=1 skip=64`
-echo SERIAL=${SERIAL} >>${DotKobo}/rcS.tophat.log
-    case ${SERIAL} in
+    case `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` in
     "SN-N7052") # Mini
         /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
     "SN-613A4") # Caz's Glo which acquired in Japan
@@ -202,8 +187,6 @@ else
 	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
 	cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
 	touch ${DotKobo}/KoboRoot.tgz
-date >>${DotKobo}/rcS.tophat.log
-echo copy uImage-USB-hot-plug and reboot >>${DotKobo}/rcS.tophat.log
 	reboot
     fi
     # disable the flashing led
@@ -232,8 +215,6 @@ echo copy uImage-USB-hot-plug and reboot >>${DotKobo}/rcS.tophat.log
     fi
 
     echo 3 > /sys/class/graphics/fb0/rotate
-date >>${DotKobo}/rcS.tophat.log
-echo start KoboMenu >>${DotKobo}/rcS.tophat.log
     /opt/tophat/bin/KoboMenu &
     /sbin/udevadm control --env=STARTUP=1
     killall plug
