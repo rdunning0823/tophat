@@ -25,9 +25,7 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
 #include "Engine/Navigation/Aircraft.hpp"
-#include "Math/LowPassFilter.hpp"
 
-#include "LogFile.hpp" //debug
 void
 FlyingComputer::Reset()
 {
@@ -109,7 +107,6 @@ FlyingComputer::Check(FlyingState &state, fixed time)
     if (!moving_clock.IsDefined()) {
       // We are probably not flying anymore
       assert(!negative(stationary_since));
-      LogDebug("FlyingComputer::Check( setting flying = false (landing)");
 
       state.flying = false;
       state.flight_time = stationary_since - state.takeoff_time;
@@ -148,8 +145,6 @@ void
 FlyingComputer::Stationary(FlyingState &state, fixed time, fixed dt,
                            const GeoPoint &location)
 {
-  LogFormat("FlyingComputer::Stationary dt:%.0f", (double)dt);
-
   // Decrease InFlight countdown for further evaluation
   if (moving_clock.IsDefined()) {
     moving_clock.Subtract(dt);
@@ -191,8 +186,6 @@ CheckLandingSpeed(fixed takeoff_speed, const NMEAInfo &basic)
 {
   const fixed speed = basic.ground_speed;
   // Speed too high for being on the ground
-  LogFormat("CheckLandingSpeed tko_speed:%.0f speed:%.0f  return:%u",
-            (double)takeoff_speed, (double)speed, speed < Half(takeoff_speed));
   return speed < Half(takeoff_speed);
 }
 
@@ -200,10 +193,6 @@ gcc_pure
 static bool
 CheckAltitudeAGL(const DerivedInfo &calculated)
 {
-  LogFormat("FComputer::CheckAltitudeAGL agl:%.0f return:%u",
-            (double)calculated.altitude_agl,
-            calculated.altitude_agl_valid && calculated.altitude_agl >= fixed(300));
-
   return calculated.altitude_agl_valid && calculated.altitude_agl >= fixed(300);
 }
 
@@ -214,10 +203,6 @@ FlyingComputer::CheckClimbing(fixed dt, fixed altitude)
     DeltaInterval = 4,
     DeltaHeight = 2,
   };
-  LogFormat("FlyingComputer::CheckClimbing dt:%.0f since_upd:%.0f, alt:%.0f cl_alt:%.0f",
-            (double)dt, (double) climbing_clock_dt_since_update,
-            (double) altitude, (double)climbing_altitude);
-
   climbing_clock_dt_since_update += dt;
 
   if (climbing_clock_dt_since_update > fixed(DeltaInterval)) {
@@ -256,7 +241,7 @@ FlyingComputer::Compute(fixed takeoff_speed,
     return;
 
   const auto any_altitude = basic.GetAnyAltitude();
-  unsigned tko_speed_adj_type = 0;
+
   if (!basic.airspeed_available && !calculated.altitude_agl_valid &&
       any_altitude.first && !negative(last_ground_altitude) &&
       any_altitude.second > last_ground_altitude + fixed(250)) {
@@ -266,33 +251,21 @@ FlyingComputer::Compute(fixed takeoff_speed,
        strong head wind (e.g. ridge or wave) */
     fixed dh = any_altitude.second - last_ground_altitude;
 
-    if (dh > fixed(1000)) {
+    if (dh > fixed(1000))
       takeoff_speed /= 4;
-      tko_speed_adj_type = 1;
-    } else if (dh > fixed(500)) {
+    else if (dh > fixed(500))
       takeoff_speed /= 2;
-      tko_speed_adj_type = 2;
-    } else {
+    else
       takeoff_speed = takeoff_speed * 2 / 3;
-      tko_speed_adj_type = 3;
-    }
   }
-  LogFormat("FlyingComputer::Compute flying:%u tko_adj_type:%u tko_speed:%.0f TAS_AVAIL:%u, tas:%.0f, ground_speed:%.0f",
-            flying.flying, tko_speed_adj_type,
-            takeoff_speed,
-            basic.airspeed_available.IsValid(),
-            (double)basic.true_airspeed, (double)basic.ground_speed);
+
   if (CheckTakeOffSpeed(takeoff_speed, basic) ||
-      CheckAltitudeAGL(calculated)) {
+      CheckAltitudeAGL(calculated))
     Moving(flying, basic.time, dt, basic.location);
-  } else if (!flying.flying ||
+  else if (!flying.flying ||
            (CheckLandingSpeed(takeoff_speed, basic) &&
-            (!any_altitude.first || !CheckClimbing(dt, any_altitude.second)))) {
-    LogFormat("FlyingComputer::Compute B any_altitude.first:%u", any_altitude.first);
+            (!any_altitude.first || !CheckClimbing(dt, any_altitude.second))))
     Stationary(flying, basic.time, dt, basic.location);
-  } else {
-    LogFormat("FComputer::Compute C");
-  }
 
   if (any_altitude.first) {
     if (flying.on_ground)
