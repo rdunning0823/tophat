@@ -68,7 +68,7 @@ InfoBoxSettings::SetDefaults()
       e_TL_Avg,         e_TL_Gain,        e_TL_Avg,           e_HeightAGL},
       // cruise
     { e_MacCready,      e_Alternate_1_GR,  e_HeadWind,        WIND_ARROW,   e_Speed_GPS,
-      e_Home_Distance,  e_HeightGPS,       e_GR_Avg,          e_GR_Cruise },
+      HomeAltitudeDiff,  e_HeightGPS,       e_GR_Avg,          e_GR_Cruise },
       //final glide
     { e_MacCready,            e_Alternate_1_GR,  e_HeightGPS, WIND_ARROW,   e_Speed_GPS,
       e_VerticalSpeed_Netto,  e_HeadWind,        e_GR_Avg,    e_Fin_Time },
