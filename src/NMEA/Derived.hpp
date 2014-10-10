@@ -136,7 +136,8 @@ struct DerivedInfo:
   public ClimbInfo,
   public CirclingInfo,
   public TerrainInfo,
-  public TeamInfo
+  public TeamInfo,
+  public PullUpInfo
 {
   /**
    * GPS date and time (local).

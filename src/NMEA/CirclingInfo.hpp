@@ -31,6 +31,16 @@ Copyright_License {
 
 #include <stdint.h>
 
+/** Data for tracking of pulling up or diving down */
+struct PullUpInfo
+{
+  /* rate of change in airspeed m/s^2 */
+  fixed pull_up_rate_smoothed;
+  /* max recent pull up rate (fasted pull up) */
+  fixed pull_up_rate_max;
+  void Clear();
+};
+
 /** Enumeration for cruise/circling mode detection */
 enum class CirclingMode: uint8_t {
   /** Established cruise mode */

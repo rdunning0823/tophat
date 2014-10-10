@@ -31,6 +31,8 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Units/Units.hpp"
 
+#include "NMEA/CirclingInfo.hpp" //debug
+
 void
 InfoBoxContentSpeedGround::Update(InfoBoxData &data)
 {
@@ -112,12 +114,17 @@ UpdateInfoBoxSpeedDolphin(InfoBoxData &data)
 {
   // Set Value
   const DerivedInfo &calculated = CommonInterface::Calculated();
-  data.SetValueFromSpeed(calculated.V_stf, false);
+  const PullUpInfo &pull_up_info = calculated;
 
+  data.SetValueFromSpeed(fixed(0.5) * pull_up_info.pull_up_rate_max, true);
+//  data.SetValueFromSpeed(calculated.V_stf, false);
+  data.SetCommentFromSpeed(fixed(0.5) * pull_up_info.pull_up_rate_smoothed, true);
   // Set Comment
+/*
   if (CommonInterface::GetComputerSettings().features.block_stf_enabled)
     data.SetComment(_("BLOCK"));
   else
     data.SetComment(_("DOLPHIN"));
+*/
 
 }

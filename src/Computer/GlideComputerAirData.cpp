@@ -62,6 +62,8 @@ GlideComputerAirData::ResetFlight(DerivedInfo &calculated,
 
   circling_computer.Reset();
 
+  pull_up_computer.Reset();
+
   thermal_band_computer.Reset();
   wind_computer.Reset();
 
@@ -91,8 +93,11 @@ GlideComputerAirData::ProcessVertical(const MoreData &basic,
 
   auto_qnh.Process(basic, calculated, settings, waypoints);
 
+  pull_up_computer.PullUpRate(calculated, basic, calculated.flight);
+
   circling_computer.TurnRate(calculated, basic,
                              calculated.flight);
+
   Turning(basic, calculated, settings);
 
   wind_computer.Compute(settings.wind, settings.polar.glide_polar_task,
@@ -291,6 +296,7 @@ GlideComputerAirData::Turning(const MoreData &basic,
                               const ComputerSettings &settings)
 {
   circling_computer.Turning(calculated,
+                            calculated,
                             basic,
                             calculated.flight,
                             settings.circling);

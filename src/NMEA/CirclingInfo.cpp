@@ -24,6 +24,13 @@ Copyright_License {
 #include "CirclingInfo.hpp"
 
 void
+PullUpInfo::Clear()
+{
+  pull_up_rate_smoothed = fixed(0);
+  pull_up_rate_max = fixed(0);
+}
+
+void
 CirclingInfo::Clear()
 {
   turning = false;

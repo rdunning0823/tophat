@@ -56,6 +56,7 @@ class GlideComputerAirData {
 
   FlyingComputer flying_computer;
   CirclingComputer circling_computer;
+  PullUpComputer pull_up_computer;
   ThermalBandComputer thermal_band_computer;
   WindComputer wind_computer;
   LiftDatabaseComputer lift_database_computer;

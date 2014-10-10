@@ -32,6 +32,77 @@ Copyright_License {
 #include <assert.h> //debug
 #include "LogFile.hpp" //debug
 
+
+
+void
+PullUpComputer::Reset()
+{
+  last_indicated_airspeed = fixed(0);
+  pull_up_delta_time.Reset();
+  for (unsigned i = 0; i < RATES_SIZE; ++i)
+    rates[i] = fixed(0);
+
+  min_rate_index = 0;
+  last_rate_index = 0;
+}
+
+void
+PullUpComputer::AddRate(fixed rate)
+{
+  rates[++last_rate_index % RATES_SIZE] = rate;
+  if (rate < rates[min_rate_index]) {
+    min_rate_index = (last_rate_index - 1) % RATES_SIZE;
+  } else {
+    min_rate_index = 0;
+    for (unsigned i = 1; i < RATES_SIZE; ++i)
+      if (rates[i] < rates[min_rate_index])
+        min_rate_index = i;
+  }
+}
+
+fixed
+PullUpComputer::MaxPullUpRate()
+{
+  return rates[min_rate_index];
+}
+
+void
+PullUpComputer::PullUpRate(PullUpInfo &pull_up_info,
+                           const NMEAInfo &basic,
+                           const FlyingState &flight)
+{
+
+  if (!basic.time_available || !flight.flying) {
+    pull_up_info.pull_up_rate_max = fixed(0);
+    pull_up_info.pull_up_rate_smoothed = fixed(0);
+    return;
+  }
+  const fixed dt = pull_up_delta_time.Update(basic.time,
+                                             fixed_third, fixed(10));
+  if (negative(dt)) {
+    pull_up_info.pull_up_rate_max = fixed(0);
+    pull_up_info.pull_up_rate_smoothed = fixed(0);
+    return;
+  }
+
+  if (positive(dt)) {
+    fixed pull_up_rate =
+      (basic.indicated_airspeed - last_indicated_airspeed) / dt;
+
+    pull_up_rate = Clamp(pull_up_rate, fixed(-8), fixed (8));
+
+    // Make the pull up rate more smooth using the LowPassFilter
+    fixed smoothed = LowPassFilter(pull_up_info.pull_up_rate_smoothed,
+                                   pull_up_rate, fixed(0.5));
+    pull_up_info.pull_up_rate_smoothed = smoothed;
+    AddRate(smoothed);
+
+    pull_up_info.pull_up_rate_max = MaxPullUpRate();
+  }
+  last_indicated_airspeed = basic.indicated_airspeed;
+}
+
+
 void
 CirclingComputer::Reset()
 {
@@ -102,6 +173,7 @@ CirclingComputer::TurnRate(CirclingInfo &circling_info,
 
 void
 CirclingComputer::Turning(CirclingInfo &circling_info,
+                          PullUpInfo &pull_up_info,
                           const MoreData &basic,
                           const FlyingState &flight,
                           const CirclingSettings &settings)
@@ -116,10 +188,12 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     LogDebug("CirclingComputer::Turning ******* dt negative!");
     return;
   }
-  LogDebug("CirclingComputer::Turning old c_i.turning:%u ci.turning:%u dt:%.0f turn_rate_smothed:%.1f",
-           circling_info.turning, circling_info.turn_rate_smoothed.Absolute() >= settings.min_turn_rate,
+  LogDebug("CirclingComputer::Turning ci.turning:%u dt:%.0f turn_rate_smothed:%.1f pullrate:%.1f/%.1f",
+           circling_info.turn_rate_smoothed.Absolute() >= settings.min_turn_rate,
            (double)dt,
-           (double)circling_info.turn_rate_smoothed.Absolute().Native());
+           (double)circling_info.turn_rate_smoothed.Absolute().Native(),
+           (double)pull_up_info.pull_up_rate_smoothed,
+           (double)pull_up_info.pull_up_rate_max);
 
   circling_info.turning =
     circling_info.turn_rate_smoothed.Absolute() >= settings.min_turn_rate;
@@ -172,7 +246,8 @@ CirclingComputer::Turning(CirclingInfo &circling_info,
     LogDebug("CirclingComputer::Turning switch turn_mode POSSIBLE_CLIMB");
 
     if (circling_info.turning || force_circling) {
-      if (((basic.time - turn_start_time) > settings.cruise_climb_switch)
+      if (((basic.time - turn_start_time) >
+           (settings.cruise_climb_switch + 2 * pull_up_info.pull_up_rate_max))
           || force_circling) {
         // yes, we are certain now that we are circling
         circling_info.circling = true;

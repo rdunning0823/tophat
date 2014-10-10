@@ -29,10 +29,44 @@ Copyright_License {
 #include "Time/DeltaTime.hpp"
 
 struct CirclingInfo;
+struct PullUpInfo;
 struct NMEAInfo;
 struct MoreData;
 struct CirclingSettings;
 struct FlyingState;
+
+
+class PullUpComputer
+{
+  enum {
+    RATES_SIZE = 10,
+  };
+
+  fixed last_indicated_airspeed;
+  DeltaTime pull_up_delta_time;
+  /** rates is a circular buffer - index of most recently added item*/
+  unsigned last_rate_index;
+  fixed rates[RATES_SIZE];
+  /** index of most negative value (largest pullup factor) */
+  unsigned min_rate_index;
+
+public:
+  void Reset();
+
+  void PullUpRate(PullUpInfo &pull_up_info,
+                  const NMEAInfo &basic,
+                  const FlyingState &flight);
+
+  /** adds new rate to circular array, computes min (biggest pullup) index
+   * @param rate
+   **/
+  void AddRate(fixed rate);
+
+  /**
+   * @return most negative rate of airspeed change
+   */
+  fixed MaxPullUpRate();
+};
 
 /**
  * Detect when the aircraft begins or ends circling.
@@ -98,6 +132,7 @@ public:
    * Determines the current flight mode (cruise/circling).
    */
   void Turning(CirclingInfo &circling_info,
+               PullUpInfo &pull_up_info,
                const MoreData &basic,
                const FlyingState &flight,
                const CirclingSettings &settings);
