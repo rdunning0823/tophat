@@ -71,6 +71,7 @@ Copyright_License {
 #include "Widgets/LineSectorZoneEditWidget.hpp"
 #include "Widgets/KeyholeZoneEditWidget.hpp"
 
+
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
 #endif
@@ -391,11 +392,12 @@ OnBrowseClicked(gcc_unused WndButton &Sender)
 
 /**
  * inserts or appends to task
- * @param insert_index point after new point.
- * (also the index of the new point)
+ * @param insert_index the index of the new point
+ * @param reference_location the reference point to pass to the waypoint list
  */
 static void
-AddInsertTurnpoint(const unsigned insert_index)
+AddInsertTurnpoint(const unsigned insert_index,
+                   const GeoPoint &reference_location)
 {
   assert(insert_index <= ordered_task->TaskSize());
   assert(!ordered_task->IsFull());
@@ -404,11 +406,10 @@ AddInsertTurnpoint(const unsigned insert_index)
 
   OrderedTaskPoint* point = nullptr;
   AbstractTaskFactory &factory = ordered_task->GetFactory();
+
   const Waypoint* way_point =
-    ShowWaypointListDialog((insert_index != task_size)
-                           ? ordered_task->GetPoint(task_size - 1).GetLocation()
-                           : CommonInterface::Basic().location,
-                             ordered_task, active_index);
+    ShowWaypointListDialog(reference_location,
+                           ordered_task, insert_index);
   if (!way_point)
     return;
 
@@ -432,6 +433,44 @@ AddInsertTurnpoint(const unsigned insert_index)
   delete point;
   RefreshView();
 }
+
+/**
+ * appends tp to end of task
+ */
+static void
+AppendTurnpoint()
+{
+  unsigned task_size = ordered_task->TaskSize();
+  assert(task_size > 0);
+
+  AddInsertTurnpoint(task_size,
+                     ordered_task->GetPoint(task_size - 1).GetLocation());
+}
+
+/**
+ * inserts turnpoint prior to index of selected item
+ * active_index can be 0 to TaskSize() (i.e. append)
+ */
+static void
+InsertTurnpoint(const unsigned active_index)
+{
+  if (active_index == ordered_task->TaskSize() &&
+      active_index > 0) {
+    AppendTurnpoint();
+    return;
+  }
+
+  const GeoPoint* point = nullptr;
+
+  if (active_index == 0)
+    point = &CommonInterface::Basic().location;
+  else
+    point = &ordered_task->GetPoint(active_index - 1).GetLocation();
+
+  assert (point != nullptr);
+  AddInsertTurnpoint(active_index, *point);
+}
+
 /**
  * appends or inserts a task point after the current item
  */
@@ -439,12 +478,18 @@ static void
 OnAddClicked(gcc_unused WndButton &Sender)
 {
   assert(!ordered_task->IsFull());
-  AddInsertTurnpoint(active_index);
+  if (active_index == ordered_task->TaskSize() &&
+      active_index > 0)
+    AppendTurnpoint();
+  else
+    InsertTurnpoint(active_index);
 }
 
 static void
 OnRelocateClicked(gcc_unused WndButton &Sender)
 {
+  assert (active_index < ordered_task->TaskSize());
+
   const GeoPoint &gpBearing = active_index > 0
     ? ordered_task->GetPoint(active_index - 1).GetLocation()
     : CommonInterface::Basic().location;
@@ -488,11 +533,12 @@ TPOZListenerUs::OnModified(ObservationZoneEditWidget &widget)
   ReadValues();
 }
 
+
 void
 TaskPointUsDialog::OnActivateItem(unsigned i)
 {
   if (i == ordered_task->TaskSize()) {
-    AddInsertTurnpoint(i);
+    AppendTurnpoint();
     return;
   }
 }
