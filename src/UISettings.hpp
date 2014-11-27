@@ -60,6 +60,16 @@ struct UISettings {
    */
   bool show_waypoints_list_warning;
 
+  enum WaypointSortDirection {
+    NAME,
+    DISTANCE,
+    BEARING,
+    ELEVATION,
+  };
+
+  /** Direction of sort in waypoint list */
+  WaypointSortDirection waypoint_sort_direction;
+
   /** show the Screens map overlay button instead of the menu with Screens */
   enum class ScreensButtonLocation : uint8_t {
     MAP,
