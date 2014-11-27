@@ -376,6 +376,11 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
 
     break;
   case IDALL:
+    unsigned result = ShowMessageBox(_("Clear all points?"), _("Confirm"),
+                                     MB_OKCANCEL | MB_ICONQUESTION);
+
+    if (result != IDOK)
+      return;
     ordered_task->RemoveAllPoints();
     active_index = 0;
     break;
