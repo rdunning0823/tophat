@@ -286,6 +286,19 @@ RefreshView()
   WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
   assert (button_type != nullptr);
 
+  WndButton *button_relocate = (WndButton*) wf->FindByName(_T("butRelocate"));
+  assert (button_relocate != nullptr);
+  button_relocate->SetVisible(active_index != ordered_task->TaskSize());
+
+  WndButton *button_remove = (WndButton*) wf->FindByName(_T("butRemove"));
+  assert (button_remove != nullptr);
+  button_remove->SetVisible(active_index != ordered_task->TaskSize());
+
+  WndButton *button_add = (WndButton*) wf->FindByName(_T("butAdd"));
+  assert (button_add != nullptr);
+  button_add->SetVisible(active_index != ordered_task->TaskSize() ||
+                         ordered_task->TaskSize() == 0);
+
   if (ordered_task->TaskSize() == 0 ||
       active_index == ordered_task->TaskSize()) {
     dock->SetWidget(nullptr);
