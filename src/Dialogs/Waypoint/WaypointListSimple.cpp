@@ -170,7 +170,7 @@ FillList(WaypointList &list, const Waypoints &src,
       list.SortByName();
     break;
   case UISettings::WaypointSortDirection::DISTANCE:
-    if (size < MAX_LIST_SIZE)
+    if (size < MAX_LIST_SIZE || !state.name.empty())
       list.SortByDistance(location);
     break;
   case UISettings::WaypointSortDirection::ELEVATION:
