@@ -115,6 +115,8 @@ Profile::Load(UISettings &settings)
       settings.show_waypoints_list_warning);
   Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
+  GetEnum(ProfileKeys::WaypointSortDirection, settings.waypoint_sort_direction);
+
 #ifndef GNAV
   Get(ProfileKeys::UseCustomFonts, settings.custom_fonts);
 #endif

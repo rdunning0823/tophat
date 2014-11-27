@@ -32,6 +32,8 @@ UISettings::SetDefaults()
 
   show_waypoints_list_warning = true;
 
+  waypoint_sort_direction = UISettings::WaypointSortDirection::NAME;
+
 #ifndef GNAV
   custom_fonts = false;
 #endif

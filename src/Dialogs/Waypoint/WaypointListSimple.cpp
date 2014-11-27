@@ -87,14 +87,7 @@ static constexpr int direction_filter_items[] = {
 
 static Angle last_heading = Angle::Zero();
 
-enum SortDirection {
-  NAME,
-  DISTANCE,
-  BEARING,
-  ELEVATION,
-};
-
-static SortDirection sort_direction;
+static UISettings::WaypointSortDirection sort_direction;
 
 struct WaypointListDialogState
 {
@@ -142,12 +135,6 @@ static WaypointListDialogState dialog_state;
 static WaypointList waypoint_list;
 
 static void
-PrepareData()
-{
-  sort_direction = SortDirection::NAME;
-}
-
-static void
 FillList(WaypointList &list, const Waypoints &src,
          GeoPoint location, Angle heading, const WaypointListDialogState &state)
 {
@@ -170,26 +157,26 @@ FillList(WaypointList &list, const Waypoints &src,
         StaticString<99> message;
         message.Format(_T("%s %u %s"), _("Only the nearest"), MAX_LIST_SIZE, _("waypoints will be displayed"));
         ShowMessageBox(message.buffer(),  _("Too many waypoints"), MB_OK);
+        ui_settings.show_waypoints_list_warning = false;
+        Profile::Set(ProfileKeys::ShowWaypointListWarning,
+                     ui_settings.show_waypoints_list_warning);
       }
-      ui_settings.show_waypoints_list_warning = false;
-      Profile::Set(ProfileKeys::ShowWaypointListWarning,
-                   ui_settings.show_waypoints_list_warning);
     }
   }
 
   switch (sort_direction) {
-  case SortDirection::NAME:
+  case UISettings::WaypointSortDirection::NAME:
     if (size >= MAX_LIST_SIZE)
       list.SortByName();
     break;
-  case SortDirection::DISTANCE:
+  case UISettings::WaypointSortDirection::DISTANCE:
     if (size < MAX_LIST_SIZE)
       list.SortByDistance(location);
     break;
-  case SortDirection::ELEVATION:
+  case UISettings::WaypointSortDirection::ELEVATION:
     list.SortByElevation();
     break;
-  case SortDirection::BEARING:
+  case UISettings::WaypointSortDirection::BEARING:
     break;
   }
 }
@@ -237,11 +224,14 @@ UpdateHeaders()
   elevation_header->Move(rc_elevation_header);
   distance_header->Move(rc_distance_header);
 
-  name_header->SetCaption(sort_direction == SortDirection::NAME ?
+  name_header->SetCaption(sort_direction ==
+      UISettings::WaypointSortDirection::NAME ?
       _("_chkmark_Name") : _("Name"));
-  elevation_header->SetCaption(sort_direction == SortDirection::ELEVATION ?
+  elevation_header->SetCaption(sort_direction ==
+      UISettings::WaypointSortDirection::ELEVATION ?
       _("_chkmark_Elev.") : elevation_header_text);
-  distance_header->SetCaption(sort_direction == SortDirection::DISTANCE ?
+  distance_header->SetCaption(sort_direction ==
+      UISettings::WaypointSortDirection::DISTANCE ?
       _("_chkmark_Dist.") : distance_header_text);
 }
 
@@ -345,28 +335,28 @@ WaypointListSimpleDialog::OnActivateItem(unsigned index)
 static void
 OnByDistanceClicked(gcc_unused WndButton &button)
 {
-  sort_direction = SortDirection::DISTANCE;
+  sort_direction = UISettings::WaypointSortDirection::DISTANCE;
   UpdateList();
 }
 
 static void
 OnByBearingClicked(gcc_unused WndButton &button)
 {
-  sort_direction = SortDirection::BEARING;
+  sort_direction = UISettings::WaypointSortDirection::BEARING;
   UpdateList();
 }
 
 static void
 OnByElevationClicked(gcc_unused WndButton &button)
 {
-  sort_direction = SortDirection::ELEVATION;
+  sort_direction = UISettings::WaypointSortDirection::ELEVATION;
   UpdateList();
 }
 
 static void
 OnByNameClicked(gcc_unused WndButton &button)
 {
-  sort_direction = SortDirection::NAME;
+  sort_direction = UISettings::WaypointSortDirection::NAME;
   UpdateList();
 }
 
@@ -393,6 +383,16 @@ static constexpr CallBackTableEntry callback_table[] = {
   DeclareCallBackEntry(nullptr)
 };
 
+static void
+SaveSortDirection()
+{
+  if (sort_direction != CommonInterface::GetUISettings().waypoint_sort_direction) {
+    CommonInterface::SetUISettings().waypoint_sort_direction = sort_direction;
+    Profile::Set(ProfileKeys::WaypointSortDirection, sort_direction);
+    Profile::SetModified(true);
+  }
+}
+
 const Waypoint*
 ShowWaypointListDialog(const GeoPoint &_location,
                        OrderedTask *_ordered_task, unsigned _ordered_task_index,
@@ -407,6 +407,7 @@ ShowWaypointListDialog(const GeoPoint &_location,
   dialog->SetKeyDownNotify(FormKeyDown);
 #endif
 
+  sort_direction = CommonInterface::SetUISettings().waypoint_sort_direction;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
   WaypointListSimpleDialog dialog2;
@@ -439,13 +440,15 @@ ShowWaypointListDialog(const GeoPoint &_location,
   ordered_task_index = _ordered_task_index;
   last_heading = CommonInterface::Basic().attitude.heading;
 
-  PrepareData();
   UpdateList();
 
   if (dialog->ShowModal() != mrOK) {
     delete dialog;
+    SaveSortDirection();
     return nullptr;
   }
+
+  SaveSortDirection();
 
   unsigned index = waypoint_list_control->GetCursorIndex();
 
