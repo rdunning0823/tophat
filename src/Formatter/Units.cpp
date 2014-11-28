@@ -120,10 +120,8 @@ GetBestDistancePrecision(fixed value, Unit unit, fixed threshold = fixed(5))
   value = Units::ToUserUnit(value, unit);
   if (value >= threshold)
     return 0;
-  else if (value > threshold / 10)
-    return 1;
   else
-    return 2;
+    return 1;
 }
 
 Unit
