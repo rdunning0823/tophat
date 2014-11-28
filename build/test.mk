@@ -1580,7 +1580,8 @@ ANALYSE_FLIGHT_SOURCES = \
 	$(TEST_SRC_DIR)/ContestPrinting.cpp \
 	$(TEST_SRC_DIR)/FlightPhaseJSON.cpp \
 	$(TEST_SRC_DIR)/FlightPhaseDetector.cpp \
-	$(TEST_SRC_DIR)/AnalyseFlight.cpp
+	$(TEST_SRC_DIR)/AnalyseFlight.cpp \
+	$(TEST_SRC_DIR)/FakeLogFile.cpp
 ANALYSE_FLIGHT_LDADD = $(DEBUG_REPLAY_LDADD)
 ANALYSE_FLIGHT_DEPENDS = CONTEST UTIL GEO MATH TIME
 $(eval $(call link-program,AnalyseFlight,ANALYSE_FLIGHT))
