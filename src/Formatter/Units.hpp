@@ -83,10 +83,11 @@ Unit FormatSmallDistance(TCHAR *buffer, fixed value, Unit unit,
  * Converts a distance into a formatted string. Changes the unit if
  * the numbers get small.
  * @param buffer buffer string to write to (pointer)
- * @param size Size of the buffer
  * @param value the distance
  * @param unit the distance unit (e.g. m, ft, km, nm, sm)
  * @param include_unit include the unit into the string?
+ * @param small_unit_threshold size under which "small" user units are used
+ * @param precision_threshold size over which less precision is used
  * @return the unit used for output formatting
  */
 Unit FormatDistanceSmart(TCHAR *buffer, fixed value, Unit unit,
