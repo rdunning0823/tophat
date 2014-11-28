@@ -107,12 +107,13 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   if (basic.location_available) {
     const GeoVector vector = basic.location.DistanceBearing(waypoint.location);
 
-    TCHAR distance_buffer[32];
-    FormatUserDistanceSmart(vector.distance, distance_buffer);
+    FormatUserDistanceSmart(vector.distance, buffer.buffer());
 
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE,
-                  vector.bearing, distance_buffer);
-    AddReadOnly(_("Bearing and Distance"), NULL, buffer);
+    StaticString<64> bearing_buffer;
+    FormatBearing(bearing_buffer.buffer(), bearing_buffer.MAX_SIZE,
+                  vector.bearing);
+    buffer.AppendFormat(_T(" %s"), bearing_buffer.c_str());
+    AddReadOnly(_("Distance"), NULL, buffer);
   }
 
   if (basic.location_available && basic.NavAltitudeAvailable() &&
