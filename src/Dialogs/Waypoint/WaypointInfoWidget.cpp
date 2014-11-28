@@ -133,10 +133,6 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                     glide_state));
   }
 
-  FormatUserAltitude(waypoint.elevation,
-                     buffer.buffer(), buffer.MAX_SIZE);
-  AddReadOnly(_("Elevation"), NULL, buffer);
-
   if (basic.location_available && basic.NavAltitudeAvailable()) {
     const TaskBehaviour &task_behaviour =
       CommonInterface::GetComputerSettings().task;
@@ -157,17 +153,9 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddSpacer();
 
-  if (basic.time_available && basic.date_time_utc.IsDatePlausible()) {
-    const SunEphemeris::Result sun =
-      SunEphemeris::CalcSunTimes(waypoint.location, basic.date_time_utc,
-                                 settings.utc_offset);
-
-    const BrokenTime sunset = BreakHourOfDay(sun.time_of_sunset);
-
-    buffer.UnsafeFormat(_T("%02u:%02u"),
-                        sunset.hour, sunset.minute);
-    AddReadOnly(_("Sunset"), nullptr, buffer);
-  }
+  FormatUserAltitude(waypoint.elevation,
+                     buffer.buffer(), buffer.MAX_SIZE);
+  AddReadOnly(_("Elevation"), NULL, buffer);
 
   if (FormatGeoPoint(waypoint.location,
                      buffer.buffer(), buffer.MAX_SIZE) != nullptr)
@@ -178,6 +166,18 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                       buffer.MAX_SIZE) != nullptr) {
     buffer += _T(" MHz");
     AddReadOnly(_("Radio frequency"), nullptr, buffer);
+  }
+
+  if (basic.time_available && basic.date_time_utc.IsDatePlausible()) {
+    const SunEphemeris::Result sun =
+      SunEphemeris::CalcSunTimes(waypoint.location, basic.date_time_utc,
+                                 settings.utc_offset);
+
+    const BrokenTime sunset = BreakHourOfDay(sun.time_of_sunset);
+
+    buffer.UnsafeFormat(_T("%02u:%02u"),
+                        sunset.hour, sunset.minute);
+    AddReadOnly(_("Sunset"), nullptr, buffer);
   }
 
   if (waypoint.runway.IsDirectionDefined())
