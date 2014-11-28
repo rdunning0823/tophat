@@ -44,8 +44,8 @@ namespace WaypointListRenderer
   void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
              const GeoVector *vector, fixed arrival_altitude,
              const DialogLook &dialog_look, const WaypointLook &look,
-             const WaypointRendererSettings &settings, unsigned col_2_width,
-             unsigned col_3_width);
+             const WaypointRendererSettings &settings, unsigned col_1_width,
+             unsigned col_2_width, unsigned col_3_width);
 
   /**
    *  * Used by MapItemList
@@ -103,11 +103,12 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
                             const DialogLook &dialog_look,
                             const WaypointLook &look,
                             const WaypointRendererSettings &settings,
+                            unsigned col_1_width,
                             unsigned col_2_width,
                             unsigned col_3_width)
 {
   Draw2(canvas, rc, waypoint, &vector, arrival_altitude, dialog_look, look, settings,
-       col_2_width, col_3_width);
+        col_1_width, col_2_width, col_3_width);
 }
 
 /**
@@ -251,6 +252,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
                             const DialogLook &dialog_look,
                             const WaypointLook &look,
                             const WaypointRendererSettings &settings,
+                            unsigned col_1_width,
                             unsigned col_2_width,
                             unsigned col_3_width)
 {
@@ -264,8 +266,8 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
       rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2 : rc.top;
 
   PixelRect rc_elevation = rc;
-  rc_elevation.left = rc.left + rc.GetSize().cx / 2;
-  rc_elevation.right = rc.right - col_3_width - padding;
+  rc_elevation.left = rc.left + col_1_width;
+  rc_elevation.right = rc_elevation.left + col_2_width - padding;
 
   Buffer buffer;
 
@@ -306,7 +308,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   PixelScalar left = rc.left + line_height;
   canvas.Select(name_font);
   canvas.DrawClippedText(left, middle,
-                         rc.GetSize().cx / 2 - line_height - padding,
+                         col_1_width - line_height - padding,
                          waypoint.name.c_str());
 
   // Draw icon
