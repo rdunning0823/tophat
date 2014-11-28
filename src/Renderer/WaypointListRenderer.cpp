@@ -42,7 +42,7 @@ namespace WaypointListRenderer
  * Used for main waypoint list renderer
  */
   void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-             const GeoVector *vector,
+             const GeoVector *vector, fixed arrival_altitude,
              const DialogLook &dialog_look, const WaypointLook &look,
              const WaypointRendererSettings &settings, unsigned col_2_width,
              unsigned col_3_width);
@@ -60,10 +60,10 @@ namespace WaypointListRenderer
 typedef StaticString<256u> Buffer;
 
 static void
-FormatWaypointDetails(Buffer &buffer, const Waypoint &waypoint)
+FormatWaypointDetails(Buffer &buffer, const Waypoint &waypoint, fixed arrival_altitude)
 {
   TCHAR alt[16];
-  FormatUserAltitude(waypoint.elevation, alt, 16);
+  FormatUserAltitude(arrival_altitude, alt, 16);
   buffer = alt;
 
   if (waypoint.radio_frequency.IsDefined()) {
@@ -99,13 +99,14 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 void
 WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
                             const Waypoint &waypoint, const GeoVector &vector,
+                            fixed arrival_altitude,
                             const DialogLook &dialog_look,
                             const WaypointLook &look,
                             const WaypointRendererSettings &settings,
                             unsigned col_2_width,
                             unsigned col_3_width)
 {
-  Draw2(canvas, rc, waypoint, &vector, dialog_look, look, settings,
+  Draw2(canvas, rc, waypoint, &vector, arrival_altitude, dialog_look, look, settings,
        col_2_width, col_3_width);
 }
 
@@ -220,7 +221,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
 
   // Draw details line
-  FormatWaypointDetails(buffer, waypoint);
+  FormatWaypointDetails(buffer, waypoint, fixed(0));
   PixelSize sz_details = text_font.TextSize(buffer.c_str());
 
   PixelScalar details_left = rc.right - sz_details.cx - padding - leg_info_width;
@@ -246,6 +247,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 void
 WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
                             const Waypoint &waypoint, const GeoVector *vector,
+                            fixed arrival_altitude,
                             const DialogLook &dialog_look,
                             const WaypointLook &look,
                             const WaypointRendererSettings &settings,
@@ -296,7 +298,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   }
 
   // Draw elevation (& possibly freq)
-  FormatWaypointDetails(buffer, waypoint);
+  FormatWaypointDetails(buffer, waypoint, arrival_altitude);
   canvas.DrawClippedText(rc_elevation.left, middle, rc_elevation.GetSize().cx,
                          buffer.c_str());
 

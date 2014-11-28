@@ -51,7 +51,7 @@ namespace WaypointListRenderer
    * Uses 3 columns
    */
   void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-             const GeoVector &vector,
+             const GeoVector &vector, fixed arrival_altitude,
              const DialogLook &dialog_look, const WaypointLook &look,
              const WaypointRendererSettings &settings,
              unsigned col_2_width,
