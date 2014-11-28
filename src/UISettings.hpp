@@ -65,6 +65,7 @@ struct UISettings {
     DISTANCE,
     BEARING,
     ELEVATION,
+    ARRIVAL_ALTITUDE,
   };
 
   /** Direction of sort in waypoint list */

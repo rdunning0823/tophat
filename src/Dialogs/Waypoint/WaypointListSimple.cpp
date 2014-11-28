@@ -176,6 +176,9 @@ FillList(WaypointList &list, const Waypoints &src,
   case UISettings::WaypointSortDirection::ELEVATION:
     list.SortByElevation();
     break;
+  case UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE:
+    list.SortByArrivalAltitude();
+    break;
   case UISettings::WaypointSortDirection::BEARING:
     break;
   }
@@ -202,7 +205,7 @@ UpdateHeaders()
   PixelRect rc_list = waypoint_list_control->GetPosition();
   const unsigned padding = Layout::GetTextPadding();
 
-  const TCHAR *elevation_header_text = _("Elev.");
+  const TCHAR *elevation_header_text = _("Arriv.");
   const TCHAR *distance_header_text = _("Dist.");
 
   rc_name_header = name_header->GetPosition();
@@ -228,8 +231,8 @@ UpdateHeaders()
       UISettings::WaypointSortDirection::NAME ?
       _("_chkmark_Name") : _("Name"));
   elevation_header->SetCaption(sort_direction ==
-      UISettings::WaypointSortDirection::ELEVATION ?
-      _("_chkmark_Elev.") : elevation_header_text);
+      UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE ?
+      _("_chkmark_Arr.") : elevation_header_text);
   distance_header->SetCaption(sort_direction ==
       UISettings::WaypointSortDirection::DISTANCE ?
       _("_chkmark_Dist.") : distance_header_text);
@@ -294,6 +297,33 @@ OnWaypointListEnter()
     OnSearchClicked(*search_button);
 }
 
+static fixed
+CalcAltitudeDifferential(const Waypoint &waypoint)
+{
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+
+/*    assert(basic.location_available);
+  assert(more_data.NavAltitudeAvailable());
+  assert(settings.polar.glide_polar_task.IsValid());*/
+
+  // altitude differential
+  const GlideState glide_state(
+    basic.location.DistanceBearing(waypoint.location),
+    waypoint.elevation + settings.task.safety_height_arrival,
+    more_data.nav_altitude,
+    calculated.GetWindOrZero());
+
+  const GlideResult &result =
+    MacCready::Solve(settings.task.glide,
+                     settings.polar.glide_polar_task,
+                     glide_state);
+  return result.pure_glide_altitude_difference;
+}
+
+
 void
 WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
                                       unsigned i)
@@ -319,6 +349,7 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
 
   WaypointListRenderer::Draw2(canvas, rc, *info.waypoint,
                               info.GetVector(location),
+                              CalcAltitudeDifferential(*info.waypoint),
                               UIGlobals::GetDialogLook(),
                               UIGlobals::GetMapLook().waypoint,
                               CommonInterface::GetMapSettings().waypoint,
@@ -349,7 +380,7 @@ OnByBearingClicked(gcc_unused WndButton &button)
 static void
 OnByElevationClicked(gcc_unused WndButton &button)
 {
-  sort_direction = UISettings::WaypointSortDirection::ELEVATION;
+  sort_direction = UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE;
   UpdateList();
 }
 
