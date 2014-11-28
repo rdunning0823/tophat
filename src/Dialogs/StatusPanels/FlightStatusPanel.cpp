@@ -73,7 +73,7 @@ FlightStatusPanel::Refresh()
     FormatBearing(buffer.buffer(), buffer.MAX_SIZE, vec.bearing, _T(""));
     SetText(Bearing, buffer);
 
-    FormatUserDistanceSmart(vec.distance, buffer.buffer(), buffer.MAX_SIZE);
+    FormatUserDistanceSmart(vec.distance, buffer.buffer());
     SetText(Distance, buffer);
   } else {
     SetText(Near, _T("-"));
