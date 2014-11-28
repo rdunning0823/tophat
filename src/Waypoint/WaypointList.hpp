@@ -57,6 +57,7 @@ public:
   void SortByDistance(const GeoPoint &location);
   void SortByName();
   void SortByElevation();
+  void SortByArrivalAltitude();
 };
 
 #endif

@@ -23,6 +23,12 @@ Copyright_License {
 
 #include "WaypointList.hpp"
 #include "Waypoint/Waypoint.hpp"
+#include "Interface.hpp"
+#include "NMEA/MoreData.hpp"
+#include "NMEA/Derived.hpp"
+#include "Engine/GlideSolvers/GlideState.hpp"
+#include "Engine/GlideSolvers/GlideResult.hpp"
+#include "Engine/GlideSolvers/MacCready.hpp"
 
 #include <algorithm>
 
@@ -88,3 +94,44 @@ void WaypointList::SortByElevation() {
   std::sort(begin(), end(), WaypointElevationCompare());
 }
 
+class WaypointArrivalAltitudeCompare
+{
+  const MoreData &more_data;
+  const DerivedInfo &calculated;
+  const NMEAInfo &basic;
+  const ComputerSettings &settings;
+
+public:
+  WaypointArrivalAltitudeCompare()
+  :more_data(CommonInterface::Basic()),
+   calculated(CommonInterface::Calculated()),
+   basic(CommonInterface::Basic()),
+   settings(CommonInterface::GetComputerSettings()) { }
+
+  fixed CalcAltitudeDifferential(const WaypointListItem &a) const
+  {
+    // altitude differential
+    const GlideState glide_state(
+      basic.location.DistanceBearing(a.waypoint->location),
+      a.waypoint->elevation + settings.task.safety_height_arrival,
+      more_data.nav_altitude,
+      calculated.GetWindOrZero());
+
+    const GlideResult &result =
+      MacCready::Solve(settings.task.glide,
+                       settings.polar.glide_polar_task,
+                       glide_state);
+    return result.pure_glide_altitude_difference;
+  }
+
+
+  bool operator()(const WaypointListItem &a,
+                  const WaypointListItem &b) const {
+
+    return CalcAltitudeDifferential(a) > CalcAltitudeDifferential(b);
+  }
+};
+
+void WaypointList::SortByArrivalAltitude() {
+  std::sort(begin(), end(), WaypointArrivalAltitudeCompare());
+}
