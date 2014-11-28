@@ -115,7 +115,7 @@ GetBestDistanceUnit(fixed value, Unit unit, fixed threshold = fixed(2500))
 }
 
 static int
-GetBestDistancePrecision(fixed value, Unit unit, fixed threshold = fixed(100))
+GetBestDistancePrecision(fixed value, Unit unit, fixed threshold = fixed(5))
 {
   value = Units::ToUserUnit(value, unit);
   if (value >= threshold)
