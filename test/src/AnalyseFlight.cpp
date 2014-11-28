@@ -91,6 +91,7 @@ ComputeCircling(DebugReplay &replay, const CirclingSettings &circling_settings)
                              replay.Basic(),
                              replay.Calculated().flight);
   circling_computer.Turning(replay.SetCalculated(),
+                            replay.SetCalculated(),
                             replay.Basic(),
                             replay.Calculated().flight,
                             circling_settings);
