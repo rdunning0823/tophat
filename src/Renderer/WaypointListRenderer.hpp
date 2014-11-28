@@ -54,6 +54,7 @@ namespace WaypointListRenderer
              const GeoVector &vector, fixed arrival_altitude,
              const DialogLook &dialog_look, const WaypointLook &look,
              const WaypointRendererSettings &settings,
+             unsigned col_1_width,
              unsigned col_2_width,
              unsigned col_3_width);
 

@@ -353,6 +353,7 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
                               UIGlobals::GetDialogLook(),
                               UIGlobals::GetMapLook().waypoint,
                               CommonInterface::GetMapSettings().waypoint,
+                              rc_name_header.GetSize().cx,
                               rc_elevation_header.GetSize().cx,
                               rc_distance_header.GetSize().cx);
 }
