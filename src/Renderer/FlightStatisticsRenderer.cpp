@@ -184,11 +184,11 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
     TCHAR timetext1[100];
     FormatSignedTimeHHMM(timetext1, (int)result.time);
     TCHAR distance_classic[100];
-    FormatUserDistanceSmart(result_classic.distance, distance_classic, 100);
+    FormatUserDistanceSmart(result_classic.distance, distance_classic);
     TCHAR distance_fai[100];
-    FormatUserDistanceSmart(result_fai.distance, distance_fai, 100);
+    FormatUserDistanceSmart(result_fai.distance, distance_fai);
     TCHAR speed[100];
-    FormatUserTaskSpeed(result.GetSpeed(), speed, ARRAY_SIZE(speed));
+    FormatUserTaskSpeed(result.GetSpeed(), speed);
     _stprintf(buffer,
               (long_line
                ? _T("%s: %s, %s (FAI)\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
@@ -210,9 +210,9 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
     TCHAR timetext1[100];
     FormatSignedTimeHHMM(timetext1, (int)result_free.time);
     TCHAR distance[100];
-    FormatUserDistanceSmart(result_free.distance, distance, 100);
+    FormatUserDistanceSmart(result_free.distance, distance);
     TCHAR distance_fai[100];
-    FormatUserDistanceSmart(result_triangle.distance, distance_fai, 100);
+    FormatUserDistanceSmart(result_triangle.distance, distance_fai);
     TCHAR speed[100];
     FormatUserTaskSpeed(result_free.GetSpeed(), speed, ARRAY_SIZE(speed));
     _stprintf(buffer,
@@ -243,7 +243,7 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
     TCHAR timetext1[100];
     FormatSignedTimeHHMM(timetext1, (int)result_olc.time);
     TCHAR distance[100];
-    FormatUserDistanceSmart(result_olc.distance, distance, 100);
+    FormatUserDistanceSmart(result_olc.distance, distance);
     TCHAR speed[100];
     FormatUserTaskSpeed(result_olc.GetSpeed(), speed, ARRAY_SIZE(speed));
     _stprintf(buffer,

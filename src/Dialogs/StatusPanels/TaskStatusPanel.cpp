@@ -66,14 +66,14 @@ TaskStatusPanel::Refresh()
 
   if (task_stats.total.planned.IsDefined()) {
     FormatUserDistanceSmart(task_stats.total.planned.GetDistance(),
-                              Temp, ARRAY_SIZE(Temp));
+                              Temp);
     SetText(TaskDistance, Temp);
   } else
     SetText(TaskDistance, _T(""));
 
   if (task_stats.total.remaining.IsDefined()) {
     FormatUserDistanceSmart(task_stats.total.remaining.GetDistance(),
-                              Temp, ARRAY_SIZE(Temp));
+                              Temp);
     SetText(RemainingDistance, Temp);
   }
 

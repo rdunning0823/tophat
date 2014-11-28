@@ -118,7 +118,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   TCHAR info_buffer[256], distance_buffer[32], direction_buffer[32];
   if (item.vector.IsValid()) {
-    FormatUserDistanceSmart(item.vector.distance, distance_buffer, 32);
+    FormatUserDistanceSmart(item.vector.distance, distance_buffer);
     FormatBearing(direction_buffer, ARRAY_SIZE(direction_buffer),
                   item.vector.bearing);
     _stprintf(info_buffer, _T("%s: %s, %s: %s"),

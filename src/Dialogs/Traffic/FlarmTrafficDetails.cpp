@@ -76,7 +76,7 @@ UpdateChanging(const MoreData &basic)
 
   // Fill distance field
   if (target_ok)
-    FormatUserDistanceSmart(target->distance, tmp, 20, fixed(1000));
+    FormatUserDistanceSmart(target->distance, tmp);
   else
     _tcscpy(tmp, _T("--"));
   SetFormValue(*wf, _T("prpDistance"), tmp);

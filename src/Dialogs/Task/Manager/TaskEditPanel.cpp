@@ -391,7 +391,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   UPixelScalar leg_info_width = 0;
   if (show_leg_info) {
     // Draw leg distance
-    FormatUserDistanceSmart(leg.distance, buffer, true);
+    FormatUserDistanceSmart(leg.distance, buffer);
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer);
     canvas.DrawText(rc.right - padding - width,
                     rc.top + padding +
