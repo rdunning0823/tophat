@@ -351,7 +351,7 @@ data=6
 event=EditTaskStart
 event=Mode default
 label=Edit start
-location=19
+location=20
 
 mode=NavOrdered
 type=key
