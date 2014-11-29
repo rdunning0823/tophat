@@ -58,7 +58,7 @@ public:
                   const FlyingState &flight);
 
   /** adds new rate to circular array, computes min (biggest pullup) index
-   * @param rate
+   * @param rate.  change in airspeed per second.  Negative means slowing down
    **/
   void AddRate(fixed rate);
 
