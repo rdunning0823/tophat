@@ -31,6 +31,9 @@ Copyright_License {
 #include "Engine/GlideSolvers/GlidePolar.hpp"
 #include "Time/WrapClock.hpp"
 #include "OS/Args.hpp"
+#include "Logger/Settings.hpp"
+#include "Util/StaticString.hpp"
+#include "IGC/IGCParser.hpp"
 
 class NLineReader;
 class Device;
@@ -63,6 +66,14 @@ protected:
   DerivedInfo calculated;
 
   WrapClock wrap_clock;
+
+public:
+  /**
+   *  for pilot name
+   */
+  LoggerSettings logger_settings;
+
+  GliderType glider_type;
 
 public:
   DebugReplay(NLineReader *reader);

@@ -38,6 +38,8 @@ DebugReplay::DebugReplay(NLineReader *_reader)
   calculated.Reset();
 
   flying_computer.Reset();
+  logger_settings.SetDefaults();
+  glider_type.clear();
 
   wrap_clock.Reset();
 }
