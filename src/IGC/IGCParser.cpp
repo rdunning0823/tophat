@@ -29,9 +29,13 @@ Copyright_License {
 #include "Time/BrokenDate.hpp"
 #include "Time/BrokenTime.hpp"
 #include "Util/CharUtil.hpp"
+#include "Util/StringUtil.hpp"
+#include "Logger/Settings.hpp"
 
 #include <string.h>
 #include <stdlib.h>
+
+#include "LogFile.hpp" //debug
 
 /**
  * Character table for base-36.
@@ -49,6 +53,53 @@ ImportDeprecatedLoggerSerial(char id[4], unsigned serial)
   id[2] = c36[serial % 36];
   id[3] = 0;
 }
+
+bool
+IGCParseHRecords(const char *line, GliderType &glider_type, LoggerSettings &logger_settings)
+{
+  if (line[0] != 'H')
+    return false;
+
+  enum {
+    StringLength = 256,
+  };
+
+  char upper_line[StringLength];
+  char tmp[StringLength];
+
+  CopyString(tmp, line, StringLength);
+  CopyASCIIUppper(upper_line, tmp);
+  TrimRight(upper_line);
+
+  if (memcmp(upper_line, "HFPLTPILOT:", 11) == 0)
+    IGCParsePilotRecord(upper_line, logger_settings);
+  else if (memcmp(upper_line, "HFGTYGLIDERTYPE:", 16) == 0)
+    IGCParseGliderType(upper_line, glider_type);
+  return true;
+}
+
+bool
+IGCParsePilotRecord(const char *upper_line, LoggerSettings &logger_settings)
+{
+  assert (memcmp(upper_line, "HFPLTPILOT:", 11) == 0);
+
+  upper_line += 11;
+  logger_settings.pilot_name = TrimLeft(upper_line);
+  LogDebug("Pilot:%s", logger_settings.pilot_name.c_str());
+  return true;
+}
+
+bool
+IGCParseGliderType(const char *upper_line, GliderType &glider_type)
+{
+  assert (memcmp(upper_line, "HFGTYGLIDERTYPE:", 16) == 0);
+
+  upper_line += 16;
+  glider_type = TrimLeft(upper_line);
+
+  return true;
+}
+
 
 bool
 IGCParseHeader(const char *line, IGCHeader &header)

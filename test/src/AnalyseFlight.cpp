@@ -23,6 +23,7 @@
 #include "Engine/Trace/Trace.hpp"
 #include "Contest/ContestManager.hpp"
 #include "OS/Args.hpp"
+#include "OS/PathName.hpp"
 #include "Computer/CirclingComputer.hpp"
 #include "DebugReplay.hpp"
 #include "Util/Macros.hpp"
@@ -32,7 +33,9 @@
 #include "JSON/GeoWriter.hpp"
 #include "FlightPhaseDetector.hpp"
 #include "FlightPhaseJSON.hpp"
+#include "ThermalWriter.hpp"
 #include "Computer/Settings.hpp"
+#include "Util/StaticString.hpp"
 
 struct Result {
   BrokenDateTime takeoff_time, release_time, landing_time;
@@ -114,7 +117,8 @@ Finish(const MoreData &basic, const DerivedInfo &calculated,
 
 static void
 Run(DebugReplay &replay, Result &result,
-    Trace &full_trace, Trace &triangle_trace, Trace &sprint_trace)
+    Trace &full_trace, Trace &triangle_trace, Trace &sprint_trace,
+    bool thermal_mode)
 {
   CirclingSettings circling_settings;
   circling_settings.SetDefaults();
@@ -152,8 +156,10 @@ Run(DebugReplay &replay, Result &result,
       released = true;
 
       full_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
-      triangle_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
-      sprint_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+      if (!thermal_mode) {
+        triangle_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+        sprint_trace.EraseEarlierThan(replay.Calculated().flight.release_time);
+      }
     }
 
     if (released && !replay.Calculated().flight.flying)
@@ -164,8 +170,10 @@ Run(DebugReplay &replay, Result &result,
 
     const TracePoint point(basic);
     full_trace.push_back(point);
-    triangle_trace.push_back(point);
-    sprint_trace.push_back(point);
+    if (!thermal_mode) {
+      triangle_trace.push_back(point);
+      sprint_trace.push_back(point);
+    }
   }
 
   Update(replay.Basic(), replay.Calculated(), result);
@@ -309,14 +317,20 @@ int main(int argc, char **argv)
 {
   unsigned full_max_points = 512,
            triangle_max_points = 1024,
-           sprint_max_points = 64;
+           sprint_max_points = 64,
+           append_thermal_database = false;
+  StaticString<256> thermal_database_name(_T(""));
 
   Args args(argc, argv,
-            "[options] DRIVER FILE\n"
+            "[options] DRIVER FILE THERMAL_DATABASE.txt\n"
+            "DRIVER used for NMEA input file ananysis\n"
+            "FILE is IGC or NMEA input file\n"
+            "THERMAL_DATABASE is output file listing thermals in flight\n"
             "Options:\n"
             "  --full-points=512        Maximum number of full trace points (default = 512)\n"
             "  --triangle-points=1024   Maximum number of triangle trace points (default = 1024)\n"
-            "  --sprint-points=64       Maximum number of sprint trace points (default = 64)");
+            "  --sprint-points=64       Maximum number of sprint trace points (default = 64)\n"
+            "  --append                 Appends to the THERMAL_DATABSE");
 
   const char *arg;
   while ((arg = args.PeekNext()) != nullptr && *arg == '-') {
@@ -350,6 +364,8 @@ int main(int argc, char **argv)
         args.UsageError();
       }
 
+    } else if ((value = StringAfterPrefix(arg, "--append")) != nullptr) {
+      append_thermal_database = true;
     } else {
       args.UsageError();
     }
@@ -359,29 +375,44 @@ int main(int argc, char **argv)
   if (replay == NULL)
     return EXIT_FAILURE;
 
+  // create .txt thermal database output file
+  if (!args.IsEmpty() && MatchesExtension(args.PeekNext(), ".txt")) {
+    thermal_database_name = args.ExpectNext();
+  }
+
   args.ExpectEnd();
 
   static Trace full_trace(0, Trace::null_time, full_max_points);
   static Trace triangle_trace(0, Trace::null_time, triangle_max_points);
   static Trace sprint_trace(0, 9000, sprint_max_points);
 
+  TextWriter writer("/dev/stdout", true);
+  TextWriter thermal_text_writer(thermal_database_name, append_thermal_database);
+  bool thermal_mode = thermal_text_writer.IsOpen();
+
   Result result;
-  Run(*replay, result, full_trace, triangle_trace, sprint_trace);
-  delete replay;
+  Run(*replay, result, full_trace, triangle_trace, sprint_trace, thermal_mode);
 
   const ContestStatistics olc_plus = SolveContest(Contest::OLC_PLUS, full_trace, triangle_trace, sprint_trace);
   const ContestStatistics dmst = SolveContest(Contest::DMST, full_trace, triangle_trace, sprint_trace);
 
-  TextWriter writer("/dev/stdout", true);
 
   {
-    JSON::ObjectWriter root(writer);
+    if (!thermal_mode) {
+      JSON::ObjectWriter root(writer);
 
-    WriteResult(root, result);
-    root.WriteElement("phases", WritePhaseList,
-                      flight_phase_detector.GetPhases());
-    root.WriteElement("performance", WritePerformanceStats,
-                      flight_phase_detector.GetTotals());
-    root.WriteElement("contests", WriteContests, olc_plus, dmst);
+      WriteResult(root, result);
+      root.WriteElement("phases", WritePhaseList,
+                        flight_phase_detector.GetPhases());
+      root.WriteElement("performance", WritePerformanceStats,
+                        flight_phase_detector.GetTotals());
+      root.WriteElement("contests", WriteContests, olc_plus, dmst);
+    } else {
+      ThermalWriter thermal_writer(thermal_text_writer);
+      thermal_writer.WriteThermalList(flight_phase_detector.GetPhases(),
+                                      replay->logger_settings, replay->glider_type,
+                                      append_thermal_database);
+    }
   }
+  delete replay;
 }

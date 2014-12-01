@@ -24,6 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_IGC_PARSER_HPP
 #define XCSOAR_IGC_PARSER_HPP
 
+#include "Util/StaticString.hpp"
+
 struct IGCFix;
 struct IGCHeader;
 struct IGCExtensions;
@@ -32,6 +34,12 @@ struct IGCDeclarationTurnpoint;
 struct BrokenDate;
 struct BrokenTime;
 struct GeoPoint;
+struct LoggerSettings;
+
+/**
+ * used by AnalyseFlight()
+ */
+typedef StaticString<64> GliderType;
 
 /**
  * Parse an IGC "A" record.
@@ -48,6 +56,25 @@ IGCParseHeader(const char *line, IGCHeader &header);
  */
 bool
 IGCParseDateRecord(const char *line, BrokenDate &date);
+
+/**
+ * parses one IGC "H" header row into IGC Header structure
+ * returns true if the row was an "H" record
+ * All H records are grouped at top of IGC file per IGC standard
+ * after initial A record
+ */
+bool
+IGCParseHRecords(const char *line, GliderType &glider_type,
+                 LoggerSettings &logger_settings);
+/**
+ * parses Pilot record
+ * @param upper_line.  Input line in all upper case, trimmed right spaces
+ */
+bool
+IGCParsePilotRecord(const char *upper_line, LoggerSettings &logger_settings);
+
+bool
+IGCParseGliderType(const char *upper_line, GliderType &glider_type);
 
 /**
  * Parse an IGC "I" record.
