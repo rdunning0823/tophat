@@ -2,17 +2,40 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.0.3 beta
-* Fix Kobo responsiveness bug
+Beta
+* Allow adjust of time to detect circling.  Advanced > Computer > Beta
+General
+* Waypoint list: sort by arrival altitude.  Bigger buttons
+* Waypoint list: remember last sort option
+* Italian translation
+* Menu options: explicitly set declutter wp label mode
+* Fix landing detection for loggers with ASI
+* Fix display of device status in quick setup screen
+* Display safety height for terrain in quick setup screen
+* Remove annoying "Too many waypoints" message when in air
+* Remove borders from read-only dialog fields
+* Lower the "Edit start" menu option so it is less prominent
+Infoboxes
+* Home Infoboxes: add Goto button
+* New: Target Infobox: draw bearing arrow, display distance
+* Add Wind to the set of default Infoboxes
+* Add Home Arrival Altitude to default Infoboxes
+Task
+* Navigation bar: navigate (distance, bearing, altitude) to center of AAT cylinders
+* Simplify MAT task dialog and language
+* MAT task display labels & OZs during "Goto/abort"
 * Task: TAT/AAT - Nav bar navigates to TP Center
 * Task: TAT/AAT - Added "Target arrow" Infobox to point to target
-* Support for Kobo Glo
-* Allow hiding of Final glide bar in advanced settings
-* Italian translation
-* Waypoint labels menu option
-* Simplify MAT task dialog
-* MAT task display labels & OZs during "Goto/abort"
-* Home Infoboxes: add Goto button
+* Task editor: confirm "Remove all waypoints" option
+Map
+* Allow hiding of Final glide bar (advanced settings)
+* Waypoint labels: format LD as n:n (advanced settings)
 * Pan mode: add white background when drawing coordinates
+* Remove decimal precision unless below 5
+Kobo
+* Fix Kobo responsiveness bug
+* Support for Kobo Glo
+* Reformat flights list power off screen
 
 Top Hat Soaring 2.0.1 July 28, 2014
 * Simplified waypoints list, added column header sort
