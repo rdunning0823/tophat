@@ -218,8 +218,6 @@ Main(SingleWindow &main_window, const DialogLook &dialog_look)
   const int result = dialog.ShowModal();
   dialog.StealWidget();
   return result;
-
-  return dialog.ShowModal();
 }
 
 static PixelSize
