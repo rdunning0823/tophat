@@ -158,14 +158,6 @@ InputEvents::eventScreenModes(const TCHAR *misc)
   } else if (StringIsEqual(misc, _T("previous")))
     PageActions::Prev();
   else {
-    StaticString<128> buffer;
-    const PageLayout *pl =
-      &CommonInterface::SetUISettings().pages.pages[PageActions::NextIndex()];
-    const InfoBoxSettings &info_box_settings =
-      CommonInterface::GetUISettings().info_boxes;
-    assert(pl != NULL);
-    pl->MakeTitle(info_box_settings, buffer.buffer(), true);
-
     PageActions::Next();
   }
 
