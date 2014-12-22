@@ -65,11 +65,11 @@ TransparentRendererCache::Commit(Canvas &canvas,
 {
   assert(canvas.IsDefined());
   assert(projection.IsValid());
-  assert(compare_projection.IsDefined());
   assert(buffer.IsDefined());
-  assert(Check(projection));
 
-  empty = false;
+  /* if Invalidate() is called then compare_projection will be undefined */
+  if (compare_projection.IsDefined() && Check(projection))
+    empty = false;
 }
 
 void
@@ -108,10 +108,8 @@ TransparentRendererCache::AlphaBlendTo(Canvas &canvas,
   assert(canvas.IsDefined());
   assert(buffer.IsDefined());
   assert(projection.IsValid());
-  assert(compare_projection.IsDefined());
-  assert(Check(projection));
 
-  if (empty)
+  if (empty || !compare_projection.IsDefined() || !Check(projection))
     return;
 
   const unsigned width = projection.GetScreenWidth(),
