@@ -97,7 +97,7 @@ PageActions::RestoreMapZoom()
     GlueMapWindow *map = UIGlobals::GetMapIfActive();
     if (map != nullptr) {
       map->RestoreMapScale();
-      map->QuickRedraw();
+      map->FullRedraw();
     }
   }
 }
