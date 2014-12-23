@@ -370,11 +370,11 @@ PageActions::ShowThermalAssistant()
 {
   PageLayout layout = GetCurrentLayout();
   if (layout.main == PageLayout::Main::THERMAL_ASSISTANT)
-    /* already showing the traffic radar */
+    /* already showing the thermal assistant */
     return;
 
   if (GetConfiguredLayout().main == PageLayout::Main::THERMAL_ASSISTANT)
-    /* the configured page is a traffic radar page: restore it */
+    /* the configured page is a thermal assistant page: restore it */
     Restore();
   else {
     /* generate a "special" page based on the current page */
