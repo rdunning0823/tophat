@@ -83,23 +83,6 @@ GlueMapWindow::SetPan(bool enable)
 }
 
 void
-GlueMapWindow::TogglePan()
-{
-  switch (follow_mode) {
-  case FOLLOW_SELF:
-    follow_mode = FOLLOW_PAN;
-    break;
-
-  case FOLLOW_PAN:
-    follow_mode = FOLLOW_SELF;
-    break;
-  }
-
-  UpdateProjection();
-  FullRedraw();
-}
-
-void
 GlueMapWindow::PanTo(const GeoPoint &location)
 {
   follow_mode = FOLLOW_PAN;

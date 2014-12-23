@@ -201,7 +201,6 @@ public:
   void Create(ContainerWindow &parent, const PixelRect &rc);
 
   void SetPan(bool enable);
-  void TogglePan();
   void PanTo(const GeoPoint &location);
 
   bool ShowMapItems(const GeoPoint &location,
