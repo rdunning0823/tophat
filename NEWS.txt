@@ -2,8 +2,7 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.0.3 beta
-Beta
-* Allow adjust of time to detect circling.  Advanced > Computer > Beta
+Experimental: Adjustable time to detect circling.  Advanced > Computer > Beta
 General
 * Waypoint list: sort by arrival altitude.  Bigger buttons
 * Waypoint list: remember last sort option
@@ -36,6 +35,7 @@ Kobo
 * Fix Kobo responsiveness bug
 * Support for Kobo Glo
 * Reformat flights list power off screen
+* Fix crash condition switching screens and zooming
 
 Top Hat Soaring 2.0.1 July 28, 2014
 * Simplified waypoints list, added column header sort
