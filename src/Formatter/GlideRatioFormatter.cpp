@@ -30,7 +30,7 @@ FormatGlideRatio(TCHAR *buffer, size_t size, fixed gr)
   assert(buffer != NULL);
   assert(size >= 8);
 
-  if (gr < fixed(10))
+  if (fabs(gr) < fixed(10))
     StringFormat(buffer, size, _T("%.1f"), (double) gr);
   else
     StringFormat(buffer, size, _T("%.0f"), (double) gr);
