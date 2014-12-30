@@ -27,6 +27,6 @@ Copyright_License {
 class Widget;
 
 Widget *
-LoadAltitudeSimulatorFullScreenPanel(unsigned id);
+LoadAltitudeSimulatorPanel(unsigned id);
 
 #endif

@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-#include "AltitudeSimulatorFullScreen.hpp"
+#include "AltitudeSimulator.hpp"
 #include "Base.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Components.hpp"
@@ -55,7 +55,7 @@ enum ControlIndex {
 };
 
 
-class AltitudeSimulatorFullScreenPanel : public BaseAccessPanel, NumberButtonLayout {
+class AltitudeSimulatorPanel : public BaseAccessPanel, NumberButtonLayout {
   class FinalGlideChart: public PaintWindow
   {
   public:
@@ -115,7 +115,7 @@ protected:
   ButtonLook big_button_look;
 
 public:
-  AltitudeSimulatorFullScreenPanel(unsigned id)
+  AltitudeSimulatorPanel(unsigned id)
     :BaseAccessPanel(id), dialog_timer(*this) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
@@ -140,7 +140,7 @@ protected:
 
 
 bool
-AltitudeSimulatorFullScreenPanel::OnTimer(WindowTimer &timer)
+AltitudeSimulatorPanel::OnTimer(WindowTimer &timer)
 {
   if (timer == dialog_timer) {
     Refresh();
@@ -150,7 +150,7 @@ AltitudeSimulatorFullScreenPanel::OnTimer(WindowTimer &timer)
 }
 
 void
-AltitudeSimulatorFullScreenPanel::OnAction(int action_id)
+AltitudeSimulatorPanel::OnAction(int action_id)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   fixed altitude = basic.gps_altitude;
@@ -178,7 +178,7 @@ AltitudeSimulatorFullScreenPanel::OnAction(int action_id)
 }
 
 void
-AltitudeSimulatorFullScreenPanel::Refresh()
+AltitudeSimulatorPanel::Refresh()
 {
   const NMEAInfo &basic = CommonInterface::Basic();
 
@@ -190,7 +190,7 @@ AltitudeSimulatorFullScreenPanel::Refresh()
 }
 
 void
-AltitudeSimulatorFullScreenPanel::Move(const PixelRect &rc_unused)
+AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
 {
   PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
 
@@ -205,7 +205,7 @@ AltitudeSimulatorFullScreenPanel::Move(const PixelRect &rc_unused)
 }
 
 void
-AltitudeSimulatorFullScreenPanel::CalculateLayout(const PixelRect &rc)
+AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc)
 {
   NumberButtonLayout::CalculateLayout(content_rc);
 
@@ -221,7 +221,7 @@ AltitudeSimulatorFullScreenPanel::CalculateLayout(const PixelRect &rc)
 }
 
 void
-AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
+AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
   CalculateLayout(rc);
@@ -279,12 +279,12 @@ AltitudeSimulatorFullScreenPanel::Prepare(ContainerWindow &parent, const PixelRe
 }
 
 void
-AltitudeSimulatorFullScreenPanel::Unprepare()
+AltitudeSimulatorPanel::Unprepare()
 {
   dialog_timer.Cancel();
 }
 
-AltitudeSimulatorFullScreenPanel::FinalGlideChart::FinalGlideChart(
+AltitudeSimulatorPanel::FinalGlideChart::FinalGlideChart(
     ContainerWindow &parent,
     PixelScalar X,
     PixelScalar Y,
@@ -301,7 +301,7 @@ AltitudeSimulatorFullScreenPanel::FinalGlideChart::FinalGlideChart(
 }
 
 void
-AltitudeSimulatorFullScreenPanel::FinalGlideChart::OnPaint(Canvas &canvas)
+AltitudeSimulatorPanel::FinalGlideChart::OnPaint(Canvas &canvas)
 {
   PaintWindow::OnPaint(canvas);
   canvas.SelectNullPen();
@@ -327,11 +327,11 @@ AltitudeSimulatorFullScreenPanel::FinalGlideChart::OnPaint(Canvas &canvas)
 }
 
 Widget*
-LoadAltitudeSimulatorFullScreenPanel(unsigned id)
+LoadAltitudeSimulatorPanel(unsigned id)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   if (!basic.gps.simulator)
     return nullptr;
 
-  return new AltitudeSimulatorFullScreenPanel(id);
+  return new AltitudeSimulatorPanel(id);
 }

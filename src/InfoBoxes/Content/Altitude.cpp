@@ -25,7 +25,7 @@ Copyright_License {
 #include "Factory.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
-#include "InfoBoxes/Panel/AltitudeSimulatorFullScreen.hpp"
+#include "InfoBoxes/Panel/AltitudeSimulator.hpp"
 #include "InfoBoxes/Panel/BarometricPressure.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Units/Units.hpp"
@@ -50,7 +50,7 @@ Copyright_License {
 constexpr
 #endif
 const InfoBoxPanel altitude_infobox_panels[] = {
-  { N_("Simulator"), LoadAltitudeSimulatorFullScreenPanel },
+  { N_("Simulator"), LoadAltitudeSimulatorPanel },
   { nullptr, nullptr }
 };
 
