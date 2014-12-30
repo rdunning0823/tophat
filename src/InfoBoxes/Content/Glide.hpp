@@ -34,6 +34,7 @@ UpdateInfoBoxGRInstant(InfoBoxData &data);
 void
 UpdateInfoBoxGRCruise(InfoBoxData &data);
 
+/* requires total energy vario */
 void
 UpdateInfoBoxLDVario(InfoBoxData &data);
 
