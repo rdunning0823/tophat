@@ -114,6 +114,9 @@ private:
   void AverageClimbRate(const NMEAInfo &basic, DerivedInfo &calculated);
   void CurrentThermal(const MoreData &basic, const CirclingInfo &circling,
                       OneClimbInfo &current_thermal);
+  /**
+   * This is the LD based on the total energe vario when connected
+   */
   void GR(const MoreData &basic, const FlyingState &flying,
           VarioInfo &vario_info);
   void CruiseGR(const MoreData &basic, DerivedInfo &calculated);
