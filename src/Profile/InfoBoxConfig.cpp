@@ -140,6 +140,8 @@ Profile::Load(InfoBoxSettings &settings)
       GetIBType(profileKey, panel.contents[j]);
     }
   }
+
+  Get(ProfileKeys::ShowAlternateAltitudeUnits, settings.show_alternative_altitude_units);
 }
 
 void

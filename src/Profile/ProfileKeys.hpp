@@ -227,6 +227,7 @@ extern const char FontTeamCodeFont[];
 extern const char UseFinalGlideDisplayMode[];
 
 extern const char InfoBoxGeometry[];
+extern const char ShowAlternateAltitudeUnits[];
 
 extern const char FlarmSideData[];
 extern const char FlarmAutoZoom[];

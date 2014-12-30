@@ -90,4 +90,6 @@ InfoBoxSettings::SetDefaults()
   for (unsigned i = 0; i < DFLT_CONFIG_PANELS; i++)
     for (unsigned j = 0; j < DFLT_CONFIG_BOXES; j++)
       panels[i].contents[j] = contents[i][j];
+
+  show_alternative_altitude_units = false;
 }

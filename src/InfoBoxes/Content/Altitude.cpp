@@ -83,6 +83,7 @@ UpdateInfoBoxAltitudeNav(InfoBoxData &data)
   }
 
   const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const InfoBoxSettings &settings_info_boxes = CommonInterface::GetUISettings().info_boxes;
 
   if (basic.baro_altitude_available &&
       settings_computer.features.nav_baro_altitude_enabled)
@@ -91,12 +92,17 @@ UpdateInfoBoxAltitudeNav(InfoBoxData &data)
     data.SetTitle(InfoBoxFactory::GetCaption(InfoBoxFactory::e_HeightGPS));
 
   data.SetValueFromAltitude(basic.nav_altitude);
+  if (settings_info_boxes.show_alternative_altitude_units)
+    data.SetCommentFromAlternateAltitude(basic.nav_altitude);
+  else
+    data.SetCommentInvalid();
 }
 
 void
 InfoBoxContentAltitudeGPS::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
+  const InfoBoxSettings &settings_info_boxes = CommonInterface::GetUISettings().info_boxes;
 
   if (!basic.gps_altitude_available) {
     data.SetInvalid();
@@ -104,6 +110,10 @@ InfoBoxContentAltitudeGPS::Update(InfoBoxData &data)
   }
 
   data.SetValueFromAltitude(basic.gps_altitude);
+  if (settings_info_boxes.show_alternative_altitude_units)
+    data.SetCommentFromAlternateAltitude(basic.gps_altitude);
+  else
+    data.SetCommentInvalid();
 }
 
 static void
@@ -154,13 +164,17 @@ void
 InfoBoxContentAltitudeAGL::Update(InfoBoxData &data)
 {
   const DerivedInfo &calculated = CommonInterface::Calculated();
-
+  const InfoBoxSettings &settings_info_boxes = CommonInterface::GetUISettings().info_boxes;
   if (!calculated.altitude_agl_valid) {
     data.SetInvalid();
     return;
   }
 
   data.SetValueFromAltitude(calculated.altitude_agl);
+  if (settings_info_boxes.show_alternative_altitude_units)
+    data.SetCommentFromAlternateAltitude(calculated.altitude_agl);
+  else
+    data.SetCommentInvalid();
 
   // Set Color (red/black)
   data.SetValueColor(calculated.altitude_agl <

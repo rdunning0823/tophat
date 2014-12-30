@@ -123,6 +123,12 @@ struct InfoBoxSettings {
 
   Panel panels[MAX_PANELS];
 
+  /**
+   * should the altitude info boxes display an alternate unit
+   * in the comment field
+   **/
+  bool show_alternative_altitude_units;
+
   void SetDefaults();
 };
 

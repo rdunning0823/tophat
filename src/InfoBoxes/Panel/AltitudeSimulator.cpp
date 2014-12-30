@@ -22,12 +22,14 @@ Copyright_License {
 */
 
 #include "AltitudeSimulator.hpp"
+#include "Altitude.hpp"
 #include "Base.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Components.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Form/Button.hpp"
 #include "Form/Frame.hpp"
+#include "Form/CheckBox.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Timer.hpp"
 #include "Formatter/UserUnits.hpp"
@@ -52,6 +54,7 @@ enum ControlIndex {
   LittlePlus,
   LittleMinus,
   BigMinus,
+  AlternateUnits,
 };
 
 
@@ -87,7 +90,7 @@ protected:
    */
   WndButton *big_plus, *big_minus, *little_plus, *little_minus;
   WndFrame *altitude_value;
-
+  CheckBoxControl *show_alternate_units;
   /**
    * draws the Final Glide Bar on the MC widget so the pilot can
    * adjust his MC with respect to the arrival height
@@ -113,6 +116,8 @@ protected:
    * ButtonLook with large font
    */
   ButtonLook big_button_look;
+
+  PixelRect show_alternate_units_rc;
 
 public:
   AltitudeSimulatorPanel(unsigned id)
@@ -152,6 +157,7 @@ AltitudeSimulatorPanel::OnTimer(WindowTimer &timer)
 void
 AltitudeSimulatorPanel::OnAction(int action_id)
 {
+  InfoBoxSettings &settings_info_boxes = CommonInterface::SetUISettings().info_boxes;
   const NMEAInfo &basic = CommonInterface::Basic();
   fixed altitude = basic.gps_altitude;
   fixed step = Units::ToSysAltitude(fixed(10));
@@ -160,7 +166,7 @@ AltitudeSimulatorPanel::OnAction(int action_id)
   case BigPlus:
     altitude += step * fixed(10);
     break;
-  case LittlePlus:
+  case LittlePlus:    Profile::SetModified(true);
     altitude += step;
     break;
   case LittleMinus:
@@ -169,6 +175,11 @@ AltitudeSimulatorPanel::OnAction(int action_id)
   case BigMinus:
     altitude -= step * fixed(10);
     break;
+  case AlternateUnits:
+    settings_info_boxes.show_alternative_altitude_units =
+        !settings_info_boxes.show_alternative_altitude_units;
+    Profile::Set(ProfileKeys::ShowAlternateAltitudeUnits,
+                 settings_info_boxes.show_alternative_altitude_units);
   default:
     BaseAccessPanel::OnAction(action_id);
     return;
@@ -202,6 +213,7 @@ AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
   big_minus->Move(big_minus_rc);
   little_minus->Move(little_minus_rc);
   altitude_value->Move(value_rc);
+  show_alternate_units->Move(show_alternate_units_rc);
 }
 
 void
@@ -218,6 +230,13 @@ AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc)
   NumberButtonLayout::CalculateLayout(content_right_rc);
   content_left_rc.right = big_plus_rc.left - 1;
   fg_rc = content_left_rc;
+
+  show_alternate_units_rc.bottom = content_rc.bottom -
+    (content_rc.bottom - big_minus_rc.bottom) / 4;
+  show_alternate_units_rc.top = big_minus_rc.bottom +
+    (content_rc.bottom - big_minus_rc.bottom) / 4;
+  show_alternate_units_rc.left = big_minus_rc.left;
+  show_alternate_units_rc.right = little_minus_rc.right;
 }
 
 void
@@ -228,6 +247,7 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle style;
   const Look &look = UIGlobals::GetLook();
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
   final_glide_chart =
       new FinalGlideChart(GetClientAreaWindow(),
@@ -273,6 +293,19 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   altitude_value->SetAlignCenter();
   altitude_value->SetVAlignCenter();
+
+  ButtonWindowStyle checkbox_style;
+  checkbox_style.TabStop();
+  show_alternate_units = new CheckBoxControl(GetClientAreaWindow(),
+                                             dialog_look,
+                                             _T("Show feet and meters"),
+                                             show_alternate_units_rc,
+                                             checkbox_style,
+                                             this, AlternateUnits);
+  const InfoBoxSettings &settings_info_boxes =
+      CommonInterface::GetUISettings().info_boxes;
+  show_alternate_units->SetState(settings_info_boxes.show_alternative_altitude_units);
+  WndForm::AddDestruct(show_alternate_units);
 
   dialog_timer.Schedule(500);
   Refresh();
@@ -331,7 +364,7 @@ LoadAltitudeSimulatorPanel(unsigned id)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   if (!basic.gps.simulator)
-    return nullptr;
+    return LoadAltitudePanel(id);
 
   return new AltitudeSimulatorPanel(id);
 }
