@@ -37,8 +37,11 @@ GlideRatioCalculator::Initialize(const ComputerSettings &settings)
   unsigned bsize;
 
   switch (settings.average_eff_time) {
+  case ae7seconds:
+    bsize = 7; // for paragliders going to the speed-bar or brakes
+    break;
   case ae15seconds:
-    bsize = 15; // useless, LDinst already there
+    bsize = 15; // for paragliders
     break;
   case ae30seconds:
     bsize = 30; // limited useful

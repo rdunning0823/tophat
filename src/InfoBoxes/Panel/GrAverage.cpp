@@ -91,6 +91,7 @@ GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 #endif
 
   static constexpr StaticEnumChoice aver_eff_list[] = {
+    { ae7seconds, _T("7 s"), N_("For paragliders going to the speed-bar or brakes.") },
     { ae15seconds, _T("15 s"), N_("Suggested period for paragliders.") },
     { ae30seconds, _T("30 s") },
     { ae60seconds, _T("60 s") },

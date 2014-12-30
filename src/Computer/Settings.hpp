@@ -167,6 +167,7 @@ struct CirclingSettings {
 };
 
 enum AverageEffTime {
+  ae7seconds,
   ae15seconds,
   ae30seconds,
   ae60seconds,
