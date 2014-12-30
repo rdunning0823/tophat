@@ -68,7 +68,7 @@ GlideRatioComputer::Compute(const MoreData &basic,
     UpdateGR(vario_info.gr, DistanceFlown,
              last_altitude - basic.nav_altitude, fixed(0.1));
 
-  if (calculated.flight.flying && !calculated.circling) {
+  if (calculated.flight.flying) {
     if (!gr_calculator_initialised) {
       gr_calculator_initialised = true;
       gr_calculator.Initialize(settings);
