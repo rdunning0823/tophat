@@ -161,10 +161,10 @@ fi
 if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
     if [ "${USB_hot_plug}" == "Y" -a -f ${DotKobo}/uImage-KoboLabs ]; then
-	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
-	cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
-	touch ${DotKobo}/KoboRoot.tgz
-	reboot
+        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+        cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
+        touch ${DotKobo}/KoboRoot.tgz
+        reboot
     fi
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     /usr/local/Kobo/hindenburg &
@@ -183,11 +183,11 @@ if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     esac
 else
     if [ "${USB_hot_plug}" != "Y" -a -f ${DotKobo}/uImage-USB-hot-plug ]; then
-	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
-	cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
-	touch ${DotKobo}/KoboRoot.tgz
-	rm -rf ${DotKobo}/force_uimage
-	reboot
+        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+        cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
+        touch ${DotKobo}/KoboRoot.tgz
+        rm -rf ${DotKobo}/force_uimage
+        reboot
     fi
     if [ -f ${DotKobo}/force_uimage -a -f ${DotKobo}/uImage-USB-hot-plug ] ; then
         [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
