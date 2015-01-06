@@ -85,7 +85,7 @@ KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 UIMAGE_BASE_DIR=$(topdir)/kobo/uimage/hw/imx507/linux-2.6.35.3-USBHOST
 UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage
 ifeq ($(KOBO_UIMAGE),y)
-	UIMAGE_PREREQUISITES=UIMAGE
+	UIMAGE_PREREQUISITES=UIMAGE FORCE_UIMAGE
 	UIMAGE_CMD=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
 endif
 
@@ -94,6 +94,9 @@ $(UIMAGE_BASE_DIR)/COPYING:
 
 UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
 	make -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+
+FORCE_UIMAGE:
+	touch $(TARGET_OUTPUT_DIR)/force_uimage
 
 # /mnt/onboard/.kobo/KoboRoot.tgz is a file that is picked up by
 # /etc/init.d/rcS, extracted to / on each boot; we can use it to
@@ -111,6 +114,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/mnt/onboard/.kobo
 	$(Q)install -m 0755 $(XCSOAR_BIN) $(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) $(@D)/KoboRoot/opt/tophat/bin
 	$(Q)$(UIMAGE_CMD)
+	$(Q)install -m 0644 $(TARGET_OUTPUT_DIR)/force_uimage $(@D)/KoboRoot/mnt/onboard/.kobo/force_uimage
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
 	$(Q)install -m 0644 $(topdir)/kobo/inetd.conf $(@D)/KoboRoot/etc

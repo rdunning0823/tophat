@@ -82,7 +82,6 @@ rm -rf /usr/local/Kobo/db.tgz
 
 echo -n 8192 > /proc/sys/vm/min_free_kbytes
 echo -n 67108864 > /proc/sys/kernel/shmmax
-
 if [ ! -e /mnt/onboard/.kobo ]; then
 	mkdir -p /mnt/onboard/.kobo
 	tar zxf /usr/local/Kobo/db.tgz -C /mnt/onboard
@@ -187,7 +186,15 @@ else
 	[ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
 	cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
 	touch ${DotKobo}/KoboRoot.tgz
+	rm -rf ${DotKobo}/force_uimage
 	reboot
+    fi
+    if [ -f ${DotKobo}/force_uimage -a -f ${DotKobo}/uImage-USB-hot-plug ] ; then
+        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+        cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
+        touch ${DotKobo}/KoboRoot.tgz
+        rm -rf ${DotKobo}/force_uimage
+        reboot
     fi
     # disable the flashing led
     echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
