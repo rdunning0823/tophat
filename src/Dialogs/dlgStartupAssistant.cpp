@@ -50,7 +50,6 @@ Copyright_License {
 #include "Task/TaskBehaviour.hpp"
 #include "Dialogs/Message.hpp"
 
-
 const TCHAR* tips [] = {
     N_("Click the Nav Bar at the top to show the navigation menu."),
     N_("Slide the Nav Bar to the left or right to advance the task turnpoint."),
@@ -348,7 +347,7 @@ dlgStartupAssistantShowModal(bool conditional)
   if (conditional)
     ShowDialogSetupQuick();
 
-  StaticString<32> decline_ver(_T(""));
+  StaticString<64> decline_ver(_T(""));
   UTF8ToWideConverter text2(Profile::Get(ProfileKeys::StartupTipDeclineVersion, ""));
   if (text2.IsValid())
     decline_ver = text2;
