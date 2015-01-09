@@ -107,6 +107,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(BITSTREAM_VERA_FILES) \
 	$(topdir)/kobo/rcS.tophat \
 	$(topdir)/kobo/50-tophat-usb.rules \
+	$(topdir)/kobo/10-media-automount.rules \
 	$(topdir)/kobo/inittab $(topdir)/kobo/inetd.conf
 	@$(NQ)echo "  TAR     $@"
 	$(Q)rm -rf $(@D)/KoboRoot
@@ -123,6 +124,8 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc/udev/rules.d
 	$(Q)install -m 0755 $(topdir)/kobo/rcS.tophat $(@D)/KoboRoot/etc/init.d
 	$(Q)install -m 0755 $(topdir)/kobo/50-tophat-usb.rules $(@D)/KoboRoot/etc/udev/rules.d
+	$(Q)install -m 0755 -d $(@D)/KoboRoot/media
+	$(Q)install -m 0755 $(topdir)/kobo/10-media-automount.rules $(@D)/KoboRoot/etc/udev/rules.d
 	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 
