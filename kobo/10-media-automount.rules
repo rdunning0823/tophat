@@ -7,10 +7,10 @@ KERNEL!="sd[a-z]*", GOTO="media_automount_end"
 ACTION=="add", ENV{ID_FS_TYPE}=="vfat|ntfs", ENV{mount_options}="$env{mount_options}"
 
 # mount all filesystems
-ACTION=="add", ENV{ID_FS_TYPE}!="ntfs", RUN+="/bin/mount -t auto -o %E{mount_options} /dev/%k '/media'"
+ACTION=="add", ENV{ID_FS_TYPE}!="ntfs", RUN+="/bin/mkdir -p /media/usb_storage", RUN+="/bin/mount -t auto -o %E{mount_options} /dev/%k '/media/usb_storage'"
 
 # clean up after device removal
-ACTION=="remove", RUN+="/bin/umount '/media'"
+ACTION=="remove", RUN+="/bin/umount '/media/usb_storage'", RUN+="/bin/rmdir /media/usb_storage"
 
 # exit
 LABEL="media_automount_end"
