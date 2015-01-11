@@ -24,6 +24,7 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Kobo/WPASupplicant.cpp \
 	$(SRC)/Kobo/System.cpp \
 	$(SRC)/Kobo/NetworkDialog.cpp \
+	$(SRC)/Kobo/SDCardSync.cpp \
 	$(SRC)/Kobo/WPASupplicant.cpp \
 	$(SRC)/Kobo/WifiDialog.cpp \
 	$(SRC)/Event/Shared/Timer.cpp \

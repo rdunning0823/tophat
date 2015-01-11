@@ -219,3 +219,28 @@ WriteSystemInfo()
   system(command);
 #endif
 }
+
+bool
+IsUSBStorageConnected()
+{
+#ifdef KOBO
+  return Directory::Exists(_T("/media/usb_storage"));
+#endif
+}
+
+void
+UploadSDCardToDevice()
+{
+#ifdef KOBO
+  system(_T("cp -r /media/usb_storage/XCSoarData /mnt/onboard"));
+#endif
+}
+
+void
+CopyTopHatDataToSDCard()
+{
+#ifdef KOBO
+  system(_T("cp -r /mnt/onboard/XCSoarData /media/usb_storage"));
+  system(_T("sync"));
+#endif
+}

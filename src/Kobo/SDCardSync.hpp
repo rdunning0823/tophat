@@ -21,61 +21,10 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_KOBO_SYSTEM_HPP
-#define XCSOAR_KOBO_SYSTEM_HPP
-
-#include "Compiler.h"
-
-bool
-KoboReboot();
-
-bool
-KoboPowerOff();
-
-gcc_pure
-bool
-IsKoboWifiOn();
-
-bool
-KoboWifiOn();
-
-bool
-KoboWifiOff();
+#ifndef XCSOAR_KOBO_SD_CARD_SYNC_DIALOG_HPP
+#define XCSOAR_KOBO_SD_CARD_SYNC_DIALOG_HPP
 
 void
-KoboExecNickel();
+ShowSDCardSyncDialog();
 
-void
-KoboRunXCSoar(const char *mode);
-
-void
-KoboRunTelnetd();
-
-/**
- * returns true if the current kernel supports USB Host mode
- */
-bool
-IsKoboUsbHostKernel();
-
-/**
- * Writes uname -a info and dd if=/dev/mmcblk0 bs=8 count=1 skip=64
- * results to /tmp/TophatSystemInfo.txt
- */
-void WriteSystemInfo();
-
-/**
- * returns true if a USB Storage device is currently mounted
- * at /media/usb_storage
- */
-bool IsUSBStorageConnected();
-
-/**
- * Copies the XCSoarData folder on the SDCard to the device
- */
-void UploadSDCardToDevice();
-
-/**
- * copies the XCSoarData folder on the device to the SD Card
- */
-void CopyTopHatDataToSDCard();
 #endif

@@ -38,6 +38,7 @@ Copyright_License {
 #include "Screen/Custom/TopCanvas.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Canvas.hpp"
+#include "SDCardSync.hpp"
 #include "System.hpp"
 #include "NetworkDialog.hpp"
 #include "Event/Timer.hpp"
@@ -94,11 +95,14 @@ class KoboMenuWidget final : public WindowWidget, ActionListener, Timer {
   /* should poweroff button behave as a reboot button ? */
   bool do_reboot;
 
+  /** was usb storage mounted last time we checked? */
+  bool usb_storage_mounted;
+
 public:
   KoboMenuWidget(const DialogLook &_look,
                  ActionListener &_dialog)
     :dialog(_dialog),
-     w(_look, _dialog, false), do_reboot(false) {}
+     w(_look, _dialog, false), do_reboot(false), usb_storage_mounted(false) {}
 
   void CreateButtons(WidgetDialog &buttons);
 
@@ -106,6 +110,11 @@ public:
    * if update file exists, change "Poweroff" button to "Reboot"
    */
   void UpdateButtons();
+
+  /**
+   * If USB Storage is just mounted, then show the SDCard Sync dialog
+   */
+  void CheckUSBStorage();
 
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent,
@@ -124,6 +133,7 @@ public:
   /* virtual methods from class Timer */
   virtual void OnTimer() {
     UpdateButtons();
+    CheckUSBStorage();
   }
 
   const TCHAR *
@@ -140,6 +150,15 @@ KoboMenuWidget::CreateButtons(WidgetDialog &buttons)
   buttons.AddButton(_("Wifi"), *this, NETWORK);
   poweroff_button = buttons.AddButton(GetPowerOffCaption(false), *this, POWEROFF);
   UpdateButtons();
+}
+
+void
+KoboMenuWidget::CheckUSBStorage()
+{
+  if (IsUSBStorageConnected() && !usb_storage_mounted) {
+    ShowSDCardSyncDialog();
+  }
+  usb_storage_mounted = IsUSBStorageConnected();
 }
 
 void
