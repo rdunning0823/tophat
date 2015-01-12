@@ -95,7 +95,7 @@ private:
 void
 SDCardSyncWidget::UpdateButtons()
 {
-  install_koboroot_button->SetEnabled(IsUSBStorageKoboRootInRoot());
+  install_koboroot_button->SetVisible(IsUSBStorageKoboRootInRoot());
 }
 
 void
@@ -111,7 +111,6 @@ SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   install_koboroot_button = AddButton(
       _T("Install KoboRoot.tgz upgrade"),
       *this, InstallKoboRoot);
-  install_koboroot_button->SetEnabled(false);
 
   UpdateButtons();
 
