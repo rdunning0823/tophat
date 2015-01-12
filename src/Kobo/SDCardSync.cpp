@@ -34,6 +34,7 @@ Copyright_License {
 #include "System.hpp"
 #include <stdlib.h>
 
+
 /**
  * Dialog that allows syncing both to and from the SDCard with the
  * XCSoarData folder.
@@ -43,9 +44,11 @@ class SDCardSyncWidget final
   enum Buttons {
     SDCardToDevice,
     DeviceToSDCard,
+    InstallKoboRoot,
   };
 
   WndButton *upload_to_device_button, *copy_to_sd_card_button;
+  WndButton *install_koboroot_button;
 
 public:
   /**
@@ -66,6 +69,16 @@ public:
     RowFormWidget::Unprepare();
   }
 
+  /**
+   * installs KoboRoot.tgz from USB Card and reboots
+   */
+  void InstallUpgrade();
+
+  /**
+   * updates text on buttons
+   */
+  void UpdateButtons();
+
 private:
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
@@ -74,20 +87,50 @@ private:
   virtual void OnTimer() {
     if (!IsUSBStorageConnected())
       listener->OnAction(mrOK);
+    else
+      UpdateButtons();
   }
 };
 
 void
+SDCardSyncWidget::UpdateButtons()
+{
+  install_koboroot_button->SetEnabled(IsUSBStorageKoboRootInRoot());
+}
+
+void
 SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  upload_to_device_button = AddButton(_T("USB card --> device"),
+  upload_to_device_button = AddButton(_T("USB card --> Kobo"),
                                       *this, SDCardToDevice);
 
   copy_to_sd_card_button = AddButton(
-      _T("Device --> USB card"),
+      _T("Kobo --> USB card"),
       *this, DeviceToSDCard);
 
-  Timer::Schedule(1000);
+  install_koboroot_button = AddButton(
+      _T("Install KoboRoot.tgz upgrade"),
+      *this, InstallKoboRoot);
+  install_koboroot_button->SetEnabled(false);
+
+  UpdateButtons();
+
+  Timer::Schedule(1000);  system(_T("sync"));
+
+}
+
+void
+SDCardSyncWidget::InstallUpgrade()
+{
+  if (ShowMessageBox(_T("Upgrade Top Hat from USB Card?"),
+                     _T("Upgrade Top Hat?"), MB_OKCANCEL | MB_ICONQUESTION) ==
+                     IDOK) {
+    if (InstallKoboRootTgz())
+      KoboReboot();
+    else
+      ShowMessageBox(_T("Could not install upgrade from USB card"),
+                     _T("Error"), MB_OK | MB_ICONERROR);
+  }
 }
 
 void
@@ -108,6 +151,9 @@ SDCardSyncWidget::OnAction(int id)
       CopyTopHatDataToSDCard();
       ShowMessageBox(_T("Top Hat data and logs copied to USB card"),
                      _T("Success"), MB_OK);
+      break;
+    case InstallKoboRoot:
+      InstallUpgrade();
       break;
     }
 

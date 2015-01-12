@@ -78,4 +78,16 @@ void UploadSDCardToDevice();
  * copies the XCSoarData folder on the device to the SD Card
  */
 void CopyTopHatDataToSDCard();
+
+/**
+ * does KoboRoot.tgz exist in the root of the USB Storage device
+ */
+bool IsUSBStorageKoboRootInRoot();
+
+/**
+ * Copies KoboRoot.tgz from root of USB storage to .kobo folder on device
+ * And deletes KoboRoot.tgz from the USB storage
+ * @return true if KoboRoot.tgz was found on the USB storage
+ */
+bool InstallKoboRootTgz();
 #endif

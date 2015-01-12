@@ -244,3 +244,22 @@ CopyTopHatDataToSDCard()
   system(_T("sync"));
 #endif
 }
+
+bool
+IsUSBStorageKoboRootInRoot()
+{
+  return IsUSBStorageConnected() &&
+      File::Exists(_T("/media/usb_storage/KoboRoot.tgz"));
+}
+
+bool
+InstallKoboRootTgz()
+{
+  if (!IsUSBStorageKoboRootInRoot())
+    return false;
+
+  system(_T("cp /media/usb_storage/KoboRoot.tgz /mnt/onboard/.kobo"));
+  system(_T("rm -f /media/usb_storage/KoboRoot.tgz"));
+  system(_T("sync"));
+  return true;
+}
