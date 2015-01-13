@@ -45,12 +45,12 @@ GetWifiToggleCaption()
 class NetworkWidget final
   : public RowFormWidget, ActionListener, Timer {
   enum Buttons {
-    TOGGLE_WIFI,
+    TOGGLE_WIFI = 0,
     WIFI,
     IPADDRESS,
   };
 
-  WndButton *toggle_wifi_button, *wifi_button, *ip_address_button;
+  WndButton *toggle_wifi_button, *wifi_button;
 
 public:
   NetworkWidget(const DialogLook &look):RowFormWidget(look) {}
@@ -87,10 +87,10 @@ NetworkWidget::UpdateIpAddress()
     unsigned i = strlen(buffer);
     buffer[i - 1] = '\0';
     char caption[256];
-    _stprintf(caption, _T("connect with username='root'\n  telnet %s or ftp %s"), buffer, buffer);
-    ip_address_button->SetCaption(caption);
+    _stprintf(caption, _T("\nConnected\nLog in with username='root'\n  telnet %s or ftp %s"), buffer, buffer);
+    SetMultiLineText(IPADDRESS, caption);
   } else
-    ip_address_button->SetCaption(_T("Not connected"));
+    SetMultiLineText(IPADDRESS, _T("\nNot connected"));
 }
 
 void
@@ -108,7 +108,7 @@ NetworkWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   wifi_button = AddButton(_("Select network"), *this, WIFI);
 
-  ip_address_button = AddButton(_T(""), *this, IPADDRESS);
+  AddMultiLine(_T(""));
 
   UpdateButtons();
   Timer::Schedule(1000);
