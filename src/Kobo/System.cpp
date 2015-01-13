@@ -225,6 +225,8 @@ IsUSBStorageConnected()
 {
 #ifdef KOBO
   return Directory::Exists(_T("/media/usb_storage"));
+#else
+  return false;
 #endif
 }
 
@@ -248,13 +250,18 @@ CopyTopHatDataToSDCard()
 bool
 IsUSBStorageKoboRootInRoot()
 {
+#ifdef KOBO
   return IsUSBStorageConnected() &&
       File::Exists(_T("/media/usb_storage/KoboRoot.tgz"));
+#else
+  return false;
+#endif
 }
 
 bool
 InstallKoboRootTgz()
 {
+#ifdef KOBO
   if (!IsUSBStorageKoboRootInRoot())
     return false;
 
@@ -262,4 +269,7 @@ InstallKoboRootTgz()
   system(_T("rm -f /media/usb_storage/KoboRoot.tgz"));
   system(_T("sync"));
   return true;
+#else
+  return false;
+#endif
 }
