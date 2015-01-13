@@ -42,9 +42,9 @@ Copyright_License {
 class SDCardSyncWidget final
   : public RowFormWidget, ActionListener, Timer {
   enum Buttons {
+    InstallKoboRoot,
     SDCardToDevice,
     DeviceToSDCard,
-    InstallKoboRoot,
   };
 
   WndButton *upload_to_device_button, *copy_to_sd_card_button;
@@ -101,16 +101,16 @@ SDCardSyncWidget::UpdateButtons()
 void
 SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
+  install_koboroot_button = AddButton(
+      _T("Install KoboRoot.tgz upgrade"),
+      *this, InstallKoboRoot);
+
   upload_to_device_button = AddButton(_T("USB card --> Kobo"),
                                       *this, SDCardToDevice);
 
   copy_to_sd_card_button = AddButton(
       _T("Kobo --> USB card"),
       *this, DeviceToSDCard);
-
-  install_koboroot_button = AddButton(
-      _T("Install KoboRoot.tgz upgrade"),
-      *this, InstallKoboRoot);
 
   UpdateButtons();
 
