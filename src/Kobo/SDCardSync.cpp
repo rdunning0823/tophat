@@ -24,6 +24,7 @@ Copyright_License {
 #include "SDCardSync.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Dialogs/Message.hpp"
+#include "Dialogs/HelpDialog.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Key.h"
 #include "Language/Language.hpp"
@@ -45,6 +46,7 @@ class SDCardSyncWidget final
     InstallKoboRoot,
     SDCardToDevice,
     DeviceToSDCard,
+    HelpButton,
   };
 
   WndButton *upload_to_device_button, *copy_to_sd_card_button;
@@ -112,10 +114,10 @@ SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       _T("Kobo --> USB card"),
       *this, DeviceToSDCard);
 
+  AddButton(_T("Help"), *this, HelpButton);
   UpdateButtons();
 
   Timer::Schedule(1000);  system(_T("sync"));
-
 }
 
 void
@@ -144,19 +146,24 @@ SDCardSyncWidget::OnAction(int id)
       UploadSDCardToDevice();
       ShowMessageBox(_T("USB card successfully copied to device"),
                      _T("Success"), MB_OK);
+      listener->OnAction(mrOK);
       break;
 
     case DeviceToSDCard:
       CopyTopHatDataToSDCard();
       ShowMessageBox(_T("Top Hat data and logs copied to USB card"),
                      _T("Success"), MB_OK);
+      listener->OnAction(mrOK);
       break;
     case InstallKoboRoot:
       InstallUpgrade();
+      listener->OnAction(mrOK);
+      break;
+
+    case HelpButton:
+      HelpDialog(_T("Kobo Sync"), _T("Copy data files to / from the XCSoarData folder on the USB card.  This includes igc log files, tasks, maps, airspace, waypoint files and all configuration files.  Copying may take a few minutes."));
       break;
     }
-
-  listener->OnAction(mrOK);
 }
 
 void
