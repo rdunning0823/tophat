@@ -126,9 +126,12 @@ SDCardSyncWidget::InstallUpgrade()
   if (ShowMessageBox(_T("Upgrade Top Hat from USB Card?"),
                      _T("Upgrade Top Hat?"), MB_OKCANCEL | MB_ICONQUESTION) ==
                      IDOK) {
-    if (InstallKoboRootTgz())
+    if (InstallKoboRootTgz()) {
+      if (IsUSBStorageConnected())
+        ShowMessageBox(_T("Remove USB Card and click OK to reboot"),
+                       _T("Upgrade Top Hat?"), MB_OK);
       KoboReboot();
-    else
+    } else
       ShowMessageBox(_T("Could not install upgrade from USB card"),
                      _T("Error"), MB_OK | MB_ICONERROR);
   }
