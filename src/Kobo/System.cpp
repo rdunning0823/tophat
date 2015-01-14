@@ -65,10 +65,16 @@ SiblingPath(const char *name, char *buffer, size_t size)
 
 #endif
 
+/**
+ * Force unmount of USB Storage.  Do this before poweroff
+ */
+void UnmountKoboUSBStorage();
+
 bool
 KoboReboot()
 {
 #ifdef KOBO
+  UnmountKoboUSBStorage();
   return Run("/sbin/reboot");
 #else
   return false;
@@ -79,6 +85,7 @@ bool
 KoboPowerOff()
 {
 #ifdef KOBO
+  UnmountKoboUSBStorage();
   char buffer[256];
   if (SiblingPath("PowerOff", buffer, sizeof(buffer)))
     execl(buffer, buffer, nullptr);
@@ -243,6 +250,18 @@ CopyTopHatDataToSDCard()
 {
 #ifdef KOBO
   system(_T("cp -r /mnt/onboard/XCSoarData /media/usb_storage"));
+  system(_T("sync"));
+#endif
+}
+
+void
+UnmountKoboUSBStorage()
+{
+#ifdef KOBO
+  if (!IsUSBStorageConnected())
+    return;
+  system(_T("umount /media/usb_storage"));
+  system(_T("rm -rf /media/usb_storage"));
   system(_T("sync"));
 #endif
 }
