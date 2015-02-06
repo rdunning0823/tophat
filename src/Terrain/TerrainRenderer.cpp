@@ -36,7 +36,7 @@ Copyright_License {
 #include <assert.h>
 
 static constexpr ColorRamp terrain_colors[][NUM_COLOR_RAMP_LEVELS] = {
-  {
+  { /* Low lands */
     {0,           0x70, 0xc0, 0xa7},
     {250,         0xca, 0xe7, 0xb9},
     {500,         0xf4, 0xea, 0xaf},
@@ -51,7 +51,7 @@ static constexpr ColorRamp terrain_colors[][NUM_COLOR_RAMP_LEVELS] = {
     {5000,        0xb7, 0xb9, 0xff},
     {6000,        0xb7, 0xb9, 0xff}
   },
-  {
+  { /* Mountainous */
     {0,           0x70, 0xc0, 0xa7},
     {500,         0xca, 0xe7, 0xb9},
     {1000,        0xf4, 0xea, 0xaf},
