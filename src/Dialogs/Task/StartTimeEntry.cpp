@@ -217,7 +217,7 @@ StartTimeEntry::OnAction(int id)
 
   case CLOSEBUTTON:
     if (!CommonInterface::Calculated().flight.flying) {
-      ShowMessageBox(_("Must by flying to update task start time."),
+      ShowMessageBox(_("Must be flying to update task start time."),
                      _T("Not flying!"),
                      MB_ICONEXCLAMATION | MB_OK);
       SetModalResult(mrCancel);
