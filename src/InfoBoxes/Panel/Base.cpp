@@ -203,7 +203,7 @@ BaseAccessPanel::SetCaption()
   const InfoBoxSettings::Panel &panel = settings.panels[panel_index];
   const InfoBoxFactory::Type old_type = panel.contents[id];
 
-  StaticString<32> buffer;
+  StaticString<64> buffer;
   buffer = gettext(InfoBoxFactory::GetName(old_type));
   header_text->SetText(buffer);
 }
