@@ -219,6 +219,8 @@ TerrainDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     {12, N_("Italian Avioportolano VFR Chart"), },
     {13, N_("German DFS VFR Chart"), },
     {14, N_("French SIA VFR Chart"), },
+    {15, N_("Greyscale Flatlands"), },
+    {16, N_("Greyscale Mountainous"), },
     { 0 }
   };
 
