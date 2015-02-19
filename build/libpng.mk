@@ -16,7 +16,7 @@ ifneq ($(filter 4.8%,$(CXX_VERSION)),)
 # though the code should be disabled by the preprocessor.
 # (see http://gcc.gnu.org/bugzilla//show_bug.cgi?id=58155)
 
-LIBPNG_CPPFLAGS += -Wno-error=literal-suffix
+#LIBPNG_CPPFLAGS += -Wno-werror=literal-suffix
 endif
 endif
 
