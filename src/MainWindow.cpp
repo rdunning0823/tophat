@@ -399,7 +399,7 @@ MainWindow::ReinitialiseLayout()
     const PixelRect bottom_rect = GetBottomWidgetRect(main_rect,
                                                       bottom_widget);
 
-    if (bottom_widget != nullptr)
+    if (HaveBottomWidget())
       bottom_widget->Move(bottom_rect);
 
     map->Move(GetMapRectAbove(main_rect, bottom_rect));
@@ -691,7 +691,7 @@ bool
 MainWindow::OnKeyDown(unsigned key_code)
 {
   return (widget != nullptr && widget->KeyPress(key_code)) ||
-    (bottom_widget != nullptr && bottom_widget->KeyPress(key_code)) ||
+    (HaveBottomWidget() && bottom_widget->KeyPress(key_code)) ||
     InputEvents::processKey(key_code) ||
     SingleWindow::OnKeyDown(key_code);
 }
@@ -830,7 +830,7 @@ bool MainWindow::OnClose() {
 void
 MainWindow::OnPaint(Canvas &canvas)
 {
-  if (bottom_widget != nullptr && map != nullptr) {
+  if (HaveBottomWidget() && map != nullptr) {
     /* draw a separator between main area and bottom area */
     PixelRect rc = map->GetPosition();
     rc.top = rc.bottom;
@@ -939,9 +939,11 @@ MainWindow::ActivateMap()
     map->Show();
     map->SetFocus();
 
-    if (bottom_widget != nullptr)
+    if (bottom_widget != nullptr) {
+      assert(HaveBottomWidget());
       bottom_widget->Show(GetBottomWidgetRect(GetMainRect(),
                                               bottom_widget));
+    }
 
 #ifndef ENABLE_OPENGL
     if (draw_suspended) {
@@ -997,7 +999,10 @@ MainWindow::KillBottomWidget()
     return;
 
   if (widget == nullptr)
+    /* the bottom widget is only visible below the map, but not below
+       a custom main widget; see HaveBottomWidget() */
     bottom_widget->Hide();
+
   bottom_widget->Unprepare();
   delete bottom_widget;
   bottom_widget = nullptr;
@@ -1028,6 +1033,8 @@ MainWindow::SetBottomWidget(Widget *_widget)
     bottom_widget->Prepare(*this, bottom_rect);
 
     if (widget == nullptr)
+      /* the bottom widget is only visible below the map, but not
+         below a custom main widget; see HaveBottomWidget() */
       bottom_widget->Show(bottom_rect);
   }
 
@@ -1041,6 +1048,8 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
   assert(_widget != NULL);
 
   restore_page_pending = false;
+
+  const bool have_bottom_widget = HaveBottomWidget();
 
   /* delete the old widget */
   KillWidget();
@@ -1060,7 +1069,7 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
 #endif
   }
 
-  if (bottom_widget != nullptr)
+  if (have_bottom_widget)
     bottom_widget->Hide();
 
   widget = _widget;

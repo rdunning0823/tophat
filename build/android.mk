@@ -23,6 +23,9 @@ endif
 ANDROID_SDK_PLATFORM_DIR = $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)
 ANDROID_ABI_DIR = $(ANDROID_BUILD)/libs/$(ANDROID_ABI3)
 
+ANDROID_BUILD_TOOLS_DIR = $(ANDROID_SDK)/build-tools/20.0.0
+ZIPALIGN = $(ANDROID_BUILD_TOOLS_DIR)/zipalign
+
 ANDROID_LIB_NAMES = tophat
 
 ifneq ($(V),2)
@@ -237,6 +240,6 @@ $(ANDROID_BIN)/XCSoar-release-unaligned.apk: $(ANDROID_BIN)/XCSoar-release-unsig
 
 $(ANDROID_BIN)/XCSoar.apk: $(ANDROID_BIN)/XCSoar-release-unaligned.apk
 	@$(NQ)echo "  ALIGN   $@"
-	$(Q)$(ANDROID_SDK)/tools/zipalign -f 4 $< $@
+	$(Q)$(ZIPALIGN) -f 4 $< $@
 
 endif

@@ -227,6 +227,7 @@ TEST_PLANES_SOURCES = \
 	$(SRC)/Units/Descriptor.cpp \
 	$(SRC)/Units/System.cpp \
 	$(TEST_SRC_DIR)/tap.c \
+	$(TEST_SRC_DIR)/FakeLogFile.cpp \
 	$(TEST_SRC_DIR)/TestPlanes.cpp
 TEST_PLANES_DEPENDS = IO OS MATH UTIL
 $(eval $(call link-program,TestPlanes,TEST_PLANES))
@@ -585,6 +586,7 @@ $(eval $(call link-program,TestGRecord,TEST_GRECORD))
 
 TEST_DRIVER_SOURCES = \
 	$(SRC)/Device/Port/NullPort.cpp \
+	$(SRC)/Device/Port/Port.cpp \
 	$(SRC)/Device/Parser.cpp \
 	$(SRC)/Device/Internal.cpp \
 	$(SRC)/Device/Declaration.cpp \

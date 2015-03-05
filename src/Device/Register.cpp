@@ -54,6 +54,8 @@ Copyright_License {
 #include "Device/Driver/CProbe.hpp"
 #include "Device/Driver/LevilAHRS_G.hpp"
 #include "Device/Driver/BlueFlyVario.hpp"
+#include "Device/Driver/OpenVario.hpp"
+#include "Device/Driver/Vaulter.hpp"
 #include "Util/Macros.hpp"
 
 #include <assert.h>
@@ -93,6 +95,8 @@ static const struct DeviceRegister *const driver_list[] = {
   &eye_driver,
   &bluefly_driver,
   &cai_lnav_driver,
+  &open_vario_driver,
+  &vaulter_driver,
   NULL
 };
 

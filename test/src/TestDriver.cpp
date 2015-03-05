@@ -42,7 +42,9 @@
 #include "Device/Driver/LX/Internal.hpp"
 #include "Device/Driver/ILEC.hpp"
 #include "Device/Driver/IMI.hpp"
+#include "Device/Driver/OpenVario.hpp"
 #include "Device/Driver/PosiGraph.hpp"
+#include "Device/Driver/Vaulter.hpp"
 #include "Device/Driver/Vega.hpp"
 #include "Device/Driver/Volkslogger.hpp"
 #include "Device/Driver/Westerboer.hpp"
@@ -1205,6 +1207,73 @@ TestVega()
 }
 
 static void
+TestOpenVario()
+{
+  NullPort null;
+  Device *device = open_vario_driver.CreateOnPort(dummy_config, null);
+  ok1(device != NULL);
+
+  NMEAInfo nmea_info;
+  nmea_info.Reset();
+  nmea_info.clock = fixed(1);
+
+  // Empty sentence is handled by device driver
+  ok1(device->ParseNMEA("$POV*49", nmea_info));
+
+  // Checksums are validated
+  ok1(!device->ParseNMEA("$POV*48", nmea_info));
+
+  // TE vario is read
+  ok1(device->ParseNMEA("$POV,E,2.15*14", nmea_info));
+  ok1(nmea_info.total_energy_vario_available);
+  ok1(equals(nmea_info.total_energy_vario, 2.15));
+  nmea_info.Reset();
+
+  // Static pressure is read
+  ok1(device->ParseNMEA("$POV,P,1018.35*39", nmea_info));
+  ok1(nmea_info.static_pressure_available);
+  ok1(equals(nmea_info.static_pressure.GetHectoPascal(), 1018.35));
+  nmea_info.Reset();
+
+  // Dynamic pressure is read
+  ok1(device->ParseNMEA("$POV,Q,23.3*04", nmea_info));
+  ok1(nmea_info.dyn_pressure_available);
+  ok1(equals(nmea_info.dyn_pressure.GetPascal(), 23.3));
+  nmea_info.Reset();
+
+  // Total pressure is read
+  ok1(device->ParseNMEA("$POV,R,1025.17*35", nmea_info));
+  ok1(nmea_info.pitot_pressure_available);
+  ok1(equals(nmea_info.pitot_pressure.GetHectoPascal(), 1025.17));
+  nmea_info.Reset();
+
+  // Multiple pressures are read
+  ok1(device->ParseNMEA("$POV,P,1018.35,Q,23.3,R,1025.17*08", nmea_info));
+  ok1(nmea_info.static_pressure_available);
+  ok1(equals(nmea_info.static_pressure.GetHectoPascal(), 1018.35));
+  ok1(nmea_info.dyn_pressure_available);
+  ok1(equals(nmea_info.dyn_pressure.GetPascal(), 23.3));
+  ok1(nmea_info.pitot_pressure_available);
+  ok1(equals(nmea_info.pitot_pressure.GetHectoPascal(), 1025.17));
+  nmea_info.Reset();
+
+  // Airspeed is read
+  ok1(device->ParseNMEA("$POV,S,123.45*05", nmea_info));
+  ok1(nmea_info.airspeed_available);
+  ok1(nmea_info.airspeed_real);
+  ok1(equals(nmea_info.true_airspeed, 123.45 / 3.6));
+  nmea_info.Reset();
+
+  // Temperature is read
+  ok1(device->ParseNMEA("$POV,T,23.52*35", nmea_info));
+  ok1(nmea_info.temperature_available);
+  ok1(equals(nmea_info.temperature, 23.52 + 273.15));
+  nmea_info.Reset();
+
+  delete device;
+}
+
+static void
 TestWesterboer()
 {
   NullPort null;
@@ -1337,6 +1406,48 @@ TestZander()
 }
 
 static void
+TestVaulter()
+{
+  NullPort null;
+  Device *device = vaulter_driver.CreateOnPort(dummy_config, null);
+  ok1(device != NULL);
+
+  NMEAInfo nmea_info;
+  nmea_info.Reset();
+  nmea_info.clock = fixed(1);
+
+  ok1(device->ParseNMEA("$PITV3,-16.0,-23.9,147.9,23.03,1.01*1C", nmea_info));
+  ok1(nmea_info.attitude.bank_angle_available);
+  ok1(equals(nmea_info.attitude.bank_angle, -16.0));
+  ok1(nmea_info.attitude.pitch_angle_available);
+  ok1(equals(nmea_info.attitude.pitch_angle, -23.9));
+  ok1(nmea_info.attitude.heading_available);
+  ok1(equals(nmea_info.attitude.heading, 147.9));
+
+  ok1(nmea_info.airspeed_available);
+  ok1(equals(nmea_info.indicated_airspeed, 23.03));
+
+  ok1(nmea_info.acceleration.available);
+  ok1(nmea_info.acceleration.real);
+  ok1(equals(nmea_info.acceleration.g_load, 1.01));
+
+  ok1(device->ParseNMEA("$PITV4,-0.04,0.57,-0.44,-102.0,-74.8,-73.7*3F", nmea_info));
+  ok1(nmea_info.total_energy_vario_available);
+  ok1(equals(nmea_info.total_energy_vario, -0.04));
+
+  ok1(device->ParseNMEA("$PITV5,6.8,29.2,0.995,0.03,0,1.54*01", nmea_info));
+  ok1(nmea_info.external_wind_available);
+  ok1(equals(nmea_info.external_wind.bearing, 29.2));
+  ok1(equals(nmea_info.external_wind.norm, 6.8));
+
+  ok1(nmea_info.switch_state.flight_mode == SwitchState::FlightMode::CIRCLING);
+  ok1(equals(nmea_info.settings.mac_cready, 1.54));
+
+  delete device;
+}
+
+
+static void
 TestDeclare(const struct DeviceRegister &driver)
 {
   FaultInjectionPort port(*(DataHandler *)NULL);
@@ -1405,7 +1516,7 @@ TestFlightList(const struct DeviceRegister &driver)
 
 int main(int argc, char **argv)
 {
-  plan_tests(725);
+  plan_tests(776);
 
   TestGeneric();
   TestTasman();
@@ -1426,10 +1537,12 @@ int main(int argc, char **argv)
   TestLX(condor_driver, true);
   TestLXV7();
   TestILEC();
+  TestOpenVario();
   TestVega();
   TestWesterboer();
   TestZander();
   TestFlyNet();
+  TestVaulter();
 
   /* XXX the Triadis drivers have too many dependencies, not enabling
      for now */
