@@ -12,6 +12,8 @@ Kobo
 	* devices
 	  - OpenVario: new device driver
 	  - Vaulter: new device driver
+* airspace
+  - accept airspaces of class RMZ in OpenAir format files
 	  
 Top Hat Soaring 2.0.3 beta
 Experimental: Adjustable time to detect circling.  Advanced > Computer > Beta
