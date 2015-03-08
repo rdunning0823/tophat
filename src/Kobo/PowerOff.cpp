@@ -155,7 +155,6 @@ int main(int argc, char **argv)
   FreeType::Initialise();
 
   Font::Initialise();
-  Display::Rotate(DisplaySettings::Orientation::PORTRAIT);
 
   {
     TopCanvas screen;

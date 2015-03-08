@@ -30,6 +30,7 @@ Copyright_License {
 
 #ifdef KOBO
 #include "Hardware/RotateDisplay.hpp"
+#include "Kobo/System.hpp"
 #endif
 
 #ifdef USE_FREETYPE
@@ -47,8 +48,8 @@ ScreenGlobalInit::ScreenGlobalInit()
   event_queue = new EventQueue();
 
 #ifdef KOBO
-  Display::Rotate(DisplaySettings::Orientation::DEFAULT);
-  event_queue->SetMouseRotation(DisplaySettings::Orientation::DEFAULT);
+  Display::Rotate(ReadKoboLastScreenOrientation());
+  event_queue->SetMouseRotation(ReadKoboLastScreenOrientation());
 #endif
 
   ScreenInitialized();

@@ -643,7 +643,9 @@ Shutdown()
 
   CloseLanguageFile();
 
+#ifndef KOBO
   Display::RestoreOrientation();
+#endif
 
   StartupLogFreeRamAndStorage();
 

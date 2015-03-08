@@ -31,6 +31,7 @@ Copyright_License {
 
 #ifdef KOBO
 #include "OS/FileUtil.hpp"
+#include "Kobo/System.hpp"
 #endif
 
 #ifdef WIN32
@@ -208,6 +209,7 @@ Display::Rotate(DisplaySettings::Orientation orientation)
     break;
   };
 
+  WriteKoboScreenOrientation(rotate);
   return File::WriteExisting("/sys/class/graphics/fb0/rotate", rotate);
 #else
   return false;

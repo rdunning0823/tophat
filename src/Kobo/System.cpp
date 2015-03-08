@@ -28,6 +28,7 @@ Copyright_License {
 #include "OS/Sleep.h"
 #include "Util/StaticString.hpp"
 #include "Net/IpAddress.hpp"
+#include "DisplaySettings.hpp"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -226,6 +227,44 @@ WriteSystemInfo()
   system(command);
 #endif
 }
+
+#ifdef KOBO
+static const char *kobo_orientation_file =
+    "/mnt/onboard/XCSoarData/OrientationKoboLast.txt";
+
+void
+WriteKoboScreenOrientation(const char * rotate)
+{
+  File::CreateExclusive(kobo_orientation_file);
+  File::WriteExisting(kobo_orientation_file, rotate);
+}
+
+DisplaySettings::Orientation
+ReadKoboLastScreenOrientation()
+{
+  DisplaySettings::Orientation orientation =
+      DisplaySettings::Orientation::DEFAULT;
+  char line[4];
+
+  if (File::ReadString(kobo_orientation_file, line, sizeof(line))) {
+    switch(line[0]) {
+    case '3':
+      orientation = DisplaySettings::Orientation::PORTRAIT;
+      break;
+    case '1':
+      orientation = DisplaySettings::Orientation::REVERSE_PORTRAIT;
+      break;
+    case '0':
+      orientation = DisplaySettings::Orientation::LANDSCAPE;
+      break;
+    case '2':
+      orientation = DisplaySettings::Orientation::REVERSE_LANDSCAPE;
+      break;
+    }
+  }
+  return orientation;
+}
+#endif
 
 bool
 IsUSBStorageConnected()

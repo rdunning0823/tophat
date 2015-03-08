@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_KOBO_SYSTEM_HPP
 
 #include "Compiler.h"
+#include "DisplaySettings.hpp"
 
 bool
 KoboReboot();
@@ -63,6 +64,19 @@ IsKoboUsbHostKernel();
  */
 void WriteSystemInfo();
 
+#ifdef KOBO
+/**
+ * Writes the hardware screen orientation to a text file
+ * for use during the next startup of Top Hat
+ */
+void WriteKoboScreenOrientation(const char * rotate);
+
+/**
+ * Reads rotation byte from file saved on disk
+ * @return Orientation based on hardware settings
+ */
+DisplaySettings::Orientation ReadKoboLastScreenOrientation();
+#endif
 /**
  * returns true if a USB Storage device is currently mounted
  * at /media/usb_storage
