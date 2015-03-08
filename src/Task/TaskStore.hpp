@@ -69,8 +69,22 @@ public:
 
     const OrderedTask *GetTask(const TaskBehaviour &task_behaviour);
 
+    struct case_insensitive_less : public std::binary_function< char,char,bool >
+    {
+        bool operator () (char x, char y) const
+        {
+            return toupper( static_cast< unsigned char >(x)) <
+                   toupper( static_cast< unsigned char >(y));
+        }
+    };
+
     gcc_pure
     bool operator<(const TaskStore::Item &other) const {
+      return std::lexicographical_compare(task_name.begin(),task_name.end(),
+                                          other.task_name.begin(),
+                                          other.task_name.end(),
+                                          case_insensitive_less() );
+
       return task_name.compare(other.task_name) < 0;
     }
   };
