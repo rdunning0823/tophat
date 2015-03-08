@@ -278,16 +278,18 @@ static int _cdecl
 DataFieldFileReaderCompareReverse(const void *elem1, const void *elem2)
 {
   // Compare by filename
-  return _tcscmp(((const DataFieldFileReader::Item *)elem2)->filename,
-                 ((const DataFieldFileReader::Item *)elem1)->filename);
+  return StringCompareIgnoreCase(
+      ((const DataFieldFileReader::Item *)elem2)->filename,
+      ((const DataFieldFileReader::Item *)elem1)->filename);
 }
 
 static int _cdecl
 DataFieldFileReaderCompare(const void *elem1, const void *elem2)
 {
   // Compare by filename
-  return _tcscmp(((const DataFieldFileReader::Item *)elem1)->filename,
-                 ((const DataFieldFileReader::Item *)elem2)->filename);
+  return StringCompareIgnoreCase(
+      ((const DataFieldFileReader::Item *)elem1)->filename,
+      ((const DataFieldFileReader::Item *)elem2)->filename);
 }
 
 void
