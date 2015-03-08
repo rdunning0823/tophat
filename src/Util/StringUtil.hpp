@@ -396,6 +396,15 @@ StringIsEqual(const TCHAR *str1, const TCHAR *str2)
 }
 #endif
 
+static inline int
+StringCompareIgnoreCase(const char *a, const char *b)
+{
+  assert(a != nullptr);
+  assert(b != nullptr);
+
+  return strcasecmp(a, b);
+}
+
 static inline bool
 StringIsEqualIgnoreCase(const char *a, const char *b)
 {
@@ -415,6 +424,15 @@ StringIsEqualIgnoreCase(const char *a, const char *b, size_t size)
 }
 
 #ifdef _UNICODE
+static inline bool
+StringCompareIgnoreCase(const TCHAR *a, const TCHAR *b)
+{
+  assert(a != nullptr);
+  assert(b != nullptr);
+
+  return _tcsicmp(a, b);
+}
+
 static inline bool
 StringIsEqualIgnoreCase(const TCHAR *a, const TCHAR *b)
 {
