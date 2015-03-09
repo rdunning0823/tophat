@@ -43,13 +43,17 @@ Copyright_License {
 class SDCardSyncWidget final
   : public RowFormWidget, ActionListener, Timer {
   enum Buttons {
+    DownloadFlights,
+    UploadTasks,
     InstallKoboRoot,
-    SDCardToDevice,
-    DeviceToSDCard,
+    UploadEverything,
+    DownloadEverything,
     HelpButton,
   };
 
-  WndButton *upload_to_device_button, *copy_to_sd_card_button;
+  WndButton *upload_everything_button, *download_everything_button;
+  WndButton *upload_tasks_button, *download_flights_button;
+
   WndButton *install_koboroot_button;
 
 public:
@@ -103,16 +107,26 @@ SDCardSyncWidget::UpdateButtons()
 void
 SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
+  download_flights_button = AddButton(
+      _T("Download flights to USB card"),
+      *this, DownloadFlights);
+
+  upload_tasks_button = AddButton(
+      _T("Upload tasks"),
+      *this, UploadTasks);
+
+  upload_everything_button = AddButton(_T("Upload everything to Kobo"),
+                                      *this, UploadEverything);
+
+  download_everything_button = AddButton(
+      _T("Download everything to USB card"),
+      *this, DownloadEverything);
+
   install_koboroot_button = AddButton(
-      _T("Install KoboRoot.tgz upgrade"),
+      _T("Upgrade Top Hat"),
       *this, InstallKoboRoot);
 
-  upload_to_device_button = AddButton(_T("USB card --> Kobo"),
-                                      *this, SDCardToDevice);
 
-  copy_to_sd_card_button = AddButton(
-      _T("Kobo --> USB card"),
-      *this, DeviceToSDCard);
 
   AddButton(_T("Help"), *this, HelpButton);
   UpdateButtons();
@@ -141,22 +155,34 @@ void
 SDCardSyncWidget::OnAction(int id)
 {
   if (!IsUSBStorageConnected())
-    ShowMessageBox(_T("USB card is not connected"),
+    ShowMessageBox(_T("USB card not connected"),
                    _T("Error"), MB_OK | MB_ICONERROR);
   else
     switch (id) {
-    case SDCardToDevice:
-      UploadSDCardToDevice();
-      ShowMessageBox(_T("USB card successfully copied to device"),
+
+    case DownloadFlights:
+      CopyFlightsToSDCard();
+      ShowMessageBox(_T("Flights copied to SD card"),
                      _T("Success"), MB_OK);
-      listener->OnAction(mrOK);
       break;
 
-    case DeviceToSDCard:
-      CopyTopHatDataToSDCard();
-      ShowMessageBox(_T("Top Hat data and logs copied to USB card"),
+    case UploadTasks:
+      UploadTasksToDevice();
+      ShowMessageBox(_T("Task folder copied to Kobo"),
                      _T("Success"), MB_OK);
-      listener->OnAction(mrOK);
+      break;
+
+
+    case UploadEverything:
+      UploadSDCardToDevice();
+      ShowMessageBox(_T("USB card successfully copied to Kobo"),
+                     _T("Success"), MB_OK);
+      break;
+
+    case DownloadEverything:
+      CopyTopHatDataToSDCard();
+      ShowMessageBox(_T("All Top Hat data copied to USB card"),
+                     _T("Success"), MB_OK);
       break;
     case InstallKoboRoot:
       InstallUpgrade();

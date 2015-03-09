@@ -277,6 +277,25 @@ IsUSBStorageConnected()
 }
 
 void
+UploadTasksToDevice()
+{
+#ifdef KOBO
+  Directory::Create(_T("/mnt/onboard/XCSoarData/tasks"));
+  system(_T("cp -r /media/usb_storage/XCSoarData/tasks/*.* /mnt/onboard/XCSoarData/tasks"));
+#endif
+}
+
+void
+CopyFlightsToSDCard()
+{
+#ifdef KOBO
+  Directory::Create(_T("/media/usb_storage/XCSoarData"));
+  Directory::Create(_T("/media/usb_storage/XCSoarData/logs"));
+  system(_T("cp -r /mnt/onboard/XCSoarData/logs/*.igc /media/usb_storage/XCSoarData/logs"));
+#endif
+}
+
+void
 UploadSDCardToDevice()
 {
 #ifdef KOBO

@@ -84,6 +84,16 @@ DisplaySettings::Orientation ReadKoboLastScreenOrientation();
 bool IsUSBStorageConnected();
 
 /**
+ * copy sdcard/XCSoarData/tasks folder to device task folder
+ */
+void UploadTasksToDevice();
+
+/**
+ * copy device XCSoarData/logs folder to sdcard/XCSoarData
+ */
+void CopyFlightsToSDCard();
+
+/**
  * Copies the XCSoarData folder on the SDCard to the device
  */
 void UploadSDCardToDevice();
