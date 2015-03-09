@@ -5,6 +5,7 @@ Top Hat Soaring 2.0.4 Beta
 * Kobo
   - Support for USB stick file transfer and upgrade
   - Support menu in all screen orientations
+  - Improved font spacing
 * airspace
   - accept airspaces of class RMZ in OpenAir format files
 * Lists - sort in alpha, non-case sensitive
