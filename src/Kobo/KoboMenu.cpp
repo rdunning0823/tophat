@@ -217,7 +217,7 @@ KoboMenuWidget::OnAction(int id)
     break;
   case LAUNCH_NICKEL:
     if (ShowMessageBox(_("Connect to PC with USB cable?  \n\nThis takes a minute.  "
-        "The screen will flash. Then click 'Computer Setup' and connect the cable"), _("USB cable connect"),
+        "Disconnect cable now.  The screen will flash. Click 'Computer Setup' and connect cable"), _("USB cable connect"),
                        MB_YESNO | MB_ICONQUESTION) == IDYES)
       if (ShowMessageBox(_("Important!\n\n"
           "Do not use the 'Wireless setup' option.  You cannot use the Kobo as an Book reader.  Doing so will break Top Hat!"), _("Warning!"),
