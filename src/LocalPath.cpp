@@ -337,7 +337,7 @@ TryMountPoint(const TCHAR *mnt)
   _tcscpy(buffer, mnt);
   _tcscat(buffer, _T(DIR_SEPARATOR_S XCSDATADIR));
 
-  __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+  __android_log_print(ANDROID_LOG_DEBUG, "TopHat",
                       "Try '%s' exists=%d access=%d",
                       buffer, Directory::Exists(buffer), access(buffer, W_OK));
 
