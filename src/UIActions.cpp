@@ -49,7 +49,7 @@ UIActions::CheckShutdown()
   if (force_shutdown)
     return true;
 
-  return ShowMessageBox(_("Quit program?"), _T("TopHat"),
+  return ShowMessageBox(_("Quit program?"), _T("Top Hat Soaring"),
                      MB_YESNO | MB_ICONQUESTION) == IDYES;
 
 }
