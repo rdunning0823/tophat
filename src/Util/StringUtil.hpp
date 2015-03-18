@@ -424,7 +424,7 @@ StringIsEqualIgnoreCase(const char *a, const char *b, size_t size)
 }
 
 #ifdef _UNICODE
-static inline bool
+static inline int
 StringCompareIgnoreCase(const TCHAR *a, const TCHAR *b)
 {
   assert(a != nullptr);
