@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
 <Form Caption="Top Hat Soaring">
-  <SymbolButton Name="cmdNext" Caption="&gt;" X="60" Y="-35" Width="60" Height="35" OnClick="OnNext" />
-  <CloseButton X="-120" Y="-35" Height="35"/>
+  <SymbolButton Name="cmdNext" Caption="&gt;" X="180" Y="-35" Width="60" Height="35" OnClick="OnNext" />
+  <CloseButton X="0" Width="120" Y="-35" Height="35"/>
 
   <Tabbed Name="tab" X="0" Y="0" Height="-35">
     <Canvas OnPaint="OnLogoPaint" />
@@ -10,5 +10,5 @@
     <LargeText Name="prpLicense"/>
   </Tabbed>
 
-  <SymbolButton Name="cmdPrev" Caption="&lt;" X="0" Y="-35" Width="60" Height="35" OnClick="OnPrev" />
+  <SymbolButton Name="cmdPrev" Caption="&lt;" X="120" Y="-35" Width="60" Height="35" OnClick="OnPrev" />
 </Form>
