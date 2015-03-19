@@ -3,9 +3,8 @@
 <Form Caption="Checklist">
   <LargeText Name="frmDetails" Height="-35"/>
 
-  <SymbolButton Name="cmdNext" Caption="&gt;" X="60" Y="-35" Width="60" Height="35" OnClick="OnNextClicked" />
+  <SymbolButton Name="cmdNext" Caption="&gt;" X="180" Y="-35" Width="60" Height="35" OnClick="OnNextClicked" />
+  <CloseButton X="0" Width="120" Y="-35" Height="35"/>
 
-  <CloseButton X="-120" Y="-35" Height="35"/>
-
-  <SymbolButton Name="cmdPrev" Caption="&lt;" X="0" Y="-35" Width="60" Height="35" OnClick="OnPrevClicked" />
+  <SymbolButton Name="cmdPrev" Caption="&lt;" X="120" Y="-35" Width="60" Height="35" OnClick="OnPrevClicked" />
 </Form>
