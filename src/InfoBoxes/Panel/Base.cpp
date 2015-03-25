@@ -275,6 +275,22 @@ RatchetListLayout::CalculateLayout(const PixelRect &rc)
 }
 
 void
+ThreeCommandButtonWidgetLayout::CalculateLayout(const PixelRect &rc)
+{
+  const unsigned height = GetFooterHeight();
+  const unsigned width = (rc.right - rc.left) / 3;
+
+  widget_rc = left_button_rc = right_button_rc = middle_button_rc = rc;
+
+  left_button_rc.top = right_button_rc.top = middle_button_rc.top =
+      rc.bottom - height;
+  left_button_rc.right = middle_button_rc.left = width;
+  middle_button_rc.right = right_button_rc.left = width * 2;
+
+  widget_rc.bottom = rc.bottom - height;
+}
+
+void
 TwoCommandButtonListLayout::CalculateLayout(const PixelRect &rc)
 {
   const UPixelScalar height = GetFooterHeight();

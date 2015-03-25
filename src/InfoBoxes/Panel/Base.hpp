@@ -214,6 +214,41 @@ protected:
 };
 
 /**
+ * A layout with a widget area and three command buttons under it
+ */
+class ThreeCommandButtonWidgetLayout {
+protected:
+  /**
+   * left button below the list
+   */
+  PixelRect left_button_rc;
+
+  /**
+   * right button below the list.
+   */
+  PixelRect right_button_rc;
+
+  /**
+   * middle button below the list.
+   */
+  PixelRect middle_button_rc;
+
+  /**
+   * The widget area
+   */
+  PixelRect widget_rc;
+
+protected:
+  /*
+   * Sizes the rectangles for the layout in the center
+   * of the rc
+   * @param parent_rc The rc of the parent window's usable area
+   */
+  void CalculateLayout(const PixelRect &rc);
+};
+
+
+/**
  * A layout with a list and two command buttons under it;
  * E.g. For alternates list with "Goto" and "Details" below.
  */
