@@ -784,7 +784,7 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentTeamCode>::Create,
     e_Team_Bearing, // Team Bearing
     e_Team_Range, // Team Range
-    DEPRECATED,
+    STANDARD,
   },
 
   // e_Team_Bearing
