@@ -4,15 +4,15 @@ SUMMARY OF NEW FEATURES AND CHANGES
 Top Hat Soaring 2.0.4 Beta
 
 * Kobo
-  - Support for USB stick file transfer and upgrade
-  - Support menu in all screen orientations
-  - Improved font spacing
-* airspace
+  - Support for USB stick file transfer
+  - Support startup screen in landscape
+  - Improved font readability
+* Airspace
   - accept airspaces of class RMZ in OpenAir format files
 * Lists - sort in alpha, non-case sensitive
-* Fix spacing issue with Fonts on Linux and Kobo
 * Option to show two units in Altitude Infoboxes 
 * Edit waypoints in all lat/long formats
+* Fix Team Code infobox
 * Merge XCSoar 6.7.6
   * tracking
    - updated SkyLines server IP
