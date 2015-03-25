@@ -36,6 +36,7 @@ Copyright_License {
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
+#include "Util/StaticString.hpp"
 
 void
 MainMenuButtonWidget::UpdateVisibility(const PixelRect &rc,
@@ -54,7 +55,15 @@ MainMenuButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
   OverlayButtonWidget::Prepare(parent, rc);
-  SetText(_T("M"));
+  UpdateText(0);
+  CommonInterface::GetLiveBlackboard().AddListener(*this);
+}
+
+void
+MainMenuButtonWidget::Unprepare()
+{
+  CommonInterface::GetLiveBlackboard().RemoveListener(*this);
+  OverlayButtonWidget::Unprepare();
 }
 
 void
@@ -70,9 +79,30 @@ MainMenuButtonWidget::Move(const PixelRect &rc_map)
 }
 
 void
+MainMenuButtonWidget::UpdateText(unsigned page)
+{
+  StaticString<20> line_two;
+  if (page > 0)
+    line_two.Format(_T("%u / 4"), page);
+  else
+    line_two = _T("");
+
+  SetLineTwoText(line_two.c_str());
+
+  SetText(_T("M"));
+}
+
+void
+MainMenuButtonWidget::OnUIStateUpdate()
+{
+  UpdateText(TophatMenu::GetMenuIndex());
+}
+
+void
 MainMenuButtonWidget::OnAction(int id)
 {
   UISettings &ui_settings = CommonInterface::SetUISettings();
   ui_settings.clear_gesture_help = true;
   TophatMenu::RotateMenu();
+  UpdateText(TophatMenu::GetMenuIndex());
 }

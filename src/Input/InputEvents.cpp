@@ -59,6 +59,8 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "IO/ConfiguredFile.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Pan.hpp"
+#include "UIState.hpp"
+#include "Interface.hpp"
 
 #ifdef KOBO
 #include "Screen/Key.h"
@@ -280,6 +282,10 @@ InputEvents::ProcessEvent(unsigned event_id)
   // experimental: update button text, macro may change the value
   if (lastMode == getModeID() && bindex > 0)
     drawButtons(lastMode);
+
+  if (getModeID() == InputEvents::MODE_DEFAULT)
+    HideMenu();
+
 }
 
 /**
@@ -446,6 +452,8 @@ InputEvents::processGo(unsigned eventid)
 void
 InputEvents::HideMenu()
 {
+  CommonInterface::SetUIState().main_menu_index = 0;
+  CommonInterface::BroadcastUIStateUpdate();
   setMode(MODE_DEFAULT);
 }
 

@@ -91,6 +91,7 @@ LeavePan()
 
   InputEvents::UpdatePan();
   PageActions::Restore();
+  InputEvents::HideMenu();
 }
 
 void

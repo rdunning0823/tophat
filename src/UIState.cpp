@@ -33,4 +33,5 @@ UIState::Clear()
   panel_index = 0;
   panel_name.clear();
   pages.Clear();
+  main_menu_index = 0;
 }

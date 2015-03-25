@@ -24,10 +24,16 @@ Copyright_License {
 #include "TophatMenu.hpp"
 #include "Input/InputEvents.hpp"
 #include "Interface.hpp"
+#include "UIState.hpp"
 
 namespace TophatMenu {
 
-  void ShowMenu(const TCHAR *menu_name)
+  unsigned GetMenuIndex()
+  {
+    return CommonInterface::GetUIState().main_menu_index;
+  }
+
+  static void ShowMenu(const TCHAR *menu_name)
   {
     InputEvents::ShowMenu();
     InputEvents::setMode(menu_name);
@@ -35,21 +41,30 @@ namespace TophatMenu {
 
   void RotateMenu()
   {
-    if (InputEvents::IsMode(menu) || InputEvents::IsMode(menu_alt_with_screens_button))
-      ShowMenu(menu_1);
-
-    else if (InputEvents::IsMode(menu_1))
-      ShowMenu(menu_2);
-
-    else if (InputEvents::IsMode(menu_2))
-      ShowMenu(menu_last);
-
-    else if (InputEvents::IsMode(menu_last))
-      InputEvents::HideMenu();
-
-    else
+    int new_menu = 0;
+    switch (GetMenuIndex()) {
+    case 0:
       ShowMenu(menu);
+      new_menu = 1;
+      break;
+    case 1:
+      ShowMenu(menu_1);
+      new_menu = 2;
+      break;
+    case 2:
+      ShowMenu(menu_2);
+      new_menu = 3;
+      break;
+    case 3:
+      ShowMenu(menu_last);
+      new_menu = 4;
+      break;
+    case 4:
+      InputEvents::HideMenu();
+      new_menu = 0;
+      break;
+    }
 
-    return;
+    CommonInterface::SetUIState().main_menu_index = new_menu;
   }
 }

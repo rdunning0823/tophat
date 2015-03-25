@@ -75,6 +75,11 @@ struct UIState {
 
   PagesState pages;
 
+  /**
+   * Index, 0-4 of Top Hat main menu button index.  0 means hidden
+   */
+  unsigned main_menu_index;
+
   void Clear();
 };
 
