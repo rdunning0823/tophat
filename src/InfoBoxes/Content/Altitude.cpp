@@ -185,6 +185,7 @@ void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
+  const InfoBoxSettings &settings_info_boxes = CommonInterface::GetUISettings().info_boxes;
 
   if (!basic.baro_altitude_available) {
     data.SetInvalid();
@@ -196,6 +197,10 @@ UpdateInfoBoxAltitudeBaro(InfoBoxData &data)
   }
 
   data.SetValueFromAltitude(basic.baro_altitude);
+  if (settings_info_boxes.show_alternative_altitude_units)
+    data.SetCommentFromAlternateAltitude(basic.baro_altitude);
+  else
+    data.SetCommentInvalid();
 }
 
 void
