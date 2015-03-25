@@ -47,3 +47,9 @@ ProxyBlackboardListener::OnUISettingsUpdate(const UISettings &settings)
 {
   next.OnUISettingsUpdate(settings);
 }
+
+void
+ProxyBlackboardListener::OnUIStateUpdate()
+{
+  next.OnUIStateUpdate();
+}

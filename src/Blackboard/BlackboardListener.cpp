@@ -44,3 +44,8 @@ void
 NullBlackboardListener::OnUISettingsUpdate(gcc_unused const UISettings &settings)
 {
 }
+
+void
+NullBlackboardListener::OnUIStateUpdate()
+{
+}

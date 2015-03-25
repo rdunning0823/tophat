@@ -46,6 +46,7 @@ public:
   void BroadcastCalculatedUpdate();
   void BroadcastComputerSettingsUpdate();
   void BroadcastUISettingsUpdate();
+  void BroadcastUIStateUpdate();
 };
 
 #endif

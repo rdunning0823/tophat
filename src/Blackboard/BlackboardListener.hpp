@@ -59,6 +59,12 @@ public:
    * The user has modified the UI settings.
    */
   virtual void OnUISettingsUpdate(const UISettings &settings) = 0;
+
+  /**
+   * The UI state has changed.
+   */
+  virtual void OnUIStateUpdate() = 0;
+
 };
 
 /**
@@ -76,6 +82,8 @@ public:
   virtual void OnComputerSettingsUpdate(const ComputerSettings &settings) override;
 
   virtual void OnUISettingsUpdate(const UISettings &settings) override;
+
+  virtual void OnUIStateUpdate() override;
 };
 
 #endif

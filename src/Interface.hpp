@@ -228,6 +228,13 @@ namespace CommonInterface {
 
     Private::blackboard.BroadcastUISettingsUpdate();
   }
+
+  static inline void BroadcastUIStateUpdate() {
+    assert(InMainThread());
+
+    Private::blackboard.BroadcastUIStateUpdate();
+  }
+
 };
 
 #endif

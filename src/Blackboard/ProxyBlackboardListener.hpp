@@ -46,6 +46,8 @@ private:
   virtual void OnComputerSettingsUpdate(const ComputerSettings &settings);
 
   virtual void OnUISettingsUpdate(const UISettings &settings);
+
+  virtual void OnUIStateUpdate();
 };
 
 #endif

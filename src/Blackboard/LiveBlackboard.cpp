@@ -91,3 +91,16 @@ LiveBlackboard::BroadcastUISettingsUpdate()
 
   calling_listeners = false;
 }
+
+void
+LiveBlackboard::BroadcastUIStateUpdate()
+{
+  calling_listeners = true;
+
+  for (BlackboardListener *listener : listeners)
+    listener->OnUIStateUpdate();
+
+  calling_listeners = false;
+}
+
+
