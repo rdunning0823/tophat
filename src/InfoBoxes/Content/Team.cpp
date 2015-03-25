@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Team.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
+#include "InfoBoxes/Panel/TeamCode.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "Interface.hpp"
 #include "TeamActions.hpp"
@@ -33,20 +34,8 @@ Copyright_License {
 #include <tchar.h>
 #include <stdio.h>
 
-static void
-ShowTeamCodeDialog()
-{
-  dlgTeamCodeShowModal();
-}
-
-static Widget *
-LoadTeamCodeDialog(unsigned id)
-{
-  return new CallbackWidget(ShowTeamCodeDialog);
-}
-
 static constexpr InfoBoxPanel team_code_infobox_panels[] = {
-  { N_("Team Code"), LoadTeamCodeDialog },
+  { N_("Team Code"), LoadTeamCodePanelFullScreen },
   { nullptr, nullptr }
 };
 
