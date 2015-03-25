@@ -31,6 +31,9 @@ class Widget;
 /**
  * A window that docks one #Widget.  It may be used as a simple
  * container to place one #Widget on the screen.
+ *
+ * Note that calling Hide() does not
+ * call the widget's Hide()
  */
 class DockWindow : public ContainerWindow {
   Widget *widget;
