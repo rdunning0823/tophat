@@ -166,6 +166,9 @@ void
 AlternateFullScreen::Unprepare()
 {
   dialog_timer.Cancel();
+  assert (alternates_list_widget2 != nullptr);
+  alternates_list_widget2->Unprepare();
+  delete alternates_list_widget2;
 }
 
 Widget *
