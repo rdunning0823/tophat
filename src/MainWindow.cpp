@@ -464,9 +464,9 @@ MainWindow::ReinitialiseLayout_flarm(PixelRect rc, const InfoBoxLayout::Layout i
     break;
 
   case TrafficSettings::GaugeLocation::TopRight:
-    rc.left = rc.right - ib_layout.control_size.cx * 2 + 1;
+    rc.left = rc.right - (rc.right - rc.left) / 3 + 1;
     rc.top += widget_overlays.HeightFromTop();
-    rc.bottom = rc.top + ib_layout.control_size.cy * 2;
+    rc.bottom = rc.top + rc.GetSize().cx;
     ++rc.top;
     break;
 
