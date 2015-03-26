@@ -395,6 +395,7 @@ InfoBoxWindow::ShowDialog(const int id,
     CommonInterface::main_window->SetWidget(widget, true);
 
   CommonInterface::main_window->ActivateMap();
+  InputEvents::HideMenu();
 }
 
 bool
