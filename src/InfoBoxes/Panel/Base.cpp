@@ -142,9 +142,6 @@ BaseAccessPanel::CalculateLayout(const PixelRect &rc)
 
   close_button_rc = base_rc;
   close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
-  close_button_rc.bottom -= Layout::Scale(2);
-  close_button_rc.left += Layout::Scale(2);
-  close_button_rc.right -= Layout::Scale(2);
 
   PixelScalar setup_button_width = 0.2 * (rc.right - rc.left);
   setup_button_rc = base_rc;
