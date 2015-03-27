@@ -108,6 +108,7 @@ BaseAccessPanel::OnAction(int action_id)
   } else if (action_id == CloseButton)
     Close();
 }
+
 void
 BaseAccessPanel::Show(const PixelRect &rc)
 {
@@ -129,8 +130,6 @@ BaseAccessPanel::Move(const PixelRect &rc_unused)
   header_text->Move(frame_rc);
 
   managed_widget.Move(content_rc);
-
-
 }
 
 void
