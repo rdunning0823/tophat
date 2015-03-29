@@ -884,7 +884,7 @@ TrafficWidget::UpdateLayout()
   next_item_button->Move(button_rc);
 
   button_rc.left = margin;
-  button_rc.top = button_height * 3 / 2;
+  button_rc.top = button_height;
   button_rc.right = button_rc.left + Layout::Scale(50);
   button_rc.bottom = button_rc.top + button_height;
   details_button->Move(button_rc);
