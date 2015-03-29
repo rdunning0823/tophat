@@ -116,11 +116,31 @@ public:
 
 protected:
   void PaintTrafficInfo(Canvas &canvas) const;
+
+  /**
+   * Vario in upper right corner
+   */
   void PaintClimbRate(Canvas &canvas, PixelRect rc, fixed climb_rate) const;
+
+  /**
+   * Distance in lower left
+   */
   void PaintDistance(Canvas &canvas, PixelRect rc, fixed distance) const;
+
+  /**
+   * Relative altitude in lower right
+   */
   void PaintRelativeAltitude(Canvas &canvas, PixelRect rc,
                              fixed relative_altitude) const;
+
+  /**
+   * Id in upper left
+   */
   void PaintID(Canvas &canvas, PixelRect rc, const FlarmTraffic &traffic) const;
+
+  /**
+   *
+   */
   void PaintTaskDirection(Canvas &canvas) const;
 
   void StopDragging() {
