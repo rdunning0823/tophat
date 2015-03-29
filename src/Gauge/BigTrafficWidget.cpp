@@ -46,6 +46,7 @@
 #include "Interface.hpp"
 #include "UISettings.hpp"
 #include "Asset.hpp"
+#include "Widgets/OverlayButtonWidget.hpp"
 
 /**
  * A Window which renders FLARM traffic, with user interaction.
@@ -378,6 +379,11 @@ FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
                            unit, look.unit_fraction_pen);
 }
 
+static unsigned GetButtonHeight()
+{
+  return Layout::GetMinimumControlHeight();
+}
+
 void
 FlarmTrafficControl::PaintDistance(Canvas &canvas, PixelRect rc,
                                    fixed distance) const
@@ -402,21 +408,23 @@ FlarmTrafficControl::PaintDistance(Canvas &canvas, PixelRect rc,
   // Calculate positions
   const unsigned max_height = std::max(unit_height, value_height);
 
+  const unsigned bottom = rc.bottom - (Layout::landscape ? 1 : 2) *
+      GetButtonHeight();
   // Paint value
-  canvas.DrawText(rc.left, rc.bottom - value_height, buffer);
+  canvas.DrawText(rc.left, bottom - value_height, buffer);
 
   // Paint unit
   canvas.Select(look.info_units_font);
   UnitSymbolRenderer::Draw(canvas,
                            RasterPoint(rc.left + value_width + space_width,
-                                       rc.bottom - unit_height),
+                                       bottom - unit_height),
                            unit, look.unit_fraction_pen);
 
 
   // Paint label
   canvas.Select(look.info_labels_font);
   canvas.DrawText(rc.left,
-                  rc.bottom - max_height - look.info_labels_font.GetHeight(),
+                  bottom - max_height - look.info_labels_font.GetHeight(),
                   _("Distance"));
 }
 
@@ -445,16 +453,22 @@ FlarmTrafficControl::PaintRelativeAltitude(Canvas &canvas, PixelRect rc,
   // Calculate positions
   const unsigned max_height = std::max(unit_height, value_height);
 
+  unsigned overlay_button_height =
+      MapOverlayButton::GetStandardButtonHeight() *
+      MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
+
+  const unsigned bottom = rc.bottom - overlay_button_height;
+
   // Paint value
   canvas.DrawText(rc.right - unit_width - space_width - value_width,
-                  rc.bottom - value_height,
+                  bottom - value_height,
                   buffer);
 
   // Paint unit
   canvas.Select(look.info_units_font);
   UnitSymbolRenderer::Draw(canvas,
                            RasterPoint(rc.right - unit_width,
-                                       rc.bottom - unit_height),
+                                       bottom - unit_height),
                            unit, look.unit_fraction_pen);
 
 
@@ -462,7 +476,7 @@ FlarmTrafficControl::PaintRelativeAltitude(Canvas &canvas, PixelRect rc,
   canvas.Select(look.info_labels_font);
   const unsigned label_width = canvas.CalcTextSize(_("Rel. Alt.")).cx;
   canvas.DrawText(rc.right - label_width,
-                  rc.bottom - max_height - look.info_labels_font.GetHeight(),
+                  bottom - max_height - look.info_labels_font.GetHeight(),
                   _("Rel. Alt."));
 }
 
@@ -831,9 +845,9 @@ TrafficWidget::UpdateLayout()
 
 #ifndef GNAV
   const unsigned margin = Layout::Scale(1);
-  const unsigned button_height = Layout::GetMinimumControlHeight();
-  const unsigned button_width = std::max(unsigned(rc.right / 6),
-                                         button_height);
+  const unsigned button_height = GetButtonHeight();
+  const unsigned button_width =  std::max(unsigned(rc.right / 6),
+                                          GetButtonHeight());
 
   const PixelScalar x1 = rc.right / 2;
   const PixelScalar x0 = x1 - button_width;
