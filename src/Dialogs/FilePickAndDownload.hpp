@@ -210,11 +210,6 @@ public:
   PickerState picker_state;
 
   /**
-   * has the repository been loaded
-   */
-  bool repository_loaded;
-
-  /**
    * pointer to the parent widget dialog so we can close it as needed
    */
   WidgetDialog *parent_widget_dialog;
