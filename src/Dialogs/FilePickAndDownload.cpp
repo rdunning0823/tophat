@@ -80,7 +80,7 @@ void
 ManagedFilePickAndDownloadWidget::CreateButtons(WidgetDialog &dialog)
 {
   close_button = dialog.AddButton(_("Cancel"), *this, mrOK);
-  search_button = dialog.AddButton(_("Search"), *this, SEARCH_BUTTON);
+  search_button = dialog.AddButton(_("Continue"), *this, SEARCH_BUTTON);
   parent_widget_dialog = &dialog;
 }
 
