@@ -711,6 +711,8 @@ MainWindow::OnTimer(WindowTimer &_timer)
   } else if (!CommonInterface::Calculated().circling ||
              InputEvents::IsFlavour(_T("TA"))) {
     thermal_assistant.Hide();
+  } else if (InputEvents::IsFlavour(_T("Traffic"))) {
+    thermal_assistant.Hide();
   } else if (!HasDialog()) {
     if (!thermal_assistant.IsDefined())
       thermal_assistant.Set(new GaugeThermalAssistant(CommonInterface::GetLiveBlackboard(),
