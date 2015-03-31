@@ -39,6 +39,8 @@ Copyright_License {
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Util/Macros.hpp"
+#include "PageActions.hpp"
+#include "UIState.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/SubCanvas.hpp"
@@ -388,13 +390,18 @@ InfoBoxWindow::ShowDialog(const int id,
       }
     }
   }
- // Widget *widget = panels->load(id);
+
+  bool special = CommonInterface::GetUIState().pages.special_page.IsDefined();
+  const PageLayout &old_layout = PageActions::GetCurrentLayout();
   if (widget == nullptr)
     CommonInterface::main_window->SetWidget(new InfoBoxDescriptionPanel(id), true);
   else
     CommonInterface::main_window->SetWidget(widget, true);
 
   CommonInterface::main_window->ActivateMap();
+
+  if (special)
+    PageActions::OpenLayout(old_layout);
   InputEvents::HideMenu();
 }
 
