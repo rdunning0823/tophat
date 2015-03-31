@@ -47,6 +47,7 @@
 #include "UISettings.hpp"
 #include "Asset.hpp"
 #include "Widgets/OverlayButtonWidget.hpp"
+#include "Renderer/SymbolRenderer.hpp"
 
 /**
  * A Window which renders FLARM traffic, with user interaction.
@@ -123,7 +124,9 @@ protected:
    *
    */
   void PaintMetric(Canvas &canvas, PixelRect rc, fixed value, const TCHAR *value_text,
-                   const Unit &unit, const TCHAR *label, unsigned row) const;
+                   const Unit &unit, const TCHAR *label, unsigned row,
+                   bool draw_arrow, SymbolRenderer::Direction arrow_direction =
+                       SymbolRenderer::Direction::UP) const;
   /**
    * Vario in upper right corner
    */
@@ -346,7 +349,8 @@ void
 FlarmTrafficControl::PaintMetric(Canvas &canvas, PixelRect rc, fixed value,
                                  const TCHAR *value_text,
                                  const Unit &unit, const TCHAR *label,
-                                 unsigned row) const
+                                 unsigned row, bool draw_arrow,
+                                 SymbolRenderer::Direction arrow_direction) const
 {
   // Calculate unit size
   canvas.Select(look.info_units_font);
@@ -363,22 +367,38 @@ FlarmTrafficControl::PaintMetric(Canvas &canvas, PixelRect rc, fixed value,
 
   // Calculate positions
   const int y = rc.top + value_height * (row + 1);
+  const unsigned arrow_width = draw_arrow ? Layout::Scale(6): 0;
+
+  if (draw_arrow) {
+    PixelRect rc_arrow = rc;
+    rc_arrow.left = rc_arrow.right - arrow_width;
+    rc_arrow.bottom = y;
+    rc_arrow.top = y - arrow_width;
+    if (arrow_direction == SymbolRenderer::Direction::UP) {
+      rc_arrow.bottom -= arrow_width;
+      rc_arrow.top -= arrow_width;
+    }
+
+    SymbolRenderer::DrawArrow(canvas, rc_arrow, arrow_direction, true);
+  }
 
   // Paint value
-  canvas.DrawText(rc.right - unit_width - space_width - value_width,
-                  y - value_height, value_text);
+  canvas.DrawText(rc.right - unit_width - space_width - value_width -
+                  arrow_width, y - value_height, value_text);
 
   // Paint unit
   canvas.Select(look.info_units_font);
   UnitSymbolRenderer::Draw(canvas,
-                           RasterPoint(rc.right - unit_width, y - unit_height),
+                           RasterPoint(rc.right - unit_width - arrow_width,
+                                       y - unit_height),
                            unit, look.unit_fraction_pen);
 
   // Paint label
   canvas.Select(look.info_labels_font);
   const unsigned label_width = canvas.CalcTextSize(label).cx;
   const unsigned label_height = look.info_labels_font.GetAscentHeight();
-  canvas.DrawText(rc.right - label_width - unit_width - 2 * space_width - value_width,
+  canvas.DrawText(rc.right - label_width - unit_width - 2 * space_width -
+                  value_width - arrow_width,
                   y - label_height, label);
 }
 
@@ -391,7 +411,7 @@ FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserVerticalSpeedUnit();
   FormatUserVerticalSpeed(climb_rate, buffer, false);
 
-  PaintMetric(canvas, rc, climb_rate, buffer, unit, _("Vario"), 0);
+  PaintMetric(canvas, rc, climb_rate, buffer, unit, _("Vario"), 0, false);
 }
 
 static unsigned GetButtonHeight()
@@ -407,7 +427,7 @@ FlarmTrafficControl::PaintDistance(Canvas &canvas, PixelRect rc,
   TCHAR buffer[20];
   Unit unit = FormatUserDistanceSmart(distance, buffer, false, fixed(1000));
 
-  PaintMetric(canvas, rc, distance, buffer, unit, _("Dist."), 1);
+  PaintMetric(canvas, rc, distance, buffer, unit, _("Dist."), 1, false);
 
 }
 
@@ -420,7 +440,9 @@ FlarmTrafficControl::PaintRelativeAltitude(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserAltitudeUnit();
   FormatRelativeUserAltitude(relative_altitude, buffer, false);
 
-  PaintMetric(canvas, rc, relative_altitude, buffer, unit, _T(""), 2);
+  PaintMetric(canvas, rc, relative_altitude, buffer, unit, _T(""), 2,
+              true, positive(relative_altitude) ? SymbolRenderer::Direction::UP :
+                  SymbolRenderer::Direction::DOWN);
 
 }
 
