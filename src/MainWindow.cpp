@@ -343,11 +343,7 @@ void
 MainWindow::ReinitialiseLayoutTA(PixelRect rc,
                                  const InfoBoxLayout::Layout &layout)
 {
-  UPixelScalar sz = std::min(layout.control_size.cy,
-                             layout.control_size.cx) * 2;
-  sz = std::min((int)sz, (int)((rc.bottom - rc.top) / 2 - widget_overlays.HeightFromTop()
-                - Layout::Scale(1)));
-
+  unsigned sz = (rc.right - rc.left) / 3 + Layout::Scale(1);
   rc.top += widget_overlays.HeightFromTop() + Layout::Scale(1);
   rc.bottom = rc.top + sz;
   rc.right = rc.left + sz;
