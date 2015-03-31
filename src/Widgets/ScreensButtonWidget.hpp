@@ -29,6 +29,7 @@ Copyright_License {
 #include "Form/ActionListener.hpp"
 #include "Look/ButtonLook.hpp"
 #include "InfoBoxes/InfoBoxLayout.hpp"
+#include "Blackboard/BlackboardListener.hpp"
 
 #include <tchar.h>
 
@@ -36,7 +37,7 @@ struct IconLook;
 class ContainerWindow;
 struct PixelRect;
 
-class ScreensButtonWidget : public OverlayButtonWidget {
+class ScreensButtonWidget : public OverlayButtonWidget, NullBlackboardListener {
 public:
   enum ButtonPosition {
     Bottom,
@@ -62,11 +63,15 @@ public:
                                 bool is_main_window_widget, bool is_map);
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Move(const PixelRect &rc);
+  virtual void Unprepare();
 
   /**
    * The OnAction is derived from ActionListener
    */
   virtual void OnAction(int id);
+
+  /* virtual methods from class BlackboardListener */
+  virtual void OnUIStateUpdate() override;
 
   /**
    * updates the text on the button

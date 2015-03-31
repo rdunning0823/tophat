@@ -40,6 +40,7 @@ Copyright_License {
 #include "PageState.hpp"
 #include "PageActions.hpp"
 #include "UIState.hpp"
+#include "Language/Language.hpp"
 
 ScreensButtonWidget::ButtonPosition
 ScreensButtonWidget::GetButtonPosition(InfoBoxSettings::Geometry geometry,
@@ -97,6 +98,14 @@ ScreensButtonWidget::Prepare(ContainerWindow &parent,
 {
   OverlayButtonWidget::Prepare(parent, rc);
   UpdateText();
+  CommonInterface::GetLiveBlackboard().AddListener(*this);
+}
+
+void
+ScreensButtonWidget::Unprepare()
+{
+  CommonInterface::GetLiveBlackboard().RemoveListener(*this);
+  OverlayButtonWidget::Unprepare();
 }
 
 void
@@ -138,19 +147,29 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
 void
 ScreensButtonWidget::UpdateText()
 {
-
   const PagesState &state = CommonInterface::GetUIState().pages;
   TCHAR line_two[50];
-  const PageLayout *pl =
-    &CommonInterface::SetUISettings().pages.pages[state.current_index];
-  const InfoBoxSettings &info_box_settings =
-    CommonInterface::GetUISettings().info_boxes;
-  assert(pl != NULL);
 
-  pl->MakeInfoBoxSetTitle(info_box_settings, line_two);
-  SetLineTwoText(line_two);
+  if (state.special_page.IsDefined()) {
+    SetLineTwoText(_("Close"));
+  } else {
+    const PageLayout *pl =
+        &CommonInterface::SetUISettings().pages.pages[state.current_index];
+    const InfoBoxSettings &info_box_settings =
+      CommonInterface::GetUISettings().info_boxes;
 
+    assert(pl != NULL);
+
+    pl->MakeInfoBoxSetTitle(info_box_settings, line_two);
+    SetLineTwoText(line_two);
+  }
   SetText(_T("S"));
+}
+
+void
+ScreensButtonWidget::OnUIStateUpdate()
+{
+  UpdateText();
 }
 
 void
