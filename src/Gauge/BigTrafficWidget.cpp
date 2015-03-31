@@ -119,6 +119,12 @@ protected:
   void PaintTrafficInfo(Canvas &canvas) const;
 
   /**
+   * paints a metric on the screen at the upper right of the rect on row 0-2
+   *
+   */
+  void PaintMetric(Canvas &canvas, PixelRect rc, fixed value, const TCHAR *value_text,
+                   const Unit &unit, const TCHAR *label, unsigned row) const;
+  /**
    * Vario in upper right corner
    */
   void PaintClimbRate(Canvas &canvas, PixelRect rc, fixed climb_rate) const;
@@ -337,19 +343,11 @@ FlarmTrafficControl::PaintTaskDirection(Canvas &canvas) const
 }
 
 void
-FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
-                                    fixed climb_rate) const
+FlarmTrafficControl::PaintMetric(Canvas &canvas, PixelRect rc, fixed value,
+                                 const TCHAR *value_text,
+                                 const Unit &unit, const TCHAR *label,
+                                 unsigned row) const
 {
-  // Paint label
-  canvas.Select(look.info_labels_font);
-  const unsigned label_width = canvas.CalcTextSize(_("Vario")).cx;
-  canvas.DrawText(rc.right - label_width, rc.top, _("Vario"));
-
-  // Format climb rate
-  TCHAR buffer[20];
-  Unit unit = Units::GetUserVerticalSpeedUnit();
-  FormatUserVerticalSpeed(climb_rate, buffer, false);
-
   // Calculate unit size
   canvas.Select(look.info_units_font);
   const unsigned unit_width = UnitSymbolRenderer::GetSize(canvas, unit).cx;
@@ -361,22 +359,39 @@ FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
   // Calculate value size
   canvas.Select(look.info_values_font);
   const unsigned value_height = look.info_values_font.GetAscentHeight();
-  const unsigned value_width = canvas.CalcTextSize(buffer).cx;
+  const unsigned value_width = canvas.CalcTextSize(value_text).cx;
 
   // Calculate positions
-  const int max_height = std::max(unit_height, value_height);
-  const int y = rc.top + look.info_units_font.GetHeight() + max_height;
+  const int y = rc.top + value_height * (row + 1);
 
   // Paint value
   canvas.DrawText(rc.right - unit_width - space_width - value_width,
-                  y - value_height,
-                  buffer);
+                  y - value_height, value_text);
 
   // Paint unit
   canvas.Select(look.info_units_font);
   UnitSymbolRenderer::Draw(canvas,
                            RasterPoint(rc.right - unit_width, y - unit_height),
                            unit, look.unit_fraction_pen);
+
+  // Paint label
+  canvas.Select(look.info_labels_font);
+  const unsigned label_width = canvas.CalcTextSize(label).cx;
+  const unsigned label_height = look.info_labels_font.GetAscentHeight();
+  canvas.DrawText(rc.right - label_width - unit_width - 2 * space_width - value_width,
+                  y - label_height, label);
+}
+
+void
+FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
+                                    fixed climb_rate) const
+{
+  // Format climb rate
+  TCHAR buffer[20];
+  Unit unit = Units::GetUserVerticalSpeedUnit();
+  FormatUserVerticalSpeed(climb_rate, buffer, false);
+
+  PaintMetric(canvas, rc, climb_rate, buffer, unit, _T("Vario"), 0);
 }
 
 static unsigned GetButtonHeight()
