@@ -171,7 +171,8 @@ EnforceLayoutConstraints(PageLayout &page_layout)
     page_layout.bottom = PageLayout::Bottom::NOTHING;
 
   if (page_layout.main != PageLayout::Main::MAP &&
-      page_layout.main != PageLayout::Main::THERMAL_ASSISTANT)
+      page_layout.main != PageLayout::Main::THERMAL_ASSISTANT &&
+      page_layout.main != PageLayout::Main::FLARM_RADAR)
     page_layout.infobox_config.enabled = false;
 }
 
@@ -183,7 +184,8 @@ PageLayoutEditWidget::UpdateVisibility()
 
 
   bool show_infoboxes = value.main == PageLayout::Main::MAP ||
-      value.main == PageLayout::Main::THERMAL_ASSISTANT;
+      value.main == PageLayout::Main::THERMAL_ASSISTANT ||
+      value.main == PageLayout::Main::FLARM_RADAR;
   RowFormWidget::SetRowVisible(INFO_BOX_PANEL, show_infoboxes);
 }
 
