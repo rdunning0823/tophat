@@ -428,7 +428,7 @@ FlarmTrafficControl::PaintDistance(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserDistanceUnit();
   FormatUserDistance(distance, buffer, false, 1);
 
-  PaintMetric(canvas, rc, distance, buffer, unit, _("Dist."), 1, false);
+  PaintMetric(canvas, rc, distance, buffer, unit, _(""), 1, false);
 
 }
 
