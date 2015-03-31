@@ -896,6 +896,7 @@ TrafficWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
 
   view = new FlarmTrafficControl(look.flarm_dialog);
   view->Create(GetContainer(), rc, style);
+  CommonInterface::BroadcastUIStateUpdate();
 
   UpdateLayout();
 }

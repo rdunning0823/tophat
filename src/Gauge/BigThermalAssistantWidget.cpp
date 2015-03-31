@@ -76,6 +76,7 @@ BigThermalAssistantWidget::Prepare(ContainerWindow &parent,
 
   view = new BigThermalAssistantWindow(look, Layout::FastScale(10));
   view->Create(GetContainer(), rc);
+  CommonInterface::BroadcastUIStateUpdate();
 }
 
 void
