@@ -27,12 +27,13 @@ Copyright_License {
 #include <algorithm>
 
 void
-SymbolRenderer::DrawArrow(Canvas &canvas, PixelRect rc, Direction direction)
+SymbolRenderer::DrawArrow(Canvas &canvas, PixelRect rc, Direction direction,
+                          bool no_margins)
 {
   assert(direction == UP || direction == DOWN ||
          direction == LEFT || direction == RIGHT);
 
-  PixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / 5;
+  PixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / (no_margins ? 2 : 5);
   RasterPoint center = rc.GetCenter();
   RasterPoint arrow[3];
 

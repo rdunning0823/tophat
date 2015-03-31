@@ -37,7 +37,11 @@ namespace SymbolRenderer
     RIGHT,
   };
 
-  void DrawArrow(Canvas &canvas, PixelRect rc, Direction direction);
+  /**
+   * @param no_margins.  scales 1:1 and eliminates margins if true
+   */
+  void DrawArrow(Canvas &canvas, PixelRect rc, Direction direction,
+                 bool no_margins = false);
   void DrawSign(Canvas &canvas, PixelRect rc, bool plus);
 }
 
