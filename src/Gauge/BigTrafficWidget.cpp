@@ -927,7 +927,16 @@ TrafficWidget::Show(const PixelRect &rc)
   ContainerWidget::Show(rc);
 #ifndef GNAV
   /* show the "Close" button only if this is a "special" page */
+
+#if defined(ENABLE_OPENGL) | defined(KOBO)
+  /* hide close button on OPENGL where we have the screens button */
+  close_button->SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined() &&
+                           CommonInterface::GetUISettings().screens_button_location ==
+                                     UISettings::ScreensButtonLocation::MENU);
+#else
   close_button->SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined());
+#endif
+
 #endif
   UpdateLayout();
 
