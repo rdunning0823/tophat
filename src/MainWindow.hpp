@@ -47,6 +47,7 @@ class RasterTerrain;
 class TopographyStore;
 class MapWindowProjection;
 class TaskNavSliderWidget;
+class ScreensButtonWidget;
 
 /**
  * The XCSoar main window.
@@ -147,6 +148,13 @@ private:
   * used to access the widget to update the task
   */
   TaskNavSliderWidget *task_nav_slider_widget;
+
+#if defined(ENABLE_OPENGL) | defined(KOBO)
+  /**
+   * used to access screens button widget
+   */
+  ScreensButtonWidget *screens_button_widget;
+#endif
 
 public:
   MainWindow(const StatusMessageList &status_messages);

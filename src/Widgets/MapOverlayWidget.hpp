@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_MAP_OVERLAY_WIDGET_HPP
 #define XCSOAR_MAP_OVERLAY_WIDGET_HPP
 
-#include "Widget/WindowWidget.hpp"
+#include "Widget/OverlappedWidget.hpp"
 #include "Screen/Window.hpp"
 
 class ContainerWindow;
@@ -33,7 +33,7 @@ struct PixelRect;
 /**
  * an abstract class for Map overlay widgets
  */
-class MapOverlayWidget : public WindowWidget {
+class MapOverlayWidget : public OverlappedWidget {
 private:
 
 public:

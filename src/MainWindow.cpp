@@ -277,11 +277,11 @@ MainWindow::InitialiseConfigured()
   }
 #if defined(ENABLE_OPENGL) | defined(KOBO)
   widget_overlays.Add(new MainMenuButtonWidget(), rc_current);
-  ScreensButtonWidget *screen_but = new ScreensButtonWidget();
-  ZoomInButtonWidget *z_in_but = new ZoomInButtonWidget(screen_but);
+  screens_button_widget = new ScreensButtonWidget();
+  ZoomInButtonWidget *z_in_but = new ZoomInButtonWidget(screens_button_widget);
   widget_overlays.Add(z_in_but, rc_current);
   widget_overlays.Add(new ZoomOutButtonWidget(z_in_but), rc_current);
-  widget_overlays.Add(screen_but, rc_current);
+  widget_overlays.Add(screens_button_widget, rc_current);
 #endif
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
@@ -736,6 +736,11 @@ MainWindow::OnTimer(WindowTimer &_timer)
   else
     task_nav_slider_widget->RefreshTask();
   battery_timer.Process();
+
+#if defined(ENABLE_OPENGL) | defined(KOBO)
+  if (screens_button_widget->IsVisible() && !HasDialog() && InputEvents::IsDefault())
+    screens_button_widget->Raise();
+#endif
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   PixelRect rc = GetClientRect();
