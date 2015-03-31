@@ -391,7 +391,7 @@ FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserVerticalSpeedUnit();
   FormatUserVerticalSpeed(climb_rate, buffer, false);
 
-  PaintMetric(canvas, rc, climb_rate, buffer, unit, _T("Vario"), 0);
+  PaintMetric(canvas, rc, climb_rate, buffer, unit, _("Vario"), 0);
 }
 
 static unsigned GetButtonHeight()
@@ -407,40 +407,8 @@ FlarmTrafficControl::PaintDistance(Canvas &canvas, PixelRect rc,
   TCHAR buffer[20];
   Unit unit = FormatUserDistanceSmart(distance, buffer, false, fixed(1000));
 
-  // Calculate unit size
-  canvas.Select(look.info_units_font);
-  const unsigned unit_width = UnitSymbolRenderer::GetSize(canvas, unit).cx;
-  const unsigned unit_height =
-      UnitSymbolRenderer::GetAscentHeight(look.info_units_font, unit);
+  PaintMetric(canvas, rc, distance, buffer, unit, _("Dist."), 1);
 
-  const unsigned space_width = unit_width / 3;
-
-  // Calculate value size
-  canvas.Select(look.info_values_font);
-  const unsigned value_height = look.info_values_font.GetAscentHeight();
-  const unsigned value_width = canvas.CalcTextSize(buffer).cx;
-
-  // Calculate positions
-  const unsigned max_height = std::max(unit_height, value_height);
-
-  const unsigned bottom = rc.bottom - (Layout::landscape ? 1 : 2) *
-      GetButtonHeight();
-  // Paint value
-  canvas.DrawText(rc.left, bottom - value_height, buffer);
-
-  // Paint unit
-  canvas.Select(look.info_units_font);
-  UnitSymbolRenderer::Draw(canvas,
-                           RasterPoint(rc.left + value_width + space_width,
-                                       bottom - unit_height),
-                           unit, look.unit_fraction_pen);
-
-
-  // Paint label
-  canvas.Select(look.info_labels_font);
-  canvas.DrawText(rc.left,
-                  bottom - max_height - look.info_labels_font.GetHeight(),
-                  _("Distance"));
 }
 
 void
@@ -452,47 +420,8 @@ FlarmTrafficControl::PaintRelativeAltitude(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserAltitudeUnit();
   FormatRelativeUserAltitude(relative_altitude, buffer, false);
 
-  // Calculate unit size
-  canvas.Select(look.info_units_font);
-  const unsigned unit_width = UnitSymbolRenderer::GetSize(canvas, unit).cx;
-  const unsigned unit_height =
-      UnitSymbolRenderer::GetAscentHeight(look.info_units_font, unit);
+  PaintMetric(canvas, rc, relative_altitude, buffer, unit, _T(""), 2);
 
-  const unsigned space_width = unit_width / 3;
-
-  // Calculate value size
-  canvas.Select(look.info_values_font);
-  const unsigned value_height = look.info_values_font.GetAscentHeight();
-  const unsigned value_width = canvas.CalcTextSize(buffer).cx;
-
-  // Calculate positions
-  const unsigned max_height = std::max(unit_height, value_height);
-
-  unsigned overlay_button_height =
-      MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
-
-  const unsigned bottom = rc.bottom - overlay_button_height;
-
-  // Paint value
-  canvas.DrawText(rc.right - unit_width - space_width - value_width,
-                  bottom - value_height,
-                  buffer);
-
-  // Paint unit
-  canvas.Select(look.info_units_font);
-  UnitSymbolRenderer::Draw(canvas,
-                           RasterPoint(rc.right - unit_width,
-                                       bottom - unit_height),
-                           unit, look.unit_fraction_pen);
-
-
-  // Paint label
-  canvas.Select(look.info_labels_font);
-  const unsigned label_width = canvas.CalcTextSize(_("Rel. Alt.")).cx;
-  canvas.DrawText(rc.right - label_width,
-                  bottom - max_height - look.info_labels_font.GetHeight(),
-                  _("Rel. Alt."));
 }
 
 void
