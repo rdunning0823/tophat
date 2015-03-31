@@ -871,12 +871,19 @@ TrafficWidget::UpdateLayout()
   PixelRect button_rc;
 
   button_rc.left = 0;
-  button_rc.right = button_width;
-  if (Layout::landscape)
-    button_rc.bottom = rc.bottom;
-  else
-    button_rc.bottom = rc.bottom - button_height;
+  button_rc.right = button_width * (Layout::landscape ? 2 : 1);
+  button_rc.bottom = rc.bottom;
   button_rc.top = button_rc.bottom - button_height;
+  close_button->Move(button_rc);
+
+  if (Layout::landscape)
+    button_rc.bottom = rc.bottom -
+        (close_button->IsVisible() ? button_height : 0);
+  else
+    button_rc.bottom = rc.bottom -
+        (close_button->IsVisible() ? 2 : 1) * button_height;
+  button_rc.top = button_rc.bottom - button_height;
+  button_rc.right = button_width;
   zoom_in_button->Move(button_rc);
 
   if (Layout::landscape)
@@ -884,7 +891,8 @@ TrafficWidget::UpdateLayout()
   else
     button_rc.left = 0;
   button_rc.right = button_rc.left + button_width;
-  button_rc.bottom = rc.bottom;
+  button_rc.bottom = rc.bottom -
+      (close_button->IsVisible() ? button_height : 0);
   button_rc.top = button_rc.bottom - button_height;
   zoom_out_button->Move(button_rc);
 
@@ -904,9 +912,6 @@ TrafficWidget::UpdateLayout()
   button_rc.bottom = button_rc.top + button_height;
   details_button->Move(button_rc);
 
-  button_rc.right = rc.right - margin;
-  button_rc.left = button_rc.right - Layout::Scale(50);
-  close_button->Move(button_rc);
 #endif
 }
 
@@ -990,12 +995,11 @@ TrafficWidget::Show(const PixelRect &rc)
   Update();
 
   ContainerWidget::Show(rc);
-  UpdateLayout();
-
 #ifndef GNAV
   /* show the "Close" button only if this is a "special" page */
   close_button->SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined());
 #endif
+  UpdateLayout();
 
   CommonInterface::GetLiveBlackboard().AddListener(*this);
 }
