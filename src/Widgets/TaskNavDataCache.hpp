@@ -311,7 +311,7 @@ public:
    * for ordered tasks
    * using "distance remaining"
    */
-  tp_info &CalcTarget(tp_info &tp_data, fixed target_altitude);
+  void CalcTarget(tp_info &tp_data, fixed target_altitude);
 
   /**
    * validates or invalidates the target-specific information

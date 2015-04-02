@@ -164,7 +164,7 @@ TaskNavDataCache::ValidateTarget(TaskNavDataCache::tp_info &tp_data,
   return tp_data;
 }
 
-TaskNavDataCache::tp_info &
+void
 TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data,
                              fixed target_altitude)
 {
@@ -190,7 +190,7 @@ TaskNavDataCache::CalcTarget(TaskNavDataCache::tp_info &tp_data,
   }
   ValidateTarget(tp_data, basic.location_available);
 
-  return tp_data;
+  return;
 }
 
 fixed
