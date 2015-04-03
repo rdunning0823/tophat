@@ -23,10 +23,10 @@ Copyright_License {
 
 /**
  * This is a program launcher for Windows CE, to be used as an AutoRun
- * binary.  It searches for XCSoar.exe and executes it.
+ * binary.  It searches for TopHat.exe and executes it.
  *
  * This has been tested on the Naviter Oudie 2.  Copy this program to
- * the Oudie's storage (right next to XCSoar.exe) and rename it to
+ * the Oudie's storage (right next to TopHat.exe) and rename it to
  * OudiePocketFMSStart.exe.
  */
 
@@ -61,7 +61,7 @@ FindAndLaunchXCSoar(const TCHAR *cmdline)
   if (GetModuleFileName(nullptr, buffer, MAX_PATH) <= 0)
     return false;
 
-  ReplaceBaseName(buffer, _T("XCSoar.exe"));
+  ReplaceBaseName(buffer, _T("TopHat.exe"));
   return LaunchExe(buffer, cmdline);
 }
 

@@ -306,7 +306,7 @@ LaunchXCSoar(HWND hWnd, const TCHAR *CommandLine)
     return false;
   }
 
-  _tcscat(FileName, _T("\\XCSoar.exe"));
+  _tcscat(FileName, _T("\\TopHat.exe"));
 
   TCHAR buffer[256];
   _sntprintf(buffer, 256, _T("\"%s\" %s"), FileName, CommandLine);
