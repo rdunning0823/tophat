@@ -691,7 +691,7 @@ InfoBoxContentHomeAltitudeDiff::Update(InfoBoxData &data)
       MacCready::Solve(settings.task.glide,
                        settings.polar.glide_polar_task,
                        glide_state);
-    data.SetValueFromArrival(result.pure_glide_altitude_difference);
+    data.SetValueFromArrival(result.SelectAltitudeDifference(settings.task.glide));
   }
   else
     data.SetInvalid();

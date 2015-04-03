@@ -221,7 +221,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
         MacCready::Solve(GetComputerSettings().task.glide,
                          GetComputerSettings().polar.glide_polar_task,
                          glide_state);
-      altitude_difference = result.pure_glide_altitude_difference;
+      altitude_difference =
+          result.SelectAltitudeDifference(GetComputerSettings().task.glide);
       altitude_difference_valid = true;
     }
 

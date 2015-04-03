@@ -215,7 +215,7 @@ TaskNavDataCache::CalcAltitudeDifferential(const GeoPoint &point,
     MacCready::Solve(settings.task.glide,
                      settings.polar.glide_polar_task,
                      glide_state);
-  return result.pure_glide_altitude_difference;
+  return result.SelectAltitudeDifference(settings.task.glide);
 }
 
 TaskNavDataCache::tp_info &
