@@ -24,6 +24,7 @@ Top Hat Soaring 2.0.4 Beta
   * devices
    - OpenVario: new device driver
    - Vaulter: new device driver
+* Fix altitude calculation not respecting thermal drift setting
 	  
 Top Hat Soaring 2.0.3 beta
 Experimental: Adjustable time to detect circling.  Advanced > Computer > Beta
