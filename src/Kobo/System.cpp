@@ -230,13 +230,18 @@ WriteSystemInfo()
 
 #ifdef KOBO
 static const char *kobo_orientation_file =
-    "/mnt/onboard/XCSoarData/OrientationKoboLast.txt";
+    "/mnt/onboard/XCSoarData/OrientationKoboLast.tx0";
 
 void
 WriteKoboScreenOrientation(const char * rotate)
 {
   File::CreateExclusive(kobo_orientation_file);
   File::WriteExisting(kobo_orientation_file, rotate);
+
+  static const char *kobo_orientation_file_old =
+      "/mnt/onboard/XCSoarData/OrientationKoboLast.txt";
+  if (File::Exists(kobo_orientation_file_old))
+    File::Delete(kobo_orientation_file_old);
 }
 
 DisplaySettings::Orientation
