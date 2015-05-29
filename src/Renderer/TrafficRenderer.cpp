@@ -27,6 +27,7 @@
 #include "Look/TrafficLook.hpp"
 #include "FLARM/Traffic.hpp"
 #include "Math/Screen.hpp"
+#include "Asset.hpp"
 
 void
 TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
@@ -64,7 +65,10 @@ TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
   }
 
   // Select black pen
-  canvas.SelectBlackPen();
+  if (IsDithered())
+    canvas.Select(Pen(Layout::FastScale(2), COLOR_BLACK));
+  else
+    canvas.SelectBlackPen();
 
   // Rotate and shift the arrow to the right position and angle
   PolygonRotateShift(Arrow, 5, pt.x, pt.y, angle);
