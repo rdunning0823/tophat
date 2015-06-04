@@ -124,7 +124,10 @@ public:
    */
   void SetRectangles(const PixelRect &rc);
 
+#ifndef _WIN32_WCE
+  /* This crashes Prepare on PPC2003 */
   virtual void OnResize(PixelSize new_size) override;
+#endif
 
   virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
 
@@ -454,6 +457,7 @@ SetupQuick::ReinitialiseLayout(const PixelRect &parent_rc)
   WndForm::Move(parent_rc);
 }
 
+#ifndef _WIN32_WCE
 void
 SetupQuick::OnResize(PixelSize new_size)
 {
@@ -476,6 +480,7 @@ SetupQuick::OnResize(PixelSize new_size)
   ok->Move(rc_ok);
   advanced->Move(rc_advanced);
 }
+#endif
 
 void
 SetupQuick::Unprepare()

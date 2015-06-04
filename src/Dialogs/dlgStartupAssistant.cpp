@@ -155,8 +155,12 @@ public:
    */
   void SetRectangles(const PixelRect &rc);
 
+#ifndef _WIN32_WCE
+  /* This crashes Prepare on PPC2003 */
+
   /* overrides from WndForm */
   virtual void OnResize(PixelSize new_size) override;
+#endif
   virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
 };
 
@@ -166,6 +170,7 @@ StartupAssistant::ReinitialiseLayout(const PixelRect &parent_rc)
   WndForm::Move(parent_rc);
 }
 
+#ifndef _WIN32_WCE
 void
 StartupAssistant::OnResize(PixelSize new_size)
 {
@@ -178,6 +183,7 @@ StartupAssistant::OnResize(PixelSize new_size)
   prev_tip->Move(rc_prev_tip);
   chkb_decline->Move(rc_chkb_decline);
 }
+#endif
 
 void
 StartupAssistant::Move(const PixelRect &rc)
