@@ -225,8 +225,11 @@ protected:
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   /**
    * returns true if handled by the button overlays.
+   *
+   * @param test if true then only tests location.  If false handles event
    */
-  virtual bool ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y);
+  virtual bool ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y,
+                                         bool test);
 #endif
 
 #ifdef HAVE_MULTI_TOUCH

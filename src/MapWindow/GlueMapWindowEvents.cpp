@@ -120,7 +120,7 @@ bool
 GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
-  if (ButtonOverlaysOnMouseDown(x, y))
+  if (ButtonOverlaysOnMouseDown(x, y, true))
     return true;
 #endif
 
@@ -197,6 +197,11 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 {
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  if (ButtonOverlaysOnMouseDown(x, y, false))
+    return true;
+#endif
+
   if (drag_mode != DRAG_NONE)
     ReleaseCapture();
 
@@ -513,42 +518,48 @@ GlueMapWindow::Render(Canvas &canvas, const PixelRect &rc)
 
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
 bool
-GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y)
+GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test)
 {
   RasterPoint p {x, y};
 
   if (rc_main_menu_button.IsInside(p)) {
-    TophatMenu::RotateMenu();
+    if (!test)
+      TophatMenu::RotateMenu();
     return true;
   }
   if (rc_zoom_out_button.IsInside(p)) {
-    InputEvents::eventZoom(_T("-"));
-    InputEvents::HideMenu();
+    if (!test) {
+      InputEvents::eventZoom(_T("-"));
+      InputEvents::HideMenu();
+    }
     return true;
   }
   if (rc_zoom_in_button.IsInside(p)) {
-    InputEvents::eventZoom(_T("+"));
-    InputEvents::HideMenu();
+    if (!test) {
+      InputEvents::eventZoom(_T("+"));
+      InputEvents::HideMenu();
+    }
     return true;
   }
   if (!HasDraggableScreen() && slider_shape.GetInnerRect().IsInside(p)) {
-    StaticString<20> menu_ordered(_T("NavOrdered"));
-    StaticString<20> menu_goto(_T("NavGoto"));
-    TaskType task_mode;
-    {
-      ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-      task_mode = task_manager->GetMode();
+    if (!test) {
+      StaticString<20> menu_ordered(_T("NavOrdered"));
+      StaticString<20> menu_goto(_T("NavGoto"));
+      TaskType task_mode;
+      {
+        ProtectedTaskManager::Lease task_manager(*protected_task_manager);
+        task_mode = task_manager->GetMode();
+      }
+
+      if (InputEvents::IsMode(menu_ordered.buffer())
+          || InputEvents::IsMode(menu_goto.buffer()))
+        InputEvents::HideMenu();
+      else if (task_mode == TaskType::GOTO
+          || task_mode == TaskType::ABORT)
+        InputEvents::setMode(menu_goto.buffer());
+      else
+        InputEvents::setMode(menu_ordered.buffer());
     }
-
-    if (InputEvents::IsMode(menu_ordered.buffer())
-        || InputEvents::IsMode(menu_goto.buffer()))
-      InputEvents::HideMenu();
-    else if (task_mode == TaskType::GOTO
-        || task_mode == TaskType::ABORT)
-      InputEvents::setMode(menu_goto.buffer());
-    else
-      InputEvents::setMode(menu_ordered.buffer());
-
     return true;
   }
 
