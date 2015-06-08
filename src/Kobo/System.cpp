@@ -297,6 +297,7 @@ CopyFlightsToSDCard()
   Directory::Create(_T("/media/usb_storage/XCSoarData"));
   Directory::Create(_T("/media/usb_storage/XCSoarData/logs"));
   system(_T("cp -r /mnt/onboard/XCSoarData/logs/*.igc /media/usb_storage/XCSoarData/logs"));
+  system(_T("cp -r /mnt/onboard/XCSoarData/logs/*.nmea /media/usb_storage/XCSoarData/logs"));
 #endif
 }
 
