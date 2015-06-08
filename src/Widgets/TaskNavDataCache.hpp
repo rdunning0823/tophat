@@ -191,8 +191,7 @@ protected:
 
 public:
   TaskNavDataCache(const ComputerSettings &_settings,
-                   const NMEAInfo &_basic,
-                   const TaskStats &_task_stats);
+                   const NMEAInfo &_basic);
 
   void UpdateOrderedTask(const OrderedTask &ordered_task,
                          TaskType _mode,

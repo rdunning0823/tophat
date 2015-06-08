@@ -56,8 +56,7 @@ Copyright_License {
 
 TaskNavSliderWidget::TaskNavSliderWidget()
   :task_data_cache(CommonInterface::GetComputerSettings(),
-                   CommonInterface::Basic(),
-                   CommonInterface::Calculated().task_stats),
+                   CommonInterface::Basic()),
                    last_rc_map(PixelRect(0, 0, 0, 0)) {}
 
 void

@@ -37,8 +37,7 @@ Copyright_License {
 #include <stdlib.h>
 
 TaskNavDataCache::TaskNavDataCache(const ComputerSettings &_settings,
-                                   const NMEAInfo &_basic,
-                                   const TaskStats &_task_stats)
+                                   const NMEAInfo &_basic)
   :settings(_settings), basic(_basic),
    ordered_task_size(0),
    task_manager_time_stamp(0) {}
