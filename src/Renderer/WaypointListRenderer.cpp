@@ -65,12 +65,6 @@ FormatWaypointDetails(Buffer &buffer, const Waypoint &waypoint, fixed arrival_al
   TCHAR alt[16];
   FormatUserAltitude(arrival_altitude, alt, 16);
   buffer = alt;
-
-  if (waypoint.radio_frequency.IsDefined()) {
-    TCHAR radio[16];
-    waypoint.radio_frequency.Format(radio, 16);
-    buffer.AppendFormat(_T(" - %s MHz"), radio);
-  }
 }
 
 UPixelScalar
