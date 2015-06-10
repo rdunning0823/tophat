@@ -222,7 +222,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
 
   // Draw details line
-  FormatWaypointDetails(buffer, waypoint, fixed(0));
+  FormatWaypointDetails(buffer, waypoint, waypoint.elevation);
   PixelSize sz_details = text_font.TextSize(buffer.c_str());
 
   PixelScalar details_left = rc.right - sz_details.cx - padding - leg_info_width;
