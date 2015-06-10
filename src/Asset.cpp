@@ -28,6 +28,10 @@ Copyright_License {
 #include "LocalPath.hpp"
 #include "IO/FileHandle.hpp"
 #include "Util/CharUtil.hpp"
+#include "Plane/Plane.hpp"
+#include "Interface.hpp"
+#include "Util/StaticString.hpp"
+#include "Util/StringUtil.hpp"
 
 #if defined(WIN32) && (!defined(__GNUC__) || defined(_WIN32_WCE))
 #include <windows.h>
@@ -87,6 +91,34 @@ ReadCompaqID()
 #else
   return false;
 #endif
+}
+
+static bool
+ReadCompetitionId()
+{
+  ComputerSettings &settings = CommonInterface::SetComputerSettings();
+
+  if (settings.plane.competition_id.length() > 0) {
+    StaticString<4> id (settings.plane.competition_id);
+    id.append(_T("AA"));
+    CopyString(asset_number,id.c_str(), 4);
+    return true;
+  }
+  return false;
+}
+
+static bool
+ReadRegistrationNumber()
+{
+  ComputerSettings &settings = CommonInterface::SetComputerSettings();
+
+  if (settings.plane.registration.length() > 0) {
+    StaticString<4> id (settings.plane.registration);
+    id.append(_T("AA"));
+    CopyString(asset_number,id.c_str(), 4);
+    return true;
+  }
+  return false;
 }
 
 static bool
@@ -176,6 +208,10 @@ ReadAssetNumber()
     LogFormat(_T("Asset ID: %s (compaq)"), asset_number);
   } else if (ReadUUID()) {
     LogFormat(_T("Asset ID: %s (uuid)"), asset_number);
+  } else if (ReadCompetitionId()){
+    LogFormat(_T("Asset ID: %s (competition id)"), asset_number);
+  } else if (ReadRegistrationNumber()){
+    LogFormat(_T("Asset ID: %s (registration number)"), asset_number);
   } else {
     _tcscpy(asset_number, _T("AAA"));
     LogFormat(_T("Asset ID: %s (fallback)"), asset_number);
