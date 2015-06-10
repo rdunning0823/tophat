@@ -21,12 +21,13 @@
  */
 
 #include "Settings.hpp"
+#include "Asset.hpp"
 
 void
 ContestSettings::SetDefaults()
 {
   enable = true;
   predict = false;
-  contest = Contest::OLC_PLUS;
+  contest = IsKobo() ? Contest::NONE : Contest::OLC_PLUS;
   handicap = 100;
 }

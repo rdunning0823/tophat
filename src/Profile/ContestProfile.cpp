@@ -24,11 +24,12 @@ Copyright_License {
 #include "ContestProfile.hpp"
 #include "Profile.hpp"
 #include "Engine/Contest/Settings.hpp"
+#include "Asset.hpp"
 
 void
 Profile::Load(ContestSettings &settings)
 {
-  if (GetEnum(ProfileKeys::OLCRules, settings.contest)) {
+  if (!IsKobo() && GetEnum(ProfileKeys::OLCRules, settings.contest)) {
     /* handle out-dated Sprint rule in profile */
     if (settings.contest == Contest::OLC_SPRINT)
       settings.contest = Contest::OLC_LEAGUE;

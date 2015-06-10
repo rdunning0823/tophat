@@ -31,6 +31,7 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "Engine/Contest/Solvers/Contests.hpp"
+#include "Asset.hpp"
 
 enum ControlIndex {
   Contests,
@@ -152,8 +153,8 @@ ScoringConfigPanel::Save(bool &_changed)
   ContestSettings &contest_settings = settings_computer.contest;
   MapSettings &map_settings = CommonInterface::SetMapSettings();
 
-  changed |= SaveValueEnum(Contests, ProfileKeys::OLCRules,
-                           contest_settings.contest);
+  changed |= (!IsKobo() && SaveValueEnum(Contests, ProfileKeys::OLCRules,
+                           contest_settings.contest));
   changed |= SaveValueEnum(PREDICT_CONTEST, ProfileKeys::PredictContest,
                            contest_settings.predict);
 
