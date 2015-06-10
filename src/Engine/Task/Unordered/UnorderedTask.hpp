@@ -60,6 +60,8 @@ public:
   virtual void GlideSolutionRemaining(const AircraftState &state_now,
                                       const GlidePolar &polar,
                                       GlideResult &total, GlideResult &leg) override;
+  virtual void UpdateNavBarStatistics(const AircraftState &aircraft,
+                                      const GlidePolar &polar);
   virtual void GlideSolutionTravelled(const AircraftState &state_now,
                                       const GlidePolar &glide_polar,
                                       GlideResult &total, GlideResult &leg) override;

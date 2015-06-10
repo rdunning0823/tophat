@@ -351,6 +351,14 @@ protected:
                                       const GlidePolar &polar,
                                       GlideResult &total, GlideResult &leg) = 0;
 
+  /*
+   * Calculate glide solutions back to previous tp and to tp after current
+   * store in stats.glide_results
+   * @param state_now Aircraft state
+   */
+  virtual void UpdateNavBarStatistics(const AircraftState &aircraft,
+                                      const GlidePolar &polar) = 0;
+
   /**
    * Calculate glide result from start of task to current state
    *

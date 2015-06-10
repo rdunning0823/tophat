@@ -26,6 +26,8 @@
 #include "Task/Solvers/TaskSolution.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
 #include "Navigation/Aircraft.hpp"
+#include "GlideSolvers/MacCready.hpp"
+#include "GlideSolvers/GlideState.hpp"
 
 UnorderedTask::UnorderedTask(const TaskType _type,
                              const TaskBehaviour &tb):
@@ -99,6 +101,31 @@ UnorderedTask::GlideSolutionRemaining(const AircraftState &state,
 
   total = res;
   leg = res;
+}
+
+void
+UnorderedTask::UpdateNavBarStatistics(const AircraftState &aircraft,
+                                      const GlidePolar &polar)
+{
+  if (GetType() != TaskType::GOTO)
+    return;
+
+  const Waypoint &wp = GetActiveTaskPoint()->GetWaypoint();
+
+  if (!aircraft.location.IsValid() || !wp.location.IsValid()) {
+    stats.glide_result_goto.Reset();
+    return;
+  }
+
+  const GlideState glide_state(aircraft.location.DistanceBearing(wp.location),
+                               wp.elevation,
+                               aircraft.altitude,
+                               aircraft.wind);
+
+  stats.glide_result_goto =
+    MacCready::Solve(task_behaviour.glide,
+                     polar,
+                     glide_state);
 }
 
 void

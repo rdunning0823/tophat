@@ -49,6 +49,8 @@
 #include "Task/PathSolvers/TaskDijkstraMax.hpp"
 #include "Task/ObservationZones/ObservationZoneClient.hpp"
 #include "Task/ObservationZones/CylinderZone.hpp"
+#include "GlideSolvers/GlideState.hpp"
+#include "GlideSolvers/MacCready.hpp"
 
 /**
  * According to "FAI Sporting Code / Annex A to Section 3 - Gliding",
@@ -956,6 +958,29 @@ OrderedTask::GlideSolutionRemaining(const AircraftState &aircraft,
                             task_behaviour.glide, polar);
   total = tm.glide_solution(aircraft);
   leg = tm.get_active_solution();
+}
+
+void
+OrderedTask::UpdateNavBarStatistics(const AircraftState &aircraft,
+                                    const GlidePolar &polar)
+{
+  if (!aircraft.location.IsValid() || task_points.empty()) {
+    return;
+  }
+  const unsigned start = (active_task_point == 0) ? 0 : active_task_point - 1;
+
+  for (unsigned i = start; i < std::min(active_task_point + 2u, TaskSize()); i++) {
+
+      const GlideState glide_state(
+          aircraft.location.DistanceBearing(task_points[i]->GetLocation()),
+          task_points[i]->GetWaypoint().elevation,
+          aircraft.altitude,
+          aircraft.wind);
+
+      stats.glide_results[i] = MacCready::Solve(task_behaviour.glide,
+                                                polar,
+                                                glide_state);
+  }
 }
 
 void

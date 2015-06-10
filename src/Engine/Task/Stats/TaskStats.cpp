@@ -40,6 +40,9 @@ TaskStats::reset()
   distance_max = fixed(0);
   distance_min = fixed(0);
   distance_scored = fixed(0);
+  for (unsigned x = 0 ; x < max_glide_results; x++)
+    glide_results[x].Reset();
+  glide_result_goto.Reset();
   active_index = 0;
   task_valid = false;
   has_targets = false;

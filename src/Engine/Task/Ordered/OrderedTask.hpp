@@ -736,6 +736,8 @@ protected:
   virtual void GlideSolutionTravelled(const AircraftState &state_now,
                                       const GlidePolar &glide_polar,
                                       GlideResult &total, GlideResult &leg) override;
+  virtual void UpdateNavBarStatistics(const AircraftState &aircraft,
+                                      const GlidePolar &polar);
   virtual void GlideSolutionPlanned(const AircraftState &state_now,
                                     const GlidePolar &glide_polar,
                                     GlideResult &total,

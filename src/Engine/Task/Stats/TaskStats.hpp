@@ -26,10 +26,15 @@
 #include "StartStats.hpp"
 #include "WindowStats.hpp"
 #include "Task/Computer/WindowStatsComputer.hpp"
+#include "Util/StaticArray.hpp"
 
 #include <type_traits>
 
 struct TaskBehaviour;
+enum {
+  /* max tps is 30 for MAT task */
+  max_glide_results = 30,
+};
 
 /** Container for common task statistics */
 class TaskStats 
@@ -57,6 +62,16 @@ public:
   fixed distance_min;
   /** Scored distance (m) */
   fixed distance_scored;
+
+  /**
+   * Glide solution to any tp in task
+   * In reality, only prev and next are accurate
+   */
+  GlideResult glide_results[max_glide_results];
+  /**
+   * Glide result for goto tasks
+   */
+  GlideResult glide_result_goto;
 
   /**
    * Index of the active task point.

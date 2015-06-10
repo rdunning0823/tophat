@@ -209,6 +209,8 @@ AbstractTask::UpdateGlideSolutions(const AircraftState &state,
     stats.current_leg.solution_mc0 = stats.current_leg.solution_remaining;
   }
 
+  UpdateNavBarStatistics(state, glide_polar);
+
   GlideSolutionTravelled(state, glide_polar,
                          stats.total.solution_travelled,
                            stats.current_leg.solution_travelled);
