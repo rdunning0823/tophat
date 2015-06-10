@@ -43,6 +43,7 @@ Copyright_License {
 #include "Task/Ordered/OrderedTask.hpp"
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
+#include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -55,9 +56,10 @@ Copyright_License {
 #include <stdlib.h>
 
 TaskNavSliderWidget::TaskNavSliderWidget()
-  :task_data_cache(CommonInterface::GetComputerSettings(),
-                   CommonInterface::Basic()),
-                   last_rc_map(PixelRect(0, 0, 0, 0)) {}
+  :task_manager_time_stamp(0u),
+   ordered_task_size(0u),
+   mode(TaskType::NONE),
+   last_rc_map(PixelRect(0, 0, 0, 0)) {}
 
 void
 TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc, bool is_panning,
@@ -79,16 +81,9 @@ TaskNavSliderWidget::RefreshTask()
   GetList().Invalidate();
 #endif
 
-  // only update if it's been changed
+
   if (TaskIsCurrent()) {
-    if (!task_data_cache.AreTransistionsAndTargetsCurrent()) {
-      ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-      task_data_cache.UpdateTransitions(task_manager->GetOrderedTask());
-      task_data_cache.UpdateTargets(task_manager->GetOrderedTask());
-    }
-
     ReadWaypointIndex();
-
     return false;
   }
 
@@ -101,13 +96,11 @@ TaskType
 TaskNavSliderWidget::ReadTask()
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-  task_data_cache.UpdateOrderedTask(task_manager->GetOrderedTask(),
-                                    task_manager->GetMode(),
-                                    task_manager->GetOrderedTask().GetFactoryType(),
-                                    task_manager->GetActiveTaskPointIndex(),
-                                    task_manager->GetTaskTimeStamp());
+  ordered_task_size = task_manager->GetOrderedTask().TaskSize();
+  mode = task_manager->GetMode();
+  task_manager_time_stamp = task_manager->GetTaskTimeStamp();
 
-  switch (task_manager->GetMode()) {
+  switch (mode) {
   case TaskType::ORDERED:
     waypoint_index = task_manager->GetActiveTaskPointIndex();
     break;
@@ -117,8 +110,7 @@ TaskNavSliderWidget::ReadTask()
     waypoint_index = 0;
     break;
   }
-
-  return task_manager->GetMode();
+  return mode;
 }
 
 void
@@ -126,7 +118,7 @@ TaskNavSliderWidget::RefreshList(TaskType mode)
 {
   switch (mode) {
   case TaskType::ORDERED:
-    GetList().SetLength(task_data_cache.GetOrderedTaskSize());
+    GetList().SetLength(ordered_task_size);
     break;
   case TaskType::NONE:
   case TaskType::ABORT:
@@ -148,43 +140,70 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 {
   // if task is not current (e.g. the tp being drawn may no longer exist) then abort drawing
   // hold lease on task_manager until drawing is done
+  const Waypoint *twp = nullptr;
+  const OrderedTaskPoint *otp = nullptr;
+  bool is_ordered = false;
+  unsigned task_size = 0;
+  bool tp_valid = true;
+  TaskFactoryType factory_type = TaskFactoryType::AAT;
+
+  TaskType mode;
   {
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-    if (task_manager->GetTaskTimeStamp()
-        != task_data_cache.GetTaskManagerTimeStamp())
+
+
+    mode = task_manager->GetMode();
+    is_ordered = (mode == TaskType::ORDERED);
+    task_size = task_manager->TaskSize();
+    factory_type = task_manager->GetOrderedTask().GetFactoryType();
+
+    if (idx > 0 && idx >= task_manager->TaskSize())
       return;
+
+    /* goto task, or ordered task exists */
+    if (task_size > 0) {
+      if (is_ordered)
+        otp = &task_manager->GetOrderedTask().GetPoint(idx);
+
+      twp = (is_ordered) ? &otp->GetWaypoint() :
+          &task_manager->GetActiveTaskPoint()->GetWaypoint();
+    } else
+      tp_valid = false;
   }
 
-  TaskNavDataCache::tp_info tp = task_data_cache.GetPoint(idx);
-  // always navigate to center!
-  bool use_target = false &&
-      task_data_cache.GetTaskFactoryType() == TaskFactoryType::AAT &&
-      task_data_cache.GetTaskMode() == TaskType::ORDERED &&
-      idx > 0;
-
+  const MoreData &basic = CommonInterface::Basic();
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
   const TerrainRendererSettings &terrain = settings_map.terrain;
   unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
   if (IsKobo())
     border_width /= 2;
 
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+
+  const GlideResult &result = (is_ordered) ?
+      task_stats.glide_results[idx] :
+      task_stats.glide_result_goto;
+
+  bool has_entered = tp_valid && is_ordered && otp->HasEntered();
+  bool has_exited = tp_valid && is_ordered && otp->HasExited();
+
   slider_shape.Draw(canvas, rc_outer,
                     idx, GetList().GetCursorDownIndex() == (int)idx,
                     idx == waypoint_index,
-                    tp.IsValid() ? tp.waypoint->name.c_str() : _T(""),
-                    tp.GetHasEntered(), tp.GetHasExited(),
-                    task_data_cache.GetTaskMode(),
-                    task_data_cache.GetTaskFactoryType(),
-                    task_data_cache.GetOrderedTaskSize(),
-                    tp.IsValid(),
-                    use_target ? tp.distance_remaining : tp.distance,
-                    use_target ? tp.distance_remaining_valid : tp.distance_valid,
-                    use_target ? tp.altitude_difference_remaining :
-                        tp.altitude_difference,
-                    use_target ? tp.altitude_difference_remaining_valid :
-                        tp.altitude_difference_valid,
-                    use_target ? tp.delta_bearing_remaining : tp.delta_bearing,
-                    use_target ? tp.delta_bearing_remaining_valid : tp.bearing_valid,
+                    tp_valid ? twp->name.c_str() : _T(""),
+                    has_entered, has_exited,
+                    mode,
+                    factory_type,
+                    task_size,
+                    tp_valid,
+                    result.vector.distance,
+                    result.vector.IsValid(),
+                    result.SelectAltitudeDifference(settings.task.glide) -
+                        settings.task.safety_height_arrival,
+                    result.IsOk() || result.vector.distance < fixed(0.01) ,
+                    result.vector.bearing - basic.track,
+                    result.vector.IsValid(),
                     border_width);
 }
 
@@ -203,7 +222,7 @@ TaskNavSliderWidget::TaskIsCurrent()
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
   return task_manager->GetTaskTimeStamp()
-      == task_data_cache.GetTaskManagerTimeStamp();
+      == task_manager_time_stamp;
 }
 
 void
@@ -243,10 +262,10 @@ TaskNavSliderWidget::CreateListEmpty(ContainerWindow &parent,
 void
 TaskNavSliderWidget::OnCursorMoved(unsigned index)
 {
-  if (task_data_cache.GetTaskMode() != TaskType::ORDERED)
+  if (mode != TaskType::ORDERED)
     return;
 
-  assert(index < task_data_cache.GetOrderedTaskSize());
+  assert(index < ordered_task_size);
 
   ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
   task_manager->SetActiveTaskPoint(index);
@@ -265,14 +284,10 @@ TaskNavSliderWidget::GetCurrentWaypoint()
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
 
-  task_data_cache.SetActiveWaypoint(task_manager->GetActiveTaskPoint());
-  task_data_cache.SetActiveTaskPointIndex(
-      task_manager->GetActiveTaskPointIndex());
-
   if (task_manager->GetMode() != TaskType::ORDERED)
     return -1;
 
-  return task_data_cache.GetActiveTaskPointIndex();
+  return task_manager->GetActiveTaskPointIndex();
 }
 
 void
@@ -338,8 +353,7 @@ TaskNavSliderWidget::OnActivateItem(unsigned index)
   if (InputEvents::IsMode(menu_ordered.buffer())
       || InputEvents::IsMode(menu_goto.buffer()))
     InputEvents::HideMenu();
-  else if (task_data_cache.GetTaskMode() == TaskType::GOTO ||
-        task_data_cache.GetTaskMode() == TaskType::ABORT) {
+  else if (mode == TaskType::GOTO || mode == TaskType::ABORT) {
     InputEvents::ShowMenu();
     InputEvents::setMode(menu_goto.buffer());
   } else {

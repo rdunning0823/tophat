@@ -25,13 +25,13 @@ Copyright_License {
 #define XCSOAR_TASK_NAV_SLIDER_WIDGET_HPP
 
 #include "Widgets/MapOverlayWidget.hpp"
-#include "Widgets/TaskNavDataCache.hpp"
 #include "Widgets/TaskNavSliderShape.hpp"
 #include "Form/HorizontalList.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
 #include "Time/PeriodClock.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Util/StaticString.hpp"
+#include "Task/TaskType.hpp"
 
 #include <assert.h>
 
@@ -49,7 +49,13 @@ class TaskNavSliderWidget : public MapOverlayWidget, ListItemRenderer,
 protected:
 
   SliderShape slider_shape;
-  TaskNavDataCache task_data_cache;
+  /**
+   * timestamp from the task manager when task was last read
+   */
+  unsigned task_manager_time_stamp;
+  /** size of ordered task when task was last read */
+  unsigned ordered_task_size;
+  TaskType mode;
   PixelRect last_rc_map;
 
 protected:
@@ -118,8 +124,7 @@ public:
 
 protected:
   /**
-   * returns true if active task has not changed since it was last cached into
-   * the TaskNavDataCache
+   * returns true if active task has not changed since it was last read
    */
   bool TaskIsCurrent();
 
