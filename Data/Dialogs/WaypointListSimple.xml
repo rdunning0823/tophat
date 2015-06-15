@@ -6,6 +6,6 @@
   <List Name="frmWaypointList" X="0" Y="70" Height="-35" />
 
   
-  <Button Name="cmdClose" Caption="Cancel" X="0" Y="-35" Width="-120" Height="35" OnClick="OnCloseClicked" />
-  <Button Name="cmdSelect" Caption="Select" X="-120" Y="-35" Height="35" OnClick="OnSelectClicked" />
+  <Button Name="cmdSelect" Caption="Select" X="0" Y="-35" Width="-120" Height="35" OnClick="OnSelectClicked" />
+  <Button Name="cmdClose" Caption="Cancel" X="-120" Y="-35" Height="35" OnClick="OnCloseClicked" />
 </Form>
