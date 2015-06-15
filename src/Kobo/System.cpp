@@ -296,8 +296,8 @@ CopyFlightsToSDCard()
 #ifdef KOBO
   Directory::Create(_T("/media/usb_storage/XCSoarData"));
   Directory::Create(_T("/media/usb_storage/XCSoarData/logs"));
-  system(_T("cp -r /mnt/onboard/XCSoarData/logs/*.igc /media/usb_storage/XCSoarData/logs"));
-  system(_T("cp -r /mnt/onboard/XCSoarData/logs/*.nmea /media/usb_storage/XCSoarData/logs"));
+  system(_T("cp -r -p /mnt/onboard/XCSoarData/logs/*.igc /media/usb_storage/XCSoarData/logs"));
+  system(_T("cp -r -p /mnt/onboard/XCSoarData/logs/*.nmea /media/usb_storage/XCSoarData/logs"));
 #endif
 }
 
@@ -305,7 +305,7 @@ void
 UploadSDCardToDevice()
 {
 #ifdef KOBO
-  system(_T("cp -r /media/usb_storage/XCSoarData /mnt/onboard"));
+  system(_T("cp -r -p /media/usb_storage/XCSoarData /mnt/onboard"));
 #endif
 }
 
@@ -313,7 +313,7 @@ void
 CopyTopHatDataToSDCard()
 {
 #ifdef KOBO
-  system(_T("cp -r /mnt/onboard/XCSoarData /media/usb_storage"));
+  system(_T("cp -r -p /mnt/onboard/XCSoarData /media/usb_storage"));
   system(_T("sync"));
 #endif
 }
