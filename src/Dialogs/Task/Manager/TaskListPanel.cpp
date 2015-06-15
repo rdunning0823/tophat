@@ -107,9 +107,9 @@ public:
   }
 
   void CreateButtons(ButtonPanel &buttons) {
+    buttons.Add(_("Load"), *this, LOAD);
     if (parent_form != nullptr)
       buttons.Add(_("Cancel"), *this, CANCEL);
-    buttons.Add(_("Load"), *this, LOAD);
     buttons.Add(_("Rename"), *this, RENAME);
     buttons.Add(_("Delete"), *this, DELETE);
     more_button = buttons.Add(_("More"), *this, MORE);
