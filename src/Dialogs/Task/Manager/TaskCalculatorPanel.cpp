@@ -46,7 +46,8 @@ Copyright_License {
 
 enum Controls {
   SPEED_ACHIEVED,
-  DISTANCE,
+  DISTANCE_DONE,
+  DISTANCE_REMAINING,
   AAT_TIME,
   AAT_ESTIMATED,
 };
@@ -71,14 +72,25 @@ TaskCalculatorPanel::Refresh()
     FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
     SetText(AAT_ESTIMATED, time.c_str());
   }
+
+  fixed distance_achieved = task_stats.total.travelled.IsDefined()
+    ? task_stats.total.travelled.GetDistance()
+    : fixed(0);
+  if (positive(distance_achieved))
+    LoadValue(DISTANCE_DONE, distance_achieved,
+              UnitGroup::DISTANCE);
+  else
+    ClearValue(DISTANCE_DONE);
+
+
   fixed rPlanned = task_stats.total.solution_remaining.IsDefined()
     ? task_stats.total.solution_remaining.vector.distance
     : fixed(0);
 
   if (positive(rPlanned))
-    LoadValue(DISTANCE, rPlanned, UnitGroup::DISTANCE);
+    LoadValue(DISTANCE_REMAINING, rPlanned, UnitGroup::DISTANCE);
   else
-    ClearValue(DISTANCE);
+    ClearValue(DISTANCE_REMAINING);
 
   if (task_stats.total.travelled.IsDefined())
     LoadValue(SPEED_ACHIEVED, task_stats.total.travelled.GetSpeed(),
@@ -96,7 +108,8 @@ TaskCalculatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddReadOnly(_("Achieved speed"), NULL, _T("%.0f %s"),
               UnitGroup::TASK_SPEED, fixed(0));
-
+  AddReadOnly(_("Achieved distance"), NULL, _T("%.0f %s"),
+              UnitGroup::DISTANCE, fixed(0));
   AddReadOnly(_("Distance remaining"), NULL, _T("%.0f %s"),
               UnitGroup::DISTANCE, fixed(0));
   AddReadOnly(_("AAT Time remaining"), NULL, _T(""));
