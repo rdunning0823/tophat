@@ -229,7 +229,7 @@ Replay::OnTimer()
   if (!positive(time_scale))
     schedule = 1000;
   else if (!negative(fast_forward))
-    schedule = 100;
+    schedule = 10;
   else if (negative(virtual_time) || !next_data.time_available)
     schedule = 500;
   else if (cli != nullptr)
