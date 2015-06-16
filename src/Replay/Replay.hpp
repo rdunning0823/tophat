@@ -122,6 +122,13 @@ public:
       return false;
   }
 
+  /**
+   *  returns virtual time, or -1 if unknown
+   */
+  fixed GetTime() {
+    return virtual_time;
+  }
+
 private:
   virtual void OnTimer() override;
 };
