@@ -112,10 +112,14 @@ public:
    * Start fast-forwarding the replay by the specified number of
    * seconds.  This replays the given amount of time from the input
    * time as quickly as possible.
+   * @return True if was able to enter fast-forward mode.
    */
-  void FastForward(fixed delta_s) {
-    if (IsActive() && !negative(virtual_time))
+  bool FastForward(fixed delta_s) {
+    if (IsActive() && !negative(virtual_time)) {
       fast_forward = virtual_time + delta_s;
+      return true;
+    } else
+      return false;
   }
 
 private:
