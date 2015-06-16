@@ -122,6 +122,10 @@ public:
       return false;
   }
 
+  void FastForwardCancel() {
+    fast_forward = fixed(-1);
+  }
+
   /**
    *  returns virtual time, or -1 if unknown
    */

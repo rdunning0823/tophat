@@ -54,10 +54,13 @@ class ReplayControlWidget final
     NOTSTARTED,
     PLAYING,
     PAUSED,
+    FASTFORWARD,
   };
 
   PlayState play_state;
   WndButton *play_pause_button;
+  WndButton *stop_button;
+  WndButton *fast_forward_button;
   fixed user_speed;
 
 public:
@@ -66,8 +69,8 @@ public:
 
   void CreateButtons(WidgetDialog &dialog) {
     play_pause_button = dialog.AddButton(_("Start"), *this, START);
-    dialog.AddButton(_("Reset"), *this, STOP);
-    dialog.AddButton(_T("+10'"), *this, FAST_FORWARD);
+    stop_button = dialog.AddButton(_("Reset"), *this, STOP);
+    fast_forward_button = dialog.AddButton(_T("+10'"), *this, FAST_FORWARD);
   }
 
 private:
@@ -79,6 +82,14 @@ private:
   bool StartReplay();
   /* update replay control */
   void SetReplayRate(fixed rate);
+  /* is replay in fast forward mode? */
+  bool CheckFastForward();
+  /* updates play state when replay object finishes the fast forward mode */
+  void OnFastForwardDone();
+
+  void FastForwardCancel();
+  /* exits PlayState::PAUSED */
+  void Resume();
 
 private:
   virtual void OnTimer() override;
@@ -101,6 +112,10 @@ void
 ReplayControlWidget::UpdateButtons()
 {
   play_pause_button->SetEnabled(play_state != PlayState::NOFILE);
+  fast_forward_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING);
+  stop_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING
+                          || play_state == PlayState::FASTFORWARD);
+
 
   switch(play_state) {
   case PlayState::NOFILE:
@@ -112,6 +127,8 @@ ReplayControlWidget::UpdateButtons()
     break;
   case PlayState::PAUSED:
     play_pause_button->SetCaption(_("Resume"));
+    break;
+  case PlayState::FASTFORWARD:
     break;
   }
 }
@@ -146,7 +163,17 @@ ReplayControlWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(0), fixed(10), fixed(1), false,
            user_speed,
            this);
+
+  if (replay->IsActive())
+    play_state = PlayState::PLAYING;
+
   Timer::Schedule(500);
+}
+
+bool
+ReplayControlWidget::CheckFastForward()
+{
+  return replay->IsFastForward();
 }
 
 void
@@ -189,6 +216,13 @@ ReplayControlWidget::OnStopClicked()
 }
 
 inline void
+ReplayControlWidget::Resume()
+{
+  SetReplayRate(user_speed);
+  play_state = PlayState::PLAYING;
+}
+
+inline void
 ReplayControlWidget::OnStartClicked()
 {
   switch(play_state) {
@@ -199,13 +233,17 @@ ReplayControlWidget::OnStartClicked()
       ShowMessageBox(_("Could not open IGC file!"),
                      _("Replay"), MB_OK | MB_ICONINFORMATION);
     break;
+  case PlayState::FASTFORWARD:
+    FastForwardCancel();
+    play_state = PlayState::PAUSED;
+    SetReplayRate(fixed(0));
+    break;
   case PlayState::PLAYING:
     play_state = PlayState::PAUSED;
     SetReplayRate(fixed(0));
     break;
   case PlayState::PAUSED:
-    SetReplayRate(user_speed);
-    play_state = PlayState::PLAYING;
+    Resume();
     break;
   }
 }
@@ -231,7 +269,25 @@ ReplayControlWidget::OnAction(int id)
 inline void
 ReplayControlWidget::OnFastForwardClicked()
 {
-  replay->FastForward(fixed(10 * 60));
+  if (play_state == PlayState::PAUSED)
+    Resume();
+
+  if (replay->FastForward(fixed(10 * 60))) {
+    play_state = PlayState::FASTFORWARD;
+  }
+}
+
+inline void
+ReplayControlWidget::OnFastForwardDone()
+{
+  SetReplayRate(user_speed);
+  play_state = PlayState::PLAYING;
+}
+
+inline void
+ReplayControlWidget::FastForwardCancel()
+{
+  replay->FastForwardCancel();
 }
 
 void
