@@ -129,6 +129,10 @@ public:
     return virtual_time;
   }
 
+  bool IsFastForward() {
+    return !negative(fast_forward);
+  }
+
 private:
   virtual void OnTimer() override;
 };
