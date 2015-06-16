@@ -124,7 +124,7 @@ Replay::Update()
     } else {
       clock.Update();
 
-      virtual_time += fixed(1);
+      virtual_time += fixed(60);
       if (virtual_time >= fast_forward)
         fast_forward = fixed(-1);
     }
