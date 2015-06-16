@@ -35,6 +35,7 @@ Copyright_License {
 #include "Form/DataField/Float.hpp"
 #include "Language/Language.hpp"
 #include "Event/Timer.hpp"
+#include "Formatter/TimeFormatter.hpp"
 
 enum Buttons {
   START,
@@ -62,10 +63,12 @@ class ReplayControlWidget final
   WndButton *stop_button;
   WndButton *fast_forward_button;
   fixed user_speed;
+  WidgetDialog *dialog;
 
 public:
   ReplayControlWidget(const DialogLook &look)
-    :RowFormWidget(look), play_state(PlayState::NOFILE), user_speed(fixed(0)) {}
+    :RowFormWidget(look), play_state(PlayState::NOFILE), user_speed(fixed(0)),
+     dialog(nullptr) {}
 
   void CreateButtons(WidgetDialog &dialog) {
     play_pause_button = dialog.AddButton(_("Start"), *this, START);
@@ -73,11 +76,16 @@ public:
     fast_forward_button = dialog.AddButton(_T("+10'"), *this, FAST_FORWARD);
   }
 
+  void SetDialog(WidgetDialog &_dialog) {
+    dialog = &_dialog;
+  }
+
 private:
   void OnStopClicked();
   void OnStartClicked();
   void OnFastForwardClicked();
   void UpdateButtons();
+  void UpdateDialogTitle();
   /* update replay control */
   bool StartReplay();
   /* update replay control */
@@ -131,6 +139,23 @@ ReplayControlWidget::UpdateButtons()
   case PlayState::FASTFORWARD:
     break;
   }
+}
+
+void
+ReplayControlWidget::UpdateDialogTitle()
+{
+
+  StaticString<50> header;
+  header = _("Replay");
+  if (replay->IsActive() && positive(replay->GetTime())) {
+    TCHAR buffer[32];
+    FormatTime(buffer, replay->GetTime());
+    header.AppendFormat(_T(" %s"), buffer);
+    if (replay->IsFastForward())
+      header.AppendFormat(_T(" %s"), _("FF"));
+  }
+  assert(dialog != nullptr);
+  dialog->SetCaption(header.c_str());
 }
 
 void
@@ -280,7 +305,6 @@ ReplayControlWidget::OnFastForwardClicked()
 inline void
 ReplayControlWidget::OnFastForwardDone()
 {
-  SetReplayRate(user_speed);
   play_state = PlayState::PLAYING;
 }
 
@@ -312,6 +336,7 @@ ShowReplayDialog()
   dialog.CreatePopup(UIGlobals::GetMainWindow(), _("Replay"), widget);
   dialog.AddButton(_("Close"), mrOK);
   widget->CreateButtons(dialog);
+  widget->SetDialog(dialog);
 
   dialog.ShowModal();
 }
