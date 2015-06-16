@@ -153,6 +153,10 @@ ReplayControlWidget::UpdateDialogTitle()
     header.AppendFormat(_T(" %s"), buffer);
     if (replay->IsFastForward())
       header.AppendFormat(_T(" %s"), _("FF"));
+
+    if (play_state == PlayState::PAUSED)
+      header.AppendFormat(_T(" %s"), _("Paused"));
+
   }
   assert(dialog != nullptr);
   dialog->SetCaption(header.c_str());
