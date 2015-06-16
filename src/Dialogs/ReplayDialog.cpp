@@ -53,7 +53,7 @@ public:
 
   void CreateButtons(WidgetDialog &dialog) {
     dialog.AddButton(_("Start"), *this, START);
-    dialog.AddButton(_("Stop"), *this, STOP);
+    dialog.AddButton(_("Reset"), *this, STOP);
     dialog.AddButton(_T("+10'"), *this, FAST_FORWARD);
   }
 
