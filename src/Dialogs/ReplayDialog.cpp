@@ -40,6 +40,7 @@ Copyright_License {
 enum Buttons {
   START,
   STOP,
+  REWIND,
   FAST_FORWARD,
 };
 
@@ -61,6 +62,7 @@ class ReplayControlWidget final
   PlayState play_state;
   WndButton *play_pause_button;
   WndButton *stop_button;
+  WndButton *rewind_button;
   WndButton *fast_forward_button;
   fixed user_speed;
   WidgetDialog *dialog;
@@ -73,6 +75,7 @@ public:
   void CreateButtons(WidgetDialog &dialog) {
     play_pause_button = dialog.AddButton(_("Start"), *this, START);
     stop_button = dialog.AddButton(_("Reset"), *this, STOP);
+    rewind_button = dialog.AddButton(_T("-10'"), *this, REWIND);
     fast_forward_button = dialog.AddButton(_T("+10'"), *this, FAST_FORWARD);
   }
 
@@ -83,6 +86,7 @@ public:
 private:
   void OnStopClicked();
   void OnStartClicked();
+  void OnRewindClicked();
   void OnFastForwardClicked();
   void UpdateButtons();
   void UpdateDialogTitle();
@@ -121,6 +125,7 @@ ReplayControlWidget::UpdateButtons()
 {
   play_pause_button->SetEnabled(play_state != PlayState::NOFILE);
   fast_forward_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING);
+  rewind_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING);
   stop_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING
                           || play_state == PlayState::FASTFORWARD);
 
@@ -292,6 +297,22 @@ ReplayControlWidget::OnAction(int id)
   case FAST_FORWARD:
     OnFastForwardClicked();
     break;
+
+  case REWIND:
+    OnRewindClicked();
+    break;
+
+  }
+}
+
+inline void
+ReplayControlWidget::OnRewindClicked()
+{
+  if (play_state == PlayState::PAUSED)
+    Resume();
+
+  if (replay->Rewind(fixed(10 * 60))) {
+    play_state = PlayState::FASTFORWARD;
   }
 }
 

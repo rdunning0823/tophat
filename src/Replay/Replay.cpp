@@ -37,6 +37,19 @@
 
 #include <assert.h>
 
+bool
+Replay::Rewind(fixed delta_s) {
+  if (IsActive() && !negative(virtual_time)) {
+    fixed rewind_save = std::max(virtual_time - delta_s, first_virtual_time);
+    fixed first_virtual_time_save = first_virtual_time;
+    Start(path);
+    first_virtual_time = first_virtual_time_save;
+    virtual_time = rewind = rewind_save;
+    return true;
+  } else
+    return false;
+}
+
 void
 Replay::Stop()
 {
@@ -96,7 +109,9 @@ Replay::Start(const TCHAR *_path)
     logger->ClearBuffer();
 
   virtual_time = fixed(-1);
+  first_virtual_time = fixed(-1);
   fast_forward = fixed(-1);
+  rewind = fixed(-1);
   next_data.Reset();
 
   Timer::Schedule(100);
@@ -119,11 +134,17 @@ Replay::Update()
     /* update the virtual time */
     assert(clock.IsDefined());
 
-    if (negative(fast_forward)) {
+    if (!negative(rewind)) {
+      clock.Update();
+      virtual_time = rewind;
+
+    } else if (negative(fast_forward)) {
+      if (negative(first_virtual_time))
+          first_virtual_time = next_data.time;
       virtual_time += clock.ElapsedUpdate() * time_scale / 1000;
+
     } else {
       clock.Update();
-
       virtual_time += fixed(60);
       if (virtual_time >= fast_forward)
         fast_forward = fixed(-1);
@@ -134,7 +155,23 @@ Replay::Update()
     assert(!next_data.time_available);
   }
 
-  if (cli == nullptr || !negative(fast_forward)) {
+  if (!negative(rewind)) {
+    while (true) {
+      if (!replay->Update(next_data)) {
+        Stop();
+        return false;
+      }
+
+      assert(!next_data.gps.real);
+
+      if (next_data.time_available) {
+        if (next_data.time >= virtual_time) {
+          rewind = fixed(-1);
+          break;
+        }
+      }
+    }
+  } else if (cli == nullptr || !negative(fast_forward)) {
     if (next_data.time_available && virtual_time < next_data.time)
       /* still not time to use next_data */
       return true;
@@ -154,6 +191,7 @@ Replay::Update()
       assert(!next_data.gps.real);
 
       if (next_data.time_available) {
+
         if (negative(virtual_time)) {
           virtual_time = next_data.time;
           clock.Update();
@@ -181,6 +219,7 @@ Replay::Update()
       assert(!next_data.gps.real);
 
       if (next_data.time_available)
+
         cli->Update(next_data.time, next_data.location,
                     next_data.gps_altitude,
                     next_data.pressure_altitude);

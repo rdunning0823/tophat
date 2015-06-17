@@ -56,10 +56,17 @@ class Replay final
   fixed virtual_time;
 
   /**
+   *  the first time read from the file
+   */
+  fixed first_virtual_time;
+
+  /**
    * If this value is not negative, then we're in fast-forward mode:
    * replay is going as quickly as possible
    */
   fixed fast_forward;
+
+  fixed rewind;
 
   /**
    * Keeps track of the wall-clock time between two Update() calls.
@@ -125,6 +132,8 @@ public:
   void FastForwardCancel() {
     fast_forward = fixed(-1);
   }
+
+  bool Rewind(fixed delta_s);
 
   /**
    *  returns virtual time, or -1 if unknown
