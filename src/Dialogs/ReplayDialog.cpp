@@ -75,8 +75,8 @@ public:
   void CreateButtons(WidgetDialog &dialog) {
     play_pause_button = dialog.AddButton(_("Start"), *this, START);
     stop_button = dialog.AddButton(_("Reset"), *this, STOP);
-    rewind_button = dialog.AddButton(_T("-10'"), *this, REWIND);
-    fast_forward_button = dialog.AddButton(_T("+10'"), *this, FAST_FORWARD);
+    rewind_button = dialog.AddSymbolButton(_T("<"), *this, REWIND);
+    fast_forward_button = dialog.AddSymbolButton(_T(">"), *this, FAST_FORWARD);
   }
 
   void SetDialog(WidgetDialog &_dialog) {
