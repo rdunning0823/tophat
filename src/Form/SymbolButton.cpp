@@ -123,11 +123,11 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   RGB8Color color;
 
   // Draw arrow symbol instead of <
-  if (ch == '<')
+  if (caption == _T("<"))
     SymbolRenderer::DrawArrow(canvas, rc, SymbolRenderer::LEFT);
 
   // Draw arrow symbol instead of >
-  else if (ch == '>')
+  else if (caption == _T(">"))
     SymbolRenderer::DrawArrow(canvas, rc, SymbolRenderer::RIGHT);
 
   // Draw arrow symbol instead of ^
@@ -141,6 +141,16 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   // Draw symbols instead of + and -
   else if (ch == '+' || ch == '-')
     SymbolRenderer::DrawSign(canvas, rc, ch == '+');
+
+  /* "play" buttons */
+  else if (caption == _T("<<"))
+    SymbolRenderer::DrawDoubleArrow(canvas, rc, SymbolRenderer::LEFT);
+  else if (caption == _T(">>"))
+    SymbolRenderer::DrawDoubleArrow(canvas, rc, SymbolRenderer::RIGHT);
+  else if (caption == _T("||"))
+    SymbolRenderer::DrawPause(canvas, rc);
+  else if (caption == _T("[]"))
+    SymbolRenderer::DrawStop(canvas, rc);
 
   // Draw Fly bitmap
   else if (caption == _T("Fly")) {

@@ -57,6 +57,57 @@ SymbolRenderer::DrawArrow(Canvas &canvas, PixelRect rc, Direction direction,
 }
 
 void
+SymbolRenderer::DrawDoubleArrow(Canvas &canvas, PixelRect rc, Direction direction,
+                                bool no_margins)
+{
+  assert(direction == LEFT || direction == RIGHT);
+
+  PixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / (no_margins ? 2 : 5);
+  PixelScalar arrow_size = (size * 5) / 9;
+  RasterPoint center = rc.GetCenter();
+  RasterPoint arrow1[3], arrow2[3];
+
+  arrow1[0].x = center.x + (direction == LEFT ? arrow_size * 2: -arrow_size * 2);
+  arrow1[0].y = center.y + arrow_size;
+  arrow1[1].x = center.x;
+  arrow1[1].y = center.y;
+  arrow1[2].x = arrow1[0].x;
+  arrow1[2].y = center.y - arrow_size;
+  for (unsigned i = 0; i < 3; ++i) {
+    arrow2[i].x = arrow1[i].x + (direction == LEFT ? -2 * arrow_size : 2 * arrow_size);
+    arrow2[i].y = arrow1[i].y;
+  }
+
+  canvas.DrawTriangleFan(arrow1, 3);
+  canvas.DrawTriangleFan(arrow2, 3);
+}
+
+void
+SymbolRenderer::DrawPause(Canvas &canvas, PixelRect rc)
+{
+  PixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / 5;
+  RasterPoint center = rc.GetCenter();
+
+  // Draw vertical bars
+  canvas.Rectangle(center.x - size, center.y - size,
+                   center.x - size / 3, center.y + size);
+
+  canvas.Rectangle(center.x + size / 3, center.y - size,
+                   center.x + size, center.y + size);
+}
+
+void
+SymbolRenderer::DrawStop(Canvas &canvas, PixelRect rc)
+{
+  PixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / 5;
+  RasterPoint center = rc.GetCenter();
+
+  // Draw square
+  canvas.Rectangle(center.x - size, center.y - size,
+                   center.x + size, center.y + size);
+}
+
+void
 SymbolRenderer::DrawSign(Canvas &canvas, PixelRect rc, bool plus)
 {
   PixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top) / 5;

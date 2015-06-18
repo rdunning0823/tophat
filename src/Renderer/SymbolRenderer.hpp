@@ -42,7 +42,11 @@ namespace SymbolRenderer
    */
   void DrawArrow(Canvas &canvas, PixelRect rc, Direction direction,
                  bool no_margins = false);
+  void DrawDoubleArrow(Canvas &canvas, PixelRect rc, Direction direction,
+                       bool no_margins = false);
   void DrawSign(Canvas &canvas, PixelRect rc, bool plus);
+  void DrawPause(Canvas &canvas, PixelRect rc);
+  void DrawStop(Canvas &canvas, PixelRect rc);
 }
 
 #endif
