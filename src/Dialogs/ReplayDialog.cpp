@@ -73,10 +73,10 @@ public:
      dialog(nullptr) {}
 
   void CreateButtons(WidgetDialog &dialog) {
-    play_pause_button = dialog.AddButton(_("Start"), *this, START);
-    stop_button = dialog.AddButton(_("Reset"), *this, STOP);
-    rewind_button = dialog.AddSymbolButton(_T("<"), *this, REWIND);
-    fast_forward_button = dialog.AddSymbolButton(_T(">"), *this, FAST_FORWARD);
+    play_pause_button = dialog.AddSymbolButton(_(">"), *this, START);
+    stop_button = dialog.AddSymbolButton(_("[]"), *this, STOP);
+    rewind_button = dialog.AddSymbolButton(_T("<<"), *this, REWIND);
+    fast_forward_button = dialog.AddSymbolButton(_T(">>"), *this, FAST_FORWARD);
   }
 
   void SetDialog(WidgetDialog &_dialog) {
@@ -133,13 +133,13 @@ ReplayControlWidget::UpdateButtons()
   switch(play_state) {
   case PlayState::NOFILE:
   case PlayState::NOTSTARTED:
-    play_pause_button->SetCaption(_("Start"));
+    play_pause_button->SetCaption(_(">"));
     break;
   case PlayState::PLAYING:
-    play_pause_button->SetCaption(_("Pause"));
+    play_pause_button->SetCaption(_("||"));
     break;
   case PlayState::PAUSED:
-    play_pause_button->SetCaption(_("Resume"));
+    play_pause_button->SetCaption(_(">"));
     break;
   case PlayState::FASTFORWARD:
     break;
