@@ -79,7 +79,7 @@ GeoPointEntryDialog(const TCHAR *caption, GeoPoint &value,
 
   /* create buttons */
 
-  dialog.AddButton(_("OK"), dialog, mrOK);
+  dialog.AddSymbolButton(_T("_X"), dialog, mrOK);
   dialog.AddButton(_("Cancel"), dialog, mrCancel);
 
   auto clear_listener = MakeLambdaActionListener([&latitude_entry,

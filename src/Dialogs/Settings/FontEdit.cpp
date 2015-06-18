@@ -190,7 +190,7 @@ dlgFontEditShowModal(const TCHAR *type, LOGFONT &data,
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateAuto(UIGlobals::GetMainWindow(), title, widget);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Reset"), *widget, 1);
   dialog.AddButton(_("Cancel"), mrCancel);
 

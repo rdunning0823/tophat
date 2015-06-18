@@ -150,7 +150,7 @@ dlgQNHShowModal()
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, instance);
 
 
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
 
   dialog.ShowModal();
 }

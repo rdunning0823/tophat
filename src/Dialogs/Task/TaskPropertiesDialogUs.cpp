@@ -322,7 +322,7 @@ dlgTaskPropertiesUsShowModal(const DialogLook &look,
   dialog.CreateFull(UIGlobals::GetMainWindow(),_("Task rules"), instance,
                 nullptr, 0, position);
 
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();
 }

@@ -40,7 +40,7 @@ dlgConfigurationSingle(Widget &widget, const TCHAR *caption)
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, &widget,
                 nullptr, 0, position);
   CommonInterface::SetUISettings().dialog.expert = false;
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();
   dialog.Hide();

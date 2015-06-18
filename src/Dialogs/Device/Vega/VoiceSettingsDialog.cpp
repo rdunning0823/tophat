@@ -122,6 +122,6 @@ void dlgVoiceShowModal(){
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Vega Voice Extensions"),
                     widget);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
 }

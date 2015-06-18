@@ -95,7 +95,7 @@ dlgWeatherShowModal()
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Weather Forecast"), widget);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
 }
 

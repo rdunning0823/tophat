@@ -35,6 +35,6 @@ ShowTaskStatusDialog()
   dialog.CreateFull(UIGlobals::GetMainWindow(),
                     _("Task Status"),
                     new TaskCalculatorPanel(look));
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
 }

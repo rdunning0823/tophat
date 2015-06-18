@@ -309,7 +309,7 @@ DefaultWidgetDialog(SingleWindow &parent, const DialogLook &look,
 {
   WidgetDialog dialog(look);
   dialog.Create(parent, caption, rc, &widget);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
 
   dialog.ShowModal();
@@ -326,7 +326,7 @@ DefaultWidgetDialog(SingleWindow &parent, const DialogLook &look,
 {
   WidgetDialog dialog(look);
   dialog.CreateFull(parent, caption, &widget);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
 
   dialog.ShowModal();

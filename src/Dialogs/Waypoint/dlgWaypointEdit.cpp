@@ -124,7 +124,7 @@ dlgWaypointEditShowModal(Waypoint &way_point)
   WidgetDialog dialog(look);
   WaypointEditWidget widget(look, way_point);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Waypoint Editor"), &widget);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   const int result = dialog.ShowModal();
   dialog.StealWidget();

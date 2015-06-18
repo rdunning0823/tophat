@@ -269,7 +269,7 @@ dlgBasicSettingsShowModal()
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, instance);
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   instance->SetDumpButton(dialog.AddButton(_("Dump"), *instance, DUMP));
 
   dialog.ShowModal();

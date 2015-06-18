@@ -64,7 +64,7 @@ TimeEntryDialog(const TCHAR *caption, RoughTime &value,
 
   /* create buttons */
 
-  dialog.AddButton(_("OK"), dialog, mrOK);
+  dialog.AddSymbolButton(_T("_X"), dialog, mrOK);
   dialog.AddButton(_("Cancel"), dialog, mrCancel);
 
   auto now_listener = MakeLambdaActionListener([&entry, time_zone](unsigned){

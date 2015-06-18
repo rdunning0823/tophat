@@ -34,7 +34,7 @@ ShowAirspaceClassRendererSettingsDialog(AirspaceClass selected)
   dialog.CreateAuto(UIGlobals::GetMainWindow(),
                     _("Airspace Renderer Settings"),
                     new AirspaceClassRendererSettingsPanel(selected));
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();
   return dialog.GetChanged();

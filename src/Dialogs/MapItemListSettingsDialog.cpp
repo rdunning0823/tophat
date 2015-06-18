@@ -33,7 +33,7 @@ ShowMapItemListSettingsDialog()
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Map Item List Settings"),
                     new MapItemListSettingsPanel());
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();
 }

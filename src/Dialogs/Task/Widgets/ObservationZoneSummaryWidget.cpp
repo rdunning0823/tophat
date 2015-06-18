@@ -65,7 +65,7 @@ ObservationZoneSummaryWidget::Prepare(ContainerWindow &parent, const PixelRect &
                     name.c_str(), &edit_widget,
                     nullptr, 0, ButtonPanel::ButtonPanelPosition::Bottom);
 
-  dialog.AddButton(_("OK"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
 
   UpdateButtonText();
