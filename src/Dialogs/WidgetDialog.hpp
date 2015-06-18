@@ -181,7 +181,9 @@ public:
 
   WndButton *AddSymbolButton(const TCHAR *caption,
                              ActionListener &listener, int id) {
-    return buttons.AddSymbol(caption, listener, id);
+    WndButton * but = buttons.AddSymbol(caption, listener, id);
+    OnResize(PixelSize {(PixelScalar)GetWidth(), (PixelScalar)GetHeight()});
+    return but;
   }
 
   void AddButtonKey(unsigned key_code) {
