@@ -290,7 +290,7 @@ public:
 void
 MapItemListWidget::CreateButtons(WidgetDialog &dialog)
 {
-  cancel_button = dialog.AddButton(_("Close"), mrCancel);
+  cancel_button = dialog.AddSymbolButton(_T("_X"), mrCancel);
   goto_button = dialog.AddButton(_("Goto"), *this, GOTO);
   ack_button = dialog.AddButton(_("Ack Day"), *this, ACK);
   details_button = dialog.AddButton(_("Details"), mrOK);

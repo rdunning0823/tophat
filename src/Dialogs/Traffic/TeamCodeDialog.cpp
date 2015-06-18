@@ -253,7 +253,7 @@ dlgTeamCodeShowModal()
   TeamCodeWidget widget(look);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Team Code"), &widget);
   widget.CreateButtons(dialog);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
   dialog.StealWidget();
 }

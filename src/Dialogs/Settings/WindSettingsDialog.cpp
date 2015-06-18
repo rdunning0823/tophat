@@ -33,6 +33,6 @@ ShowWindSettingsDialog()
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   WindSettingsPanel *panel = new WindSettingsPanel(true, false, true, true);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Wind Settings"), panel);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
 }

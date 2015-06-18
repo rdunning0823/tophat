@@ -267,7 +267,7 @@ void dlgConfigFontsShowModal()
   WidgetDialog dialog(look);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Font Configuration"),
                     new CustomFontsWidget(look));
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
 
   if (changed) {

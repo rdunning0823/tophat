@@ -203,7 +203,7 @@ ShowSDCardSyncDialog()
   WidgetDialog dialog(look);
   widget.listener = &dialog;
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Top Hat data sync"), &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
   dialog.StealWidget();
 }

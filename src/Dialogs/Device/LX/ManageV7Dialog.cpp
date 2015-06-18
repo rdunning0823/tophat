@@ -126,6 +126,6 @@ ManageV7Dialog(Device &device, const DeviceInfo &info,
                     new ManageV7Widget(UIGlobals::GetDialogLook(),
                                        (LXDevice &)device, info,
                                        secondary_info));
-  dialog.AddButton(_("Close"), mrCancel);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   dialog.ShowModal();
 }

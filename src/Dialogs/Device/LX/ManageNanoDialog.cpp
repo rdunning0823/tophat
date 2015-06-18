@@ -105,6 +105,6 @@ ManageNanoDialog(Device &device, const DeviceInfo &info)
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _T("LXNAV Nano"),
                     new ManageNanoWidget(UIGlobals::GetDialogLook(),
                                          (LXDevice &)device, info));
-  dialog.AddButton(_("Close"), mrCancel);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   dialog.ShowModal();
 }

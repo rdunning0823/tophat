@@ -673,7 +673,7 @@ ShowDeviceList(const TerminalLook &terminal_look)
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Devices"), &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
 
   dialog.ShowModal();

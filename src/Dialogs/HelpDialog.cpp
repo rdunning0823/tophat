@@ -47,6 +47,6 @@ HelpDialog(const TCHAR *Caption, const TCHAR *HelpText)
   WidgetDialog dialog(look);
   dialog.CreateFull(UIGlobals::GetMainWindow(), Caption,
                     new LargeTextWidget(look, HelpText));
-  dialog.AddButton(_("Close"), mrCancel);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   dialog.ShowModal();
 }

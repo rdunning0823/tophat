@@ -124,7 +124,7 @@ dlgVegaDemoShowModal()
   WidgetDialog dialog(look);
   VegaDemoWidget widget(look);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Vario Demo"), &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
   dialog.StealWidget();
 

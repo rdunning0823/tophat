@@ -159,6 +159,6 @@ ManageCAI302Dialog(SingleWindow &parent, const DialogLook &look,
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _T("CAI 302"),
                     new ManageCAI302Widget(look, (CAI302Device &)device));
-  dialog.AddButton(_("Close"), mrCancel);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   dialog.ShowModal();
 }

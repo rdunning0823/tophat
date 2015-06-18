@@ -79,6 +79,6 @@ ManageLX16xxDialog(Device &device, const DeviceInfo &info)
   dialog.CreateAuto(UIGlobals::GetMainWindow(), title,
                     new ManageLX16xxWidget(UIGlobals::GetDialogLook(),
                                            (LXDevice &)device, info));
-  dialog.AddButton(_("Close"), mrCancel);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   dialog.ShowModal();
 }

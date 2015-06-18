@@ -585,7 +585,7 @@ dlgAirspaceWarningsShowModal(SingleWindow &parent,
 
   WidgetDialog dialog2(UIGlobals::GetDialogLook());
   dialog2.CreateFull(parent, _("Airspace Warnings"), list);
-  dialog2.AddButton(_("Close"), mrOK);
+  dialog2.AddSymbolButton(_T("_X"), mrOK);
   list->CreateButtons(dialog2);
 
   dialog = &dialog2;

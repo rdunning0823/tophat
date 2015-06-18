@@ -140,7 +140,7 @@ dlgBrightnessShowModal()
   AltairBacklightWidget widget(look);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Screen Brightness"),
                     &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
   dialog.StealWidget();
 }

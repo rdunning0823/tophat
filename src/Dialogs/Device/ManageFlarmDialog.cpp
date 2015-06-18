@@ -111,6 +111,6 @@ ManageFlarmDialog(Device &device, const FlarmVersion &version)
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _T("FLARM"),
                     new ManageFLARMWidget(UIGlobals::GetDialogLook(),
                                           (FlarmDevice &)device, version));
-  dialog.AddButton(_("Close"), mrCancel);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   dialog.ShowModal();
 }

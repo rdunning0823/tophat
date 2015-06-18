@@ -449,7 +449,7 @@ dlgPlanesShowModal()
   PlaneListWidget widget;
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Planes"), &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
 
   dialog.ShowModal();

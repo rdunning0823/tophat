@@ -260,7 +260,7 @@ KnobTextEntry(TCHAR *text, size_t width,
   KnobTextEntryWidget widget(text, width);
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, &widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
 
   if (dialog.ShowModal() == mrOK) {
