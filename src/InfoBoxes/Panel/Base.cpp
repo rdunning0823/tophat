@@ -170,10 +170,10 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   CalculateLayout(rc);
 
-  close_button = new WndButton(GetClientAreaWindow(), look.button,
-                               _("Close"), close_button_rc,
-                               button_style,
-                               *this, CloseButton);
+  close_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
+                                     _T("_X"), close_button_rc,
+                                     button_style,
+                                     *this, CloseButton);
   AddDestruct(close_button);
   setup_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
                                      _("Setup"), setup_button_rc,

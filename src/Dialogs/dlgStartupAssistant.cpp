@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/Form.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Form/Frame.hpp"
@@ -310,9 +311,9 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  close = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
-                        rc_close,
-                        button_style, *this, CloseDialogClick);
+  close = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("_X"),
+                              rc_close,
+                              button_style, *this, CloseDialogClick);
 
   next_tip = new WndButton(GetClientAreaWindow(), button_look, _("Next tip"),
                            rc_next_tip,

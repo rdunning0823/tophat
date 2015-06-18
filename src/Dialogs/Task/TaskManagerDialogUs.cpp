@@ -37,6 +37,7 @@ Copyright_License {
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
@@ -165,9 +166,9 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ButtonWindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  fly_button = new WndButton(GetClientAreaWindow(), look.button, _("Close"),
-                             rc_fly_button,
-                             button_style, *this, FLY);
+  fly_button = new WndSymbolButton(GetClientAreaWindow(), look.button, _T("_X"),
+                                   rc_fly_button,
+                                   button_style, *this, FLY);
 
   save_as_button = new WndButton(GetClientAreaWindow(), look.button,
                                  _("Save as"),

@@ -27,6 +27,7 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/Edit.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
@@ -368,8 +369,8 @@ dlgConfigInfoboxesShowModal(SingleWindow &parent,
   button_rc.top = button_rc.bottom - button_height;
 
   WndButton *close_button =
-    new WndButton(client_area, dialog_look.button, _("Close"),
-                  button_rc, button_style, *wf, mrOK);
+    new WndSymbolButton(client_area, dialog_look.button, _T("_X"),
+                        button_rc, button_style, *wf, mrOK);
 
   button_rc.left += button_width + Layout::Scale(2);
   button_rc.right += button_width + Layout::Scale(2);

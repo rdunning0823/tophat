@@ -517,9 +517,9 @@ LoadChild(SubForm &form, ContainerWindow &parent, const PixelRect &parent_rc,
     ButtonWindowStyle button_style(style);
     button_style.TabStop();
 
-    window = new WndButton(parent, UIGlobals::GetDialogLook().button,
-                           _("Close"), rc,
-                           button_style, (WndForm &)form, mrOK);
+    window = new WndSymbolButton(parent, UIGlobals::GetDialogLook().button,
+                                 _T("_X"), rc,
+                                 button_style, (WndForm &)form, mrOK);
   } else if (StringIsEqual(node.GetName(), _T("CheckBox"))) {
     // Determine click_callback function
     CheckBoxControl::ClickNotifyCallback click_callback =

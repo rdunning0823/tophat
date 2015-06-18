@@ -34,6 +34,7 @@ Copyright_License {
 #include "Dialogs/WidgetDialog.hpp"
 #include "Form/ButtonPanel.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
@@ -505,9 +506,9 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                rc_pilot_button,
                                button_style, *this, PILOT);
 
-  ok = new WndButton(GetClientAreaWindow(), button_look, _("Close"),
-                     rc_ok,
-                     button_style, *this, OK);
+  ok = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("_X"),
+                           rc_ok,
+                           button_style, *this, OK);
 
   screens_button = new WndButton(GetClientAreaWindow(), button_look,
                                  _("Screen"),

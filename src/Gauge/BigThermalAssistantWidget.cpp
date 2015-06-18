@@ -26,6 +26,7 @@ Copyright_License {
 #include "Blackboard/LiveBlackboard.hpp"
 #include "Language/Language.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Screen/Layout.hpp"
 #include "Look/DialogLook.hpp"
 #include "UIGlobals.hpp"
@@ -68,10 +69,10 @@ BigThermalAssistantWidget::Prepare(ContainerWindow &parent,
   const PixelRect rc = GetContainer().GetClientRect();
 
 #ifndef GNAV
-  close_button = new WndButton(GetContainer(),
-                               UIGlobals::GetDialogLook().button,
-                               _("Close"), rc, ButtonWindowStyle(),
-                               *this, CLOSE);
+  close_button = new WndSymbolButton(GetContainer(),
+                                     UIGlobals::GetDialogLook().button,
+                                     _T("_X"), rc, ButtonWindowStyle(),
+                                     *this, CLOSE);
 #endif
 
   view = new BigThermalAssistantWindow(look, Layout::FastScale(10));

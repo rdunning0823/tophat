@@ -146,7 +146,7 @@ public:
 
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override {
-    AddButton(_("Close"), dialog, mrCancel);
+    AddSymbolButton(_T("_X"), dialog, mrCancel);
   }
 };
 

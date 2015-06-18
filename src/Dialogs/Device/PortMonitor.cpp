@@ -196,7 +196,7 @@ ShowPortMonitor(SingleWindow &parent, const DialogLook &dialog_look,
   PortMonitorGlue glue(device, terminal_look);
 
   ButtonPanel buttons(client_area, dialog_look.button);
-  buttons.Add(_("Close"), dialog, mrOK);
+  buttons.AddSymbol(_T("_X"), dialog, mrOK);
   glue.CreateButtons(buttons);
   glue.CreateTerminal(client_area, buttons.UpdateLayout());
 

@@ -346,7 +346,7 @@ public:
                        const PixelRect &rc) override {
     AddButton(_("Details"), *list, DETAILS);
     AddButton(_("Map"), *list, MAP);
-    AddButton(_("Close"), dialog, mrCancel);
+    AddSymbolButton(_T("_X"), dialog, mrCancel);
   }
 };
 

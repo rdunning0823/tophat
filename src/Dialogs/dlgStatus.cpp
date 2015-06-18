@@ -24,6 +24,7 @@ Copyright_License {
 #include "Dialogs/Dialogs.h"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/TabBar.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
@@ -92,9 +93,9 @@ dlgStatusShowModal(int start_page)
   ButtonWindowStyle button_style;
   button_style.TabStop();
 
-  WndButton close_button(form.GetClientAreaWindow(), look.button,
-                         _("Close"), close_rc, button_style,
-                         form, mrOK);
+  WndSymbolButton close_button(form.GetClientAreaWindow(), look.button,
+                               _T("_X"), close_rc, button_style,
+                               form, mrOK);
 
   ButtonWindowStyle tab_style;
   tab_style.ControlParent();
