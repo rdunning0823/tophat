@@ -193,6 +193,11 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const Bitmap &bmp = icon_look.hBmpTabSettings;
     DrawIcon1(canvas, rc, bmp, pressed);
+  }
+  else if (caption == _("_X")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const Bitmap &bmp = icon_look.hBmpClose;
+    DrawIcon1(canvas, rc, bmp, pressed);
 
   } else if (caption.compare(0, 9, _T("_chkmark_")) == 0) { // new
     const Font &font = *look.font;

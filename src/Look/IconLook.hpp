@@ -57,6 +57,7 @@ struct IconLook {
   Bitmap hBmpBearingRightTwo;
   Bitmap hBmpBearingRightThree;
   Bitmap hBmpBearingRightFour;
+  Bitmap hBmpClose;
 
   void Initialise();
 };
