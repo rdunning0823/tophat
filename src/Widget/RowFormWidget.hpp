@@ -440,6 +440,7 @@ public:
   void AddMultiLine(const TCHAR *text=nullptr);
 
   WndButton *AddButton(const TCHAR *label, ActionListener &listener, int id);
+  WndButton *AddSymbolButton(const TCHAR *label, ActionListener &listener, int id);
 
   gcc_pure
   Widget &GetRowWidget(unsigned i) {

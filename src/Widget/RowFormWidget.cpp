@@ -24,6 +24,7 @@ Copyright_License {
 #include "RowFormWidget.hpp"
 #include "Form/Panel.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/HLine.hpp"
 #include "Look/DialogLook.hpp"
 #include "Dialogs/DialogSettings.hpp"
@@ -286,6 +287,28 @@ RowFormWidget::AddMultiLine(const TCHAR *text)
     ltw->SetText(text);
 
   Add(Row::Type::MULTI_LINE, ltw);
+}
+
+WndButton *
+RowFormWidget::AddSymbolButton(const TCHAR *label, ActionListener &listener, int id)
+{
+  assert(IsDefined());
+
+  const PixelRect button_rc =
+    InitialControlRect(Layout::GetMinimumControlHeight());
+
+  ButtonWindowStyle button_style;
+  button_style.TabStop();
+  button_style.multiline();
+
+  ContainerWindow &panel = (ContainerWindow &)GetWindow();
+
+  WndSymbolButton *button = new WndSymbolButton(panel, look.button, label,
+                                                button_rc,
+                                                button_style, listener, id);
+
+  Add(Row::Type::BUTTON, button);
+  return button;
 }
 
 WndButton *
