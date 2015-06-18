@@ -175,6 +175,10 @@ public:
     return AddButton(caption, *this, modal_result);
   }
 
+  WndButton *AddSymbolButton(const TCHAR *caption, int modal_result) {
+    return AddSymbolButton(caption, *this, modal_result);
+  }
+
   WndButton *AddSymbolButton(const TCHAR *caption,
                              ActionListener &listener, int id) {
     return buttons.AddSymbol(caption, listener, id);
