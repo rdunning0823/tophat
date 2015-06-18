@@ -359,7 +359,7 @@ ShowReplayDialog()
   ReplayControlWidget *widget = new ReplayControlWidget(look);
   WidgetDialog dialog(look);
   dialog.CreatePopup(UIGlobals::GetMainWindow(), _("Replay"), widget);
-  dialog.AddButton(_("Close"), mrOK);
+  dialog.AddSymbolButton(_("_X"), mrOK);
   widget->CreateButtons(dialog);
   widget->SetDialog(dialog);
 
