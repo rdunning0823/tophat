@@ -289,7 +289,7 @@ public:
 
   void AddButtons() {
     assert(dialog != nullptr);
-    dialog->AddButton(_("OK"), mrOK);
+    dialog->AddSymbolButton(_T("_X"), mrOK);
     dialog->AddButton(_("Cancel"), mrCancel);
     dialog->AddSymbolButton(_(">"), *this, NEXT_PLANE_PAGE);
   }

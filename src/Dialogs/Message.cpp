@@ -24,6 +24,7 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #include "Language/Language.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
 #include "Look/DialogLook.hpp"
@@ -104,8 +105,8 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
   if (button_flags == MB_OK ||
       button_flags == MB_OKCANCEL)
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("OK"), button_rc,
-                    button_style, wf, IDOK);
+      new WndSymbolButton(client_area, dialog_look.button, _T("_X"), button_rc,
+                          button_style, wf, IDOK);
 
   if (button_flags == MB_YESNO ||
       button_flags == MB_YESNOCANCEL ||

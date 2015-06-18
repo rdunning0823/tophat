@@ -25,6 +25,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
+#include "Form/SymbolButton.hpp"
 #include "Form/Edit.hpp"
 #include "Widget/KeyboardWidget.hpp"
 #include "Widget/KeyboardNumericWidget.hpp"
@@ -241,9 +242,9 @@ TouchTextEntry(TCHAR *text, size_t width,
   ButtonWindowStyle button_style;
   button_style.TabStop();
 
-  WndButton ok_button(client_area, look.button, _("OK"),
-                      { ok_left, button_top, ok_right, button_bottom },
-                      button_style, form, mrOK);
+  WndSymbolButton ok_button(client_area, look.button, _T("_X"),
+                            { ok_left, button_top, ok_right, button_bottom },
+                            button_style, form, mrOK);
 
   WndButton cancel_button(client_area, look.button, _("Cancel"),
                           { cancel_left, button_top,
@@ -359,10 +360,10 @@ TouchNumericEntry(fixed &value,
   button_style.TabStop();
 
   PixelScalar button_width = (rc.right - rc.left) / 3;
-  WndButton ok_button(client_area, look.button, _("OK"),
-                      { 0, rc.top + 5 * button_height, button_width,
-                        rc.top + 6 * button_height},
-                      button_style, form, mrOK);
+  WndSymbolButton ok_button(client_area, look.button, _T("_X"),
+                            { 0, rc.top + 5 * button_height, button_width,
+                              rc.top + 6 * button_height},
+                            button_style, form, mrOK);
 
   WndButton cancel_button(client_area, look.button, _("Cancel"),
                           { button_width,
