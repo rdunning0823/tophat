@@ -89,6 +89,18 @@ FormatSignedTimeHHMM(TCHAR* buffer, int _time)
 }
 
 void
+FormatSignedTimeMMSS(TCHAR* buffer, int _time)
+{
+  if (_time < 0) {
+    *buffer++ = _T('-');
+    _time = -_time;
+  }
+
+  const BrokenTime time = BrokenTime::FromSecondOfDayChecked(_time);
+  _stprintf(buffer, _T("%02u:%02u"), time.minute, time.second);
+}
+
+void
 FormatTimeTwoLines(TCHAR *buffer1, TCHAR *buffer2, int _time)
 {
   if ((unsigned)abs(_time) >= 24u * 3600u) {
