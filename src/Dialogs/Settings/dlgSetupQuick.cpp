@@ -63,6 +63,7 @@ Copyright_License {
 #include "Dialogs/Settings/Panels/LayoutConfigPanel.hpp"
 #include "UtilsSettings.hpp"
 #include "Simulator.hpp"
+#include "Event/Timer.hpp"
 
 #include <math.h>
 #include <assert.h>
@@ -90,7 +91,7 @@ GetDialogStyle()
   return style;
 }
 
-class SetupQuick : public NullWidget, public WndForm
+class SetupQuick : public NullWidget, public WndForm, private Timer
 {
 private:
   PixelRect rc_site_files_text, rc_plane_text, rc_device_text;
@@ -144,6 +145,9 @@ public:
    * buffer_out the buffer
    */
   void CreateDeviceList(TCHAR *buffer_out, size_t buffer_size);
+
+private:
+  virtual void OnTimer() override;
 };
 
 static SetupQuick *instance;
@@ -520,6 +524,13 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            button_style, *this, ADVANCED);
 
   RefreshForm();
+  Timer::Schedule(1000);
+}
+
+void
+SetupQuick::OnTimer()
+{
+  RefreshForm();
 }
 
 void
@@ -556,6 +567,7 @@ SetupQuick::OnResize(PixelSize new_size)
 void
 SetupQuick::Unprepare()
 {
+  Timer::Cancel();
   delete nationality_text;
   delete site_files_text;
   delete plane_text;
