@@ -885,8 +885,7 @@ UpdateInfoBoxTaskTimeUnderMaxHeight(InfoBoxData &data)
       common_stats.TimeUnderStartMaxHeight);
 
   TCHAR value[32];
-  TCHAR comment[32];
-  FormatTimeTwoLines(value, comment, dd);
+  FormatSignedTimeMMSS(value, dd);
 
   data.SetValue(value);
   data.SetComment(_("Time Below"));
