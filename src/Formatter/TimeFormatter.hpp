@@ -55,6 +55,13 @@ void FormatTimeLong(TCHAR* buffer, fixed time);
 void FormatSignedTimeHHMM(TCHAR* buffer, int time);
 
 /**
+ * precedes with "-" if time is negative
+ * @param buffer returns SMMSS
+ * @param time input seconds
+ */
+void FormatSignedTimeMMSS(TCHAR* buffer, int _time);
+
+/**
  * sets HHMMSSSmart and SSSmart
  * if hours > 0, returns HHMM in buffer1 and SS in buffer2
  * if hours == 0, returns MMSS in buffer1 and "" in buffer2
