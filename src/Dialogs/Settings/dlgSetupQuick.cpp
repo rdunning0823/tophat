@@ -21,6 +21,7 @@ Copyright_License {
 }
 */
 
+#include "dlgSetupQuick.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Compiler.h"
 #include "Components.hpp"
@@ -60,6 +61,7 @@ Copyright_License {
 #include "Dialogs/Settings/Panels/SafetyFactorsConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/LayoutConfigPanel.hpp"
 #include "UtilsSettings.hpp"
+#include "Simulator.hpp"
 
 #include <math.h>
 #include <assert.h>
@@ -135,6 +137,12 @@ public:
    * from ActionListener
    */
   virtual void OnAction(int id);
+
+  /**
+   * Reads relevant devices and puts them into a string
+   * buffer_out the buffer
+   */
+  void CreateDeviceList(TCHAR *buffer_out, size_t buffer_size);
 };
 
 static SetupQuick *instance;
@@ -283,27 +291,88 @@ SetupQuick::OnAction(int id)
 }
 
 void
+SetupQuick::CreateDeviceList(TCHAR *buffer_out, size_t buffer_size)
+{
+  bool first = true;
+
+  StaticString<256> buffer(_T(""));
+  for (unsigned idx = 0; idx < NUMDEV; idx++) {
+    Item item;
+    item.Set(CommonInterface::GetSystemSettings().devices[idx],
+             *device_list[idx], device_blackboard->RealState(idx));
+
+    const DeviceConfig &config =
+      CommonInterface::SetSystemSettings().devices[idx];
+    const Flags flags(*item);
+
+    StaticString<256> name(_T(""));
+
+    if (config.UsesDriver()) {
+      name = config.driver_name;
+    } else {
+      TCHAR port_name_buffer[128];
+      name = config.GetPortName(port_name_buffer, ARRAY_SIZE(port_name_buffer));
+    }
+
+    bool show;
+    show = false;
+    StaticString<256> flag_text;
+    const TCHAR *status;
+    status = _T("");
+    if (flags.alive) {
+      show = true;
+      if (flags.location) {
+        flag_text = _("GPS fix");
+      } else if (flags.gps) {
+        /* device sends GPGGA, but no valid location */
+        flag_text = _("Bad GPS");
+      } else {
+        flag_text = _("Connected");
+      }
+
+      status = flag_text;
+    } else if (config.IsDisabled()) {
+      flag_text = _("Disabled");
+    } else if (is_simulator() || !config.IsAvailable()) {
+      status = _("");
+      show = true;
+    } else if (flags.open) {
+      status = _("No data");
+      show = true;
+    } else if (flags.duplicate) {
+      status = _("Duplicate");
+    } else if (flags.error) {
+      status = _("Error");
+      show = true;
+    } else {
+      status = _("Not connected");
+      show = true;
+    }
+
+    if (show) {
+      if (!first)
+        buffer.append(_T(" \n"));
+
+      buffer.append(name.c_str());
+      if (StringLength(status) > 0)
+        buffer.AppendFormat(_T(": %s"), status);
+
+      first = false;
+    }
+  }
+  CopyString(buffer_out, buffer.c_str(), buffer_size);
+}
+
+void
 SetupQuick::RefreshForm()
 {
   StaticString<255> text;
   StaticString<255> text_filename;
   const TCHAR unconfigured[] = N_("*** Not configured ***");
 
-  const DeviceConfig &config =
-    CommonInterface::SetSystemSettings().devices[0];
-  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-  TCHAR port_name_buffer[128];
-  const TCHAR *port_name =
-    config.GetPortName(port_name_buffer, ARRAY_SIZE(port_name_buffer));
-
   text.clear();
-  if (config.UsesDriver()) {
-    const TCHAR *driver_name = FindDriverDisplayName(config.driver_name);
-    if (StringLength(driver_name) > 0 && StringLength(port_name) > 0)
-      text.AppendFormat(_("%s on %s"), driver_name, port_name);
-  } else {
-    text.append(port_name);
-  }
+  CreateDeviceList(text.buffer(), text.MAX_SIZE);
+
   if (text.empty())
     text = gettext(unconfigured);
   device_text->SetCaption(text.c_str());
@@ -332,6 +401,7 @@ SetupQuick::RefreshForm()
 
   site_files_text->SetCaption(text_filename.c_str());
 
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
   text = settings.plane.registration;
   if (text.empty())
       text = gettext(unconfigured);
