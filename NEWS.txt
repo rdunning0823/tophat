@@ -1,8 +1,27 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Top Hat Soaring 2.0.5 Beta
+* Infoboxes:
+  -Display speed to fly when setting MC
+  -Show seconds in start time below max altitude
+  -Fix wind arrow to optionally display on map
+* FLARM
+ - Draw power planes with a propeller
+ - Draw traffic darker on eInk screens
+* Setup screen: show status of attached devices
+* Replay: add Rewind and Fast forward buttons
+* Kobo:
+ - preserve file dates when copying to/from USB stick
+ - disable OLC
+ - copy NMEA log files with IGC logs
+* Task Stats: show distance done
+* Map click item list
+ - Remove airfield frequency from list
+ - Display elevation instead of 0
+* Use plane's ID in log file name instead of AAA
+ 
 Top Hat Soaring 2.0.4 Beta
-
 *Flarm
   - Improve radar screen
   - Allow Infoboxes on radar screen
