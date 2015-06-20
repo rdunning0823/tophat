@@ -56,7 +56,7 @@ enum ControlIndex {
 };
 
 
-class MacCreadyEditPanel : public BaseAccessPanel, NumberButtonLayout {
+class MacCreadyEditPanel : public BaseAccessPanel, NumberButtonSubNumberLayout {
   class FinalGlideChart: public PaintWindow
   {
   public:
@@ -86,7 +86,7 @@ protected:
    * calculated in NumberButtonLayout
    */
   WndSymbolButton *big_plus, *big_minus, *little_plus, *little_minus;
-  WndFrame *mc_value;
+  WndFrame *mc_value, *speed_to_fly;
   CheckBoxControl *auto_mc;
   PixelRect checkbox_rc;
 
@@ -204,6 +204,12 @@ MacCreadyEditPanel::Refresh()
   FormatUserVerticalSpeed(mc, buffer.buffer(), false);
   mc_value->SetCaption(buffer.c_str());
   mc_value->SetEnabled(!auto_mc->GetState());
+
+  buffer.clear();
+  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
+  FormatUserSpeed(common_stats.V_block, buffer.buffer(), true, false);
+  speed_to_fly->SetCaption(buffer.c_str());
+
   final_glide_chart->Invalidate();
 }
 
@@ -221,13 +227,15 @@ MacCreadyEditPanel::Move(const PixelRect &rc_unused)
   little_minus->Move(little_minus_rc);
 
   mc_value->Move(value_rc);
+
+  speed_to_fly->Move(sub_number_rc);
   auto_mc->Move(checkbox_rc);
 }
 
 void
 MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
 {
-  NumberButtonLayout::CalculateLayout(content_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_rc);
 
   PixelRect content_right_rc = content_rc;
   PixelRect content_left_rc = content_rc;
@@ -235,7 +243,7 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
   // split content area into two columns, buttons on the right, fg on left
   content_right_rc.left += Layout::Scale(50);
 
-  NumberButtonLayout::CalculateLayout(content_right_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_right_rc);
   content_left_rc.right = big_plus_rc.left - 1;
   fg_rc = content_left_rc;
 
@@ -245,6 +253,14 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
     (content_rc.bottom - big_minus_rc.bottom) / 4;
   checkbox_rc.left = big_minus_rc.left;
   checkbox_rc.right = little_minus_rc.right;
+
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  sub_number_rc.left = sub_number_rc.right -
+      dialog_look.text_font->TextSize(_T("333 km/h")).cx + Layout::Scale(1);
+
+
+
+
 }
 
 void
@@ -295,9 +311,15 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   mc_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
                           value_rc, style_frame);
   WndForm::AddDestruct(mc_value);
-
   mc_value->SetAlignCenter();
   mc_value->SetVAlignCenter();
+
+
+  speed_to_fly = new WndFrame(GetClientAreaWindow(), dialog_look,
+                          sub_number_rc, style_frame);
+  WndForm::AddDestruct(speed_to_fly);
+  speed_to_fly->SetAlignCenter();
+  speed_to_fly->SetVAlignCenter();
 
   ButtonWindowStyle checkbox_style;
   checkbox_style.TabStop();
