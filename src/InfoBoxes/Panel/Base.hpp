@@ -113,7 +113,6 @@ protected:
   void Close();
 };
 
-
 /**
  *  Base class that sizes the rectangles needed to layout four buttons
  *  and a frame so there are two "up" buttons and two "down" buttons
@@ -177,6 +176,28 @@ protected:
   void CalculateLayout(const PixelRect &parent_rc);
 };
 
+
+/**
+ * Layout class that inherits NumberButtonLayout, and adds a sub_number to
+ * the right of the value
+ */
+class NumberButtonSubNumberLayout : public NumberButtonLayout {
+protected:
+/**
+ *  positioned flush right on screen, at same X as big value
+ *  Layout looks like (where yy is the sub number).
+ *    +    +
+ *     xxxx  yy
+ *    -    -
+ */
+  PixelRect sub_number_rc;
+protected:
+  /*
+   * Sizes the rectangles for the layout
+   * @param parent_rc The rc of the parent window's usable area
+   */
+  void CalculateLayout(const PixelRect &parent_rc);
+};
 
 /**
  *  Base class that sizes the rectangles needed to layout a
