@@ -204,6 +204,17 @@ BaseAccessPanel::SetCaption()
   header_text->SetText(buffer);
 }
 
+
+void
+NumberButtonSubNumberLayout::CalculateLayout(const PixelRect &parent_rc)
+{
+  NumberButtonLayout::CalculateLayout(parent_rc);
+
+  sub_number_rc = value_rc;
+  sub_number_rc.right = parent_rc.right;
+  sub_number_rc.left = sub_number_rc.right - 6 * Layout::Scale(8);
+}
+
 void
 NumberButtonLayout::CalculateLayout(const PixelRect &parent_rc)
 {
