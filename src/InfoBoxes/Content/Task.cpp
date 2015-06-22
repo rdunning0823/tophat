@@ -33,7 +33,6 @@ Copyright_License {
 #include "Units/Units.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Language/Language.hpp"
-#include "Widget/CallbackWidget.hpp"
 #include "UIGlobals.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
