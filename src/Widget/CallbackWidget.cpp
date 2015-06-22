@@ -35,13 +35,16 @@ CallbackWidget::ReClick()
 {
   callback();
 }
-
-#ifndef HAVE_CLIPPING
 void
 CallbackWidget::Show(const PixelRect &rc)
 {
+#ifdef HAVE_CLIPPING
+  PanelWidget::Show(rc);
+#endif
+  callback();
 }
 
+#ifndef HAVE_CLIPPING
 void
 CallbackWidget::Hide()
 {
