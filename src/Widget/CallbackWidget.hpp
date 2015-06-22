@@ -57,8 +57,8 @@ public:
   virtual bool Click() override;
   virtual void ReClick() override;
 
-#ifndef HAVE_CLIPPING
   virtual void Show(const PixelRect &rc) override;
+#ifndef HAVE_CLIPPING
   virtual void Hide() override;
 #endif
 };
