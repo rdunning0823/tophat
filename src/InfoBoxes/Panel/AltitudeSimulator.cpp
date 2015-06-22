@@ -58,7 +58,7 @@ enum ControlIndex {
 };
 
 
-class AltitudeSimulatorPanel : public BaseAccessPanel, NumberButtonLayout {
+class AltitudeSimulatorPanel : public BaseAccessPanel, NumberButtonSubNumberLayout {
   class FinalGlideChart: public PaintWindow
   {
   public:
@@ -85,11 +85,12 @@ class AltitudeSimulatorPanel : public BaseAccessPanel, NumberButtonLayout {
 
 protected:
   /**
-   * These 4 buttons and the altitude_value frame use the layout rectangles
-   * calculated in NumberButtonLayout
+   * These buttons and the altitude_value and altitude_type frames use the layout rectangles
+   * calculated in NumberButtonSubNumberLayout
    */
   WndButton *big_plus, *big_minus, *little_plus, *little_minus;
   WndFrame *altitude_value;
+  WndFrame *altitude_type;
   CheckBoxControl *show_alternate_units;
   /**
    * draws the Final Glide Bar on the MC widget so the pilot can
@@ -119,9 +120,12 @@ protected:
 
   PixelRect show_alternate_units_rc;
 
+  /* is the altitude displayed AGL? */
+  bool is_agl;
+
 public:
-  AltitudeSimulatorPanel(unsigned id)
-    :BaseAccessPanel(id), dialog_timer(*this) {}
+  AltitudeSimulatorPanel(unsigned id, bool _is_agl)
+    :BaseAccessPanel(id), dialog_timer(*this), is_agl(_is_agl) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
@@ -160,6 +164,7 @@ AltitudeSimulatorPanel::OnAction(int action_id)
   InfoBoxSettings &settings_info_boxes = CommonInterface::SetUISettings().info_boxes;
   const NMEAInfo &basic = CommonInterface::Basic();
   fixed altitude = basic.gps_altitude;
+
   fixed step = Units::ToSysAltitude(fixed(10));
 
   switch (action_id) {
@@ -192,12 +197,17 @@ void
 AltitudeSimulatorPanel::Refresh()
 {
   const NMEAInfo &basic = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  bool use_agl = is_agl && calculated.altitude_agl_valid;
+  fixed altitude = use_agl ? calculated.altitude_agl : basic.gps_altitude;
 
-  StaticString<50> altitude;
-  FormatUserAltitude(basic.gps_altitude, altitude.buffer(), true);
 
-  altitude_value->SetCaption(altitude.get());
+  StaticString<50> altitude_string;
+  FormatUserAltitude(altitude, altitude_string.buffer(), true);
+
+  altitude_value->SetCaption(altitude_string.get());
   final_glide_chart->Invalidate();
+  altitude_type->SetCaption(is_agl ? _("AGL") : _("MSL"));
 }
 
 void
@@ -213,13 +223,14 @@ AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
   big_minus->Move(big_minus_rc);
   little_minus->Move(little_minus_rc);
   altitude_value->Move(value_rc);
+  altitude_type->Move(sub_number_rc);
   show_alternate_units->Move(show_alternate_units_rc);
 }
 
 void
 AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc)
 {
-  NumberButtonLayout::CalculateLayout(content_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_rc);
 
   PixelRect content_right_rc = content_rc;
   PixelRect content_left_rc = content_rc;
@@ -227,7 +238,7 @@ AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc)
   // split content area into two columns, buttons on the right, fg on left
   content_right_rc.left += Layout::Scale(50);
 
-  NumberButtonLayout::CalculateLayout(content_right_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_right_rc);
   content_left_rc.right = big_plus_rc.left - 1;
   fg_rc = content_left_rc;
 
@@ -294,6 +305,12 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   altitude_value->SetAlignCenter();
   altitude_value->SetVAlignCenter();
 
+  altitude_type = new WndFrame(GetClientAreaWindow(), dialog_look,
+                                sub_number_rc, style_frame);
+  WndForm::AddDestruct(altitude_type);
+  altitude_type->SetAlignCenter();
+  altitude_type->SetVAlignCenter();
+
   ButtonWindowStyle checkbox_style;
   checkbox_style.TabStop();
   show_alternate_units = new CheckBoxControl(GetClientAreaWindow(),
@@ -359,12 +376,24 @@ AltitudeSimulatorPanel::FinalGlideChart::OnPaint(Canvas &canvas)
   description.c_str());
 }
 
-Widget*
-LoadAltitudeSimulatorPanel(unsigned id)
+static Widget*
+LoadAltitudeSimulatorPanel(unsigned id, bool is_agl)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   if (!basic.gps.simulator)
     return LoadAltitudePanel(id);
 
-  return new AltitudeSimulatorPanel(id);
+  return new AltitudeSimulatorPanel(id, is_agl);
+}
+
+Widget*
+LoadAglAltitudeSimulatorPanel(unsigned id)
+{
+  return LoadAltitudeSimulatorPanel(id, true);
+}
+
+Widget*
+LoadGpsAltitudeSimulatorPanel(unsigned id)
+{
+  return LoadAltitudeSimulatorPanel(id, false);
 }

@@ -61,7 +61,7 @@ public:
   virtual void OnCustomPaint(Canvas &canvas, const PixelRect &rc) override;
 };
 
-class InfoBoxContentBarogram : public InfoBoxContentAltitude
+class InfoBoxContentBarogram : public InfoBoxContent
 {
 public:
   virtual void Update(InfoBoxData &data) override;

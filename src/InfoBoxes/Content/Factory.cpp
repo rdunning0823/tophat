@@ -951,7 +951,7 @@ static constexpr MetaData meta_data[] = {
     N_("H T/O"),
     N_("Height based on an automatic take-off reference elevation (like a QFE reference)."),
     UpdateInfoBoxAltitudeQFE,
-    altitude_infobox_panels,
+    gps_altitude_infobox_panels,
     e_FlightLevel, // Flight Level
     e_H_Baro, // Alt Baro
     DEPRECATED,
@@ -1041,7 +1041,7 @@ static constexpr MetaData meta_data[] = {
     N_("FL"),
     N_("Pressure Altitude given as Flight Level. Only available if barometric altitude available and correct QNH set."),
     UpdateInfoBoxAltitudeFlightLevel,
-    altitude_infobox_panels,
+    gps_altitude_infobox_panels,
     e_Barogram, // Barogram
     e_H_QFE, // H T/O
     STANDARD,
@@ -1219,7 +1219,7 @@ static constexpr MetaData meta_data[] = {
     N_("Alt Auto"),
     N_("This is the barometric altitude obtained from a device equipped with a pressure sensor or the GPS altitude if the barometric altitude is not available."),
     UpdateInfoBoxAltitudeNav,
-    altitude_infobox_panels,
+    gps_altitude_infobox_panels,
     NavAltitude,
     NavAltitude,
     DEPRECATED,

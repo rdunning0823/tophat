@@ -27,27 +27,24 @@ Copyright_License {
 #include "InfoBoxes/Content/Base.hpp"
 
 extern const InfoBoxPanel barometric_altitude_infobox_panels[];
-extern const InfoBoxPanel altitude_infobox_panels[];
-
-class InfoBoxContentAltitude : public InfoBoxContent
-{
-public:
-  virtual const InfoBoxPanel *GetDialogContent() override;
-};
+extern const InfoBoxPanel gps_altitude_infobox_panels[];
+extern const InfoBoxPanel agl_altitude_infobox_panels[];
 
 void
 UpdateInfoBoxAltitudeNav(InfoBoxData &data);
 
-class InfoBoxContentAltitudeGPS : public InfoBoxContentAltitude
+class InfoBoxContentAltitudeGPS : public InfoBoxContent
 {
 public:
+  virtual const InfoBoxPanel *GetDialogContent() override;
   virtual void Update(InfoBoxData &data) override;
   virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
 };
 
-class InfoBoxContentAltitudeAGL : public InfoBoxContentAltitude
+class InfoBoxContentAltitudeAGL : public InfoBoxContent
 {
 public:
+  virtual const InfoBoxPanel *GetDialogContent() override;
   virtual void Update(InfoBoxData &data) override;
 };
 

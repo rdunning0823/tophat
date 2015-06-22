@@ -49,8 +49,17 @@ Copyright_License {
 /* gcc gives "redeclaration differs in 'constexpr'" */
 constexpr
 #endif
-const InfoBoxPanel altitude_infobox_panels[] = {
-  { N_("Simulator"), LoadAltitudeSimulatorPanel },
+const InfoBoxPanel agl_altitude_infobox_panels[] = {
+  { N_("Simulator"), LoadAglAltitudeSimulatorPanel },
+  { nullptr, nullptr }
+};
+
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel gps_altitude_infobox_panels[] = {
+  { N_("Simulator"), LoadGpsAltitudeSimulatorPanel },
   { nullptr, nullptr }
 };
 
@@ -64,8 +73,13 @@ const InfoBoxPanel barometric_altitude_infobox_panels[] = {
 };
 
 const InfoBoxPanel *
-InfoBoxContentAltitude::GetDialogContent() {
-  return altitude_infobox_panels;
+InfoBoxContentAltitudeGPS::GetDialogContent() {
+  return gps_altitude_infobox_panels;
+}
+
+const InfoBoxPanel *
+InfoBoxContentAltitudeAGL::GetDialogContent() {
+  return agl_altitude_infobox_panels;
 }
 
 void
