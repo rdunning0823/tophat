@@ -112,7 +112,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     StaticString<64> bearing_buffer;
     FormatBearing(bearing_buffer.buffer(), bearing_buffer.MAX_SIZE,
                   vector.bearing);
-    buffer.AppendFormat(_T(" %s"), bearing_buffer.c_str());
+    buffer.AppendFormat(_T(" / %s"), bearing_buffer.c_str());
     AddReadOnly(_("Distance / bearing"), NULL, buffer);
   }
 
