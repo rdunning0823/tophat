@@ -1013,6 +1013,14 @@ location=18
 
 mode=Menu
 type=key
+data=7
+event=Ballast toggle
+event=Mode default
+label=$(Dump)
+location=18
+
+mode=Menu
+type=key
 data=8
 event=TerrainTopography terrain toggle
 event=Mode default
