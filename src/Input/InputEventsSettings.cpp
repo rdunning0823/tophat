@@ -210,6 +210,7 @@ InputEvents::eventBugs(const TCHAR *misc)
 // down: decreases ballast by 10%
 // max: selects 100% ballast
 // min: selects 0% ballast
+// toggle: starts or stops ballast dumping
 // show: displays a status message indicating the ballast percentage
 void
 InputEvents::eventBallast(const TCHAR *misc)
@@ -217,8 +218,8 @@ InputEvents::eventBallast(const TCHAR *misc)
   if (protected_task_manager == NULL)
     return;
 
-  GlidePolar &polar =
-    CommonInterface::SetComputerSettings().polar.glide_polar_task;
+  ComputerSettings &settings = CommonInterface::SetComputerSettings();
+  GlidePolar &polar = settings.polar.glide_polar_task;
   fixed BALLAST = polar.GetBallast();
   fixed oldBallast = BALLAST;
 
@@ -239,6 +240,10 @@ InputEvents::eventBallast(const TCHAR *misc)
     _stprintf(Temp, _T("%d"), (int)(BALLAST * 100));
     /* xgettext:no-c-format */
     Message::AddMessage(_("Ballast %"), Temp);
+
+  } else if (StringIsEqual(misc, _T("toggle"))) {
+    if (positive(BALLAST))
+      settings.polar.ballast_timer_active = !settings.polar.ballast_timer_active;
   }
 
   if (BALLAST != oldBallast) {
