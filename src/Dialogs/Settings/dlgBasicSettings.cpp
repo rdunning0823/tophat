@@ -228,7 +228,7 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddFloat(_("Ballast"),
            _("The amount of water ballast currently in the glider.  Affects the glide polar.  A 'Dump' button shows on the main menu if ballast > 0.  See 'Setup Plane.'"),
-           _T("%.0f l"), _T("%.0f"),
+           _T("%.0f L"), _T("%.0f"),
            fixed(0), fixed(500), fixed(5), false,
            fixed(0),
            this);
