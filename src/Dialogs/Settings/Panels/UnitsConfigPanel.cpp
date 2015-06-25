@@ -39,7 +39,6 @@ Copyright_License {
 
 enum ControlIndex {
   UnitsPreset,
-  spacer_1,
   UnitsSpeed,
   UnitsDistance,
   UnitsLift,
@@ -48,7 +47,6 @@ enum ControlIndex {
   UnitsTaskSpeed,
   UnitsPressure,
   UnitsWingLoading,
-  spacer_2,
   UnitsLatLon
 };
 
@@ -111,9 +109,6 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   wp->GetDataField()->SetListener(this);
   wp->SetReadOnly(true);
-
-  AddSpacer();
-  SetExpertRow(spacer_1);
 
   static constexpr StaticEnumChoice units_speed_list[] = {
     { (unsigned)Unit::STATUTE_MILES_PER_HOUR, _T("mph") },
@@ -203,9 +198,6 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           wing_loading_labels_list,
           (unsigned)config.wing_loading_unit, this);
   SetExpertRow(UnitsWingLoading);
-
-  AddSpacer();
-  SetExpertRow(spacer_2);
 
   static constexpr StaticEnumChoice units_lat_lon_list[] = {
     { (unsigned)CoordinateFormat::DDMMSS, _T("DDMMSS") },
