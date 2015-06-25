@@ -192,25 +192,29 @@ public:
 void
 PlaneEditMoreWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  AddInteger(_("Handicap"), nullptr,
+  AddInteger(_("Handicap"),
+             _("The European contest handicap for your glider.  Affects Top Hat's internal on-line contest score calculation."),
              _T("%u %%"), _T("%u"),
              50, 150, 1,
              plane.handicap);
 
-  AddFloat(_("Wing Area"), nullptr,
+  AddFloat(_("Wing Area"),
+           _("Your ship's wing area."),
            _T("%.1f m²"), _T("%.1f"),
            fixed(0), fixed(40), fixed(0.1),
            false, plane.wing_area);
 
-  AddFloat(_("Max. Ballast"), nullptr,
+  AddFloat(_("Max. Ballast"),
+           _("The max water ballast your ship holds.  See 'Max ballast dump time.'"),
            _T("%.0f l"), _T("%.0f"),
            fixed(0), fixed(500), fixed(5),
            false, plane.max_ballast);
 
-  AddInteger(_("Dump Time"), nullptr,
-               _T("%u s"), _T("%u"),
-               10, 300, 5,
-               plane.dump_time);
+  AddInteger(_("Dump Time"),
+             _("This amount of time it takes to dump full water ballast.  See 'Max ballast.'"),
+             _T("%u s"), _T("%u"),
+             10, 300, 5,
+             plane.dump_time);
 
   AddFloat(_("Max. Cruise Speed"), nullptr,
            _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(300), fixed(5),
