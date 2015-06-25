@@ -64,6 +64,7 @@ const char HomeElevation[] = "HomeElevation";
 const char HomeElevationAvailable[] = "HomeElevationAvailable";
 const char LiftUnitsValue[] = "LiftUnit";
 const char PressureUnitsValue[] = "Pressure";
+const char WingLoadingUnitsValue[] = "WingLoadingUnits";
 const char LatLonUnits[] = "LatLonUnits";
 const char PolarID[] = "Polar";
 const char Polar[] = "PolarInformation";

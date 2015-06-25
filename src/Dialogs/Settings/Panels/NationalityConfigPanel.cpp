@@ -264,6 +264,9 @@ NationalityConfigPanel::Save(bool &_changed)
       Profile::Set(ProfileKeys::PressureUnitsValue,
                    (int)config.pressure_unit);
 
+      Profile::Set(ProfileKeys::WingLoadingUnitsValue,
+                   (int)config.wing_loading_unit);
+
     }
   }
 

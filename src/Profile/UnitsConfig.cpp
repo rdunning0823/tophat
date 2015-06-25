@@ -296,6 +296,24 @@ GetPressureUnit(const char *key, Unit &value)
   return true;
 }
 
+gcc_const
+static bool
+ValidWingLoadingUnit(Unit unit)
+{
+  return unit == Unit::KG_PER_M2 || unit == Unit::LB_PER_FT2;
+}
+
+static bool
+GetWingLoadingUnit(const char *key, Unit &value)
+{
+  Unit tmp;
+  if (!Profile::GetEnum(key, tmp) || !ValidWingLoadingUnit(tmp))
+    return false;
+
+  value = tmp;
+  return true;
+}
+
 void
 Profile::LoadUnits(UnitSetting &config)
 {
@@ -314,4 +332,5 @@ Profile::LoadUnits(UnitSetting &config)
   GetVerticalSpeedUnit(ProfileKeys::LiftUnitsValue, "Lift",
                        config.vertical_speed_unit);
   GetPressureUnit(ProfileKeys::PressureUnitsValue, config.pressure_unit);
+  GetWingLoadingUnit(ProfileKeys::WingLoadingUnitsValue, config.wing_loading_unit);
 }
