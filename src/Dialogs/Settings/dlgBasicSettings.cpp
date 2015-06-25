@@ -227,7 +227,7 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
   AddFloat(_("Ballast"),
-           _("Ballast of the glider.  Increase this value if the pilot/cockpit load is greater than the reference pilot weight of the glide polar (typically 75kg).  Press ENTER on this field to toggle count-down of the ballast volume according to the dump rate specified in the configuration settings."),
+           _("The amount of water ballast currently in the glider.  Affects the glide polar.  A 'Dump' button shows on the main menu if ballast > 0.  See 'Setup Plane.'"),
            _T("%.0f l"), _T("%.0f"),
            fixed(0), fixed(500), fixed(5), false,
            fixed(0),
