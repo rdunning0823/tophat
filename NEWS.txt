@@ -27,6 +27,7 @@ Top Hat Soaring 2.0.5 Beta June 2015
  - Remove airfield frequency from list
  - Display elevation instead of 0
 * Use plane's ID in log file name instead of AAA
+* Added vario configuration screen in advanced setup
 
 Top Hat Soaring 2.0.4 Beta April 2015
 *Flarm

@@ -112,6 +112,7 @@ static constexpr TabMenuControl::PageItem pages[] = {
 #ifdef HAVE_PCM_PLAYER
   {N_("Audio Vario"), 3, CreateAudioVarioConfigPanel },
 #endif
+  {N_("Vario"), 3, CreateVarioConfigPanel },
   {N_("Competition rules"), 4, CreateTaskRulesConfigPanel },
   {N_("Online contest"), 4, CreateScoringConfigPanel },
   {N_("Language, Input"), 5, CreateInterfaceConfigPanel },
