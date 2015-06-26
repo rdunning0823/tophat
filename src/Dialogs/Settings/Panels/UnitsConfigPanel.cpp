@@ -211,6 +211,7 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           units_lat_lon_list,
           (unsigned)coordinate_format);
   SetExpertRow(UnitsLatLon);
+  PresetCheck();
 }
 
 bool
