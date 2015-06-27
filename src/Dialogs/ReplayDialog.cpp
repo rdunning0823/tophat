@@ -129,7 +129,6 @@ ReplayControlWidget::UpdateButtons()
   stop_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING
                           || play_state == PlayState::FASTFORWARD);
 
-
   switch(play_state) {
   case PlayState::NOFILE:
   case PlayState::NOTSTARTED:
@@ -213,6 +212,9 @@ ReplayControlWidget::CheckFastForward()
 void
 ReplayControlWidget::OnTimer()
 {
+  if (!replay->IsActive())
+    play_state = PlayState::NOTSTARTED;
+
   UpdateButtons();
   UpdateDialogTitle();
 
