@@ -252,7 +252,7 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
     help = _("Maximum height based on start height reference (AGL or MSL) while starting the task.  Set to 0 for no limit.");
   }
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
-           fixed(0), fixed(10000), fixed(25), false, fixed(0));
+           fixed(0), fixed(18000), fixed(25), false, fixed(0));
 
   if (IsUs())
     RowFormWidget::AddDummy();
@@ -270,7 +270,7 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
     help = _("Minimum height based on finish height reference (AGL or MSL) while finishing the task.  Set to 0 for no limit.");
   }
   AddFloat(label.c_str(), help.c_str(), _T("%.0f %s"), _T("%.0f"),
-           fixed(0), fixed(10000), fixed(25), false, fixed(0));
+           fixed(0), fixed(18000), fixed(25), false, fixed(0));
 
   if (IsUs())
     RowFormWidget::AddDummy();
