@@ -29,7 +29,6 @@ Copyright_License {
 namespace TophatMenu {
 
   const TCHAR menu[] = _T("Menu");
-  const TCHAR menu_alt_with_screens_button[] = _T("MenuWithScreens");
   const TCHAR menu_1[] = _T("Menu1");
   const TCHAR menu_2[] = _T("Menu2");
   const TCHAR menu_last[] = _T("MenuLast");
