@@ -712,7 +712,7 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
 
   CondReplaceInString(show_screens_button, OutBuffer,
                       _T("$(SwitchScreen)"),
-                      _(""), _("Switch Screens"), Size);
+                      _(""), _("Switch screens"), Size);
 
   if (_tcsstr(OutBuffer, _T("$(NextPageName)"))) {
     TCHAR label[30];
