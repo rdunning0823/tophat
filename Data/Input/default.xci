@@ -1017,7 +1017,7 @@ data=7
 event=Ballast toggle
 event=Mode default
 label=$(Dump)
-location=18
+location=19
 
 mode=Menu
 type=key
