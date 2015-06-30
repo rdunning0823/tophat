@@ -997,19 +997,10 @@ location=16
 
 mode=Menu
 type=key
-data=0
-event=Zoom auto show
-event=Zoom auto toggle
-event=Mode default
-label=Set zoom $(ZoomAutoToggleActionName)
-location=17
-
-mode=Menu
-type=key
 data=6
 event=ScreenModes next
 label=$(SwitchScreen)
-location=18
+location=17
 
 mode=Menu
 type=key
@@ -1017,7 +1008,7 @@ data=7
 event=Ballast toggle
 event=Mode default
 label=$(Dump)
-location=19
+location=18
 
 mode=Menu
 type=key
@@ -1053,6 +1044,15 @@ event=ThermalAssistant
 event=Mode default
 label=Thermal assistant
 location=16
+
+mode=Menu1
+type=key
+data=0
+event=Zoom auto show
+event=Zoom auto toggle
+event=Mode default
+label=Set zoom $(ZoomAutoToggleActionName)
+location=17
 
 mode=Menu1
 type=key
