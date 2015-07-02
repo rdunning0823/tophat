@@ -47,7 +47,8 @@ enum ControlIndex {
   UnitsTaskSpeed,
   UnitsPressure,
   UnitsWingLoading,
-  UnitsLatLon
+  UnitsMass,
+  UnitsLatLon,
 };
 
 class UnitsConfigPanel final
@@ -80,6 +81,7 @@ UnitsConfigPanel::PresetCheck()
   current_dlg_set.task_speed_unit = (Unit)GetValueInteger((unsigned)UnitsTaskSpeed);
   current_dlg_set.pressure_unit = (Unit)GetValueInteger((unsigned)UnitsPressure);
   current_dlg_set.wing_loading_unit = (Unit)GetValueInteger((unsigned)UnitsWingLoading);
+  current_dlg_set.mass_unit = (Unit)GetValueInteger((unsigned)UnitsMass);
 
   LoadValueEnum(UnitsPreset, Units::Store::EqualsPresetUnits(current_dlg_set));
 }
@@ -199,6 +201,17 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           (unsigned)config.wing_loading_unit, this);
   SetExpertRow(UnitsWingLoading);
 
+  static constexpr StaticEnumChoice mass_labels_list[] = {
+    { (unsigned)Unit::KG, _T("kg") },
+    { (unsigned)Unit::LB, _T("lb") },
+    { 0 }
+  };
+  AddEnum(_("Mass"), _("Units used mass."),
+          mass_labels_list,
+          (unsigned)config.mass_unit, this);
+  SetExpertRow(UnitsMass);
+
+
   static constexpr StaticEnumChoice units_lat_lon_list[] = {
     { (unsigned)CoordinateFormat::DDMMSS, _T("DDMMSS") },
     { (unsigned)CoordinateFormat::DDMMSS_S, _T("DDMMSS.s") },
@@ -242,6 +255,8 @@ UnitsConfigPanel::Save(bool &_changed)
   changed |= SaveValueEnum(UnitsPressure, ProfileKeys::PressureUnitsValue, config.pressure_unit);
 
   changed |= SaveValueEnum(UnitsWingLoading, ProfileKeys::WingLoadingUnitsValue, config.wing_loading_unit);
+
+  changed |= SaveValueEnum(UnitsMass, ProfileKeys::MassUnitsValue, config.mass_unit);
 
   changed |= SaveValueEnum(UnitsLatLon, ProfileKeys::LatLonUnits, coordinate_format);
 
