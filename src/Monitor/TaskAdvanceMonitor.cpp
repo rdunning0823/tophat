@@ -83,11 +83,11 @@ TaskAdvanceMonitor::Check()
     if (widget == nullptr && (!last_need_to_arm ||
                               stats.active_index != last_active_index)) {
       widget = new TaskAdvanceWidget(*this);
-      PageActions::SetCustomBottom(widget);
+      PageActions::SetCustomTop(widget);
     }
   } else {
     if (widget != nullptr)
-      PageActions::RestoreBottom();
+      PageActions::RestoreTop();
   }
 
   last_active_index = stats.active_index;

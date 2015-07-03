@@ -109,17 +109,38 @@ struct PageLayout
     MAX
   } bottom;
 
+  /**
+   * What to show below the main area (i.e. map)?
+   */
+  enum class Top : uint8_t {
+    NOTHING,
+
+    /**
+     * A custom #Widget is being displayed.  This is not a
+     * user-accessible option, it's only used for runtime state.
+     */
+    CUSTOM,
+
+    /**
+     * A dummy entry that is used for validating profile values.
+     */
+    MAX
+  } top;
+
+
   PageLayout() = default;
 
   constexpr PageLayout(bool _valid, InfoBoxConfig _infobox_config)
     :valid(_valid), main(Main::MAP),
      infobox_config(_infobox_config),
-     bottom(Bottom::NOTHING) {}
+     bottom(Bottom::NOTHING),
+     top(Top::NOTHING){}
 
   constexpr PageLayout(InfoBoxConfig _infobox_config)
     :valid(true), main(Main::MAP),
      infobox_config(_infobox_config),
-     bottom(Bottom::NOTHING) {}
+     bottom(Bottom::NOTHING),
+     top(Top::NOTHING){}
 
   /**
    * Return an "undefined" page.  Its IsDefined() method will return
@@ -177,6 +198,7 @@ struct PageLayout
     return valid == other.valid &&
       main == other.main &&
       bottom == other.bottom &&
+      top == other.top &&
       infobox_config == other.infobox_config;
   }
 

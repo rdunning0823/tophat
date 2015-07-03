@@ -97,6 +97,11 @@ class MainWindow : public SingleWindow {
   Widget *bottom_widget;
 
   /**
+   * A #Widget that is shown above the map.
+   */
+  Widget *top_widget;
+
+  /**
    * A #Widget that is shown instead of the map.  The #GlueMapWindow
    * is hidden and the DrawThread is suspended while this attribute is
    * non-NULL.
@@ -122,7 +127,7 @@ private:
   BatteryTimer battery_timer;
 
   /**
-   * need to rename this.  Really map/main widget rect/map + bottom widget recr
+   * need to rename this.  Really map/main widget rect/map + bottom + top widget recr
    */
   PixelRect map_rect;
   bool FullScreen;
@@ -196,6 +201,21 @@ protected:
    * new bottom Widget.
    */
   void KillBottomWidget();
+
+  /**
+   * Destroy the current "top" Widget, but don't resize the main
+   * area.  The caller is responsible for doing that or installing a
+   * new top Widget.
+   */
+  void KillTopWidget();
+
+  bool HaveTopWidget() const {
+    /* currently, the top widget is only visible above the map, but
+       not above a custom main widget */
+    /* TODO: eliminate this limitation; don't forget to remove the
+       "widget==nullptr" check from MainWindow::KillTopWidget() */
+    return top_widget != nullptr && widget == nullptr;
+  }
 
 public:
   void Create(PixelSize size, TopWindowStyle style=TopWindowStyle());
@@ -365,6 +385,13 @@ public:
    * this method with widget==nullptr.
    */
   void SetBottomWidget(Widget *widget);
+
+  /**
+   * Show this #Widget above the map.  This replaces (deletes) the
+   * previous top widget, if any.  To disable this feature, call
+   * this method with widget==nullptr.
+   */
+  void SetTopWidget(Widget *widget);
 
   /**
    * Replace the map with a #Widget.  The Widget instance gets deleted

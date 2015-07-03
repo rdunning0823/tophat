@@ -118,19 +118,55 @@ GetBottomWidgetRect(const PixelRect &rc, const Widget *bottom_widget)
 
 gcc_pure
 static PixelRect
-GetMapRectAbove(const PixelRect &rc, const PixelRect &bottom_rect)
+GetTopWidgetRect(const PixelRect &rc, const Widget *top_widget)
+{
+  if (top_widget == nullptr) {
+    /* no top widget: return empty rectangle, map uses the whole
+       main area */
+    PixelRect result = rc;
+    result.bottom = result.top;
+    return result;
+  }
+
+  const UPixelScalar requested_height = top_widget->GetMinimumSize().cy;
+  UPixelScalar height;
+  if (requested_height > 0) {
+    const UPixelScalar max_height = (rc.bottom - rc.top) / 2;
+    height = std::min(max_height, requested_height);
+  } else {
+    const UPixelScalar recommended_height = (rc.bottom - rc.top) / 3;
+    height = recommended_height;
+  }
+
+  PixelRect result = rc;
+  result.bottom = result.top + height;
+  return result;
+}
+
+/**
+ * The area between the top and bottom widgets
+ */
+gcc_pure
+static PixelRect
+GetMapRectBetween(const PixelRect &rc, const PixelRect &bottom_rect,
+                  const PixelRect &top_rect)
 {
   PixelRect result = rc;
+  result.top = top_rect.bottom;
+  if (top_rect.top < top_rect.bottom)
+    result.top += separator_height;
+
   result.bottom = bottom_rect.top;
   if (bottom_rect.top < bottom_rect.bottom)
     result.bottom -= separator_height;
+
   return result;
 }
 
 MainWindow::MainWindow(const StatusMessageList &status_messages)
   :look(NULL),
-   map(nullptr), bottom_widget(nullptr), widget(nullptr), vario(*this),
-   traffic_gauge(*this),
+   map(nullptr), bottom_widget(nullptr), top_widget(nullptr), widget(nullptr),
+   vario(*this), traffic_gauge(*this),
    suppress_traffic_gauge(false), force_traffic_gauge(false),
    thermal_assistant(*this),
    dragging(false),
@@ -394,15 +430,22 @@ MainWindow::ReinitialiseLayout()
     const PixelRect main_rect = GetMainRect();
     const PixelRect bottom_rect = GetBottomWidgetRect(main_rect,
                                                       bottom_widget);
+    const PixelRect top_rect = GetTopWidgetRect(main_rect,
+                                                top_widget);
 
     if (HaveBottomWidget())
       bottom_widget->Move(bottom_rect);
 
-    map->Move(GetMapRectAbove(main_rect, bottom_rect));
+    if (HaveTopWidget())
+      top_widget->Move(top_rect);
+
+    /* area between the two widgets */
+    map->Move(GetMapRectBetween(main_rect, bottom_rect, top_rect));
     map->FullRedraw();
   }
 
-  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+  widget_overlays.UpdateVisibility(GetClientRect(),
+                                   IsPanning() || HaveTopWidget(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
 
@@ -519,6 +562,7 @@ MainWindow::BeginShutdown()
   timer.Cancel();
 
   KillBottomWidget();
+  KillTopWidget();
 }
 
 void
@@ -687,6 +731,7 @@ bool
 MainWindow::OnKeyDown(unsigned key_code)
 {
   return (widget != nullptr && widget->KeyPress(key_code)) ||
+    (HaveTopWidget() && top_widget->KeyPress(key_code)) ||
     (HaveBottomWidget() && bottom_widget->KeyPress(key_code)) ||
     InputEvents::processKey(key_code) ||
     SingleWindow::OnKeyDown(key_code);
@@ -722,7 +767,8 @@ MainWindow::OnTimer(WindowTimer &_timer)
     }
   }
 
-  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+  widget_overlays.UpdateVisibility(GetClientRect(),
+                                   IsPanning() || HaveTopWidget(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
@@ -814,6 +860,7 @@ MainWindow::OnDestroy()
 
   KillWidget();
   KillBottomWidget();
+  KillTopWidget();
 
   SingleWindow::OnDestroy();
 }
@@ -838,6 +885,14 @@ MainWindow::OnPaint(Canvas &canvas)
     PixelRect rc = map->GetPosition();
     rc.top = rc.bottom;
     rc.bottom += separator_height;
+    canvas.DrawFilledRectangle(rc, COLOR_BLACK);
+  }
+  if (HaveTopWidget() && map != nullptr) {
+    /* draw a separator between main area and top area */
+    PixelRect rc = map->GetPosition();
+    rc.bottom = rc.top;
+    if (rc.top > (int)separator_height)
+      rc.top -= separator_height;
     canvas.DrawFilledRectangle(rc, COLOR_BLACK);
   }
 
@@ -948,6 +1003,12 @@ MainWindow::ActivateMap()
                                               bottom_widget));
     }
 
+    if (top_widget != nullptr) {
+      assert(HaveTopWidget());
+      top_widget->Show(GetTopWidgetRect(GetMainRect(),
+                                        top_widget));
+    }
+
 #ifndef ENABLE_OPENGL
     if (draw_suspended) {
       draw_suspended = false;
@@ -955,7 +1016,8 @@ MainWindow::ActivateMap()
     }
 #endif
   }
-  widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+  widget_overlays.UpdateVisibility(GetClientRect(),
+                                   IsPanning() || HaveTopWidget(),
                                    widget != NULL,
                                    map != NULL, FullScreen);
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
@@ -1041,7 +1103,63 @@ MainWindow::SetBottomWidget(Widget *_widget)
       bottom_widget->Show(bottom_rect);
   }
 
-  map->Move(GetMapRectAbove(main_rect, bottom_rect));
+  const PixelRect top_rect = GetTopWidgetRect(main_rect,
+                                              top_widget);
+
+  map->Move(GetMapRectBetween(main_rect, bottom_rect, top_rect));
+  map->FullRedraw();
+}
+
+void
+MainWindow::KillTopWidget()
+{
+  if (top_widget == nullptr)
+    return;
+
+  if (widget == nullptr)
+    /* the top widget is only visible below the map, but not below
+       a custom main widget; see HaveTopWidget() */
+    top_widget->Hide();
+
+  top_widget->Unprepare();
+  delete top_widget;
+  top_widget = nullptr;
+}
+
+void
+MainWindow::SetTopWidget(Widget *_widget)
+{
+  if (top_widget == nullptr && _widget == nullptr)
+    return;
+
+  if (map == nullptr) {
+    /* this doesn't work without a map */
+    delete _widget;
+    return;
+  }
+
+  KillTopWidget();
+
+  top_widget = _widget;
+
+  const PixelRect main_rect = GetMainRect();
+  const PixelRect top_rect = GetTopWidgetRect(main_rect,
+                                              top_widget);
+
+  if (top_widget != nullptr) {
+    top_widget->Initialise(*this, top_rect);
+    top_widget->Prepare(*this, top_rect);
+
+    if (widget == nullptr)
+      /* the top widget is only visible below the map, but not
+         below a custom main widget; see HaveTopWidget() */
+      top_widget->Show(top_rect);
+  }
+
+  const PixelRect bottom_rect = GetBottomWidgetRect(main_rect,
+                                                    bottom_widget);
+
+  map->Move(GetMapRectBetween(main_rect, bottom_rect, top_rect));
   map->FullRedraw();
 }
 
@@ -1053,6 +1171,7 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
   restore_page_pending = false;
 
   const bool have_bottom_widget = HaveBottomWidget();
+  const bool have_top_widget = HaveTopWidget();
 
   /* delete the old widget */
   KillWidget();
@@ -1060,7 +1179,8 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
   /* hide the map (might be hidden already) */
   if (map != NULL) {
     map->FastHide();
-    widget_overlays.UpdateVisibility(GetClientRect(), IsPanning(),
+    widget_overlays.UpdateVisibility(GetClientRect(),
+                                     IsPanning() || HaveTopWidget(),
                                      _widget != NULL,
                                      map != NULL, FullScreen);
 
@@ -1074,6 +1194,9 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
 
   if (have_bottom_widget)
     bottom_widget->Hide();
+
+  if (have_top_widget)
+    top_widget->Hide();
 
   widget = _widget;
 

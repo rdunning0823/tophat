@@ -234,6 +234,23 @@ LoadBottom(PageLayout::Bottom bottom)
 }
 
 static void
+LoadTop(PageLayout::Top top)
+{
+  switch (top) {
+  case PageLayout::Top::NOTHING:
+    CommonInterface::main_window->SetTopWidget(nullptr);
+    break;
+
+  case PageLayout::Top::CUSTOM:
+    /* don't touch */
+    break;
+
+  case PageLayout::Top::MAX:
+    gcc_unreachable();
+  }
+}
+
+static void
 LoadInfoBoxes(const PageLayout::InfoBoxConfig &config)
 {
   UIState &ui_state = CommonInterface::SetUIState();
@@ -264,6 +281,7 @@ PageActions::LoadLayout(const PageLayout &layout)
 
   LoadInfoBoxes(layout.infobox_config);
   LoadBottom(layout.bottom);
+  LoadTop(layout.top);
   LoadMain(layout.main);
 
   ActionInterface::UpdateDisplayMode();
@@ -316,6 +334,24 @@ PageActions::RestoreBottom()
     special_page.SetUndefined();
 
   LoadBottom(configured_page.bottom);
+}
+
+void
+PageActions::RestoreTop()
+{
+  PageLayout &special_page = CommonInterface::SetUIState().pages.special_page;
+  if (!special_page.IsDefined())
+    return;
+
+  const PageLayout &configured_page = GetConfiguredLayout();
+  if (special_page.top == configured_page.top)
+    return;
+
+  special_page.top = configured_page.top;
+  if (special_page == configured_page)
+    special_page.SetUndefined();
+
+  LoadTop(configured_page.top);
 }
 
 GlueMapWindow *
@@ -394,4 +430,16 @@ PageActions::SetCustomBottom(Widget *widget)
   state.special_page = GetCurrentLayout();
   state.special_page.bottom = PageLayout::Bottom::CUSTOM;
   CommonInterface::main_window->SetBottomWidget(widget);
+}
+
+void
+PageActions::SetCustomTop(Widget *widget)
+{
+  assert(widget != nullptr);
+
+  PagesState &state = CommonInterface::SetUIState().pages;
+
+  state.special_page = GetCurrentLayout();
+  state.special_page.top = PageLayout::Top::CUSTOM;
+  CommonInterface::main_window->SetTopWidget(widget);
 }
