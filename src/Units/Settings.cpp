@@ -34,8 +34,8 @@ UnitSetting::SetDefaults()
   wind_speed_unit = Unit::KILOMETER_PER_HOUR;
   task_speed_unit = Unit::KILOMETER_PER_HOUR;
   pressure_unit = Unit::HECTOPASCAL;
-  wing_loading_unit = Unit::KG_PER_M2;
-  mass_unit = Unit::KG;
+  wing_loading_unit = Unit::LB_PER_FT2;
+  mass_unit = Unit::LB;
 }
 
 Unit
