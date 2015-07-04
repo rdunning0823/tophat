@@ -27,6 +27,7 @@ Copyright_License {
 #include "Math/fixed.hpp"
 #include "Time/BrokenDateTime.hpp"
 #include "Util/tstring.hpp"
+#include "Computer/FlyingComputer.hpp"
 
 struct MoreData;
 struct DerivedInfo;
@@ -53,6 +54,10 @@ class FlightLogger {
   BrokenDateTime start_time;
 
   BrokenDateTime landing_time;
+
+  fixed rel_altitude;
+  fixed max_altitude;
+  FlyingComputer flying_computer;
 
 public:
   FlightLogger() {

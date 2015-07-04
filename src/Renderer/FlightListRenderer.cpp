@@ -52,30 +52,37 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
     return;
 
   const unsigned row_height = font_height + padding;
-  const unsigned date_width = canvas.CalcTextWidth(_T("2222-22-22")) + padding * 4;
-  const unsigned time_width = canvas.CalcTextWidth(_T("22:22")) + padding * 4;
+  const unsigned date_width = canvas.CalcTextWidth(_T("2015-12-31")) + padding * 3;
+  const unsigned time_width = canvas.CalcTextWidth(_T("22:22")) + padding * 2;
+  const unsigned alt_width = canvas.CalcTextWidth(_T("12500")) + padding * 2;
 
   int y = rc.top + 2 * padding + row_height;
   canvas.Select(header_font);
   {
     int x = rc.left + padding;
-    canvas.DrawText(x, y, _T("Date"));
+    canvas.DrawText(x, y, _T("       Date"));
     x += date_width;
 
     canvas.DrawText(x, y, _T("Start"));
     x += time_width;
 
-    canvas.DrawText(x, y, _T("End"));
+    canvas.DrawText(x, y, _T(" End"));
     x += time_width;
 
-    canvas.DrawText(x, y, _T("Duration"));
+    canvas.DrawText(x, y, _T(" Dur."));
+    x += time_width;
+
+    canvas.DrawText(x, y, _T("  Rel."));
+    x += alt_width;
+
+    canvas.DrawText(x, y, _T("  Max"));
   }
   y += row_height;
 
   canvas.Select(font);
 
   while (!flights.empty() && y < (int) rc.bottom - (int) row_height) {
-    const FlightInfo flight = flights.pop();
+    FlightInfo flight = flights.pop();
     int x = rc.left + padding;
 
     StaticString<64> buffer;
@@ -88,7 +95,7 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
     x += date_width;
 
     if (flight.start_time.IsPlausible()) {
-      buffer.UnsafeFormat(_T("%02u:%02u  "),
+      buffer.UnsafeFormat(_T("%02u:%02u "),
                           flight.start_time.hour, flight.start_time.minute);
       canvas.DrawText(x, y, buffer);
     } else
@@ -104,13 +111,20 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
     x += time_width;
 
     if (flight.Duration() >= 0) {
-      BrokenTime duration = BrokenTime::FromSecondOfDay(flight.Duration());
-      buffer.UnsafeFormat(_T("%02u:%02u"),
-                          duration.hour, duration.minute);
+      buffer.UnsafeFormat(_T("%5.1f"),
+                          (double)flight.Duration() / (60*60));
       canvas.DrawText(x, y, buffer);
     } else
       canvas.DrawText(x, y, _T("--:--"));
     x += time_width;
+
+    buffer.UnsafeFormat(_T("%5u"), flight.rel_altitude);
+    canvas.DrawText(x, y, buffer);
+    x += alt_width;
+
+    buffer.UnsafeFormat(_T("%5u"), flight.max_altitude);
+    canvas.DrawText(x, y, buffer);
+    x += alt_width;
 
     y += row_height;
   }

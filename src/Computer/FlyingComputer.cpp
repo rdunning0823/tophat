@@ -42,7 +42,7 @@ FlyingComputer::Reset()
   last_ground_altitude = fixed(-1);
 }
 
-inline void
+void
 FlyingComputer::CheckRelease(FlyingState &state, fixed time,
                              const GeoPoint &location, fixed altitude)
 {
