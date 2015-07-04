@@ -33,6 +33,9 @@ struct FlightInfo {
   BrokenTime start_time, end_time;
 
   int Duration() const;
+
+  unsigned int rel_altitude;
+  unsigned int max_altitude;
 };
 
 #endif

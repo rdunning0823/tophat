@@ -119,10 +119,11 @@ public:
    */
   void Finish(FlyingState &flying, fixed time);
 
-protected:
   void CheckRelease(FlyingState &state, fixed time, const GeoPoint &location,
                     fixed altitude);
+  fixed get_sinking_altitude() { return sinking_altitude; }
 
+protected:
   /**
    * Check for monotonic climb.  This check is used for "flying"
    * detection in a wave, when ground speed is low, no airspeed is

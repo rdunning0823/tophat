@@ -25,6 +25,7 @@ Copyright_License {
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
 #include "IO/TextWriter.hpp"
+#include "Formatter/UserUnits.hpp"
 
 void
 FlightLogger::Reset()
@@ -33,6 +34,9 @@ FlightLogger::Reset()
   seen_on_ground = seen_flying = false;
   start_time.Clear();
   landing_time.Clear();
+  flying_computer.Reset();
+  rel_altitude = fixed(0);
+  max_altitude = fixed(0);
 }
 
 void
@@ -82,9 +86,14 @@ FlightLogger::TickInternal(const MoreData &basic,
       /* landing was confirmed (not on ground anymore): log it */
       seen_flying = false;
 
-      LogEvent(landing_time, "landing");
+      StaticString<32> rel, max, temp;
+      FormatUserAltitude(rel_altitude, rel.buffer(), false);
+      FormatUserAltitude(max_altitude, max.buffer(), false);
+      temp.Format(_T("landing %s/%s"), rel.buffer(), max.buffer());
+      LogEvent(landing_time, temp.buffer());
 
       landing_time.Clear();
+
     }
   }
 
@@ -93,6 +102,18 @@ FlightLogger::TickInternal(const MoreData &basic,
 
   if (!flight.flying && flight.on_ground)
     seen_on_ground = true;
+
+  if (seen_flying) {
+    if (max_altitude < basic.nav_altitude)
+      max_altitude = basic.nav_altitude;
+    /* CheckRelease does not accept (const FlyingState &) */
+    FlyingState _flight = flight;
+    FlyingState &state = _flight;
+    flying_computer.CheckRelease(state, basic.time, basic.location,
+				 basic.nav_altitude);
+    if (rel_altitude == fixed(0) && state.release_location.IsValid())
+      rel_altitude = flying_computer.get_sinking_altitude();
+  }
 }
 
 void

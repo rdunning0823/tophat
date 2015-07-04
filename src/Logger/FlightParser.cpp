@@ -21,6 +21,7 @@ Copyright_License {
 }
 */
 
+#include <ctype.h>
 #include "FlightParser.hpp"
 #include "IO/LineReader.hpp"
 #include "Util/StringUtil.hpp"
@@ -33,6 +34,7 @@ FlightParser::Read(FlightInfo &flight)
   flight.date = BrokenDate::Invalid();
   flight.start_time = BrokenTime::Invalid();
   flight.end_time = BrokenTime::Invalid();
+  const char *landing = "landing";
 
   while (true) {
     BrokenDateTime dt;
@@ -49,7 +51,13 @@ FlightParser::Read(FlightInfo &flight)
 
       flight.date = dt;
       flight.start_time = dt;
-    } else if (StringIsEqual(line, "landing")) {
+    } else if (strncmp(line, landing, strlen(landing)) == 0) {
+      while (*line && !isdigit(*line)) /* advance until release altitude */
+	line++;
+      int result = sscanf(line, "%u/%u",
+			  &flight.rel_altitude, &flight.max_altitude);
+      if (result != 2)
+	return false;
       if (flight.date.IsPlausible()) {
         // we have a start date/time
         int duration = dt - BrokenDateTime(flight.date, flight.start_time);
