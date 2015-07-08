@@ -160,14 +160,6 @@ AbstractTask::UpdateStatsDistances(const GeoPoint &location,
 
   stats.total.travelled.SetDistance(ScanDistanceTravelled(location));
   stats.total.planned.SetDistance(ScanDistancePlanned());
-
-  if (IsScored()) {
-    if (!stats.start.task_started)
-      stats.distance_scored = fixed(0);
-    else if (!stats.task_finished)
-      stats.distance_scored = ScanDistanceScored(location);
-  } else
-    stats.distance_scored = fixed(0);
 }
 
 static void
