@@ -135,3 +135,7 @@ LogFormat(const TCHAR *Str, ...)
 }
 
 #endif
+
+namespace DebugFlags {
+  bool Print = false;
+}
