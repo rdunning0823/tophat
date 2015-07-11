@@ -83,32 +83,43 @@ StartPoint::UpdateSampleNear(const AircraftState& state,
 void
 StartPoint::find_best_start(const AircraftState &state,
                             const OrderedTaskPoint &next,
-                            const TaskProjection &projection)
+                            const TaskProjection &projection,
+                            bool subtract_start_radius)
 {
   /* check which boundary point results in the smallest distance to
      fly */
 
-  const OZBoundary boundary = GetBoundary();
-  assert(!boundary.empty());
-
-  const auto end = boundary.end();
-  auto i = boundary.begin();
-  assert(i != end);
-
   const GeoPoint &next_location = next.GetLocationRemaining();
 
-  GeoPoint best_location = *i;
-  fixed best_distance = ::DoubleDistance(state.location, *i, next_location);
+  if (subtract_start_radius) {
+    const OZBoundary boundary = GetBoundary();
+    assert(!boundary.empty());
 
-  for (++i; i != end; ++i) {
-    fixed distance = ::DoubleDistance(state.location, *i, next_location);
-    if (distance < best_distance) {
-      best_location = *i;
-      best_distance = distance;
+    const auto end = boundary.end();
+    auto i = boundary.begin();
+    assert(i != end);
+
+    GeoPoint best_location = *i;
+    fixed best_distance = ::DoubleDistance(state.location, *i, next_location);
+
+    for (++i; i != end; ++i) {
+      fixed distance = ::DoubleDistance(state.location, *i, next_location);
+      if (distance < best_distance) {
+        best_location = *i;
+        best_distance = distance;
+      }
     }
-  }
 
-  SetSearchMin(SearchPoint(best_location, projection));
+    SetSearchMin(SearchPoint(best_location, projection));
+  } else {
+    // for US Contests, never score more distance than start point
+    // regardless of where they exit the cylinder
+    const GeoPoint &best_us_start =
+        (state.location.Distance(next_location) > Distance(next_location)) ?
+        this->GetLocation() : state.location;
+    SetSearchMin(SearchPoint(best_us_start, projection));
+
+  }
 }
 
 bool

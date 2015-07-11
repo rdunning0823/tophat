@@ -241,6 +241,12 @@ public:
     return !optional_start_points.empty();
   }
 
+  /* returns true if the task start point radius should be subtracted from
+   * distance calculation
+   */
+  gcc_pure
+  bool SubtractStartRadius() const;
+
   /**
    * Insert taskpoint before specified index in task.  May fail if the candidate
    * is the wrong type (e.g. if it is a StartPoint and the task already

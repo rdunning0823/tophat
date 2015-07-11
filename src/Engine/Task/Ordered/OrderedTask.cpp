@@ -58,10 +58,10 @@
  * subtracted from the task distance.  This flag controls whether this
  * behaviour is enabled.
  *
- * Currently, it is always enabled, but at some point, we may want to
- * make it optional.
+ * Currently, finish is always enabled, but at some point, we may want to
+ * make it optional.  Start is controlled separately by a function.
  */
-constexpr bool subtract_start_finish_cylinder_radius = true;
+constexpr bool subtract_finish_cylinder_radius = true;
 
 /**
  * Determine the cylinder radius if this is a CylinderZone.  If not,
@@ -223,6 +223,33 @@ OrderedTask::ScanLegStartTime()
 // DISTANCES
 
 inline bool
+OrderedTask::SubtractStartRadius() const {
+  if (taskpoint_start == nullptr)
+    return false;
+
+  if (!taskpoint_start->HasEntered())
+    return true;
+
+  switch (GetFactoryType()) {
+  case TaskFactoryType::FAI_GENERAL:
+  case TaskFactoryType::FAI_TRIANGLE:
+  case TaskFactoryType::FAI_OR:
+  case TaskFactoryType::FAI_GOAL:
+    return true;
+
+  case TaskFactoryType::MIXED:
+  case TaskFactoryType::TOURING:
+  case TaskFactoryType::COUNT:
+
+  case TaskFactoryType::RACING:
+  case TaskFactoryType::AAT:
+  case TaskFactoryType::MAT:
+    return task_behaviour.contest_nationality != ContestNationalities::AMERICAN;
+  }
+  return false;
+}
+
+inline bool
 OrderedTask::RunDijsktraMin(const GeoPoint &location)
 {
   const unsigned task_size = TaskSize();
@@ -233,7 +260,9 @@ OrderedTask::RunDijsktraMin(const GeoPoint &location)
     dijkstra_min = new TaskDijkstraMin();
   TaskDijkstraMin &dijkstra = *dijkstra_min;
 
-  const unsigned active_index = GetActiveIndex();
+  // only let Dijstra set min for start if we're subtracting start radius
+  const unsigned active_index = std::max((SubtractStartRadius() ? 0u : 1u),
+                                         GetActiveIndex());
   dijkstra.SetTaskSize(task_size - active_index);
   for (unsigned i = active_index; i != task_size; ++i) {
     const SearchPointVector &boundary = task_points[i]->GetSearchPoints();
@@ -304,17 +333,15 @@ OrderedTask::RunDijsktraMax()
   }
 
   fixed start_radius(-1), finish_radius(-1);
-  if (subtract_start_finish_cylinder_radius) {
+  if (SubtractStartRadius()) {
+    start_radius = GetCylinderRadiusOrMinusOne(*taskpoint_start);
+    if (positive(start_radius))
+      dijkstra.SetBoundary(0, task_points[0]->GetNominalPoints());
+  }
+  if (subtract_finish_cylinder_radius) {
     /* to subtract the start/finish cylinder radius, we use only the
        nominal points (i.e. the cylinder's center), and later replace
        it with a point on the cylinder boundary */
-
-    if (taskpoint_start != nullptr) {
-      start_radius = GetCylinderRadiusOrMinusOne(*taskpoint_start);
-      if (positive(start_radius))
-        dijkstra.SetBoundary(0, task_points[0]->GetNominalPoints());
-    }
-
     if (taskpoint_finish != nullptr) {
       finish_radius = GetCylinderRadiusOrMinusOne(*taskpoint_finish);
       if (positive(finish_radius))
@@ -348,7 +375,8 @@ OrderedTask::RunDijsktraMax()
     }
 
     SetPointSearchMax(i, solution);
-    if (i <= active_index)
+    // only do this for start if we're subtracting the start radius
+    if (i <= active_index && ((i > 0) || SubtractStartRadius()))
       set_tp_search_achieved(i, solution);
   }
 
@@ -389,16 +417,15 @@ OrderedTask::ScanDistanceNominal()
 
   fixed d = taskpoint_start->ScanDistanceNominal();
 
-  if (subtract_start_finish_cylinder_radius) {
-    fixed radius = GetCylinderRadiusOrMinusOne(*taskpoint_start);
+  // always subtract start/finish cylinders for nominal distance
+  fixed radius = GetCylinderRadiusOrMinusOne(*taskpoint_start);
+  if (positive(radius) && radius < d)
+    d -= radius;
+
+  if (taskpoint_finish != nullptr) {
+    radius = GetCylinderRadiusOrMinusOne(*taskpoint_finish);
     if (positive(radius) && radius < d)
       d -= radius;
-
-    if (taskpoint_finish != nullptr) {
-      radius = GetCylinderRadiusOrMinusOne(*taskpoint_finish);
-      if (positive(radius) && radius < d)
-        d -= radius;
-    }
   }
 
   return d;
@@ -543,6 +570,13 @@ OrderedTask::CheckTransitions(const AircraftState &state,
 
     taskpoint_finish->set_fai_finish_height(start_state.altitude - fixed(1000));
   }
+
+  // find boundary point that produces shortest
+  // distance from state to that point to next tp point for FAI
+  // or for US contest use actual start location.
+  if (stats.start.task_started && !last_started)
+    taskpoint_start->find_best_start(state, *task_points[1], task_projection,
+                                     SubtractStartRadius());
 
   if (task_events != nullptr) {
     if (stats.start.task_started && !last_started)
@@ -1264,9 +1298,6 @@ OrderedTask::UpdateStartTransition(const AircraftState &state,
                                    OrderedTaskPoint &start)
 {
   if (active_task_point == 0) {
-    // find boundary point that produces shortest
-    // distance from state to that point to next tp point
-    taskpoint_start->find_best_start(state, *task_points[1], task_projection);
   } else if (!start.HasExited() && !start.IsInSector(state)) {
     start.Reset();
     // reset on invalid transition to outside

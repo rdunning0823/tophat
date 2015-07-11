@@ -85,10 +85,13 @@ public:
    *
    * @param state Current aircraft state
    * @param next Next task point following the start
+   * @param
+   * @para do we subtract the start radius from the best start
    */
   void find_best_start(const AircraftState &state,
                        const OrderedTaskPoint &next,
-                       const TaskProjection &projection);
+                       const TaskProjection &projection,
+                       bool subtract_start_radius);
 
   /* virtual methods from class TaskPoint */
   virtual fixed GetElevation() const override;
