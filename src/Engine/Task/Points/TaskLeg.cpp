@@ -119,9 +119,12 @@ TaskLeg::GetTravelledVector(const GeoPoint &ref) const
       return GeoVector::Zero();
 
     // this leg may be partially included
-    if (GetOrigin()->HasEntered())
-      return memo_travelled.calc(GetOrigin()->GetLocationTravelled(), ref);
-
+    if (GetOrigin()->HasEntered()) {
+      if (ref.IsValid())
+        return memo_travelled.calc(GetOrigin()->GetLocationTravelled(), ref);
+      else
+        return memo_travelled.calc(GetOrigin()->GetLocationTravelled(), destination.GetLocationTravelled());
+    }
     return GeoVector::Zero();
   }
 
