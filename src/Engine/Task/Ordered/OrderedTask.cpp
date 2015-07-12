@@ -303,6 +303,8 @@ OrderedTask::ScanDistanceMin(const GeoPoint &location, bool full)
   }
 
   if (full) {
+    /* updates SearchPointMin() for points including and ahead of ActiveTaskPoint() */
+    /* e.g. start location (not time) */
     RunDijsktraMin(location);
     last_min_location = location;
   }
@@ -328,7 +330,7 @@ OrderedTask::RunDijsktraMax()
       /* since one can still travel further in the current sector, use
          the full boundary here */
       ? task_points[i]->GetBoundaryPoints()
-      : task_points[i]->GetSearchPoints();
+      : task_points[i]->GetSearchPoints();  // sampled for past, boundary for future
     dijkstra_max->SetBoundary(i, boundary);
   }
 
@@ -523,7 +525,6 @@ OrderedTask::CheckTransitions(const AircraftState &state,
                                                   transition_exit,
                                                   last_started);
     }
-
     full_update |= CheckTransitionPoint(*task_points[i],
                                         state, state_last, bb_now, bb_last,
                                         transition_enter, transition_exit,
@@ -632,6 +633,7 @@ OrderedTask::CheckTransitionPoint(OrderedTaskPoint &point,
   const bool nearby = point.BoundingBoxOverlaps(bb_now) ||
     point.BoundingBoxOverlaps(bb_last);
 
+  /* sets state_entered */
   if (nearby && point.TransitionEnter(state, state_last)) {
     transition_enter = true;
 
@@ -639,6 +641,11 @@ OrderedTask::CheckTransitionPoint(OrderedTaskPoint &point,
       task_events->EnterTransition(point);
   }
 
+  /**
+   * Transition exit for the start point returns true if we have a valid start
+   * and sets has_exited = true;
+   * Sets state_entered (start time)
+   */
   if (nearby && point.TransitionExit(state, state_last, task_projection)) {
     transition_exit = true;
 
