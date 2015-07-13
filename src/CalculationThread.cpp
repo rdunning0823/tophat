@@ -106,7 +106,9 @@ CalculationThread::Tick()
 
   // if (new GPS data)
   if (gps_updated || force)
-    // inform map new data is ready
+    // inform map new data is ready.
+    // Updates Private::Calculated() which is same as CommonInterface::Calculated()
+    // from device_blackboard.  Also propagates signal
     TriggerCalculatedUpdate();
 
   if (do_idle) {
