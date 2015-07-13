@@ -517,6 +517,22 @@ private:
   gcc_pure
   bool AllowIncrementalBoundaryStats(const AircraftState &state) const;
 
+  /**
+   * Calls task_events for appropriate transition events
+   * Updates sampled points for tp.
+   * Updates state_entered for enter or exit transition
+   * Sets has_exited = true if exit transition.
+   * @param point
+   * @param state_now
+   * @param state_last
+   * @param bb_now
+   * @param bb_last
+   * @param transition_enter.  Sets to true if just entered
+   * @param transition_exit.  Sets to true if just exited
+   * @param last_started.  Sets to false if value was true but we just exited start oz
+   * @param is_start.  True if this is the start point
+   * @return.  True if sampled points change for tp
+   */
   bool CheckTransitionPoint(OrderedTaskPoint &point,
                             const AircraftState &state_now,
                             const AircraftState &state_last,
@@ -713,8 +729,19 @@ protected:
   virtual bool UpdateSample(const AircraftState &state_now,
                             const GlidePolar &glide_polar,
                             const bool full_update) override;
+
+  /**
+   * Updates ActiveState for each point (BEFORE/CURRENT/AFTER)
+   * Run CheckTransitionPoint for each point and optional start.
+   * check "arm" state (XCSoar only)
+   * calls task_events->ActiveAdvanced, TaskStart and TaskFinish
+   * calls find_best_start to calc correct start for US/FAI tasks
+   * sets FAI finish altitudes
+   * Updates stats, samples and states for start, intermediate and finish transitions
+   */
   virtual bool CheckTransitions(const AircraftState &state_now,
                                 const AircraftState &state_last) override;
+
   virtual bool CalcBestMC(const AircraftState &state_now,
                           const GlidePolar &glide_polar,
                           fixed& best) const override;
