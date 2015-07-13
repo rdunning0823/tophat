@@ -90,6 +90,7 @@ StartPoint::find_best_start(const AircraftState &state,
      fly */
 
   const GeoPoint &next_location = next.GetLocationRemaining();
+  AircraftState new_state = state;
 
   if (subtract_start_radius) {
     const OZBoundary boundary = GetBoundary();
@@ -111,6 +112,7 @@ StartPoint::find_best_start(const AircraftState &state,
     }
 
     SetSearchMin(SearchPoint(best_location, projection));
+    new_state.location = best_location;
   } else {
     // for US Contests, never score more distance than start point
     // regardless of where they exit the cylinder
@@ -118,8 +120,9 @@ StartPoint::find_best_start(const AircraftState &state,
         (state.location.Distance(next_location) > Distance(next_location)) ?
         this->GetLocation() : state.location;
     SetSearchMin(SearchPoint(best_us_start, projection));
-
+    new_state.location = best_us_start;
   }
+  this->SetStateEntered(new_state);
 }
 
 bool
