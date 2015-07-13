@@ -77,6 +77,10 @@ public:
     trace.LockedCopyTo(v, min_time, location, resolution);
   }
 
+  /**
+   * Triggers the task to calculate and update its internal Calculated settings and
+   * copy them to the glide_computer object's Calculated settings
+   */
   void ProcessBasicTask(const MoreData &basic,
                         DerivedInfo &calculated,
                         const ComputerSettings &settings_computer,
