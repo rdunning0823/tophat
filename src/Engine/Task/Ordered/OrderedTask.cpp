@@ -565,18 +565,16 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   stats.start.task_started = TaskStarted();
 
   if (stats.start.task_started) {
+    /* calculates location of start and updates samples, and state_entered */
+    if (!last_started)
+      taskpoint_start->find_best_start(state, *task_points[1], task_projection,
+                                       SubtractStartRadius());
+
     const AircraftState start_state = taskpoint_start->GetEnteredState();
     stats.start.SetStarted(start_state);
 
     taskpoint_finish->set_fai_finish_height(start_state.altitude - fixed(1000));
   }
-
-  // find boundary point that produces shortest
-  // distance from state to that point to next tp point for FAI
-  // or for US contest use actual start location.
-  if (stats.start.task_started && !last_started)
-    taskpoint_start->find_best_start(state, *task_points[1], task_projection,
-                                     SubtractStartRadius());
 
   if (task_events != nullptr) {
     if (stats.start.task_started && !last_started)
