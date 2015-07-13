@@ -79,14 +79,17 @@ public:
   }
 
   /**
-   * Search for the min point on the boundary from
-   * the aircraft state to the next point.  Should only
-   * be performed when the aircraft state is inside the sector
+   * Find correct start point for either FAI or US contest
+   *   - for US, use actual start location (or center of cylinder if actual
+   *     start is in back half)
+   *   - for FAI use closest point on boundary of cylinder
+   * Updates stats, samples and states for start, intermediate and finish transitions
+   * Should only be performed when the aircraft state is inside the sector
    *
    * @param state Current aircraft state
    * @param next Next task point following the start
    * @param
-   * @para do we subtract the start radius from the best start
+   * @para do we find a point on the border instead of the actual start point
    */
   void find_best_start(const AircraftState &state,
                        const OrderedTaskPoint &next,
