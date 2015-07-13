@@ -108,7 +108,8 @@ public:
 
   /**
    * Test whether aircraft has exited observation zone and
-   * was previously inside; records this transition.
+   * was previously inside;
+   * Records this transition as has_exited = true if transition occurs.
    *
    * @param ref_now State current
    * @param ref_last State at last sample
