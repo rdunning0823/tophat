@@ -315,7 +315,7 @@ protected:
     bool watchedWaypoint = way_point.flags.watched;
 
     vwp.DrawSymbol(settings, look, canvas,
-                   projection.GetMapScale() > fixed(4000),
+                   projection.GetMapScale() > fixed(8000),
                    projection.GetScreenAngle());
     if (is_mat & vwp.in_task) {
       DrawMatTaskpointOz(canvas, vwp);
