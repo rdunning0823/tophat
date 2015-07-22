@@ -39,7 +39,7 @@ public:
   void
   WriteThermalList(const PhaseList &phases, const LoggerSettings &logger_settings,
                    const GliderType &glider_type,
-                   bool append);
+                   bool append, bool cup_file);
 
   /**
    *  Writes all thermal records to the output file
@@ -47,9 +47,10 @@ public:
    */
   void WriteRecord(const Phase &phase,
                    const LoggerSettings &logger_settings,
-                   const GliderType &glider_type);
+                   const GliderType &glider_type,
+                   bool cup_file);
 
-  void WriteHeaderRecord();
+  void WriteHeaderRecord(bool cup_file);
 
 };
 

@@ -317,7 +317,8 @@ int main(int argc, char **argv)
   unsigned full_max_points = 512,
            triangle_max_points = 1024,
            sprint_max_points = 64,
-           append_thermal_database = false;
+           append_thermal_database = false,
+           cup_file = false;
   StaticString<256> thermal_database_name(_T(""));
 
   Args args(argc, argv,
@@ -329,7 +330,8 @@ int main(int argc, char **argv)
             "  --full-points=512        Maximum number of full trace points (default = 512)\n"
             "  --triangle-points=1024   Maximum number of triangle trace points (default = 1024)\n"
             "  --sprint-points=64       Maximum number of sprint trace points (default = 64)\n"
-            "  --append                 Appends to the THERMAL_DATABSE");
+            "  --append                 Appends to the THERMAL_DATABASE\n"
+            "  --cup-file               creates See You .cup file format");
 
   const char *arg;
   while ((arg = args.PeekNext()) != nullptr && *arg == '-') {
@@ -365,6 +367,8 @@ int main(int argc, char **argv)
 
     } else if ((value = StringAfterPrefix(arg, "--append")) != nullptr) {
       append_thermal_database = true;
+    } else if ((value = StringAfterPrefix(arg, "--cup-file")) != nullptr) {
+      cup_file = true;
     } else {
       args.UsageError();
     }
@@ -410,7 +414,7 @@ int main(int argc, char **argv)
       ThermalWriter thermal_writer(thermal_text_writer);
       thermal_writer.WriteThermalList(flight_phase_detector.GetPhases(),
                                       replay->logger_settings, replay->glider_type,
-                                      append_thermal_database);
+                                      append_thermal_database, cup_file);
     }
   }
   delete replay;

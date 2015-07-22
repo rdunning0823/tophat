@@ -26,65 +26,99 @@
 #include "IO/TextWriter.hpp"
 
 
+NarrowString<2> delimiter;
 /**
  * Writer for a "null" value.
  */
 static inline void WriteNull(TextWriter &writer) {
-  writer.Write("null\t");
+  writer.Write("null");
+  writer.Write(delimiter.c_str());
 }
 
 /**
  * Writer for a integer value.
  */
 static inline void WriteInteger(TextWriter &writer, int value) {
-  writer.Format("%d\t", value);
+  writer.Format("%d", value);
+  writer.Write(delimiter.c_str());
 }
 
 /**
  * Writer for a integer value.
  */
 static inline void WriteUnsigned(TextWriter &writer, unsigned value) {
-  writer.Format("%u\t", value);
+  writer.Format("%u", value);
+  writer.Write(delimiter.c_str());
 }
 
 /**
  * Writer for a integer value.
  */
 static inline void WriteLong(TextWriter &writer, long value) {
-  writer.Format("%ld\t", value);
+  writer.Format("%ld", value);
+  writer.Write(delimiter.c_str());
 }
 
 /**
  * Writer for a string value.
  */
 static inline void WriteString(TextWriter &writer, const char *value) {
-  writer.Format("%s\t", value);
+  writer.Format("%s", value);
+  writer.Write(delimiter.c_str());
 }
 
 static inline void WriteFixed(TextWriter &writer, fixed value) {
-  writer.Format("%f\t", (double)value);
+  writer.Format("%f", (double)value);
+  writer.Write(delimiter.c_str());
 }
 
 static inline void WriteAngle(TextWriter &writer, Angle value) {
   WriteFixed(writer, value.Degrees());
 }
 
+static inline void WriteUSLatitude(TextWriter &writer, Angle value) {
+  writer.Format("%.3fN", (double)(value.Degrees() * fixed(100)));
+  writer.Write(delimiter.c_str());
+}
+static inline void WriteUSLongitude(TextWriter &writer, Angle value) {
+  writer.Format("0%.3fW", (double)(value.Degrees() * fixed(-100)));
+  writer.Write(delimiter.c_str());
+}
+
 void
-ThermalWriter::WriteHeaderRecord()
+ThermalWriter::WriteHeaderRecord(bool cup_file)
 {
-  WriteString(writer,
-              "Start_time\t"
-              "lat\t"
-              "lon\t"
-              "Alt_diff\t"
-              "Start_alt\t"
-              "End_alt\t"
-              "Vario\t"
-              "Duration\t"
-              "Wind_speed\t"
-              "Wind_direction\t"
-              "Pilot\t"
-              "Glider_type");
+  if (cup_file) {
+    //name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,desc,userdata,pics
+    //"44 (2.8) moderate thermal",44(2.mal,,4229.949N,07749.351W,528.2m,11,,,,,,
+    WriteString(writer,"name");
+    WriteString(writer,"code");
+    WriteString(writer,"country");
+    WriteString(writer,"lat");
+    WriteString(writer,"lon");
+    WriteString(writer,"elev");
+    WriteString(writer,"style");
+    WriteString(writer,"rwdir");
+    WriteString(writer,"rwlen");
+    WriteString(writer,"freq");
+    WriteString(writer,"desc");
+    WriteString(writer,"userdata");
+    WriteString(writer,"pics");
+
+  } else {
+    WriteString(writer,"Start_time");
+    WriteString(writer,"lat");
+    WriteString(writer,"lon");
+    WriteString(writer,"Alt_diff");
+    WriteString(writer,"Start_alt");
+    WriteString(writer,"End_alt");
+    WriteString(writer,"Vario");
+    WriteString(writer,"Duration");
+    WriteString(writer,"Wind_speed");
+    WriteString(writer,"Wind_direction");
+    WriteString(writer,"Pilot");
+    WriteString(writer,"Glider_type");
+  }
   writer.NewLine();
 }
 
@@ -92,39 +126,64 @@ void
 ThermalWriter::WriteThermalList(const PhaseList &phases,
                                 const LoggerSettings &logger_settings,
                                 const GliderType &glider_type,
-                                bool append)
+                                bool append, bool cup_file)
 {
+  delimiter = (cup_file) ? "," : "\t";
   if (!append)
-    WriteHeaderRecord();
+    WriteHeaderRecord(cup_file);
   for (Phase phase : phases) {
     if (phase.phase_type == Phase::CIRCLING)
-      WriteRecord(phase, logger_settings, glider_type);
+      WriteRecord(phase, logger_settings, glider_type, cup_file);
   }
 }
 
 void
 ThermalWriter::WriteRecord(const Phase &phase,
                            const LoggerSettings &logger_settings,
-                           const GliderType &glider_type)
+                           const GliderType &glider_type, bool cup_file)
 {
   NarrowString<64> buffer;
 
-  FormatISO8601(buffer.buffer(), phase.start_datetime);
-  WriteString(writer, buffer.c_str());
+  if (!positive(phase.alt_diff) || phase.GetVario() < fixed(1))
+    return;
 
-  WriteAngle(writer, phase.start_loc.latitude);
-  WriteAngle(writer, phase.start_loc.longitude);
-  WriteInteger(writer, (int)phase.alt_diff);
-  WriteInteger(writer, (int)phase.start_alt);
-  WriteInteger(writer, (int)phase.end_alt);
-  WriteFixed(writer, phase.GetVario());
-  WriteInteger(writer, (int)phase.duration);
-  WriteLong(writer, (double)0); // wind speed
-  WriteAngle(writer, Angle()); // wind speed
+  if (cup_file) {
+    //name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,desc,userdata,pics
+    //"44 (2.8) moderate thermal",44(2.mal,,4229.949N,07749.351W,528.2m,11,,,,,,
 
-  WriteString(writer, logger_settings.pilot_name.c_str());
-  WriteString(writer, glider_type.c_str());
+    buffer.Format("%.1f", (double)(phase.GetVario() * phase.alt_diff / fixed(300)));
+    WriteString(writer,buffer.c_str());
+    buffer.Format("v%.1f", (double)phase.GetVario());
+    WriteString(writer,buffer.c_str());
+    WriteString(writer,""); //country
+    WriteUSLatitude(writer, phase.start_loc.latitude);
+    WriteUSLongitude(writer, phase.start_loc.longitude);
+    WriteInteger(writer, (int)phase.alt_diff); // elev
+    WriteInteger(writer, 11);
+    WriteString(writer,"");
+    WriteString(writer,"");
+    WriteString(writer,"");
+    WriteString(writer,"");
+    WriteString(writer,"");
+    WriteString(writer,"");
 
+  } else {
+    FormatISO8601(buffer.buffer(), phase.start_datetime);
+    WriteString(writer, buffer.c_str());
+
+    WriteAngle(writer, phase.start_loc.latitude);
+    WriteAngle(writer, phase.start_loc.longitude);
+    WriteInteger(writer, (int)phase.alt_diff);
+    WriteInteger(writer, (int)phase.start_alt);
+    WriteInteger(writer, (int)phase.end_alt);
+    WriteFixed(writer, phase.GetVario());
+    WriteInteger(writer, (int)phase.duration);
+    WriteLong(writer, (double)0); // wind speed
+    WriteAngle(writer, Angle()); // wind speed
+
+    WriteString(writer, logger_settings.pilot_name.c_str());
+    WriteString(writer, glider_type.c_str());
+  }
   writer.NewLine();
 
 }
