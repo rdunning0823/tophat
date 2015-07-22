@@ -389,12 +389,11 @@ int main(int argc, char **argv)
   Result result;
   Run(*replay, result, full_trace, triangle_trace, sprint_trace, thermal_mode);
 
-  const ContestStatistics olc_plus = SolveContest(Contest::OLC_PLUS, full_trace, triangle_trace, sprint_trace);
-  const ContestStatistics dmst = SolveContest(Contest::DMST, full_trace, triangle_trace, sprint_trace);
-
-
   {
     if (!thermal_mode) {
+      const ContestStatistics olc_plus = SolveContest(Contest::OLC_PLUS, full_trace, triangle_trace, sprint_trace);
+      const ContestStatistics dmst = SolveContest(Contest::DMST, full_trace, triangle_trace, sprint_trace);
+
       JSON::ObjectWriter root(writer);
 
       WriteResult(root, result);
