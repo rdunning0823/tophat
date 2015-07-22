@@ -319,18 +319,16 @@ int main(int argc, char **argv)
            sprint_max_points = 64,
            append_thermal_database = false,
            cup_file = false;
-  StaticString<256> thermal_database_name(_T(""));
 
   Args args(argc, argv,
-            "[options] DRIVER FILE THERMAL_DATABASE.txt\n"
+            "[options] DRIVER FILE \n"
             "DRIVER used for NMEA input file ananysis\n"
             "FILE is IGC or NMEA input file\n"
-            "THERMAL_DATABASE is output file listing thermals in flight\n"
             "Options:\n"
             "  --full-points=512        Maximum number of full trace points (default = 512)\n"
             "  --triangle-points=1024   Maximum number of triangle trace points (default = 1024)\n"
             "  --sprint-points=64       Maximum number of sprint trace points (default = 64)\n"
-            "  --append                 Appends to the THERMAL_DATABASE\n"
+            "  --append                 skips file headers if set\n"
             "  --cup-file               creates See You .cup file format");
 
   const char *arg;
@@ -378,11 +376,6 @@ int main(int argc, char **argv)
   if (replay == NULL)
     return EXIT_FAILURE;
 
-  // create .txt thermal database output file
-  if (!args.IsEmpty() && MatchesExtension(args.PeekNext(), ".txt")) {
-    thermal_database_name = args.ExpectNext();
-  }
-
   args.ExpectEnd();
 
   static Trace full_trace(0, Trace::null_time, full_max_points);
@@ -390,7 +383,7 @@ int main(int argc, char **argv)
   static Trace sprint_trace(0, 9000, sprint_max_points);
 
   TextWriter writer("/dev/stdout", true);
-  TextWriter thermal_text_writer(thermal_database_name, append_thermal_database);
+  TextWriter thermal_text_writer("/dev/stdout", append_thermal_database);
   bool thermal_mode = thermal_text_writer.IsOpen();
 
   Result result;
