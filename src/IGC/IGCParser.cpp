@@ -74,6 +74,10 @@ IGCParseHRecords(const char *line, GliderType &glider_type, LoggerSettings &logg
     IGCParsePilotRecord(upper_line, logger_settings);
   else if (memcmp(upper_line, "HFGTYGLIDERTYPE:", 16) == 0)
     IGCParseGliderType(upper_line, glider_type);
+  else if (memcmp(upper_line, "HFCIDCOMPETITIONID:", 19) == 0)
+    IGCParseCompetitionIDRecord(upper_line, logger_settings);
+  else if (memcmp(upper_line, "HFGIDGLIDERID:", 14) == 0)
+    IGCParseGliderIDRecord(upper_line, logger_settings);
   return true;
 }
 
@@ -86,6 +90,30 @@ IGCParsePilotRecord(const char *upper_line, LoggerSettings &logger_settings)
   ACPToWideConverter trimmed_line(TrimLeft(upper_line));
 
   logger_settings.pilot_name = trimmed_line;
+  return true;
+}
+
+bool
+IGCParseCompetitionIDRecord(const char *upper_line, LoggerSettings &logger_settings)
+{
+  assert (memcmp(upper_line, "HFCIDCOMPETITIONID:", 19) == 0);
+
+  upper_line += 19;
+  ACPToWideConverter trimmed_line(TrimLeft(upper_line));
+
+  logger_settings.competition_id = trimmed_line;
+  return true;
+}
+
+bool
+IGCParseGliderIDRecord(const char *upper_line, LoggerSettings &logger_settings)
+{
+  assert (memcmp(upper_line, "HFGIDGLIDERID:", 14) == 0);
+
+  upper_line += 14;
+  ACPToWideConverter trimmed_line(TrimLeft(upper_line));
+
+  logger_settings.glider_id = trimmed_line;
   return true;
 }
 

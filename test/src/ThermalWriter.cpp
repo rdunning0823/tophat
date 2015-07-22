@@ -148,10 +148,8 @@ ThermalWriter::WriteRecord(const Phase &phase,
     return;
 
   if (cup_file) {
-    //name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,desc,userdata,pics
-    //"44 (2.8) moderate thermal",44(2.mal,,4229.949N,07749.351W,528.2m,11,,,,,,
-
-    buffer.Format("%.1f", (double)(phase.GetVario() * phase.alt_diff / fixed(300)));
+    buffer.Format("%s %.1f", logger_settings.GetCompetitionID(),
+                  (double)(phase.GetVario() * phase.alt_diff / fixed(300)));
     WriteString(writer,buffer.c_str());
     buffer.Format("v%.1f", (double)phase.GetVario());
     WriteString(writer,buffer.c_str());

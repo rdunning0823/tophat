@@ -76,6 +76,12 @@ IGCParsePilotRecord(const char *upper_line, LoggerSettings &logger_settings);
 bool
 IGCParseGliderType(const char *upper_line, GliderType &glider_type);
 
+bool
+IGCParseGliderIDRecord(const char *upper_line, LoggerSettings &logger_settings);
+
+bool
+IGCParseCompetitionIDRecord(const char *upper_line, LoggerSettings &logger_settings);
+
 /**
  * Parse an IGC "I" record.
  *

@@ -31,10 +31,21 @@ LoggerSettings::SetDefaults()
   auto_logger = AutoLogger::ON;
   logger_id.clear();
   pilot_name.clear();
+  competition_id.clear();
+  glider_id.clear();
 
   /* XXX disabled by default for now, until the FlightLogger
      implementation is finished */
   enable_flight_logger = false;
 
   enable_nmea_logger = false;
+}
+
+const TCHAR*
+LoggerSettings::GetCompetitionID() const
+{
+  if (competition_id.empty())
+    return glider_id.c_str();
+  else
+    return competition_id.c_str();
 }

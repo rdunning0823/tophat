@@ -27,6 +27,7 @@ Copyright_License {
 #include "Util/StaticString.hpp"
 
 #include <stdint.h>
+#include <tchar.h>
 
 /**
  * Logger settings
@@ -58,7 +59,16 @@ struct LoggerSettings {
 
   StaticString<64> pilot_name;
 
+  /* currently only used by replay */
+  StaticString<10> competition_id;
+  StaticString<32> glider_id;
+
   void SetDefaults();
+
+  /**
+   * returns competition_id if exists, else glider_id
+   */
+  const TCHAR *GetCompetitionID() const;
 };
 
 #endif
