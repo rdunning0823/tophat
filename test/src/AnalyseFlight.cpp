@@ -36,6 +36,8 @@
 #include "ThermalWriter.hpp"
 #include "Computer/Settings.hpp"
 #include "Util/StaticString.hpp"
+#include "Computer/Wind/Computer.hpp"
+#include "Engine/GlideSolvers/GlidePolar.hpp"
 
 struct Result {
   BrokenDateTime takeoff_time, release_time, landing_time;
@@ -53,6 +55,7 @@ struct Result {
 };
 
 
+static WindComputer wind_computer;
 static CirclingComputer circling_computer;
 static FlightPhaseDetector flight_phase_detector;
 
@@ -100,6 +103,16 @@ ComputeCircling(DebugReplay &replay, const CirclingSettings &circling_settings)
 }
 
 static void
+ComputeWind(WindSettings &wind_settings, GlidePolar &glide_polar,
+            DebugReplay &replay)
+{
+
+  wind_computer.Compute(wind_settings, glide_polar, replay.Basic(),
+                        replay.SetCalculated());
+}
+
+
+static void
 Finish(const MoreData &basic, const DerivedInfo &calculated,
        Result &result)
 {
@@ -122,6 +135,13 @@ Run(DebugReplay &replay, Result &result,
   CirclingSettings circling_settings;
   circling_settings.SetDefaults();
 
+  WindSettings wind_settings;
+  wind_settings.SetDefaults();
+  wind_settings.user_wind_source = UserWindSource::INTERNAL_WIND;
+  wind_computer.Reset();
+
+  GlidePolar *glide_polar = new GlidePolar(fixed(0));
+
   bool released = false;
 
   GeoPoint last_location = GeoPoint::Invalid();
@@ -130,6 +150,8 @@ Run(DebugReplay &replay, Result &result,
 
   while (replay.Next()) {
     ComputeCircling(replay, circling_settings);
+    ComputeWind(wind_settings, *glide_polar, replay);
+    wind_computer.Select(wind_settings, replay.Basic(), replay.SetCalculated());
 
     const MoreData &basic = replay.Basic();
 
@@ -178,6 +200,7 @@ Run(DebugReplay &replay, Result &result,
   Update(replay.Basic(), replay.Calculated(), result);
   Finish(replay.Basic(), replay.Calculated(), result);
   flight_phase_detector.Finish();
+  delete glide_polar;
 }
 
 gcc_pure

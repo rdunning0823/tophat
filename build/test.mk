@@ -1571,6 +1571,15 @@ $(eval $(call link-program,RunOLCAnalysis,RUN_OLC))
 
 ANALYSE_FLIGHT_SOURCES = \
 	$(DEBUG_REPLAY_SOURCES) \
+	$(SRC)/Computer/CirclingComputer.cpp \
+	$(SRC)/Computer/Wind/Settings.cpp \
+	$(SRC)/Computer/Wind/WindEKF.cpp \
+	$(SRC)/Computer/Wind/WindEKFGlue.cpp \
+	$(SRC)/Computer/Wind/CirclingWind.cpp \
+	$(SRC)/Computer/Wind/Computer.cpp \
+	$(SRC)/Computer/Wind/MeasurementList.cpp \
+	$(SRC)/Computer/Wind/Store.cpp \
+	$(SRC)/Formatter/TimeFormatter.cpp \
 	$(SRC)/NMEA/Aircraft.cpp \
 	$(SRC)/JSON/Writer.cpp \
 	$(SRC)/Formatter/TimeFormatter.cpp \

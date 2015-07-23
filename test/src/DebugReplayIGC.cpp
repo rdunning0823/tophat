@@ -31,35 +31,59 @@ bool
 DebugReplayIGC::Next()
 {
   last_basic = computed_basic;
-
   const char *line;
-  while ((line = reader->ReadLine()) != NULL) {
-    if (line[0] == 'B') {
-      IGCFix fix;
-      if (IGCParseFix(line, extensions, fix)) {
-        CopyFromFix(fix);
+  IGCFix fix;
+  while (cli->NeedData(virtual_time)) {
+    if ((line = reader->ReadLine()) != NULL) {
+      if (line[0] == 'B') {
+        fix.Clear();
+        if (IGCParseFix(line, extensions, fix) && fix.time.IsPlausible()) {
+          cli->Update(fix.time.GetSecondOfDay(), fix.location,
+                      fix.gps_altitude,
+                      fix.pressure_altitude);
+          if (negative(virtual_time)) {
+            virtual_time = fix.time.GetSecondOfDay();
+          }
+        }
+        continue;
 
-        Compute();
-        return true;
+      } else if (line[0] == 'H') {
+        BrokenDate date;
+        if (memcmp(line, "HFDTE", 5) == 0 &&
+            IGCParseDateRecord(line, date)) {
+          (BrokenDate &)raw_basic.date_time_utc = date;
+          raw_basic.time_available.Clear();
+        } else {
+          IGCParseHRecords(line, glider_type, logger_settings);
+        }
+      } else if (line[0] == 'I') {
+        IGCParseExtensions(line, extensions);
       }
-    } else if (line[0] == 'H') {
-      BrokenDate date;
-      if (memcmp(line, "HFDTE", 5) == 0 &&
-          IGCParseDateRecord(line, date)) {
-        (BrokenDate &)raw_basic.date_time_utc = date;
-        raw_basic.time_available.Clear();
-      } else {
-        IGCParseHRecords(line, glider_type, logger_settings);
-      }
-    } else if (line[0] == 'I') {
-      IGCParseExtensions(line, extensions);
+    } else {
+      if (computed_basic.time_available)
+        flying_computer.Finish(calculated.flight, computed_basic.time);
+
+      return false;
     }
   }
 
-  if (computed_basic.time_available)
-    flying_computer.Finish(calculated.flight, computed_basic.time);
+  const CatmullRomInterpolator::Record r = cli->Interpolate(virtual_time);
+  const GeoVector v = cli->GetVector(virtual_time);
 
-  return false;
+  fix.Clear();
+  fix.time = BrokenTime::FromSecondOfDayChecked(virtual_time);
+  fix.gps_valid = true;
+  fix.gps_altitude = r.gps_altitude;
+  fix.pressure_altitude = r.baro_altitude;
+  fix.location = r.location;
+  fix.gsp = v.distance; /* use m/s, not kph */
+  fix.trt = v.bearing.AbsoluteDegrees();
+  CopyFromFix(fix);
+
+  Compute();
+  ++virtual_time;
+
+  return true;
 }
 
 void
@@ -114,8 +138,7 @@ DebugReplayIGC::CopyFromFix(const IGCFix &fix)
   }
 
   if (fix.gsp >= 0) {
-    basic.ground_speed = Units::ToSysUnit(fixed(fix.gsp),
-                                          Unit::KILOMETER_PER_HOUR);
+    basic.ground_speed = fix.gsp; /* fix.gps was stored as m/s, not kph */
     basic.ground_speed_available.Update(basic.clock);
   }
 

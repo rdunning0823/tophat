@@ -26,20 +26,32 @@ Copyright_License {
 
 #include "DebugReplay.hpp"
 #include "IGC/IGCExtensions.hpp"
+#include "Replay/CatmullRomInterpolator.hpp"
 
 class NLineReader;
 struct IGCFix;
 
 class DebugReplayIGC : public DebugReplay {
   IGCExtensions extensions;
+  fixed virtual_time;
+  CatmullRomInterpolator *cli;
 
 public:
   DebugReplayIGC(NLineReader *reader)
-    :DebugReplay(reader) {
+    :DebugReplay(reader), virtual_time(fixed(-1)) {
     extensions.clear();
+    cli = new CatmullRomInterpolator(fixed(0.98));
+    cli->Reset();
+  }
+  ~DebugReplayIGC() {
+    delete cli;
   }
 
+  /**
+   * Process next line, or virtual line if fixes more than 1 second apart
+   */
   virtual bool Next();
+
 
 protected:
   void CopyFromFix(const IGCFix &fix);
