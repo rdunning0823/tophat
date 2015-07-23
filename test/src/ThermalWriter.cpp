@@ -161,7 +161,10 @@ ThermalWriter::WriteRecord(const Phase &phase,
     WriteString(writer,"");
     WriteString(writer,"");
     WriteString(writer,"");
-    WriteString(writer,"");
+    buffer.Format("wind %.0f / %.0fkts",
+                  (double)phase.wind.bearing.AbsoluteDegrees(),
+                  (double)(phase.wind.norm * fixed(1.94384)));
+    WriteString(writer,buffer.c_str());
     WriteString(writer,"");
     WriteString(writer,"");
 
@@ -176,8 +179,8 @@ ThermalWriter::WriteRecord(const Phase &phase,
     WriteInteger(writer, (int)phase.end_alt);
     WriteFixed(writer, phase.GetVario());
     WriteInteger(writer, (int)phase.duration);
-    WriteLong(writer, (double)0); // wind speed
-    WriteAngle(writer, Angle()); // wind speed
+    WriteInteger(writer, (int)(phase.wind.norm * fixed(1.94384))); // knots
+    WriteInteger(writer, (int)phase.wind.bearing.AbsoluteDegrees());
 
     WriteString(writer, logger_settings.pilot_name.c_str());
     WriteString(writer, glider_type.c_str());
