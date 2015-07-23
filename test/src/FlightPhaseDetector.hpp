@@ -27,6 +27,8 @@
 #include "Math/fixed.hpp"
 #include "Geo/GeoPoint.hpp"
 #include "Time/BrokenDateTime.hpp"
+#include "Computer/Wind/Store.hpp"
+
 
 struct MoreData;
 struct DerivedInfo;
@@ -91,6 +93,8 @@ struct Phase {
   /** Average glide rate during the phase */
   fixed GetGlideRate() const;
 
+  /* wind for current phase */
+  SpeedVector wind;
   /**
    * Reinitialize phase
    */
@@ -106,6 +110,7 @@ struct Phase {
     alt_diff = fixed(0);
     distance = fixed(0);
     merges = 0;
+    wind.Zero();
   }
 };
 

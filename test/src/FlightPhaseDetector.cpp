@@ -66,6 +66,7 @@ CombinePhases(Phase &base, const Phase &addition)
   base.distance += addition.distance;
   base.duration += addition.duration;
   base.alt_diff += addition.alt_diff;
+  base.wind = addition.wind; /* this always uses last wind! */
   base.merges++;
 }
 
@@ -179,6 +180,7 @@ FlightPhaseDetector::Update(const MoreData &basic, const DerivedInfo &calculated
   current_phase.end_time = basic.time;
   current_phase.end_loc = basic.location;
   current_phase.end_alt = basic.nav_altitude;
+  current_phase.wind = calculated.wind;
   UpdateCirclingDirection(current_phase, CalcCirclingDirection(calculated));
   // When powered flight is detected, current phase becomes "powered"
   if (IsPoweredFlight(calculated)) {
