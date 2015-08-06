@@ -118,6 +118,12 @@ namespace InputEvents
   void sub_AutoZoom(int vswitch);
   void sub_ScaleZoom(int vswitch);
   void sub_SetZoom(fixed value);
+  void findNextActiveLabel(int direction);
+
+  /**
+   * Clears the "down" property for all items in current menu
+   */
+  void ReleaseMenuItems();
 
   // -------
 
@@ -192,6 +198,17 @@ namespace InputEvents
   void eventWeather(const TCHAR *misc);
   void eventQuickMenu(const TCHAR *misc);
   void eventFileManager(const TCHAR *misc);
+
+  /**
+   * Move active menu item up or down
+   * @param misc "up" or "down"
+   */
+  void eventChangeActiveLabel(const TCHAR *misc);
+
+  /**
+   * process event associated with active menu item
+   */
+  void eventDoActiveLabel(gcc_unused const TCHAR *misc);
 
   // -------
 };

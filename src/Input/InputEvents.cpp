@@ -86,6 +86,8 @@ namespace InputEvents
 
   static unsigned MenuTimeOut = 0;
 
+  static int active_label = 1;
+
   gcc_pure
   static Mode getModeID();
 
@@ -105,6 +107,58 @@ namespace InputEvents
 };
 
 static InputConfig input_config;
+
+void InputEvents::ReleaseMenuItems()
+{
+  Menu *const menu = &input_config.menus[getModeID()];
+  Menu *const overlay_menu = &input_config.menus[overlay_mode];
+
+  Menu &active_menu = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+      ? (*overlay_menu)
+      : (*menu);
+
+  for (unsigned i = 0; i < active_menu.MAX_ITEMS; ++i)
+    active_menu.SetMenuItem(i).down = false;
+}
+
+void InputEvents::findNextActiveLabel(int direction)
+{
+    assert(direction == 1 || direction == -1);
+    Menu *const menu = &input_config.menus[getModeID()];
+    Menu *const overlay_menu = &input_config.menus[overlay_mode];
+    int max_label = (*menu).MAX_ITEMS ;
+
+    MenuItem &item_old = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+        ? (*overlay_menu).SetMenuItem(active_label)
+        : (*menu).SetMenuItem(active_label);
+    if (item_old.event)
+      item_old.down = false;
+
+    int old_active_label = active_label;
+    bool looped = 0;
+    active_label = active_label + direction;
+    for (; (active_label < old_active_label && direction > 0)
+         || (active_label > old_active_label && direction < 0)
+         || !looped ;
+         active_label = active_label + direction) {
+
+        if (active_label > max_label) {
+            active_label = 0;
+            looped = 1;
+        } else if (active_label < 0) {
+            active_label = max_label;
+            looped = 1;
+        }
+        MenuItem &item = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+            ? (*overlay_menu).SetMenuItem(active_label)
+            : (*menu).SetMenuItem(active_label);
+        if (item.event) {
+          item.down = true;
+            break;
+        }
+    }
+    drawButtons(getModeID(), true);
+}
 
 // Read the data files
 void
@@ -135,6 +189,9 @@ InputEvents::setMode(Mode mode)
   UpdateOverlayMode();
 
   drawButtons(getModeID(), true);
+  ReleaseMenuItems();
+  active_label = 0;
+  findNextActiveLabel(1);
 }
 
 void
@@ -241,6 +298,25 @@ InputEvents::UpdateOverlayMode()
     overlay_mode = MODE_DEFAULT;
 }
 
+void
+InputEvents::eventChangeActiveLabel(const TCHAR *misc)
+{
+    if (StringIsEqual(misc, _T("up")))
+        findNextActiveLabel(1);
+    else if (StringIsEqual(misc, _T("down")))
+        findNextActiveLabel(-1);
+}
+
+void InputEvents::eventDoActiveLabel(gcc_unused const TCHAR *misc)
+{
+    const Menu *const menu = &input_config.menus[getModeID()];
+    const Menu *const overlay_menu = &input_config.menus[overlay_mode];
+    const MenuItem &item = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+      ? (*overlay_menu)[active_label]
+      : (*menu)[active_label];
+    ProcessEvent(item.event);
+}
+
 // -----------------------------------------------------------------------
 // Processing functions - which one to do
 // -----------------------------------------------------------------------
@@ -272,7 +348,6 @@ void
 InputEvents::ProcessEvent(unsigned event_id)
 {
   assert(event_id != 0);
-
   InputEvents::Mode lastMode = getModeID();
 
   int bindex = FindMenuItemByEvent(lastMode, overlay_mode, event_id);
@@ -452,6 +527,7 @@ InputEvents::processGo(unsigned eventid)
 void
 InputEvents::HideMenu()
 {
+  ReleaseMenuItems();
   CommonInterface::SetUIState().main_menu_index = 0;
   CommonInterface::BroadcastUIStateUpdate();
   setMode(MODE_DEFAULT);
