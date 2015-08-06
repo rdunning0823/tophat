@@ -172,11 +172,11 @@ data=F7
 event=Setup Task
 event=Mode default
 
+#hack until we can figure out how to map the four buttons on Niv's device
 mode=default
 type=key
 data=F8
-event=Setup Basic
-event=Mode default
+event=Mode Menu
 
 mode=default
 type=key
@@ -331,6 +331,21 @@ event=Setup Target
 
 mode=NavOrdered
 type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=NavOrdered
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=NavOrdered
+type=key
+data=RETURN
+event=DoActiveLabel
+
+mode=NavOrdered
+type=key
 data=6
 event=Mode default
 event=Status task
@@ -380,6 +395,21 @@ location=24
 # -------------
 # mode=NavGoto
 # -------------
+
+mode=NavGoto
+type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=NavGoto
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=NavGoto
+type=key
+data=RETURN
+event=DoActiveLabel
 
 mode=NavGoto
 type=key
@@ -990,6 +1020,21 @@ location=18
 
 mode=Menu
 type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=Menu
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=Menu
+type=key
+data=RETURN
+event=DoActiveLabel
+
+mode=Menu
+type=key
 data=6
 event=Mode DeclutterLabels
 label=Map labels
@@ -1039,6 +1084,21 @@ location=23
 
 mode=Menu1
 type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=Menu1
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=Menu1
+type=key
+data=RETURN
+event=DoActiveLabel
+
+mode=Menu1
+type=key
 data=0
 event=ThermalAssistant
 event=Mode default
@@ -1065,6 +1125,21 @@ location=21
 # -------------
 # mode=Menu2
 # -------------
+
+mode=Menu2
+type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=Menu2
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=Menu2
+type=key
+data=RETURN
+event=DoActiveLabel
 
 mode=Menu2
 type=key
@@ -1109,6 +1184,21 @@ location=23
 # -------------
 # mode=MenuLast
 # -------------
+
+mode=MenuLast
+type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=MenuLast
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=MenuLast
+type=key
+data=RETURN
+event=DoActiveLabel
 
 mode=MenuLast
 type=key
@@ -1179,6 +1269,21 @@ location=24
 
 mode=Orientation
 type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=Orientation
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=Orientation
+type=key
+data=RETURN
+event=DoActiveLabel
+
+mode=Orientation
+type=key
 data=6
 event=Orientation northup
 event=Mode default
@@ -1205,6 +1310,21 @@ location=18
 # mode=DeclutterLabels
 # -------------
     
+mode=DeclutterLabels
+type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=DeclutterLabels
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=DeclutterLabels
+type=key
+data=RETURN
+event=DoActiveLabel
+
 mode=DeclutterLabels
 type=key
 data=6
