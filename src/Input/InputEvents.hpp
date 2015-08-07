@@ -185,6 +185,10 @@ namespace InputEvents
   void eventThermalAssistant(const TCHAR *misc);
   void eventBeep(const TCHAR *misc);
   void eventUserDisplayModeForce(const TCHAR *misc);
+  /**
+   * toggles between Circling mode and non-circling mode
+   */
+  void eventUserDisplayModeToggleCircling(const TCHAR *misc);
   void eventAirspaceDisplayMode(const TCHAR *misc);
   void eventAutoLogger(const TCHAR *misc);
   void eventGotoLookup(const TCHAR *misc);

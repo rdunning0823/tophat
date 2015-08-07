@@ -546,6 +546,20 @@ InputEvents::eventUserDisplayModeForce(const TCHAR *misc)
 }
 
 void
+InputEvents::eventUserDisplayModeToggleCircling(const TCHAR *misc)
+{
+  UIState &ui_state = CommonInterface::SetUIState();
+
+  if (ui_state.force_display_mode == DisplayMode::NONE)
+    ui_state.force_display_mode = DisplayMode::CIRCLING;
+  else
+    ui_state.force_display_mode = DisplayMode::NONE;
+
+  ActionInterface::UpdateDisplayMode();
+  ActionInterface::SendUIState();
+}
+
+void
 InputEvents::eventAddWaypoint(const TCHAR *misc)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
