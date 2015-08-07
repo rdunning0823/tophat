@@ -350,6 +350,16 @@ event=ChangeActiveLabel down
 
 mode=NavOrdered
 type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=NavOrdered
+type=key
+data=DOWN
+event=ChangeActiveLabel down
+
+mode=NavOrdered
+type=key
 data=RETURN
 event=DoActiveLabel
 
@@ -418,6 +428,16 @@ event=ChangeActiveLabel up
 mode=NavGoto
 type=key
 data=RIGHT
+event=ChangeActiveLabel down
+
+mode=NavGoto
+type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=NavGoto
+type=key
+data=DOWN
 event=ChangeActiveLabel down
 
 mode=NavGoto
@@ -1049,6 +1069,16 @@ event=ChangeActiveLabel down
 
 mode=Menu
 type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=Menu
+type=key
+data=DOWN
+event=ChangeActiveLabel down
+
+mode=Menu
+type=key
 data=RETURN
 event=DoActiveLabel
 
@@ -1118,6 +1148,16 @@ event=ChangeActiveLabel down
 
 mode=Menu1
 type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=Menu1
+type=key
+data=DOWN
+event=ChangeActiveLabel down
+
+mode=Menu1
+type=key
 data=RETURN
 event=DoActiveLabel
 
@@ -1163,6 +1203,16 @@ event=ChangeActiveLabel up
 mode=Menu2
 type=key
 data=RIGHT
+event=ChangeActiveLabel down
+
+mode=Menu2
+type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=Menu2
+type=key
+data=DOWN
 event=ChangeActiveLabel down
 
 mode=Menu2
@@ -1227,6 +1277,16 @@ event=ChangeActiveLabel up
 mode=MenuLast
 type=key
 data=RIGHT
+event=ChangeActiveLabel down
+
+mode=MenuLast
+type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=MenuLast
+type=key
+data=DOWN
 event=ChangeActiveLabel down
 
 mode=MenuLast
@@ -1313,6 +1373,16 @@ event=ChangeActiveLabel down
 
 mode=Orientation
 type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=Orientation
+type=key
+data=DOWN
+event=ChangeActiveLabel down
+
+mode=Orientation
+type=key
 data=RETURN
 event=DoActiveLabel
 
@@ -1352,6 +1422,16 @@ event=ChangeActiveLabel up
 mode=DeclutterLabels
 type=key
 data=RIGHT
+event=ChangeActiveLabel down
+
+mode=DeclutterLabels
+type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=DeclutterLabels
+type=key
+data=DOWN
 event=ChangeActiveLabel down
 
 mode=DeclutterLabels
