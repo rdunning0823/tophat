@@ -299,20 +299,19 @@ event=Status all
 
 mode=default
 type=key
-data=6
-event=Setup Basic
-event=Mode default
+data=8
+event=RotateTophatMenu
 
 mode=default
 type=key
 data=7
 event=Calculator
 
-#mode=default
-#type=key
-#data=8
-#event=Setup Task
-#event=Mode default
+mode=default
+type=key
+data=0
+event=Setup Task
+event=Mode default
 
 mode=default
 type=key
@@ -346,7 +345,7 @@ event=DoActiveLabel
 
 mode=NavOrdered
 type=key
-data=6
+data=0
 event=Mode default
 event=Status task
 label=Stats
@@ -354,7 +353,7 @@ location=17
 
 mode=NavOrdered
 type=key
-data=6
+data=0
 event=Calculator
 event=Mode default
 label=Edit task
@@ -362,7 +361,7 @@ location=18
 
 mode=NavOrdered
 type=key
-data=6
+data=0
 event=EditTaskStart
 event=Mode default
 label=Edit start
@@ -413,7 +412,7 @@ event=DoActiveLabel
 
 mode=NavGoto
 type=key
-data=6
+data=0
 event=Calculator
 event=Mode default
 label=Edit task
@@ -421,7 +420,7 @@ location=18
 
 mode=NavGoto
 type=key
-data=6
+data=0
 event=Mode default
 event=AbortTask toggle
 label=Resume task$(CheckTask)
@@ -1020,6 +1019,11 @@ location=18
 
 mode=Menu
 type=key
+data=8
+event=RotateTophatMenu
+
+mode=Menu
+type=key
 data=LEFT
 event=ChangeActiveLabel up
 
@@ -1035,14 +1039,14 @@ event=DoActiveLabel
 
 mode=Menu
 type=key
-data=6
+data=0
 event=Mode DeclutterLabels
 label=Map labels
 location=16
 
 mode=Menu
 type=key
-data=6
+data=0
 event=ScreenModes next
 label=$(SwitchScreen)
 location=17
@@ -1057,7 +1061,7 @@ location=18
 
 mode=Menu
 type=key
-data=8
+data=0
 event=TerrainTopography terrain toggle
 event=Mode default
 label=$(TerrainToggleActionName) terrain
@@ -1073,7 +1077,7 @@ location=22
 
 mode=Menu
 type=key
-data=6
+data=0
 event=Mode Orientation
 label=Map orientation
 location=23
@@ -1081,6 +1085,11 @@ location=23
 # -------------
 # mode=Menu1
 # -------------
+
+mode=Menu1
+type=key
+data=8
+event=RotateTophatMenu
 
 mode=Menu1
 type=key
@@ -1116,7 +1125,7 @@ location=17
 
 mode=Menu1
 type=key
-data=6
+data=0
 event=Mode default
 event=Status all
 label=Status
@@ -1125,6 +1134,11 @@ location=21
 # -------------
 # mode=Menu2
 # -------------
+
+mode=Menu2
+type=key
+data=8
+event=RotateTophatMenu
 
 mode=Menu2
 type=key
@@ -1187,6 +1201,11 @@ location=23
 
 mode=MenuLast
 type=key
+data=8
+event=RotateTophatMenu
+
+mode=MenuLast
+type=key
 data=LEFT
 event=ChangeActiveLabel up
 
@@ -1218,7 +1237,7 @@ location=17
 
 mode=MenuLast
 type=key
-data=6
+data=0
 event=Credits
 event=Mode default
 label=About
@@ -1284,7 +1303,7 @@ event=DoActiveLabel
 
 mode=Orientation
 type=key
-data=6
+data=0
 event=Orientation northup
 event=Mode default
 label=$(OrientationNorthUp)
@@ -1292,7 +1311,7 @@ location=16
 
 mode=Orientation
 type=key
-data=6
+data=0
 event=Orientation trackup
 event=Mode default
 label=$(OrientationTrackUp)
@@ -1300,7 +1319,7 @@ location=17
 
 mode=Orientation
 type=key
-data=6
+data=0
 event=Orientation targetup
 event=Mode default
 label=$(OrientationTargetUp)
@@ -1327,7 +1346,7 @@ event=DoActiveLabel
 
 mode=DeclutterLabels
 type=key
-data=6
+data=0
 event=DeclutterLabels all
 event=Mode default
 label=$(DeclutterLabelsAll)
@@ -1343,7 +1362,7 @@ location=17
 
 mode=DeclutterLabels
 type=key
-data=8
+data=0
 event=DeclutterLabels task
 event=Mode default
 label=$(DeclutterLabelsTask)
