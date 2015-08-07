@@ -32,6 +32,7 @@ Copyright_License {
 #include "Engine/Task/TaskManager.hpp"
 #include "Util/StaticString.hpp"
 #include "Task/TaskType.hpp"
+#include "Menu/TophatMenu.hpp"
 
 #include <assert.h>
 

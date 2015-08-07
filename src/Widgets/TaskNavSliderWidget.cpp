@@ -344,24 +344,7 @@ TaskNavSliderWidget::ResumeTask()
 void
 TaskNavSliderWidget::OnActivateItem(unsigned index)
 {
-  StaticString<20> menu_ordered;
-  StaticString<20> menu_goto;
-
-  menu_ordered = _T("NavOrdered");
-  menu_goto = _T("NavGoto");
-
-  if (InputEvents::IsMode(menu_ordered.buffer())
-      || InputEvents::IsMode(menu_goto.buffer()))
-    InputEvents::HideMenu();
-  else if (mode == TaskType::GOTO || mode == TaskType::ABORT) {
-    InputEvents::ShowMenu();
-    InputEvents::setMode(menu_goto.buffer());
-  } else {
-    InputEvents::ShowMenu();
-    InputEvents::setMode(menu_ordered.buffer());
-  }
-
-  return;
+  TophatMenu::RotateNavMenu();
 }
 
 void
