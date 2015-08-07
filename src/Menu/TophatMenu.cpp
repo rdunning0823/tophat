@@ -23,8 +23,12 @@ Copyright_License {
 
 #include "TophatMenu.hpp"
 #include "Input/InputEvents.hpp"
-#include "Interface.hpp"
+#include "ActionInterface.hpp"
 #include "UIState.hpp"
+#include "Util/StaticString.hpp"
+#include "Engine/Task/TaskType.hpp"
+#include "NMEA/Derived.hpp"
+#include "Task/Stats/CommonStats.hpp"
 
 namespace TophatMenu {
 
@@ -66,5 +70,29 @@ namespace TophatMenu {
     }
 
     CommonInterface::SetUIState().main_menu_index = new_menu;
+  }
+
+  void
+  RotateNavMenu()
+  {
+    StaticString<20> menu_ordered;
+    StaticString<20> menu_goto;
+
+    menu_ordered = _T("NavOrdered");
+    menu_goto = _T("NavGoto");
+    TaskType mode = XCSoarInterface::Calculated().common_stats.task_type;
+
+    if (InputEvents::IsMode(menu_ordered.buffer())
+        || InputEvents::IsMode(menu_goto.buffer()))
+      InputEvents::HideMenu();
+    else if (mode == TaskType::GOTO || mode == TaskType::ABORT) {
+      InputEvents::ShowMenu();
+      InputEvents::setMode(menu_goto.buffer());
+    } else {
+      InputEvents::ShowMenu();
+      InputEvents::setMode(menu_ordered.buffer());
+    }
+
+    return;
   }
 }

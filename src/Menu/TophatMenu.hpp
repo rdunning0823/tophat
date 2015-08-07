@@ -42,5 +42,11 @@ namespace TophatMenu {
    * @return number of menu displayed (1 to 4).  0 if none is displayed
    */
   unsigned GetMenuIndex();
+
+  /**
+   * Shows or hides the Nav menu
+   * Either Goto or Ordered, whichever is current
+   */
+  void RotateNavMenu();
 }
 #endif /* TOPHATMENU_HPP_ */
