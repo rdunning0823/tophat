@@ -61,6 +61,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Pan.hpp"
 #include "UIState.hpp"
 #include "Interface.hpp"
+#include "Menu/TophatMenu.hpp"
 
 #ifdef KOBO
 #include "Screen/Key.h"
@@ -305,6 +306,11 @@ InputEvents::eventChangeActiveLabel(const TCHAR *misc)
         findNextActiveLabel(1);
     else if (StringIsEqual(misc, _T("down")))
         findNextActiveLabel(-1);
+}
+
+void InputEvents::eventRotateTophatMenu(gcc_unused const TCHAR *misc)
+{
+  TophatMenu::RotateMenu();
 }
 
 void InputEvents::eventDoActiveLabel(gcc_unused const TCHAR *misc)
