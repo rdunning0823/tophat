@@ -231,6 +231,11 @@ type=key
 data=RIGHT
 event=ScreenModes next
 
+mode=default
+type=key
+data=4
+event=UserDisplayModeToggleCircling
+
 # Gestures
 
 mode=default
