@@ -303,6 +303,11 @@ event=RotateTophatMenu
 
 mode=default
 type=key
+data=6
+event=RotateTophatNavMenu
+
+mode=default
+type=key
 data=7
 event=Calculator
 
@@ -326,6 +331,11 @@ event=Setup Target
 # -------------
 # mode=NavOrdered
 # -------------
+
+mode=NavOrdered
+type=key
+data=6
+event=RotateTophatNavMenu
 
 mode=NavOrdered
 type=key
@@ -393,6 +403,11 @@ location=24
 # -------------
 # mode=NavGoto
 # -------------
+
+mode=NavGoto
+type=key
+data=6
+event=RotateTophatNavMenu
 
 mode=NavGoto
 type=key
