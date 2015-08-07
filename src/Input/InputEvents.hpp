@@ -211,6 +211,7 @@ namespace InputEvents
   void eventDoActiveLabel(gcc_unused const TCHAR *misc);
 
   void eventRotateTophatMenu(gcc_unused const TCHAR *misc);
+  void eventRotateTophatNavMenu(gcc_unused const TCHAR *misc);
 
   // -------
 };

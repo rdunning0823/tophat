@@ -313,6 +313,11 @@ void InputEvents::eventRotateTophatMenu(gcc_unused const TCHAR *misc)
   TophatMenu::RotateMenu();
 }
 
+void InputEvents::eventRotateTophatNavMenu(gcc_unused const TCHAR *misc)
+{
+  TophatMenu::RotateNavMenu();
+}
+
 void InputEvents::eventDoActiveLabel(gcc_unused const TCHAR *misc)
 {
     const Menu *const menu = &input_config.menus[getModeID()];
