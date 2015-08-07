@@ -52,8 +52,9 @@ namespace ButtonLabel {
    * @param text label
    * @param event
    * @param down.  renders button in down state if true
+   * @return.  true if the expanded text is non-empty (label is visible)
    */
-  void SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool down);
+  bool SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool down);
   bool IsEnabled(unsigned i);
 
   bool ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size);
@@ -66,7 +67,7 @@ namespace ButtonLabel {
    * @param full do a full update; if false, then only dynamic buttons
    * are updated (to reduce flickering)
    */
-  void Set(const Menu &menu, const Menu *overlay=NULL, bool full=true);
+  void Set(Menu &menu, Menu *overlay=NULL, bool full=true);
 };
 
 #endif

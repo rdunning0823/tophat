@@ -137,7 +137,7 @@ ButtonLabel::Expand(const TCHAR *text, TCHAR *buffer, size_t size)
   }
 }
 
-void
+bool
 ButtonLabel::SetLabelText(unsigned index, const TCHAR *text, unsigned event,
                           bool down)
 {
@@ -147,18 +147,19 @@ ButtonLabel::SetLabelText(unsigned index, const TCHAR *text, unsigned event,
     bar->ShowButton(index, expanded.enabled, expanded.text, event, down);
   else
     bar->HideButton(index);
+  return expanded.visible;
 }
 
 void
-ButtonLabel::Set(const Menu &menu, const Menu *overlay, bool full)
+ButtonLabel::Set(Menu &menu, Menu *overlay, bool full)
 {
   for (unsigned i = 0; i < menu.MAX_ITEMS; ++i) {
-    const MenuItem &item = overlay != NULL && (*overlay)[i].IsDefined()
-      ? (*overlay)[i]
-      : menu[i];
+    MenuItem &item = overlay != NULL && (*overlay)[i].IsDefined()
+      ? (*overlay).SetMenuItem(i)
+      : menu.SetMenuItem(i);
 
     if (full || item.IsDynamic())
-      SetLabelText(i, item.label, item.event, item.down);
+      item.visible = SetLabelText(i, item.label, item.event, item.down);
   }
 }
 

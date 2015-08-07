@@ -38,6 +38,8 @@ public:
   unsigned event;
   /* this button in the selected state */
   bool down;
+  /* is the expanded text non-empty, so this button is visible? */
+  bool visible;
 
   void Clear() {
     label = NULL;
