@@ -37,6 +37,7 @@ enum {
   KEYCODE_9 = 0x10,
   KEYCODE_A = 0x1d,
   KEYCODE_Z = 0x36,
+  KEYCODE_ESCAPE = 0x6F,
 };
 
 static constexpr unsigned KEYCODE_DPAD_UP = 0x13;
@@ -52,6 +53,9 @@ TranslateKeyCode(unsigned key_code)
     /* return upper-case character, because InputEvents::findKey()
        calls ToUpperASCII() */
     return 'A' + (key_code - KEYCODE_A);
+
+  if (key_code == KEYCODE_ESCAPE)
+    return 0x04;
 
   return key_code;
 }
