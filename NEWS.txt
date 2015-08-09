@@ -1,6 +1,18 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+
+Top Hat Soaring 2.1.1 Beta August, 2015
+* Task
+  - Increase max start altitude to 18000
+  - Add Dump ballast menu and notification when ballasted
+  - Fix task speed calculation bug
+* LiveTrack24 - add vehicle name
+* Add "lb" and "lb/ft^2" units
+* Support for joystick control of menus
+
+Top Hat Soaring 2.1 July 4, 2015
+
 Top Hat Soaring 2.0.5 Beta June 26, 2015
 * Infoboxes
   -Display speed to fly when setting MC
