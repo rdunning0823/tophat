@@ -32,6 +32,22 @@ FlightListRenderer::AddFlight(const FlightInfo &_flight)
   flights.push(_flight);
 }
 
+/**
+ * draws text flush right in rc
+ * @param x. left of rc
+ * @param y. right of rc
+ * @param rc_width
+ * @param text
+ * @return: x value to right of rc
+ */
+static unsigned
+DrawRightFlush(Canvas &canvas, unsigned x, unsigned y, unsigned rc_width, const TCHAR* text)
+{
+  const unsigned text_width = canvas.CalcTextWidth(text);
+  canvas.DrawText(x + rc_width - text_width, y, text);
+  return x + rc_width;
+}
+
 void
 FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
 {
@@ -53,29 +69,35 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
 
   const unsigned row_height = font_height + padding;
   const unsigned date_width = canvas.CalcTextWidth(_T("2015-12-31")) + padding * 3;
-  const unsigned time_width = canvas.CalcTextWidth(_T("22:22")) + padding * 2;
-  const unsigned alt_width = canvas.CalcTextWidth(_T("12500")) + padding * 2;
+  const unsigned time_width = canvas.CalcTextWidth(_T("22:22")) + padding * 3;
+  const unsigned dur_num_width = canvas.CalcTextWidth(_T("Dur."));
+  const unsigned dur_padding_width = padding * 4;
+  const unsigned rel_num_width = canvas.CalcTextWidth(_T("Release"));
+  const unsigned rel_padding_width = padding * 3;
+  const unsigned alt_num_width = canvas.CalcTextWidth(_T("12500"));
+  const unsigned alt_padding_width = padding * 1;
 
   int y = rc.top + 2 * padding + row_height;
   canvas.Select(header_font);
   {
     int x = rc.left + padding;
-    canvas.DrawText(x, y, _T("       Date"));
+    canvas.DrawText(x, y, _T("Date"));
     x += date_width;
 
     canvas.DrawText(x, y, _T("Start"));
     x += time_width;
 
-    canvas.DrawText(x, y, _T(" End"));
+    canvas.DrawText(x, y, _T("End"));
     x += time_width;
 
-    canvas.DrawText(x, y, _T(" Dur."));
-    x += time_width;
+    x = DrawRightFlush(canvas, x, y, dur_num_width, _T("Dur."));
+    x+= dur_padding_width;
 
-    canvas.DrawText(x, y, _T("  Rel."));
-    x += alt_width;
+    x = DrawRightFlush(canvas, x, y, rel_num_width, _T("Release"));
+    x+= rel_padding_width;
 
-    canvas.DrawText(x, y, _T("  Max"));
+    x = DrawRightFlush(canvas, x, y, alt_num_width, _T("Max"));
+    x+= alt_padding_width;
   }
   y += row_height;
 
@@ -111,20 +133,27 @@ FlightListRenderer::Draw(Canvas &canvas, PixelRect rc)
     x += time_width;
 
     if (flight.Duration() >= 0) {
-      buffer.UnsafeFormat(_T("%5.1f"),
+      buffer.UnsafeFormat(_T("%2.1f"),
                           (double)flight.Duration() / (60*60));
-      canvas.DrawText(x, y, buffer);
+      x = DrawRightFlush(canvas, x, y, dur_num_width, buffer.c_str());
     } else
-      canvas.DrawText(x, y, _T("--:--"));
-    x += time_width;
+      x = DrawRightFlush(canvas, x, y, dur_num_width, _T("--"));
+    x+= dur_padding_width;
 
-    buffer.UnsafeFormat(_T("%5u"), flight.rel_altitude);
-    canvas.DrawText(x, y, buffer);
-    x += alt_width;
+    if (flight.rel_altitude > 0u) {
+      buffer.UnsafeFormat(_T("%5u"), flight.rel_altitude);
+      x = DrawRightFlush(canvas, x, y, rel_num_width, buffer.c_str());
 
-    buffer.UnsafeFormat(_T("%5u"), flight.max_altitude);
-    canvas.DrawText(x, y, buffer);
-    x += alt_width;
+    } else
+      x = DrawRightFlush(canvas, x, y, rel_num_width, _T("--"));
+    x+= rel_padding_width;
+
+    if (flight.max_altitude > 0u) {
+      buffer.UnsafeFormat(_T("%5u"), flight.max_altitude);
+      x += DrawRightFlush(canvas, x, y, alt_num_width, buffer.c_str());
+    } else
+      x += DrawRightFlush(canvas, x, y, alt_num_width, _T("--"));
+    x+= alt_padding_width;
 
     y += row_height;
   }
