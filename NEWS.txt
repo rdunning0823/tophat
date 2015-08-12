@@ -9,7 +9,10 @@ Top Hat Soaring 2.1.1 Beta August, 2015
   - Fix task speed calculation bug
 * LiveTrack24 - add vehicle name
 * Add "lb" and "lb/ft^2" units
-* Support for joystick control of menus
+* Support for joystick control of menus (Android)
+* Kobo
+  - Copies logs to Kobo during device download process
+  - Shows release and max altitude on Power off screen
 
 Top Hat Soaring 2.1 July 4, 2015
 
