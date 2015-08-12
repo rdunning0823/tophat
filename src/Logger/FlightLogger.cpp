@@ -26,6 +26,7 @@ Copyright_License {
 #include "NMEA/Derived.hpp"
 #include "IO/TextWriter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Util/ConvertString.hpp"
 
 void
 FlightLogger::Reset()
@@ -90,7 +91,9 @@ FlightLogger::TickInternal(const MoreData &basic,
       FormatUserAltitude(rel_altitude, rel.buffer(), false);
       FormatUserAltitude(max_altitude, max.buffer(), false);
       temp.Format(_T("landing %s/%s"), rel.buffer(), max.buffer());
-      LogEvent(landing_time, temp.buffer());
+      WideToACPConverter rel2(rel.c_str());
+      if (rel2.IsValid())
+        LogEvent(landing_time, rel2);
 
       landing_time.Clear();
 
