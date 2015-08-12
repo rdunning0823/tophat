@@ -42,6 +42,10 @@
 #include "Time/BrokenDate.hpp"
 #include "Util/StringUtil.hpp"
 
+#ifdef KOBO
+#include "Kobo/System.hpp"
+#endif
+
 #include <windef.h> /* for MAX_PATH */
 
 class DeclareJob {
@@ -347,6 +351,14 @@ ExternalLogger::DownloadFlightFrom(DeviceDescriptor &device)
                     _("Download flight"), MB_YESNO | MB_ICONQUESTION) != IDYES)
       break;
   }
+
+#ifdef KOBO
+  if (IsUSBStorageConnected()) {
+    if (ShowMessageBox(_("Copy flights from Kobo to USB stick?"),
+                    _("Copy to USB"), MB_YESNO | MB_ICONQUESTION) == IDYES)
+      CopyFlightsToSDCard();
+  }
+#endif
 
   device.EnableNMEA(env);
 }
