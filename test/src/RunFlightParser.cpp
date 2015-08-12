@@ -45,6 +45,8 @@ Print(const FlightInfo &flight)
   else
     printf("xx-xx");
 
+  printf(" %.0f/%.0f", (double)flight.rel_altitude, (double)flight.max_altitude);
+
   printf("\n");
 }
 
