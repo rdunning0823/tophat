@@ -52,12 +52,16 @@ FlightParser::Read(FlightInfo &flight)
       flight.date = dt;
       flight.start_time = dt;
     } else if (strncmp(line, landing, strlen(landing)) == 0) {
+
       while (*line && !isdigit(*line)) /* advance until release altitude */
-	line++;
+        line++;
+
       int result = sscanf(line, "%u/%u",
-			  &flight.rel_altitude, &flight.max_altitude);
+                          &flight.rel_altitude, &flight.max_altitude);
+
       if (result != 2)
-	return false;
+        flight.rel_altitude = flight.max_altitude = 0;
+
       if (flight.date.IsPlausible()) {
         // we have a start date/time
         int duration = dt - BrokenDateTime(flight.date, flight.start_time);
