@@ -185,19 +185,19 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     bmp = caption == _("Search") ? &icon_look.hBmpSearch :
         &icon_look.hBmpSearchChecked;
 
-    DrawIcon1(canvas, rc, *bmp, pressed);
+    DrawIcon1(canvas, rc, *bmp, focused);
   }
 
   //draw gear for set up icon
   else if (caption == _("Setup")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const Bitmap &bmp = icon_look.hBmpTabSettings;
-    DrawIcon1(canvas, rc, bmp, pressed);
+    DrawIcon1(canvas, rc, bmp, focused);
   }
   else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const Bitmap &bmp = icon_look.hBmpClose;
-    DrawIcon1(canvas, rc, bmp, pressed);
+    DrawIcon1(canvas, rc, bmp, focused);
 
   } else if (caption.compare(0, 9, _T("_chkmark_")) == 0) { // new
     const Font &font = *look.font;
@@ -217,7 +217,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
     rc_caption.left = rc_icon.right + padding;
     rc_caption.right = rc_caption.left + sz_text.cx + padding;
 
-    DrawIcon1(canvas, rc_icon, bmp, pressed);
+    DrawIcon1(canvas, rc_icon, bmp, focused);
 
     canvas.SetBackgroundTransparent();
     if (!IsEnabled())
