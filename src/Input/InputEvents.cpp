@@ -128,6 +128,7 @@ void InputEvents::findNextActiveLabel(int direction)
     Menu *const menu = &input_config.menus[getModeID()];
     Menu *const overlay_menu = &input_config.menus[overlay_mode];
     int max_label = (*menu).MAX_ITEMS ;
+    assert(max_label > 0);
 
     MenuItem &item_old = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
         ? (*overlay_menu).SetMenuItem(active_label)
@@ -135,29 +136,24 @@ void InputEvents::findNextActiveLabel(int direction)
     if (item_old.event)
       item_old.down = false;
 
-    int old_active_label = active_label;
-    bool looped = 0;
-    active_label = active_label + direction;
-    for (; (active_label < old_active_label && direction > 0)
-         || (active_label > old_active_label && direction < 0)
-         || !looped ;
-         active_label = active_label + direction) {
+    int tries = 0;
+    for (active_label = active_label + direction;
+        ++tries < max_label;
+        active_label += direction) {
+      if (active_label >= max_label)
+        active_label = 0;
+      if (active_label < 0)
+        active_label = max_label - 1;
 
-        if (active_label > max_label) {
-            active_label = 0;
-            looped = 1;
-        } else if (active_label < 0) {
-            active_label = max_label;
-            looped = 1;
-        }
-        MenuItem &item = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
-            ? (*overlay_menu).SetMenuItem(active_label)
-            : (*menu).SetMenuItem(active_label);
-        if (item.event && item.visible) {
-          item.down = true;
-          break;
-        }
+      MenuItem &item = overlay_menu != NULL && (*overlay_menu)[active_label].IsDefined()
+          ? (*overlay_menu).SetMenuItem(active_label)
+          : (*menu).SetMenuItem(active_label);
+      if (item.event && item.visible) {
+        item.down = true;
+        break;
+      }
     }
+
     drawButtons(getModeID(), true);
 }
 
