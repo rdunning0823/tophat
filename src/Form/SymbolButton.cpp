@@ -99,7 +99,7 @@ WndSymbolButton::OnPaint(Canvas &canvas)
   const ButtonLook &look = renderer.GetLook();
 
   const bool pressed = IsDown();
-  const bool focused = HasCursorKeys() ? HasFocus() : pressed;
+  const bool focused = draw_focus_override || (HasCursorKeys() ? HasFocus() : pressed);
 
   PixelRect rc = canvas.GetRect();
   renderer.DrawButton(canvas, rc, focused, pressed, transparent);

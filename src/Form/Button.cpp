@@ -33,6 +33,7 @@ WndButton::WndButton(ContainerWindow &parent, const ButtonLook &look,
                      ButtonWindowStyle style,
                      ClickNotifyCallback _click_callback)
   :renderer(look),
+   draw_focus_override(false),
    listener(NULL),
    click_callback(_click_callback)
 {
@@ -44,13 +45,15 @@ WndButton::WndButton(ContainerWindow &parent, const ButtonLook &look,
                      const TCHAR *caption, const PixelRect &rc,
                      ButtonWindowStyle style,
                      ActionListener &_listener, int _id)
-  :renderer(look), listener(nullptr), click_callback(nullptr)
+  :renderer(look), draw_focus_override(false), listener(nullptr),
+   click_callback(nullptr)
 {
   Create(parent, caption, rc, style, _listener, _id);
 }
 
 WndButton::WndButton(const ButtonLook &_look)
-  :renderer(_look), listener(nullptr), click_callback(nullptr) {}
+  :renderer(_look), draw_focus_override(false), listener(nullptr),
+   click_callback(nullptr) {}
 
 void
 WndButton::Create(ContainerWindow &parent,
@@ -123,7 +126,8 @@ WndButton::OnPaint(Canvas &canvas)
   const ButtonLook &look = renderer.GetLook();
 
   const bool pressed = IsDown();
-  const bool focused = HasCursorKeys() ? (HasFocus() | pressed) : pressed;
+  const bool focused = draw_focus_override ||
+      (HasCursorKeys() ? (HasFocus() | pressed) : pressed);
 
   PixelRect rc = canvas.GetRect();
   renderer.DrawButton(canvas, rc, focused, pressed);
@@ -166,4 +170,10 @@ WndButton::OnPaint(Canvas &canvas)
 
   canvas.DrawFormattedText(&text_rc, caption.c_str(), style);
 #endif
+}
+
+void
+WndButton::SetFocusedOverride(bool focus_override)
+{
+  draw_focus_override = focus_override;
 }

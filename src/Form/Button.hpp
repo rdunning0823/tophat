@@ -44,6 +44,11 @@ public:
 protected:
   ButtonRenderer renderer;
 
+  /**
+   * if true, draws focused style despite not being focused
+   */
+  bool draw_focus_override;
+
 private:
 #ifdef USE_GDI
   int id;
@@ -123,6 +128,13 @@ public:
    * callback.
    */
   virtual bool OnClicked() override;
+
+  /**
+   *  forces it to draw in the focused style
+   *  Normally, this is not needed to be set because it is
+   *  set by the Window::HasFocus() property
+   **/
+  void SetFocusedOverride(bool focus_override);
 
 protected:
 #ifdef USE_GDI
