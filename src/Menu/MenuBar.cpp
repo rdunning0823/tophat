@@ -221,7 +221,7 @@ MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
 
   Button &button = *buttons[i];
 
-  buttons[i]->SetDown(down);
+  buttons[i]->SetFocusedOverride(down);
   button.SetText(text);
   button.SetEnabled(enabled && event > 0);
   button.SetEvent(event);
