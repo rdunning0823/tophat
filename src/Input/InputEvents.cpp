@@ -122,7 +122,7 @@ void InputEvents::ReleaseMenuItems()
     active_menu.SetMenuItem(i).down = false;
 }
 
-void InputEvents::findNextActiveLabel(int direction)
+void InputEvents::FindNextActiveLabel(int direction)
 {
     assert(direction == 1 || direction == -1);
     Menu *const menu = &input_config.menus[getModeID()];
@@ -188,7 +188,7 @@ InputEvents::setMode(Mode mode)
   drawButtons(getModeID(), true);
   ReleaseMenuItems();
   active_label = 0;
-  findNextActiveLabel(1);
+  FindNextActiveLabel(1);
 }
 
 void
@@ -299,9 +299,9 @@ void
 InputEvents::eventChangeActiveLabel(const TCHAR *misc)
 {
     if (StringIsEqual(misc, _T("up")))
-        findNextActiveLabel(1);
+        FindNextActiveLabel(1);
     else if (StringIsEqual(misc, _T("down")))
-        findNextActiveLabel(-1);
+        FindNextActiveLabel(-1);
 }
 
 void InputEvents::eventRotateTophatMenu(gcc_unused const TCHAR *misc)

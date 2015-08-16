@@ -118,7 +118,7 @@ namespace InputEvents
   void sub_AutoZoom(int vswitch);
   void sub_ScaleZoom(int vswitch);
   void sub_SetZoom(fixed value);
-  void findNextActiveLabel(int direction);
+  void FindNextActiveLabel(int direction);
 
   /**
    * Clears the "down" property for all items in current menu
