@@ -119,7 +119,7 @@ void InputEvents::ReleaseMenuItems()
       : (*menu);
 
   for (unsigned i = 0; i < active_menu.MAX_ITEMS; ++i)
-    active_menu.SetMenuItem(i).down = false;
+    active_menu.SetMenuItem(i).focused = false;
 }
 
 void InputEvents::FindNextActiveLabel(int direction)
@@ -134,7 +134,7 @@ void InputEvents::FindNextActiveLabel(int direction)
         ? (*overlay_menu).SetMenuItem(active_label)
         : (*menu).SetMenuItem(active_label);
     if (item_old.event)
-      item_old.down = false;
+      item_old.focused = false;
 
     int tries = 0;
     for (active_label = active_label + direction;
@@ -149,7 +149,7 @@ void InputEvents::FindNextActiveLabel(int direction)
           ? (*overlay_menu).SetMenuItem(active_label)
           : (*menu).SetMenuItem(active_label);
       if (item.event && item.visible) {
-        item.down = true;
+        item.focused = true;
         break;
       }
     }

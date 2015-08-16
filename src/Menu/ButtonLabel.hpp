@@ -51,10 +51,10 @@ namespace ButtonLabel {
    * @param i
    * @param text label
    * @param event
-   * @param down.  renders button in down state if true
+   * @param focused.  renders button in focused state if true
    * @return.  true if the expanded text is non-empty (label is visible)
    */
-  bool SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool down);
+  bool SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool focused);
   bool IsEnabled(unsigned i);
 
   bool ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size);

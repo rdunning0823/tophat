@@ -57,16 +57,6 @@ protected:
 
     virtual bool OnClicked();
 
-    /** sets the down flag that renders the button as such.
-     *  This method does not work with GDI
-     * @param _down
-     */
-    virtual void SetDown(bool _down) {
-#ifndef USE_GDI
-      ButtonWindow::SetDown(_down);
-#endif
-    }
-
 #ifdef USE_GDI
   protected:
     virtual LRESULT OnMessage(HWND hWnd, UINT message,

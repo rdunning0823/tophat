@@ -37,14 +37,14 @@ public:
   const TCHAR *label;
   unsigned event;
   /* this button in the selected state */
-  bool down;
+  bool focused;
   /* is the expanded text non-empty, so this button is visible? */
   bool visible;
 
   void Clear() {
     label = NULL;
     event = 0;
-    down = false;
+    focused = false;
   }
 
   constexpr
