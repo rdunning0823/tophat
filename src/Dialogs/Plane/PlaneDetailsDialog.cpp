@@ -88,10 +88,10 @@ PlaneEditWidget::UpdateCaption()
 void
 PlaneEditWidget::UpdatePolarButton()
 {
-  const TCHAR *caption = _("Polar");
+  const TCHAR *caption = _("Click to enter polar");
   StaticString<64> buffer;
   if (!plane.polar_name.empty()) {
-    buffer.Format(_T("%s: %s"), caption, plane.polar_name.c_str());
+    buffer.Format(_T("%s: %s"), _("Polar"), plane.polar_name.c_str());
     caption = buffer;
   }
 
