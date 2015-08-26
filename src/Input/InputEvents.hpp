@@ -99,7 +99,7 @@ namespace InputEvents
   void ProcessEvent(unsigned event_id);
 
   /**
-   * Process a hot key for the specified mode.
+   * Process a hot key for the specified mode in the map, not in dialogs.
    */
   bool ProcessKey(Mode mode, unsigned key_code);
 
