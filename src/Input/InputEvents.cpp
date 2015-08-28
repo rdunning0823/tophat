@@ -412,7 +412,10 @@ InputEvents::ProcessKey(Mode mode, unsigned key_code)
     /* the Kobo power button opens the main menu */
     key_code = KEY_MENU;
 #else
-  // TODO: check the console key code
+  if (key_code == 0x74) { /* power slide switch */
+    UIActions::SignalShutdown(false);
+    return true;
+  }
 #endif
 #endif
 
