@@ -79,8 +79,8 @@ ManagedFilePickAndDownloadWidget::GetResult()
 void
 ManagedFilePickAndDownloadWidget::CreateButtons(WidgetDialog &dialog)
 {
-  close_button = dialog.AddButton(_("Cancel"), *this, mrOK);
   search_button = dialog.AddButton(_("Continue"), *this, SEARCH_BUTTON);
+  close_button = dialog.AddButton(_("Cancel"), *this, mrOK);
   parent_widget_dialog = &dialog;
 }
 
