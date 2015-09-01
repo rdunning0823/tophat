@@ -169,18 +169,7 @@ if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     /usr/local/Kobo/hindenburg &
 
-    case `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` in
-    "SN-N7052") # Mini
-        /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
-    "SN-613A4") # Caz's Glo which acquired in Japan
-        /usr/local/Kobo/nickel -platform kobo -skipFontLoad & ;;
-    "SN-613A3") # Rob's Glo
-        /usr/local/Kobo/nickel -qws & ;;
-    "SN-N905B") # Touch
-        /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
-    *) # for safety
-        /usr/local/Kobo/nickel -qws -skipFontLoad & ;;
-    esac
+    `grep /usr/local/Kobo/nickel /etc/init.d/rcS`
 else
     if [ "${USB_hot_plug}" != "Y" -a -f ${DotKobo}/uImage-USB-hot-plug ]; then
         [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
