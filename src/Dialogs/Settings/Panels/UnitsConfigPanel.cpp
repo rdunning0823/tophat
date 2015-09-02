@@ -57,7 +57,15 @@ public:
   UnitsConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
+  /**
+   * Update the Preset field if the selected units match one
+   */
   void PresetCheck();
+
+  /**
+   * Update all unit fields from the selected preset
+   */
+  void UpdateFromPreset();
 
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
@@ -67,6 +75,28 @@ private:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
 };
+
+void
+UnitsConfigPanel::UpdateFromPreset()
+{
+  DataFieldEnum* dfe = (DataFieldEnum*)
+      RowFormWidget::GetControl(UnitsPreset).GetDataField();
+  unsigned the_unit = (unsigned)dfe->GetAsInteger();
+  // don't change anything if the selected unit is "Custom"
+  if (the_unit > 0) {
+    UnitSetting preset_units = Units::Store::Read(the_unit - 1);
+
+    LoadValueEnum(UnitsSpeed, preset_units.speed_unit);
+    LoadValueEnum(UnitsDistance, preset_units.distance_unit);
+    LoadValueEnum(UnitsLift, preset_units.vertical_speed_unit);
+    LoadValueEnum(UnitsAltitude, preset_units.altitude_unit);
+    LoadValueEnum(UnitsTemperature, preset_units.temperature_unit);
+    LoadValueEnum(UnitsTaskSpeed, preset_units.task_speed_unit);
+    LoadValueEnum(UnitsPressure, preset_units.pressure_unit);
+    LoadValueEnum(UnitsWingLoading, preset_units.wing_loading_unit);
+    LoadValueEnum(UnitsMass, preset_units.mass_unit);
+  }
+}
 
 void
 UnitsConfigPanel::PresetCheck()
@@ -89,7 +119,10 @@ UnitsConfigPanel::PresetCheck()
 void
 UnitsConfigPanel::OnModified(DataField &df)
 {
-  PresetCheck();
+  if (IsDataField(UnitsPreset, df))
+    UpdateFromPreset();
+  else
+    PresetCheck();
 }
 
 void
@@ -110,7 +143,7 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     df.addEnumText(Units::Store::GetName(i), i+1);
 
   wp->GetDataField()->SetListener(this);
-  wp->SetReadOnly(true);
+  wp->SetReadOnly(false);
 
   static constexpr StaticEnumChoice units_speed_list[] = {
     { (unsigned)Unit::STATUTE_MILES_PER_HOUR, _T("mph") },
