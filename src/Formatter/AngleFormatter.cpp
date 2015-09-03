@@ -33,6 +33,8 @@ FormatBearing(TCHAR *buffer, size_t size, unsigned value_degrees,
 {
   assert(buffer != NULL);
   assert(size >= 8);
+  if (value_degrees == 360)
+    value_degrees = 0;
 
   if (suffix != NULL)
     StringFormat(buffer, size, _T("%u° %s"), value_degrees, suffix);
