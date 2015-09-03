@@ -358,8 +358,10 @@ ManagedFilePickAndDownloadWidget::SetFilterVisible(bool visible)
   wp_subarea_filter->SetVisible(visible && subarea_filter->Count() > 2);
   search_button->SetVisible(visible);
 
-  if (visible)
+  if (visible) {
     status_message->SetCaption(_("Where will you be flying?"));
+    search_button->SetFocus();
+  }
 }
 
 bool
