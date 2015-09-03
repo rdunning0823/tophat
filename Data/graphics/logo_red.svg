@@ -14,8 +14,8 @@
    height="173"
    id="svg3263"
    version="1.1"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="xcsoarswiftsplash_red_beta.svg"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="logo_red.svg"
    enable-background="new"
    inkscape:export-filename="F:\Installs\nook\graphics\xcsoarswiftsplash.png"
    inkscape:export-xdpi="90"
@@ -95,15 +95,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="116.17654"
+     inkscape:cx="52.962254"
      inkscape:cy="82.721698"
      inkscape:document-units="px"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="878"
-     inkscape:window-x="1272"
-     inkscape:window-y="-8"
+     inkscape:window-width="1600"
+     inkscape:window-height="800"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
@@ -117,7 +117,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -177,12 +177,12 @@
      transform="translate(0,-879.36218)"
      style="display:inline;filter:url(#filter6123)">
     <rect
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.02782953;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.58000708000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3980"
-       width="180.04317"
-       height="175.72931"
-       x="-1.0575094"
-       y="878.04761" />
+       width="180.49098"
+       height="55.819988"
+       x="-1.2814206"
+       y="998.18085" />
     <text
        xml:space="preserve"
        style="font-size:42.1100235px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial"
