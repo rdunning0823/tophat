@@ -565,11 +565,10 @@ OrderedTask::CheckTransitions(const AircraftState &state,
     taskpoint_finish->HasEntered();
   stats.start.task_started = TaskStarted();
 
-  if (stats.start.task_started) {
+  if (stats.start.task_started && !last_started) {
     /* calculates location of start and updates samples, and state_entered */
-    if (!last_started)
-      taskpoint_start->find_best_start(state, *task_points[1], task_projection,
-                                       SubtractStartRadius());
+    taskpoint_start->find_best_start(state, *task_points[1], task_projection,
+                                     SubtractStartRadius());
 
     const AircraftState start_state = taskpoint_start->GetEnteredState();
     stats.start.SetStarted(start_state);
