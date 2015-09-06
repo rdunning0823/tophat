@@ -21,40 +21,40 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_ALL_MONITORS_HPP
-#define XCSOAR_ALL_MONITORS_HPP
+#ifndef XCSOAR_TASK_START_MONITOR_HPP
+#define XCSOAR_TASK_START_MONITOR_HPP
 
-#include "Blackboard/BlackboardListener.hpp"
-#include "RateLimiter.hpp"
-#include "TaskStartMonitor.hpp"
+#include "Math/fixed.hpp"
+#include "Util/StaticString.hpp"
 
-/**
- * A container that combines all monitor classes.
- */
-class AllMonitors final : NullBlackboardListener, RateLimiter {
-  TaskStartMonitor task_start;
+#include <tchar.h>
+
+class StartStats;
+
+typedef StaticString<128> message_string;
+
+class TaskStartMonitor {
+  fixed last_start_time;
+
+  friend class TaskStartWidget;
+  class TaskStartWidget *widget;
 
 public:
-  AllMonitors();
-  ~AllMonitors();
+  TaskStartMonitor():last_start_time(fixed(0)), widget(nullptr) {}
 
   void Reset() {
-    task_start.Reset();
+    last_start_time = fixed(0);
   }
 
-  void Check() {
-    task_start.Check();
-  }
+  void Check();
 
-private:
-  void OnCalculatedUpdate(const MoreData &basic,
-                          const DerivedInfo &calculated) override {
-    RateLimiter::Trigger();
-  }
-
-  void Run() override {
-    Check();
-  }
+  /**
+   * updates the buffer with a message relevant to start stats
+   * @param start: the StartStat relevant to the current start
+   * @message: updated with text
+   * @return rows of text in the message
+   */
+  unsigned GetMessage1(const StartStats &start, message_string &message);
 };
 
 #endif

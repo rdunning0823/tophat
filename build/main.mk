@@ -712,6 +712,7 @@ XCSOAR_SOURCES := \
 	\
 	$(SRC)/Monitor/TaskAdvanceMonitor.cpp \
 	$(SRC)/Monitor/MatTaskMonitor.cpp \
+	$(SRC)/Monitor/TaskStartMonitor.cpp \
 	$(SRC)/Monitor/AllMonitors.cpp \
 	\
 	$(SRC)/Hardware/Battery.cpp
