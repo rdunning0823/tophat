@@ -42,7 +42,7 @@ class QuestionWidget : public SolidWidget {
     int id;
   };
 
-  const TCHAR *const message;
+  const TCHAR *message;
 
   ActionListener &listener;
 
@@ -54,6 +54,12 @@ public:
   void AddButton(const TCHAR *caption, int id) {
     buttons.append({caption, id});
   }
+
+  /**
+   * update the widget's message
+   */
+  void UpdateMessage(const TCHAR *_message);
+
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 };
