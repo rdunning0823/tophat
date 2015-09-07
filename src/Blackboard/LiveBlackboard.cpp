@@ -111,12 +111,16 @@ LiveBlackboard::BroadcastUISettingsUpdate()
 void
 LiveBlackboard::BroadcastUIStateUpdate()
 {
+#ifndef NDEBUG
   calling_listeners = true;
+#endif
 
   for (BlackboardListener *listener : listeners)
     listener->OnUIStateUpdate();
 
+#ifndef NDEBUG
   calling_listeners = false;
+#endif
 }
 
 
