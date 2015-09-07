@@ -91,9 +91,9 @@ FlightLogger::TickInternal(const MoreData &basic,
       FormatUserAltitude(rel_altitude, rel.buffer(), false);
       FormatUserAltitude(max_altitude, max.buffer(), false);
       temp.Format(_T("landing %s/%s"), rel.buffer(), max.buffer());
-      WideToACPConverter rel2(rel.c_str());
-      if (rel2.IsValid())
-        LogEvent(landing_time, rel2);
+      WideToACPConverter temp2(temp.c_str());
+      if (temp2.IsValid())
+        LogEvent(landing_time, temp2);
 
       landing_time.Clear();
 
@@ -123,7 +123,6 @@ void
 FlightLogger::Tick(const MoreData &basic, const DerivedInfo &calculated)
 {
   assert(!path.empty());
-
   if (basic.gps.replay || basic.gps.simulator)
     return;
 
