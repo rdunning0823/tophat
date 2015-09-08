@@ -28,6 +28,8 @@
 #include "SmartTaskAdvance.hpp"
 #include "Util/DereferenceIterator.hpp"
 #include "Util/StaticString.hpp"
+#include "Task/Stats/StartStats.hpp"
+#include "Navigation/Aircraft.hpp"
 
 #include <assert.h>
 #include <vector>
@@ -89,6 +91,13 @@ private:
 
   /** name of task */
   StaticString<40> task_name;
+
+  /* state that triggered the start prior to the most recent start */
+  StartStats saved_start_stats_pushed;
+  AircraftState saved_start_state_pushed;
+
+  /* is the saved start valid? */
+  bool saved_start_pushed_valid;
 
 public:
   /**
@@ -454,6 +463,30 @@ public:
    * @return True if start and finish found
    */
   bool ScanStartFinish();
+
+  /**
+   * Saves the stats of the last start
+   *
+   * @param stats.  The task stats of the aircraft at the time of the last start
+   * @param state.  The state of the aircraft at the time of the last start
+   */
+  void SavedStartSave(const StartStats &stats, const AircraftState &state);
+
+  /**
+   * Restores the last pushed start data: time, location
+   * TODO: update samples around start
+   */
+  void SavedStartRestore();
+
+  /**
+   * Invalidates the saved start
+   */
+  void SavedStartInvalidate();
+
+  /**
+   * Are the saved start valid?
+   */
+  bool SavedStartIsValid();
 
 private:
 

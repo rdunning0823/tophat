@@ -94,7 +94,8 @@ OrderedTask::OrderedTask(const TaskBehaviour &tb)
    factory_mode(tb.task_type_default),
    active_factory(nullptr),
    ordered_settings(tb.ordered_defaults),
-   dijkstra_min(nullptr), dijkstra_max(nullptr)
+   dijkstra_min(nullptr), dijkstra_max(nullptr),
+   saved_start_pushed_valid(false)
 {
   active_factory = CreateTaskFactory(factory_mode, *this, task_behaviour);
   active_factory->UpdateOrderedTaskSettings(ordered_settings);
@@ -505,6 +506,8 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   FlatBoundingBox bb_now(task_projection.ProjectInteger(state.location),
                          1);
 
+  StartStats last_start_stats = stats.start;
+  AircraftState last_start_state = taskpoint_start->GetEnteredState();
   bool last_started = stats.start.task_started;
   const bool last_finished = stats.task_finished;
 
@@ -574,6 +577,11 @@ OrderedTask::CheckTransitions(const AircraftState &state,
     stats.start.SetStarted(start_state);
 
     taskpoint_finish->set_fai_finish_height(start_state.altitude - fixed(1000));
+
+    if (!SavedStartIsValid()) {
+      SavedStartSave(last_start_stats, last_start_state);
+      saved_start_pushed_valid = true;
+    }
   }
 
   if (task_events != nullptr) {
@@ -616,6 +624,39 @@ OrderedTask::CheckTransitionOptionalStart(const AircraftState &state,
     }
   }
   return full_update;
+}
+
+void
+OrderedTask::SavedStartSave(const StartStats &stats, const AircraftState &state)
+{
+  saved_start_stats_pushed = stats;
+  saved_start_state_pushed = state;
+  saved_start_pushed_valid = true;
+}
+
+void
+OrderedTask::SavedStartRestore()
+{
+  taskpoint_start->find_best_start(saved_start_state_pushed, *task_points[1],
+                                   task_projection, SubtractStartRadius());
+  stats.start.SetStarted(saved_start_state_pushed);
+  taskpoint_finish->set_fai_finish_height(saved_start_state_pushed.altitude - fixed(1000));
+
+  // TODO: update sample points around start done in CheckTransitionPoint()
+
+  SavedStartInvalidate();
+}
+
+void
+OrderedTask::SavedStartInvalidate()
+{
+  saved_start_pushed_valid = false;
+}
+
+bool
+OrderedTask::SavedStartIsValid()
+{
+  return saved_start_pushed_valid;
 }
 
 bool
