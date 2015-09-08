@@ -81,7 +81,8 @@ void
 ScreensButtonWidget::UpdateVisibility(const PixelRect &rc,
                                        bool is_panning,
                                        bool is_main_window_widget,
-                                       bool is_map)
+                                       bool is_map,
+                                       bool is_top_widget)
 {
   if (!is_panning &&
       CommonInterface::GetUISettings().screens_button_location ==

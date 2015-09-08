@@ -133,7 +133,8 @@ MapWidgetOverlays::UpdateVisibility(const PixelRect &rc_full_screen,
                                     bool is_panning,
                                     bool is_main_window_widget,
                                     bool is_map,
-                                    bool is_full_screen)
+                                    bool is_full_screen,
+                                    bool is_top_widget)
 {
   const UISettings &ui_settings = CommonInterface::GetUISettings();
   const InfoBoxLayout::Layout ib_layout =
@@ -145,7 +146,7 @@ MapWidgetOverlays::UpdateVisibility(const PixelRect &rc_full_screen,
   for (const auto i : widget_list) {
     MapOverlayWidget *widget = (MapOverlayWidget*)i;
     widget->UpdateVisibility(rc_current, is_panning, is_main_window_widget,
-                             is_map);
+                             is_map, is_top_widget);
     if (widget->IsVisible())
       widget->Move(rc_current);
   }

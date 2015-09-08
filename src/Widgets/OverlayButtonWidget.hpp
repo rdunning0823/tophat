@@ -59,7 +59,8 @@ public:
    * @is_map. is the map non-NULL
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
-                                bool is_main_window_widget, bool is_map) = 0;
+                                bool is_main_window_widget, bool is_map,
+                                bool is_top_widget) = 0;
 
   /**
    * Must call Prepare() at end of derived class Prepare()

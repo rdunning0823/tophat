@@ -56,9 +56,11 @@ public:
    * @is_panning.  is the map in panning mode
    * @is_main_window_widget. is the mainWindow's widget non-NULL
    * @is_map. is the map non-NULL
+   * @is_top_widget.  is the top widget visible
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
-                                bool is_main_window_widget, bool is_map) = 0;
+                                bool is_main_window_widget, bool is_map,
+                                bool is_top_widget) = 0;
 
   /**
    * How much height does this widget use at the top of the map screen

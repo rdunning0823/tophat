@@ -445,9 +445,10 @@ MainWindow::ReinitialiseLayout()
   }
 
   widget_overlays.UpdateVisibility(GetClientRect(),
-                                   IsPanning() || HaveTopWidget(),
+                                   IsPanning(),
                                    widget != NULL,
-                                   map != NULL, FullScreen);
+                                   map != NULL, FullScreen,
+                                   HaveTopWidget());
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
@@ -768,9 +769,10 @@ MainWindow::OnTimer(WindowTimer &_timer)
   }
 
   widget_overlays.UpdateVisibility(GetClientRect(),
-                                   IsPanning() || HaveTopWidget(),
+                                   IsPanning(),
                                    widget != NULL,
-                                   map != NULL, FullScreen);
+                                   map != NULL, FullScreen,
+                                   HaveTopWidget());
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
@@ -1017,9 +1019,10 @@ MainWindow::ActivateMap()
 #endif
   }
   widget_overlays.UpdateVisibility(GetClientRect(),
-                                   IsPanning() || HaveTopWidget(),
+                                   IsPanning(),
                                    widget != NULL,
-                                   map != NULL, FullScreen);
+                                   map != NULL, FullScreen,
+                                   HaveTopWidget());
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
@@ -1180,9 +1183,10 @@ MainWindow::SetWidget(Widget *_widget, bool full_screen)
   if (map != NULL) {
     map->FastHide();
     widget_overlays.UpdateVisibility(GetClientRect(),
-                                     IsPanning() || HaveTopWidget(),
+                                     IsPanning(),
                                      _widget != NULL,
-                                     map != NULL, FullScreen);
+                                     map != NULL, FullScreen,
+                                     HaveTopWidget());
 
 #ifndef ENABLE_OPENGL
     if (!draw_suspended) {

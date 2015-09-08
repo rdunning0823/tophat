@@ -62,10 +62,11 @@ public:
    * @is_panning.  is the map in panning mode
    * @is_main_window_widget. is the mainWindow's widget non-NULL
    * @is_map. is the map non-NULL
+   * @is_top_widget the top widget visible.
    */
   void UpdateVisibility(const PixelRect &rc_full_screen, bool is_panning,
                         bool is_main_window_widget, bool is_map,
-                        bool is_full_screen);
+                        bool is_full_screen, bool is_top_widget);
 
   /**
    * Adds an Uninitialised widget to the list of widgets
