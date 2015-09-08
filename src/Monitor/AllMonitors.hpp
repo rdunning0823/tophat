@@ -26,28 +26,20 @@ Copyright_License {
 
 #include "Blackboard/BlackboardListener.hpp"
 #include "RateLimiter.hpp"
-#include "TaskAdvanceMonitor.hpp"
-#include "MatTaskMonitor.hpp"
 
 /**
  * A container that combines all monitor classes.
  */
 class AllMonitors final : NullBlackboardListener, RateLimiter {
-  TaskAdvanceMonitor task_advance;
-  MatTaskMonitor mat_task;
 
 public:
   AllMonitors();
   ~AllMonitors();
 
   void Reset() {
-    task_advance.Reset();
-    mat_task.Reset();
   }
 
   void Check() {
-    task_advance.Check();
-    mat_task.Check();
   }
 
 private:
