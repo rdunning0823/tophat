@@ -633,7 +633,7 @@ OrderedTask::CheckTransitionPoint(OrderedTaskPoint &point,
     point.BoundingBoxOverlaps(bb_last);
 
   /* sets state_entered */
-  if (nearby && point.TransitionEnter(state, state_last)) {
+  if (!is_start && nearby && point.TransitionEnter(state, state_last)) {
     transition_enter = true;
 
     if (task_events != nullptr)
