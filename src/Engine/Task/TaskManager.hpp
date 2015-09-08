@@ -130,6 +130,22 @@ public:
    * @param time time of new start
    */
   void OverrideStartTime(AircraftState default_state, fixed time);
+
+  /**
+   * Invalidates the saved start in the Ordered Task class
+   */
+  void SavedStartInvalidate();
+
+  /**
+   * Restores the saved start state to the active task
+   */
+  void SavedStartRestore();
+
+  /**
+   * Is the saved start state valid?
+   */
+  bool SavedStartIsValid();
+
   /**
    * Accessor of current task point of active task
    *

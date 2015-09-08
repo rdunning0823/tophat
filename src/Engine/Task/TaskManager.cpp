@@ -134,6 +134,24 @@ TaskManager::OverrideStartTime(AircraftState default_state, fixed time)
 }
 
 void
+TaskManager::SavedStartInvalidate()
+{
+  ordered_task->SavedStartInvalidate();
+}
+
+void
+TaskManager::SavedStartRestore()
+{
+  ordered_task->SavedStartRestore();
+}
+
+bool
+TaskManager::SavedStartIsValid()
+{
+  return ordered_task->SavedStartIsValid();
+}
+
+void
 TaskManager::IncrementActiveTaskPoint(int offset)
 {
   if (active_task) {
