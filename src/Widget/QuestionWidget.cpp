@@ -32,6 +32,12 @@ QuestionWidget::QuestionWidget(const TCHAR *_message,
                                      ButtonPanelWidget::Alignment::BOTTOM)),
    message(_message), listener(_listener) {}
 
+QuestionWidget::QuestionWidget(const TCHAR *_message,
+                               ActionListener &_listener, unsigned num_rows_text)
+  :SolidWidget(new ButtonPanelWidget(new TextWidget(num_rows_text),
+                                     ButtonPanelWidget::Alignment::BOTTOM)),
+   message(_message), listener(_listener) {}
+
 void
 QuestionWidget::UpdateMessage(const TCHAR *_message)
 {
