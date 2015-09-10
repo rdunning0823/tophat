@@ -37,11 +37,15 @@ class Color;
 class TextWidget : public WindowWidget {
 public:
   PixelScalar fixed_height;
+  unsigned num_rows_text;
   void SetText(const TCHAR *text);
   void SetColor(Color _color);
 
   TextWidget()
-  : fixed_height(0u) {}
+  : fixed_height(0u), num_rows_text(1u) {}
+
+  TextWidget(unsigned _rows_text)
+  : fixed_height(0u), num_rows_text(_rows_text) {}
 
   /* virtual methods from class Widget */
   virtual PixelSize GetMinimumSize() const override;
