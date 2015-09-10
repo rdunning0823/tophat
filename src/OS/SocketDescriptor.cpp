@@ -208,7 +208,7 @@ SocketDescriptor::WaitReadable(int timeout_ms) const
 
   fd_set rfds;
   FD_ZERO(&rfds);
-  FD_SET(Get(), &rfds);
+  FD_SET((unsigned)Get(),  &rfds);
 
   struct timeval timeout, *timeout_p = NULL;
   if (timeout_ms >= 0) {
@@ -227,7 +227,7 @@ SocketDescriptor::WaitWritable(int timeout_ms) const
 
   fd_set wfds;
   FD_ZERO(&wfds);
-  FD_SET(Get(), &wfds);
+  FD_SET((unsigned)Get(), &wfds);
 
   struct timeval timeout, *timeout_p = NULL;
   if (timeout_ms >= 0) {
