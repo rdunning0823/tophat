@@ -57,9 +57,4 @@ LogFormat(const TCHAR *fmt, ...);
 
 #endif /* NDEBUG */
 
-namespace DebugFlags {
-/* a generic flag that is set, unset so modules can communicate debug info */
-  extern bool Print;
-}
-
 #endif
