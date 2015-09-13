@@ -441,6 +441,16 @@ SetupQuick::RefreshForm()
   if (text.empty())
     text = gettext(unconfigured);
   pilot_text->SetCaption(text.c_str());
+
+  nationality_button->SetCaption(_("Nationality"));
+  device_button->SetCaption(_("Device"));
+  site_files_button->SetCaption(_("Site files"));
+  safety_button->SetCaption(_("Safety heights"));
+  pilot_button->SetCaption(_("Pilot"));
+  plane_button->SetCaption(_("Plane"));
+  screens_button->SetCaption(_("Screen"));
+  advanced->SetCaption(_("Advanced"));
+  WndForm::SetCaption(_("Set up Top Hat"));
 }
 
 // TODO : needs to depend on landscape and maybe device to get order right
