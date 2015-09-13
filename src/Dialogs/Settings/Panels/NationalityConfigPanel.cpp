@@ -116,7 +116,7 @@ NationalityConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 #ifndef HAVE_NATIVE_GETTEXT
   wp = AddEnum(_("Language"),
                _("The text in Top Hat is displayed in the following languages.  "
-                 "Select automatic to select the lanugage based on your "
+                 "Select automatic to select the language based on your "
                  "device settings"));
   if (wp != NULL) {
     DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
