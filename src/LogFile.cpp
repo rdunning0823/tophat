@@ -92,6 +92,9 @@ LogString(const char *p)
   char time_buffer[32];
   FormatISO8601(time_buffer, BrokenDateTime::NowUTC());
   writer.FormatLine("[%s] %s", time_buffer, p);
+#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__WINE__)
+  printf("[%s] %s\r\n", time_buffer, p);
+#endif
 }
 
 void
