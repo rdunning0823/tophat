@@ -116,6 +116,7 @@ public:
               GetDialogStyle()) {}
 
   void RefreshForm();
+  void RefreshDeviceStatus();
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
@@ -221,7 +222,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
     rc_screens_button = rc_advanced;
     rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
   }
-
 }
 
 static void
@@ -369,18 +369,26 @@ SetupQuick::CreateDeviceList(TCHAR *buffer_out, size_t buffer_size)
 }
 
 void
-SetupQuick::RefreshForm()
+SetupQuick::RefreshDeviceStatus()
 {
-  StaticString<255> text;
-  StaticString<255> text_filename;
   const TCHAR unconfigured[] = N_("*** Not configured ***");
-
+  StaticString<255> text;
   text.clear();
   CreateDeviceList(text.buffer(), text.MAX_SIZE);
 
   if (text.empty())
     text = gettext(unconfigured);
   device_text->SetCaption(text.c_str());
+}
+
+void
+SetupQuick::RefreshForm()
+{
+  StaticString<255> text;
+  StaticString<255> text_filename;
+  const TCHAR unconfigured[] = N_("*** Not configured ***");
+
+  RefreshDeviceStatus();
 
   text.clear();
   text_filename.clear();
@@ -422,7 +430,8 @@ SetupQuick::RefreshForm()
   text.AppendFormat(_T(" / %s"), terrain_height.c_str());
   safety_text->SetCaption(text.c_str());
 
-  text.Format(_T("%s / %s"), (GetActiveLanguageName() == nullptr) ? _("System") : GetActiveLanguageName(),
+  const TCHAR *active_language = GetActiveLanguageName();
+  text.Format(_T("%s / %s"), ( active_language== nullptr) ? _("System") : active_language,
               (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) ?
                   _("US task rules") : _("FAI task rules"));
   nationality_text->SetCaption(text);
@@ -530,7 +539,7 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
 void
 SetupQuick::OnTimer()
 {
-  RefreshForm();
+  RefreshDeviceStatus();
 }
 
 void
