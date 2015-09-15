@@ -67,6 +67,13 @@ public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
 
+  /**
+   * checks for language change and reads the
+   * language file if needed
+   */
+  void UpdateLanguage();
+  void RefreshForm();
+
 protected:
   void OnModified(DataField &df);
 };
@@ -102,6 +109,12 @@ NationalityConfigPanel::OnModified(DataField &df)
 {
   if (IsDataField(UnitsPreset, df))
     units_changed = true;
+#ifndef HAVE_NATIVE_GETTEXT
+  else if (IsDataField(LanguageFile, df)) {
+    UpdateLanguage();
+    RefreshForm();
+  }
+#endif
 }
 
 void
@@ -117,7 +130,7 @@ NationalityConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   wp = AddEnum(_("Language"),
                _("The text in Top Hat is displayed in the following languages.  "
                  "Select automatic to select the language based on your "
-                 "device settings"));
+                 "device settings"), this);
   if (wp != NULL) {
     DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
     df.addEnumText(_("Automatic"));
@@ -181,14 +194,24 @@ NationalityConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   units_changed = false;
 }
 
-bool
-NationalityConfigPanel::Save(bool &_changed)
+void
+NationalityConfigPanel::RefreshForm()
 {
-  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
-  TaskBehaviour &task_behaviour = settings_computer.task;
+#ifndef HAVE_NATIVE_GETTEXT
+  WndProperty &wp_language = GetControl(LanguageFile);
+  wp_language.SetCaption(_("Language"));
+#endif
 
-  bool changed = false;;
+  WndProperty &wp_task_rules = GetControl(ContestNationality);
+  wp_task_rules.SetCaption(_("Task rules"));
 
+  WndProperty &wp_units = GetControl(UnitsPreset);
+  wp_units.SetCaption(_("Units"));
+}
+
+void
+NationalityConfigPanel::UpdateLanguage()
+{
 #ifndef HAVE_NATIVE_GETTEXT
   WndProperty *wp = (WndProperty *)&GetControl(LanguageFile);
   if (wp != NULL) {
@@ -219,14 +242,23 @@ NationalityConfigPanel::Save(bool &_changed)
         new_base = new_value;
       break;
     }
-
     if (_tcscmp(old_value, new_value) != 0 &&
         _tcscmp(old_base, new_base) != 0) {
       Profile::Set(ProfileKeys::LanguageFile, new_value);
-      LanguageChanged = changed = true;
+      ReadLanguageFile();
     }
   }
 #endif
+}
+
+bool
+NationalityConfigPanel::Save(bool &_changed)
+{
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  TaskBehaviour &task_behaviour = settings_computer.task;
+
+  bool changed = false;;
+
 
   SaveValueEnum(ContestNationality, ProfileKeys::ContestNationality,
                 task_behaviour.contest_nationality);
