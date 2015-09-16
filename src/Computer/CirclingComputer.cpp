@@ -59,6 +59,7 @@ CirclingComputer::TurnRate(CirclingInfo &circling_info,
     circling_info.turn_rate_heading = Angle::Zero();
     circling_info.turn_rate_smoothed = Angle::Zero();
     circling_info.turn_rate_heading_smoothed = Angle::Zero();
+    circling_info.turn_rate_circle = Angle::Zero();
     last_track = basic.track;
     last_heading = basic.attitude.heading;
     return;
@@ -71,6 +72,7 @@ CirclingComputer::TurnRate(CirclingInfo &circling_info,
     circling_info.turn_rate_heading = Angle::Zero();
     circling_info.turn_rate_smoothed = Angle::Zero();
     circling_info.turn_rate_heading_smoothed = Angle::Zero();
+    circling_info.turn_rate_circle = Angle::Zero();
     last_track = basic.track;
     last_heading = basic.attitude.heading;
     return;
@@ -99,6 +101,11 @@ CirclingComputer::TurnRate(CirclingInfo &circling_info,
     smoothed = LowPassFilter(circling_info.turn_rate_heading_smoothed.Native(),
                              turn_rate.Native(), fixed(0.3));
     circling_info.turn_rate_heading_smoothed = Angle::Native(smoothed);
+
+    // approximate circle of 20 seconds, update 1x per second
+    smoothed = LowPassFilter(circling_info.turn_rate_circle.Native(),
+                             turn_rate.Native(), fixed(0.05));
+    circling_info.turn_rate_circle = Angle::Native(smoothed);
 
     last_track = basic.track;
     last_heading = basic.attitude.heading;

@@ -58,6 +58,9 @@ struct CirclingInfo
   /** Turn rate based on heading after low pass filter (angle/s)*/
   Angle turn_rate_heading_smoothed;
 
+  /** Turn rate of the current circle */
+  Angle turn_rate_circle;
+
   /** StartLocation of the current/last climb */
   GeoPoint climb_start_location;
 

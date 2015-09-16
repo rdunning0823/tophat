@@ -40,7 +40,8 @@ CirclingInfo::Clear()
 
   max_height_gain = fixed(0);
 
-  turn_rate_smoothed = turn_rate_heading_smoothed = Angle::Zero();
+  turn_rate_smoothed = turn_rate_heading_smoothed =
+      turn_rate_circle = Angle::Zero();
   turn_mode = CirclingMode::CRUISE;
 
   circling_percentage = fixed(-1);

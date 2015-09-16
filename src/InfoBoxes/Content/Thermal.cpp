@@ -29,6 +29,8 @@ Copyright_License {
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
+#include "DisplayMode.hpp"
+#include "UIState.hpp"
 
 #include <tchar.h>
 
@@ -189,13 +191,14 @@ UpdateInfoBoxNextLegEqThermal(InfoBoxData &data)
 void
 UpdateInfoBoxCircleDiameter(InfoBoxData &data)
 {
-  if (!CommonInterface::Basic().airspeed_available.IsValid()) {
+  if (!CommonInterface::Basic().airspeed_available.IsValid() ||
+      CommonInterface::GetUIState().display_mode != DisplayMode::CIRCLING) {
     data.SetInvalid();
     return;
   }
 
   const Angle turn_rate =
-    CommonInterface::Calculated().turn_rate_heading_smoothed.Absolute();
+    CommonInterface::Calculated().turn_rate_circle.Absolute();
 
   // deal with div zero and small turn rates
   if (turn_rate < Angle::Degrees(1)) {
@@ -213,7 +216,7 @@ UpdateInfoBoxCircleDiameter(InfoBoxData &data)
   }
 
   TCHAR buffer[32];
-  Unit unit = FormatSmallUserDistance(buffer, circle_diameter, false, 0);
+  Unit unit = FormatSmallUserDistance(buffer, circle_diameter, false, -1);
   data.SetValue (buffer);
   data.SetValueUnit(unit);
 
