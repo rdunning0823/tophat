@@ -95,7 +95,7 @@ void FormatDistance(TCHAR *buffer, fixed value, const Unit unit,
  * @param value the distance
  * @param unit the distance unit (e.g. m, ft, km, nm, sm)
  * @param include_unit include the unit into the string?
- * @param precision the number of decimal places
+ * @param precision the number of decimal places.  If -1, then rounds to 10
  * @return the unit used for output formatting
  */
 Unit FormatSmallDistance(TCHAR *buffer, fixed value, Unit unit,

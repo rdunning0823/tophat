@@ -115,6 +115,11 @@ FormatSmallDistance(TCHAR *buffer, fixed value, Unit unit,
   unit = GetSmallerDistanceUnit(unit);
   value = Units::ToUserUnit(value, unit);
 
+  if (precision == -1) {
+    precision = 0;
+    value = fixed(((int)(value / fixed(10))) * 10); // round to nearest 10
+  }
+
   if (include_unit)
     _stprintf(buffer, _T("%.*f %s"), precision, (double)value,
                Units::GetUnitName(unit));
