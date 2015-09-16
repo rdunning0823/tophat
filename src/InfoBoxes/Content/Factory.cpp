@@ -1361,7 +1361,7 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxCircleDiameter,
     CIRCLE_DIAMETER,
     CIRCLE_DIAMETER,
-    DEPRECATED,
+    STANDARD,
   },
 
   {
