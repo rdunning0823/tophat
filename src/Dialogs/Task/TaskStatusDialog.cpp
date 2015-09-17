@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/WidgetDialog.hpp"
-#include "Task/Manager/TaskCalculatorPanel.hpp"
+#include "Dialogs/Task/Manager/TaskCalculatorPanel.hpp"
 #include "Look/DialogLook.hpp"
 #include "Language/Language.hpp"
 

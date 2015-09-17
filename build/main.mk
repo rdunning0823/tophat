@@ -44,7 +44,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Airspace/dlgAirspaceWarnings.cpp \
 	$(SRC)/Dialogs/Settings/WindSettingsPanel.cpp \
 	$(SRC)/Dialogs/Settings/WindSettingsDialog.cpp \
-	$(SRC)/Dialogs/TaskStatusDialog.cpp \
 	$(SRC)/Dialogs/Settings/dlgBasicSettings.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfiguration.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigurationSingle.cpp \
@@ -141,6 +140,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/AlternatesListDialog.cpp \
 	$(SRC)/Dialogs/Task/dlgMatItemClick.cpp \
 	$(SRC)/Dialogs/Task/StartTimeEntry.cpp \
+	$(SRC)/Dialogs/Task/TaskStatusDialog.cpp \
 	\
 	$(SRC)/Dialogs/NumberEntry.cpp \
 	$(SRC)/Dialogs/TextEntry.cpp \
