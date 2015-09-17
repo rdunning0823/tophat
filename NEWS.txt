@@ -1,11 +1,12 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Top Hat Soaring 2.1.2 Beta
+Top Hat Soaring 2.1.1b Beta September 15, 2015
 * Smooth the circle diameter infobox
+* Fix but in "Ignore task start"
 
 Top Hat Soaring 2.1.1 Beta September 11, 2015
-* Option to ignore task restart
+* Option to ignore task start
 * UI - Use "door" icon for close button
 * Task
   - Increase max start altitude to 18000
