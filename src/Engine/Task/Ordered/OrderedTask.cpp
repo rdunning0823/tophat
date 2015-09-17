@@ -579,8 +579,7 @@ OrderedTask::CheckTransitions(const AircraftState &state,
     taskpoint_finish->set_fai_finish_height(start_state.altitude - fixed(1000));
 
     if (!SavedStartIsValid()) {
-      SavedStartSave(last_start_stats, last_start_state);
-      saved_start_pushed_valid = true;
+      saved_start_pushed_valid = SavedStartSave(last_start_stats, last_start_state);
     }
   }
 
@@ -626,12 +625,17 @@ OrderedTask::CheckTransitionOptionalStart(const AircraftState &state,
   return full_update;
 }
 
-void
+bool
 OrderedTask::SavedStartSave(const StartStats &stats, const AircraftState &state)
 {
+  if (!state.location.IsValid() || negative(state.time))
+    return false;
+
   saved_start_stats_pushed = stats;
   saved_start_state_pushed = state;
   saved_start_pushed_valid = true;
+
+  return true;
 }
 
 void

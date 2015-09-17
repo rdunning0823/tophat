@@ -35,7 +35,6 @@ typedef StaticString<128> message_string;
 
 class TaskStartMonitor {
   fixed last_start_time;
-
   friend class TaskStartWidget;
   class TaskStartWidget *widget;
 

@@ -140,12 +140,10 @@ TaskStartMonitor::Check()
       !stats.start.task_started ||
       /* but not finished */
       stats.task_finished ||
-      /** not navigating to start or first tp */
-      stats.active_index > 1 ||
-      /* skip the first start */
-      last_start_time == fixed(0) ||
       /* we don't have a newer start */
       stats.start.time <= last_start_time ||
+      /** not navigating to start or first tp */
+      stats.active_index > 1 ||
       /* valid GPS fix required to calculate nearest turn point */
       !basic.location_available) {
     last_start_time = stats.start.time;
@@ -162,5 +160,4 @@ TaskStartMonitor::Check()
     widget->UpdateMessage(message.c_str());
 
   last_start_time = stats.start.time;
-
 }

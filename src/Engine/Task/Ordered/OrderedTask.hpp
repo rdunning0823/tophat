@@ -465,12 +465,13 @@ public:
   bool ScanStartFinish();
 
   /**
-   * Saves the stats of the last start
+   * Saves the stats of the last start if state.location & time are valid
    *
    * @param stats.  The task stats of the aircraft at the time of the last start
    * @param state.  The state of the aircraft at the time of the last start
+   * @return. true if the prior state was valid and saved
    */
-  void SavedStartSave(const StartStats &stats, const AircraftState &state);
+  bool SavedStartSave(const StartStats &stats, const AircraftState &state);
 
   /**
    * Restores the last pushed start data: time, location
