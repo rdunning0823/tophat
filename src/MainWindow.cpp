@@ -1164,6 +1164,7 @@ MainWindow::SetTopWidget(Widget *_widget)
 
   map->Move(GetMapRectBetween(main_rect, bottom_rect, top_rect));
   map->FullRedraw();
+  CommonInterface::BroadcastUIStateUpdate();
 }
 
 void

@@ -61,7 +61,6 @@ public:
 
   virtual void Show(const PixelRect &rc) override {
     QuestionWidget::Show(rc);
-    CommonInterface::BroadcastUIStateUpdate();
   }
 
 private:
