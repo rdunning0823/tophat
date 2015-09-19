@@ -200,6 +200,7 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
               _("Score"), (double)result.score, _("pts"),
               _("Time"), timetext1,
               _("Speed"), speed);
+
   } else if (settings.contest == Contest::DHV_XC ||
              settings.contest == Contest::XCONTEST) {
     const ContestResult& result_free =

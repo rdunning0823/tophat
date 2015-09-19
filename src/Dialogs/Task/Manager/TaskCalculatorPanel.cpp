@@ -113,14 +113,13 @@ TaskCalculatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddReadOnly(_("Distance remaining"), NULL, _T("%.0f %s"),
               UnitGroup::DISTANCE, fixed(0));
   AddReadOnly(_("AAT Time remaining"), NULL, _T(""));
-
   AddReadOnly(_("Estimated total time"), NULL, _T(""));
 }
 
 void
 TaskCalculatorPanel::Show(const PixelRect &rc)
 {
-  emc = CommonInterface::Calculated().task_stats.effective_mc;
+  emc = CommonInterface::Calculated().ordered_task_stats.effective_mc;
 
   Refresh();
 

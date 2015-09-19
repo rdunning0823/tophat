@@ -38,6 +38,7 @@ class TaskCalculatorPanel final
   fixed emc;
 
 public:
+
   TaskCalculatorPanel(const DialogLook &look)
     :RowFormWidget(look) {}
 

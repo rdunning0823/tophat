@@ -2,6 +2,20 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.1.2 Beta TBD
+* merge XCSoar 6.7.8
+	* user interface
+	  - draw gray title bar on inactive dialogs
+	  - improved dialog button placement
+	  - fix missing buttons in terrain configuration (#3421)
+	* task
+	  - support large legs in the FAI triangle renderer (#3413)
+	  - make "Cruise efficiency" read-only
+	* devices
+	  - fix crash when downloading flight without "logs" folder
+	* Linux
+	  - support Raspberry Pi 2
+	  - show ports renamed by udev
+
 * Merge XCSoar 6.7.7
 	* airspace
 	  - accept airspaces of class RMZ in OpenAir format files (#3437)
@@ -136,52 +150,6 @@ Top Hat Soaring 2.0.1 July 28, 2014
 * Android - fix crash when switching to other apps
 * Show distance to pan crosshairs
 * Merged XCSoar 6.7.5
-
-* devices
-  - fixed attitude data handling
-  - properly detect LXNAV Nano 3
-  - FLARM: fix declaration with asterisk in task point name (#3323)
-  - Westerboer: ignore implausible values from buggy devices
-  - LX: improved logger handshake (#3199)
-  - LX: auto-retry after errors during IGC download
-  - auto-reconnect TCP client (#3127)
-* airspace
-  - assume all airspaces are active if day of week is not known
-  - restore "Repetitive Sound" setting on startup (#3308)
-  - relax parsing of TNP airspace files (#3272)
-* Android
-  - fix crash when opening IOIO port (#3309)
-  - allow reconnecting IOIO sensors
-  - enable Vivante workaround for GC600 (#3184)
-  - faster map renderer (#3124)
-  - improved font quality
-  - enable cursor key navigation in dialogs (#3133)
-* tasks
-  - fix loading of some tasks from .cup files
-* map
-  - fix topography rendering for polygon shapes (#3245)
-  - fix SDL clipped polygon rendering algorithm (#3250)
-  - fix disappearing observation zones at left/top screen border (#3212)
-  - load XCSoarData from external SD card if available (#3198)
-* tracking
-  - changed host for DHV tracking server (#3208)
-* user interface
-  - fix missing battery info in status panels
-  - fix crash in alternates list (#3146)
-  - new translation: Slovenian
-* Kobo
-  - fix touch screen bug (#3195, #3204, #3211)
-  - fix misassigned passphrase in WiFi dialog (#3151)
-  - the "Home" button opens the menu
-  - mount /dev/pts for telnetd (#3135)
-  - fix crash in file manager and METAR/TAF dialog (#3078)
-* infoboxes
-  - fix "Fin Dist" infobox for GOTO tasks (#3152)
-* configuration
-  - increase upper limit for plane wing area (#3154)
-* waypoints
-  - correctly handle S latitudes and W longitudes in waypoint editor (#3155)
-  - fix saving waypoints to cup format files from waypoint editor
 
 Top Hat Soaring 2.0 - 5/20/2014
 * Fix NavBar checkmark with 12-Infobox geometry

@@ -44,6 +44,14 @@ LogoView::LogoView()
   big_title.EnableInterpolation();
 }
 
+static int
+Center(unsigned canvas_size, unsigned element_size)
+{
+  /* cast to int to force signed integer division, just in case the
+     difference is negative */
+  return int(canvas_size - element_size) / 2;
+}
+
 void
 LogoView::draw(Canvas &canvas, const PixelRect &rc)
 {
@@ -80,26 +88,47 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   // Determine title image size
   PixelSize title_size = bitmap_title.GetSize();
 
-  const unsigned magnification =
-    std::max(1u,
-             std::min((width - 16u) / unsigned(logo_size.cx + title_size.cx),
-                      (height - 16u) / std::max(unsigned(logo_size.cy),
-                                                unsigned(title_size.cx))));
+  unsigned spacing = title_size.cy / 2;
 
-  logo_size.cx *= magnification;
-  logo_size.cy *= magnification;
-  title_size.cx *= magnification;
-  title_size.cy *= magnification;
+  unsigned estimated_width, estimated_height;
+  switch (orientation) {
+  case LANDSCAPE:
+    estimated_width = logo_size.cx + spacing + title_size.cx;
+    estimated_height = logo_size.cy;
+    break;
+
+  case PORTRAIT:
+    estimated_width = title_size.cx;
+    estimated_height = logo_size.cy + spacing + title_size.cy;
+    break;
+
+  case SQUARE:
+    estimated_width = logo_size.cx;
+    estimated_height = logo_size.cy;
+    break;
+  }
+
+  const unsigned magnification =
+    std::min((width - 16u) / estimated_width,
+             (height - 16u) / estimated_height);
+
+  if (magnification > 1) {
+    logo_size.cx *= magnification;
+    logo_size.cy *= magnification;
+    title_size.cx *= magnification;
+    title_size.cy *= magnification;
+    spacing *= magnification;
+  }
 
   int logox, logoy, titlex, titley;
 
   // Determine logo and title positions
   switch (orientation) {
   case LANDSCAPE:
-    logox = (width - (logo_size.cx + title_size.cy + title_size.cx)) / 2;
-    logoy = (height - logo_size.cy) / 2;
-    titlex = logox + logo_size.cx + title_size.cy;
-    titley = (height - title_size.cy) / 2;
+    logox = Center(width, logo_size.cx + spacing + title_size.cx);
+    logoy = Center(height, logo_size.cy);
+    titlex = logox + logo_size.cx + spacing;
+    titley = Center(height, title_size.cy);
     break;
   case PORTRAIT:
   case SQUARE:

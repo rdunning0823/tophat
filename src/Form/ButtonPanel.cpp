@@ -91,19 +91,19 @@ ButtonPanel::AddKey(unsigned key_code)
   keys[buttons.size() - 1] = key_code;
 }
 
-UPixelScalar
+unsigned
 ButtonPanel::Width(unsigned i) const
 {
   return look.font->TextSize(buttons[i]->GetText().c_str()).cx +
     Layout::SmallScale(8);
 }
 
-UPixelScalar
+unsigned
 ButtonPanel::RangeMaxWidth(unsigned start, unsigned end) const
 {
-  UPixelScalar max_width = Layout::Scale(50);
+  unsigned max_width = Layout::Scale(50);
   for (unsigned i = start; i < end; ++i) {
-    UPixelScalar width = Width(i);
+    unsigned width = Width(i);
     if (width > max_width)
       max_width = width;
   }
@@ -117,10 +117,10 @@ ButtonPanel::VerticalRange(PixelRect rc, unsigned start, unsigned end)
   const unsigned n = end - start;
   assert(n > 0);
 
-  const UPixelScalar width = RangeMaxWidth(start, end);
-  const UPixelScalar total_height = rc.bottom - rc.top;
-  const UPixelScalar max_height = n * Layout::GetMaximumControlHeight();
-  const UPixelScalar row_height = std::min(total_height, max_height) / n;
+  const unsigned width = RangeMaxWidth(start, end);
+  const unsigned total_height = rc.bottom - rc.top;
+  const unsigned max_height = n * Layout::GetMaximumControlHeight();
+  const unsigned row_height = std::min(total_height, max_height) / n;
 
   PixelRect button_rc(rc.left, rc.top, rc.left + width, rc.top + row_height);
   rc.left += width;
@@ -181,31 +181,91 @@ ButtonPanel::LeftLayout()
   return LeftLayout(parent.GetClientRect());
 }
 
+inline unsigned
+ButtonPanel::FitButtonRow(unsigned start, unsigned total_width) const
+{
+  const unsigned n_buttons = buttons.size();
+  unsigned max_width = Width(start);
+  unsigned i = start + 1;
+  for (; i < n_buttons; ++i) {
+    /* determine max_width incrementally */
+    unsigned width = Width(i);
+    if (width > max_width)
+      max_width = width;
+
+    /* would adding that button fit into the row? */
+    if ((i - start + 1) * max_width > total_width)
+      /* no, doesn't fit - omit it and break this loop */
+      break;
+  }
+
+  return i;
+}
+
 PixelRect
 ButtonPanel::BottomLayout(PixelRect rc)
 {
   assert(!buttons.empty());
 
-  const UPixelScalar total_width = rc.right - rc.left;
+  const unsigned n_buttons = buttons.size();
+  const unsigned total_width = rc.right - rc.left;
 
-  unsigned end = buttons.size();
-  while (end > 0) {
-    unsigned start = end - 1;
-    UPixelScalar max_width = Width(buttons.size() - start - 1);
-    while (start > 0) {
-      --start;
-      UPixelScalar width = Width(buttons.size() - start - 1);
-      UPixelScalar new_width = std::max(width, max_width);
-      if ((end - start) * new_width > total_width) {
-        ++start;
-        break;
-      }
+  /* naive button distribution algorithm: distribute as many buttons
+     as possible into each row; weakness: the last row may have only
+     one button */
+  struct Row {
+    unsigned start, end;
 
-      max_width = new_width;
+    constexpr unsigned size() const {
+      return end - start;
     }
+  };
 
-    rc = HorizontalRange(rc, start, end);
-    end = start;
+  StaticArray<Row, 8u> rows;
+
+  for (unsigned i = 0; i < n_buttons;) {
+    unsigned end = FitButtonRow(i, total_width);
+    assert(end > i);
+
+    auto &row = rows.append();
+    row.start = i;
+    row.end = i = end;
+  }
+
+  assert(!rows.empty());
+
+  /* optimise the naive result: try to move buttons down until we see
+     no further chance for improvement */
+
+  bool modified;
+  do {
+    modified = false;
+
+    for (unsigned i = rows.size() - 1; i > 0; --i) {
+      auto &dest_row = rows[i];
+      auto &src_row = rows[i - 1];
+
+      /* the upper row has many more buttons than the lower row */
+      if (dest_row.size() + 2 <= src_row.size()) {
+        unsigned max_width = RangeMaxWidth(dest_row.start - 1, dest_row.end);
+        unsigned row_width = (dest_row.size() + 1) * max_width;
+
+        /* yes, we can move one button down */
+        if (row_width <= total_width) {
+          --src_row.end;
+          --dest_row.start;
+          modified = true;
+        }
+      }
+    }
+  } while (modified);
+
+  /* now do the actual layout based on row metadata */
+
+  for (int i = rows.size() - 1; i >= 0; --i) {
+    const auto &row = rows[i];
+
+    rc = HorizontalRange(rc, row.start, row.end);
   }
 
   return rc;
