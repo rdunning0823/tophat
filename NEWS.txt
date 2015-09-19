@@ -1,7 +1,23 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Top Hat Soaring 2.1.1b Beta September 15, 2015 
+Top Hat Soaring 2.1.2 Beta TBD
+* Merge XCSoar 6.7.7
+	* airspace
+	  - accept airspaces of class RMZ in OpenAir format files (#3437)
+	  - fix wrong AGL height due to longitude east/west wraparound (#3468)
+	* infoboxes
+	  - fix data for OLC infoboxes if "OLC League" is used (#3461)
+	* calculations
+	  - fix handicap factor for "OLC League" scores
+	  - fix reach calculation problems at border of map (#3239)
+	  - simplified EKF wind algorithm (#3062)
+	* input events
+	  - allow '_' character in event identifiers (#3464)
+	* replay
+	  - fix replay progress while replay is paused (#3446)
+
+Top Hat Soaring 2.1.1b Beta September 15, 2015
 * Smooth the circle diameter infobox
 * Fix but in "Ignore task start"
 
@@ -120,6 +136,7 @@ Top Hat Soaring 2.0.1 July 28, 2014
 * Android - fix crash when switching to other apps
 * Show distance to pan crosshairs
 * Merged XCSoar 6.7.5
+
 * devices
   - fixed attitude data handling
   - properly detect LXNAV Nano 3

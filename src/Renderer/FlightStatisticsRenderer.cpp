@@ -24,6 +24,7 @@ Copyright_License {
 #include "FlightStatisticsRenderer.hpp"
 #include "ChartRenderer.hpp"
 #include "Util/Macros.hpp"
+#include "Util/StringUtil.hpp"
 #include "Look/MapLook.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
@@ -189,7 +190,7 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
     FormatUserDistanceSmart(result_fai.distance, distance_fai);
     TCHAR speed[100];
     FormatUserTaskSpeed(result.GetSpeed(), speed);
-    _stprintf(buffer,
+    StringFormatUnsafe(buffer,
               (long_line
                ? _T("%s: %s, %s (FAI)\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
                  (Layout::landscape
@@ -202,10 +203,10 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
   } else if (settings.contest == Contest::DHV_XC ||
              settings.contest == Contest::XCONTEST) {
     const ContestResult& result_free =
-        derived.contest_stats.GetResult(0);
+      derived.contest_stats.GetResult(0);
 
     const ContestResult& result_triangle =
-        derived.contest_stats.GetResult(1);
+      derived.contest_stats.GetResult(1);
 
     TCHAR timetext1[100];
     FormatSignedTimeHHMM(timetext1, (int)result_free.time);
@@ -215,16 +216,16 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
     FormatUserDistanceSmart(result_triangle.distance, distance_fai);
     TCHAR speed[100];
     FormatUserTaskSpeed(result_free.GetSpeed(), speed, ARRAY_SIZE(speed));
-    _stprintf(buffer,
-              (long_line
-               ? _T("%s: %s (Free), %s (Triangle)\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
-                 (Layout::landscape
-                  ? _T("%s:\r\n%s (Free)\r\n%s (Triangle)\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
-                  : _T("%s: %s (Free)\r\n%s (Triangle)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
-              _("Distance"), distance, distance_fai,
-              _("Score"), (double)result_free.score, _("pts"),
-              _("Time"), timetext1,
-              _("Speed"), speed);
+    StringFormatUnsafe(buffer,
+                       (long_line
+                        ? _T("%s: %s (Free), %s (Triangle)\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
+                          (Layout::landscape
+                           ? _T("%s:\r\n%s (Free)\r\n%s (Triangle)\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
+                           : _T("%s: %s (Free)\r\n%s (Triangle)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
+                       _("Distance"), distance, distance_fai,
+                       _("Score"), (double)result_free.score, _("pts"),
+                       _("Time"), timetext1,
+                       _("Speed"), speed);
   } else {
     unsigned result_index;
     switch (settings.contest) {
@@ -246,16 +247,16 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
     FormatUserDistanceSmart(result_olc.distance, distance);
     TCHAR speed[100];
     FormatUserTaskSpeed(result_olc.GetSpeed(), speed, ARRAY_SIZE(speed));
-    _stprintf(buffer,
-              (long_line
-               ? _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
-                 (Layout::landscape
-                  ? _T("%s:\r\n%s\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
-                  : _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
-              _("Distance"), distance,
-              _("Score"), (double)result_olc.score, _("pts"),
-              _("Time"), timetext1,
-              _("Speed"), speed);
+    StringFormatUnsafe(buffer,
+                       (long_line
+                        ? _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s, %s: %s") :
+                          (Layout::landscape
+                           ? _T("%s:\r\n%s\r\n%s:\r\n%.1f %s\r\n%s: %s\r\n%s: %s\r\n")
+                           : _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
+                       _("Distance"), distance,
+                       _("Score"), (double)result_olc.score, _("pts"),
+                       _("Time"), timetext1,
+                       _("Speed"), speed);
   }
 }
 
@@ -319,31 +320,31 @@ FlightStatisticsRenderer::CaptionTask(TCHAR *sTmp, const DerivedInfo &derived)
       FormatSignedTimeHHMM(timetext2, (int)common.aat_time_remaining);
 
       if (Layout::landscape) {
-        _stprintf(sTmp,
-            _T("%s:\r\n  %s\r\n%s:\r\n  %s\r\n%s:\r\n  %5.0f %s\r\n%s:\r\n  %5.0f %s\r\n"),
-            _("Task to go"), timetext1, _("AAT to go"), timetext2,
-            _("Distance to go"),
-            (double)Units::ToUserDistance(d_remaining),
-            Units::GetDistanceName(), _("Target speed"),
-            (double)Units::ToUserTaskSpeed(common.aat_speed_remaining),
-            Units::GetTaskSpeedName());
+        StringFormatUnsafe(sTmp,
+                           _T("%s:\r\n  %s\r\n%s:\r\n  %s\r\n%s:\r\n  %5.0f %s\r\n%s:\r\n  %5.0f %s\r\n"),
+                           _("Task to go"), timetext1, _("AAT to go"), timetext2,
+                           _("Distance to go"),
+                           (double)Units::ToUserDistance(d_remaining),
+                           Units::GetDistanceName(), _("Target speed"),
+                           (double)Units::ToUserTaskSpeed(common.aat_speed_remaining),
+                           Units::GetTaskSpeedName());
       } else {
-        _stprintf(sTmp,
-            _T("%s: %s\r\n%s: %s\r\n%s: %5.0f %s\r\n%s: %5.0f %s\r\n"),
-            _("Task to go"), timetext1, _("AAT to go"), timetext2,
-            _("Distance to go"),
-            (double)Units::ToUserDistance(d_remaining),
-            Units::GetDistanceName(),
-            _("Target speed"),
-            (double)Units::ToUserTaskSpeed(common.aat_speed_remaining),
-            Units::GetTaskSpeedName());
+        StringFormatUnsafe(sTmp,
+                           _T("%s: %s\r\n%s: %s\r\n%s: %5.0f %s\r\n%s: %5.0f %s\r\n"),
+                           _("Task to go"), timetext1, _("AAT to go"), timetext2,
+                           _("Distance to go"),
+                           (double)Units::ToUserDistance(d_remaining),
+                           Units::GetDistanceName(),
+                           _("Target speed"),
+                           (double)Units::ToUserTaskSpeed(common.aat_speed_remaining),
+                           Units::GetTaskSpeedName());
       }
     } else {
       FormatSignedTimeHHMM(timetext1, (int)task_stats.total.time_remaining_now);
-      _stprintf(sTmp, _T("%s: %s\r\n%s: %5.0f %s\r\n"),
-                _("Task to go"), timetext1, _("Distance to go"),
-                (double)Units::ToUserDistance(d_remaining),
-                Units::GetDistanceName());
+      StringFormatUnsafe(sTmp, _T("%s: %s\r\n%s: %5.0f %s\r\n"),
+                         _("Task to go"), timetext1, _("Distance to go"),
+                         (double)Units::ToUserDistance(d_remaining),
+                         Units::GetDistanceName());
     }
   }
 }

@@ -48,6 +48,7 @@ KOBO_POWER_OFF_SOURCES = \
 	$(SRC)/Hardware/RotateDisplay.cpp \
 	$(SRC)/Logger/FlightParser.cpp \
 	$(SRC)/Renderer/FlightListRenderer.cpp \
+	$(SRC)/Thread/Mutex.cpp \
 	$(SRC)/FlightInfo.cpp \
 	$(SRC)/Thread/Mutex.cpp \
 	$(SRC)/Version.cpp \

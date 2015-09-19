@@ -257,7 +257,7 @@ protected:
         size_t length = _tcslen(buffer);
         if (length > 0)
           buffer[length++] = _T(' ');
-        _stprintf(buffer + length, _T("%.0f:1"), (double) gr);
+        StringFormatUnsafe(buffer + length, _T("%.0f:1"), (double) gr);
       }
       return;
     }
@@ -276,7 +276,7 @@ protected:
       if (reach.IsReachableTerrain()) {
         if (length > 0)
           buffer[length++] = _T(':');
-        _stprintf(buffer + length, _T("%d%s"), uah_terrain, sAltUnit);
+        StringFormatUnsafe(buffer + length, _T("%d%s"), uah_terrain, sAltUnit);
       }
       return;
     }
@@ -287,12 +287,12 @@ protected:
     if (settings.arrival_height_display == WaypointRendererSettings::ArrivalHeightDisplay::GLIDE_AND_TERRAIN &&
         reach.IsReachableDirect() && reach.IsReachableTerrain() &&
         reach.IsDeltaConsiderable()) {
-      _stprintf(buffer + length, _T("%d/%d%s"), uah_glide,
-                uah_terrain, sAltUnit);
+      StringFormatUnsafe(buffer + length, _T("%d/%d%s"), uah_glide,
+                         uah_terrain, sAltUnit);
       return;
     }
 
-    _stprintf(buffer + length, _T("%d%s"), uah_glide, sAltUnit);
+    StringFormatUnsafe(buffer + length, _T("%d%s"), uah_glide, sAltUnit);
   }
 
   /**
@@ -393,13 +393,11 @@ protected:
   }
 
 public:
-  void
-  Visit(const Waypoint& way_point)
-  {
+  void Visit(const Waypoint& way_point) override {
     AddWaypoint(way_point, way_point.IsTurnpoint() && is_mat);
   }
 
-  virtual void Visit(const TaskPoint &tp) override {
+  void Visit(const TaskPoint &tp) override {
     switch (tp.GetType()) {
     case TaskPointType::UNORDERED:
       AddWaypoint(((const UnorderedTaskPoint &)tp).GetWaypoint(), true);
