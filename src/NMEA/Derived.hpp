@@ -189,15 +189,16 @@ struct DerivedInfo:
     MANUAL,
 
     /**
-     * Calculated by #CirclingWind or EKF
+     * XCSoar has calculated the wind vector automatically.
      */
-    INTERNAL,
+    AUTO,
 
     /**
      * The wind vector was received from an external device.
      */
     EXTERNAL,
   } wind_source;
+
 
   Validity head_wind_available;
   fixed head_wind;
