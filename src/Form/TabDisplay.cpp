@@ -24,13 +24,15 @@ Copyright_License {
 #include "Form/TabDisplay.hpp"
 #include "Widget/TabWidget.hpp"
 #include "Look/DialogLook.hpp"
-#include "Event/KeyCode.hpp"
+#include "Screen/Key.h"
 #include "Screen/Icon.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Asset.hpp"
 
 #include <assert.h>
+#include <winuser.h>
+
 
 TabDisplay::TabDisplay(TabWidget &_pager, const DialogLook &_look,
                        ContainerWindow &parent, PixelRect rc,

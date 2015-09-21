@@ -24,7 +24,7 @@
 #include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
 #include "Look/ButtonLook.hpp"
-#include "Event/KeyCode.hpp"
+#include "Screen/Key.h"
 #include "Asset.hpp"
 #include "Renderer/TextButtonRenderer.hpp"
 #include "Hardware/Vibrator.hpp"
@@ -150,6 +150,12 @@ bool
 Button::OnKeyCheck(unsigned key_code) const
 {
   switch (key_code) {
+#ifdef GNAV
+  case VK_F4:
+    // using F16 also as Enter-Key. This allows to use the RemoteStick of Altair to do a "click" on the focused button
+  case VK_F16:
+endif
+
   case KEY_RETURN:
     return true;
 

@@ -29,7 +29,7 @@ Copyright_License {
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
-#include "Event/KeyCode.hpp"
+#include "Screen/Key.h"
 #include "Renderer/TwoTextRowsRenderer.hpp"
 #include "Interface.hpp"
 #include "Screen/SingleWindow.hpp"
@@ -260,6 +260,7 @@ public:
 
   void ReClick() override;
   void Show(const PixelRect &rc) override;
+  bool KeyPress(unsigned key_code) override;
 
 protected:
   void RefreshView();
@@ -419,15 +420,22 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
   text_rc.left += line_height + padding;
 
   if (show_leg_info) {
+    // Use small font for details
+    canvas.Select(row_renderer.GetSecondFont());
+
     // Draw leg distance
     FormatUserDistanceSmart(leg.distance, buffer, true);
-    const int x1 = row_renderer.DrawRightFirstRow(canvas, rc, buffer);
+    unsigned width = canvas.CalcTextWidth(buffer);
+    const int x1 = rc.right - padding - width;
+    canvas.DrawText(x1, rc.top + row_renderer.GetFirstY(), buffer);
 
     // Draw leg bearing
     FormatBearing(buffer, ARRAY_SIZE(buffer), leg.bearing);
-    const int x2 = row_renderer.DrawRightSecondRow(canvas, rc, buffer);
+    width = canvas.CalcTextWidth(buffer);
+    const int x2 = rc.right - padding - width;
+    canvas.DrawText(x2, rc.top + row_renderer.GetSecondY(), buffer);
 
-    text_rc.right = std::min(x1, x2);
+    text_rc.right = std::min(x1, x2) - padding;
   }
 
   // Draw details line
@@ -560,6 +568,36 @@ TaskEditPanel::MoveDown()
 
   ordered_task->UpdateGeometry();
   RefreshView();
+}
+
+bool
+TaskEditPanel::KeyPress(unsigned key_code)
+{
+  switch (key_code){
+  case KEY_ESCAPE:
+    if (IsAltair() && GetList().HasFocus()){
+       dialog.FocusFirstControl();
+      return true;
+    }
+    return false;
+
+  case '6': /* F5 */
+    if (IsAltair()) {
+      MoveUp();
+      return true;
+    } else
+      return false;
+
+  case '7': /* F6 */
+    if (IsAltair()) {
+      MoveDown();
+      return true;
+    } else
+      return false;
+
+  default:
+    return false;
+  }
 }
 
 void
