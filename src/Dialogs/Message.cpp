@@ -24,7 +24,7 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #include "Language/Language.hpp"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
 #include "Look/DialogLook.hpp"
@@ -118,7 +118,7 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
 
     if (button_flags == MB_YESNOALL) {
       buttons.append() =
-          new WndButton(client_area, dialog_look.button, _("All"), button_rc,
+          new Button(client_area, dialog_look.button, _("All"), button_rc,
                         button_style, wf, IDALL);
     }
 

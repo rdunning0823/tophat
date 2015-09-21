@@ -24,7 +24,7 @@ Copyright_License {
 #include "RowFormWidget.hpp"
 #include "Form/Panel.hpp"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/HLine.hpp"
 #include "Look/DialogLook.hpp"
 #include "Dialogs/DialogSettings.hpp"
@@ -297,7 +297,7 @@ RowFormWidget::AddSymbolButton(const TCHAR *label, ActionListener &listener, int
   const PixelRect button_rc =
     InitialControlRect(Layout::GetMinimumControlHeight());
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 

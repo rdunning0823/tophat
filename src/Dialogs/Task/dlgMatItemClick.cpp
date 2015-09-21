@@ -190,7 +190,7 @@ private:
   PixelRect rc_add, rc_delete, rc_replace, rc_cancel, rc_more;
   PixelRect rc_add_info, rc_estimate, rc_header, rc_replace_info;
 
-  WndButton *add_button, *delete_button, *replace_button, *cancel, *more;
+  Button *add_button, *delete_button, *replace_button, *cancel, *more;
 
   WndFrame *add_info_frame, *estimate_frame, *replace_info_frame,
       *header_frame;
@@ -525,26 +525,26 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const ButtonLook &button_look = dialog_look.button;
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
   WindowStyle style_frame;
 
   if (modified_task.mat_mode == MAT_DELETE) {
-    delete_button = new WndButton(GetClientAreaWindow(), button_look,
+    delete_button = new Button(GetClientAreaWindow(), button_look,
                                   add_del_button_text.c_str(),
                                   rc_delete,
                                   button_style, *this, DeletePointClick);
     AddDestruct(delete_button);
   } else {
-    add_button = new WndButton(GetClientAreaWindow(), button_look,
+    add_button = new Button(GetClientAreaWindow(), button_look,
                                add_del_button_text.c_str(),
                                rc_add,
                                button_style, *this, AddPointClick);
     AddDestruct(add_button);
 
     if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
-      replace_button = new WndButton(GetClientAreaWindow(), button_look,
+      replace_button = new Button(GetClientAreaWindow(), button_look,
                                      replace_button_text.c_str(),
                                      rc_replace,
                                      button_style, *this, ReplacePointClick);
@@ -570,12 +570,12 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddDestruct(add_info_frame);
   add_info_frame->SetCaption(add_del_info_text.c_str());
 
-  more = new WndButton(GetClientAreaWindow(), button_look, _T("More"),
+  more = new Button(GetClientAreaWindow(), button_look, _T("More"),
                        rc_more,
                        button_style, *this, MoreClick);
   AddDestruct(more);
 
-  cancel = new WndButton(GetClientAreaWindow(), button_look, _T("Cancel"),
+  cancel = new Button(GetClientAreaWindow(), button_look, _T("Cancel"),
                          rc_cancel,
                          button_style, *this, CancelClick);
   AddDestruct(cancel);

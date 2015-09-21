@@ -29,7 +29,7 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Widget/ManagedWidget.hpp"
 
-class WndButton;
+class Button;
 class WndFrame;
 
 
@@ -45,8 +45,8 @@ class BaseAccessPanel : public NullWidget, public WndForm
 protected:
   unsigned id;
 
-  WndButton *setup_button;
-  WndButton *close_button;
+  Button *setup_button;
+  Button *close_button;
   WndFrame *header_text;
   ManagedWidget managed_widget;
 

@@ -26,7 +26,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
 #include "Look/GlobalFonts.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Components.hpp"
@@ -78,7 +78,7 @@ TaskButtonWidget::CreateButton(ContainerWindow &parent,
                                const ButtonLook &button_look,
                                const PixelRect &rc_map)
 {
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.multiline();
 
   WndSymbolButton *button = new WndSymbolButton(parent, button_look, caption,

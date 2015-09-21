@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_FORM_BUTTON_HPP
 
 #include "Screen/PaintWindow.hpp"
+#include "Util/StaticString.hxx"
 
 #include <tchar.h>
 
@@ -114,6 +115,8 @@ public:
    * #TextButtonRenderer instance.
    */
   void SetCaption(const TCHAR *caption);
+
+  StaticString<64>::const_pointer GetCaption() const;
 
   void SetSelected(bool _selected);
 

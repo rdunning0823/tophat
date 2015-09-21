@@ -52,7 +52,7 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
 #include "Widgets/MapOverlayButton.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"

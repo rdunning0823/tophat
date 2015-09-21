@@ -27,11 +27,11 @@ Copyright_License {
 #include "Widget/ContainerWidget.hpp"
 #include "Form/ActionListener.hpp"
 #include "Blackboard/BlackboardListener.hpp"
+#include "Form/Button.hpp"
 
 struct AttitudeState;
 class LiveBlackboard;
 struct ThermalAssistantLook;
-class Button;
 class BigThermalAssistantWindow;
 
 class BigThermalAssistantWidget
@@ -50,7 +50,7 @@ class BigThermalAssistantWidget
     CLOSE,
   };
 
-  Button *close_button;
+  Button close_button;
 #endif
 
 public:

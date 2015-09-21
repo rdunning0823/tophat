@@ -25,7 +25,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Edit.hpp"
 #include "Form/LambdaActionListener.hpp"
 #include "Widget/KeyboardWidget.hpp"
@@ -363,7 +363,7 @@ TouchNumericEntry(fixed &value,
   _editor.SetReadOnly();
   editor = &_editor;
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
 
   PixelScalar button_width = (rc.right - rc.left) / 3;
@@ -372,19 +372,19 @@ TouchNumericEntry(fixed &value,
                               rc.top + 6 * button_height},
                             button_style, form, mrOK);
 
-  WndButton cancel_button(client_area, look.button, _("Cancel"),
+  Button cancel_button(client_area, look.button, _("Cancel"),
                           { button_width,
                             rc.top + 5 * button_height, 2 * button_width,
                             rc.top + 6 * button_height},
                           button_style, form, mrCancel);
 
-  WndButton help_button(client_area, look.button, _("Help"),
+  Button help_button(client_area, look.button, _("Help"),
                           { button_width * 2,
                             rc.top + 5 * button_height, 3 * button_width,
                             rc.top + 6 * button_height},
                           button_style, ShowHelp);
 
-  WndButton clear_button(client_area, look.button, _("Clear"),
+  Button clear_button(client_area, look.button, _("Clear"),
                          { button_width * 2,
                            rc.top + 5 * button_height, 3 * button_width,
                            rc.top + 6 * button_height},
@@ -407,7 +407,7 @@ TouchNumericEntry(fixed &value,
   kb = nullptr;
   knb = &keyboard;
 
-  WndButton backspace_button(client_area, look.button, _T("<-"),
+  Button backspace_button(client_area, look.button, _T("<-"),
                              { backspace_left, padding, rc.right - padding,
                                rc.top + button_height },
                              button_style, OnBackspace);

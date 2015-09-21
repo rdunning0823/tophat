@@ -32,7 +32,7 @@ Copyright_License {
 #include "Engine/Task/Ordered/TaskAdvance.hpp"
 #include "Components.hpp"
 #include "Interface.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
 

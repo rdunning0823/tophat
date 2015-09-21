@@ -25,7 +25,7 @@ Copyright_License {
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Font.hpp"
 
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
@@ -62,7 +62,7 @@ bool
 MapOverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
 {
   if (IsInside(x, y))
-    return WndButton::OnMouseMove(x, y, keys);
+    return Button::OnMouseMove(x, y, keys);
   else
     OnCancelMode();
   return true;

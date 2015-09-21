@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_IGC_PARSER_HPP
 #define XCSOAR_IGC_PARSER_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 struct IGCFix;
 struct IGCHeader;

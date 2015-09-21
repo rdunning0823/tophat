@@ -34,7 +34,7 @@ Copyright_License {
 #include "Dialogs/WidgetDialog.hpp"
 #include "Form/ButtonPanel.hpp"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
@@ -103,10 +103,10 @@ private:
 
   WndFrame *site_files_text, *plane_text, *device_text;
   WndFrame *safety_text, *nationality_text, *pilot_text;
-  WndButton *site_files_button, *plane_button, *device_button;
-  WndButton *safety_button, *nationality_button, *pilot_button;
-  WndButton *screens_button;
-  WndButton *ok, *advanced;
+  Button *site_files_button, *plane_button, *device_button;
+  Button *safety_button, *nationality_button, *pilot_button;
+  Button *screens_button;
+  Button *ok, *advanced;
 
 public:
   SetupQuick()
@@ -496,35 +496,35 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                             pilot_text->SetVAlignCenter();
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 
-  nationality_button = new WndButton(GetClientAreaWindow(), button_look,
+  nationality_button = new Button(GetClientAreaWindow(), button_look,
                                 _("Nationality"),
                                 rc_nationality_button,
                                 button_style, *this, NATIONALITY);
 
-  device_button = new WndButton(GetClientAreaWindow(), button_look,
+  device_button = new Button(GetClientAreaWindow(), button_look,
                                 _("Device"),
                                 rc_device_button,
                                 button_style, *this, DEVICE);
 
-  site_files_button = new WndButton(GetClientAreaWindow(), button_look,
+  site_files_button = new Button(GetClientAreaWindow(), button_look,
                                     _("Site files"),
                                     rc_site_files_button,
                                     button_style, *this, SITE_FILES);
 
-  safety_button = new WndButton(GetClientAreaWindow(), button_look,
+  safety_button = new Button(GetClientAreaWindow(), button_look,
                                 _("Safety heights"),
                                 rc_safety_button,
                                 button_style, *this, SAFETY);
 
-  plane_button = new WndButton(GetClientAreaWindow(), button_look, _("Plane"),
+  plane_button = new Button(GetClientAreaWindow(), button_look, _("Plane"),
                                rc_plane_button,
                                button_style, *this, PLANE);
 
-  pilot_button = new WndButton(GetClientAreaWindow(), button_look,
+  pilot_button = new Button(GetClientAreaWindow(), button_look,
                                _("Pilot"),
                                rc_pilot_button,
                                button_style, *this, PILOT);
@@ -533,12 +533,12 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            rc_ok,
                            button_style, *this, OK);
 
-  screens_button = new WndButton(GetClientAreaWindow(), button_look,
+  screens_button = new Button(GetClientAreaWindow(), button_look,
                                  _("Screen"),
                                  rc_screens_button,
                                  button_style, *this, SCREENS);
 
-  advanced = new WndButton(GetClientAreaWindow(), button_look, _("Advanced"),
+  advanced = new Button(GetClientAreaWindow(), button_look, _("Advanced"),
                            rc_advanced,
                            button_style, *this, ADVANCED);
 

@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "OverlayButtonWidget.hpp"
 #include "MapOverlayButton.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"
@@ -113,7 +113,7 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
                                    const IconLook &icon_look,
                                    const PixelRect &rc_map)
 {
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.multiline();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 

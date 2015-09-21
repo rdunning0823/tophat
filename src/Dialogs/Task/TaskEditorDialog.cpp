@@ -60,7 +60,7 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Widget/DockWindow.hpp"
@@ -183,7 +183,7 @@ CheckAndFixTask()
 }
 
 static void
-OnCloseClicked(gcc_unused WndButton &Sender)
+OnCloseClicked(gcc_unused Button &Sender)
 {
   if (CheckAndFixTask())
     wf->SetModalResult(mrOK);
@@ -208,7 +208,7 @@ ShowDetails(bool visible)
   assert(p != nullptr);
   p->SetVisible(visible);
 
-  WndButton *button_add = (WndButton*) wf->FindByName(_T("butAdd"));
+  Button *button_add = (Button*) wf->FindByName(_T("butAdd"));
   assert (button_add != nullptr);
   button_add->SetVisible(!ordered_task->IsFull());
   if (visible)
@@ -220,7 +220,7 @@ ShowDetails(bool visible)
 static void
 RefreshTaskProperties()
 {
-  WndButton *button_properties = (WndButton*) wf->FindByName(_T("butTaskProperties"));
+  Button *button_properties = (Button*) wf->FindByName(_T("butTaskProperties"));
   assert (button_properties != nullptr);
   StaticString<255> line_1;
   StaticString<255> line_2;
@@ -230,10 +230,10 @@ RefreshTaskProperties()
   const TaskFactoryType ftype = ordered_task->GetFactoryType();
   line_1 = OrderedTaskFactoryName(ftype);
 
-  if (ordered_task->GetTaskNameIsBlank())
+  if (ordered_task->GetNameIsBlank())
     wf->SetCaption(line_1.c_str());
   else
-    wf->SetCaption(ordered_task->GetTaskName());
+    wf->SetCaption(ordered_task->GetName());
 
   if (IsFai(ordered_task->GetFactoryType())) {
     button_properties->SetCaption(line_1.c_str());
@@ -283,18 +283,18 @@ RefreshView()
 
   ShowDetails(ordered_task->TaskSize() != 0);
 
-  WndButton *button_type = (WndButton*) wf->FindByName(_T("butType"));
+  Button *button_type = (Button*) wf->FindByName(_T("butType"));
   assert (button_type != nullptr);
 
-  WndButton *button_relocate = (WndButton*) wf->FindByName(_T("butRelocate"));
+  Button *button_relocate = (Button*) wf->FindByName(_T("butRelocate"));
   assert (button_relocate != nullptr);
   button_relocate->SetVisible(active_index != ordered_task->TaskSize());
 
-  WndButton *button_remove = (WndButton*) wf->FindByName(_T("butRemove"));
+  Button *button_remove = (Button*) wf->FindByName(_T("butRemove"));
   assert (button_remove != nullptr);
   button_remove->SetVisible(active_index != ordered_task->TaskSize());
 
-  WndButton *button_add = (WndButton*) wf->FindByName(_T("butAdd"));
+  Button *button_add = (Button*) wf->FindByName(_T("butAdd"));
   assert (button_add != nullptr);
   button_add->SetVisible(active_index != ordered_task->TaskSize() ||
                          ordered_task->TaskSize() == 0);
@@ -356,7 +356,7 @@ ReadValues()
 }
 
 static void 
-OnRemoveClicked(gcc_unused WndButton &Sender)
+OnRemoveClicked(gcc_unused Button &Sender)
 {
   assert(active_index < ordered_task->TaskSize());
 
@@ -391,7 +391,7 @@ OnRemoveClicked(gcc_unused WndButton &Sender)
 }
 
 static void
-OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
+OnTaskPropertiesClicked(gcc_unused Button &Sender)
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
   dlgTaskPropertiesUsShowModal(look, &ordered_task, task_modified);
@@ -401,7 +401,7 @@ OnTaskPropertiesClicked(gcc_unused WndButton &Sender)
  * shows the task browse dialog, and updates the task as needed
  */
 static void
-OnBrowseClicked(gcc_unused WndButton &Sender)
+OnBrowseClicked(gcc_unused Button &Sender)
 {
   dlgTaskListUsShowModal(ordered_task_pointer, task_modified);
   ordered_task = *ordered_task_pointer;
@@ -493,7 +493,7 @@ InsertTurnpoint(const unsigned active_index)
  * appends or inserts a task point after the current item
  */
 static void
-OnAddClicked(gcc_unused WndButton &Sender)
+OnAddClicked(gcc_unused Button &Sender)
 {
   assert(!ordered_task->IsFull());
   if (active_index == ordered_task->TaskSize() &&
@@ -504,7 +504,7 @@ OnAddClicked(gcc_unused WndButton &Sender)
 }
 
 static void
-OnRelocateClicked(gcc_unused WndButton &Sender)
+OnRelocateClicked(gcc_unused Button &Sender)
 {
   assert (active_index < ordered_task->TaskSize());
 
@@ -524,7 +524,7 @@ OnRelocateClicked(gcc_unused WndButton &Sender)
 }
 
 static void
-OnTypeClicked(gcc_unused WndButton &Sender)
+OnTypeClicked(gcc_unused Button &Sender)
 {
   if (dlgTaskPointType(&ordered_task, active_index)) {
     task_modified = true;

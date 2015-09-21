@@ -30,7 +30,7 @@ Copyright_License {
 #include "Task/Ordered/OrderedTask.hpp"
 #include "Time/PeriodClock.hpp"
 #include "Engine/Task/TaskManager.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Task/TaskType.hpp"
 #include "Menu/TophatMenu.hpp"
 

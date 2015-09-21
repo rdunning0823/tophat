@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "Widgets/TaskNavSliderWidget.hpp"
 #include "Input/InputEvents.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "OS/Clock.hpp"
 
 #include "UIGlobals.hpp"

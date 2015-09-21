@@ -90,7 +90,7 @@ UIGlobals::GetIconLook()
 class KoboMenuWidget final : public WindowWidget, ActionListener, Timer {
   ActionListener &dialog;
   SimulatorPromptWindow w;
-  WndButton *poweroff_button;
+  Button *poweroff_button;
 
   /* should poweroff button behave as a reboot button ? */
   bool do_reboot;

@@ -30,7 +30,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 
 class WndForm;
-class WndButton;
+class Button;
 
 class TaskCalculatorPanel final
   : public RowFormWidget,

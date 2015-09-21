@@ -30,7 +30,7 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
 #include "Form/CheckBox.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/List.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
@@ -263,7 +263,7 @@ WaypointNameAllowedCharacters(const TCHAR *prefix)
 }
 
 static void
-OnSearchClicked(gcc_unused WndButton &button)
+OnSearchClicked(gcc_unused Button &button)
 {
   TCHAR new_name_filter[WaypointFilter::NAME_LENGTH + 1];
   CopyString(new_name_filter, dialog_state.name.c_str(),
@@ -365,41 +365,41 @@ WaypointListSimpleDialog::OnActivateItem(unsigned index)
 }
 
 static void
-OnByDistanceClicked(gcc_unused WndButton &button)
+OnByDistanceClicked(gcc_unused Button &button)
 {
   sort_direction = UISettings::WaypointSortDirection::DISTANCE;
   UpdateList();
 }
 
 static void
-OnByBearingClicked(gcc_unused WndButton &button)
+OnByBearingClicked(gcc_unused Button &button)
 {
   sort_direction = UISettings::WaypointSortDirection::BEARING;
   UpdateList();
 }
 
 static void
-OnByElevationClicked(gcc_unused WndButton &button)
+OnByElevationClicked(gcc_unused Button &button)
 {
   sort_direction = UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE;
   UpdateList();
 }
 
 static void
-OnByNameClicked(gcc_unused WndButton &button)
+OnByNameClicked(gcc_unused Button &button)
 {
   sort_direction = UISettings::WaypointSortDirection::NAME;
   UpdateList();
 }
 
 static void
-OnSelectClicked(gcc_unused WndButton &button)
+OnSelectClicked(gcc_unused Button &button)
 {
   OnWaypointListEnter();
 }
 
 static void
-OnCloseClicked(gcc_unused WndButton &button)
+OnCloseClicked(gcc_unused Button &button)
 {
   dialog->SetModalResult(mrCancel);
 }
@@ -450,7 +450,7 @@ ShowWaypointListDialog(const GeoPoint &_location,
   waypoint_list_control->SetCursorHandler(&dialog2);
   waypoint_list_control->SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
   if (goto_button) {
-    WndButton *button_select = (WndButton*)dialog->FindByName(_T("cmdSelect"));
+    Button *button_select = (Button*)dialog->FindByName(_T("cmdSelect"));
     assert (button_select != nullptr);
     button_select->SetCaption(_T("Goto"));
   }

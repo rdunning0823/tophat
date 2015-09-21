@@ -37,7 +37,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Interface.hpp"
 #include "Screen/Layout.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Look/Look.hpp"
 #include "Screen/Canvas.hpp"
@@ -88,7 +88,7 @@ protected:
    * These buttons and the altitude_value and altitude_type frames use the layout rectangles
    * calculated in NumberButtonSubNumberLayout
    */
-  WndButton *big_plus, *big_minus, *little_plus, *little_minus;
+  Button *big_plus, *big_minus, *little_plus, *little_minus;
   WndFrame *altitude_value;
   WndFrame *altitude_type;
   CheckBoxControl *show_alternate_units;
@@ -273,25 +273,25 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   big_dialog_look.Initialise(Fonts::map_bold, Fonts::infobox, Fonts::map_label,
                              Fonts::infobox, Fonts::map_bold,
                              Fonts::map_bold);
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  big_plus = new WndButton(GetClientAreaWindow(), big_button_look, _T("+100"),
+  big_plus = new Button(GetClientAreaWindow(), big_button_look, _T("+100"),
                            big_plus_rc,
                            button_style, *this, BigPlus);
   WndForm::AddDestruct(big_plus);
 
-  little_plus = new WndButton(GetClientAreaWindow(), big_button_look,
+  little_plus = new Button(GetClientAreaWindow(), big_button_look,
                               _T("+10"), little_plus_rc,
                               button_style, *this, LittlePlus);
   WndForm::AddDestruct(little_plus);
 
-  big_minus = new WndButton(GetClientAreaWindow(), big_button_look,
+  big_minus = new Button(GetClientAreaWindow(), big_button_look,
                             _T("-100"), big_minus_rc,
                             button_style, *this, BigMinus);
   WndForm::AddDestruct(big_minus);
 
-  little_minus = new WndButton(GetClientAreaWindow(), big_button_look,
+  little_minus = new Button(GetClientAreaWindow(), big_button_look,
                                _T("-10"), little_minus_rc,
                                button_style, *this, LittleMinus);
   WndForm::AddDestruct(little_minus);
@@ -311,7 +311,7 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   altitude_type->SetAlignCenter();
   altitude_type->SetVAlignCenter();
 
-  ButtonWindowStyle checkbox_style;
+  WindowStyle checkbox_style;
   checkbox_style.TabStop();
   show_alternate_units = new CheckBoxControl(GetClientAreaWindow(),
                                              dialog_look,

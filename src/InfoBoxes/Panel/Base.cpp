@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "Base.hpp"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Form.hpp"
 #include "Interface.hpp"
@@ -164,7 +164,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const DialogLook &look = UIGlobals::GetDialogLook();
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
 

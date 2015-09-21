@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "MainMenuButtonWidget.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"
@@ -36,7 +36,7 @@ Copyright_License {
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 void
 MainMenuButtonWidget::UpdateVisibility(const PixelRect &rc,

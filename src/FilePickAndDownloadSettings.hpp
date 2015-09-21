@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_FILE_PICK_AND_DOWNLOAD_SETTINGS_HPP
 #define XCSOAR_FILE_PICK_AND_DOWNLOAD_SETTINGS_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/TypeTraits.hpp"
 
 /**

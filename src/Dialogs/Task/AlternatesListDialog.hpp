@@ -30,7 +30,7 @@ Copyright_License {
 #include "Form/ActionListener.hpp"
 #include "Screen/Layout.hpp"
 
-class WndButton;
+class Button;
 class WidgetDialog;
 class Canvas;
 class WndForm;
@@ -51,7 +51,7 @@ class AlternatesListWidget
 
   const DialogLook &dialog_look;
 
-  WndButton *details_button, *cancel_button, *goto_button;
+  Button *details_button, *cancel_button, *goto_button;
 
 public:
   AlternateList alternates;

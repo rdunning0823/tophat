@@ -448,7 +448,7 @@ public:
    */
   void AddMultiLine(const TCHAR *text=nullptr);
 
-  WndButton *AddSymbolButton(const TCHAR *label, ActionListener &listener, int id);
+  Button *AddSymbolButton(const TCHAR *label, ActionListener &listener, int id);
   Button *AddButton(const TCHAR *label, ActionListener &listener, int id);
 
   gcc_pure

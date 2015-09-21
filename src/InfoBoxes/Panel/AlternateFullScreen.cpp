@@ -59,7 +59,7 @@ protected:
   AlternatesListWidgetNoButtons *alternates_list_widget2;
   TwoWidgets *two_widgets;
 
-  WndButton *details_button, *goto_button;
+  Button *details_button, *goto_button;
 
 public:
   AlternateFullScreen(unsigned _id)
@@ -134,15 +134,15 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   list_dock.SetWidget(two_widgets);
   list_dock.Move(list_rc);
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  goto_button = new WndButton(GetClientAreaWindow(), button_look, _T("Goto"),
+  goto_button = new Button(GetClientAreaWindow(), button_look, _T("Goto"),
                               left_button_rc,
                               button_style, *this, Goto);
   WndForm::AddDestruct(goto_button);
 
-  details_button = new WndButton(GetClientAreaWindow(), button_look, _T("Details"),
+  details_button = new Button(GetClientAreaWindow(), button_look, _T("Details"),
                                  right_button_rc,
                                  button_style, *this, Details);
   WndForm::AddDestruct(details_button);

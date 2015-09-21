@@ -30,7 +30,7 @@ Copyright_License {
 #include "Blackboard/BlackboardListener.hpp"
 #include "Form/Form.hpp"
 
-class WndButton;
+class Button;
 
 class WindSettingsPanel final
   : public RowFormWidget, public ActionListener,

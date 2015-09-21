@@ -28,7 +28,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/ButtonWindow.hpp"
 #include "Screen/Layout.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 
 #include <assert.h>
 #include <string.h>
@@ -176,7 +176,7 @@ KeyboardNumericWidget::AddButton(ContainerWindow &parent,
 {
   assert(num_buttons < MAX_BUTTONS);
 
-  ButtonWindowStyle style;
+  WindowStyle style;
   style.Hide();
 
   PixelRect rc;

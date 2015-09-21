@@ -165,7 +165,7 @@ protected:
   DockWindow widget_dock;
   TeamCodeWidget2 *team_code_widget2;
 
-  WndButton *set_code_button, *set_waypoint_button, *flarm_lock_button;
+  Button *set_code_button, *set_waypoint_button, *flarm_lock_button;
 
 public:
   TeamCodeFullScreen(unsigned _id)
@@ -219,20 +219,20 @@ TeamCodeFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   widget_dock.SetWidget(team_code_widget2);
   widget_dock.Move(widget_rc);
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  set_code_button = new WndButton(GetClientAreaWindow(), button_look, _T("Set code"),
+  set_code_button = new Button(GetClientAreaWindow(), button_look, _T("Set code"),
                                   left_button_rc,
                               button_style, *this, SET_CODE);
   WndForm::AddDestruct(set_code_button);
 
-  set_waypoint_button = new WndButton(GetClientAreaWindow(), button_look, _T("Set WP"),
+  set_waypoint_button = new Button(GetClientAreaWindow(), button_look, _T("Set WP"),
                                  middle_button_rc,
                                  button_style, *this, SET_WAYPOINT);
   WndForm::AddDestruct(set_waypoint_button);
 
-  flarm_lock_button = new WndButton(GetClientAreaWindow(), button_look, _T("Flarm lock"),
+  flarm_lock_button = new Button(GetClientAreaWindow(), button_look, _T("Flarm lock"),
                                  right_button_rc,
                                  button_style, *this, SET_FLARM_LOCK);
   WndForm::AddDestruct(flarm_lock_button);
@@ -282,7 +282,7 @@ TeamCodeFullScreen::OnCodeClicked()
   if (!TextEntryDialog(newTeammateCode, 7))
     return;
 
-  TrimRight(newTeammateCode);
+  StripRight(newTeammateCode);
 
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;

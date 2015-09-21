@@ -24,7 +24,7 @@
 #include "LineSectorZoneEditWidget.hpp"
 #include "Engine/Task/ObservationZones/LineSectorZone.hpp"
 #include "Language/Language.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 enum Controls {
   LENGTH,

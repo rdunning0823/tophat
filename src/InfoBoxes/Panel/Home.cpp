@@ -30,7 +30,7 @@ Copyright_License {
 #include "Waypoint/WaypointGlue.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Screen/Layout.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Language/Language.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/TaskManager.hpp"
@@ -59,8 +59,8 @@ protected:
    * These 3 items use the layout rectangles
    * calculated in ThreeButtonLayout
    */
-  WndButton *goto_home;
-  WndButton *change;
+  Button *goto_home;
+  Button *change;
   WndFrame *home_name;
 
 public:
@@ -94,11 +94,11 @@ HomePanel::OnAction(int action_id)
 
     {
       ScopeSuspendAllThreads suspend;
-      WaypointGlue::SetHome(way_points, terrain,
-                            settings_computer.poi,
-                            settings_computer.team_code,
+      WaypointGlue::SetHome(Profile::map, way_points, terrain,
+                            settings_computer.poi, settings_computer.team_code,
                             device_blackboard, false);
-      WaypointGlue::SaveHome(settings_computer.poi, settings_computer.team_code);
+      WaypointGlue::SaveHome(Profile::map,
+                             settings_computer.poi, settings_computer.team_code);
     }
     SetModalResult(mrOK);
     StaticString<255> message;
@@ -148,14 +148,14 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle style;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
-  change = new WndButton(GetClientAreaWindow(), dialog_look.button,
+  change = new Button(GetClientAreaWindow(), dialog_look.button,
                          _("Select waypoint"),
                          lower_left_rc, button_style, *this, Change);
 
-  goto_home = new WndButton(GetClientAreaWindow(), dialog_look.button,
+  goto_home = new Button(GetClientAreaWindow(), dialog_look.button,
                          _("Goto"),
                          lower_right_rc, button_style, *this, GotoHome);
 

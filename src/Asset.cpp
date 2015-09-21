@@ -29,7 +29,7 @@ Copyright_License {
 #include "Util/CharUtil.hpp"
 #include "Plane/Plane.hpp"
 #include "Interface.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/StringUtil.hpp"
 
 #ifdef USE_CONSOLE

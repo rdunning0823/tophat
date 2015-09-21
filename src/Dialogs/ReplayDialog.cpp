@@ -60,10 +60,10 @@ class ReplayControlWidget final
   };
 
   PlayState play_state;
-  WndButton *play_pause_button;
-  WndButton *stop_button;
-  WndButton *rewind_button;
-  WndButton *fast_forward_button;
+  Button *play_pause_button;
+  Button *stop_button;
+  Button *rewind_button;
+  Button *fast_forward_button;
   fixed user_speed;
   WidgetDialog *dialog;
 

@@ -37,7 +37,7 @@ Copyright_License {
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
@@ -76,10 +76,10 @@ void
 TaskManagerDialogUs::SetDialogCaption()
 {
   const TaskFactoryType ftype = active_task->GetFactoryType();
-  if (active_task->GetTaskNameIsBlank())
+  if (active_task->GetNameIsBlank())
     SetCaption(OrderedTaskFactoryName(ftype));
   else
-    SetCaption(active_task->GetTaskName());
+    SetCaption(active_task->GetName());
 }
 
 TaskManagerDialogUs::TaskManagerDialogUs(const DialogLook &look,
@@ -163,19 +163,19 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   OrderedTaskSummary(active_task, text.buffer(), false);
   task_summary->SetCaption(text.c_str());
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
   fly_button = new WndSymbolButton(GetClientAreaWindow(), look.button, _T("_X"),
                                    rc_fly_button,
                                    button_style, *this, FLY);
 
-  save_as_button = new WndButton(GetClientAreaWindow(), look.button,
+  save_as_button = new Button(GetClientAreaWindow(), look.button,
                                  _("Save as"),
                              rc_save_as_button,
                              button_style, *this, SAVE_AS);
 
-  back_button = new WndButton(GetClientAreaWindow(), look.button, _("Back"),
+  back_button = new Button(GetClientAreaWindow(), look.button, _("Back"),
                              rc_back_button,
                              button_style, *this, BACK);
 
@@ -367,13 +367,13 @@ TaskManagerDialogUs::SaveTask()
     active_task->ScanStartFinish();
 
   if (active_task->CheckTask()) {
-    StaticString<100>name(active_task->GetTaskName());
+    StaticString<100>name(active_task->GetName());
 
     if (!OrderedTaskSave(*active_task))
       return;
 
     SetDialogCaption();
-    if (name != active_task->GetTaskName())
+    if (name != active_task->GetName())
       task_modified = true;
 
   } else {

@@ -26,7 +26,7 @@
 
 #include "Widget/RowFormWidget.hpp"
 #include "Form/DataField/Listener.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/tstring.hpp"
 
 #include <assert.h>

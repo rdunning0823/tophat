@@ -28,7 +28,7 @@
 #include "Language/Language.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/AngleFormatter.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 enum Controls {
   RADIUS,

@@ -25,7 +25,7 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "ActionInterface.hpp"
 #include "UIState.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Engine/Task/TaskType.hpp"
 #include "NMEA/Derived.hpp"
 #include "Task/Stats/CommonStats.hpp"

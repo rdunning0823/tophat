@@ -74,7 +74,7 @@ ObservationZoneSummaryWidget::Prepare(ContainerWindow &parent, const PixelRect &
 void
 ObservationZoneSummaryWidget::UpdateButtonText()
 {
-  WndButton &button = (WndButton&)RowFormWidget::GetRow(SummaryButton);
+  Button &button = (Button&)RowFormWidget::GetRow(SummaryButton);
   StaticString<255>summary;
   summary = GetWidget().GetOzSummary();
   button.SetCaption(summary.c_str());

@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_TASK_START_MONITOR_HPP
 
 #include "Math/fixed.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 #include <tchar.h>
 

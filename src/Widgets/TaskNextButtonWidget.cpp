@@ -26,7 +26,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
 #include "Look/GlobalFonts.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/TaskType.hpp"

@@ -51,10 +51,10 @@ class SDCardSyncWidget final
     HelpButton,
   };
 
-  WndButton *upload_everything_button, *download_everything_button;
-  WndButton *upload_tasks_button, *download_flights_button;
+  Button *upload_everything_button, *download_everything_button;
+  Button *upload_tasks_button, *download_flights_button;
 
-  WndButton *install_koboroot_button;
+  Button *install_koboroot_button;
 
 public:
   /**

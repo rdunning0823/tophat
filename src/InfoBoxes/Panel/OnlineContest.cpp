@@ -33,7 +33,7 @@ Copyright_License {
 #include "Screen/PaintWindow.hpp"
 #include "Renderer/FlightStatisticsRenderer.hpp"
 #include "Look/Look.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Screen/Color.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Timer.hpp"

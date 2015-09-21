@@ -26,7 +26,7 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Components.hpp"
 #include "Task/ProtectedTaskManager.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/CheckBox.hpp"
 #include "Form/Frame.hpp"
 #include "Screen/Timer.hpp"
@@ -36,7 +36,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Interface.hpp"
 #include "Screen/Layout.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Look/Look.hpp"
 #include "Look/DialogLook.hpp"
@@ -281,7 +281,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
   big_plus = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("^"),
@@ -321,7 +321,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   speed_to_fly->SetAlignCenter();
   speed_to_fly->SetVAlignCenter();
 
-  ButtonWindowStyle checkbox_style;
+  WindowStyle checkbox_style;
   checkbox_style.TabStop();
 
   auto_mc = new CheckBoxControl(GetClientAreaWindow(), dialog_look, _T("Auto MC"),

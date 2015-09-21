@@ -33,7 +33,7 @@ Copyright_License {
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
 #endif
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 void
 FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,

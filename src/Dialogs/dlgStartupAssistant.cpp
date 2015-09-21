@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Form.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Form/Frame.hpp"
@@ -45,7 +45,7 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Widget/ManagedWidget.hpp"
 #include "Look/GlobalFonts.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/ConvertString.hpp"
 #include "Task/TaskNationalities.hpp"
 #include "Task/TaskBehaviour.hpp"
@@ -117,7 +117,7 @@ public:
   PixelRect rc_tip_text, rc_chkb_decline;
   PixelRect rc_prev_tip, rc_next_tip, rc_close;
 
-  WndButton *prev_tip, *next_tip, *close;
+  Button *prev_tip, *next_tip, *close;
   WndFrame *tip_text;
   CheckBoxControl *chkb_decline;
 
@@ -308,22 +308,22 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
   tip_text->SetFont(Fonts::infobox_small);
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
   close = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("_X"),
                               rc_close,
                               button_style, *this, CloseDialogClick);
 
-  next_tip = new WndButton(GetClientAreaWindow(), button_look, _("Next tip"),
+  next_tip = new Button(GetClientAreaWindow(), button_look, _("Next tip"),
                            rc_next_tip,
                            button_style, *this, NextTipClick);
 
-  prev_tip = new WndButton(GetClientAreaWindow(), button_look, _("Previous tip"),
+  prev_tip = new Button(GetClientAreaWindow(), button_look, _("Previous tip"),
                            rc_prev_tip,
                            button_style, *this, PrevTipClick);
 
-  ButtonWindowStyle checkbox_style;
+  WindowStyle checkbox_style;
   checkbox_style.TabStop();
   chkb_decline = new CheckBoxControl(GetClientAreaWindow(),
                                      UIGlobals::GetDialogLook(),

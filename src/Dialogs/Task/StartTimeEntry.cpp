@@ -40,7 +40,7 @@ Copyright_License {
 #include "Time/LocalTime.hpp"
 #include "Language/Language.hpp"
 #include "Interface.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Formatter/LocalTimeFormatter.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Engine/Task/TaskManager.hpp"
@@ -94,7 +94,7 @@ protected:
   PixelRect rc_digit_entry, rc_label_start, rc_label_current, rc_label_help;
   PixelRect rc_cancel, rc_close;
 
-  WndButton *cancel, *close;
+  Button *cancel, *close;
   WndFrame *label_start, *label_current, *label_help;
   DigitEntry *digit_entry;
 
@@ -299,18 +299,18 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
   SetRectangles(rc_form);
   digit_entry->Move(rc_digit_entry);
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
   button_style.multiline();
   WindowStyle style_frame;
 
-  close = new WndButton(GetClientAreaWindow(), button_look,
+  close = new Button(GetClientAreaWindow(), button_look,
                         _("Update"),
                         rc_close,
                         button_style, *this, CLOSEBUTTON);
   AddDestruct(close);
 
-  cancel = new WndButton(GetClientAreaWindow(), button_look,
+  cancel = new Button(GetClientAreaWindow(), button_look,
                          _("Cancel"),
                          rc_cancel,
                          button_style, *this, CANCELBUTTON);

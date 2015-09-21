@@ -54,7 +54,7 @@ Copyright_License {
 #include <vector>
 #endif
 
-class WndButton;
+class Button;
 class WndFrame;
 class WidgetDialog;
 class DataFieldEnum;
@@ -137,8 +137,8 @@ public:
 
   UPixelScalar font_height;
 
-  WndButton *close_button;
-  WndButton *search_button;
+  Button *close_button;
+  Button *search_button;
   WndFrame *status_message;
   DataFieldEnum *area_filter;
   DataFieldEnum *subarea_filter;
