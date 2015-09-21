@@ -27,7 +27,20 @@
 #include "Screen/Key.h"
 #include "Asset.hpp"
 #include "Renderer/TextButtonRenderer.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Hardware/Vibrator.hpp"
+
+WndSymbolButton::WndSymbolButton(ContainerWindow &parent,
+                                 const ButtonLook &_look,
+                                 const TCHAR *_caption,
+                                 const PixelRect &rc,
+                                 WindowStyle style,
+                                 ActionListener &_listener,
+                                 int _id)
+{
+  void Create(parent, rc, style, new SymbolButtonRenderer(_look,_caption),
+              _listener, _id);
+}
 
 Button::~Button() {
   /* we must override ~Window(), because in ~Window(), our own

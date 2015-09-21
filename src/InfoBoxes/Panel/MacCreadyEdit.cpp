@@ -26,7 +26,6 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Components.hpp"
 #include "Task/ProtectedTaskManager.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/CheckBox.hpp"
 #include "Form/Frame.hpp"
 #include "Screen/Timer.hpp"

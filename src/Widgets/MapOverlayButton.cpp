@@ -24,8 +24,6 @@ Copyright_License {
 #include "MapOverlayButton.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Font.hpp"
-
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"

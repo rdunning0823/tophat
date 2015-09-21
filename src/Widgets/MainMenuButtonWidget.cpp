@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "MainMenuButtonWidget.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"

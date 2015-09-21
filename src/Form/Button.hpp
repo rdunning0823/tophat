@@ -144,4 +144,15 @@ private:
   void SetDown(bool _down);
 };
 
+class WndSymbolButton : public Button {
+public:
+  WndSymbolButton(ContainerWindow &parent,
+                  const ButtonLook &look,
+                  const TCHAR *caption,
+                  const PixelRect &rc,
+                  WindowStyle style,
+                  ActionListener &_listener,
+                  int _id);
+};
+
 #endif

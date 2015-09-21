@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Base.hpp"
 #include "Form/Button.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Form.hpp"
 #include "Interface.hpp"

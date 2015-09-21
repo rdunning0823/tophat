@@ -25,7 +25,6 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Form/Form.hpp"
 #include "Form/Button.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Edit.hpp"
 #include "Form/LambdaActionListener.hpp"
 #include "Widget/KeyboardWidget.hpp"

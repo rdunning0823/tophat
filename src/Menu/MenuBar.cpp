@@ -27,6 +27,7 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 
 #include <assert.h>
 
@@ -186,14 +187,15 @@ MenuBar::MenuBar(ContainerWindow &parent, const ButtonLook &look)
   }
 }
 
+void
 MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
                     unsigned event, bool focused)
 {
   assert(i < MAX_BUTTONS);
 
-  Button &button = *buttons[i];
+  Button &button = buttons[i];
 
-  buttons[i].SetFocusedOverride(focused);
+//  buttons[i].SetFocusedOverride(focused);
   button.SetCaption(text);
   button.SetEnabled(enabled && event > 0);
   button.SetEvent(event);

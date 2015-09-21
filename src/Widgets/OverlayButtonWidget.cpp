@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "OverlayButtonWidget.hpp"
 #include "MapOverlayButton.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"

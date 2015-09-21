@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Form/Button.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Form.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Form/Frame.hpp"

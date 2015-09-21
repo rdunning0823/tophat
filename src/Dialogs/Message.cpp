@@ -24,7 +24,6 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #include "Language/Language.hpp"
 #include "Form/Button.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
 #include "Look/DialogLook.hpp"

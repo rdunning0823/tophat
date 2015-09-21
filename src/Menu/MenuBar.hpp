@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_MENU_BAR_HPP
 #define XCSOAR_MENU_BAR_HPP
 
-#include "Renderer/SymbolButtonRenderer.hpp"
+#include "Form/Button.hpp"
 
 #include <tchar.h>
 
