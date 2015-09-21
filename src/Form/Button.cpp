@@ -18,7 +18,7 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-}
+  }
 */
 
 #include "Form/Button.hpp"
@@ -150,12 +150,6 @@ bool
 Button::OnKeyCheck(unsigned key_code) const
 {
   switch (key_code) {
-#ifdef GNAV
-  case VK_F4:
-    // using F16 also as Enter-Key. This allows to use the RemoteStick of Altair to do a "click" on the focused button
-  case VK_F16:
-endif
-
   case KEY_RETURN:
     return true;
 
@@ -168,6 +162,11 @@ bool
 Button::OnKeyDown(unsigned key_code)
 {
   switch (key_code) {
+#ifdef GNAV
+  case VK_F4:
+    // using F16 also as Enter-Key. This allows to use the RemoteStick of Altair to do a "click" on the focused button
+  case VK_F16:
+#endif
   case KEY_RETURN:
   case KEY_SPACE:
     Click();
@@ -245,9 +244,9 @@ Button::OnPaint(Canvas &canvas)
   assert(renderer != nullptr);
 
   const bool pressed = down;
-  const bool focused = draw_focus_override  || (HasCursorKeys()
+  const bool focused = HasCursorKeys()
     ? HasFocus() || (selected && !HasPointer())
-    : pressed);
+    : pressed;
 
   renderer->DrawButton(canvas, GetClientRect(),
                        IsEnabled(), focused, pressed);

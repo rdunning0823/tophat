@@ -27,6 +27,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Look/ButtonLook.hpp"
 #include "Look/DialogLook.hpp"
+#include "Util/tstring.hpp"
 
 #include <tchar.h>
 
@@ -36,7 +37,7 @@ class Bitmap;
 class ActionListener;
 struct PixelRect;
 
-class MapOverlayButton : public WndButton {
+class MapOverlayButton : public Button {
 
 protected:
   /** optional text displayed after main text as a subscript */
@@ -77,9 +78,9 @@ public:
                    const DialogLook &_dialog_look,
                     const Bitmap *_bmp,
                     const PixelRect &rc,
-                    ButtonWindowStyle style,
+                    WindowStyle style,
                     ActionListener& listener, int id)
-  :WndButton(parent, _button_look, _T(""), rc, style, listener, id),
+  :Button(parent, _button_look, _T(""), rc, style, listener, id),
    icon_look(_icon_look), button_look(_button_look),
    dialog_look(_dialog_look), bmp(_bmp) {}
 

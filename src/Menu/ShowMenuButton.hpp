@@ -32,7 +32,7 @@ public:
               WindowStyle style=WindowStyle());
 
 protected:
-  /* virtual methods from class ButtonWindow */
+  /* virtual methods from class Button */
   bool OnClicked() override;
 };
 

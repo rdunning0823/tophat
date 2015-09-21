@@ -26,7 +26,7 @@ Copyright_License {
 #include "Util/StringUtil.hpp"
 #include "Util/CharUtil.hpp"
 #include "Screen/Canvas.hpp"
-#include "Screen/ButtonWindow.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 #include "Renderer/SymbolButtonRenderer.hpp"
 
@@ -81,7 +81,7 @@ KeyboardNumericWidget::SetAllowedCharacters(const TCHAR *allowed)
                           != nullptr);
 }
 
-ButtonWindow *
+Button *
 KeyboardNumericWidget::FindButton(unsigned ch)
 {
   for (unsigned i = 0; i < num_buttons; ++i)
@@ -103,7 +103,7 @@ KeyboardNumericWidget::FindButton(unsigned ch)
 void
 KeyboardNumericWidget::MoveButton(unsigned ch, PixelScalar left, PixelScalar top)
 {
-  ButtonWindow *kb = FindButton(ch);
+  Button *kb = FindButton(ch);
   if (kb)
     kb->Move(left, top);
 }
@@ -120,7 +120,7 @@ void
 KeyboardNumericWidget::ResizeButton(unsigned ch,
                        UPixelScalar width, UPixelScalar height)
 {
-  ButtonWindow *kb = FindButton(ch);
+  Button *kb = FindButton(ch);
   if (kb)
     kb->Resize(width, height);
 }

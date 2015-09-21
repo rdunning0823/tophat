@@ -25,7 +25,6 @@ Copyright_License {
 #define XCSOAR_FORM_BUTTON_HPP
 
 #include "Screen/PaintWindow.hpp"
-#include "Util/StaticString.hxx"
 
 #include <tchar.h>
 
@@ -41,11 +40,6 @@ class ButtonRenderer;
  */
 class Button : public PaintWindow {
   bool dragging, down;
-
-  /**
-   * if true, draws focused style despite not being focused
-   */
-  bool draw_focus_override;
 
   ButtonRenderer *renderer;
 
@@ -64,20 +58,18 @@ class Button : public PaintWindow {
 public:
   Button(ContainerWindow &parent, const PixelRect &rc,
          WindowStyle style, ButtonRenderer *_renderer,
-         ActionListener &_listener, int _id)
-         :draw_focus_override(false) {
+         ActionListener &_listener, int _id) {
     Create(parent, rc, style, _renderer, _listener, _id);
   }
 
   Button(ContainerWindow &parent, const ButtonLook &look,
          const TCHAR *caption, const PixelRect &rc,
          WindowStyle style,
-         ActionListener &_listener, int _id)
-         :draw_focus_override(false) {
+         ActionListener &_listener, int _id) {
     Create(parent, look, caption, rc, style, _listener, _id);
   }
 
-  Button():draw_focus_override(false), listener(nullptr) {}
+  Button():listener(nullptr) {}
 
   virtual ~Button();
 
@@ -116,8 +108,6 @@ public:
    */
   void SetCaption(const TCHAR *caption);
 
-  StaticString<64>::const_pointer GetCaption() const;
-
   void SetSelected(bool _selected);
 
   gcc_pure
@@ -135,13 +125,6 @@ protected:
    * callback.
    */
   virtual bool OnClicked();
-
-  /**
-   *  forces it to draw in the focused style
-   *  Normally, this is not needed to be set because it is
-   *  set by the Window::HasFocus() property
-   **/
-  void SetFocusedOverride(bool focus_override);
 
 /* virtual methods from class Window */
   void OnDestroy() override;

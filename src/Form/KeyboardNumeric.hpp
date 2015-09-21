@@ -56,7 +56,7 @@ protected:
 
 private:
   gcc_pure
-  ButtonWindow *FindButton(TCHAR ch);
+  Button *FindButton(TCHAR ch);
 
   void MoveButton(TCHAR ch, PixelScalar left, PixelScalar top);
 

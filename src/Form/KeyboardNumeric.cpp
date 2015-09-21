@@ -29,7 +29,7 @@ Copyright_License {
 #include "Util/StringUtil.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Canvas.hpp"
-#include "Screen/ButtonWindow.hpp"
+#include "Form/Button.hpp"
 #include "Screen/Layout.hpp"
 
 #include <assert.h>
@@ -68,14 +68,14 @@ KeyboardNumericControl::SetAllowedCharacters(const TCHAR *allowed)
                           _tcschr(allowed, button_values[i]) != NULL);
 }
 
-ButtonWindow *
+Button *
 KeyboardNumericControl::FindButton(TCHAR ch)
 {
   for (unsigned i = 0; i < num_buttons; ++i)
     if (button_values[i] == ch)
       return &buttons[i];
 
-  return NULL;
+  return nullptr;
 }
 
 void
