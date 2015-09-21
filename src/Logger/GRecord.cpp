@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@
 /**
  * Security theater.
  */
-static constexpr MD5::State g_key[4] = {
+static constexpr MD5::State g_key[GRecord::N_MD5] = {
   { 0x1C80A301,0x9EB30b89,0x39CB2Afe,0x0D0FEA76 },
   { 0x48327203,0x3948ebea,0x9a9b9c9e,0xb3bed89a },
   { 0x67452301,0xefcdab89,0x98badcfe,0x10325476 },
@@ -45,7 +45,7 @@ GRecord::Initialize()
 {
   ignore_comma = true;
 
-  for (unsigned i = 0; i < 4; ++i)
+  for (unsigned i = 0; i < N_MD5; ++i)
     md5[i].Initialise(g_key[i]);
 }
 
@@ -56,7 +56,7 @@ GRecord::AppendRecordToBuffer(const char *in)
     return false;
 
   if (memcmp(in, "HFFTYFRTYPE:XCSOAR,XCSOAR ", 26) == 0 &&
-      strstr(in + 25, " 6.5 ") != NULL)
+      strstr(in + 25, " 6.5 ") != nullptr)
     /* this is XCSoar 6.5: enable the G record workaround */
     ignore_comma = false;
 
@@ -84,22 +84,22 @@ AppendIGCString(MD5 &md5, const char *s, bool ignore_comma)
 void
 GRecord::AppendStringToBuffer(const char *in)
 {
-  for (int i = 0; i < 4; i++)
-    AppendIGCString(md5[i], in, ignore_comma);
+  for (auto &i : md5)
+    AppendIGCString(i, in, ignore_comma);
 }
 
 void
 GRecord::FinalizeBuffer()
 {
-  for (int i = 0; i < 4; i++)
-    md5[i].Finalize();
+  for (auto &i : md5)
+    i.Finalize();
 }
 
 void
 GRecord::GetDigest(char *output) const
 {
-  for (int i = 0; i <= 3; i++, output += MD5::DIGEST_LENGTH)
-    md5[i].GetDigest(output);
+  for (auto &i : md5)
+    output = i.GetDigest(output);
 }
 
 bool
@@ -138,7 +138,7 @@ GRecord::LoadFileToBuffer(const TCHAR *filename)
 
   char *line;
 
-  while ((line = reader.ReadLine()) != NULL)
+  while ((line = reader.ReadLine()) != nullptr)
     AppendRecordToBuffer(line);
 
   return true;
@@ -182,7 +182,7 @@ GRecord::ReadGRecordFromFile(const TCHAR *filename,
 
   unsigned int digest_length = 0;
   char *data;
-  while ((data = reader.ReadLine()) != NULL) {
+  while ((data = reader.ReadLine()) != nullptr) {
     if (data[0] != 'G')
       continue;
 

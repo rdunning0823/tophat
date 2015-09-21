@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,23 +26,6 @@ Copyright_License {
 
 #include <stdint.h>
 
-/**
- * Dialog display styles
- */
-enum DialogStyle
-{
-  /** cover screen, stretch controls horizontally */
-  dsFullWidth = 0,
-  /** stretch only frame to maintain aspect ratio */
-  dsScaled,
-  /** like eDialogScaled but center dialog in screen */
-  dsScaledCentered,
-  /** don't adjust at all (same as !Layout::ScaleSupported()) */
-  dsFixed,
-  /** stretch horizontal and place to bottom */
-  dsScaledBottom
-};
-
 struct DialogSettings {
   enum class TextInputStyle : uint8_t {
     /**
@@ -58,9 +41,6 @@ struct DialogSettings {
     Text,
     Icon,
   };
-
-  // hard coded to Full Width
-  DialogStyle dialog_style;
 
   TextInputStyle text_input_style;
   TabStyle tab_style;

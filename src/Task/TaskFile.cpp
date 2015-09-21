@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ TaskFile::Create(const TCHAR* path)
 {
   // If filename is empty or file does not exist
   if (StringIsEmpty(path) || !File::Exists(path))
-    return NULL;
+    return nullptr;
 
   // If XCSoar task file -> return new TaskFileXCSoar
   if (MatchesExtension(path, _T(".tsk")))
@@ -57,7 +57,7 @@ TaskFile::Create(const TCHAR* path)
     return new TaskFileIGC(path);
 
   // unknown task file type
-  return NULL;
+  return nullptr;
 }
 
 OrderedTask *
@@ -66,7 +66,7 @@ TaskFile::GetTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
 {
   std::unique_ptr<TaskFile> file(TaskFile::Create(path));
   if (!file)
-    return NULL;
+    return nullptr;
 
   return file->GetTask(task_behaviour, waypoints, index);
 }
@@ -75,7 +75,7 @@ const TCHAR *
 TaskFile::GetName(unsigned index) const
 {
   if (index >= namesuffixes.size())
-    return NULL;
+    return nullptr;
 
   return namesuffixes[index];
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_NMEA_INFO_H
 #define XCSOAR_NMEA_INFO_H
 
+#include "GPSState.hpp"
 #include "NMEA/Validity.hpp"
 #include "NMEA/ExternalSettings.hpp"
 #include "NMEA/Acceleration.hpp"
@@ -37,74 +38,6 @@ Copyright_License {
 #include "Geo/SpeedVector.hpp"
 
 #include <type_traits>
-
-enum class FixQuality: uint8_t {
-  NO_FIX,
-  GPS,
-  DGPS,
-  PPS,
-  REAL_TIME_KINEMATIC,
-  FLOAT_RTK,
-  ESTIMATION,
-  MANUAL_INPUT,
-  SIMULATION,
-};
-
-/**
- * State of GPS fix
- */
-struct GPSState
-{
-  static constexpr unsigned MAXSATELLITES = 12;
-
-  //############
-  //   Status
-  //############
-
-  /**
-   * Fix quality
-   */
-  FixQuality fix_quality;
-  Validity fix_quality_available;
-
-  /**
-   * Number of satellites used for gps fix.  -1 means "unknown".
-   */
-  int satellites_used;
-  Validity satellites_used_available;
-
-  /** GPS Satellite ids */
-  int satellite_ids[MAXSATELLITES];
-  Validity satellite_ids_available;
-
-  /** Horizontal dilution of precision */
-  fixed hdop;
-
-  /**
-   * Is the fix real? (no replay, no simulator)
-   */
-  bool real;
-
-  /** Is XCSoar in replay mode? */
-  bool replay;
-
-  /**
-   * Did the simulator provide the GPS position?
-   */
-  bool simulator;
-
-#ifdef ANDROID
-  /**
-   * Was this fix obtained from an Android InternalGPS device?  If
-   * yes, then link timeout detection is disabled, because we get
-   * notifications from Android when the GPS gets disconnected.
-   */
-  bool android_internal_gps;
-#endif
-
-  void Reset();
-  void Expire(fixed now);
-};
 
 /**
  * A struct that holds all the parsed data read from the connected devices
@@ -360,6 +293,26 @@ struct NMEAInfo {
    * @see TemperatureAvailable
    */
   fixed temperature;
+
+  /**
+   * Is heading information available?
+   */
+  Validity heading_available;
+
+  /**
+   * Magnetic Heading (if available)
+   */
+  Angle heading;
+
+ /**
+   * Is Magnetic Variation information available?
+   */
+  Validity variation_available;
+
+  /**
+   * Magnetic Variation (if available)
+   */
+  Angle variation;
 
   /**
    * Is humidity information available?

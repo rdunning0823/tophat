@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ Copyright_License {
 #include "Units/System.hpp"
 #include "Time/TimeoutClock.hpp"
 #include "Operation/Operation.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 #include <assert.h>
 #include <stdio.h>
@@ -53,9 +53,10 @@ public:
     :port(_port) {}
 
 public:
-  virtual bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
-  virtual bool Declare(const Declaration &declaration, const Waypoint *home,
-                       OperationEnvironment &env) override;
+  /* virtual methods from class Device */
+  bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
+  bool Declare(const Declaration &declaration, const Waypoint *home,
+               OperationEnvironment &env) override;
 };
 
 static bool
@@ -121,7 +122,7 @@ TryConnect(Port &port, char *user_data, size_t max_user_data,
 
     if (user_size == 0) {
       const char *minus = (const char *)memchr(user_data, '-', nbytes);
-      if (minus == NULL)
+      if (minus == nullptr)
         continue;
 
       user_size = user_data + nbytes - minus;
@@ -130,7 +131,7 @@ TryConnect(Port &port, char *user_data, size_t max_user_data,
       user_size += nbytes;
 
     char *end = (char *)memchr(user_data, '\x13', user_size);
-    if (end != NULL) {
+    if (end != nullptr) {
       *end = 0;
       port.Write('\x16');
       return true;
@@ -284,7 +285,7 @@ DeclareInner(Port &port, const Declaration &declaration,
     return false;
 
   char *p = strstr(user_data, "USER DETAILS");
-  if (p != NULL)
+  if (p != nullptr)
     *p = 0;
 
   port.Write('\x18');         // start to upload file

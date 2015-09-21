@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,7 +27,8 @@
 #include "FinishPoint.hpp"
 #include "Task/ObservationZones/ObservationZonePoint.hpp"
 #include "Task/ObservationZones/Boundary.hpp"
-#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/GeoBounds.hpp"
+#include "Geo/Flat/FlatProjection.hpp"
 #include "Task/Visitors/TaskPointVisitor.hpp"
 #include "Geo/Math.hpp"
 
@@ -63,7 +64,7 @@ OrderedTaskPoint::UpdateGeometry()
 }
 
 void
-OrderedTaskPoint::UpdateOZ(const TaskProjection &projection)
+OrderedTaskPoint::UpdateOZ(const FlatProjection &projection)
 {
   UpdateGeometry();
 
@@ -108,7 +109,7 @@ OrderedTaskPoint::IsInSector(const AircraftState &ref) const
 
 bool
 OrderedTaskPoint::UpdateSampleNear(const AircraftState &state,
-                                   const TaskProjection &projection)
+                                   const FlatProjection &projection)
 {
   if (!IsInSector(state))
     // return false (no update required)
@@ -196,21 +197,21 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
 }
 
 void
-OrderedTaskPoint::ScanProjection(TaskProjection &task_projection) const
+OrderedTaskPoint::ScanBounds(GeoBounds &bounds) const
 {
-  task_projection.Scan(GetLocation());
+  bounds.Extend(GetLocation());
 
   for (const auto &i : GetBoundary())
-    task_projection.Scan(i);
+    bounds.Extend(i);
 }
 
 void
-OrderedTaskPoint::UpdateBoundingBox(const TaskProjection &task_projection)
+OrderedTaskPoint::UpdateBoundingBox(const FlatProjection &projection)
 {
-  flat_bb = FlatBoundingBox(task_projection.ProjectInteger(GetLocation()));
+  flat_bb = FlatBoundingBox(projection.ProjectInteger(GetLocation()));
 
   for (const auto &i : GetBoundary())
-    flat_bb.Expand(task_projection.ProjectInteger(i));
+    flat_bb.Expand(projection.ProjectInteger(i));
 
   flat_bb.ExpandByOne(); // add 1 to fix rounding
 }

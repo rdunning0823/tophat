@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,50 +30,41 @@ ButtonLook::Initialise(const Font &_font)
   font = &_font;
 
   standard.foreground_color = COLOR_BLACK;
-  standard.foreground_brush.Set(standard.foreground_color);
-
+  standard.foreground_brush.Create(standard.foreground_color);
   standard.background_color = IsDithered() ? COLOR_WHITE : COLOR_LIGHT_GRAY;
   if (IsDithered()) {
-    standard.light_border_pen.Set(1, COLOR_BLACK);
-    standard.dark_border_pen.Set(1, COLOR_BLACK);
+    standard.CreateBorder(COLOR_BLACK, COLOR_BLACK);
   } else if (!HasColors()) {
-    standard.light_border_pen.Set(1, LightColor(COLOR_DARK_GRAY));
-    standard.dark_border_pen.Set(1, COLOR_BLACK);
+    standard.CreateBorder(LightColor(COLOR_DARK_GRAY), COLOR_BLACK);
   } else {
-    standard.light_border_pen.Set(1, LightColor(standard.background_color));
-    standard.dark_border_pen.Set(1, DarkColor(standard.background_color));
+    standard.CreateBorder(LightColor(standard.background_color),
+                          DarkColor(standard.background_color));
   }
 
   constexpr Color dimmed_dark = COLOR_DARK_GRAY;
   dimmed.foreground_color = dimmed_dark;
-  dimmed.foreground_brush.Set(dimmed.foreground_color);
-
+  dimmed.foreground_brush.Create(dimmed.foreground_color);
   dimmed.background_color = IsDithered() ? COLOR_WHITE : COLOR_LIGHT_GRAY;
   if (IsDithered()) {
-    dimmed.light_border_pen.Set(1, dimmed_dark);
-    dimmed.dark_border_pen.Set(1, dimmed_dark);
+    dimmed.CreateBorder(LightColor(COLOR_DARK_GRAY), dimmed_dark);
   } else if (!HasColors()) {
-    dimmed.light_border_pen.Set(1, LightColor(COLOR_DARK_GRAY));
-    dimmed.dark_border_pen.Set(1, dimmed_dark);
+    dimmed.CreateBorder(LightColor(COLOR_DARK_GRAY), dimmed_dark);
   } else {
-    dimmed.light_border_pen.Set(1, LightColor(dimmed.background_color));
-    dimmed.dark_border_pen.Set(1, dimmed_dark);
+    dimmed.CreateBorder(LightColor(dimmed.background_color), dimmed_dark);
   }
 
   focused.foreground_color = COLOR_WHITE;
-  focused.foreground_brush.Set(focused.foreground_color);
+  focused.foreground_brush.Create(focused.foreground_color);
   focused.background_color = IsDithered() ? COLOR_BLACK : COLOR_XCSOAR_DARK;
   if (IsDithered()) {
-    focused.light_border_pen.Set(1, COLOR_WHITE);
-    focused.dark_border_pen.Set(1, COLOR_WHITE);
+    focused.CreateBorder(COLOR_WHITE, COLOR_WHITE);
   } else if (!HasColors()) {
-    focused.light_border_pen.Set(1, LightColor(COLOR_DARK_GRAY));
-    focused.dark_border_pen.Set(1, COLOR_BLACK);
+    focused.CreateBorder(LightColor(COLOR_DARK_GRAY), COLOR_BLACK);
   } else {
-    focused.light_border_pen.Set(1, LightColor(focused.background_color));
-    focused.dark_border_pen.Set(1, DarkColor(focused.background_color));
+    focused.CreateBorder(LightColor(focused.background_color),
+                         DarkColor(focused.background_color));
   }
 
   disabled.color = COLOR_GRAY;
-  disabled.brush.Set(disabled.color);
+  disabled.brush.Create(disabled.color);
 }

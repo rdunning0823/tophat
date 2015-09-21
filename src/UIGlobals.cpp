@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@ Copyright_License {
 SingleWindow &
 UIGlobals::GetMainWindow()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return *CommonInterface::main_window;
 }
@@ -37,7 +37,7 @@ UIGlobals::GetMainWindow()
 GlueMapWindow *
 UIGlobals::GetMap()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::main_window->GetMap();
 }
@@ -45,7 +45,7 @@ UIGlobals::GetMap()
 GlueMapWindow *
 UIGlobals::GetMapIfActive()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::main_window->GetMapIfActive();
 }
@@ -53,15 +53,21 @@ UIGlobals::GetMapIfActive()
 const DialogSettings &
 UIGlobals::GetDialogSettings()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::GetUISettings().dialog;
+}
+
+const FormatSettings &
+UIGlobals::GetFormatSettings()
+{
+  return CommonInterface::GetUISettings().format;
 }
 
 const Look &
 UIGlobals::GetLook()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::main_window->GetLook();
 }
@@ -69,7 +75,7 @@ UIGlobals::GetLook()
 const DialogLook &
 UIGlobals::GetDialogLook()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::main_window->GetLook().dialog;
 }
@@ -77,7 +83,7 @@ UIGlobals::GetDialogLook()
 const IconLook &
 UIGlobals::GetIconLook()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::main_window->GetLook().icon;
 }
@@ -85,7 +91,7 @@ UIGlobals::GetIconLook()
 const MapLook &
 UIGlobals::GetMapLook()
 {
-  assert(CommonInterface::main_window != NULL);
+  assert(CommonInterface::main_window != nullptr);
 
   return CommonInterface::main_window->GetLook().map;
 }

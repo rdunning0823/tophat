@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 
 class AirspaceWarningManager;
 class AbstractAirspace;
-class TaskProjection;
+class FlatProjection;
 
 class ProtectedAirspaceWarningManager : public Guard<AirspaceWarningManager> {
 public:
@@ -36,7 +36,7 @@ public:
     Guard<AirspaceWarningManager>(awm) {}
 
   gcc_pure
-  const TaskProjection &GetProjection() const;
+  const FlatProjection &GetProjection() const;
 
   void Clear();
   void AcknowledgeAll();
@@ -49,6 +49,7 @@ public:
                           const bool set=true);
   void AcknowledgeInside(const AbstractAirspace &airspace,
                          const bool set=true);
+  void Acknowledge(const AbstractAirspace &airspace);
 
   gcc_pure
   bool IsEmpty() const;

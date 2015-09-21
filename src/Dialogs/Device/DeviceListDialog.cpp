@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #include "DeviceListDialog.hpp"
 #include "DeviceEditWidget.hpp"
 #include "Vega/VegaDialogs.hpp"
+#include "BlueFly/BlueFlyDialogs.hpp"
 #include "ManageCAI302Dialog.hpp"
 #include "ManageFlarmDialog.hpp"
 #include "LX/ManageV7Dialog.hpp"
@@ -34,12 +35,14 @@ Copyright_License {
 #include "Dialogs/Message.hpp"
 #include "UIGlobals.hpp"
 #include "Util/TrivialArray.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/Macros.hpp"
-#include "Device/List.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Device/Descriptor.hpp"
 #include "Device/Register.hpp"
+#include "Device/Port/Listener.hpp"
 #include "Device/Driver/LX/Internal.hpp"
+#include "Event/Notify.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Blackboard/BlackboardListener.hpp"
 #include "Components.hpp"
@@ -52,18 +55,19 @@ Copyright_License {
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Simulator.hpp"
 #include "Logger/ExternalLogger.hpp"
+#include "Profile/Current.hpp"
 #include "Profile/Profile.hpp"
 #include "Profile/DeviceConfig.hpp"
 #include "Interface.hpp"
 
 #ifdef ANDROID
-#include "Java/Global.hpp"
+#include "Java/Global.hxx"
 #include "Android/BluetoothHelper.hpp"
 #endif
 
 class DeviceListWidget final
   : public ListWidget, private ActionListener,
-    private NullBlackboardListener {
+    NullBlackboardListener, PortListener, Notify {
   enum Buttons {
     DISABLE,
     RECONNECT, FLIGHT, EDIT, MANAGE, MONITOR,
@@ -71,7 +75,6 @@ class DeviceListWidget final
   };
 
   const DialogLook &look;
-  const TerminalLook &terminal_look;
 
   UPixelScalar font_height;
 
@@ -157,15 +160,15 @@ class DeviceListWidget final
 
   Item items[NUMDEV];
 
-  WndButton *disable_button;
-  WndButton *reconnect_button, *flight_button;
-  WndButton *edit_button;
-  WndButton *manage_button, *monitor_button;
-  WndButton *debug_button;
+  Button *disable_button;
+  Button *reconnect_button, *flight_button;
+  Button *edit_button;
+  Button *manage_button, *monitor_button;
+  Button *debug_button;
 
 public:
-  DeviceListWidget(const DialogLook &_look, const TerminalLook &_terminal_look)
-    :look(_look), terminal_look(_terminal_look) {}
+  DeviceListWidget(const DialogLook &_look)
+    :look(_look) {}
 
   void CreateButtons(WidgetDialog &dialog);
 
@@ -192,6 +195,7 @@ public:
   virtual void Show(const PixelRect &rc) override {
     ListWidget::Show(rc);
 
+    devices->AddPortListener(*this);
     CommonInterface::GetLiveBlackboard().AddListener(*this);
 
     RefreshList();
@@ -202,6 +206,7 @@ public:
     ListWidget::Hide();
 
     CommonInterface::GetLiveBlackboard().RemoveListener(*this);
+    devices->RemovePortListener(*this);
   }
 
   /* virtual methods from class List::Handler */
@@ -215,6 +220,17 @@ private:
 
   /* virtual methods from class BlackboardListener */
   virtual void OnGPSUpdate(const MoreData &basic) override;
+
+  /* virtual methods from class PortListener */
+  void PortStateChanged() override {
+    Notify::SendNotification();
+  }
+
+  /* virtual methods from class Notify */
+  void OnNotification() override {
+    if (RefreshList())
+      UpdateButtons();
+  }
 };
 
 void
@@ -224,10 +240,10 @@ DeviceListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const UPixelScalar margin = Layout::GetTextPadding();
   font_height = look.list.font->GetHeight();
   CreateList(parent, look, rc, 3 * margin + font_height +
-             look.small_font->GetHeight()).SetLength(NUMDEV);
+             look.small_font.GetHeight()).SetLength(NUMDEV);
 
-  for (unsigned i = 0; i < NUMDEV; ++i)
-    items[i].Clear();
+  for (Item &i : items)
+    i.Clear();
 
   UpdateButtons();
 }
@@ -241,7 +257,7 @@ DeviceListWidget::RefreshList()
 
     Item n;
     n.Set(CommonInterface::GetSystemSettings().devices[i],
-          *device_list[i], device_blackboard->RealState(i));
+          (*devices)[i], device_blackboard->RealState(i));
 
     if (n != item) {
       item = n;
@@ -257,12 +273,12 @@ DeviceListWidget::RefreshList()
 void
 DeviceListWidget::CreateButtons(WidgetDialog &dialog)
 {
-  disable_button = dialog.AddButton(_("Disable"), *this, DISABLE);
-  reconnect_button = dialog.AddButton(_("Reconnect"), *this, RECONNECT);
-  flight_button = dialog.AddButton(_("Flight download"), *this, FLIGHT);
   edit_button = dialog.AddButton(_("Edit"), *this, EDIT);
+  flight_button = dialog.AddButton(_("Flight download"), *this, FLIGHT);
   manage_button = dialog.AddButton(_("Manage"), *this, MANAGE);
   monitor_button = dialog.AddButton(_("Monitor"), *this, MONITOR);
+  reconnect_button = dialog.AddButton(_("Reconnect"), *this, RECONNECT);
+  disable_button = dialog.AddButton(_("Disable"), *this, DISABLE);
   debug_button = dialog.AddButton(_("Debug"), *this, DEBUG);
 }
 
@@ -276,7 +292,7 @@ DeviceListWidget::UpdateButtons()
 
     if (config.port_type != DeviceConfig::PortType::DISABLED) {
       disable_button->SetEnabled(true);
-      disable_button->SetText(config.enabled ? _("Disable") : _("Enable"));
+      disable_button->SetCaption(config.enabled ? _("Disable") : _("Enable"));
     } else
       disable_button->SetEnabled(false);
   } else
@@ -289,9 +305,9 @@ DeviceListWidget::UpdateButtons()
     monitor_button->SetEnabled(false);
     debug_button->SetEnabled(false);
   } else {
-    const DeviceDescriptor &device = *device_list[current];
+    const DeviceDescriptor &device = (*devices)[current];
 
-    reconnect_button->SetEnabled(device.IsConfigured());
+    reconnect_button->SetEnabled(!device.GetConfig().IsDisabled());
     flight_button->SetEnabled(device.IsLogger());
     manage_button->SetEnabled(device.IsManageable());
     monitor_button->SetEnabled(device.GetConfig().UsesPort());
@@ -396,7 +412,7 @@ DeviceListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned idx)
     status = _("Not connected");
   }
 
-  canvas.Select(*look.small_font);
+  canvas.Select(look.small_font);
   canvas.DrawText(rc.left + margin, rc.top + 2 * margin + font_height,
                   status);
 }
@@ -421,12 +437,12 @@ DeviceListWidget::EnableDisableCurrent()
   /* save new config to profile .. */
 
   config.enabled = !config.enabled;
-  Profile::SetDeviceConfig(index, config);
+  Profile::SetDeviceConfig(Profile::map, index, config);
   Profile::Save();
 
   /* .. and reopen the device */
 
-  DeviceDescriptor &descriptor = *device_list[index];
+  DeviceDescriptor &descriptor = (*devices)[index];
   descriptor.SetConfig(config);
 
   GetList().Invalidate();
@@ -457,7 +473,7 @@ DeviceListWidget::ReconnectCurrent()
   }
 #endif
 
-  DeviceDescriptor &device = *device_list[current];
+  DeviceDescriptor &device = (*devices)[current];
   if (device.IsBorrowed()) {
     ShowMessageBox(_("Device is occupied"), _("Reconnect"), MB_OK | MB_ICONERROR);
     return;
@@ -477,7 +493,7 @@ DeviceListWidget::DownloadFlightFromCurrent()
   if (current >= NUMDEV)
     return;
 
-  DeviceDescriptor &device = *device_list[current];
+  DeviceDescriptor &device = (*devices)[current];
   if (!device.IsLogger())
     return;
 
@@ -515,12 +531,12 @@ DeviceListWidget::EditCurrent()
   /* save new config to profile .. */
 
   config = widget.GetConfig();
-  Profile::SetDeviceConfig(index, config);
+  Profile::SetDeviceConfig(Profile::map, index, config);
   Profile::Save();
 
   /* .. and reopen the device */
 
-  DeviceDescriptor &descriptor = *device_list[index];
+  DeviceDescriptor &descriptor = (*devices)[index];
   descriptor.SetConfig(widget.GetConfig());
 
   GetList().Invalidate();
@@ -539,7 +555,7 @@ DeviceListWidget::ManageCurrent()
   if (current >= NUMDEV)
     return;
 
-  DeviceDescriptor &descriptor = *device_list[current];
+  DeviceDescriptor &descriptor = (*devices)[current];
   if (!descriptor.IsManageable())
     return;
 
@@ -585,6 +601,8 @@ DeviceListWidget::ManageCurrent()
       ManageLX16xxDialog(lx_device, info);
   } else if (descriptor.IsDriver(_T("Vega")))
     dlgConfigurationVarioShowModal(*device);
+  else if (descriptor.IsDriver(_T("BlueFly")))
+    dlgConfigurationBlueFlyVarioShowModal(*device);
 
   MessageOperationEnvironment env;
   descriptor.EnableNMEA(env);
@@ -598,9 +616,8 @@ DeviceListWidget::MonitorCurrent()
   if (current >= NUMDEV)
     return;
 
-  DeviceDescriptor &descriptor = *device_list[current];
-  ShowPortMonitor(UIGlobals::GetMainWindow(), look, terminal_look,
-                  descriptor);
+  DeviceDescriptor &descriptor = (*devices)[current];
+  ShowPortMonitor(descriptor);
 }
 
 inline void
@@ -610,7 +627,7 @@ DeviceListWidget::DebugCurrent()
   if (current >= NUMDEV)
     return;
 
-  DeviceDescriptor &device = *device_list[current];
+  DeviceDescriptor &device = (*devices)[current];
   if (!device.GetConfig().UsesPort() || device.GetState() != PortState::READY)
     return;
 
@@ -667,14 +684,15 @@ DeviceListWidget::OnGPSUpdate(const MoreData &basic)
 }
 
 void
-ShowDeviceList(const TerminalLook &terminal_look)
+ShowDeviceList()
 {
-  DeviceListWidget widget(UIGlobals::GetDialogLook(), terminal_look);
+  DeviceListWidget widget(UIGlobals::GetDialogLook());
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Devices"), &widget);
   dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
+  dialog.EnableCursorSelection();
 
   dialog.ShowModal();
   dialog.StealWidget();

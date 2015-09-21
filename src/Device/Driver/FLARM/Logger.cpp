@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 */
 
 #include "Device.hpp"
-#include "Device/Driver.hpp"
+#include "Device/RecordedFlight.hpp"
 #include "IO/BinaryWriter.hpp"
 #include "OS/FileUtil.hpp"
 #include "Operation/Operation.hpp"
@@ -133,7 +133,7 @@ ParseRecordInfo(char *record_info, RecordedFlightInfo &flight)
 
   // Search for first separator
   char *p = strchr(record_info, '|');
-  if (p == NULL)
+  if (p == nullptr)
     return false;
 
   // Replace separator by \0
@@ -151,7 +151,7 @@ ParseRecordInfo(char *record_info, RecordedFlightInfo &flight)
 
     // Search for second separator
     p = strchr(record_info, '|');
-    if (p == NULL)
+    if (p == nullptr)
       return false;
 
     // Replace separator by \0
@@ -176,7 +176,7 @@ ParseRecordInfo(char *record_info, RecordedFlightInfo &flight)
 
   // Search for next separator
   p = strchr(record_info, '|');
-  if (p == NULL)
+  if (p == nullptr)
     return false;
 
   // Replace separator by \0
@@ -200,7 +200,7 @@ ParseRecordInfo(char *record_info, RecordedFlightInfo &flight)
 
   // Search for next separator
   p = strchr(record_info, '|');
-  if (p == NULL)
+  if (p == nullptr)
     return false;
 
   // Replace separator by \0

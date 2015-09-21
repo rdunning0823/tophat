@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ Copyright_License {
 
 struct Look;
 struct GestureLook;
-class Logger;
+class TopographyThread;
 
 class OffsetHistory
 {
@@ -59,9 +59,11 @@ public:
 
 
 class GlueMapWindow : public MapWindow {
-  const Logger *logger;
+  enum class Command {
+    INVALIDATE,
+  };
 
-  unsigned idle_robin;
+  TopographyThread *topography_thread;
 
 #ifdef ENABLE_OPENGL
   /**
@@ -112,6 +114,13 @@ class GlueMapWindow : public MapWindow {
    */
   GestureZone gesture_zone;
   bool ignore_single_click;
+
+  /**
+   * Skip the next Idle() call?  This is set to true when a new frame
+   * shall be rendered quickly without I/O delay, e.g. to display the
+   * first frame quickly.
+   */
+  bool skip_idle;
 
 #ifdef ENABLE_OPENGL
   KineticManager kinetic_x, kinetic_y;
@@ -165,9 +174,7 @@ public:
   GlueMapWindow(const Look &look);
   virtual ~GlueMapWindow();
 
-  void SetLogger(Logger *_logger) {
-    logger = _logger;
-  }
+  void SetTopography(TopographyStore *_topography);
 
   void SetMapSettings(const MapSettings &new_value);
   void SetComputerSettings(const ComputerSettings &new_value);
@@ -241,6 +248,7 @@ protected:
   virtual void OnPaint(Canvas &canvas) override;
   virtual void OnPaintBuffer(Canvas& canvas) override;
   virtual bool OnTimer(WindowTimer &timer) override;
+  bool OnUser(unsigned id) override;
 
   /**
    * This event handler gets called when a gesture has
@@ -294,8 +302,22 @@ private:
 
   void SaveDisplayModeScales();
 
+  /**
+   * The attribute visible_projection has been edited.
+   */
+  void OnProjectionModified() {}
+
+  /**
+   * Invoke WindowProjection::UpdateScreenBounds() and trigger updates
+   * of data file caches for the new bounds (e.g. topography).
+   */
+  void UpdateScreenBounds();
+
   void UpdateScreenAngle();
   void UpdateProjection();
+
+public:
+  void SetLocation(const GeoPoint location);
 
   /**
    * Update the visible_projection location, but only if the new
@@ -305,7 +327,6 @@ private:
    */
   void SetLocationLazy(const GeoPoint location);
 
-public:
   void UpdateMapScale();
 
   /**

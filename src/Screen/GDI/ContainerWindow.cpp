@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "Screen/ContainerWindow.hpp"
-#include "Screen/ButtonWindow.hpp"
 #include "Canvas.hpp"
 #include "Asset.hpp"
 
@@ -30,7 +29,7 @@ bool
 ContainerWindow::FocusFirstControl()
 {
   HWND hControl = ::GetNextDlgTabItem(hWnd, nullptr, false);
-  if (hControl == NULL)
+  if (hControl == nullptr)
     return false;
 
   ::SetFocus(hControl);
@@ -41,7 +40,7 @@ bool
 ContainerWindow::FocusNextControl()
 {
   HWND hControl = ::GetNextDlgTabItem(hWnd, ::GetFocus(), false);
-  if (hControl == NULL)
+  if (hControl == nullptr)
     return false;
 
   if (IsAltair()) { // detect and block wraparound 
@@ -66,7 +65,7 @@ ContainerWindow::FocusPreviousControl()
   }
 
   HWND hControl = ::GetNextDlgTabItem(hWnd, hFocus, true);
-  if (hControl == NULL)
+  if (hControl == nullptr)
     return false;
 
   ::SetFocus(hControl);
@@ -76,7 +75,7 @@ ContainerWindow::FocusPreviousControl()
 const Brush *
 ContainerWindow::OnChildColor(Window &window, Canvas &canvas)
 {
-  return NULL;
+  return nullptr;
 }
 
 LRESULT
@@ -88,40 +87,16 @@ ContainerWindow::OnMessage(HWND hWnd, UINT message,
   case WM_CTLCOLORBTN:
     {
       Window *window = Window::GetChecked((HWND)lParam);
-      if (window == NULL)
+      if (window == nullptr)
         break;
 
       Canvas canvas((HDC)wParam, {1, 1});
       const Brush *brush = OnChildColor(*window, canvas);
-      if (brush == NULL)
+      if (brush == nullptr)
         break;
 
       return (LRESULT)brush->Native();
     }
-
-  case WM_DRAWITEM:
-    /* forward WM_DRAWITEM to the child window who sent this
-       message */
-    {
-      const DRAWITEMSTRUCT *di = (const DRAWITEMSTRUCT *)lParam;
-
-      Window *window = Window::GetChecked(di->hwndItem);
-      if (window == NULL)
-        break;
-
-      Canvas canvas(di->hDC, PixelRect(di->rcItem).GetSize());
-      window->OnPaint(canvas);
-      return TRUE;
-    }
-
-  case WM_COMMAND:
-    if (wParam == MAKEWPARAM(BaseButtonWindow::COMMAND_BOUNCE_ID, BN_CLICKED)) {
-      /* forward this message to ButtonWindow::OnClicked() */
-      BaseButtonWindow *window = (BaseButtonWindow *)Window::GetChecked((HWND)lParam);
-      if (window != NULL && window->OnClicked())
-        return true;
-    }
-    break;
   };
 
   return PaintWindow::OnMessage(hWnd, message, wParam, lParam);

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -49,6 +49,7 @@ AirspaceRendererSettings::SetDefaults()
 #endif
 
   fill_mode = FillMode::DEFAULT;
+  label_selection = LabelSelection::NONE;
 
   for (auto it = classes; it != classes + AIRSPACECLASSCOUNT; ++it)
     it->SetDefaults();

@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #ifndef GEOELLIPSE_HPP
 #define GEOELLIPSE_HPP
 
-#include "Flat/TaskProjection.hpp"
+#include "Flat/FlatProjection.hpp"
 #include "Flat/FlatEllipse.hpp"
 #include "Compiler.h"
 
@@ -34,7 +34,7 @@
  */
 class GeoEllipse
 {
-  TaskProjection task_projection;
+  FlatProjection projection;
   FlatEllipse ell;
 
 public:
@@ -44,10 +44,10 @@ public:
    * @param f1 Focus 1
    * @param f2 Focus 2
    * @param p Point on ellipse
-   * @param _task_projection Task projection used for internal representation
+   * @param _projection projection used for internal representation
    */
   GeoEllipse(const GeoPoint &f1, const GeoPoint &f2,
-             const GeoPoint &p, const TaskProjection &_task_projection);
+             const GeoPoint &p, const FlatProjection &_projection);
 
   /**
    * Parametric form of ellipse border

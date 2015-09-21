@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,8 @@ Copyright_License {
 */
 
 #include "WaypointGlue.hpp"
-#include "Profile/Profile.hpp"
+#include "Profile/Map.hpp"
+#include "Profile/ProfileKeys.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "LogFile.hpp"
 #include "Terrain/RasterTerrain.hpp"
@@ -38,12 +39,12 @@ WaypointGlue::FindHomeId(Waypoints &waypoints,
                          PlacesOfInterestSettings &settings)
 {
   if (settings.home_waypoint < 0)
-    return NULL;
+    return nullptr;
 
   const Waypoint *wp = waypoints.LookupId(settings.home_waypoint);
-  if (wp == NULL) {
+  if (wp == nullptr) {
     settings.home_waypoint = -1;
-    return NULL;
+    return nullptr;
   }
 
   settings.home_location = wp->location;
@@ -60,7 +61,7 @@ WaypointGlue::FindHomeLocation(Waypoints &waypoints,
 {
   if (!settings.home_location_available) {
     settings.home_elevation_available = false;
-    return NULL;
+    return nullptr;
   }
 
   const Waypoint *wp = waypoints.LookupLocation(settings.home_location,
@@ -84,8 +85,8 @@ WaypointGlue::FindFlaggedHome(Waypoints &waypoints,
                               PlacesOfInterestSettings &settings)
 {
   const Waypoint *wp = waypoints.FindHome();
-  if (wp == NULL)
-    return NULL;
+  if (wp == nullptr)
+    return nullptr;
 
   settings.SetHome(*wp);
   return wp;
@@ -146,7 +147,7 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
 
   // check invalid home waypoint or forced reset due to file change
   const Waypoint *wp = FindHomeId(way_points, poi_settings);
-  if (wp == NULL) {
+  if (wp == nullptr) {
     /* fall back to HomeLocation, try to find it in the waypoint
        database */
     wp = FindHomeLocation(way_points, poi_settings);
@@ -155,12 +156,12 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
       wp = CreateHomeAndAppend(way_points, poi_settings,
                                device_blackboard->Calculated().flight.flying);
 
-    if (wp == NULL)
+    if (wp == nullptr)
       // search for home in waypoint list, if we don't have a home
       wp = FindFlaggedHome(way_points, poi_settings);
   }
 
-  if (wp != NULL)
+  if (wp != nullptr)
     LastUsedWaypoints::Add(*wp);
 
   // check invalid task ref waypoint or forced reset due to file change
@@ -178,12 +179,12 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
     Profile::Set(ProfileKeys::HomeWaypointName, name.c_str());
   }
 
-  if (device_blackboard != NULL) {
-    if (wp != NULL) {
+  if (device_blackboard != nullptr) {
+    if (wp != nullptr) {
       // OK, passed all checks now
       LogFormat("Start at home waypoint");
       device_blackboard->SetStartupLocation(wp->location, wp->elevation);
-    } else if (terrain != NULL) {
+    } else if (terrain != nullptr) {
       // no home at all, so set it from center of terrain if available
       GeoPoint loc = terrain->GetTerrainCenter();
       LogFormat("Start at terrain center");
@@ -194,23 +195,21 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
 }
 
 void
-WaypointGlue::SaveHome(const PlacesOfInterestSettings &poi_settings,
+WaypointGlue::SaveHome(ProfileMap &profile,
+                       const PlacesOfInterestSettings &poi_settings,
                        const TeamCodeSettings &team_code_settings)
 {
-  Profile::Set(ProfileKeys::HomeWaypoint, poi_settings.home_waypoint);
+  profile.Set(ProfileKeys::HomeWaypoint, poi_settings.home_waypoint);
   if (poi_settings.home_location_available) {
-    Profile::SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
-/*    const Waypoint *wp = way_points.LookupId(poi_settings.home_waypoint);
-    if (wp != nullptr)
-      Profile::Set(ProfileKeys::HomeWaypointName, wp->name.c_str());*/
+    profile.SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
   }
 
-  Profile::Set(ProfileKeys::HomeElevationAvailable, poi_settings.home_elevation_available);
+  profile.Set(ProfileKeys::HomeElevationAvailable, poi_settings.home_elevation_available);
   if (poi_settings.home_elevation_available)
-    Profile::Set(ProfileKeys::HomeElevation, poi_settings.home_elevation);
+    profile.Set(ProfileKeys::HomeElevation, poi_settings.home_elevation);
 
-  Profile::Set(ProfileKeys::TeamcodeRefWaypoint,
-               team_code_settings.team_code_reference_waypoint);
+  profile.Set(ProfileKeys::TeamcodeRefWaypoint,
+              team_code_settings.team_code_reference_waypoint);
 }
 
 void

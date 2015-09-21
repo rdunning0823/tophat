@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -62,9 +62,11 @@ public:
   using ThreadedOperationEnvironment::Cancel;
 
 protected:
-  virtual void Run();
+  /* virtual methods from class Thread */
+  void Run() override;
 
-  virtual void OnNotification();
+  /* virtual methods from class DelayedNotify */
+  void OnNotification() override;
 
   /**
    * Implement this method.  It is run in the main thread.

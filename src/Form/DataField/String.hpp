@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_DATA_FIELD_STRING_HPP
 
 #include "Base.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 #define EDITSTRINGSIZE 32
 
@@ -42,15 +42,11 @@ public:
   DataFieldString(const TCHAR *_value, DataFieldListener *listener=nullptr)
     :DataField(Type::STRING, false, listener), mValue(_value) {}
 
-  DataFieldString(const TCHAR *Default,
-                  DataAccessCallback OnDataAccess) :
-    DataField(Type::STRING, false, OnDataAccess), mValue(Default) {}
-
   void Set(const TCHAR *Value);
 
   /* virtual methods from class DataField */
-  virtual const TCHAR *GetAsString() const override;
-  virtual void SetAsString(const TCHAR *Value) override;
+  const TCHAR *GetAsString() const override;
+  void SetAsString(const TCHAR *Value) override;
 };
 
 #endif

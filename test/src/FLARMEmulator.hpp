@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,14 +25,14 @@ Copyright_License {
 #define XCSOAR_FLARM_EMULATOR_HPP
 
 #include "DeviceEmulator.hpp"
-#include "Device/Port/LineSplitter.hpp"
+#include "Device/Util/LineSplitter.hpp"
 #include "Device/Driver/FLARM/BinaryProtocol.hpp"
-#include "Device/Internal.hpp"
+#include "Device/Util/NMEAWriter.hpp"
 #include "NMEA/InputLine.hpp"
 #include "NMEA/Checksum.hpp"
 #include "Util/Macros.hpp"
-#include "Util/FifoBuffer.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticFifoBuffer.hpp"
+#include "Util/StaticString.hxx"
 
 #include <string>
 #include <map>
@@ -43,7 +43,7 @@ class FLARMEmulator : public Emulator, PortLineSplitter {
   std::map<std::string, std::string> settings;
 
   bool binary;
-  FifoBuffer<char, 256u> binary_buffer;
+  StaticFifoBuffer<char, 256u> binary_buffer;
 
 public:
   FLARMEmulator():binary(false) {
@@ -182,7 +182,7 @@ private:
         continue;
       }
 
-      size_t nbytes = std::min(size_t(range.length), size_t(end - data));
+      size_t nbytes = std::min(size_t(range.size), size_t(end - data));
       memcpy(range.data, data, nbytes);
       data += nbytes;
       binary_buffer.Append(nbytes);
@@ -192,7 +192,7 @@ private:
         if (range.IsEmpty())
           break;
 
-        size_t nbytes = HandleBinary(range.data, range.length);
+        size_t nbytes = HandleBinary(range.data, range.size);
         if (nbytes == 0) {
           if (binary_buffer.IsFull())
             binary_buffer.Clear();

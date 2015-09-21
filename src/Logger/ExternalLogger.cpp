@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,8 +27,10 @@
 #include "Dialogs/ComboPicker.hpp"
 #include "Language/Language.hpp"
 #include "Device/Descriptor.hpp"
-#include "Device/List.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Device/Driver.hpp"
+#include "Device/RecordedFlight.hpp"
+#include "Components.hpp"
 #include "LocalPath.hpp"
 #include "UIGlobals.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
@@ -88,7 +90,7 @@ DeviceDeclare(DeviceDescriptor &dev, const Declaration &declaration,
     return false;
 
   const TCHAR *caption = dev.GetDisplayName();
-  if (caption == NULL)
+  if (caption == nullptr)
     caption = _("Declare task");
 
   auto result = DoDeviceDeclare(dev, declaration, home);
@@ -117,8 +119,8 @@ ExternalLogger::Declare(const Declaration &decl, const Waypoint *home)
 {
   bool found_logger = false;
 
-  for (unsigned i = 0; i < NUMDEV; ++i) {
-    DeviceDescriptor &device = *device_list[i];
+  for (DeviceDescriptor *i : *devices) {
+    DeviceDescriptor &device = *i;
 
     if (device.CanDeclare() && device.GetState() == PortState::READY) {
       found_logger = true;
@@ -206,11 +208,11 @@ ReadIGCMetaData(const TCHAR *path, IGCHeader &header, BrokenDate &date)
   }
 
   char *line = reader.ReadLine();
-  if (line != NULL)
+  if (line != nullptr)
     IGCParseHeader(line, header);
 
   line = reader.ReadLine();
-  if (line == NULL || !IGCParseDateRecord(line, date))
+  if (line == nullptr || !IGCParseDateRecord(line, date))
     date = BrokenDate::TodayUTC();
 }
 
@@ -256,9 +258,9 @@ ShowFlightList(const RecordedFlightList &flight_list)
 
   // Show list of the flights
   int i = ComboPicker(_T("Choose a flight"),
-                      combo, NULL, false);
+                      combo, nullptr, false);
 
-  return (i < 0) ? NULL : &flight_list[i];
+  return i < 0 ? nullptr : &flight_list[i];
 }
 
 void

@@ -116,7 +116,7 @@ class DigitEntry : public PaintWindow {
 
   const DialogLook &look;
 
-  ButtonRenderer button_renderer;
+  ButtonFrameRenderer button_renderer;
 
   ActionListener *action_listener;
   int action_id;
@@ -271,12 +271,12 @@ private:
   void SetDigits(fixed degrees, CoordinateFormat format, bool isLatitude);
 
 protected:
-  virtual void OnSetFocus() override;
-  virtual void OnKillFocus() override;
-  virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
-  virtual bool OnKeyCheck(unsigned key_code) const override;
-  virtual bool OnKeyDown(unsigned key_code) override;
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnSetFocus() override;
+  void OnKillFocus() override;
+  bool OnMouseDown(PixelScalar x, PixelScalar y) override;
+  bool OnKeyCheck(unsigned key_code) const override;
+  bool OnKeyDown(unsigned key_code) override;
+  void OnPaint(Canvas &canvas) override;
 };
 
 #endif

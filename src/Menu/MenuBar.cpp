@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -171,49 +171,21 @@ MenuBar::Button::OnClicked()
   return true;
 }
 
-#ifdef USE_GDI
-LRESULT
-MenuBar::Button::OnMessage(HWND hWnd, UINT message,
-                            WPARAM wParam, LPARAM lParam)
-{
-  switch (message) {
-  case WM_CAPTURECHANGED:
-    if (lParam == 0)
-      /* the button has the keyboard focus, and the user has stopped
-         dragging the mouse: return the keyboard focus to the parent
-         window, because menu buttons shouldn't have keyboard focus */
-      ::SetFocus(::GetParent(hWnd));
-    break;
-  }
-
-  return ButtonWindow::OnMessage(hWnd, message, wParam, lParam);
-}
-#endif
-
-MenuBar::MenuBar(ContainerWindow &parent)
+MenuBar::MenuBar(ContainerWindow &parent, const ButtonLook &look)
 {
   const PixelRect rc = parent.GetClientRect();
 
-  ButtonWindowStyle style;
+  WindowStyle style;
   style.Hide();
   style.Border();
-  style.multiline();
-  const ButtonLook &look = UIGlobals::GetDialogLook().button;
 
   for (unsigned i = 0; i < MAX_BUTTONS; ++i) {
     PixelRect button_rc = GetButtonPosition(i, rc);
-    buttons[i] = new Button(parent, look, _T(""), button_rc, style);
+    buttons[i].Create(parent, button_rc, style,
+                      new SymbolButtonRenderer(look, _T("")));
   }
 }
 
-void
-MenuBar::SetFont(const Font &font)
-{
-  for (unsigned i = 0; i < MAX_BUTTONS; i++)
-    buttons[i]->SetFont(font);
-}
-
-void
 MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
                     unsigned event, bool focused)
 {
@@ -221,8 +193,8 @@ MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
 
   Button &button = *buttons[i];
 
-  buttons[i]->SetFocusedOverride(focused);
-  button.SetText(text);
+  buttons[i].SetFocusedOverride(focused);
+  button.SetCaption(text);
   button.SetEnabled(enabled && event > 0);
   button.SetEvent(event);
   button.ShowOnTop();
@@ -233,12 +205,12 @@ MenuBar::HideButton(unsigned i)
 {
   assert(i < MAX_BUTTONS);
 
-  buttons[i]->Hide();
+  buttons[i].Hide();
 }
 
 void
 MenuBar::OnResize(const PixelRect &rc)
 {
   for (unsigned i = 0; i < MAX_BUTTONS; ++i)
-    buttons[i]->Move(GetButtonPosition(i, rc));
+    buttons[i].Move(GetButtonPosition(i, rc));
 }

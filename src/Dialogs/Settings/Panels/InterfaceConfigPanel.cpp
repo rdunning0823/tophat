@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "InterfaceConfigPanel.hpp"
 #include "Profile/Profile.hpp"
-#include "Form/Button.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Dialogs/Dialogs.h"
@@ -43,6 +42,9 @@ Copyright_License {
 #include <windef.h> /* for MAX_PATH */
 
 enum ControlIndex {
+#ifndef GNAV
+  UIScale,
+#endif
 #ifdef HAVE_BLANK
   AutoBlank,
 #endif
@@ -50,53 +52,20 @@ enum ControlIndex {
 #ifndef HAVE_NATIVE_GETTEXT
   LanguageFile,
 #endif
-  StatusFile,
   MenuTimeout,
   TextInput,
   HapticFeedback
 };
 
 class InterfaceConfigPanel final : public RowFormWidget {
-#ifndef GNAV
-  WndButton *buttonFonts;
-#endif
-
 public:
   InterfaceConfigPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook())
-#ifndef GNAV
-    , buttonFonts(0)
-#endif
-    {}
+    :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
 };
-
-void
-InterfaceConfigPanel::Show(const PixelRect &rc)
-{
-#ifndef GNAV
-  buttonFonts->SetText(_("Fonts"));
-  buttonFonts->SetOnClickNotify(dlgConfigFontsShowModal);
-  buttonFonts->Show();
-#endif
-
-  RowFormWidget::Show(rc);
-}
-
-void
-InterfaceConfigPanel::Hide()
-{
-#ifndef GNAV
-  buttonFonts->Hide();
-#endif
-
-  RowFormWidget::Hide();
-}
 
 #ifndef HAVE_NATIVE_GETTEXT
 
@@ -111,7 +80,7 @@ public:
   void
   Visit(const TCHAR *path, const TCHAR *filename)
   {
-    if (filename != NULL && !df.Exists(filename))
+    if (filename != nullptr && !df.Exists(filename))
       df.addEnumText(filename);
   }
 };
@@ -126,8 +95,10 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
 #ifndef GNAV
-  buttonFonts = ConfigPanel::GetExtraButton(1);
-  assert(buttonFonts);
+  AddInteger(_("Text size"),
+             nullptr,
+             _T("%d %%"), _T("%d"), 75, 200, 5,
+             settings.scale);
 #endif
 
 #ifdef HAVE_BLANK
@@ -137,10 +108,10 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings.display.enable_auto_blank);
 #endif
 
-  AddFileReader(_("Events"),
-                _("The Input Events file defines the menu system and how XCSoar responds to "
-                    "button presses and events from external devices."),
-                ProfileKeys::InputFile, _T("*.xci\0"));
+  AddFile(_("Events"),
+          _("The Input Events file defines the menu system and how XCSoar responds to "
+            "button presses and events from external devices."),
+          ProfileKeys::InputFile, _T("*.xci\0"));
   SetExpertRow(InputFile);
 
 #ifndef HAVE_NATIVE_GETTEXT
@@ -149,13 +120,13 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                _("The text in Top Hat is displayed in the following languages.  "
                  "Select automatic to select the lanugage based on your "
                  "device settings"));
-  if (wp != NULL) {
+  if (wp != nullptr) {
     DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
     df.addEnumText(_("Automatic"));
 
 #ifdef HAVE_BUILTIN_LANGUAGES
     for (const BuiltinLanguage *l = language_table;
-         l->resource != NULL; ++l) {
+         l->resource != nullptr; ++l) {
       df.addEnumText(l->resource, l->name);
     }
 #endif
@@ -175,18 +146,12 @@ InterfaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
       df.Set(1);
     else if (!StringIsEmpty(value) && !StringIsEqual(value, _T("auto"))) {
       const TCHAR *base = BaseName(value);
-      if (base != NULL)
+      if (base != nullptr)
         df.Set(base);
     }
     wp->RefreshDisplay();
   }
 #endif /* !HAVE_NATIVE_GETTEXT */
-
-  AddFileReader(_("Status message"),
-                _("The status file can be used to define sounds to be played when certain "
-                    "events occur, and how long various status messages will appear on screen."),
-                ProfileKeys::StatusFile, _T("*.xcs\0"));
-  SetExpertRow(StatusFile);
 
   AddTime(_("Menu timeout"),
           _("This determines how long menus will appear on screen if the user does not make any button "
@@ -232,6 +197,12 @@ InterfaceConfigPanel::Save(bool &_changed)
   UISettings &settings = CommonInterface::SetUISettings();
   bool changed = false;;
 
+#ifndef GNAV
+  if (SaveValueEnum(UIScale, ProfileKeys::UIScale,
+                    settings.scale))
+    require_restart = changed = true;
+#endif
+
 #ifdef HAVE_BLANK
   changed |= SaveValue(AutoBlank, ProfileKeys::AutoBlank,
                        settings.display.enable_auto_blank);
@@ -242,7 +213,7 @@ InterfaceConfigPanel::Save(bool &_changed)
 
 #ifndef HAVE_NATIVE_GETTEXT
   WndProperty *wp = (WndProperty *)&GetControl(LanguageFile);
-  if (wp != NULL) {
+  if (wp != nullptr) {
     DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
 
     TCHAR old_value[MAX_PATH];
@@ -250,7 +221,7 @@ InterfaceConfigPanel::Save(bool &_changed)
       old_value[0] = _T('\0');
 
     const TCHAR *old_base = BaseName(old_value);
-    if (old_base == NULL)
+    if (old_base == nullptr)
       old_base = old_value;
 
     TCHAR buffer[MAX_PATH];
@@ -266,21 +237,18 @@ InterfaceConfigPanel::Save(bool &_changed)
       ContractLocalPath(buffer);
       new_value = buffer;
       new_base = BaseName(new_value);
-      if (new_base == NULL)
+      if (new_base == nullptr)
         new_base = new_value;
       break;
     }
 
-    if (_tcscmp(old_value, new_value) != 0 &&
-        _tcscmp(old_base, new_base) != 0) {
+    if (!StringIsEqual(old_value, new_value) &&
+        !StringIsEqual(old_base, new_base)) {
       Profile::Set(ProfileKeys::LanguageFile, new_value);
       LanguageChanged = changed = true;
     }
   }
 #endif
-
-  if (SaveValueFileReader(StatusFile, ProfileKeys::StatusFile))
-    require_restart = changed = true;
 
   unsigned menu_timeout = GetValueInteger(MenuTimeout) * 2;
   if (settings.menu_timeout != menu_timeout) {

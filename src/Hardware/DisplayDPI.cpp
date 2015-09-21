@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,21 +28,72 @@ Copyright_License {
 #include "Android/NativeView.hpp"
 #endif
 
-#ifdef KOBO
-#include "OS/FileUtil.hpp"
-#endif
-
 #ifdef WIN32
-#include "Screen/RootDC.hpp"
-#include "Config/Registry.hpp"
-#include "OS/GlobalEvent.hpp"
+#include "Screen/GDI/RootDC.hpp"
 
 #include <windows.h>
+#endif
+
+#ifdef USE_X11
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
+
+#define Font X11Font
+#define Window X11Window
+#define Display X11Display
+#include <X11/Xlib.h>
+#undef Font
+#undef Window
+#undef Display
+#endif
+
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#else
+#import <AppKit/AppKit.h>
+#endif
 #endif
 
 #if !defined(ANDROID) && !defined(_WIN32_WCE)
   static unsigned forced_x_dpi = 0;
   static unsigned forced_y_dpi = 0;
+#endif
+
+#ifdef USE_X11
+
+static constexpr unsigned
+MMToDPI(unsigned pixels, unsigned mm)
+{
+  /* 1 inch = 25.4 mm */
+  return pixels * 254 / (mm * 10);
+}
+
+#elif !defined(WIN32) && !defined(ANDROID)
+#ifndef __APPLE__
+gcc_const
+#endif
+static unsigned
+GetDPI()
+{
+#ifdef KOBO
+  /* Kobo Mini 200 dpi; Kobo Glo 212 dpi (according to Wikipedia) */
+  return 200;
+#elif defined(__APPLE__)
+#if TARGET_OS_IPHONE
+  UIScreen *screen = [UIScreen mainScreen];
+  float scale = [screen scale];
+  return static_cast<unsigned>(scale * 160);
+#else
+  NSScreen *screen = [NSScreen mainScreen];
+  float scale = [screen backingScaleFactor];
+  return static_cast<unsigned>(scale * 115);
+#endif
+#else
+  return 96;
+#endif
+}
 #endif
 
 void
@@ -61,16 +112,21 @@ Display::GetXDPI()
   if (forced_x_dpi > 0)
     return forced_x_dpi;
 #endif
+
 #ifdef WIN32
   RootDC dc;
   return GetDeviceCaps(dc, LOGPIXELSX);
 #elif defined(ANDROID)
   return native_view->GetXDPI();
-#elif defined(KOBO)
-  /* Kobo Mini 200 dpi; Kobo Glo 212 dpi (according to Wikipedia) */
-  return 200;
+#elif defined(USE_X11)
+  assert(event_queue != nullptr);
+
+  auto display = event_queue->GetDisplay();
+  assert(display != nullptr);
+
+  return MMToDPI(DisplayWidth(display, 0), DisplayWidthMM(display, 0));
 #else
-  return 96;
+  return GetDPI();
 #endif
 }
 
@@ -81,15 +137,20 @@ Display::GetYDPI()
   if (forced_y_dpi > 0)
     return forced_y_dpi;
 #endif
+
 #ifdef WIN32
   RootDC dc;
   return GetDeviceCaps(dc, LOGPIXELSY);
 #elif defined(ANDROID)
   return native_view->GetYDPI();
-#elif defined(KOBO)
-  /* Kobo Mini 200 dpi; Kobo Glo 212 dpi (according to Wikipedia) */
-  return 200;
+#elif defined(USE_X11)
+  assert(event_queue != nullptr);
+
+  auto display = event_queue->GetDisplay();
+  assert(display != nullptr);
+
+  return MMToDPI(DisplayHeight(display, 0), DisplayHeightMM(display, 0));
 #else
-  return 96;
+  return GetDPI();
 #endif
 }

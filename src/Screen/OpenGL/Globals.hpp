@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,12 +31,20 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_OPENGL_GLOBALS_HPP
 #define XCSOAR_SCREEN_OPENGL_GLOBALS_HPP
 
-#include "Screen/OpenGL/Point.hpp"
 #include "Screen/OpenGL/Features.hpp"
+#include "System.hpp"
 
-#ifndef NDEBUG
-#include <pthread.h>
+#ifdef USE_GLSL
+#include <glm/glm.hpp>
 #endif
+
+#ifdef SOFTWARE_ROTATE_DISPLAY
+#include <stdint.h>
+enum class DisplayOrientation : uint8_t;
+#endif
+
+template<typename T> struct Point2D;
+struct RasterPoint;
 
 namespace OpenGL {
 #ifdef HAVE_DYNAMIC_EGL
@@ -57,9 +65,6 @@ namespace OpenGL {
 #ifdef HAVE_OES_DRAW_TEXTURE
   /**
    * Shall we use the OES_draw_texture extension?
-   *
-   * This will be disabled on Vivante GPUs, because they are known to
-   * be buggy.
    */
   extern bool oes_draw_texture;
 #endif
@@ -77,6 +82,16 @@ namespace OpenGL {
   extern bool vertex_buffer_object;
 #else
   static constexpr bool vertex_buffer_object = true;
+#endif
+
+  /**
+   * Is glMapBuffer() available?  May be implemented by the extension
+   * GL_OES_mapbuffer.
+   */
+#ifdef HAVE_OES_MAPBUFFER
+  extern bool mapbuffer;
+#else
+  static constexpr bool mapbuffer = true;
 #endif
 
   /**
@@ -98,14 +113,27 @@ namespace OpenGL {
   extern GLenum render_buffer_stencil;
 
   /**
-   * The dimensions of the screen in pixels.
+   * The dimensions of the OpenGL window in pixels.
    */
-  extern UPixelScalar screen_width, screen_height;
+  extern Point2D<unsigned> window_size;
+
+  /**
+   * The dimensions of the OpenGL viewport in pixels.
+   */
+  extern Point2D<unsigned> viewport_size;
+
+#ifdef SOFTWARE_ROTATE_DISPLAY
+  extern DisplayOrientation display_orientation;
+#endif
 
   /**
    * The current SubCanvas translation in pixels.
    */
   extern RasterPoint translate;
+
+#ifdef USE_GLSL
+  extern glm::mat4 projection_matrix;
+#endif
 };
 
 #endif

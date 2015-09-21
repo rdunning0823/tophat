@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Screen/OpenGL/Globals.hpp"
 #include "Screen/OpenGL/Debug.hpp"
+#include "Point.hpp"
 
 namespace OpenGL {
 #ifdef HAVE_DYNAMIC_EGL
@@ -39,13 +40,25 @@ namespace OpenGL {
   bool vertex_buffer_object;
 #endif
 
+#ifdef HAVE_OES_MAPBUFFER
+  bool mapbuffer;
+#endif
+
   bool frame_buffer_object;
 
   GLenum render_buffer_depth_stencil, render_buffer_stencil;
 
-  UPixelScalar screen_width, screen_height;
+  Point2D<unsigned> window_size, viewport_size;
+
+#ifdef SOFTWARE_ROTATE_DISPLAY
+  DisplayOrientation display_orientation;
+#endif
 
   RasterPoint translate;
+
+#ifdef USE_GLSL
+  glm::mat4 projection_matrix;
+#endif
 
 #ifndef NDEBUG
   pthread_t thread;

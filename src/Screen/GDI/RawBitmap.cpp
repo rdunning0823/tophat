@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -70,9 +70,9 @@ RawBitmap::RawBitmap(unsigned nWidth, unsigned nHeight)
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x0400
   /* StretchDIBits() is bugged on PPC2002, workaround follows */
   VOID *pvBits;
-  HDC hDC = ::GetDC(NULL);
-  bitmap = CreateDIBSection(hDC, &bi, DIB_RGB_COLORS, &pvBits, NULL, 0);
-  ::ReleaseDC(NULL, hDC);
+  HDC hDC = ::GetDC(nullptr);
+  bitmap = CreateDIBSection(hDC, &bi, DIB_RGB_COLORS, &pvBits, nullptr, 0);
+  ::ReleaseDC(nullptr, hDC);
   buffer = (BGRColor *)pvBits;
 #else
   buffer = new BGRColor[corrected_width * height];

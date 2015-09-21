@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #include "InfoBoxesConfigPanel.hpp"
 #include "../dlgConfigInfoboxes.hpp"
 #include "Profile/Profile.hpp"
+#include "Profile/Current.hpp"
 #include "Profile/InfoBoxConfig.hpp"
 #include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
@@ -62,9 +63,9 @@ InfoBoxesConfigPanel::OnAction(int id)
                                 InfoBoxManager::layout.geometry, data,
                                 i >= InfoBoxSettings::PREASSIGNED_PANELS);
   if (changed) {
-    Profile::Save(data, i);
+    Profile::Save(Profile::map, data, i);
     Profile::Save();
-    ((WndButton &)GetRow(i)).SetCaption(gettext(data.name));
+    ((Button &)GetRow(i)).SetCaption(gettext(data.name));
   }
 }
 

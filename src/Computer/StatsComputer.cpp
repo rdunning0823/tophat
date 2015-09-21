@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,9 +25,6 @@ Copyright_License {
 #include "StatsComputer.hpp"
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
-
-StatsComputer::StatsComputer()
-  :stats_clock(fixed(60)) {}
 
 void
 StatsComputer::ResetFlight(const bool full)
@@ -57,7 +54,7 @@ StatsComputer::DoLogging(const MoreData &basic,
 {
   /// @todo consider putting this sanity check inside Parser
   bool location_jump = basic.location_available && last_location.IsValid() &&
-                       basic.location.Distance(last_location) > fixed(200);
+    basic.location.DistanceS(last_location) > fixed(200);
 
   last_location = basic.location_available
     ? basic.location : GeoPoint::Invalid();
@@ -67,7 +64,7 @@ StatsComputer::DoLogging(const MoreData &basic,
     return false;
 
   if (calculated.flight.flying &&
-      stats_clock.CheckAdvance(basic.time)) {
+      stats_clock.CheckAdvance(basic.time, PERIOD)) {
     flightstats.AddAltitudeTerrain(calculated.flight.flight_time,
                                    calculated.terrain_altitude);
 

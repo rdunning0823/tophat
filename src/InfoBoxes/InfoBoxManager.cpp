@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,6 +32,7 @@ Copyright_License {
 #include "Form/DataField/ComboList.hpp"
 #include "Dialogs/ComboPicker.hpp"
 #include "Profile/InfoBoxConfig.hpp"
+#include "Profile/Current.hpp"
 #include "Interface.hpp"
 #include "UIState.hpp"
 
@@ -277,7 +278,7 @@ InfoBoxManager::ShowInfoBoxPicker(const int id)
   }
 
   list.Sort();
-  list.ComboPopupItemSavedIndex = list.LookUp(old_type);
+  list.current_index = list.LookUp(old_type);
 
   /* let the user select */
 
@@ -289,7 +290,7 @@ InfoBoxManager::ShowInfoBoxPicker(const int id)
 
   /* was there a modification? */
 
-  InfoBoxFactory::Type new_type = (InfoBoxFactory::Type)list[result].DataFieldIndex;
+  InfoBoxFactory::Type new_type = (InfoBoxFactory::Type)list[result].int_value;
   if (new_type == old_type)
     return;
 
@@ -298,5 +299,5 @@ InfoBoxManager::ShowInfoBoxPicker(const int id)
   panel.contents[i] = new_type;
   DisplayInfoBox();
 
-  Profile::Save(panel, panel_index);
+  Profile::Save(Profile::map, panel, panel_index);
 }

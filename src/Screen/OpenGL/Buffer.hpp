@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Compute5r - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,9 +24,16 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_OPENGL_BUFFER_HPP
 #define XCSOAR_SCREEN_OPENGL_BUFFER_HPP
 
-#include "System.hpp"
+#include "SystemExt.hpp"
+#include "Globals.hpp"
+#include "Features.hpp"
+
+#ifdef HAVE_DYNAMIC_MAPBUFFER
+#include "Dynamic.hpp"
+#endif
 
 #include <assert.h>
+#include <stdlib.h>
 
 #ifndef NDEBUG
 extern unsigned num_buffers;
@@ -35,27 +42,29 @@ extern unsigned num_buffers;
 /**
  * This class represents an OpenGL buffer object.
  */
+template<GLenum target, GLenum usage>
 class GLBuffer {
   GLuint id;
+
+#ifndef NDEBUG
+  GLvoid *p;
+#endif
 
 public:
   GLBuffer() {
     glGenBuffers(1, &id);
 
 #ifndef NDEBUG
+    p = nullptr;
     ++num_buffers;
 #endif
   }
 
-  explicit GLBuffer(GLuint _id)
-    :id(_id) {
-#ifndef NDEBUG
-    ++num_buffers;
-#endif
-  }
+  GLBuffer(const GLBuffer &) = delete;
 
   ~GLBuffer() {
 #ifndef NDEBUG
+    assert(p == nullptr);
     assert(num_buffers > 0);
     --num_buffers;
 #endif
@@ -63,37 +72,85 @@ public:
     glDeleteBuffers(1, &id);
   }
 
-  void Bind(GLenum target) {
+  void Bind() {
+    assert(p == nullptr);
+
     glBindBuffer(target, id);
   }
 
-  static void Unbind(GLenum target) {
+  static void Unbind() {
     glBindBuffer(target, 0);
   }
 
-  void Load(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage) {
-    Bind(target);
+  /**
+   * Allocates and initializes the buffer.
+   */
+  static void Data(GLsizeiptr size, const GLvoid *data) {
     glBufferData(target, size, data, usage);
-    Unbind(target);
-  }
-};
-
-class GLArrayBuffer : private GLBuffer {
-public:
-  GLArrayBuffer() = default;
-  explicit GLArrayBuffer(GLuint _id):GLBuffer(_id) {}
-
-  void Bind() {
-    GLBuffer::Bind(GL_ARRAY_BUFFER);
-  }
-
-  static void Unbind() {
-    GLBuffer::Unbind(GL_ARRAY_BUFFER);
   }
 
   void Load(GLsizeiptr size, const GLvoid *data) {
-    GLBuffer::Load(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    Bind();
+    Data(size, data);
+    Unbind();
   }
+
+  static void *MapWrite() {
+#ifdef HAVE_DYNAMIC_MAPBUFFER
+    return GLExt::map_buffer(target, GL_WRITE_ONLY_OES);
+#elif defined(GL_OES_mapbuffer)
+    return glMapBufferOES(target, GL_WRITE_ONLY_OES);
+#else
+    return glMapBuffer(target, GL_WRITE_ONLY);
+#endif
+  }
+
+  static void Unmap() {
+#ifdef HAVE_DYNAMIC_MAPBUFFER
+    GLExt::unmap_buffer(target);
+#elif defined(GL_OES_mapbuffer)
+    glUnmapBufferOES(target);
+#else
+    glUnmapBuffer(target);
+#endif
+  }
+
+  GLvoid *BeginWrite(size_t size) {
+    Bind();
+
+    void *result;
+    if (OpenGL::mapbuffer) {
+      Data(GLsizeiptr(size), nullptr);
+      result = MapWrite();
+    } else {
+      result = malloc(size);
+    }
+
+#ifndef NDEBUG
+    p = result;
+#endif
+
+    return result;
+  }
+
+  void CommitWrite(size_t size, GLvoid *data) {
+#ifndef NDEBUG
+    assert(data == p);
+    p = nullptr;
+#endif
+
+    if (OpenGL::mapbuffer) {
+      Unmap();
+    } else {
+      Data(GLsizeiptr(size), data);
+      free(data);
+    }
+
+    Unbind();
+  }
+};
+
+class GLArrayBuffer : public GLBuffer<GL_ARRAY_BUFFER, GL_STATIC_DRAW> {
 };
 
 #endif

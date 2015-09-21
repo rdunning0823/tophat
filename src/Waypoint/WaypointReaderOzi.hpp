@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,19 +26,20 @@ Copyright_License {
 
 #include "WaypointReaderBase.hpp"
 
-class WaypointReaderOzi:
-  public WaypointReaderBase 
-{
+class WaypointReaderOzi final : public WaypointReaderBase {
+  unsigned ignore_lines;
+
 public:
-  WaypointReaderOzi(const int _file_num,
-                    bool _compressed = false)
-    :WaypointReaderBase(_file_num, _compressed) {}
+  explicit WaypointReaderOzi(WaypointFactory _factory)
+    :WaypointReaderBase(_factory),
+     /* ignore the first 4 lines */
+     ignore_lines(4) {}
 
   static bool VerifyFormat(TLineReader &reader);
 
 protected:
-  bool ParseLine(const TCHAR* line, const unsigned linenum,
-                 Waypoints &way_points);
+  /* virtual methods from class WaypointReaderBase */
+  bool ParseLine(const TCHAR *line, Waypoints &way_points) override;
 };
 
 #endif

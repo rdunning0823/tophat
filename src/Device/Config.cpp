@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ Copyright_License {
 
 #ifdef ANDROID
 #include "Android/BluetoothHelper.hpp"
-#include "Java/Global.hpp"
+#include "Java/Global.hxx"
 #endif
 
 bool
@@ -66,7 +66,7 @@ DeviceConfig::IsAvailable() const
 #endif
 
   case PortType::INTERNAL:
-    return IsAndroid();
+    return IsAndroid() || IsApple();
 
   case PortType::TCP_CLIENT:
     return !IsWindowsCE();
@@ -128,7 +128,7 @@ DeviceConfig::ShouldReopenOnTimeout() const
     return false;
 
   case PortType::INTERNAL:
-    /* reopening the Android internal GPS doesn't help */
+    /* reopening the Android / Apple internal GPS doesn't help */
     return false;
 
   case PortType::TCP_LISTENER:
@@ -156,7 +156,7 @@ DeviceConfig::MaybeBluetooth(PortType port_type, const TCHAR *path)
     return true;
 
 #ifdef HAVE_POSIX
-  if (port_type == PortType::SERIAL && _tcsstr(path, _T("/rfcomm")) != NULL)
+  if (port_type == PortType::SERIAL && _tcsstr(path, _T("/rfcomm")) != nullptr)
     return true;
 #endif
 
@@ -230,7 +230,6 @@ DeviceConfig::Clear()
 #ifndef NDEBUG
   dump_port = false;
 #endif
-  ignore_checksum = false;
 }
 
 const TCHAR *

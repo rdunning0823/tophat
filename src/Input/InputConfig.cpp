@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,6 +36,12 @@ InputConfig::SetDefaults()
   modes[3] = _T("Menu");
 
   std::fill_n(&Key2Event[0][0], MAX_MODE*MAX_KEY, 0);
+#if defined(ENABLE_SDL) && (SDL_MAJOR_VERSION >= 2)
+  std::fill_n(&Key2EventNonChar[0][0], MAX_MODE*MAX_KEY, 0);
+#endif
+#ifdef USE_X11
+  std::fill_n(&Key2EventFF00[0][0], MAX_MODE * MAX_KEY, 0);
+#endif
 
   Gesture2Event.Clear();
 

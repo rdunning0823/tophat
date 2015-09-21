@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -101,7 +101,13 @@ public:
   bool changed;
 
 public:
-  WidgetDialog(const DialogLook &look);
+  explicit WidgetDialog(const DialogLook &look);
+
+  virtual ~WidgetDialog();
+
+  const ButtonLook &GetButtonLook() const {
+    return buttons.GetLook();
+  }
 
   void Create(SingleWindow &parent, const TCHAR *caption,
               const PixelRect &rc, Widget *widget,
@@ -153,6 +159,13 @@ public:
     return changed;
   }
 
+  /**
+   * Ensure that the widget is prepared.
+   */
+  void PrepareWidget() {
+    widget.Prepare();
+  }
+
   Widget &GetWidget() {
     assert(widget.IsDefined());
     return *widget.Get();
@@ -164,26 +177,28 @@ public:
     return widget.Steal();
   }
 
-  WndButton *AddButton(const TCHAR *caption,
-                       ActionListener &listener, int id) {
-    WndButton * but = buttons.Add(caption, listener, id);
-    OnResize(PixelSize {(PixelScalar)GetWidth(), (PixelScalar)GetHeight()});
-    return but;
+  Button *AddButton(ButtonRenderer *renderer,
+                    ActionListener &listener, int id) {
+    return buttons.Add(renderer, listener, id);
   }
 
-  WndButton *AddButton(const TCHAR *caption, int modal_result) {
+  Button *AddButton(const TCHAR *caption,
+                    ActionListener &listener, int id) {
+    return buttons.Add(caption, listener, id);
+  }
+
+  Button *AddButton(const TCHAR *caption, int modal_result) {
     return AddButton(caption, *this, modal_result);
   }
 
-  WndButton *AddSymbolButton(const TCHAR *caption, int modal_result) {
+
+  Button *AddSymbolButton(const TCHAR *caption, int modal_result) {
     return AddSymbolButton(caption, *this, modal_result);
   }
 
-  WndButton *AddSymbolButton(const TCHAR *caption,
+  Button *AddSymbolButton(const TCHAR *caption,
                              ActionListener &listener, int id) {
-    WndButton * but = buttons.AddSymbol(caption, listener, id);
-    OnResize(PixelSize {(PixelScalar)GetWidth(), (PixelScalar)GetHeight()});
-    return but;
+    return buttons.AddSymbol(caption, listener, id);
   }
 
   void AddButtonKey(unsigned key_code) {
@@ -192,6 +207,13 @@ public:
 
   void AddAltairButtonKey(unsigned key_code) {
     return buttons.AddAltairKey(key_code);
+  }
+
+  /**
+   * @see ButtonPanel::EnableCursorSelection()
+   */
+  void EnableCursorSelection(unsigned _index=0) {
+    buttons.EnableCursorSelection(_index);
   }
 
   int ShowModal();

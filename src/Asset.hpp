@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,10 @@ Copyright_License {
 #include "Compiler.h"
 #ifdef ANDROID
 #include "Android/Product.hpp"
+#endif
+
+#ifdef __APPLE__
+#include <TargetConditionals.h>
 #endif
 
 #include <tchar.h>
@@ -152,6 +156,48 @@ IsAndroid()
 }
 
 /**
+ * Returns whether the application is running on an apple device
+ */
+constexpr
+static inline bool
+IsApple()
+{
+#if defined(__APPLE__)
+  return true;
+#else
+  return false;
+#endif
+}
+
+/**
+ * Returns whether the application is running on a Mac OS X device
+ */
+constexpr
+static inline bool
+IsMacOSX()
+{
+#if defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE
+  return true;
+#else
+  return false;
+#endif
+}
+
+/**
+ * Returns whether the application is running on an iOS device
+ */
+constexpr
+static inline bool
+IsIOS()
+{
+#if defined(__APPLE__) && TARGET_OS_IPHONE
+  return true;
+#else
+  return false;
+#endif
+}
+
+/**
  * Returns whether the application is running on a Kobo e-book reader.
  */
 constexpr
@@ -173,7 +219,7 @@ constexpr
 static inline bool
 IsEmbedded()
 {
-  return IsAndroid() || IsWindowsCE() || IsKobo();
+  return IsAndroid() || IsWindowsCE() || IsKobo() || IsIOS();
 }
 
 /**
@@ -207,7 +253,7 @@ HasIOIOLib()
 static inline bool
 HasAndroidInternalGPS()
 {
-#ifdef ANDROID
+#if defined(ANDROID) || defined(__APPLE__)
   return !IsNookSimpleTouch();
 #else
   return true;
@@ -219,6 +265,11 @@ HasAndroidInternalGPS()
  * @return True if a touch screen or mouse is assumed for the hardware
  * that XCSoar is running on, False if the hardware has only buttons
  */
+#if defined(USE_CONSOLE) && !defined(KOBO)
+gcc_pure
+bool
+HasPointer();
+#else
 constexpr
 static inline bool
 HasPointer()
@@ -226,16 +277,24 @@ HasPointer()
   return !IsAltair();
 }
 
+#endif
+
 /**
  * Does this device have a touch screen?  Used for distinguishing
  * between behaviours
  */
+#ifdef USE_LIBINPUT
+gcc_pure
+bool
+HasTouchScreen();
+#else
 constexpr
 static inline bool
 HasTouchScreen()
 {
-  return IsAndroid() || (IsWindowsCE() && !IsAltair()) || IsKobo();
+  return IsAndroid() || (IsWindowsCE() && !IsAltair()) || IsKobo() || IsIOS();
 }
+#endif
 
 
 /**
@@ -269,12 +328,18 @@ HasDraggableScreen()
  * @return True if a keyboard is assumed for the hardware
  * that XCSoar is running on, False if the hardware has no keyboard
  */
+#ifdef USE_LIBINPUT
+gcc_pure
+bool
+HasKeyboard();
+#else
 constexpr
 static inline bool
 HasKeyboard()
 {
   return !IsEmbedded();
 }
+#endif
 
 /**
  * Does this device have a cursor keys?  These may be used to navigate
@@ -293,7 +358,7 @@ HasCursorKeys()
 #ifdef ANDROID
   return has_cursor_keys;
 #else
-  return !IsKobo();
+  return !IsKobo() && !IsIOS();
 #endif
 }
 

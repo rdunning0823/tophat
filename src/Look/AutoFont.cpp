@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,32 +22,34 @@ Copyright_License {
 */
 
 #include "AutoFont.hpp"
-#include "StandardFonts.hpp"
-#include "FontSettings.hpp"
+#include "FontDescription.hpp"
 #include "Screen/Font.hpp"
+#include "Asset.hpp"
 
 #include <algorithm>
 
+#ifndef GNAV
+
 void
-AutoSizeFont(LOGFONT &logfont, unsigned width, const TCHAR *text)
+AutoSizeFont(FontDescription &d, unsigned width, const TCHAR *text)
 {
   // JMW algorithm to auto-size info window font.
   // this is still required in case title font property doesn't exist.
 
   /* reasonable start value (ignoring the original input value) */
-  logfont.lfHeight = std::max(10u, unsigned(width) / 4u);
+  d.SetHeight(std::max(10u, unsigned(width) / 4u));
 
   Font font;
-  if (!font.Load(logfont))
+  if (!font.Load(d))
     return;
 
   /* double the font size until it is large enough */
 
   PixelSize tsize = font.TextSize(text);
   while (unsigned(tsize.cx) < width) {
-    logfont.lfHeight *= 2;
-    if (!font.Load(logfont)) {
-      logfont.lfHeight /= 2;
+    d.SetHeight(d.GetHeight() * 2);
+    if (!font.Load(d)) {
+      d.SetHeight(d.GetHeight() / 2);
       break;
     }
 
@@ -57,28 +59,16 @@ AutoSizeFont(LOGFONT &logfont, unsigned width, const TCHAR *text)
   /* decrease font size until it fits exactly */
 
   do {
-    --logfont.lfHeight;
+    d.SetHeight(d.GetHeight() - 1);
 
     Font font;
-    if (!font.Load(logfont))
+    if (!font.Load(d))
       break;
 
     tsize = font.TextSize(text);
   } while ((unsigned)tsize.cx > width);
 
-  ++logfont.lfHeight;
+  d.SetHeight(d.GetHeight() + 1);
 }
 
-void
-AutoSizeInfoBoxFonts(FontSettings &settings, unsigned control_width)
-{
-  if (!IsAltair())
-    AutoSizeFont(settings.infobox, control_width, _T("1234m"));
-
-#ifndef GNAV
-  settings.infobox_units.lfHeight = unsigned(settings.infobox.lfHeight) * 2u / 5u;
 #endif
-
-  if (!IsAltair())
-    AutoSizeFont(settings.infobox_small, control_width, _T("12345m"));
-}

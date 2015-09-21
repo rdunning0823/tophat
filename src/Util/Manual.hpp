@@ -27,31 +27,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_MANUAL_HPP
-#define XCSOAR_MANUAL_HPP
+#ifndef MANUAL_HPP
+#define MANUAL_HPP
 
 #include "Compiler.h"
 
 #include <new>
 #include <utility>
 
-#if !defined(__clang__) && __GNUC__ && GCC_VERSION < 40800
+#if GCC_OLDER_THAN(4,8)
 #include <type_traits>
 #endif
 
 #include <assert.h>
 
-#if defined(__clang__) || GCC_VERSION >= 40700
+#if CLANG_OR_GCC_VERSION(4,7)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
-
-#if defined(__clang__) || GCC_VERSION < 40700 || defined(ANDROID)
-#pragma GCC diagnostic push
-/* this warning is emitted by clang 3.2 and gcc 4.6, even though we
-   use alignas(T); TODO: check if this is a clang bug or a bug in this
-   class */
-#pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 /**
@@ -92,36 +84,46 @@ public:
   void Destruct() {
     assert(initialized);
 
-    T *t = (T *)data;
-    t->T::~T();
+    T &t = Get();
+    t.T::~T();
 
 #ifndef NDEBUG
     initialized = false;
 #endif
   }
 
+  T &Get() {
+    assert(initialized);
+
+    void *p = static_cast<void *>(data);
+    return *static_cast<T *>(p);
+  }
+
+  const T &Get() const {
+    assert(initialized);
+
+    const void *p = static_cast<const void *>(data);
+    return *static_cast<const T *>(p);
+  }
+
   operator T &() {
-    return *(T *)data;
+    return Get();
   }
 
   operator const T &() const {
-    return *(const T *)data;
+    return Get();
   }
 
   T *operator->() {
-    return (T *)data;
+    return &Get();
   }
 
   const T *operator->() const {
-    return (T *)data;
+    return &Get();
   }
 };
 
-#if defined(__clang__) || GCC_VERSION < 40700 || defined(ANDROID)
-#pragma GCC diagnostic pop
-#endif
-
-#if defined(__clang__) || GCC_VERSION >= 40700
+#if CLANG_OR_GCC_VERSION(4,7)
 #pragma GCC diagnostic pop
 #endif
 

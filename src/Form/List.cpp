@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@ Copyright_License {
 #include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
-#include "Screen/OpenGL/Scope.hpp"
+#include "Screen/OpenGL/Scissor.hpp"
 #include "Screen/OpenGL/Globals.hpp"
 #elif defined(USE_GDI)
 #include "Screen/WindowCanvas.hpp"
@@ -52,12 +52,28 @@ UsePixelPan()
   return HasDraggableScreen();
 }
 
+ListControl::ListControl(const DialogLook &_look)
+  :look(_look),
+   has_scroll_bar(true),
+   scroll_bar(look.button),
+   length(0),
+   origin(0), pixel_pan(0),
+   cursor(0),
+   drag_mode(DragMode::NONE),
+   item_renderer(nullptr), cursor_handler(nullptr)
+#ifndef _WIN32_WCE
+  , kinetic_timer(*this)
+#endif
+{
+}
+
 ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
                          PixelRect rc, const WindowStyle style,
                          UPixelScalar _item_height, int stopping_time)
   :look(_look),
    has_scroll_bar(true),
    item_height(_item_height),
+   scroll_bar(look.button),
    length(0),
    origin(0), pixel_pan(0),
    cursor(0),
@@ -68,7 +84,23 @@ ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
    kinetic_timer(*this)
 #endif
 {
-  Create(parent, rc, style);
+  Create(parent, rc, style, _item_height);
+}
+
+ListControl::~ListControl() {
+  /* we must override ~Window(), because in ~Window(), our own
+     OnDestroy() method won't be called (during object destruction,
+     this object loses its identity) */
+  Destroy();
+}
+
+void
+ListControl::Create(ContainerWindow &parent,
+                    PixelRect rc, const WindowStyle style,
+                    unsigned _item_height)
+{
+  item_height = _item_height;
+  PaintWindow::Create(parent, rc, style);
 }
 
 bool
@@ -77,7 +109,7 @@ ListControl::CanActivateItem() const
   if (IsEmpty())
     return false;
 
-  return cursor_handler != NULL &&
+  return cursor_handler != nullptr &&
     cursor_handler->CanActivateItem(GetCursorIndex());
 }
 
@@ -88,7 +120,7 @@ ListControl::ActivateItem()
 
   unsigned index = GetCursorIndex();
   assert(index < GetLength());
-  if (cursor_handler != NULL)
+  if (cursor_handler != nullptr)
     cursor_handler->OnActivateItem(index);
 }
 
@@ -151,9 +183,9 @@ ListControl::DrawItems(Canvas &canvas, unsigned start, unsigned end) const
 
 #ifdef ENABLE_OPENGL
   /* enable clipping */
-  GLScissor scissor(OpenGL::translate.x,
-                    OpenGL::screen_height - OpenGL::translate.y - canvas.GetHeight(),
-                    scroll_bar.GetLeft(GetSize()), canvas.GetHeight());
+  const PixelRect scissor_rc(0, 0, scroll_bar.GetLeft(GetSize()),
+                             canvas.GetHeight());
+  GLCanvasScissor scissor(scissor_rc);
 #endif
 
   unsigned last_item = std::min(length, end);
@@ -407,36 +439,10 @@ ListControl::OnKeyCheck(unsigned key_code) const
   case KEY_RETURN:
     return CanActivateItem();
 
-  case KEY_LEFT:
-    if (!HasPointer())
-      /* no wrap-around on Altair, as KEY_LEFT is usually used to
-         switch to the previous dialog page */
-      return true;
-
-    return GetCursorIndex() > 0;
-
   case KEY_UP:
-    if (!HasPointer() && IsShort())
-      /* no page up/down behaviour in short lists on Altair; this
-         rotation knob should move focus */
-      return false;
-
     return GetCursorIndex() > 0;
-
-  case KEY_RIGHT:
-    if (!HasPointer())
-      /* no wrap-around on Altair, as KEY_RIGHT is usually used to
-         switch to the next dialog page */
-      return true;
-
-    return GetCursorIndex() + 1 < length;
 
   case KEY_DOWN:
-    if (!HasPointer() && IsShort())
-      /* no page up/down behaviour in short lists on Altair; this
-         rotation knob should move focus */
-      return false;
-
     return GetCursorIndex() + 1 < length;
 
   default:
@@ -464,34 +470,30 @@ ListControl::OnKeyDown(unsigned key_code)
     return true;
 
   case KEY_UP:
-  case KEY_LEFT:
-    if (!HasPointer() ^ (key_code == KEY_LEFT)) {
-      // page up
-      MoveCursor(-(int)items_visible);
-      return true;
-    } else {
-      // previous item
-      if (GetCursorIndex() <= 0)
-        break;
+    // previous item
+    if (GetCursorIndex() <= 0)
+      break;
 
-      MoveCursor(-1);
-      return true;
-    }
+    MoveCursor(-1);
+    return true;
 
   case KEY_DOWN:
-  case KEY_RIGHT:
-    if (!HasPointer() ^ (key_code == KEY_RIGHT)) {
-      // page down
-      MoveCursor(items_visible);
-      return true;
-    } else {
-      // next item
-      if (GetCursorIndex() +1 >= length)
-        break;
+    // next item
+    if (GetCursorIndex() +1 >= length)
+      break;
 
-      MoveCursor(1);
-      return true;
-    }
+    MoveCursor(1);
+    return true;
+
+  case KEY_LEFT:
+    // page up
+    MoveCursor(-(int)items_visible);
+    return true;
+
+  case KEY_RIGHT:
+    // page down
+    MoveCursor(items_visible);
+    return true;
 
   case KEY_HOME:
     SetCursorIndex(0);

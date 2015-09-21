@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,7 +27,18 @@ Copyright_License {
 #include "Features.hpp"
 
 #ifdef ENABLE_SDL
-#include <SDL/SDL_opengl.h>
+#include <SDL_version.h>
+#if defined(HAVE_GLES) && (SDL_MAJOR_VERSION >= 2)
+#ifdef HAVE_GLES2
+#include <SDL_opengles2.h>
+#else
+#include <SDL_opengles.h>
+#endif
+#else
+#include <SDL_opengl.h>
+#endif
+#elif defined(HAVE_GLES2)
+#include <GLES2/gl2.h>
 #elif defined(HAVE_GLES)
 #include <GLES/gl.h>
 #else

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,15 +21,16 @@ Copyright_License {
 }
 */
 
-#include "Profile/InfoBoxConfig.hpp"
-#include "Profile/Profile.hpp"
+#include "InfoBoxConfig.hpp"
+#include "ProfileKeys.hpp"
+#include "Map.hpp"
 #include "InfoBoxes/InfoBoxSettings.hpp"
 #include "Asset.hpp"
 
 using namespace InfoBoxFactory;
 
 static void
-GetV60InfoBoxManagerConfig(InfoBoxSettings &settings)
+GetV60InfoBoxManagerConfig(const ProfileMap &map, InfoBoxSettings &settings)
 {
   char profileKey[16];
 
@@ -39,7 +40,7 @@ GetV60InfoBoxManagerConfig(InfoBoxSettings &settings)
   for (unsigned i = 0; i < InfoBoxSettings::Panel::MAX_CONTENTS; ++i) {
     sprintf(profileKey + 4, "%u", i);
     unsigned int temp = 0;
-    if (Profile::Get(profileKey, temp)) {
+    if (map.Get(profileKey, temp)) {
       settings.panels[0].contents[i] = (Type)( temp       & 0xFF);
       settings.panels[1].contents[i] = (Type)((temp >> 8) & 0xFF);
       settings.panels[2].contents[i] = (Type)((temp >> 16) & 0xFF);
@@ -49,10 +50,10 @@ GetV60InfoBoxManagerConfig(InfoBoxSettings &settings)
 }
 
 static bool
-GetIBType(const char *key, InfoBoxFactory::Type &val)
+GetIBType(const ProfileMap &map, const char *key, InfoBoxFactory::Type &val)
 {
   unsigned _val = val;
-  bool ret = Profile::Get(key, _val);
+  bool ret = map.Get(key, _val);
 
   if (_val >= e_NUM_TYPES)
     return false;
@@ -62,15 +63,16 @@ GetIBType(const char *key, InfoBoxFactory::Type &val)
 }
 
 void
-Profile::Load(InfoBoxSettings &settings)
+Profile::Load(const ProfileMap &map, InfoBoxSettings &settings)
 {
-  if (!Get(ProfileKeys::UseFinalGlideDisplayMode, settings.use_final_glide))
+  if (!map.Get(ProfileKeys::UseFinalGlideDisplayMode,
+               settings.use_final_glide))
     /* default value is "false" for new users, and "true" for existing
        users (to preserve old behaviour and avoid surprises); this is
        a hack to check if this is a new user */
-    settings.use_final_glide = Exists(ProfileKeys::InfoBoxGeometry);
+    settings.use_final_glide = map.Exists(ProfileKeys::InfoBoxGeometry);
 
-  GetEnum(ProfileKeys::InfoBoxGeometry, settings.geometry);
+  map.GetEnum(ProfileKeys::InfoBoxGeometry, settings.geometry);
 
   /* migrate from XCSoar older than 6.7 */
   switch (settings.geometry) {
@@ -94,6 +96,7 @@ Profile::Load(InfoBoxSettings &settings)
   case InfoBoxSettings::Geometry::RIGHT_9_VARIO:
   case InfoBoxSettings::Geometry::RIGHT_5:
   case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
+  case InfoBoxSettings::Geometry::RIGHT_16:
   case InfoBoxSettings::Geometry::RIGHT_24:
     break;
 
@@ -120,24 +123,29 @@ Profile::Load(InfoBoxSettings &settings)
     break;
   }
 
-  Get(ProfileKeys::AppInverseInfoBox, settings.inverse);
+  map.Get(ProfileKeys::AppInverseInfoBox, settings.inverse);
+  // auto this
   settings.use_colors = HasColors();
+  //map.Get(ProfileKeys::AppInfoBoxColors, settings.use_colors);
 
-  GetV60InfoBoxManagerConfig(settings);
+  // use default
+  //map.GetEnum(ProfileKeys::AppInfoBoxBorder, settings.border_style);
+
+  GetV60InfoBoxManagerConfig(map, settings);
   char profileKey[32];
   for (unsigned i = 0; i < settings.MAX_PANELS; ++i) {
     InfoBoxSettings::Panel &panel = settings.panels[i];
 
     if (i >= settings.PREASSIGNED_PANELS) {
       sprintf(profileKey, "InfoBoxPanel%uName", i);
-      Get(profileKey, panel.name.buffer(), panel.name.MAX_SIZE);
+      map.Get(profileKey, panel.name);
       if (panel.name.empty())
         _stprintf(panel.name.buffer(), _T("AUX-%u"), i-2);
     }
 
     for (unsigned j = 0; j < panel.MAX_CONTENTS; ++j) {
       sprintf(profileKey, "InfoBoxPanel%uBox%u", i, j);
-      GetIBType(profileKey, panel.contents[j]);
+      GetIBType(map, profileKey, panel.contents[j]);
     }
   }
 
@@ -145,17 +153,18 @@ Profile::Load(InfoBoxSettings &settings)
 }
 
 void
-Profile::Save(const InfoBoxSettings::Panel &panel, unsigned index)
+Profile::Save(ProfileMap &map,
+              const InfoBoxSettings::Panel &panel, unsigned index)
 {
   char profileKey[32];
 
   if (index >= InfoBoxSettings::PREASSIGNED_PANELS) {
     sprintf(profileKey, "InfoBoxPanel%uName", index);
-    Set(profileKey, panel.name);
+    map.Set(profileKey, panel.name);
   }
 
   for (unsigned j = 0; j < panel.MAX_CONTENTS; ++j) {
     sprintf(profileKey, "InfoBoxPanel%uBox%u", index, j);
-    Set(profileKey, panel.contents[j]);
+    map.Set(profileKey, panel.contents[j]);
   }
 }

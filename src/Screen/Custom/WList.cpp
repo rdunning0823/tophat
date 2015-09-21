@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,9 +31,9 @@ void
 WindowList::Clear()
 {
   /* destroy all child windows */
-  std::list<Window *>::const_iterator i;
+  List::iterator i;
   while ((i = list.begin()) != list.end()) {
-    Window &w = **i;
+    Window &w = *i;
     w.Destroy();
 
     assert(!Contains(w));
@@ -45,7 +45,11 @@ WindowList::Clear()
 bool
 WindowList::Contains(const Window &w) const
 {
-  return std::find(list.begin(), list.end(), &w) != list.end();
+  for (const auto &i : list)
+    if (&i == &w)
+      return true;
+
+  return false;
 }
 
 bool
@@ -58,12 +62,12 @@ WindowList::IsCovered(const Window &w) const
   for (auto i = list.begin();; ++i) {
     assert(i != list.end());
 
-    Window &child = **i;
+    const Window &child = *i;
     if (&child == &w)
       /* didn't find a covering sibling so far */
       return false;
 
-    if (child.IsVisible() &&
+    if (child.IsVisible() && !child.IsTransparent() &&
         child.GetLeft() <= rc.left &&
         child.GetRight() >= rc.right &&
         child.GetTop() <= rc.top &&
@@ -78,8 +82,8 @@ WindowList::BringToTop(Window &w)
 {
   assert(Contains(w));
 
-  list.remove(&w);
-  list.insert(list.begin(), &w);
+  list.erase(list.iterator_to(w));
+  list.push_front(w);
 }
 
 void
@@ -87,8 +91,8 @@ WindowList::BringToBottom(Window &w)
 {
   assert(Contains(w));
 
-  list.remove(&w);
-  list.push_back(&w);
+  list.erase(list.iterator_to(w));
+  list.push_back(w);
 }
 
 gcc_pure
@@ -103,20 +107,19 @@ IsAt(Window &w, PixelScalar x, PixelScalar y)
 Window *
 WindowList::FindAt(PixelScalar x, PixelScalar y)
 {
-  for (Window *w : list)
-    if (w->IsEnabled() && IsAt(*w, x, y))
-      return w;
+  for (Window &w : list)
+    if (w.IsEnabled() && IsAt(w, x, y))
+      return &w;
 
-  return NULL;
+  return nullptr;
 }
 
 gcc_pure
 Window *
-WindowList::FindControl(std::list<Window*>::const_iterator i,
-                        std::list<Window*>::const_iterator end)
+WindowList::FindControl(List::iterator i, WindowList::List::iterator end)
 {
   for (; i != end; ++i) {
-    Window &child = **i;
+    Window &child = *i;
     if (!child.IsVisible() || !child.IsEnabled())
       continue;
 
@@ -126,21 +129,21 @@ WindowList::FindControl(std::list<Window*>::const_iterator i,
     if (child.IsControlParent()) {
       ContainerWindow &container = (ContainerWindow &)child;
       Window *control = container.children.FindFirstControl();
-      if (control != NULL)
+      if (control != nullptr)
         return control;
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 gcc_pure
 Window *
-WindowList::FindControl(std::list<Window*>::const_reverse_iterator i,
-                        std::list<Window*>::const_reverse_iterator end)
+WindowList::FindControl(WindowList::List::reverse_iterator i,
+                        WindowList::List::reverse_iterator end)
 {
   for (; i != end; ++i) {
-    Window &child = **i;
+    Window &child = *i;
     if (!child.IsVisible() || !child.IsEnabled())
       continue;
 
@@ -150,12 +153,12 @@ WindowList::FindControl(std::list<Window*>::const_reverse_iterator i,
     if (child.IsControlParent()) {
       ContainerWindow &container = (ContainerWindow &)child;
       Window *control = container.children.FindLastControl();
-      if (control != NULL)
+      if (control != nullptr)
         return control;
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 Window *
@@ -173,11 +176,10 @@ WindowList::FindLastControl()
 Window *
 WindowList::FindNextChildControl(Window *reference)
 {
-  assert(reference != NULL);
+  assert(reference != nullptr);
   assert(Contains(*reference));
 
-  std::list<Window*>::const_iterator i =
-    std::find(list.begin(), list.end(), reference);
+  auto i = list.iterator_to(*reference);
   assert(i != list.end());
 
   return FindControl(++i, list.end());
@@ -186,16 +188,14 @@ WindowList::FindNextChildControl(Window *reference)
 Window *
 WindowList::FindPreviousChildControl(Window *reference)
 {
-  assert(reference != NULL);
+  assert(reference != nullptr);
   assert(Contains(*reference));
 
-  std::list<Window*>::const_reverse_iterator i =
-    std::find(list.rbegin(), list.rend(), reference);
-#ifndef ANDROID
-  /* Android's NDK r5b ships a cxx-stl which does not allow comparing
-     two const_reverse_iterator objects for inequality */
+  /* the std::next() is necessary because reverse iterators
+     dereference to std::previous() - sounds like an awkward design
+     decision, but that's how it is */
+  List::reverse_iterator i(std::next(list.iterator_to(*reference)));
   assert(i != list.rend());
-#endif
 
   return FindControl(++i, list.rend());
 }
@@ -212,20 +212,19 @@ IsFullWindow(const Window &w, int width, int height)
 void
 WindowList::Paint(Canvas &canvas)
 {
-  const auto &list = this->list;
-
   auto begin = list.rbegin(), end = list.rend();
 
   /* find the last full window which covers all the other windows
      behind it */
   for (auto i = begin; i != end; ++i) {
-    Window &child = **i;
-    if (IsFullWindow(child, canvas.GetWidth(), canvas.GetHeight()))
+    Window &child = *i;
+    if (IsFullWindow(child, canvas.GetWidth(), canvas.GetHeight()) &&
+        !child.IsTransparent())
       begin = i;
   }
 
   for (auto i = begin; i != end; ++i) {
-    Window &child = **i;
+    PaintWindow &child = (PaintWindow &)*i;
     if (!child.IsVisible())
       continue;
 
@@ -238,7 +237,6 @@ WindowList::Paint(Canvas &canvas)
       continue;
 #endif
 
-    child.Setup(sub_canvas);
     child.OnPaint(sub_canvas);
   }
 }

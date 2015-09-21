@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -218,12 +218,13 @@ InfoBoxContentWindArrow::Update(InfoBoxData &data)
 
   data.SetCustom();
 
-  TCHAR speed_buffer[16], bearing_buffer[16];
+  TCHAR speed_buffer[16];
   FormatUserWindSpeed(info.wind.norm, speed_buffer, true, false);
-  FormatBearing(bearing_buffer, ARRAY_SIZE(bearing_buffer), info.wind.bearing);
 
   StaticString<32> buffer;
-  buffer.Format(_T("%s / %s"), bearing_buffer, speed_buffer);
+  buffer.Format(_T("%s / %s"),
+                FormatBearing(info.wind.bearing).c_str(),
+                speed_buffer);
   data.SetComment(buffer);
 }
 
@@ -234,8 +235,8 @@ InfoBoxContentWindArrow::OnCustomPaint(Canvas &canvas, const PixelRect &rc)
 
   const RasterPoint pt = rc.GetCenter();
 
-  UPixelScalar padding = Layout::FastScale(10);
-  UPixelScalar size = std::min(rc.right - rc.left, rc.bottom - rc.top);
+  const unsigned padding = Layout::FastScale(10u);
+  unsigned size = std::min(rc.right - rc.left, rc.bottom - rc.top);
 
   if (size > padding)
     size -= padding;
@@ -246,10 +247,10 @@ InfoBoxContentWindArrow::OnCustomPaint(Canvas &canvas, const PixelRect &rc)
 
   auto angle = info.wind.bearing - CommonInterface::Basic().attitude.heading;
 
-  PixelScalar length =
-    std::min(size, (UPixelScalar)std::max(10, iround(Quadruple(info.wind.norm))));
+  const int length =
+    std::min(size, std::max(10u, uround(Quadruple(info.wind.norm))));
 
-  PixelScalar offset = -length / 2;
+  const int offset = -length / 2;
 
   auto style = CommonInterface::GetMapSettings().wind_arrow_style;
 

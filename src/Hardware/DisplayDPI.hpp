@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,13 +38,17 @@ namespace Display {
    * Returns the number of pixels per logical inch along the screen width
    * @return Number of pixels per logical inch along the screen width
    */
+#ifndef __APPLE__
   gcc_const
+#endif
   unsigned GetXDPI();
   /**
    * Returns the number of pixels per logical inch along the screen height
    * @return Number of pixels per logical inch along the screen height
    */
+#ifndef __APPLE__
   gcc_const
+#endif
   unsigned GetYDPI();
 }
 

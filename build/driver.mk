@@ -40,6 +40,7 @@ IMI_SOURCES = \
 
 LX_SOURCES = \
 	$(DRIVER_SRC_DIR)/LX/NanoLogger.cpp \
+	$(DRIVER_SRC_DIR)/LX/NanoDeclare.cpp \
 	$(DRIVER_SRC_DIR)/LX/Protocol.cpp \
 	$(DRIVER_SRC_DIR)/LX/Mode.cpp \
 	$(DRIVER_SRC_DIR)/LX/Parser.cpp \
@@ -75,15 +76,24 @@ VEGA_SOURCES = \
 	$(DRIVER_SRC_DIR)/Vega/Volatile.cpp \
 	$(DRIVER_SRC_DIR)/Vega/Register.cpp
 
+BLUEFLY_SOURCES = \
+	$(DRIVER_SRC_DIR)/BlueFly/Misc.cpp \
+	$(DRIVER_SRC_DIR)/BlueFly/Parser.cpp \
+	$(DRIVER_SRC_DIR)/BlueFly/Settings.cpp \
+	$(DRIVER_SRC_DIR)/BlueFly/Register.cpp
+
 DRIVER_SOURCES = \
+	$(SRC)/Device/Driver.cpp \
+	$(SRC)/Device/Register.cpp \
 	$(VOLKSLOGGER_SOURCES) \
+	$(CAI302_SOURCES) \
 	$(IMI_SOURCES) \
 	$(LX_SOURCES) \
 	$(FLARM_SOURCES) \
 	$(FLYTEC_SOURCES) \
 	$(VEGA_SOURCES) \
+	$(BLUEFLY_SOURCES) \
 	$(DRIVER_SRC_DIR)/AltairPro.cpp \
-	$(DRIVER_SRC_DIR)/BlueFlyVario.cpp \
 	$(DRIVER_SRC_DIR)/BorgeltB50.cpp \
 	$(DRIVER_SRC_DIR)/CaiGpsNav.cpp \
 	$(DRIVER_SRC_DIR)/CaiLNav.cpp \
@@ -105,11 +115,8 @@ DRIVER_SOURCES = \
 	$(DRIVER_SRC_DIR)/XCOM760.cpp \
 	$(DRIVER_SRC_DIR)/ILEC.cpp \
 	$(DRIVER_SRC_DIR)/Westerboer.cpp \
-	$(DRIVER_SRC_DIR)/WesterboerVW921.cpp \
 	$(DRIVER_SRC_DIR)/Zander.cpp \
-	$(DRIVER_SRC_DIR)/Vaulter.cpp
+	$(DRIVER_SRC_DIR)/Vaulter.cpp \
+	$(DRIVER_SRC_DIR)/ATR833.cpp
 
 $(eval $(call link-library,driver,DRIVER))
-
-$(eval $(call link-library,cai302,CAI302))
-DRIVER_LDADD += $(CAI302_LDADD)

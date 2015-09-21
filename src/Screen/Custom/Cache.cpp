@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,12 +26,17 @@ Copyright_License {
 #include "Screen/Font.hpp"
 #include "Util/Cache.hpp"
 #include "Util/StringUtil.hpp"
+#include "Util/StringAPI.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Debug.hpp"
 #else
 #include "Thread/Mutex.hpp"
+#endif
+
+#ifdef UNICODE
+#include "Util/ConvertString.hpp"
 #endif
 
 #include <assert.h>
@@ -56,11 +61,11 @@ struct TextCacheKey {
     :font(other.font),
      text(other.text), allocated(other.allocated),
      hash(other.hash) {
-    other.allocated = NULL;
+    other.allocated = nullptr;
   }
 
   TextCacheKey(const Font &_font, const char *_text)
-    :font(&_font), text(_text), allocated(NULL) {}
+    :font(&_font), text(_text), allocated(nullptr) {}
 
   ~TextCacheKey() {
     free(allocated);
@@ -71,7 +76,7 @@ struct TextCacheKey {
    * this key into the #Cache.
    */
   void Allocate() {
-    assert(allocated == NULL);
+    assert(allocated == nullptr);
 
     text = allocated = strdup(text);
   }
@@ -127,7 +132,7 @@ struct RenderedText {
 #ifdef ENABLE_OPENGL
   RenderedText(RenderedText &&other)
     :texture(other.texture) {
-    other.texture = NULL;
+    other.texture = nullptr;
   }
 
 #ifdef USE_FREETYPE
@@ -203,10 +208,14 @@ TextCache::GetSize(const Font &font, const char *text)
 
   TextCacheKey key(font, text);
   const PixelSize *cached = size_cache.Get(key);
-  if (cached != NULL)
+  if (cached != nullptr)
     return *cached;
 
+#ifdef UNICODE
+  PixelSize size = font.TextSize(UTF8ToWideConverter(text));
+#else
   PixelSize size = font.TextSize(text);
+#endif
 
   key.Allocate();
   size_cache.Put(std::move(key), std::move(size));
@@ -227,7 +236,7 @@ TextCache::LookupSize(const Font &font, const char *text)
 
   TextCacheKey key(font, text);
   const RenderedText *cached = text_cache.Get(key);
-  if (cached == NULL)
+  if (cached == nullptr)
     return size;
 
 #ifdef ENABLE_OPENGL
@@ -244,7 +253,7 @@ TextCache::Get(const Font &font, const char *text)
   assert(pthread_equal(pthread_self(), OpenGL::thread));
 #endif
   assert(font.IsDefined());
-  assert(text != NULL);
+  assert(text != nullptr);
 
   if (StringIsEmpty(text)) {
 #ifdef ENABLE_OPENGL
@@ -263,13 +272,18 @@ TextCache::Get(const Font &font, const char *text)
 #endif
 
   const RenderedText *cached = text_cache.Get(key);
-  if (cached != NULL)
+  if (cached != nullptr)
     return *cached;
 
   /* render the text into a OpenGL texture */
 
 #ifdef USE_FREETYPE
-  PixelSize size = font.TextSize(text);
+#if defined(USE_FREETYPE) && defined(UNICODE)
+  UTF8ToWideConverter text2(text);
+#else
+  const TCHAR* text2 = text;
+#endif
+  PixelSize size = font.TextSize(text2);
   size_t buffer_size = font.BufferSize(size);
   if (buffer_size == 0) {
 #ifdef ENABLE_OPENGL
@@ -288,7 +302,7 @@ TextCache::Get(const Font &font, const char *text)
 #endif
   }
 
-  font.Render(text, size, buffer);
+  font.Render(text2, size, buffer);
   RenderedText rt(size.cx, size.cy, buffer);
 #ifdef ENABLE_OPENGL
   delete[] buffer;
@@ -297,7 +311,7 @@ TextCache::Get(const Font &font, const char *text)
   PixelSize size, allocated_size;
   int texture_id = font.TextTextureGL(text, size, allocated_size);
   if (texture_id == 0)
-    return NULL;
+    return nullptr;
 
   RenderedText rt(texture_id, size.cx, size.cy,
                   allocated_size.cx, allocated_size.cy);

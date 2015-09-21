@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,14 +36,14 @@ DrawArrow(Canvas &canvas, RasterPoint point, const fixed mag, const Angle angle)
 {
   const FastRotation r(angle);
 
-  FastRotation::Pair p = r.Rotate(mag, fixed(0));
-  canvas.DrawLine(point, point + RasterPoint((int)p.first, (int)p.second));
+  auto p = r.Rotate(mag, fixed(0));
+  canvas.DrawLine(point, point + RasterPoint((int)p.x, (int)p.y));
 
   p = r.Rotate(mag - fixed(5), fixed(-3));
-  canvas.DrawLine(point, point + RasterPoint((int)p.first, (int)p.second));
+  canvas.DrawLine(point, point + RasterPoint((int)p.x, (int)p.y));
 
   p = r.Rotate(mag - fixed(5), fixed(3));
-  canvas.DrawLine(point, point + RasterPoint((int)p.first, (int)p.second));
+  canvas.DrawLine(point, point + RasterPoint((int)p.x, (int)p.y));
 }
 
 void
@@ -57,21 +57,25 @@ RenderWindChart(Canvas &canvas, const PixelRect rc,
   bool found = true;
 
   LeastSquares windstats_mag;
+
   ChartRenderer chart(chart_look, canvas, rc);
 
-  if (fs.altitude_ceiling.y_max - fs.altitude_ceiling.y_min <= fixed(10)) {
+  const fixed height =
+    fs.altitude_ceiling.GetMaxY() - fs.altitude_ceiling.GetMinY();
+  if (height <= fixed(10)) {
     chart.DrawNoData();
     return;
   }
 
+  windstats_mag.Reset();
+
   for (unsigned i = 0; i < numsteps; i++) {
-    fixed h = fixed(fs.altitude_ceiling.y_max - fs.altitude_base.y_min) * i /
-              (numsteps - 1) + fixed(fs.altitude_base.y_min);
+    fixed h = height * i / (numsteps - 1) + fs.altitude_base.GetMinY();
 
     Vector wind = wind_store.GetWind(nmea_info.time, h, found);
     fixed mag = wind.Magnitude();
 
-    windstats_mag.LeastSquaresUpdate(mag, h);
+    windstats_mag.Update(mag, h);
   }
 
   chart.ScaleXFromData(windstats_mag);
@@ -93,17 +97,16 @@ RenderWindChart(Canvas &canvas, const PixelRect rc,
   canvas.Select(chart_look.GetPen(ChartLook::STYLE_MEDIUMBLACK));
 
   // draw direction vectors
+  const fixed x_max = std::max(windstats_mag.GetMaxX(),
+                               fixed(1)); // prevent /0 problems
   fixed hfact;
   for (unsigned i = 0; i < numsteps; i++) {
     hfact = fixed(i + 1) / (numsteps + 1);
-    fixed h = fixed(fs.altitude_ceiling.y_max - fs.altitude_base.y_min) * hfact +
-              fixed(fs.altitude_base.y_min);
+    fixed h = height * hfact + fs.altitude_base.GetMinY();
 
     Vector wind = wind_store.GetWind(nmea_info.time, h, found);
-    if (windstats_mag.x_max == fixed(0))
-      windstats_mag.x_max = fixed(1); // prevent /0 problems
-    wind.x /= fixed(windstats_mag.x_max);
-    wind.y /= fixed(windstats_mag.x_max);
+    wind.x /= x_max;
+    wind.y /= x_max;
     fixed mag = wind.Magnitude();
     if (negative(mag))
       continue;

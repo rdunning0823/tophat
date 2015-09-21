@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Screen/Canvas.hpp"
 #include "Asset.hpp"
+#include "Util/StringAPI.hpp"
 
 #ifndef NDEBUG
 #include "Util/UTF8.hpp"
@@ -33,38 +34,10 @@ Copyright_License {
 #include <string.h>
 #include <winuser.h>
 
-void
-Canvas::DrawButton(PixelRect rc, bool down)
-{
-  const Pen old_pen = pen;
-
-  Color gray = IsDithered()
-    ? (down ? COLOR_BLACK : COLOR_WHITE)
-    : COLOR_LIGHT_GRAY;
-  DrawFilledRectangle(rc, gray);
-
-  Pen bright(1, IsDithered() ? COLOR_BLACK : LightColor(gray));
-  Pen dark(1, IsDithered() ? COLOR_BLACK : DarkColor(gray));
-
-  Select(down ? dark : bright);
-  DrawTwoLinesExact(rc.left, rc.bottom - 2, rc.left, rc.top,
-                    rc.right - 2, rc.top);
-  DrawTwoLinesExact(rc.left + 1, rc.bottom - 3, rc.left + 1, rc.top + 1,
-                    rc.right - 3, rc.top + 1);
-
-  Select(down ? bright : dark);
-  DrawTwoLinesExact(rc.left + 1, rc.bottom - 1, rc.right - 1, rc.bottom - 1,
-                    rc.right - 1, rc.top + 1);
-  DrawTwoLinesExact(rc.left + 2, rc.bottom - 2, rc.right - 2, rc.bottom - 2,
-                    rc.right - 2, rc.top + 2);
-
-  pen = old_pen;
-}
-
 const PixelSize
 Canvas::CalcTextSize(const TCHAR *text, size_t length) const
 {
-  assert(text != NULL);
+  assert(text != nullptr);
 
   TCHAR *duplicated = _tcsdup(text);
   duplicated[length] = 0;
@@ -82,12 +55,12 @@ Canvas::CalcTextSize(const TCHAR *text, size_t length) const
 void
 Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
 {
-  assert(text != NULL);
+  assert(text != nullptr);
 #ifndef UNICODE
   assert(ValidateUTF8(text));
 #endif
 
-  if (font == NULL)
+  if (font == nullptr)
     return;
 
   unsigned skip = font->GetLineSpacing();
@@ -102,7 +75,7 @@ Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
     if (ch == _T('\n')) {
       /* explicit line break */
 
-      if (++lines >= max_lines)
+      if (++lines > max_lines)
         break;
 
       ch = _T('\0');
@@ -124,11 +97,11 @@ Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
   if (format & DT_WORDBREAK) {
     for (size_t i = 0; i < len; i += _tcslen(duplicated + i) + 1) {
       PixelSize sz = CalcTextSize(duplicated + i);
-      TCHAR *prev_p = NULL;
+      TCHAR *prev_p = nullptr;
 
       // remove words from behind till line fits or no more space is found
       while (sz.cx > rc->right - rc->left &&
-             (p = _tcsrchr(duplicated + i, _T(' '))) != NULL) {
+             (p = StringFindLast(duplicated + i, _T(' '))) != nullptr) {
         if (prev_p)
           *prev_p = _T(' ');
         *p = _T('\0');
@@ -182,11 +155,10 @@ void
 Canvas::DrawText(int x, int y,
                  const TCHAR *_text, size_t length)
 {
-  assert(_text != NULL);
+  assert(_text != nullptr);
 
   TCHAR copy[length + 1];
-  std::copy(_text, _text + length, copy);
-  copy[length] = _T('\0');
+  *std::copy_n(_text, length, copy) = _T('\0');
 
 #ifndef UNICODE
   assert(ValidateUTF8(copy));
@@ -199,7 +171,7 @@ void
 Canvas::DrawOpaqueText(int x, int y, const PixelRect &rc,
                        const TCHAR *_text)
 {
-  assert(_text != NULL);
+  assert(_text != nullptr);
 #ifndef UNICODE
   assert(ValidateUTF8(_text));
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,7 +33,9 @@ Copyright_License {
 
 #ifdef USE_GDI
 #include <windows.h>
-#endif /* GDI */
+#else
+#include <boost/intrusive/list.hpp>
+#endif
 
 #ifdef ANDROID
 struct Event;
@@ -56,21 +58,18 @@ protected:
   bool tab_stop, control_parent;
   bool double_clicks;
   bool has_border;
-  unsigned text_style;
 
 public:
   constexpr
   WindowStyle()
     :visible(true), enabled(true),
      tab_stop(false), control_parent(false),
-     double_clicks(false), has_border(false),
-     text_style(0) {}
+     double_clicks(false), has_border(false) {}
 
 #else /* USE_GDI */
 protected:
   DWORD style, ex_style;
   bool double_clicks;
-  bool custom_painting;
 
 #ifdef _WIN32_WCE
   /* workaround for gcc optimization bug on ARM/XScale */
@@ -81,7 +80,7 @@ public:
   constexpr
   WindowStyle()
     :style(WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS),
-     ex_style(0), double_clicks(false), custom_painting(false)
+     ex_style(0), double_clicks(false)
 #ifdef _WIN32_WCE
     , dummy0(0), dummy1(0)
 #endif
@@ -166,12 +165,6 @@ public:
 #endif
   }
 
-  void EnableCustomPainting() {
-#ifdef USE_GDI
-    custom_painting = true;
-#endif
-  }
-
   void EnableDoubleClicks() {
     double_clicks = true;
   }
@@ -187,6 +180,12 @@ public:
 class Window {
   friend class ContainerWindow;
 
+#ifndef USE_GDI
+  friend class WindowList;
+  typedef boost::intrusive::list_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>> SiblingsHook;
+  SiblingsHook siblings;
+#endif
+
 protected:
 #ifndef USE_GDI
   ContainerWindow *parent;
@@ -196,12 +195,10 @@ private:
   PixelSize size;
 
 private:
-  const Font *font;
-  unsigned text_style;
-
   bool tab_stop, control_parent;
 
   bool visible;
+  bool transparent;
   bool enabled;
   bool focused;
   bool capture;
@@ -215,33 +212,22 @@ private:
 
 private:
   bool double_clicks;
-  bool custom_painting;
 
 public:
 #ifndef USE_GDI
   Window()
-    :parent(NULL), size(0, 0),
-     font(NULL),
-     visible(true), focused(false), capture(false), has_border(false),
+    :parent(nullptr), size(0, 0),
+     visible(true), transparent(false),
+     focused(false), capture(false), has_border(false),
      double_clicks(false) {}
 #else
-  Window():hWnd(NULL), prev_wndproc(NULL),
-           double_clicks(false), custom_painting(false) {}
+  Window():hWnd(nullptr), prev_wndproc(nullptr),
+           double_clicks(false) {}
 #endif
   virtual ~Window();
 
   Window(const Window &other) = delete;
   Window &operator=(const Window &other) = delete;
-
-  /**
-   * Activates the OnPaint() method.  It is disabled by default
-   * because its preparation would needlessly allocate resources.
-   */
-  void EnableCustomPainting() {
-#ifdef USE_GDI
-    custom_painting = true;
-#endif
-  }
 
 #ifndef USE_GDI
   const ContainerWindow *GetParent() const {
@@ -290,12 +276,6 @@ protected:
   void AssertThreadOrUndefined() const;
 #endif
 
-#ifdef USE_GDI
-  bool GetCustomPainting() const {
-    return custom_painting;
-  }
-#endif
-
 #ifndef USE_GDI
   bool HasBorder() const {
     return has_border;
@@ -307,7 +287,7 @@ public:
 #ifndef USE_GDI
     return size.cx > 0;
 #else
-    return hWnd != NULL;
+    return hWnd != nullptr;
 #endif
   }
 
@@ -342,10 +322,6 @@ public:
 
   PixelScalar GetBottom() const {
     return GetTop() + GetHeight();
-  }
-
-  unsigned GetTextStyle() const {
-    return text_style;
   }
 #else /* USE_GDI */
   UPixelScalar GetWidth() const {
@@ -400,7 +376,7 @@ public:
     position = { left, top };
     Invalidate();
 #else
-    ::SetWindowPos(hWnd, NULL, left, top, 0, 0,
+    ::SetWindowPos(hWnd, nullptr, left, top, 0, 0,
                    SWP_NOSIZE | SWP_NOZORDER |
                    SWP_NOACTIVATE | SWP_NOOWNERZORDER);
 #endif
@@ -415,7 +391,7 @@ public:
     Move(left, top);
     Resize(width, height);
 #else /* USE_GDI */
-    ::SetWindowPos(hWnd, NULL, left, top, width, height,
+    ::SetWindowPos(hWnd, nullptr, left, top, width, height,
                    SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
     // XXX store new size?
 #endif
@@ -448,7 +424,7 @@ public:
 #ifndef USE_GDI
     Move(left, top, width, height);
 #else /* USE_GDI */
-    ::SetWindowPos(hWnd, NULL, left, top, width, height,
+    ::SetWindowPos(hWnd, nullptr, left, top, width, height,
                    SWP_NOCOPYBITS | SWP_NOREDRAW | SWP_DEFERERASE |
                    SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
 #endif
@@ -467,7 +443,7 @@ public:
     AssertThread();
 
 #ifdef USE_GDI
-    ::SetWindowPos(hWnd, NULL,
+    ::SetWindowPos(hWnd, nullptr,
                    rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
                    SWP_SHOWWINDOW | SWP_NOACTIVATE |
                    SWP_NOZORDER | SWP_NOOWNERZORDER);
@@ -490,7 +466,7 @@ public:
     Invalidate();
     OnResize(size);
 #else /* USE_GDI */
-    ::SetWindowPos(hWnd, NULL, 0, 0, width, height,
+    ::SetWindowPos(hWnd, nullptr, 0, 0, width, height,
                    SWP_NOMOVE | SWP_NOZORDER |
                    SWP_NOACTIVATE | SWP_NOOWNERZORDER);
     // XXX store new size?
@@ -542,21 +518,6 @@ public:
 
 #ifdef USE_GDI
   void SetFont(const Font &_font);
-#else
-  void SetFont(const Font &_font) {
-    AssertNoneLocked();
-    AssertThread();
-
-    font = &_font;
-    Invalidate();
-  }
-
-  const Font &GetFont() const {
-    AssertThread();
-    assert(font != NULL);
-
-    return *font;
-  }
 #endif
 
   /**
@@ -602,7 +563,7 @@ public:
 #ifndef USE_GDI
     Hide();
 #else
-    ::SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+    ::SetWindowPos(hWnd, nullptr, 0, 0, 0, 0,
                    SWP_HIDEWINDOW |
                    SWP_NOCOPYBITS | SWP_NOREDRAW | SWP_DEFERERASE |
                    SWP_NOMOVE | SWP_NOSIZE |
@@ -618,18 +579,44 @@ public:
   }
 
 #ifndef USE_GDI
+  bool IsTransparent() const {
+    return transparent;
+  }
+
+  /**
+   * Declare this window "transparent".  This means that portions of
+   * the windows below it may be visible, and it will not be
+   * considered "covering" windows behind it completely.  This flag is
+   * evaluated by WindowList::IsCovered().
+   */
+  void SetTransparent() {
+    assert(!transparent);
+
+    transparent = true;
+  }
+#endif
+
+  gcc_pure
   bool IsTabStop() const {
     assert(IsDefined());
 
+#ifdef USE_GDI
+    return (GetStyle() & WS_VISIBLE) != 0;
+#else
     return tab_stop;
+#endif
   }
 
+  gcc_pure
   bool IsControlParent() const {
     assert(IsDefined());
 
+#ifdef USE_GDI
+    return (GetExStyle() & WS_EX_CONTROLPARENT) != 0;
+#else
     return control_parent;
-  }
 #endif
+  }
 
   /**
    * Can this window get user input?
@@ -702,6 +689,18 @@ public:
   void SetCapture();
   void ReleaseCapture();
   virtual void ClearCapture();
+
+protected:
+#if defined(USE_X11) || defined(USE_WAYLAND)
+  virtual void EnableCapture() {}
+  virtual void DisableCapture() {}
+#else
+  void EnableCapture() {}
+  void DisableCapture() {}
+#endif
+
+public:
+
 #else /* USE_GDI */
 
   void SetCapture() {
@@ -774,7 +773,7 @@ public:
     PixelRect rc = GetScreenPosition();
 
     HWND parent = ::GetParent(hWnd);
-    if (parent != NULL) {
+    if (parent != nullptr) {
       POINT pt;
 
       pt.x = rc.left;
@@ -849,7 +848,7 @@ public:
     assert(IsDefined());
 
     HWND hParent = ::GetParent(hWnd);
-    assert(hParent != NULL);
+    assert(hParent != nullptr);
 
     PixelRect rc;
     ::GetClientRect(hParent, &rc);
@@ -861,8 +860,6 @@ public:
 #endif
 
 #ifndef USE_GDI
-  void Setup(Canvas &canvas);
-
   virtual void Invalidate();
 #else /* USE_GDI */
   HDC BeginPaint(PAINTSTRUCT *ps) {
@@ -880,7 +877,8 @@ public:
   void Scroll(PixelScalar dx, PixelScalar dy, const PixelRect &rc) {
     assert(IsDefined());
 
-    ::ScrollWindowEx(hWnd, dx, dy, &rc, NULL, NULL, NULL, SW_INVALIDATE);
+    ::ScrollWindowEx(hWnd, dx, dy, &rc, nullptr, nullptr, nullptr,
+                     SW_INVALIDATE);
   }
 
   /**
@@ -893,7 +891,7 @@ public:
   }
 
   /**
-   * Converts a #HWND into a #Window pointer.  Returns NULL if the
+   * Converts a #HWND into a #Window pointer.  Returns nullptr if the
    * HWND is not a Window peer.  This only works for windows which
    * have called InstallWndProc().
    */
@@ -909,7 +907,7 @@ public:
       || ((DWORD)wndproc & 0xffffff) == (DWORD)WndProc
 #endif
       ? GetUnchecked(hWnd)
-      : NULL;
+      : nullptr;
   }
 
   gcc_pure
@@ -1003,15 +1001,15 @@ public:
    */
   virtual bool OnCharacter(unsigned ch);
 
+#ifdef USE_GDI
   virtual bool OnCommand(unsigned id, unsigned code);
+#endif
+
   virtual void OnCancelMode();
   virtual void OnSetFocus();
   virtual void OnKillFocus();
   virtual bool OnTimer(WindowTimer &timer);
   virtual bool OnUser(unsigned id);
-
-  virtual void OnPaint(Canvas &canvas);
-  virtual void OnPaint(Canvas &canvas, const PixelRect &dirty);
 
 #ifdef USE_GDI
   /**

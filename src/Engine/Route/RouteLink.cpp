@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@
 #include "GlideSolvers/GlideResult.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "Geo/SpeedVector.hpp"
-#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/Flat/FlatProjection.hpp"
 #include "Math/FastMath.h"
 
 #include <assert.h>
@@ -50,21 +50,21 @@ XYToIndex(fixed x, fixed y)
   return AngleToIndex(Angle::FromXY(y, x));
 }
 
-RouteLink::RouteLink (const RouteLinkBase& _link, const TaskProjection &proj)
+RouteLink::RouteLink (const RouteLinkBase& _link, const FlatProjection &proj)
   :RouteLinkBase(_link)
 {
   CalcSpeedups(proj);
 }
 
 RouteLink::RouteLink (const RoutePoint& _destination, const RoutePoint& _origin,
-                      const TaskProjection &proj)
+                      const FlatProjection &proj)
   :RouteLinkBase(_destination, _origin)
 {
   CalcSpeedups(proj);
 }
 
 void
-RouteLink::CalcSpeedups(const TaskProjection& proj)
+RouteLink::CalcSpeedups(const FlatProjection &proj)
 {
   const fixed scale = proj.GetApproximateScale();
   const fixed dx = fixed(first.longitude - second.longitude);

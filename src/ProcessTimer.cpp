@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,13 +28,14 @@ Copyright_License {
 #include "Input/InputQueue.hpp"
 #include "Input/InputEvents.hpp"
 #include "Device/device.hpp"
-#include "Device/All.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Screen/Blank.hpp"
 #include "UtilsSystem.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Components.hpp"
 #include "Time/PeriodClock.hpp"
 #include "MainWindow.hpp"
+#include "PopupMessage.hpp"
 #include "Asset.hpp"
 #include "Simulator.hpp"
 #include "Replay/Replay.hpp"
@@ -64,7 +65,8 @@ static void
 MessageProcessTimer()
 {
   // don't display messages if airspace warning dialog is active
-  if (CommonInterface::main_window->popup.Render())
+  if (CommonInterface::main_window->popup != nullptr &&
+      CommonInterface::main_window->popup->Render())
     // turn screen on if blanked and receive a new message
     ResetUserIdle();
 }
@@ -165,7 +167,7 @@ BallastDumpProcessTimer()
     // Plane is dry now -> disable ballast_timer
     settings_computer.polar.ballast_timer_active = false;
 
-  if (protected_task_manager != NULL)
+  if (protected_task_manager != nullptr)
     protected_task_manager->SetGlidePolar(glide_polar);
 }
 
@@ -210,23 +212,10 @@ ProcessAutoBugs()
 }
 
 static void
-ManualWindProcessTimer()
-{
-  ComputerSettings &settings_computer =
-    CommonInterface::SetComputerSettings();
-  const DerivedInfo &calculated = CommonInterface::Calculated();
-
-  /* as soon as another wind setting is used, clear the manual wind */
-  if (calculated.wind_available.Modified(settings_computer.wind.manual_wind_available))
-    settings_computer.wind.manual_wind_available.Clear();
-}
-
-static void
 SettingsProcessTimer()
 {
   BallastDumpProcessTimer();
   ProcessAutoBugs();
-  ManualWindProcessTimer();
 }
 
 static void
@@ -246,6 +235,9 @@ CommonProcessTimer()
 static void
 ConnectionProcessTimer()
 {
+  if (devices == nullptr)
+    return;
+
   static bool connected_last = false;
   static bool location_last = false;
   static bool wait_connect = false;
@@ -275,7 +267,7 @@ ConnectionProcessTimer()
   /* this OperationEnvironment instance must be persistent, because
      DeviceDescriptor::Open() is asynchronous */
   static QuietOperationEnvironment env;
-  AllDevicesAutoReopen(env);
+  devices->AutoReopen(env);
 }
 
 void
@@ -285,7 +277,8 @@ ProcessTimer()
 
   if (!is_simulator()) {
     // now check GPS status
-    devTick();
+    if (devices != nullptr)
+      devices->Tick();
 
     // also service replay logger
     if (replay && replay->IsActive()) {
@@ -307,7 +300,7 @@ ProcessTimer()
   }
 
 #ifdef HAVE_TRACKING
-  if (tracking != NULL && CommonInterface::Basic().gps.real) {
+  if (tracking != nullptr) {
     tracking->SetSettings(CommonInterface::GetComputerSettings().tracking);
     tracking->OnTimer(CommonInterface::Basic(), CommonInterface::Calculated());
   }

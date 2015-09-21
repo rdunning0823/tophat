@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,11 +24,9 @@ Copyright_License {
 #ifndef XCSOAR_STATUS_MESSAGE_H
 #define XCSOAR_STATUS_MESSAGE_H
 
-#include "Util/StaticArray.hpp"
+#include "Compiler.h"
 
 #include <tchar.h>
-
-class TLineReader;
 
 /**
  * Struct used to store status message items
@@ -44,39 +42,10 @@ struct StatusMessage {
 
   /** Delay for DoStatusMessage */
   unsigned delay_ms;
-
-  void Clear() {
-    key = NULL;
-    sound = NULL;
-    delay_ms = 2500;
-    visible = true;
-  }
-
-  bool IsEmpty() const {
-    return key == NULL;
-  }
 };
 
-/**
- * Class to manage a list of active and recent status messages
- */
-class StatusMessageList {
-  StaticArray<StatusMessage, 1000> list;
-  int old_delay;
-
-public:
-  StatusMessageList();
-
-  void LoadFile();
-  void LoadFile(TLineReader &reader);
-
-  void Startup(bool first);
-
-  const StatusMessage &First() const {
-    return list[0];
-  }
-
-  const StatusMessage *Find(const TCHAR *key) const;
-};
+gcc_pure
+const StatusMessage &
+FindStatusMessage(const TCHAR *key);
 
 #endif

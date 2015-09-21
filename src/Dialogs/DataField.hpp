@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ class DataField;
 /**
  * Show a dialog to edit the value of a #DataField.
  *
- * @return false if no dialog is available for this value type
+ * @return true if the value has been modified
  */
 bool
 EditDataFieldDialog(const TCHAR *caption, DataField &df,

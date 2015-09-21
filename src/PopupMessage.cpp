@@ -3,7 +3,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,10 +24,10 @@ Copyright_License {
 */
 
 #include "PopupMessage.hpp"
-#include "Look/GlobalFonts.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Screen/Layout.hpp"
-#include "Screen/Font.hpp"
+#include "Screen/Canvas.hpp"
+#include "Look/DialogLook.hpp"
 #include "Audio/Sound.hpp"
 #include "StatusMessage.hpp"
 #include "UISettings.hpp"
@@ -92,14 +92,15 @@ PopupMessage::Message::AppendTo(StaticString<2000> &buffer, unsigned now)
   return true;
 }
 
-PopupMessage::PopupMessage(const StatusMessageList &_status_messages,
-                           SingleWindow &_parent, const UISettings &_settings)
-  :status_messages(_status_messages),
-   parent(_parent),
+PopupMessage::PopupMessage(SingleWindow &_parent, const DialogLook &_look,
+                           const UISettings &_settings)
+  :parent(_parent), look(_look),
    settings(_settings),
    n_visible(0),
    enable_sound(true)
 {
+  renderer.SetCenter();
+  text.clear();
 }
 
 void
@@ -107,15 +108,13 @@ PopupMessage::Create(const PixelRect _rc)
 {
   rc = _rc;
 
-  LargeTextWindowStyle style;
+  WindowStyle style;
+#ifdef USE_GDI
   style.Border();
-  style.SetCenter();
+#endif
   style.Hide();
 
-  LargeTextWindow::Create(parent, GetRect(100), style);
-
-  SetFont(Fonts::dialog_bold);
-  InstallWndProc();
+  PaintWindow::Create(parent, GetRect(), style);
 }
 
 bool
@@ -127,8 +126,39 @@ PopupMessage::OnMouseDown(PixelScalar x, PixelScalar y)
   return true;
 }
 
+void
+PopupMessage::OnPaint(Canvas &canvas)
+{
+  canvas.ClearWhite();
+
+  auto rc = GetClientRect();
+#ifndef USE_GDI
+  canvas.DrawOutlineRectangle(rc.left, rc.top, rc.right, rc.bottom,
+                              COLOR_BLACK);
+#endif
+
+  const int padding = Layout::GetTextPadding();
+  rc.Grow(-padding);
+
+  canvas.SetTextColor(look.text_color);
+  canvas.SetBackgroundTransparent();
+  canvas.Select(look.text_font);
+
+  renderer.Draw(canvas, rc, text);
+}
+
+inline unsigned
+PopupMessage::CalculateWidth() const
+{
+  if (settings.popup_message_position == UISettings::PopupMessagePosition::TOP_LEFT)
+    // TODO code: this shouldn't be hard-coded
+    return Layout::FastScale(206);
+  else
+    return unsigned((rc.right - rc.left) * 0.9);
+}
+
 PixelRect
-PopupMessage::GetRect(UPixelScalar height) const
+PopupMessage::GetRect(unsigned width, unsigned height) const
 {
   PixelRect rthis;
 
@@ -136,15 +166,12 @@ PopupMessage::GetRect(UPixelScalar height) const
     rthis.top = 0;
     rthis.left = 0;
     rthis.bottom = height;
-    rthis.right = Layout::FastScale(206);
-    // TODO code: this shouldn't be hard-coded
+    rthis.right = width;
   } else {
-    PixelScalar width =// min((rc.right-rc.left)*0.8,tsize.cx);
-      (PixelScalar)((rc.right - rc.left) * 0.9);
-    PixelScalar midx = (rc.right + rc.left) / 2;
-    PixelScalar midy = (rc.bottom + rc.top) / 2;
-    PixelScalar h1 = height / 2;
-    PixelScalar h2 = height - h1;
+    const int midx = (rc.right + rc.left) / 2;
+    const int midy = (rc.bottom + rc.top) / 2;
+    const int h1 = height / 2;
+    const int h2 = height - h1;
     rthis.left = midx-width/2;
     rthis.right = midx+width/2;
     rthis.top = midy-h1;
@@ -154,47 +181,49 @@ PopupMessage::GetRect(UPixelScalar height) const
   return rthis;
 }
 
-void
-PopupMessage::UpdateTextAndLayout(const TCHAR *text)
+PixelRect
+PopupMessage::GetRect() const
 {
-  if (StringIsEmpty(text)) {
+  const unsigned width = CalculateWidth();
+  const unsigned height = renderer.GetHeight(look.text_font, width, text)
+    + 2 * Layout::GetTextPadding();
+
+  return GetRect(width, height);
+}
+
+void
+PopupMessage::UpdateLayout(PixelRect _rc)
+{
+  rc = _rc;
+
+  if (!text.empty()) {
+    renderer.InvalidateLayout();
+    Move(GetRect());
+    Invalidate();
+  }
+}
+
+void
+PopupMessage::UpdateTextAndLayout()
+{
+  if (text.empty()) {
     Hide();
   } else {
-    SetText(text);
+    renderer.InvalidateLayout();
 
-    const UPixelScalar font_height = Fonts::dialog_bold.GetHeight();
-
-    unsigned n_lines = max(n_visible, max(1u, GetRowCount()));
-
-    PixelScalar height = min((PixelScalar)((rc.bottom-rc.top) * 0.8),
-                             (PixelScalar)(font_height * (n_lines + 1)));
-
-    PixelRect rthis = GetRect(height);
-#ifdef USE_GDI
-    PixelRect old_rc = GetPosition();
-    if (rthis.left != old_rc.left || rthis.right != old_rc.right) {
-      /* on Windows, the TEXT control can never change its text style
-         after it has been created, so we have to destroy it and
-         create a new one */
-      Destroy();
-      Create(rthis);
-      SetText(text);
-    } else
-#endif
-      Move(rthis);
-
+    Move(GetRect());
     ShowOnTop();
+    Invalidate();
   }
 }
 
 bool
 PopupMessage::Render()
 {
-  mutex.Lock();
-  if (parent.HasDialog()) {
-    mutex.Unlock();
+  if (parent.HasDialog())
     return false;
-  }
+
+  mutex.Lock();
 
   const unsigned now = MonotonicClockMS();
 
@@ -209,24 +238,14 @@ PopupMessage::Render()
   for (unsigned i = 0; i < MAXMESSAGES; ++i)
     changed = messages[i].Update(now) || changed;
 
-  static bool doresize = false;
-
   if (!changed) {
     mutex.Unlock();
-
-    if (doresize) {
-      doresize = false;
-      // do one extra resize after display so we are sure we get all
-      // the text (workaround bug in getlinecount)
-      UpdateTextAndLayout(text);
-    }
     return false;
   }
 
   // ok, we've changed the visible messages, so need to regenerate the
   // text box
 
-  doresize = true;
   text.clear();
   n_visible = 0;
   for (unsigned i = 0; i < MAXMESSAGES; ++i)
@@ -235,7 +254,7 @@ PopupMessage::Render()
 
   mutex.Unlock();
 
-  UpdateTextAndLayout(text);
+  UpdateTextAndLayout();
 
   return true;
 }
@@ -330,19 +349,16 @@ PopupMessage::AddMessage(const TCHAR* text, const TCHAR *data)
 {
   ScopeLock protect(mutex);
 
-  StatusMessage msg = status_messages.First();
-  const StatusMessage *found = status_messages.Find(text);
-  if (found != NULL)
-    msg = *found;
+  const auto &msg = FindStatusMessage(text);
 
-  if (enable_sound && msg.sound != NULL)
+  if (enable_sound && msg.sound != nullptr)
     PlayResource(msg.sound);
 
   // TODO code: consider what is a sensible size?
   if (msg.visible) {
     TCHAR msgcache[1024];
     _tcscpy(msgcache, text);
-    if (data != NULL) {
+    if (data != nullptr) {
       _tcscat(msgcache, _T(" "));
       _tcscat(msgcache, data);
     }

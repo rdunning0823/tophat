@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -35,6 +35,7 @@ struct WaypointLook {
   MaskedIcon mountain_pass_icon;
   MaskedIcon mountain_top_icon, bridge_icon, obstacle_icon;
   MaskedIcon tower_icon, power_plant_icon, tunnel_icon, thermal_hotspot_icon;
+  MaskedIcon marker_icon;
   MaskedIcon airport_reachable_icon, airport_unreachable_icon;
   MaskedIcon airport_marginal_icon;
   MaskedIcon field_marginal_icon, field_reachable_icon, field_unreachable_icon;
@@ -47,6 +48,8 @@ struct WaypointLook {
 
   void Initialise(const WaypointRendererSettings &settings,
                   const Font &font, const Font &bold_font);
+
+  void Reinitialise(const WaypointRendererSettings &settings);
 };
 
 #endif

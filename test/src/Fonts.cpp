@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,97 +22,22 @@ Copyright_License {
 */
 
 #include "Fonts.hpp"
+#include "Look/FontDescription.hpp"
 #include "Screen/Font.hpp"
 #include "Screen/Layout.hpp"
-#include "Asset.hpp"
 
-#include <string.h>
-
-Font normal_font, small_font, bold_font, monospace_font;
-Font large_font, large_bold_font;
-
-static const TCHAR *
-GetStandardMonospaceFontFace()
-{
-  if (IsAndroid())
-    return _T("Droid Sans Mono");
-
-  return _T("Courier");
-}
-
-static void
-InitialiseLogfont(LOGFONT* font, const TCHAR* facename, int height,
-                  bool bold = false, bool italic = false,
-                  bool variable_pitch = true)
-{
-  memset((char *)font, 0, sizeof(LOGFONT));
-
-  _tcscpy(font->lfFaceName, facename);
-
-#ifdef WIN32
-  font->lfPitchAndFamily = (variable_pitch ? VARIABLE_PITCH : FIXED_PITCH)
-                          | FF_DONTCARE;
-#endif
-
-  font->lfHeight = (long)height;
-  font->lfWeight = (long)(bold ? FW_BOLD : FW_MEDIUM);
-  font->lfItalic = italic;
-
-#ifdef WIN32
-  if (IsAltair())
-    font->lfQuality = NONANTIALIASED_QUALITY;
-  else
-    font->lfQuality = ANTIALIASED_QUALITY;
-#endif
-}
+Font normal_font, bold_font;
 
 void
-InitialiseFonts() {
-  InitialiseFonts({600, 800});
-}
-
-void
-InitialiseFonts(PixelSize screen_size)
+InitialiseFonts()
 {
-  const TCHAR *face = _T("Tahoma");
-
-#ifndef USE_GDI
-  UPixelScalar font_height = Layout::SmallScale(IsAndroid() ? 30 : 24);
-#else
-  UPixelScalar font_height = Layout::SmallScale(35);
-#endif
-
-  if (IsKobo()) {
-    font_height = (font_height * screen_size.cx) / 600;
-  }
-  LOGFONT lf;
-  InitialiseLogfont(&lf, face, font_height / 2);
-  normal_font.Load(lf);
-
-  InitialiseLogfont(&lf, face, (font_height * 6) / 10);
-  large_font.Load(lf);
-
-  InitialiseLogfont(&lf, face, font_height / 2 - 2 * Layout::Scale(2));
-  small_font.Load(lf);
-
-  InitialiseLogfont(&lf, face, font_height / 2, true);
-  bold_font.Load(lf);
-
-  InitialiseLogfont(&lf, face, (font_height * 6) / 10, true);
-  large_bold_font.Load(lf);
-
-  InitialiseLogfont(&lf, GetStandardMonospaceFontFace(),
-                    10, false, false, false);
-  monospace_font.Load(lf);
+  normal_font.Load(FontDescription(Layout::FontScale(12)));
+  bold_font.Load(FontDescription(Layout::FontScale(12), true));
 }
 
 void
 DeinitialiseFonts()
 {
-  monospace_font.Destroy();
   bold_font.Destroy();
-  small_font.Destroy();
   normal_font.Destroy();
-  large_font.Destroy();
-  large_bold_font.Destroy();
 }

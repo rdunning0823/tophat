@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -19,16 +19,14 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
  */
+
 #ifndef ROUTELINK_HPP
 #define ROUTELINK_HPP
 
-#include "Config.hpp"
 #include "Math/fixed.hpp"
-#include "Math/Angle.hpp"
-#include "Rough/RoughAltitude.hpp"
 #include "Geo/Flat/FlatGeoPoint.hpp"
 
-class TaskProjection;
+class FlatProjection;
 
 typedef AFlatGeoPoint RoutePoint;
 
@@ -59,34 +57,6 @@ struct RouteLinkBase {
   bool operator==(const RouteLinkBase &o) const {
     return (first == o.first) && (second == o.second);
   }
-
-  /**
-   * Ordering operator, used for set ordering.  Uses lexicographic comparison.
-   *
-   * @param o object to compare to
-   *
-   * @return true if lexicographically smaller
-   */
-  gcc_pure
-  bool
-  operator<(const RouteLinkBase &o) const
-  {
-    if (first.longitude != o.first.longitude)
-      return first.longitude < o.first.longitude;
-    if (first.latitude != o.first.latitude)
-      return first.latitude < o.first.latitude;
-    if (first.altitude != o.first.altitude)
-      return first.altitude < o.first.altitude;
-
-    if (second.longitude != o.second.longitude)
-      return second.longitude < o.second.longitude;
-    if (second.latitude != o.second.latitude)
-      return second.latitude < o.second.latitude;
-    if (second.altitude != o.second.altitude)
-      return second.altitude < o.second.altitude;
-
-    return false;
-   }
 
   /**
    * Return 2d Distance of this link
@@ -148,9 +118,9 @@ public:
   /** Direction index to be used for RoutePolar lookups */
   unsigned polar_index;
 
-  RouteLink(const RouteLinkBase& link, const TaskProjection& proj);
+  RouteLink(const RouteLinkBase &link, const FlatProjection &proj);
   RouteLink (const RoutePoint& _first, const RoutePoint& _second,
-             const TaskProjection& proj);
+             const FlatProjection &proj);
 
   /**
    * Generate RouteLink projected flat such that the destination altitude equals
@@ -161,7 +131,7 @@ public:
   RouteLink Flat() const;
 
 private:
-  void CalcSpeedups(const TaskProjection& proj);
+  void CalcSpeedups(const FlatProjection &proj);
 };
 
 #endif

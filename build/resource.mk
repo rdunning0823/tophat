@@ -1,6 +1,12 @@
 include build/rsvg.mk
 include build/imagemagick.mk
 
+USE_WIN32_RESOURCES = $(call bool_and,$(HAVE_WIN32),$(call bool_not,$(ENABLE_SDL)))
+
+ifeq ($(USE_WIN32_RESOURCES),y)
+TARGET_CPPFLAGS += -DUSE_WIN32_RESOURCES
+endif
+
 ####### market icons
 
 SVG_MARKET_ICONS = Data/graphics/logo.svg Data/graphics/logo_red.svg
@@ -123,7 +129,7 @@ BMP_LAUNCH_DLL_FLY_224 = $(PNG_LAUNCH_224:.png=_dll_1.bmp)
 BMP_LAUNCH_DLL_SIM_224 = $(PNG_LAUNCH_224:.png=_dll_2.bmp)
 
 BMP_LAUNCH_ALL = $(BMP_LAUNCH_FLY_224) $(BMP_LAUNCH_SIM_224)
-ifeq ($(HAVE_WIN32),y)
+ifeq ($(USE_WIN32_RESOURCES),y)
 BMP_LAUNCH_ALL += $(BMP_LAUNCH_DLL_FLY_224) $(BMP_LAUNCH_DLL_SIM_224)
 endif
 
@@ -175,7 +181,7 @@ ifeq ($(TARGET_IS_KOBO),y)
 RESOURCE_FILES += $(patsubst po/%.po,$(OUT)/po/%.mo,$(wildcard po/*.po))
 endif
 
-ifeq ($(HAVE_WIN32),y)
+ifeq ($(USE_WIN32_RESOURCES),y)
 RESOURCE_FILES += $(BMP_BITMAPS)
 else
 RESOURCE_FILES += $(PNG_BITMAPS)
@@ -187,7 +193,7 @@ RESOURCE_FILES += $(BMP_DIALOG_TITLE) $(BMP_PROGRESS_BORDER)
 RESOURCE_FILES += $(BMP_TITLE_320) $(BMP_TITLE_110)
 RESOURCE_FILES += $(BMP_LAUNCH_ALL)
 
-ifeq ($(HAVE_WIN32),n)
+ifeq ($(USE_WIN32_RESOURCES),n)
 
 $(patsubst $(DATA)/icons/%.bmp,$(DATA)/icons2/%.png,$(filter $(DATA)/icons/%.bmp,$(RESOURCE_FILES))): $(DATA)/icons2/%.png: $(DATA)/icons/%.bmp | $(DATA)/icons2/dirstamp
 	$(Q)$(IM_PREFIX)convert $< $@
@@ -207,7 +213,7 @@ $(OUT)/include/resource.h: src/Resources.hpp $(OUT)/include/dirstamp
 	$(Q)$(PERL) -ne 'print "#define $$1 $$2\n" if /^MAKE_RESOURCE\((\w+), (\d+)\);/;' $< >$@.tmp
 	$(Q)mv $@.tmp $@
 
-ifeq ($(HAVE_WIN32),y)
+ifeq ($(USE_WIN32_RESOURCES),y)
 
 RESOURCE_TEXT = Data/XCSoar.rc
 
@@ -220,9 +226,12 @@ $(RESOURCE_BINARY): $(RESOURCE_TEXT) $(OUT)/include/resource.h $(RESOURCE_FILES)
 
 else
 
-RESOURCE_BINARY = $(TARGET_OUTPUT_DIR)/resources.a
-$(RESOURCE_BINARY): $(TARGET_OUTPUT_DIR)/XCSoar.rc $(OUT)/include/resource.h $(RESOURCE_FILES) tools/LinkResources.pl | $(TARGET_OUTPUT_DIR)/resources/dirstamp
+$(TARGET_OUTPUT_DIR)/resources.c: $(TARGET_OUTPUT_DIR)/XCSoar.rc $(OUT)/include/resource.h $(RESOURCE_FILES) tools/LinkResources.pl tools/BinToC.pm | $(TARGET_OUTPUT_DIR)/resources/dirstamp
 	@$(NQ)echo "  GEN     $@"
-	$(Q)$(PERL) tools/LinkResources.pl $< $@ "$(LD)" "$(AR) $(ARFLAGS)"
+	$(Q)$(PERL) tools/LinkResources.pl $< $@
+
+RESOURCES_SOURCES = $(TARGET_OUTPUT_DIR)/resources.c
+$(eval $(call link-library,resources,RESOURCES))
+RESOURCE_BINARY = $(RESOURCES_BIN)
 
 endif

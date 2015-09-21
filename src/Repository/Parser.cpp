@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,28 +25,24 @@ Copyright_License {
 #include "FileRepository.hpp"
 #include "IO/LineReader.hpp"
 #include "Util/StringUtil.hpp"
-#include "Util/CharUtil.hpp"
 
 static const char *
 ParseLine(char *line)
 {
   char *separator = strchr(line, '=');
-  if (separator == NULL)
+  if (separator == nullptr)
     /* malformed line */
-    return NULL;
+    return nullptr;
 
-  char *p = separator;
-  while (p > separator && IsWhitespaceOrNull(p[-1]))
-    --p;
-
+  char *p = StripRight(line, separator);
   if (p == line)
     /* empty name */
-    return NULL;
+    return nullptr;
 
   *p = 0;
 
-  char *value = const_cast<char *>(TrimLeft(separator + 1));
-  TrimRight(value);
+  char *value = const_cast<char *>(StripLeft(separator + 1));
+  StripRight(value);
   return value;
 }
 
@@ -71,13 +67,13 @@ ParseFileRepository(FileRepository &repository, NLineReader &reader)
   file.Clear();
 
   char *line;
-  while ((line = reader.ReadLine()) != NULL) {
-    line = const_cast<char *>(TrimLeft(line));
+  while ((line = reader.ReadLine()) != nullptr) {
+    line = const_cast<char *>(StripLeft(line));
     if (*line == 0 || *line == '#')
       continue;
 
     const char *name = line, *value = ParseLine(line);
-    if (value == NULL)
+    if (value == nullptr)
       return false;
 
     if (StringIsEqual(name, "name")) {
@@ -99,13 +95,13 @@ ParseFileRepository(FileRepository &repository, NLineReader &reader)
       file.subarea = value;
     } else if (StringIsEqual(name, "type")) {
       if (StringIsEqual(value, "airspace"))
-        file.type = AvailableFile::Type::AIRSPACE;
+        file.type = FileType::AIRSPACE;
       else if (StringIsEqual(value, "waypoint"))
-        file.type = AvailableFile::Type::WAYPOINT;
+        file.type = FileType::WAYPOINT;
       else if (StringIsEqual(value, "map"))
-        file.type = AvailableFile::Type::MAP;
+        file.type = FileType::MAP;
       else if (StringIsEqual(value, "flarmnet"))
-        file.type = AvailableFile::Type::FLARMNET;
+        file.type = FileType::FLARMNET;
     }
   }
 

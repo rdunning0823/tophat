@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ public:
   };
 
 private:
-  const AbstractAirspace& airspace;
+  const AbstractAirspace &airspace;
   State state;
   State state_last;
   AirspaceInterceptSolution solution;
@@ -72,7 +72,7 @@ public:
    *
    * @param the_airspace Airspace that this object will manage warnings for
    */
-  explicit AirspaceWarning(const AbstractAirspace& the_airspace);
+  explicit AirspaceWarning(const AbstractAirspace &the_airspace);
 
   /**
    * Save warning state prior to performing update
@@ -113,7 +113,7 @@ public:
    *
    * @return Airspace
    */
-  const AbstractAirspace& GetAirspace() const {
+  const AbstractAirspace &GetAirspace() const {
     return airspace;
   }
 
@@ -142,7 +142,7 @@ public:
    *
    * @return Reference to solution
    */
-  const AirspaceInterceptSolution& GetSolution() const {
+  const AirspaceInterceptSolution &GetSolution() const {
     return solution;
   }
 
@@ -163,6 +163,12 @@ public:
   bool GetAckDay() const {
     return ack_day;
   }
+
+  /**
+   * Acknowledge an airspace warning or airspace inside (depending on
+   * the state).
+   */
+  void Acknowledge();
 
   /**
    * Acknowledge an airspace warning
@@ -197,8 +203,8 @@ public:
 
 #ifdef DO_PRINT
 public:
-  friend std::ostream& operator<< (std::ostream& f, 
-                                   const AirspaceWarning& aw);
+  friend std::ostream &operator<<(std::ostream &f,
+                                  const AirspaceWarning &aw);
 #endif
 };
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@ Copyright_License {
 #include "OS/LogError.hpp"
 #include "OS/Sleep.h"
 #include "IO/Async/GlobalIOThread.hpp"
-#include "Util/StringUtil.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <time.h>
 #include <fcntl.h>
@@ -45,7 +45,7 @@ TTYPort::~TTYPort()
   BufferedPort::BeginClose();
 
   if (tty.IsDefined())
-    io_thread->LockRemove(tty.Get());
+    io_thread->LockRemove(tty.ToFileDescriptor());
 
   BufferedPort::EndClose();
 }
@@ -82,7 +82,8 @@ TTYPort::Open(const TCHAR *path, unsigned _baud_rate)
     return false;
 
   valid.store(true, std::memory_order_relaxed);
-  io_thread->LockAdd(tty.Get(), Poll::READ, *this);
+  io_thread->LockAdd(tty.ToFileDescriptor(), Poll::READ, *this);
+  StateChanged();
   return true;
 }
 
@@ -90,10 +91,11 @@ const char *
 TTYPort::OpenPseudo()
 {
   if (!tty.OpenNonBlocking("/dev/ptmx") || !tty.Unlock())
-    return NULL;
+    return nullptr;
 
   valid.store(true, std::memory_order_relaxed);
-  io_thread->LockAdd(tty.Get(), Poll::READ, *this);
+  io_thread->LockAdd(tty.ToFileDescriptor(), Poll::READ, *this);
+  StateChanged();
   return tty.GetSlaveName();
 }
 
@@ -241,7 +243,8 @@ TTYPort::SetBaudrate(unsigned BaudRate)
   if (!tty.GetAttr(attr))
     return false;
 
-  attr.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+  attr.c_iflag &= ~(BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+  attr.c_iflag |= (IGNPAR | IGNBRK);
   attr.c_oflag &= ~OPOST;
   attr.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
   attr.c_cflag &= ~(CSIZE | PARENB | CRTSCTS);
@@ -258,13 +261,14 @@ TTYPort::SetBaudrate(unsigned BaudRate)
 }
 
 bool
-TTYPort::OnFileEvent(int fd, unsigned mask)
+TTYPort::OnFileEvent(gcc_unused FileDescriptor fd, unsigned mask)
 {
   char buffer[1024];
 
   ssize_t nbytes = tty.Read(buffer, sizeof(buffer));
   if (nbytes == 0 || (nbytes < 0 && errno != EAGAIN && errno != EINTR)) {
     valid.store(false, std::memory_order_relaxed);
+    StateChanged();
     return false;
   }
 

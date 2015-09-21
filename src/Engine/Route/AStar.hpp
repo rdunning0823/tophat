@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,55 +25,45 @@ Copyright_License {
 #define ASTAR_HPP
 
 #include "Util/ReservablePriorityQueue.hpp"
-#include <assert.h>
 #include "Compiler.h"
 
-//#define ASTAR_TR1
-
-#ifdef ASTAR_TR1
-#include <tr1/unordered_map>
-#else
-#include <map>
-#endif
+#include <unordered_map>
 
 #ifdef INSTRUMENT_TASK
 extern long count_astar_links;
 #endif
 
-#define ASTAR_MINMAX_OFFSET 134217727
-
-#define ASTAR_QUEUE_SIZE 1024
-
 struct AStarPriorityValue
 {
+  static constexpr unsigned MINMAX_OFFSET = 134217727;
+
   /** Actual edge value */
   unsigned g;
   /** Heuristic cost to goal */
   unsigned h;
 
-  AStarPriorityValue(unsigned _g = 0):g(_g), h(0) {}
-  AStarPriorityValue(const unsigned _g, const unsigned _h):g(_g), h(_h) {}
+  explicit constexpr AStarPriorityValue(unsigned _g):g(_g), h(0) {}
+  constexpr AStarPriorityValue(const unsigned _g, const unsigned _h)
+    :g(_g), h(_h) {}
 
-  gcc_pure
-  AStarPriorityValue Adjust(const bool is_min) const {
-    return is_min ? *this : AStarPriorityValue(ASTAR_MINMAX_OFFSET - g,
-                                               ASTAR_MINMAX_OFFSET - h);
+  template<bool is_min>
+  constexpr
+  AStarPriorityValue Adjust() const {
+    return is_min ? *this : AStarPriorityValue(MINMAX_OFFSET - g,
+                                               MINMAX_OFFSET - h);
   }
 
-  gcc_pure
+  constexpr
   unsigned f() const {
     return g + h;
   }
 
-  gcc_pure
+  constexpr
   AStarPriorityValue operator+(const AStarPriorityValue& other) const {
-    AStarPriorityValue n(*this);
-    n.g += other.g;
-    n.h = other.h;
-    return n;
+    return AStarPriorityValue(g + other.g, other.h);
   }
 
-  gcc_pure
+  constexpr
   bool operator>(const AStarPriorityValue& other) const {
     return g > other.g;
   }
@@ -84,23 +74,17 @@ struct AStarPriorityValue
  * Modifications by John Wharington to track optimal solution
  * @see http://en.giswiki.net/wiki/Dijkstra%27s_algorithm
  */
-template <class Node, class CompareNode=std::less<Node>, bool m_min=true>
+template <class Node, class Hash=std::hash<Node>,
+          class KeyEqual=std::equal_to<Node>,
+          bool m_min=true>
 class AStar
 {
-#ifdef ASTAR_TR1
-  typedef std::tr1::unordered_map<Node, AStarPriorityValue> node_value_map;
-#else
-  typedef std::map<Node, AStarPriorityValue, CompareNode> node_value_map;
-#endif
+  typedef std::unordered_map<Node, AStarPriorityValue, Hash, KeyEqual> node_value_map;
 
   typedef typename node_value_map::iterator node_value_iterator;
   typedef typename node_value_map::const_iterator node_value_const_iterator;
 
-#ifdef ASTAR_TR1
-  typedef std::tr1::unordered_map<Node, Node> node_parent_map;
-#else
-  typedef std::map<Node, Node, CompareNode> node_parent_map;
-#endif
+  typedef std::unordered_map<Node, Node, Hash, KeyEqual> node_parent_map;
 
   typedef typename node_parent_map::iterator node_parent_iterator;
   typedef typename node_parent_map::const_iterator node_parent_const_iterator;
@@ -144,12 +128,14 @@ class AStar
   node_value_iterator cur;
 
 public:
+  static constexpr unsigned DEFAULT_QUEUE_SIZE = 1024;
+
   /**
    * Default constructor
    *
    * @param is_min Whether this algorithm will search for min or max distance
    */
-  AStar(unsigned reserve_default = ASTAR_QUEUE_SIZE)
+  AStar(unsigned reserve_default = DEFAULT_QUEUE_SIZE)
   {
     Reserve(reserve_default);
   }
@@ -160,7 +146,7 @@ public:
    * @param n Node to start
    * @param is_min Whether this algorithm will search for min or max distance
    */
-  AStar(const Node &node, unsigned reserve_default = ASTAR_QUEUE_SIZE)
+  AStar(const Node &node, unsigned reserve_default = DEFAULT_QUEUE_SIZE)
   {
     Reserve(reserve_default);
     Push(node, node, AStarPriorityValue(0));
@@ -235,7 +221,7 @@ public:
 #ifdef INSTRUMENT_TASK
     count_astar_links++;
 #endif
-    Push(node, parent, GetNodeValue(parent) + edge_value.Adjust(m_min));
+    Push(node, parent, GetNodeValue(parent) + edge_value.Adjust<m_min>());
     // note order of + here is important!
   }
 
@@ -320,16 +306,11 @@ private:
 
   void SetPredecessor(const Node &node, const Node &parent) {
     // Try to find the given node in the node_parent_map
-    node_parent_iterator it = node_parents.find(node);
-    if (it == node_parents.end())
-      // first entry
-      // If the node wasn't found
-      // -> Insert a new node into the node_parent_map
-      node_parents.insert(std::make_pair(node, parent));
-    else
+    auto result = node_parents.insert(std::make_pair(node, parent));
+    if (!result.second)
       // If the node was found
       // -> Replace the according parent node with the new one
-      it->second = parent;
+      result.first->second = parent;
   }
 };
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,30 +24,51 @@ Copyright_License {
 #ifndef XCSOAR_DATA_FIELD_COMBO_LIST_HPP
 #define XCSOAR_DATA_FIELD_COMBO_LIST_HPP
 
-#include "Util/NonCopyable.hpp"
 #include "Util/StaticArray.hpp"
+
+#include <utility>
 
 #include <tchar.h>
 
-class ComboList : private NonCopyable {
+class ComboList {
 public:
-  struct Item : private NonCopyable {
-    enum {
-      NEXT_PAGE = -800001,
-      PREVIOUS_PAGE = -800002,
-    };
+  struct Item {
+    static constexpr int NEXT_PAGE = -800001;
+    static constexpr int PREVIOUS_PAGE = -800002;
+    static constexpr int DOWNLOAD = -800003;
 
-    int DataFieldIndex;
-    TCHAR *StringValue;
-    TCHAR *StringValueFormatted;
-    TCHAR *StringHelp;
+    int int_value;
+    TCHAR *string_value;
+    TCHAR *display_string;
+    TCHAR *help_text;
 
-    Item(int _DataFieldIndex, const TCHAR *_StringValue,
-         const TCHAR *_StringValueFormatted, const TCHAR *_StringHelp = NULL);
+    Item(int _int_value, const TCHAR *_string_value,
+         const TCHAR *_display_string, const TCHAR *_help_text = nullptr);
     ~Item();
 
     Item(const Item &other) = delete;
     Item &operator=(const Item &other) = delete;
+
+    Item(Item &&src)
+      :int_value(src.int_value), string_value(src.string_value),
+       display_string(src.display_string), help_text(src.help_text) {
+      src.string_value = src.display_string = src.help_text = nullptr;
+    }
+
+    Item &operator=(Item &&src) {
+      int_value = src.int_value;
+      std::swap(string_value, src.string_value);
+      std::swap(display_string, src.display_string);
+      std::swap(help_text, src.help_text);
+      return *this;
+    }
+
+    friend void swap(Item &a, Item &b) {
+      std::swap(a.int_value, b.int_value);
+      std::swap(a.string_value, b.string_value);
+      std::swap(a.display_string, b.display_string);
+      std::swap(a.help_text, b.help_text);
+    }
   };
 
 #ifdef _WIN32_WCE
@@ -56,14 +77,14 @@ public:
   static constexpr unsigned MAX_SIZE = 512;
 #endif
 
-  int ComboPopupItemSavedIndex;
+  int current_index;
 
 private:
   StaticArray<Item*, MAX_SIZE> items;
 
 public:
   ComboList()
-    :ComboPopupItemSavedIndex(0) {}
+    :current_index(0) {}
 
   ComboList(ComboList &&other);
 
@@ -86,20 +107,20 @@ public:
 
   unsigned Append(Item *item);
 
-  unsigned Append(int DataFieldIndex,
-                  const TCHAR *StringValue,
-                  const TCHAR *StringValueFormatted,
-                  const TCHAR *StringHelp = NULL) {
-    return Append(new Item(DataFieldIndex,
-                           StringValue, StringValueFormatted, StringHelp));
+  unsigned Append(int int_value,
+                  const TCHAR *string_value,
+                  const TCHAR *display_string,
+                  const TCHAR *help_text = nullptr) {
+    return Append(new Item(int_value,
+                           string_value, display_string, help_text));
   }
 
-  unsigned Append(int DataFieldIndex, const TCHAR *StringValue) {
-    return Append(DataFieldIndex, StringValue, StringValue);
+  unsigned Append(int int_value, const TCHAR *string_value) {
+    return Append(int_value, string_value, string_value);
   }
 
   void Sort();
-  unsigned LookUp(int DataFieldIndex);
+  unsigned LookUp(int int_value);
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,17 +28,29 @@ struct Look;
 class SingleWindow;
 class FullBlackboard;
 class GlideComputer;
-class ProtectedTaskManager;
 class Airspaces;
 class RasterTerrain;
+
+enum class AnalysisPage {
+  BAROGRAPH,
+  CLIMB,
+  THERMAL_BAND,
+  TASK_SPEED,
+  WIND,
+  POLAR,
+  TEMPTRACE,
+  TASK,
+  OLC,
+  AIRSPACE,
+  COUNT
+};
 
 void
 dlgAnalysisShowModal(SingleWindow &parent, const Look &look,
                      const FullBlackboard &blackboard,
                      GlideComputer &glide_computer,
-                     const ProtectedTaskManager *protected_task_manager,
                      const Airspaces *airspaces,
                      const RasterTerrain *terrain,
-                     int page=-1);
+                     AnalysisPage page=AnalysisPage::COUNT);
 
 #endif

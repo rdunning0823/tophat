@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #include "Screen/Font.hpp"
 #include "Screen/Debug.hpp"
 #include "Screen/Custom/Files.hpp"
+#include "Look/FontDescription.hpp"
 #include "Init.hpp"
 #include "Asset.hpp"
 
@@ -33,6 +34,12 @@ Copyright_License {
 
 #ifndef _UNICODE
 #include "Util/UTF8.hpp"
+#endif
+
+#if defined(__clang__) && defined(__arm__)
+/* work around warning: 'register' storage class specifier is
+   deprecated */
+#define register
 #endif
 
 #include <ft2build.h>
@@ -64,24 +71,24 @@ static inline bool
 IsMono()
 {
 #ifdef KOBO
+  /* on the Kobo, "mono" mode can be set at runtime; the shutdown
+     screen renders in greyscale mode */
   return FreeType::mono;
 #else
   return IsDithered();
 #endif
 }
 
-gcc_const
-static inline FT_Long
+static constexpr inline FT_Long
 FT_FLOOR(FT_Long x)
 {
   return (x & -64) / 64;
 }
 
-gcc_const
-static inline FT_Long
+static constexpr inline FT_Long
 FT_CEIL(FT_Long x)
 {
-  return ((x + 63) & -64) / 64;
+  return FT_FLOOR(x + 63);
 }
 
 gcc_pure
@@ -98,6 +105,8 @@ NextChar(const TCHAR *p)
 void
 Font::Initialise()
 {
+  FreeType::Initialise();
+
   if (IsMono()) {
     /* disable anti-aliasing */
     load_flags |= FT_LOAD_TARGET_MONO;
@@ -109,6 +118,18 @@ Font::Initialise()
   italic_font_path = FindDefaultItalicFont();
   bold_italic_font_path = FindDefaultBoldItalicFont();
   monospace_font_path = FindDefaultMonospaceFont();
+}
+
+void
+Font::Deinitialise()
+{
+  delete[] font_path;
+  delete[] bold_font_path;
+  delete[] italic_font_path;
+  delete[] bold_italic_font_path;
+  delete[] monospace_font_path;
+
+  FreeType::Deinitialise();
 }
 
 gcc_pure
@@ -131,7 +152,7 @@ GetCapitalHeight(FT_Face face)
 }
 
 bool
-Font::LoadFile(const char *file, UPixelScalar ptsize, bool bold, bool italic)
+Font::LoadFile(const char *file, unsigned ptsize, bool bold, bool italic)
 {
   assert(IsScreenInitialized());
 
@@ -163,23 +184,12 @@ Font::LoadFile(const char *file, UPixelScalar ptsize, bool bold, bool italic)
 }
 
 bool
-Font::Load(const TCHAR *facename, UPixelScalar height, bool bold, bool italic)
-{
-  LOGFONT lf;
-  lf.lfWeight = bold ? 700 : 500;
-  lf.lfHeight = height;
-  lf.lfItalic = italic;
-  lf.lfPitchAndFamily = FF_DONTCARE | VARIABLE_PITCH;
-  return Load(lf);
-}
-
-bool
-Font::Load(const LOGFONT &log_font)
+Font::Load(const FontDescription &d)
 {
   assert(IsScreenInitialized());
 
-  bool bold = log_font.lfWeight >= 700;
-  bool italic = log_font.lfItalic;
+  bool bold = d.IsBold();
+  bool italic = d.IsItalic();
   const char *path = nullptr;
 
   /* check for presence of "real" font and clear the bold or italic
@@ -192,8 +202,7 @@ Font::Load(const LOGFONT &log_font)
   } else if (italic && italic_font_path != nullptr) {
     path = italic_font_path;
     italic = false;
-  } else if ((log_font.lfPitchAndFamily & 0x03) == FIXED_PITCH &&
-      monospace_font_path != nullptr) {
+  } else if (d.IsMonospace() && monospace_font_path != nullptr) {
     path = monospace_font_path;
   } else if (bold && bold_font_path != nullptr) {
     path = bold_font_path;
@@ -205,8 +214,7 @@ Font::Load(const LOGFONT &log_font)
   if (path == nullptr)
     return false;
 
-  return LoadFile(path, log_font.lfHeight > 0 ? log_font.lfHeight : 10,
-                  bold, italic);
+  return LoadFile(path, d.GetHeight(), bold, italic);
 }
 
 void
@@ -221,15 +229,30 @@ Font::Destroy()
   face = nullptr;
 }
 
-PixelSize
-Font::TextSize(const TCHAR *text) const
+template<typename F>
+static void
+ForEachChar(const TCHAR *text, F &&f)
 {
   assert(text != nullptr);
 #ifndef _UNICODE
   assert(ValidateUTF8(text));
 #endif
 
-  const FT_Face face = this->face;
+  while (true) {
+      const auto n = NextChar(text);
+      if (n.first == 0)
+        break;
+
+      text = n.second;
+      f(n.first);
+    }
+}
+
+template<typename T, typename F>
+static void
+ForEachGlyph(const FT_Face face, unsigned ascent_height, T &&text,
+             F &&f)
+{
   const bool use_kerning = FT_HAS_KERNING(face);
 
   int x = 0;
@@ -239,51 +262,64 @@ Font::TextSize(const TCHAR *text) const
   const ScopeLock protect(freetype_mutex);
 #endif
 
-  while (true) {
-    const auto n = NextChar(text);
-    if (n.first == 0)
-      break;
+  ForEachChar(std::forward<T>(text),
+              [face, ascent_height, &f, use_kerning,
+               &x, &prev_index](unsigned ch){
+      const FT_UInt i = FT_Get_Char_Index(face, ch);
+      if (i == 0)
+        return;
 
-    const unsigned ch = n.first;
-    text = n.second;
+      const FT_Error error = FT_Load_Glyph(face, i, load_flags);
+      if (error)
+        return;
 
-    FT_UInt i = FT_Get_Char_Index(face, ch);
-    if (i == 0)
-      continue;
+      const FT_GlyphSlot glyph = face->glyph;
+      const FT_Glyph_Metrics &metrics = glyph->metrics;
 
-    FT_Error error = FT_Load_Glyph(face, i, load_flags);
-    if (error)
-      continue;
+      if (use_kerning) {
+        if (prev_index != 0 && i != 0) {
+          FT_Vector delta;
+          FT_Get_Kerning(face, prev_index, i, ft_kerning_default,
+                         &delta);
+          x += delta.x >> 6;
+        }
 
-    const FT_GlyphSlot glyph = face->glyph;
-    const FT_Glyph_Metrics &metrics = glyph->metrics;
-
-    if (use_kerning) {
-      if (prev_index != 0) {
-        FT_Vector delta;
-        FT_Get_Kerning(face, prev_index, i, ft_kerning_default,
-                       &delta);
-        x += delta.x >> 6;
+        prev_index = i;
       }
 
-      prev_index = i;
-    }
-    if (x < 0)
-      x = 0;
+      f(x + FT_FLOOR(metrics.horiBearingX),
+        ascent_height - FT_FLOOR(metrics.horiBearingY),
+        glyph);
 
-    error = FT_Render_Glyph(glyph, render_mode);
-    if (error)
-      continue;
+      x += FT_CEIL(metrics.horiAdvance);
+    });
+}
 
-    const int glyph_advance = glyph->bitmap.width == 0 ?
-        FT_CEIL(metrics.horiAdvance) - 1: // space
-        glyph->bitmap.width <= 3 ? glyph->bitmap.width + 1 : // . l i etc.
-            glyph->bitmap.width;
+PixelSize
+Font::TextSize(const TCHAR *text) const
+{
+  int maxx = 0;
 
-    x += glyph_advance + 1;
-  }
+  ForEachGlyph(face, ascent_height, text,
+               [&maxx](int x, int y, const FT_GlyphSlot glyph){
+      const FT_Glyph_Metrics &metrics = glyph->metrics;
+      const int glyph_minx = FT_FLOOR(metrics.horiBearingX);
+      const int glyph_maxx = glyph_minx + FT_CEIL(metrics.width);
 
-  return PixelSize{unsigned(std::max(0, x - 1)), height};
+      int z = x + glyph_maxx;
+      if (z > maxx)
+        maxx = z;
+    });
+
+  return PixelSize{unsigned(maxx), height};
+}
+
+static void
+MixLine(uint8_t *dest, const uint8_t *src, size_t n)
+{
+  for (size_t i = 0; i != n; ++i)
+    /* bit-wise "OR" should be good enough for kerning */
+    dest[i] = dest[i] | src[i];
 }
 
 static void
@@ -321,8 +357,7 @@ RenderGlyph(uint8_t *buffer, unsigned buffer_width, unsigned buffer_height,
   buffer += unsigned(y) * buffer_width + unsigned(x);
   for (const uint8_t *end = src + height * pitch;
        src != end; src += pitch, buffer += buffer_width)
-    // TODO: mix with previous character?
-    std::copy(src, src + width, buffer);
+    MixLine(buffer, src, width);
 }
 
 static void
@@ -354,6 +389,10 @@ static void
 RenderGlyph(uint8_t *buffer, size_t width, size_t height,
             FT_GlyphSlot glyph, int x, int y)
 {
+  FT_Error error = FT_Render_Glyph(glyph, render_mode);
+  if (error)
+    return;
+
   if (IsMono()) {
     /* with anti-aliasing disabled, FreeType writes each pixel in one
        bit; hack: convert it to 1 byte per pixel and then render it */
@@ -368,69 +407,12 @@ RenderGlyph(uint8_t *buffer, size_t width, size_t height,
 void
 Font::Render(const TCHAR *text, const PixelSize size, void *_buffer) const
 {
-  assert(text != nullptr);
-#ifndef _UNICODE
-  assert(ValidateUTF8(text));
-#endif
-
   uint8_t *buffer = (uint8_t *)_buffer;
   std::fill_n(buffer, BufferSize(size), 0);
 
-  const FT_Face face = this->face;
-  const bool use_kerning = FT_HAS_KERNING(face);
-
-  int x = 0;
-  unsigned prev_index = 0;
-
-#ifndef ENABLE_OPENGL
-  const ScopeLock protect(freetype_mutex);
-#endif
-
-  while (true) {
-    const auto n = NextChar(text);
-    if (n.first == 0)
-      break;
-
-    const unsigned ch = n.first;
-    text = n.second;
-
-    FT_UInt i = FT_Get_Char_Index(face, ch);
-    if (i == 0)
-      continue;
-
-    FT_Error error = FT_Load_Glyph(face, i, load_flags);
-    if (error)
-      continue;
-
-    const FT_GlyphSlot glyph = face->glyph;
-    const FT_Glyph_Metrics &metrics = glyph->metrics;
-    const int glyph_maxy = FT_FLOOR(metrics.horiBearingY);
-
-    if (use_kerning) {
-      if (prev_index != 0) {
-        FT_Vector delta;
-        FT_Get_Kerning(face, prev_index, i, ft_kerning_default,
-                       &delta);
-        x += delta.x >> 6;
-      }
-
-      prev_index = i;
-    }
-    if (x < 0)
-      x = 0;
-
-    error = FT_Render_Glyph(glyph, render_mode);
-    if (error)
-      continue;
-
-    const int glyph_advance = glyph->bitmap.width == 0 ?
-        FT_CEIL(metrics.horiAdvance) - 1: // space
-        glyph->bitmap.width <= 3 ? glyph->bitmap.width + 1 : // . l i etc.
-            glyph->bitmap.width;
-
-    RenderGlyph((uint8_t *)buffer, size.cx, size.cy,
-                glyph, x, ascent_height - glyph_maxy);
-
-    x += glyph_advance + 1;
-  }
+  ForEachGlyph(face, ascent_height, text,
+               [size, buffer](int x, int y, const FT_GlyphSlot glyph){
+      RenderGlyph(buffer, size.cx, size.cy, glyph,
+                  x, y);
+    });
 }

@@ -27,8 +27,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_SLICE_ALLOCATOR_HPP
-#define XCSOAR_SLICE_ALLOCATOR_HPP
+#ifndef SLICE_ALLOCATOR_HPP
+#define SLICE_ALLOCATOR_HPP
 
 #include <utility>
 #include <cstddef>
@@ -144,7 +144,7 @@ public:
   SliceAllocator():head(nullptr) {}
 
   constexpr
-  SliceAllocator(const SliceAllocator &other):head(nullptr) {}
+  SliceAllocator(const SliceAllocator &):head(nullptr) {}
 
   ~SliceAllocator() {
     while (head != nullptr) {
@@ -238,7 +238,7 @@ public:
 
   template<typename U>
   constexpr
-  GlobalSliceAllocator(const GlobalSliceAllocator<U, size> &_other) {}
+  GlobalSliceAllocator(const GlobalSliceAllocator<U, size> &) {}
 
   T *allocate(const size_type n) {
     return allocator.allocate(n);

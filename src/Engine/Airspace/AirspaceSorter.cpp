@@ -3,8 +3,8 @@
 #include "AbstractAirspace.hpp"
 #include "AirspaceVisitor.hpp"
 #include "Geo/GeoVector.hpp"
+#include "Util/StringAPI.hpp"
 
-#include <string.h>
 #include <algorithm>
 
 void
@@ -15,7 +15,7 @@ AirspaceSelectInfo::ResetVector()
 
 const GeoVector &
 AirspaceSelectInfo::GetVector(const GeoPoint &location,
-                              const TaskProjection &projection) const
+                              const FlatProjection &projection) const
 {
   if (!vec.IsValid()) {
     const GeoPoint closest_loc = airspace->ClosestPoint(location, projection);
@@ -27,7 +27,7 @@ AirspaceSelectInfo::GetVector(const GeoPoint &location,
 
 bool
 AirspaceFilterData::Match(const GeoPoint &location,
-                          const TaskProjection &projection,
+                          const FlatProjection &projection,
                           const AbstractAirspace &as) const
 {
   if (cls != AirspaceClass::AIRSPACECLASSCOUNT && as.GetType() != cls)
@@ -56,18 +56,18 @@ AirspaceFilterData::Match(const GeoPoint &location,
 
 class AirspaceFilterVisitor final : public AirspaceVisitor {
   GeoPoint location;
-  const TaskProjection &projection;
+  const FlatProjection &projection;
   const AirspaceFilterData &filter;
 
 public:
   AirspaceSelectInfoVector result;
 
   AirspaceFilterVisitor(const GeoPoint &_location,
-                        const TaskProjection &_projection,
+                        const FlatProjection &_projection,
                         const AirspaceFilterData &_filter)
     :location(_location), projection(_projection), filter(_filter) {}
 
-  virtual void Visit(const AbstractAirspace &as) {
+  void Visit(const AbstractAirspace &as) override {
     if (filter.Match(location, projection, as))
       result.emplace_back(as);
   }
@@ -75,7 +75,7 @@ public:
 
 static void
 SortByDistance(AirspaceSelectInfoVector &vec, const GeoPoint &location,
-               const TaskProjection &projection)
+               const FlatProjection &projection)
 {
   auto compare = [&] (const AirspaceSelectInfo &elem1,
                       const AirspaceSelectInfo &elem2) {
@@ -91,8 +91,8 @@ SortByName(AirspaceSelectInfoVector &vec)
 {
   auto compare = [&] (const AirspaceSelectInfo &elem1,
                       const AirspaceSelectInfo &elem2) {
-    return _tcscmp(elem1.GetAirspace().GetName(),
-                   elem2.GetAirspace().GetName()) < 0;
+    return StringCollate(elem1.GetAirspace().GetName(),
+                         elem2.GetAirspace().GetName()) < 0;
   };
 
   std::sort(vec.begin(), vec.end(), compare);
@@ -108,7 +108,7 @@ FilterAirspaces(const Airspaces &airspaces, const GeoPoint &location,
     airspaces.VisitWithinRange(location, filter.distance, visitor);
   else
     for (const auto &i : airspaces)
-      visitor.Visit(*i.GetAirspace());
+      visitor.Visit(i.GetAirspace());
 
   if (negative(filter.direction.Native()) && negative(filter.distance))
     SortByName(visitor.result);

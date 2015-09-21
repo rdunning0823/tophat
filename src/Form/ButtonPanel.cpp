@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,15 +22,16 @@ Copyright_License {
 */
 
 #include "Form/ButtonPanel.hpp"
-#include "SymbolButton.hpp"
+#include "Renderer/TextButtonRenderer.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Look/ButtonLook.hpp"
 #include "Screen/ContainerWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Font.hpp"
+#include "Event/KeyCode.hpp"
 
-ButtonPanel::ButtonPanel(ContainerWindow &_parent, const ButtonLook &_look,
-                         ButtonPanelPosition _position)
-  :parent(_parent), look(_look), position(_position) {
+ButtonPanel::ButtonPanel(ContainerWindow &_parent, const ButtonLook &_look)
+  :parent(_parent), look(_look), selected_index(-1) {
   style.TabStop();
 }
 
@@ -46,7 +47,8 @@ ButtonPanel::UpdateLayout(const PixelRect rc)
   if (buttons.empty())
     return rc;
 
-  return (Layout::landscape && (position != Bottom))
+  const bool landscape = rc.right - rc.left > rc.bottom - rc.top;
+  return landscape
     ? LeftLayout(rc)
     : BottomLayout(rc);
 }
@@ -59,27 +61,29 @@ ButtonPanel::UpdateLayout()
 
 static constexpr PixelRect dummy_rc = { 0, 0, 100, 40 };
 
-WndButton *
-ButtonPanel::Add(const TCHAR *caption, ActionListener &listener, int id)
+Button *
+ButtonPanel::Add(ButtonRenderer *renderer,
+                 ActionListener &listener, int id)
 {
-  WndButton *button = new WndButton(parent, look, caption,
-                                    dummy_rc, style, listener, id);
+  auto *button = new Button(parent, dummy_rc, style,
+                            renderer, listener, id);
   keys[buttons.size()] = 0;
   buttons.append(button);
 
   return button;
 }
 
-WndButton *
-ButtonPanel::AddSymbol(tstring::const_pointer caption,
+Button *
+ButtonPanel::Add(const TCHAR *caption, ActionListener &listener, int id)
+{
+  return Add(new TextButtonRenderer(look, caption), listener, id);
+}
+
+Button *
+ButtonPanel::AddSymbol(const TCHAR *caption,
                        ActionListener &listener, int id)
 {
-  WndButton *button = new WndSymbolButton(parent, look, caption,
-                                          dummy_rc, style, listener, id);
-  keys[buttons.size()] = 0;
-  buttons.append(button);
-
-  return button;
+  return Add(new SymbolButtonRenderer(look, caption), listener, id);
 }
 
 void
@@ -91,11 +95,11 @@ ButtonPanel::AddKey(unsigned key_code)
   keys[buttons.size() - 1] = key_code;
 }
 
-unsigned
+inline unsigned
 ButtonPanel::Width(unsigned i) const
 {
-  return look.font->TextSize(buttons[i]->GetText().c_str()).cx +
-    Layout::SmallScale(8);
+  return std::max(buttons[i]->GetMinimumWidth(),
+                  Layout::GetMinimumControlHeight());
 }
 
 unsigned
@@ -155,13 +159,11 @@ ButtonPanel::HorizontalRange(PixelRect rc, unsigned start, unsigned end)
                       rc.left + width, rc.bottom);
   rc.bottom -= row_height;
 
-  for (unsigned i = end - 1; ; --i) {
-    buttons[buttons.size() - i - 1]->Move(button_rc);
+  for (unsigned i = start; i < end; ++i) {
+    buttons[i]->Move(button_rc);
 
     button_rc.left = button_rc.right;
     button_rc.right += width;
-    if (i == start)
-      break;
   }
 
   return rc;
@@ -213,6 +215,7 @@ ButtonPanel::BottomLayout(PixelRect rc)
   /* naive button distribution algorithm: distribute as many buttons
      as possible into each row; weakness: the last row may have only
      one button */
+
   struct Row {
     unsigned start, end;
 
@@ -291,6 +294,49 @@ ButtonPanel::HideAll()
     i->Hide();
 }
 
+void
+ButtonPanel::SetSelectedIndex(unsigned _index)
+{
+  assert(selected_index >= 0);
+  assert(_index < buttons.size());
+
+  if (_index == (unsigned)selected_index)
+    return;
+
+  buttons[selected_index]->SetSelected(false);
+  selected_index = _index;
+  buttons[selected_index]->SetSelected(true);
+}
+
+bool
+ButtonPanel::SelectPrevious()
+{
+  for (int i = selected_index - 1; i >= 0; --i) {
+    const auto &button = *buttons[i];
+    if (button.IsVisible() && button.IsEnabled()) {
+      SetSelectedIndex(i);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool
+ButtonPanel::SelectNext()
+{
+  for (unsigned i = selected_index + 1, n = buttons.size();
+       i < n; ++i) {
+    const auto &button = *buttons[i];
+    if (button.IsVisible() && button.IsEnabled()) {
+      SetSelectedIndex(i);
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool
 ButtonPanel::KeyPress(unsigned key_code)
 {
@@ -299,8 +345,22 @@ ButtonPanel::KeyPress(unsigned key_code)
   const unsigned n = buttons.size();
   for (unsigned i = 0; i < n; ++i) {
     if (keys[i] == key_code) {
-      buttons[i]->OnClicked();
+      buttons[i]->Click();
       return true;
+    }
+  }
+
+  if (selected_index >= 0 && !HasPointer()) {
+    if (key_code == KEY_LEFT) {
+      SelectPrevious();
+      return true;
+    } else if (key_code == KEY_RIGHT) {
+      SelectNext();
+      return true;
+    } else if (key_code == KEY_RETURN) {
+      auto &button = *buttons[selected_index];
+      if (button.IsVisible() && button.IsEnabled())
+        button.Click();
     }
   }
 

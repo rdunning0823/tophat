@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,9 +26,10 @@ Copyright_License {
 #include "LocalPath.hpp"
 #include "IO/FileLineReader.hpp"
 #include "IO/Async/IOThread.hpp"
-#include "OS/FileDescriptor.hpp"
+#include "OS/FileDescriptor.hxx"
 
 #include <atomic>
+#include <string>
 
 #include <assert.h>
 #include <unistd.h>
@@ -50,13 +51,13 @@ class LogCatReader final : private FileEventHandler {
   std::string data;
 
 public:
-  LogCatReader(IOThread &_io_thread, FileDescriptor &&_fd, pid_t _pid)
-    :io_thread(_io_thread), fd(std::move(_fd)), pid(_pid) {
-    io_thread.LockAdd(fd.Get(), IOThread::READ, *this);
+  LogCatReader(IOThread &_io_thread, FileDescriptor _fd, pid_t _pid)
+    :io_thread(_io_thread), fd(_fd), pid(_pid) {
+    io_thread.LockAdd(fd, IOThread::READ, *this);
   }
 
   ~LogCatReader() {
-    io_thread.LockRemove(fd.Get());
+    io_thread.LockRemove(fd);
     fd.Close();
 
     Kill(pid.exchange(0));
@@ -68,14 +69,14 @@ private:
   void Save(int pid) const;
   void EndOfFile();
 
-  virtual bool OnFileEvent(int fd, unsigned mask) override;
+  bool OnFileEvent(FileDescriptor fd, unsigned mask) override;
 };
 
 static void
 SaveCrash(int pid, const char *data, size_t length)
 {
   char name[64];
-  time_t t = time(NULL);
+  time_t t = time(nullptr);
   struct tm tm;
   strftime(name, sizeof(name),
            "crash/crash-%Y-%m-%d-%H-%M-%S", gmtime_r(&t, &tm));
@@ -175,9 +176,9 @@ LogCatReader::EndOfFile()
 }
 
 bool
-LogCatReader::OnFileEvent(int _fd, unsigned mask)
+LogCatReader::OnFileEvent(FileDescriptor _fd, unsigned mask)
 {
-  assert(_fd == fd.Get());
+  assert(_fd == fd);
 
   char buffer[1024];
   ssize_t nbytes = fd.Read(buffer, sizeof(buffer));
@@ -208,16 +209,19 @@ CheckLogCat(IOThread &io_thread)
     w.Duplicate(1);
 
     execl("/system/bin/logcat", "logcat", "-v", "threadtime",
-          "-d", "-t", "1000", NULL);
+          "-d", "-t", "1000", nullptr);
     _exit(EXIT_FAILURE);
   }
 
+  w.Close();
+
   if (pid < 0) {
+    r.Close();
     LogFormat("Launching logcat has failed: %s", strerror(errno));
     return;
   }
 
-  log_cat_reader = new LogCatReader(io_thread, std::move(r), pid);
+  log_cat_reader = new LogCatReader(io_thread, r, pid);
 }
 
 void

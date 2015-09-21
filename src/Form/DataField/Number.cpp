@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,15 +22,6 @@ Copyright_License {
 */
 
 #include "Number.hpp"
-
-NumberDataField::NumberDataField(Type type, bool support_combo,
-                                 const TCHAR *_edit_format,
-                                 const TCHAR *_display_format,
-                                 DataAccessCallback OnDataAccess)
-  :DataField(type, support_combo, OnDataAccess),
-   edit_format(_edit_format), display_format(_display_format)
-{
-}
 
 NumberDataField::NumberDataField(Type type, bool support_combo,
                                  const TCHAR *_edit_format,

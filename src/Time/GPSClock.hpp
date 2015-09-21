@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,9 +30,14 @@ Copyright_License {
  * Class for GPS-time based time intervals
  */
 class GPSClock {
-private:
+  /**
+   * A large negative value which ensure that first CheckAdvance()
+   * call after Reset() returns true, even if starting XCSoar right
+   * after midnight.
+   */
+  static constexpr int RESET_VALUE = -99999;
+
   fixed last;
-  fixed dt;
 
 public:
   /**
@@ -41,13 +46,13 @@ public:
    * default behaviour, call update() immediately after creating the
    * object.
    */
-  GPSClock(const fixed _minstep):last(fixed(0)), dt(_minstep) {}
+  GPSClock():last(RESET_VALUE) {}
 
   /**
    * Resets the clock.
    */
   void Reset() {
-    last = fixed(0);
+    last = fixed(RESET_VALUE);
   }
 
   /**
@@ -72,24 +77,6 @@ public:
   }
 
   /**
-   * Set dt to a new value defined by _dt
-   * @param _dt The new value fot dt
-   */
-  void SetDT(const fixed _dt) {
-    dt = _dt;
-  }
-
-  /**
-   * Calls check_advance(fixed, fixed) with dt
-   * as the default value for dt
-   * @param now Current time
-   * @see check_advance(fixed, fixed)
-   */
-  bool CheckAdvance(const fixed now) {
-    return CheckAdvance(now, dt);
-  }
-
-  /**
    * Checks whether the specified duration (dt) has passed since the last
    * update. If yes, it updates the time stamp.
    * @param now Current time
@@ -105,6 +92,10 @@ public:
       return true;
     } else
       return false;
+  }
+
+  bool CheckAdvance(fixed now, unsigned dt) {
+    return CheckAdvance(now, fixed(dt));
   }
 };
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -47,8 +47,8 @@ LoadConfiguredTopographyZip(TopographyStore &store,
     return false;
 
   const WideToACPConverter narrow_path(path);
-  ZZIP_DIR *dir = zzip_dir_open(narrow_path, NULL);
-  if (dir == NULL)
+  ZZIP_DIR *dir = zzip_dir_open(narrow_path, nullptr);
+  if (dir == nullptr)
     return false;
 
   ZipLineReaderA reader(dir, "topology.tpl");
@@ -58,7 +58,7 @@ LoadConfiguredTopographyZip(TopographyStore &store,
     return false;
   }
 
-  store.Load(operation, reader, NULL, dir);
+  store.Load(operation, reader, nullptr, dir);
   zzip_dir_close(dir);
   return true;
 }

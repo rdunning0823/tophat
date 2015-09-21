@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -265,8 +265,8 @@ static constexpr MetaData meta_data[] = {
 
   // e_TL_Time
   {
-    N_("Last thermal time"),
-    N_("TL Time"),
+    N_("Last thermal duration"),
+    N_("TL duration"),
     N_("Time spent circling in the last thermal."),
     UpdateInfoBoxThermalLastTime,
     e_Thermal_Avg, // TC Avg
@@ -1395,6 +1395,30 @@ static constexpr MetaData meta_data[] = {
     STANDARD,
   },
 
+  {
+    N_("Final MC0 altitude difference"),
+    N_("Fin MC0 AltD"),
+    N_("Arrival altitude at the final waypoint with MC 0 setting relative to the safety arrival height."),
+    UpdateInfoBoxFinalMC0AltitudeDiff,
+    FIN_MC0_ALTD,
+    FIN_MC0_ALTD,
+    STANDARD,
+  },
+
+  // NEXT_ARROW
+  {
+    N_("Next arrow"),
+    N_("Next arrow"),
+    N_("Arrow pointing to the currently selected waypoint. The name of the "
+       "waypoint and the distance are also shown. "
+       "The position used is the optimized position of the active waypoint "
+       "in the current task, the center of a selected goto waypoint "
+       "or the target within the AAT sector for AAT tasks."),
+    IBFHelper<InfoBoxContentNextArrow>::Create,
+    NEXT_ARROW,
+    NEXT_ARROW,
+    DEPRECATED,
+  },
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

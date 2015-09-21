@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,8 +29,21 @@ Copyright_License {
 
 #include "OS/PathName.hpp"
 #include "IO/TextFile.hpp"
+#include "IO/LineReader.hpp"
 
-#include <memory>
+template<class R>
+gcc_pure
+static bool
+VerifyFormat(const TCHAR *path)
+{
+  auto reader = OpenTextFile(path);
+  if (reader == nullptr)
+    return false;
+
+  bool result = R::VerifyFormat(*reader);
+  delete reader;
+  return result;
+}
 
 WaypointFileType
 DetermineWaypointFileType(const TCHAR *path)
@@ -50,17 +63,13 @@ DetermineWaypointFileType(const TCHAR *path)
 
   // If FS waypoint file -> save type and return true
   if (MatchesExtension(path, _T(".wpt"))) {
-
-    std::unique_ptr<TLineReader> reader(OpenTextFile(path));
-    if (reader && WaypointReaderFS::VerifyFormat(*reader))
+    if (VerifyFormat<WaypointReaderFS>(path))
       return WaypointFileType::FS;
 
-    reader.reset(OpenTextFile(path));
-    if (reader && WaypointReaderOzi::VerifyFormat(*reader))
+    if (VerifyFormat<WaypointReaderOzi>(path))
       return WaypointFileType::OZI_EXPLORER;
 
-    reader.reset(OpenTextFile(path));
-    if (reader && WaypointReaderCompeGPS::VerifyFormat(*reader))
+    if (VerifyFormat<WaypointReaderCompeGPS>(path))
       return WaypointFileType::COMPE_GPS;
   }
 

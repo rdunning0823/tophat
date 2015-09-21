@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -59,6 +59,11 @@ public:
   void AttachFramebuffer(GLenum attachment) {
     FBO::FramebufferRenderbuffer(FBO::FRAMEBUFFER, attachment,
                                  FBO::RENDERBUFFER, id);
+  }
+
+  static void DetachFramebuffer(GLenum attachment) {
+    FBO::FramebufferRenderbuffer(FBO::FRAMEBUFFER, attachment,
+                                 FBO::RENDERBUFFER, 0);
   }
 
 protected:

@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 
 #include "AirspaceCircle.hpp"
 #include "Geo/GeoVector.hpp"
-#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/Flat/FlatProjection.hpp"
 #include "Geo/Flat/FlatLine.hpp"
 #include "AirspaceIntersectSort.hpp"
 #include "AirspaceIntersectionVector.hpp"
@@ -30,7 +30,7 @@
 AirspaceCircle::AirspaceCircle(const GeoPoint &loc, const fixed _radius)
   :AbstractAirspace(Shape::CIRCLE), m_center(loc), m_radius(_radius)
 {
-  m_is_convex = true;
+  is_convex = TriState::TRUE;
 
   // @todo: find better enclosing radius as fn of NUM_SEGMENTS
 
@@ -44,15 +44,15 @@ AirspaceCircle::AirspaceCircle(const GeoPoint &loc, const fixed _radius)
   }
 }
 
-bool 
+bool
 AirspaceCircle::Inside(const GeoPoint &loc) const
 {
-  return (loc.Distance(m_center) <= m_radius);
+  return loc.DistanceS(m_center) <= m_radius;
 }
 
 AirspaceIntersectionVector
 AirspaceCircle::Intersects(const GeoPoint &start, const GeoPoint &end,
-                           const TaskProjection &projection) const
+                           const FlatProjection &projection) const
 {
   const fixed f_radius = projection.ProjectRangeFloat(m_center, m_radius);
   const FlatPoint f_center = projection.ProjectFloat(m_center);
@@ -88,10 +88,10 @@ AirspaceCircle::Intersects(const GeoPoint &start, const GeoPoint &end,
 
 GeoPoint
 AirspaceCircle::ClosestPoint(const GeoPoint &loc,
-                             const TaskProjection &projection) const
+                             gcc_unused const FlatProjection &projection) const
 {
   // Calculate distance from center point
-  const fixed d = loc.Distance(m_center);
+  const fixed d = loc.DistanceS(m_center);
 
   // If loc is INSIDE the circle return loc itself
   if (d <= m_radius)

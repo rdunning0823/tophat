@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,10 +24,9 @@ Copyright_License {
 #include "Enum.hpp"
 #include "ComboList.hpp"
 #include "Language/Language.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <algorithm>
-
-#include <string.h>
 
 DataFieldEnum::Entry::~Entry()
 {
@@ -57,7 +56,7 @@ DataFieldEnum::Entry::Set(unsigned _id, const TCHAR *_string,
   id = _id;
   SetString(_string);
 
-  if (_display_string != NULL)
+  if (_display_string != nullptr)
     display_string = _tcsdup(_display_string);
 
   free(help);
@@ -105,12 +104,12 @@ DataFieldEnum::AddChoice(unsigned id, const TCHAR *text,
 void
 DataFieldEnum::AddChoices(const StaticEnumChoice *p)
 {
-  while (p->display_string != NULL) {
+  while (p->display_string != nullptr) {
     const TCHAR *help = p->help;
-    if (help != NULL)
+    if (help != nullptr)
       help = gettext(help);
 
-    AddChoice(p->id, gettext(p->display_string), NULL, help);
+    AddChoice(p->id, gettext(p->display_string), nullptr, help);
     ++p;
   }
 }
@@ -131,7 +130,7 @@ DataFieldEnum::addEnumText(const TCHAR *Text, const TCHAR *display_string,
 void
 DataFieldEnum::addEnumTexts(const TCHAR *const*list)
 {
-  while (*list != NULL)
+  while (*list != nullptr)
     addEnumText(*list++);
 }
 
@@ -163,7 +162,7 @@ const TCHAR *
 DataFieldEnum::GetHelp() const
 {
   if (entries.empty()) {
-    return NULL;
+    return nullptr;
   } else {
     assert(value < entries.size());
     return entries[value].GetHelp();
@@ -257,7 +256,8 @@ DataFieldEnum::Sort(unsigned startindex)
 {
   std::sort(entries.begin() + startindex, entries.end(),
             [](const DataFieldEnum::Entry &a, const DataFieldEnum::Entry &b) {
-              return _tcscmp(a.GetDisplayString(), b.GetDisplayString()) < 0;
+              return StringCollate(a.GetDisplayString(),
+                                   b.GetDisplayString()) < 0;
             });
 }
 
@@ -270,17 +270,17 @@ DataFieldEnum::CreateComboList(const TCHAR *reference_string) const
     combo_list.Append(i.GetId(), i.GetString(), i.GetDisplayString(),
                        i.GetHelp());
 
-  combo_list.ComboPopupItemSavedIndex = value;
+  combo_list.current_index = value;
   return combo_list;
 }
 
 int
 DataFieldEnum::Find(const TCHAR *text) const
 {
-  assert(text != NULL);
+  assert(text != nullptr);
 
   for (unsigned int i = 0; i < entries.size(); i++)
-    if (_tcscmp(text, entries[i].GetString()) == 0)
+    if (StringIsEqual(text, entries[i].GetString()))
       return i;
 
   return -1;

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,11 +32,15 @@ struct ComputerSettings;
 class Waypoints;
 
 class AutoQNH {
-  static constexpr unsigned QNH_TIME = 10;
+  const unsigned QNH_TIME;
 
   unsigned countdown_autoqnh;
 
 public:
+  constexpr AutoQNH(const unsigned qnh_time = 10)
+    : QNH_TIME(qnh_time), countdown_autoqnh(qnh_time)
+  {};
+
   void Process(const NMEAInfo &basic, DerivedInfo &calculated,
                const ComputerSettings &settings_computer,
                const Waypoints &way_points);

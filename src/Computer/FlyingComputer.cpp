@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,6 +39,8 @@ FlyingComputer::Reset()
   climbing_altitude = fixed(0);
   climbing_clock_dt_since_update = fixed(0);
   sinking_since = fixed(-1);
+  powered_since = fixed(-1);
+  unpowered_since = fixed(-1);
   last_ground_altitude = fixed(-1);
 }
 
@@ -94,8 +96,10 @@ FlyingComputer::Check(FlyingState &state, fixed time)
       state.takeoff_location = moving_at;
       state.flight_time = fixed(0);
 
-      /* when a new flight starts, forget the old release time */
+      /* when a new flight starts, forget the old release and power-on/off time */
       state.release_time = fixed(-1);
+      state.power_on_time = fixed(-1);
+      state.power_off_time = fixed(-1);
       state.far_location.SetInvalid();
       state.far_distance = fixed(-1);
     }
@@ -222,6 +226,36 @@ FlyingComputer::CheckClimbing(fixed dt, fixed altitude)
   return climbing_clock >= dt + fixed(1);
 }
 
+inline void
+FlyingComputer::CheckPowered(fixed dt, const NMEAInfo &basic, FlyingState &flying)
+{
+  if (basic.engine_noise_level > 500 &&
+      negative(powered_since)) {
+    powered_since = basic.time;
+    powered_at = basic.location;
+
+    unpowered_since = fixed(-1);
+    unpowered_at.SetInvalid();
+  } else if (basic.engine_noise_level <= 350 &&
+             negative(unpowered_since)) {
+    unpowered_since = basic.time;
+    unpowered_at = basic.location;
+
+    powered_since = fixed(-1);
+    powered_at.SetInvalid();
+  }
+
+  if (!negative(powered_since) && negative(unpowered_since) && basic.time - powered_since >= fixed(30)) {
+    flying.powered = true;
+    flying.power_on_time = powered_since;
+    flying.power_on_location = powered_at;
+  } else if (!negative(unpowered_since) && basic.time - unpowered_since >= fixed(30)) {
+    flying.powered = false;
+    flying.power_off_time = unpowered_since;
+    flying.power_off_location = unpowered_at;
+  }
+}
+
 void
 FlyingComputer::Compute(fixed takeoff_speed,
                         const NMEAInfo &basic,
@@ -266,6 +300,9 @@ FlyingComputer::Compute(fixed takeoff_speed,
            (CheckLandingSpeed(takeoff_speed, basic) &&
             (!any_altitude.first || !CheckClimbing(dt, any_altitude.second))))
     Stationary(flying, basic.time, dt, basic.location);
+
+  if (basic.engine_noise_level_available)
+    CheckPowered(dt, basic, flying);
 
   if (any_altitude.first) {
     if (flying.on_ground)

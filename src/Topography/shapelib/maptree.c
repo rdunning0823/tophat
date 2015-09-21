@@ -146,6 +146,10 @@ SHPTreeHandle msSHPDiskTreeOpen(struct zzip_dir *zdir, const char * pszTree,
   pszFullname = (char *) msSmallMalloc(strlen(pszBasename) + 5);
   sprintf( pszFullname, "%s%s", pszBasename, MS_INDEX_EXTENSION);
   psTree->fp = zzip_open_rb(zdir, pszFullname);
+  if( psTree->fp == NULL ) {
+      sprintf( pszFullname, "%s.QIX", pszBasename);
+      psTree->fp = zzip_open_rb(zdir, pszFullname);
+  }
 
   msFree(pszBasename); /* don't need these any more */
   msFree(pszFullname);
@@ -479,7 +483,7 @@ void msTreeTrim(treeObj *tree)
 
 #endif /* SHAPELIB_DISABLED */
 
-static void searchDiskTreeNode(SHPTreeHandle disktree, rectObj aoi, ms_bitarray status) 
+static void searchDiskTreeNode(SHPTreeHandle disktree, rectObj aoi, ms_bitarray status)
 {
   int i;
   ms_int32 offset;
@@ -774,6 +778,7 @@ int msWriteTree(treeObj *tree, char *filename, int B_order)
   i = fwrite( pabyBuf, 8, 1, disktree->fp );
   if( !i ) {
     fprintf (stderr, "unable to write to index file ... exiting \n");
+    msSHPDiskTreeClose( disktree );
     return (MS_FALSE);
   }
 

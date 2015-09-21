@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,32 +24,33 @@ Copyright_License {
 #ifndef XCSOAR_RESOURCE_ID_HPP
 #define XCSOAR_RESOURCE_ID_HPP
 
-#include "Util/ConstBuffer.hpp"
+#include "Util/ConstBuffer.hxx"
 
 /**
  * The identifier for a resource to be passed to
  * ResourceLoader::Load() or other resource-loading functions.
  */
 class ResourceId {
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
   unsigned id;
 #else
-  const void *begin, *size;
+  const void *begin;
+  const size_t *size_ptr;
 #endif
 
 public:
   ResourceId() = default;
 
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
   constexpr explicit ResourceId(unsigned _id)
     :id(_id) {}
 #else
-  constexpr explicit ResourceId(const void *_begin, const void *_size)
-    :begin(_begin), size(_size) {}
+  constexpr explicit ResourceId(const void *_begin, const size_t *_size_ptr)
+    :begin(_begin), size_ptr(_size_ptr) {}
 #endif
 
   static constexpr ResourceId Null() {
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
     return ResourceId(0);
 #else
     return ResourceId(nullptr, nullptr);
@@ -57,26 +58,26 @@ public:
   }
 
   constexpr bool IsDefined() const {
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
     return id != 0;
 #else
     return begin != nullptr;
 #endif
   }
 
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
   constexpr explicit operator unsigned() const {
     return id;
   }
 #else
   gcc_pure
   operator ConstBuffer<void>() const {
-    return ConstBuffer<void>(begin, (size_t)size);
+    return ConstBuffer<void>(begin, *size_ptr);
   }
 #endif
 
   constexpr bool operator==(ResourceId other) const {
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
     return id == other.id;
 #else
     return begin == other.begin;
@@ -84,7 +85,7 @@ public:
   }
 
   constexpr bool operator!=(ResourceId other) const {
-#if defined(WIN32) || defined(ANDROID)
+#if defined(USE_WIN32_RESOURCES) || defined(ANDROID)
     return id != other.id;
 #else
     return begin != other.begin;

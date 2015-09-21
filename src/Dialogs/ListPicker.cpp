@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -157,7 +157,8 @@ ListPicker(const TCHAR *caption,
            unsigned item_height,
            ListItemRenderer &item_renderer, bool update,
            const TCHAR *help_text,
-           ItemHelpCallback_t _itemhelp_callback)
+           ItemHelpCallback_t _itemhelp_callback,
+           const TCHAR *extra_caption)
 {
   assert(num_items <= 0x7fffffff);
   assert((num_items == 0 && initial_value == 0) || initial_value < num_items);
@@ -186,10 +187,14 @@ ListPicker(const TCHAR *caption,
   if (num_items > 0)
     dialog.AddButton(_("Select"), mrOK);
 
+  if (extra_caption != nullptr)
+    dialog.AddButton(extra_caption, -2);
+
   dialog.AddButton(_("Cancel"), mrCancel);
 
   if (help_text != nullptr)
     dialog.AddButton(_("Help"), *list_widget, HELP);
+  dialog.EnableCursorSelection();
 
   auto update_timer = MakeLambdaTimer([list_widget](){
       list_widget->GetList().Invalidate();
@@ -197,9 +202,11 @@ ListPicker(const TCHAR *caption,
   if (update)
     update_timer.Schedule(1000);
 
-  int result = dialog.ShowModal() == mrOK
-    ? (int)list_widget->GetList().GetCursorIndex()
-    : -1;
+  int result = dialog.ShowModal();
+  if (result == mrOK)
+    result = (int)list_widget->GetList().GetCursorIndex();
+  else if (result != -2)
+    result = -1;
 
   update_timer.Cancel();
   return result;

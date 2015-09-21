@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "Device/Driver/AltairPro.hpp"
 #include "Device/Driver.hpp"
-#include "Device/Internal.hpp"
+#include "Device/Util/NMEAWriter.hpp"
 #include "Device/Port/Port.hpp"
 #include "Device/Declaration.hpp"
 #include "NMEA/Checksum.hpp"
@@ -63,10 +63,11 @@ public:
   AltairProDevice(Port &_port):port(_port){}
 
 public:
-  virtual bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
-  virtual bool Declare(const struct Declaration &declaration,
-                       const Waypoint *home,
-                       OperationEnvironment &env) override;
+  /* virtual methods from class Device */
+  bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
+  bool Declare(const struct Declaration &declaration,
+               const Waypoint *home,
+               OperationEnvironment &env) override;
 };
 
 static bool
@@ -182,8 +183,8 @@ AltairProDevice::DeclareInternal(const struct Declaration &declaration,
    */
 
   if (declaration.Size() > 1) {
-    PutTurnPoint(_T("DeclTakeoff"), NULL, env);
-    PutTurnPoint(_T("DeclLanding"), NULL, env);
+    PutTurnPoint(_T("DeclTakeoff"), nullptr, env);
+    PutTurnPoint(_T("DeclLanding"), nullptr, env);
 
     PutTurnPoint(_T("DeclStart"), &declaration.GetFirstWaypoint(), env);
     PutTurnPoint(_T("DeclFinish"), &declaration.GetLastWaypoint(), env);
@@ -196,7 +197,7 @@ AltairProDevice::DeclareInternal(const struct Declaration &declaration,
         PutTurnPoint(TurnPointPropertyName, &declaration.GetWaypoint(index),
                      env);
       } else {
-        PutTurnPoint(TurnPointPropertyName, NULL, env);
+        PutTurnPoint(TurnPointPropertyName, nullptr, env);
       }
     }
   }
@@ -205,7 +206,7 @@ AltairProDevice::DeclareInternal(const struct Declaration &declaration,
   if (!PropertySetGet(Buffer, ARRAY_SIZE(Buffer), env))
     return false;
 
-  if (_tcscmp(&Buffer[9], _T("LOCKED")) == 0)
+  if (StringIsEqual(&Buffer[9], _T("LOCKED")))
     // FAILED! try to declare a task on a airborn recorder
     return false;
 
@@ -222,7 +223,7 @@ bool
 AltairProDevice::PropertySetGet(char *Buffer, size_t size,
                                 OperationEnvironment &env)
 {
-  assert(Buffer != NULL);
+  assert(Buffer != nullptr);
 
   port.Flush();
 
@@ -235,7 +236,7 @@ AltairProDevice::PropertySetGet(char *Buffer, size_t size,
   Buffer[6] = _T('A');
   char *comma = strchr(&Buffer[8], ',');
 
-  if (comma == NULL)
+  if (comma == nullptr)
     return false;
 
   comma[1] = '\0';
@@ -251,7 +252,7 @@ AltairProDevice::PropertySetGet(char *Buffer, size_t size,
       return false;
 
     char *asterisk = (char *)memchr(Buffer, '*', nbytes);
-    if (asterisk != NULL) {
+    if (asterisk != nullptr) {
       *asterisk = 0;
       return true;
     }
@@ -267,11 +268,11 @@ bool
 AltairProDevice::PropertySetGet(TCHAR *s, size_t size,
                                 OperationEnvironment &env)
 {
-  assert(s != NULL);
+  assert(s != nullptr);
 
   char buffer[_tcslen(s) * 4 + 1];
   if (::WideCharToMultiByte(CP_ACP, 0, s, -1, buffer, sizeof(buffer),
-                               NULL, NULL) <= 0)
+                               nullptr, nullptr) <= 0)
     return false;
 
   if (!PropertySetGet(buffer, _tcslen(s) * 4 + 1, env))
@@ -298,7 +299,7 @@ AltairProDevice::PutTurnPoint(const TCHAR *propertyName,
   double tmp, MinLat, MinLon;
   char NoS, EoW;
 
-  if (waypoint != NULL){
+  if (waypoint != nullptr){
 
     CopyString(Name, waypoint->name.c_str(), ARRAY_SIZE(Name));
 

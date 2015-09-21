@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,8 +23,9 @@ Copyright_License {
 
 #include "Thread/StandbyThread.hpp"
 
-StandbyThread::StandbyThread()
-  :alive(false), pending(false), busy(false), stop(false) {}
+StandbyThread::StandbyThread(const char *_name)
+  :Thread(_name),
+   alive(false), pending(false), busy(false), stop(false) {}
 
 StandbyThread::~StandbyThread()
 {
@@ -36,7 +37,6 @@ void
 StandbyThread::Trigger()
 {
   assert(!IsInside());
-  assert(!IsBusy());
   assert(mutex.IsLockedByCurrent());
 
   stop = false;

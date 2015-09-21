@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,79 +32,56 @@ Copyright_License {
 #include "OS/FileUtil.hpp"
 #include "IO/ZipSource.hpp"
 #include "IO/TextFile.hpp"
-#include "Util/StringUtil.hpp"
+#include "IO/LineReader.hpp"
 
-bool
-WaypointReader::Parse(Waypoints &way_points, OperationEnvironment &operation)
+#include <string.h>
+
+static WaypointReaderBase *
+CreateWaypointReader(const TCHAR *path, WaypointFactory factory)
 {
-  if (reader == NULL)
-    return false;
-
-  TLineReader *line_reader = OpenTextFile(path, ConvertLineReader::AUTO);
-  if (line_reader == nullptr)
-    return false;
-
-  reader->Parse(way_points, *line_reader, operation);
-  delete line_reader;
-  return true;
-}
-
-void
-WaypointReader::SetTerrain(const RasterTerrain* _terrain)
-{
-  if (reader != NULL)
-    reader->SetTerrain(_terrain);
-}
-
-void
-WaypointReader::Open(const TCHAR* filename, int the_filenum)
-{
-  delete reader;
-  reader = NULL;
-
-  // If filename is empty -> clear and return NULL pointer
-  if (StringIsEmpty(filename))
-    return;
-
-  _tcscpy(path, filename);
-
-  // Test if file exists
-  bool compressed = false;
-  if (!File::Exists(filename)) {
-    compressed = true;
-    // Test if file exists in zip archive
-    ZipSource zip(filename);
-    if (zip.error())
-      // If the file doesn't exist return NULL pointer
-      return;
-  }
-
-  switch (DetermineWaypointFileType(filename)) {
-  case WaypointFileType::WINPILOT:
-    reader = new WaypointReaderWinPilot(the_filenum, compressed);
+  switch (DetermineWaypointFileType(path)) {
+  case WaypointFileType::UNKNOWN:
     break;
+
+  case WaypointFileType::WINPILOT:
+    return new WaypointReaderWinPilot(factory);
 
   case WaypointFileType::SEEYOU:
-    reader = new WaypointReaderSeeYou(the_filenum, compressed);
-    break;
+    return new WaypointReaderSeeYou(factory);
 
   case WaypointFileType::ZANDER:
-    reader = new WaypointReaderZander(the_filenum, compressed);
-    break;
+    return new WaypointReaderZander(factory);
 
   case WaypointFileType::FS:
-    reader = new WaypointReaderFS(the_filenum, compressed);
-    break;
+    return new WaypointReaderFS(factory);
 
   case WaypointFileType::OZI_EXPLORER:
-    reader = new WaypointReaderOzi(the_filenum, compressed);
-    break;
+    return new WaypointReaderOzi(factory);
 
   case WaypointFileType::COMPE_GPS:
-    reader = new WaypointReaderCompeGPS(the_filenum, compressed);
-    break;
-
-  default:
-    break;
+    return new WaypointReaderCompeGPS(factory);
   }
+
+  return nullptr;
+}
+
+bool
+ReadWaypointFile(const TCHAR *path, Waypoints &way_points,
+                 WaypointFactory factory, OperationEnvironment &operation)
+{
+  auto *reader = CreateWaypointReader(path, factory);
+  if (reader == nullptr)
+    return false;
+
+  bool success = false;
+
+  auto *line_reader = OpenTextFile(path, Charset::AUTO);
+  if (line_reader != nullptr) {
+    reader->Parse(way_points, *line_reader, operation);
+    delete line_reader;
+    success = true;
+  }
+
+  delete reader;
+  return success;
 }

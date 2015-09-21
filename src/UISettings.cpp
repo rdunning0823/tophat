@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ UISettings::SetDefaults()
   waypoint_sort_direction = UISettings::WaypointSortDirection::NAME;
 
 #ifndef GNAV
-  custom_fonts = false;
+  scale = 100;
 #endif
 
   enable_thermal_assistant_gauge = false;
@@ -45,13 +45,13 @@ UISettings::SetDefaults()
 
   screens_button_location = ScreensButtonLocation::MENU;
 
+  enable_airspace_warning_dialog = true;
+
   popup_message_position = PopupMessagePosition::CENTER;
 
   haptic_feedback = HapticFeedback::DEFAULT;
 
-  coordinate_format = CoordinateFormat::DDMMSS;
-
-  units.SetDefaults();
+  format.SetDefaults();
   map.SetDefaults();
   info_boxes.SetDefaults();
   vario.SetDefaults();

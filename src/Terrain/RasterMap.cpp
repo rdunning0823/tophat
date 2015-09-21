@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,6 +30,14 @@ Copyright_License {
 #include <assert.h>
 #include <string.h>
 
+/* use separate cache files for FIXED=y and FIXED=n because the file
+   format is different */
+#ifdef FIXED_MATH
+static const TCHAR *const terrain_cache_name = _T("terrain_fixed");
+#else
+static const TCHAR *const terrain_cache_name = _T("terrain");
+#endif
+
 static char *
 ToNarrowPath(const TCHAR *src)
 {
@@ -43,7 +51,7 @@ RasterMap::RasterMap(const TCHAR *_path, const TCHAR *world_file,
   bool cache_loaded = false;
   if (cache != NULL) {
     /* load the cache file */
-    FILE *file = cache->Load(_T("terrain"), _path);
+    FILE *file = cache->Load(terrain_cache_name, _path);
     if (file != NULL) {
       cache_loaded = raster_tile_cache.LoadCache(file);
       fclose(file);
@@ -56,12 +64,12 @@ RasterMap::RasterMap(const TCHAR *_path, const TCHAR *world_file,
 
     if (cache != NULL) {
       /* save the cache file */
-      FILE *file = cache->Save(_T("terrain"), _path);
+      FILE *file = cache->Save(terrain_cache_name, _path);
       if (file != NULL) {
         if (raster_tile_cache.SaveCache(file))
-          cache->Commit(_T("terrain"), file);
+          cache->Commit(terrain_cache_name, file);
         else
-          cache->Cancel(_T("terrain"), file);
+          cache->Cancel(terrain_cache_name, file);
       }
     }
   }
@@ -122,7 +130,7 @@ RasterMap::ScanLine(const GeoPoint &start, const GeoPoint &end,
 
   const short invalid = RasterBuffer::TERRAIN_INVALID;
 
-  const fixed total_distance = start.Distance(end);
+  const fixed total_distance = start.DistanceS(end);
   if (!positive(total_distance)) {
     std::fill_n(buffer, size, invalid);
     return;
@@ -138,9 +146,9 @@ RasterMap::ScanLine(const GeoPoint &start, const GeoPoint &end,
   }
 
   fixed clipped_start_distance =
-    std::max(clipped_start.Distance(start), fixed(0));
+    std::max(clipped_start.DistanceS(start), fixed(0));
   fixed clipped_end_distance =
-    std::max(clipped_end.Distance(start), fixed(0));
+    std::max(clipped_end.DistanceS(start), fixed(0));
 
   /* calculate the offsets of the clipped range within the buffer */
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "RowFormWidget.hpp"
 #include "Form/Edit.hpp"
-#include "Form/DataField/FileReader.hpp"
+#include "Form/DataField/File.hpp"
 #include "Profile/Profile.hpp"
 #include "LocalPath.hpp"
 #include "Math/Angle.hpp"
@@ -33,12 +33,14 @@ Copyright_License {
 #include <assert.h>
 
 WndProperty *
-RowFormWidget::AddFileReader(const TCHAR *label, const TCHAR *help,
-                             const char *registry_key, const TCHAR *filters,
-                             bool nullable)
+RowFormWidget::AddFile(const TCHAR *label, const TCHAR *help,
+                       const char *registry_key, const TCHAR *filters,
+                       FileType file_type,
+                       bool nullable)
 {
   WndProperty *edit = Add(label, help);
-  DataFieldFileReader *df = new DataFieldFileReader();
+  auto *df = new FileDataField();
+  df->SetFileType(file_type);
   edit->SetDataField(df);
 
   if (nullable)
@@ -126,8 +128,7 @@ RowFormWidget::SaveValue(unsigned i, const char *registry_key,
 bool
 RowFormWidget::SaveValueFileReader(unsigned i, const char *registry_key)
 {
-  const DataFieldFileReader *dfe =
-    (const DataFieldFileReader *)GetControl(i).GetDataField();
+  const auto *dfe = (const FileDataField *)GetControl(i).GetDataField();
   TCHAR new_value[MAX_PATH];
   _tcscpy(new_value, dfe->GetPathFile());
   ContractLocalPath(new_value);

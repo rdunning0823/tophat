@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -86,7 +86,7 @@ private:
   bool stop;
 
 public:
-  StandbyThread();
+  StandbyThread(const char *_name);
 
   /**
    * This destructor verifies that the thread has been stopped.
@@ -115,6 +115,9 @@ private:
   }
 
 protected:
+  using Thread::SetLowPriority;
+  using Thread::SetIdlePriority;
+
   /**
    * Wakes up the thread to do work, calls Tick().  If the thread is
    * not already running, it is launched.  Must not be called while
@@ -123,6 +126,16 @@ protected:
    * Caller must lock the mutex.
    */
   void Trigger();
+
+  /**
+   * Same as Trigger(), but automatically lock and unlock the mutex.
+   *
+   * Caller must not lock the mutex.
+   */
+  void LockTrigger() {
+    ScopeLock protect(mutex);
+    Trigger();
+  }
 
   /**
    * Is the thread currently working (i.e. inside Tick())?
@@ -190,6 +203,11 @@ protected:
 
     StopAsync();
     WaitStopped();
+  }
+
+  void LockStop() {
+    ScopeLock protect(mutex);
+    Stop();
   }
 
   /**

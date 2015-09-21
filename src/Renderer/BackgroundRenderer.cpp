@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@ BackgroundRenderer::SetTerrain(const RasterTerrain *_terrain)
 }
 
 void
-BackgroundRenderer::SetWeather(const RasterWeather *_weather)
+BackgroundRenderer::SetWeather(const RasterWeatherCache *_weather)
 {
   weather = _weather;
   Reset();
@@ -85,10 +85,10 @@ BackgroundRenderer::Draw(Canvas& canvas,
     // defer creation until first draw because
     // the buffer size, smoothing etc is set by the
     // loaded terrain properties
-    if (weather) {
-      renderer = new WeatherTerrainRenderer(terrain, weather);
+    if (weather != nullptr) {
+      renderer = new WeatherTerrainRenderer(*terrain, *weather);
     } else {
-      renderer = new TerrainRenderer(terrain);
+      renderer = new TerrainRenderer(*terrain);
     }
   }
 

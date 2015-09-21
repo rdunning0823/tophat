@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,12 +33,12 @@ Copyright_License {
 #include <SLES/OpenSLES_Android.h>
 #elif defined(WIN32)
 #else
-#include <SDL/SDL_audio.h>
+#include <SDL_audio.h>
 #endif
 
 #include <assert.h>
 
-PCMPlayer::PCMPlayer():sample_rate(0), synthesiser(NULL) {}
+PCMPlayer::PCMPlayer():sample_rate(0), synthesiser(nullptr) {}
 
 PCMPlayer::~PCMPlayer()
 {
@@ -90,7 +90,8 @@ PCMPlayer::Start(PCMSynthesiser &_synthesiser, unsigned _sample_rate)
   /* why, oh why is OpenSL/ES so complicated? */
 
   SLObjectItf _object;
-  SLresult result = SLES::CreateEngine(&_object, 0, NULL, 0, NULL, NULL);
+  SLresult result = SLES::CreateEngine(&_object, 0, nullptr,
+                                       0, nullptr, nullptr);
   if (result != SL_RESULT_SUCCESS) {
     LogFormat("PCMPlayer: slCreateEngine() result=%#x", (int)result);
     return false;
@@ -116,7 +117,7 @@ PCMPlayer::Start(PCMSynthesiser &_synthesiser, unsigned _sample_rate)
 
   SLES::Engine engine(_engine);
 
-  result = engine.CreateOutputMix(&_object, 0, NULL, NULL);
+  result = engine.CreateOutputMix(&_object, 0, nullptr, nullptr);
   if (result != SL_RESULT_SUCCESS) {
     LogFormat("PCMPlayer: CreateOutputMix() result=%#x", (int)result);
     engine_object.Destroy();
@@ -158,7 +159,7 @@ PCMPlayer::Start(PCMSynthesiser &_synthesiser, unsigned _sample_rate)
 
   SLDataSink audioSnk = {
     &loc_outmix,
-    NULL,
+    nullptr,
   };
 
   const SLInterfaceID ids2[] = {
@@ -234,7 +235,7 @@ PCMPlayer::Start(PCMSynthesiser &_synthesiser, unsigned _sample_rate)
     play_object.Destroy();
     mix_object.Destroy();
     engine_object.Destroy();
-    synthesiser = NULL;
+    synthesiser = nullptr;
     return false;
   }
 
@@ -246,7 +247,7 @@ PCMPlayer::Start(PCMSynthesiser &_synthesiser, unsigned _sample_rate)
   return true;
 #elif defined(WIN32)
 #else
-  if (synthesiser != NULL) {
+  if (synthesiser != nullptr) {
     if (_sample_rate == sample_rate) {
       /* already open, just change the synthesiser */
       SDL_LockAudio();
@@ -268,7 +269,7 @@ PCMPlayer::Start(PCMSynthesiser &_synthesiser, unsigned _sample_rate)
   spec.callback = ::Synthesise;
   spec.userdata = this;
 
-  if (SDL_OpenAudio(&spec, NULL) < 0)
+  if (SDL_OpenAudio(&spec, nullptr) < 0)
     return false;
 
   synthesiser = &_synthesiser;
@@ -282,7 +283,7 @@ void
 PCMPlayer::Stop()
 {
 #ifdef ANDROID
-  if (synthesiser == NULL)
+  if (synthesiser == nullptr)
     return;
 
   play.SetPlayState(SL_PLAYSTATE_PAUSED);
@@ -291,15 +292,15 @@ PCMPlayer::Stop()
   engine_object.Destroy();
 
   sample_rate = 0;
-  synthesiser = NULL;
+  synthesiser = nullptr;
 #elif defined(WIN32)
 #else
-  if (synthesiser == NULL)
+  if (synthesiser == nullptr)
     return;
 
   SDL_CloseAudio();
   sample_rate = 0;
-  synthesiser = NULL;
+  synthesiser = nullptr;
 #endif
 }
 
@@ -308,7 +309,7 @@ PCMPlayer::Stop()
 void
 PCMPlayer::Enqueue()
 {
-  assert(synthesiser != NULL);
+  assert(synthesiser != nullptr);
 
   ScopeLock protect(mutex);
 
@@ -333,7 +334,7 @@ PCMPlayer::Enqueue()
 void
 PCMPlayer::Synthesise(void *buffer, size_t n)
 {
-  assert(synthesiser != NULL);
+  assert(synthesiser != nullptr);
 
   synthesiser->Synthesise((int16_t *)buffer, n);
 }

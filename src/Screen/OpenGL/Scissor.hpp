@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,18 +28,41 @@ Copyright_License {
 #include "Screen/OpenGL/Globals.hpp"
 #include "Screen/Canvas.hpp"
 
+#ifdef SOFTWARE_ROTATE_DISPLAY
+#include "Rotate.hpp"
+
+class GLCanvasScissor : public GLEnable<GL_SCISSOR_TEST> {
+public:
+  explicit GLCanvasScissor(const Canvas &canvas) {
+    Scissor(PixelRect(0, 0, canvas.GetWidth(), canvas.GetHeight()));
+  }
+
+  explicit GLCanvasScissor(PixelRect rc) {
+    Scissor(rc);
+  }
+
+private:
+  void Scissor(PixelRect rc) {
+    OpenGL::ToViewport(rc);
+    ::glScissor(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
+  }
+};
+
+#else
 
 class GLCanvasScissor : public GLScissor {
 public:
   GLCanvasScissor(const Canvas &canvas)
     :GLScissor(OpenGL::translate.x,
-               OpenGL::screen_height - OpenGL::translate.y - canvas.GetHeight(),
+               OpenGL::viewport_size.y - OpenGL::translate.y - canvas.GetHeight(),
                canvas.GetWidth(), canvas.GetHeight()) {}
 
   explicit GLCanvasScissor(PixelRect rc)
     :GLScissor(OpenGL::translate.x + rc.left,
-               OpenGL::screen_height - OpenGL::translate.y - rc.bottom,
+               OpenGL::viewport_size.y - OpenGL::translate.y - rc.bottom,
                rc.right - rc.top, rc.bottom - rc.top) {}
 };
+
+#endif
 
 #endif

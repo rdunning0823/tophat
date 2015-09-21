@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ public:
                                Lookup(_T("DecompressImageIndirect"))) {}
 
   HRESULT DecompressImageIndirect(DecompressImageInfo *pParams) const {
-    return DecompressImageIndirect_p != NULL
+    return DecompressImageIndirect_p != nullptr
       ? DecompressImageIndirect_p(pParams)
       : E_NOTIMPL;
   }

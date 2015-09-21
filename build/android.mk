@@ -4,12 +4,6 @@
 
 ifeq ($(TARGET),ANDROID)
 
-# When enabled, the package org.tophat.testing is created, with a red
-# Activity icon, to allow simultaneous installation of "stable" and
-# "testing".
-# In the stable branch, this should default to "n".
-TESTING = y
-
 ANDROID_KEYSTORE ?= $(HOME)/.android/mk.keystore
 ANDROID_KEY_ALIAS ?= mk
 ANDROID_BUILD = $(TARGET_OUTPUT_DIR)/build
@@ -21,7 +15,7 @@ else
   ANDROID_SDK ?= $(HOME)/opt/android-sdk-linux
 endif
 ANDROID_SDK_PLATFORM_DIR = $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)
-ANDROID_ABI_DIR = $(ANDROID_BUILD)/libs/$(ANDROID_ABI3)
+ANDROID_ABI_DIR = $(ANDROID_BUILD)/libs/$(ANDROID_ABI5)
 
 ANDROID_BUILD_TOOLS_DIR = $(ANDROID_SDK)/build-tools/20.0.0
 ZIPALIGN = $(ANDROID_BUILD_TOOLS_DIR)/zipalign
@@ -49,6 +43,8 @@ CLASS_SOURCE = $(subst .,/,$(CLASS_NAME)).java
 CLASS_CLASS = $(patsubst %.java,%.class,$(CLASS_SOURCE))
 
 NATIVE_CLASSES = NativeView EventBridge InternalGPS NonGPSSensors NativeInputListener DownloadUtil BatteryReceiver
+NATIVE_CLASSES += NativePortListener
+NATIVE_CLASSES += NativeLeScanCallback
 NATIVE_CLASSES += NativeBMP085Listener
 NATIVE_CLASSES += NativeI2CbaroListener
 NATIVE_CLASSES += NativeNunchuckListener
@@ -165,7 +161,7 @@ endif
 $(ANDROID_BUILD)/build.xml: $(MANIFEST) $(PNG_FILES) | $(TARGET_BIN_DIR)/dirstamp
 	@$(NQ)echo "  ANDROID $@"
 	$(Q)rm -r -f $@ $(@D)/*_rules.xml $(@D)/AndroidManifest.xml $(@D)/src $(@D)/bin $(@D)/res/values $(@D)/res/xml
-	$(Q)mkdir -p $(ANDROID_BUILD)/res $(ANDROID_BUILD)/src/org/tophat $(ANDROID_BUILD)/src/ioio/lib
+	$(Q)mkdir -p $(ANDROID_BUILD)/res $(ANDROID_BUILD)/src/org/tophat $(ANDROID_BUILD)/src/ioio/lib/android
 	$(Q)ln -s ../../../$(MANIFEST) $(@D)/AndroidManifest.xml
 	$(Q)ln -s ../bin $(@D)/bin
 	$(Q)ln -s $(addprefix ../../../../../../,$(ANDROID_JAVA_SOURCES)) $(@D)/src/org/tophat
@@ -175,10 +171,9 @@ $(ANDROID_BUILD)/build.xml: $(MANIFEST) $(PNG_FILES) | $(TARGET_BIN_DIR)/dirstam
 	$(Q)ln -s ../../../../../../android/ioio/software/IOIOLib/src/ioio/lib/impl $(ANDROID_BUILD)/src/ioio/lib/impl
 	$(Q)ln -s ../../../../../../android/ioio/software/IOIOLib/target/android/src/ioio/lib/spi $(ANDROID_BUILD)/src/ioio/lib/spi2
 	$(Q)ln -s ../../../../../android/ioio/software/IOIOLib/target/android/src/ioio/lib/util/android/ContextWrapperDependent.java $(ANDROID_BUILD)/src/ioio/
-	$(Q)sed -e 's/com\.android\.future\.usb/android.hardware.usb/g' \
-		-e 's/UsbManager.getInstance(wrapper)/(UsbManager)wrapper.getSystemService(Context.USB_SERVICE)/' \
-		<android/ioio/software/IOIOLibAccessory/src/ioio/lib/android/accessory/AccessoryConnectionBootstrap.java \
-		>$(ANDROID_BUILD)/src/AccessoryConnectionBootstrap.java
+	$(Q)ln -s ../../../../../../../android/ioio/software/IOIOLibAccessory/src/ioio/lib/android/accessory $(ANDROID_BUILD)/src/ioio/lib/android/accessory
+	$(Q)ln -s ../../../../../../../android/ioio/software/IOIOLibBT/src/ioio/lib/android/bluetooth $(ANDROID_BUILD)/src/ioio/lib/android/bluetooth
+	$(Q)ln -s ../../../../../../../android/ioio/software/IOIOLibAndroidDevice/src/ioio/lib/android/device $(ANDROID_BUILD)/src/ioio/lib/android/device
 	$(Q)ln -s ../../../../android/res/values $(@D)/res/values
 	$(Q)ln -s ../../../../android/res/xml $(@D)/res/xml
 ifeq ($(HOST_IS_WIN32),y)
@@ -220,6 +215,9 @@ $(eval $(call generate-abi,$(1),armeabi,ANDROID))
 $(eval $(call generate-abi,$(1),armeabi-v7a,ANDROID7))
 $(eval $(call generate-abi,$(1),x86,ANDROID86))
 $(eval $(call generate-abi,$(1),mips,ANDROIDMIPS))
+$(eval $(call generate-abi,$(1),arm64-v8a,ANDROIDAARCH64))
+$(eval $(call generate-abi,$(1),x86_64,ANDROIDX64))
+# Not adding ANDROIDMIPS64, because this platform has not been tested yet.
 endef
 
 $(foreach NAME,$(ANDROID_LIB_NAMES),$(eval $(call generate-all-abis,$(NAME))))
@@ -231,6 +229,8 @@ $(call SRC_TO_OBJ,$(SRC)/Android/Main.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/EventBridge.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/InternalSensors.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/Battery.cpp): $(NATIVE_HEADERS)
+$(call SRC_TO_OBJ,$(SRC)/Android/NativePortListener.cpp): $(NATIVE_HEADERS)
+$(call SRC_TO_OBJ,$(SRC)/Android/NativeLeScanCallback.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeInputListener.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/DownloadManager.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeBMP085Listener.cpp): $(NATIVE_HEADERS)

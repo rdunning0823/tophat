@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -54,21 +54,21 @@ protected:
    * Determines whether this BufferWindow maintains a persistent
    * buffer which allows incremental drawing in each frame.
    */
-  static bool IsPersistent() {
+  static constexpr bool IsPersistent() {
     return true;
   }
 
 protected:
   /* virtual methods from class Window */
 #ifndef ENABLE_OPENGL
-  virtual void OnCreate() override;
-  virtual void OnDestroy() override;
+  void OnCreate() override;
+  void OnDestroy() override;
 #endif
 
-  virtual void OnResize(PixelSize new_size) override;
+  void OnResize(PixelSize new_size) override;
 
   /* virtual methods from class PaintWindow */
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnPaint(Canvas &canvas) override;
 
   /* our virtual methods */
   virtual void OnPaintBuffer(Canvas &canvas) = 0;

@@ -27,27 +27,9 @@
  */
 
 #include "Node.hpp"
-#include "Util/StringUtil.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <assert.h>
-
-void
-XMLNode::Data::Ref()
-{
-  assert(ref_count > 0);
-
-  ++ref_count;
-}
-
-void
-XMLNode::Data::Unref()
-{
-  assert(ref_count > 0);
-
-  --ref_count;
-  if (ref_count == 0)
-    delete this;
-}
 
 XMLNode
 XMLNode::CreateRoot(const TCHAR *name)
@@ -70,7 +52,7 @@ XMLNode::XMLNode(const TCHAR *name, size_t name_length, bool is_declaration)
 XMLNode &
 XMLNode::AddChild(const TCHAR *name, bool is_declaration)
 {
-  assert(name != NULL);
+  assert(name != nullptr);
 
   d->children.push_back(XMLNode(name, is_declaration));
   return d->children.back();
@@ -79,7 +61,7 @@ XMLNode::AddChild(const TCHAR *name, bool is_declaration)
 XMLNode &
 XMLNode::AddChild(const TCHAR *name, size_t name_length, bool is_declaration)
 {
-  assert(name != NULL);
+  assert(name != nullptr);
 
   d->children.push_back(XMLNode(name, name_length, is_declaration));
   return d->children.back();
@@ -88,7 +70,7 @@ XMLNode::AddChild(const TCHAR *name, size_t name_length, bool is_declaration)
 void
 XMLNode::AddText(const TCHAR *value)
 {
-  assert(value != NULL);
+  assert(value != nullptr);
 
   d->text.append(value);
 }
@@ -96,38 +78,16 @@ XMLNode::AddText(const TCHAR *value)
 void
 XMLNode::AddText(const TCHAR *text, size_t length)
 {
-  assert(text != NULL);
+  assert(text != nullptr);
 
   d->text.append(text, length);
-}
-
-XMLNode&
-XMLNode::operator=(const XMLNode& A)
-{
-  Data *old = d;
-
-  d = A.d;
-  if (d != nullptr)
-    d->Ref();
-
-  if (old != nullptr)
-    old->Unref();
-
-  return *this;
-}
-
-XMLNode::XMLNode(const XMLNode &A)
-{
-  d = A.d;
-  if (d)
-    d->Ref();
 }
 
 const XMLNode *
 XMLNode::GetChildNode(const TCHAR *name) const
 {
   if (!d)
-    return NULL;
+    return nullptr;
 
   for (auto i = d->begin(), end = d->end(); i != end; ++i) {
     const XMLNode &node = *i;
@@ -135,19 +95,19 @@ XMLNode::GetChildNode(const TCHAR *name) const
       return &node;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const TCHAR *
 XMLNode::GetAttribute(const TCHAR *name) const
 {
   if (!d)
-    return NULL;
+    return nullptr;
 
   for (auto i = d->attributes.begin(), end = d->attributes.end();
        i != end; ++i)
     if (StringIsEqualIgnoreCase(i->name.c_str(), name))
       return i->value.c_str();
 
-  return NULL;
+  return nullptr;
 }

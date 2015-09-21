@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -109,7 +109,7 @@ private:
 #else /* !HAVE_POSIX */
     FILETIME f_kernel_time, f_user_time;
 
-    if (!::GetThreadTimes(::GetCurrentThread(), NULL, NULL,
+    if (!::GetThreadTimes(::GetCurrentThread(), nullptr, nullptr,
                           &f_kernel_time, &f_user_time))
       return 0;
 
@@ -133,9 +133,9 @@ public:
       return;
 
     FlushScreen();
-    markers.append().Set(NULL);
+    markers.append().Set(nullptr);
 
-    for (unsigned i = 0; markers[i + 1].text != NULL; ++i) {
+    for (unsigned i = 0; markers[i + 1].text != nullptr; ++i) {
       const Marker &start = markers[i];
       const Marker &end = markers[i + 1];
 

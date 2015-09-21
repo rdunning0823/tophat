@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Listener.hpp"
-#include "Form/Form.hpp"
 #include "Form/Frame.hpp"
 #include "Units/Units.hpp"
 #include "Units/UnitsStore.hpp"
@@ -33,12 +32,12 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Asset.hpp"
 #include "Language/Language.hpp"
-#include "Form/DataField/Base.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
 enum ControlIndex {
   UnitsPreset,
+  spacer_1,
   UnitsSpeed,
   UnitsDistance,
   UnitsLift,
@@ -46,9 +45,10 @@ enum ControlIndex {
   UnitsTemperature,
   UnitsTaskSpeed,
   UnitsPressure,
-  UnitsWingLoading,
   UnitsMass,
-  UnitsLatLon,
+  UnitsWingLoading,
+  spacer_2,
+  UnitsLatLon
 };
 
 class UnitsConfigPanel final
@@ -57,15 +57,8 @@ public:
   UnitsConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
-  /**
-   * Update the Preset field if the selected units match one
-   */
+  void UpdateUnitFields(const UnitSetting &units);
   void PresetCheck();
-
-  /**
-   * Update all unit fields from the selected preset
-   */
-  void UpdateFromPreset();
 
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
@@ -77,25 +70,19 @@ private:
 };
 
 void
-UnitsConfigPanel::UpdateFromPreset()
+UnitsConfigPanel::UpdateUnitFields(const UnitSetting &units)
 {
-  DataFieldEnum* dfe = (DataFieldEnum*)
-      RowFormWidget::GetControl(UnitsPreset).GetDataField();
-  unsigned the_unit = (unsigned)dfe->GetAsInteger();
-  // don't change anything if the selected unit is "Custom"
-  if (the_unit > 0) {
-    UnitSetting preset_units = Units::Store::Read(the_unit - 1);
+  LoadValueEnum(UnitsSpeed, units.speed_unit);
+  LoadValueEnum(UnitsDistance, units.distance_unit);
+  LoadValueEnum(UnitsLift, units.vertical_speed_unit);
+  LoadValueEnum(UnitsAltitude, units.altitude_unit);
+  LoadValueEnum(UnitsTemperature, units.temperature_unit);
+  LoadValueEnum(UnitsTaskSpeed, units.task_speed_unit);
+  LoadValueEnum(UnitsPressure, units.pressure_unit);
+  LoadValueEnum(UnitsMass, units.mass_unit);
+  LoadValueEnum(UnitsWingLoading, units.wing_loading_unit);
 
-    LoadValueEnum(UnitsSpeed, preset_units.speed_unit);
-    LoadValueEnum(UnitsDistance, preset_units.distance_unit);
-    LoadValueEnum(UnitsLift, preset_units.vertical_speed_unit);
-    LoadValueEnum(UnitsAltitude, preset_units.altitude_unit);
-    LoadValueEnum(UnitsTemperature, preset_units.temperature_unit);
-    LoadValueEnum(UnitsTaskSpeed, preset_units.task_speed_unit);
-    LoadValueEnum(UnitsPressure, preset_units.pressure_unit);
-    LoadValueEnum(UnitsWingLoading, preset_units.wing_loading_unit);
-    LoadValueEnum(UnitsMass, preset_units.mass_unit);
-  }
+  // Ignore the coord.format for the preset selection.
 }
 
 void
@@ -110,8 +97,8 @@ UnitsConfigPanel::PresetCheck()
   current_dlg_set.temperature_unit = (Unit)GetValueInteger((unsigned)UnitsTemperature);
   current_dlg_set.task_speed_unit = (Unit)GetValueInteger((unsigned)UnitsTaskSpeed);
   current_dlg_set.pressure_unit = (Unit)GetValueInteger((unsigned)UnitsPressure);
-  current_dlg_set.wing_loading_unit = (Unit)GetValueInteger((unsigned)UnitsWingLoading);
   current_dlg_set.mass_unit = (Unit)GetValueInteger((unsigned)UnitsMass);
+  current_dlg_set.wing_loading_unit = (Unit)GetValueInteger((unsigned)UnitsWingLoading);
 
   LoadValueEnum(UnitsPreset, Units::Store::EqualsPresetUnits(current_dlg_set));
 }
@@ -119,22 +106,28 @@ UnitsConfigPanel::PresetCheck()
 void
 UnitsConfigPanel::OnModified(DataField &df)
 {
-  if (IsDataField(UnitsPreset, df))
-    UpdateFromPreset();
-  else
+  if (IsDataField(UnitsPreset, df)) {
+    const DataFieldEnum &dfe = (const DataFieldEnum &)df;
+    int result = dfe.GetValue();
+    if (result > 0) {
+      // First selection means not to load any preset.
+      const UnitSetting &units = Units::Store::Read(result - 1);
+      UpdateUnitFields(units);
+    }
+  } else
     PresetCheck();
 }
 
 void
 UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  const UnitSetting &config = CommonInterface::GetUISettings().units;
+  const UnitSetting &config = CommonInterface::GetUISettings().format.units;
   const CoordinateFormat coordinate_format =
-      CommonInterface::GetUISettings().coordinate_format;
+      CommonInterface::GetUISettings().format.coordinate_format;
 
   RowFormWidget::Prepare(parent, rc);
 
-  WndProperty *wp = AddEnum(_("Preset"), _("Your nationality's units."));
+  WndProperty *wp = AddEnum(_("Preset"), _("Load a set of units."));
   DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
 
   df.addEnumText(_("Custom"), (unsigned)0, _("My individual set of units."));
@@ -142,13 +135,17 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   for (unsigned i = 0; i < len; i++)
     df.addEnumText(Units::Store::GetName(i), i+1);
 
+  LoadValueEnum(UnitsPreset, Units::Store::EqualsPresetUnits(config));
   wp->GetDataField()->SetListener(this);
-  wp->SetReadOnly(false);
+
+  AddSpacer();
+  SetExpertRow(spacer_1);
 
   static constexpr StaticEnumChoice units_speed_list[] = {
     { (unsigned)Unit::STATUTE_MILES_PER_HOUR, _T("mph") },
     { (unsigned)Unit::KNOTS, N_("knots") },
     { (unsigned)Unit::KILOMETER_PER_HOUR, _T("km/h") },
+    { (unsigned)Unit::METER_PER_SECOND, _T("m/s") },
     { 0 }
   };
   AddEnum(_("Aircraft/Wind speed"),
@@ -206,6 +203,7 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { (unsigned)Unit::STATUTE_MILES_PER_HOUR, _T("mph") },
     { (unsigned)Unit::KNOTS, N_("knots") },
     { (unsigned)Unit::KILOMETER_PER_HOUR, _T("km/h") },
+    { (unsigned)Unit::METER_PER_SECOND, _T("m/s") },
     { 0 }
   };
   AddEnum(_("Task speed"), _("Units used for task speeds."),
@@ -224,6 +222,16 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           (unsigned)config.pressure_unit, this);
   SetExpertRow(UnitsPressure);
 
+  static constexpr StaticEnumChoice mass_labels_list[] = {
+    { (unsigned)Unit::KG, _T("kg") },
+    { (unsigned)Unit::LB, _T("lb") },
+    { 0 }
+  };
+  AddEnum(_("Mass"), _("Units used for mass."),
+          mass_labels_list,
+          (unsigned)config.mass_unit, this);
+  SetExpertRow(UnitsMass);
+
   static constexpr StaticEnumChoice wing_loading_labels_list[] = {
     { (unsigned)Unit::KG_PER_M2, _T("kg/m²") },
     { (unsigned)Unit::LB_PER_FT2, _T("lb/ft²") },
@@ -234,16 +242,8 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           (unsigned)config.wing_loading_unit, this);
   SetExpertRow(UnitsWingLoading);
 
-  static constexpr StaticEnumChoice mass_labels_list[] = {
-    { (unsigned)Unit::KG, _T("kg") },
-    { (unsigned)Unit::LB, _T("lb") },
-    { 0 }
-  };
-  AddEnum(_("Mass"), _("Units used mass."),
-          mass_labels_list,
-          (unsigned)config.mass_unit, this);
-  SetExpertRow(UnitsMass);
-
+  AddSpacer();
+  SetExpertRow(spacer_2);
 
   static constexpr StaticEnumChoice units_lat_lon_list[] = {
     { (unsigned)CoordinateFormat::DDMMSS, _T("DDMMSS") },
@@ -257,7 +257,6 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           units_lat_lon_list,
           (unsigned)coordinate_format);
   SetExpertRow(UnitsLatLon);
-  PresetCheck();
 }
 
 bool
@@ -265,9 +264,9 @@ UnitsConfigPanel::Save(bool &_changed)
 {
   bool changed = false;
 
-  UnitSetting &config = CommonInterface::SetUISettings().units;
+  UnitSetting &config = CommonInterface::SetUISettings().format.units;
   CoordinateFormat &coordinate_format =
-      CommonInterface::SetUISettings().coordinate_format;
+      CommonInterface::SetUISettings().format.coordinate_format;
 
   /* the Units settings affect how other form values are read and translated
    * so changes to Units settings should be processed after all other form settings
@@ -287,9 +286,11 @@ UnitsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(UnitsPressure, ProfileKeys::PressureUnitsValue, config.pressure_unit);
 
-  changed |= SaveValueEnum(UnitsWingLoading, ProfileKeys::WingLoadingUnitsValue, config.wing_loading_unit);
+  changed |= SaveValueEnum(UnitsMass, ProfileKeys::MassUnitValue,
+                           config.mass_unit);
 
-  changed |= SaveValueEnum(UnitsMass, ProfileKeys::MassUnitsValue, config.mass_unit);
+  changed |= SaveValueEnum(UnitsWingLoading, ProfileKeys::WingLoadingUnitValue,
+                           config.wing_loading_unit);
 
   changed |= SaveValueEnum(UnitsLatLon, ProfileKeys::LatLonUnits, coordinate_format);
 

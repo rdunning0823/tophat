@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,16 +29,17 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Time/PeriodClock.hpp"
 #include "Event/Idle.hpp"
+#include "Topography/Thread.hpp"
 
 GlueMapWindow::GlueMapWindow(const Look &look)
   :MapWindow(look.map, look.traffic),
-   logger(NULL),
-   idle_robin(-1),
+   topography_thread(nullptr),
 #ifdef ENABLE_OPENGL
    data_timer(*this),
 #endif
    drag_mode(DRAG_NONE),
    ignore_single_click(false),
+   skip_idle(true),
 #ifdef ENABLE_OPENGL
    kinetic_x(700),
    kinetic_y(700),
@@ -57,6 +58,25 @@ GlueMapWindow::GlueMapWindow(const Look &look)
 GlueMapWindow::~GlueMapWindow()
 {
   Destroy();
+}
+
+void
+GlueMapWindow::SetTopography(TopographyStore *_topography)
+{
+  if (topography_thread != nullptr) {
+    topography_thread->LockStop();
+    delete topography_thread;
+    topography_thread = nullptr;
+  }
+
+  MapWindow::SetTopography(_topography);
+
+  if (_topography != nullptr)
+    topography_thread =
+      new TopographyThread(*_topography,
+                           [this](){
+                             SendUser(unsigned(Command::INVALIDATE));
+                           });
 }
 
 void
@@ -128,7 +148,7 @@ void
 GlueMapWindow::SuspendThreads()
 {
 #ifndef ENABLE_OPENGL
-  if (draw_thread != NULL)
+  if (draw_thread != nullptr)
     draw_thread->Suspend();
 #endif
 }
@@ -137,7 +157,7 @@ void
 GlueMapWindow::ResumeThreads()
 {
 #ifndef ENABLE_OPENGL
-  if (draw_thread != NULL)
+  if (draw_thread != nullptr)
     draw_thread->Resume();
 #endif
 }
@@ -149,6 +169,7 @@ GlueMapWindow::FullRedraw()
   UpdateScreenAngle();
   UpdateProjection();
   UpdateMapScale();
+  UpdateScreenBounds();
 
 #ifdef ENABLE_OPENGL
   Invalidate();
@@ -163,6 +184,7 @@ GlueMapWindow::QuickRedraw()
   UpdateScreenAngle();
   UpdateProjection();
   UpdateMapScale();
+  UpdateScreenBounds();
 
 #ifndef ENABLE_OPENGL
   /* update the Projection */
@@ -192,12 +214,18 @@ GlueMapWindow::Idle()
   if (!render_projection.IsValid())
     return false;
 
-  if (idle_robin == unsigned(-1)) {
+  if (skip_idle) {
     /* draw the first frame as quickly as possible, so the user can
        start interacting with XCSoar immediately */
-    idle_robin = 2;
+    skip_idle = false;
     return true;
   }
+
+  /* hack: update RASP weather maps as quickly as possible; they only
+     ever need to be updated after the user has selected a new map, so
+     this is not a UI latency problem (quite contrary, don't let the
+     user wait until he sees the new map) */
+  UpdateWeather();
 
   if (!IsUserIdle(2500))
     /* don't hold back the UI thread while the user is interacting */
@@ -207,27 +235,9 @@ GlueMapWindow::Idle()
   clock.Update();
 
   bool still_dirty;
-  bool topography_dirty = true; /* scan topography in every Idle() call */
-  bool terrain_dirty = true;
-  bool weather_dirty = true;
 
   do {
-    idle_robin = (idle_robin + 1) % 3;
-    switch (idle_robin) {
-    case 0:
-      topography_dirty = UpdateTopography(1) > 0;
-      break;
-
-    case 1:
-      terrain_dirty = UpdateTerrain();
-      break;
-
-    case 2:
-      weather_dirty = UpdateWeather();
-      break;
-    }
-
-    still_dirty = terrain_dirty || topography_dirty || weather_dirty;
+    still_dirty = UpdateWeather() || UpdateTerrain();
   } while (!clock.Check(700) && /* stop after 700ms */
 #ifndef ENABLE_OPENGL
            !draw_thread->IsTriggered() &&
@@ -236,4 +246,21 @@ GlueMapWindow::Idle()
            still_dirty);
 
   return still_dirty;
+}
+
+bool
+GlueMapWindow::OnUser(unsigned id)
+{
+  switch (Command(id)) {
+  case Command::INVALIDATE:
+#ifdef ENABLE_OPENGL
+    Invalidate();
+#else
+    draw_thread->TriggerRedraw();
+#endif
+    return true;
+
+  default:
+    return MapWindow::OnUser(id);
+  }
 }

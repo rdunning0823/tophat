@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,19 +21,20 @@ Copyright_License {
 }
 */
 
-#include "Android/TextUtil.hpp"
-#include "Java/Class.hpp"
-#include "Java/String.hpp"
-#include "Java/Exception.hpp"
+#include "TextUtil.hpp"
+#include "Java/Class.hxx"
+#include "Java/String.hxx"
+#include "Java/Exception.hxx"
 #include "Screen/Point.hpp"
+#include "Look/FontDescription.hpp"
 #include "Asset.hpp"
 
-JNIEnv *TextUtil::env(NULL);
+JNIEnv *TextUtil::env;
 static Java::TrivialClass cls;
-jmethodID TextUtil::midTextUtil(NULL);
-jmethodID TextUtil::midGetFontMetrics(NULL);
-jmethodID TextUtil::midGetTextBounds(NULL);
-jmethodID TextUtil::midGetTextTextureGL(NULL);
+jmethodID TextUtil::midTextUtil;
+jmethodID TextUtil::midGetFontMetrics;
+jmethodID TextUtil::midGetTextBounds;
+jmethodID TextUtil::midGetTextTextureGL;
 
 void
 TextUtil::Initialise(JNIEnv *_env)
@@ -42,7 +43,7 @@ TextUtil::Initialise(JNIEnv *_env)
 
   cls.Find(env, "org/tophat/TextUtil");
 
-  midTextUtil = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;III)V");
+  midTextUtil = env->GetMethodID(cls, "<init>", "(IIIZ)V");
   midGetFontMetrics = env->GetMethodID(cls, "getFontMetrics", "([I)V");
   midGetTextBounds = env->GetMethodID(cls, "getTextBounds",
                                       "(Ljava/lang/String;)[I");
@@ -76,18 +77,17 @@ TextUtil::TextUtil(jobject _obj)
 }
 
 TextUtil *
-TextUtil::create(const char *facename, int height, bool bold, bool italic)
+TextUtil::create(const FontDescription &d)
 {
   jobject localObject;
   jint paramStyle, paramTextSize;
 
-  Java::String paramFamilyName(env, facename);
   paramStyle = 0;
-  if (bold)
+  if (d.IsBold())
     paramStyle |= 1;
-  if (italic)
+  if (d.IsItalic())
     paramStyle |= 2;
-  paramTextSize = height;
+  paramTextSize = d.GetHeight();
 
   int paint_flags = 0;
   if (!IsDithered())
@@ -96,11 +96,10 @@ TextUtil::create(const char *facename, int height, bool bold, bool italic)
 
   // construct org.tophat.TextUtil object
   localObject = env->NewObject(cls, midTextUtil,
-                               paramFamilyName.Get(),
                                paramStyle, paramTextSize,
-                               paint_flags);
+                               paint_flags, d.IsMonospace());
   if (!localObject)
-    return NULL;
+    return nullptr;
 
   TextUtil *tu = new TextUtil(localObject);
 

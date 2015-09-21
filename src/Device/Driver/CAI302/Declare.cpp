@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ convert_string(char *dest, size_t size, const TCHAR *src)
     length = size - 1;
 
   int length2 = ::WideCharToMultiByte(CP_ACP, 0, src, length, dest, size,
-                                      NULL, NULL);
+                                      nullptr, nullptr);
   if (length2 < 0)
     length2 = 0;
   dest[length2] = '\0';

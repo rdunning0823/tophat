@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 
 #include <assert.h>
 
-class TaskProjection;
+class FlatProjection;
 
 /**
  * Class used to hold a geodetic point, its projected integer form.
@@ -82,7 +82,7 @@ public:
    * @param loc Location of search point
    * @param tp Projection used
    */
-  SearchPoint(const GeoPoint &loc, const TaskProjection& tp);
+  SearchPoint(const GeoPoint &loc, const FlatProjection &tp);
 
   /**
    * Constructor
@@ -90,7 +90,7 @@ public:
    * @param floc Location of search point
    * @param tp Projection used
    */
-  SearchPoint(const FlatGeoPoint &floc, const TaskProjection& tp);
+  SearchPoint(const FlatGeoPoint &floc, const FlatProjection &tp);
 
   gcc_const
   static SearchPoint Invalid() {
@@ -114,7 +114,7 @@ public:
    *
    * @param tp Projection used
    */
-  void Project(const TaskProjection& tp);
+  void Project(const FlatProjection &tp);
 
   /**
    * The actual location

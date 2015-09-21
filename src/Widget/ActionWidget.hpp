@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -57,12 +57,12 @@ public:
     :listener(_listener), id(_id) {}
 
 public:
-  virtual bool Click() override;
-  virtual void ReClick() override;
+  bool Click() override;
+  void ReClick() override;
 
 #ifndef HAVE_CLIPPING
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
 #endif
 };
 

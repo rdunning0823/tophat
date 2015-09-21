@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -102,7 +102,7 @@ EventQueue::AddTimer(Timer &timer, unsigned ms)
   ScopeLock protect(mutex);
 
   const uint64_t due_us = MonotonicClockUS() + ms * 1000;
-  timers.Add(timer, MonotonicClockUS() + ms * 1000);
+  timers.Add(timer, due_us);
 
   if (timers.IsBefore(due_us))
     WakeUp();

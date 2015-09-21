@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,9 +38,11 @@ Copyright_License {
 #include "GeoPointFormatter.hpp"
 #include "Units/Units.hpp"
 #include "Math/Angle.hpp"
-#include "Util/StringUtil.hpp"
 #include "Geo/GeoPoint.hpp"
 #include "Geo/UTM.hpp"
+#include "Util/StringUtil.hpp"
+#include "Util/StringFormat.hpp"
+#include "Util/StringAPI.hpp"
 
 bool
 FormatLongitude(Angle longitude, TCHAR *buffer, size_t size,
@@ -182,34 +184,34 @@ FormatLatitude(Angle latitude, TCHAR *buffer, size_t size,
 
 static TCHAR *
 FormatUTM(const GeoPoint &location, TCHAR *buffer, size_t size,
-          TCHAR seperator = _T(' '))
+          TCHAR separator = _T(' '))
 {
   UTM utm = UTM::FromGeoPoint(location);
   StringFormat(buffer, size, _T("%u%c%c%.0f%c%.0f"),
-               utm.zone_number, utm.zone_letter, seperator,
-               (double)utm.easting, seperator,
+               utm.zone_number, utm.zone_letter, separator,
+               (double)utm.easting, separator,
                (double)utm.northing);
   return buffer;
 }
 
 TCHAR *
 FormatGeoPoint(const GeoPoint &location, TCHAR *buffer, size_t size,
-               CoordinateFormat format, TCHAR seperator)
+               CoordinateFormat format, TCHAR separator)
 {
   if (format == CoordinateFormat::UTM)
-    return FormatUTM(location, buffer, size, seperator);
+    return FormatUTM(location, buffer, size, separator);
 
   if (!FormatLatitude(location.latitude, buffer, size, format))
-    return NULL;
+    return nullptr;
 
-  TCHAR *end = buffer + size, *p = buffer + _tcslen(buffer);
+  TCHAR *end = buffer + size, *p = buffer + StringLength(buffer);
   if (p >= end)
-    return NULL;
+    return nullptr;
 
-  *p++ = seperator;
+  *p++ = separator;
 
   if (!FormatLongitude(location.longitude, p, end - p, format))
-    return NULL;
+    return nullptr;
 
   return buffer;
 }

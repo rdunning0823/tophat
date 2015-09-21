@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "Form/Edit.hpp"
-#include "Form/Internal.hpp"
 #include "Look/DialogLook.hpp"
 #include "DataField/Base.hpp"
 #include "Screen/Canvas.hpp"
@@ -33,22 +32,12 @@ Copyright_License {
 
 #include <assert.h>
 
-static bool
-CanEditInPlace()
-{
-  /* disabled for now, because we don't handle this yet properly:
-     return HasKeyboard(); */
-  return false;
-}
-
 bool
 WndProperty::OnKeyCheck(unsigned key_code) const
 {
   switch (key_code) {
   case KEY_RETURN:
-    return IsReadOnly() ||
-      (mDataField != NULL && mDataField->supports_combolist) ||
-      !CanEditInPlace() || HasHelp();
+    return true;
 
   case KEY_LEFT:
   case KEY_RIGHT:
@@ -63,8 +52,10 @@ bool
 WndProperty::OnKeyDown(unsigned key_code)
 {
   // If return key pressed (Compaq uses VKF23)
-  if (key_code == KEY_RETURN && BeginEditing())
+  if (key_code == KEY_RETURN) {
+    BeginEditing();
     return true;
+  }
 
   switch (key_code) {
   case KEY_RIGHT:
@@ -81,33 +72,13 @@ WndProperty::OnKeyDown(unsigned key_code)
     return true;
   }
 
-  KeyTimer(true, key_code);
   return WindowControl::OnKeyDown(key_code);
-}
-
-bool
-WndProperty::OnKeyUp(unsigned key_code)
-{
-  if (KeyTimer(false, key_code)) {
-    // activate tool tips if hit return for long time
-    if (key_code == KEY_RETURN) {
-      if (OnHelp())
-        return true;
-    }
-  } else if (key_code == KEY_RETURN) {
-    if (CallSpecial())
-      return true;
-  }
-
-  return WindowControl::OnKeyUp(key_code);
 }
 
 void
 WndProperty::OnSetFocus()
 {
   WindowControl::OnSetFocus();
-
-  KeyTimer(true, 0);
 
   Invalidate();
 }
@@ -116,8 +87,6 @@ void
 WndProperty::OnKillFocus()
 {
   WindowControl::OnKillFocus();
-
-  KeyTimer(true, 0);
 
   Invalidate();
 }
@@ -128,35 +97,54 @@ WndProperty::WndProperty(ContainerWindow &parent, const DialogLook &_look,
                          int CaptionWidth,
                          const WindowStyle style)
   :look(_look),
-   caption_width(CaptionWidth),
-   mDataField(NULL),
+   data_field(nullptr),
+   edit_callback(EditDataFieldDialog),
    read_only(false),
    dragging(false), pressed(false),
    editing_caption(caption),
    highlighted(false)
 {
-  caption = Caption;
-
-  Create(parent, rc, style);
+  Create(parent, rc, Caption, CaptionWidth, style);
 
 #if defined(USE_GDI) && !defined(NDEBUG)
   ::SetWindowText(hWnd, Caption);
 #endif
 }
 
-WndProperty::~WndProperty()
+WndProperty::WndProperty(const DialogLook &_look)
+  :look(_look),
+   data_field(nullptr),
+   edit_callback(EditDataFieldDialog),
+   read_only(false),
+   dragging(false), pressed(false)
 {
-  delete mDataField;
-}
-
-UPixelScalar
-WndProperty::GetRecommendedCaptionWidth() const
-{
-  return look.text_font->TextSize(caption).cx + Layout::GetTextPadding();
 }
 
 void
-WndProperty::SetCaptionWidth(PixelScalar _caption_width)
+WndProperty::Create(ContainerWindow &parent, const PixelRect &rc,
+                    const TCHAR *_caption,
+                    unsigned _caption_width,
+                    const WindowStyle style=WindowStyle())
+{
+  caption = _caption;
+  caption_width = _caption_width;
+
+  WindowControl::Create(parent, rc, style);
+}
+
+WndProperty::~WndProperty()
+{
+  delete data_field;
+}
+
+unsigned
+WndProperty::GetRecommendedCaptionWidth() const
+{
+  return look.text_font.TextSize(caption).cx + Layout::GetTextPadding();
+}
+
+void
+WndProperty::SetCaptionWidth(int _caption_width)
 {
   if (caption_width == _caption_width)
     return;
@@ -168,22 +156,16 @@ WndProperty::SetCaptionWidth(PixelScalar _caption_width)
 bool
 WndProperty::BeginEditing()
 {
-  if (IsReadOnly()) {
-    /* this would display xml file help on a read-only wndproperty if
-       it exists */
-    return OnHelp();
-  } else if (mDataField != NULL) {
-    if (!EditDataFieldDialog(GetEditingCaption(), *mDataField, GetHelpText()))
+  if (IsReadOnly() || data_field == nullptr || edit_callback == nullptr) {
+    OnHelp();
+    return false;
+  } else {
+    if (!edit_callback(GetEditingCaption(), *data_field, GetHelpText()))
       return false;
 
     RefreshDisplay();
     return true;
-
-  } else if (CanEditInPlace()) {
-    // TODO: implement
-    return true;
-  } else
-    return false;
+  }
 }
 
 void
@@ -191,20 +173,20 @@ WndProperty::UpdateLayout()
 {
   edit_rc = GetClientRect();
 
-  const UPixelScalar DEFAULTBORDERPENWIDTH = Layout::FastScale(1);
+  const unsigned margin = Layout::VptScale(1u);
 
   if (caption_width >= 0) {
-    edit_rc.left += caption_width + (DEFAULTBORDERPENWIDTH + 1);
-    edit_rc.top += (DEFAULTBORDERPENWIDTH + 1);
-    edit_rc.right -= (DEFAULTBORDERPENWIDTH + 1);
-    edit_rc.bottom -= (DEFAULTBORDERPENWIDTH + 1);
+    edit_rc.left += caption_width + margin;
+    edit_rc.top += margin;
+    edit_rc.right -= margin;
+    edit_rc.bottom -= margin;
   } else {
-    const unsigned caption_height = look.text_font->GetHeight();
+    const unsigned caption_height = look.text_font.GetHeight();
 
-    edit_rc.left += (DEFAULTBORDERPENWIDTH + 1);
-    edit_rc.top = DEFAULTBORDERPENWIDTH + caption_height;
-    edit_rc.right -= (DEFAULTBORDERPENWIDTH + 1);
-    edit_rc.bottom -= (DEFAULTBORDERPENWIDTH + 1);
+    edit_rc.left += margin;
+    edit_rc.top = margin + caption_height;
+    edit_rc.right -= margin;
+    edit_rc.bottom -= margin;
   }
 
   Invalidate();
@@ -280,20 +262,10 @@ WndProperty::OnCancelMode()
 }
 
 int
-WndProperty::CallSpecial()
-{
-  if (mDataField != NULL) {
-    mDataField->Special();
-    RefreshDisplay();
-  }
-  return 0;
-}
-
-int
 WndProperty::IncValue()
 {
-  if (mDataField != NULL) {
-    mDataField->Inc();
+  if (data_field != nullptr) {
+    data_field->Inc();
     RefreshDisplay();
   }
   return 0;
@@ -302,8 +274,8 @@ WndProperty::IncValue()
 int
 WndProperty::DecValue()
 {
-  if (mDataField != NULL) {
-    mDataField->Dec();
+  if (data_field != nullptr) {
+    data_field->Dec();
     RefreshDisplay();
   }
   return 0;
@@ -326,15 +298,12 @@ WndProperty::OnPaint(Canvas &canvas)
       canvas.Clear(look.background_color);
   }
 
-  /* kludge: don't draw caption if width is too small (but not 0),
-     used by the polar configuration panel.  This concept needs to be
-     redesigned. */
   if (!caption.empty()) {
     canvas.SetTextColor(focused
                           ? look.focused.text_color
                           : look.text_color);
     canvas.SetBackgroundTransparent();
-    canvas.Select(*look.text_font);
+    canvas.Select(look.text_font);
 
     PixelSize tsize = canvas.CalcTextSize(caption.c_str());
 
@@ -383,12 +352,12 @@ WndProperty::OnPaint(Canvas &canvas)
   if (!value.empty()) {
     canvas.SetTextColor(text_color);
     canvas.SetBackgroundTransparent();
-    canvas.Select(*look.text_font);
+    canvas.Select(look.text_font);
 
-    const PixelScalar x = edit_rc.left + Layout::GetTextPadding();
-    const PixelScalar canvas_height = edit_rc.bottom - edit_rc.top;
-    const PixelScalar text_height = canvas.GetFontHeight();
-    const PixelScalar y = edit_rc.top + (canvas_height - text_height) / 2;
+    const int x = edit_rc.left + Layout::GetTextPadding();
+    const int canvas_height = edit_rc.bottom - edit_rc.top;
+    const int text_height = canvas.GetFontHeight();
+    const int y = edit_rc.top + (canvas_height - text_height) / 2;
 
     canvas.TextAutoClipped(x, y, value.c_str());
   }
@@ -409,12 +378,10 @@ WndProperty::SetText(const TCHAR *_value)
 void
 WndProperty::RefreshDisplay()
 {
-  if (!mDataField)
+  if (!data_field)
     return;
 
-  SetText(HasFocus() && CanEditInPlace()
-          ? mDataField->GetAsString()
-          : mDataField->GetAsDisplayString());
+  SetText(data_field->GetAsDisplayString());
 }
 
 const TCHAR *
@@ -429,10 +396,10 @@ WndProperty::GetEditingCaption() const
 void
 WndProperty::SetDataField(DataField *Value)
 {
-  assert(mDataField == NULL || mDataField != Value);
+  assert(data_field == nullptr || data_field != Value);
 
-  delete mDataField;
-  mDataField = Value;
+  delete data_field;
+  data_field = Value;
 
   UpdateLayout();
 

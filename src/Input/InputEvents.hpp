@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -177,6 +177,7 @@ namespace InputEvents
   void eventTerrainTopography(const TCHAR *misc);
   void eventTerrainTopology(const TCHAR *misc);
   void eventWaypointDetails(const TCHAR *misc);
+  void eventWaypointEditor(const TCHAR *misc);
   void eventZoom(const TCHAR *misc);
   void eventBrightness(const TCHAR *misc);
   void eventDeclutterLabels(const TCHAR *misc);

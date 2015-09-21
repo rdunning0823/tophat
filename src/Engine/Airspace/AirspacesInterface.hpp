@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,6 +28,8 @@
 
 #include <kdtree++/kdtree.hpp>
 
+#include <assert.h>
+
 /**
  * Abstract class for interface to #Airspaces database.
  * Allows references to the #Airspaces to be substituted for a
@@ -48,7 +50,7 @@ class AirspacesInterface {
      *
      * @return Coordinate value
      */
-    int operator() ( const FlatBoundingBox &d, const unsigned k) const {
+    int operator()(const FlatBoundingBox &d, const unsigned k) const {
       switch(k) {
       case 0:
         return d.GetLowerLeft().longitude;
@@ -58,8 +60,10 @@ class AirspacesInterface {
         return d.GetUpperRight().longitude;
       case 3:
         return d.GetUpperRight().latitude;
+      default:
+        assert(false);
+        gcc_unreachable();
       };
-      return 0;
     };
   };
 

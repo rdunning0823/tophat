@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@ Copyright_License {
 */
 
 #include "Vibrator.hpp"
+#include "Main.hpp"
 #include "Context.hpp"
-#include "Java/Class.hpp"
-#include "Android/Main.hpp"
+#include "Java/Class.hxx"
 
 jmethodID Vibrator::cancel_method, Vibrator::vibrate_method;
 
@@ -41,8 +41,8 @@ Vibrator *
 Vibrator::Create(JNIEnv *env, Context &context)
 {
   jobject obj = context.GetVibrator(env);
-  if (obj == NULL)
-    return NULL;
+  if (obj == nullptr)
+    return nullptr;
 
   Vibrator *vibrator = new Vibrator(env, obj);
   env->DeleteLocalRef(obj);

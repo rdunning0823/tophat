@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #include "Device.hpp"
 #include "Device/Port/Port.hpp"
 #include "Util/ConvertString.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/Macros.hpp"
 #include "Util/NumberParser.hpp"
 #include "NMEA/Checksum.hpp"
@@ -195,7 +195,7 @@ FlarmDevice::GetConfig(const char *setting, char *buffer, size_t length,
 
   NarrowString<90> expected_answer(request);
   expected_answer[6u] = 'A';
-  expected_answer += ',';
+  expected_answer.push_back(',');
 
   Send(request, env);
   return Receive(expected_answer, buffer, length, env, 2000);

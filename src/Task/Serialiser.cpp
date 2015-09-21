@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -64,38 +64,65 @@ GetName(const OrderedTaskPoint &tp, bool mode_optional_start)
   return GetName(tp.GetType(), mode_optional_start);
 }
 
-void
-Serialiser::Serialise(const OrderedTaskPoint &data, const TCHAR* name)
+static void
+Serialise(WritableDataNode &node, const GeoPoint &data)
 {
-  // do nothing
-  std::unique_ptr<DataNode> child(node.AppendChild(_T("Point")));
-  child->SetAttribute(_T("type"), name);
-
-  std::unique_ptr<DataNode> wchild(child->AppendChild(_T("Waypoint")));
-  Serialiser wser(*wchild);
-  wser.Serialise(data.GetWaypoint());
-
-  std::unique_ptr<DataNode> ochild(child->AppendChild(_T("ObservationZone")));
-  Serialiser oser(*ochild);
-  oser.Serialise(data.GetObservationZone());
-
-  if (data.GetType() == TaskPointType::AST) {
-    const ASTPoint &ast = (const ASTPoint &)data;
-    if (ast.GetScoreExit())
-      child->SetAttribute(_T("score_exit"), true);
-  }
+  node.SetAttribute(_T("longitude"), data.longitude);
+  node.SetAttribute(_T("latitude"), data.latitude);
 }
 
-void
-Serialiser::Serialise(const OrderedTaskPoint &tp)
+static void
+Serialise(WritableDataNode &node, const Waypoint &data)
 {
-  const TCHAR *name = GetName(tp, mode_optional_start);
-  assert(name != nullptr);
-  Serialise(tp, name);
+  node.SetAttribute(_T("name"), data.name.c_str());
+  node.SetAttribute(_T("id"), data.id);
+  node.SetAttribute(_T("comment"), data.comment.c_str());
+  node.SetAttribute(_T("altitude"), data.elevation);
+
+  std::unique_ptr<WritableDataNode> child(node.AppendChild(_T("Location")));
+  Serialise(*child, data.location);
 }
 
-void 
-Serialiser::Serialise(const ObservationZonePoint &data)
+static void
+Visit(WritableDataNode &node, const SectorZone &data)
+{
+  node.SetAttribute(_T("type"), _T("Sector"));
+  node.SetAttribute(_T("radius"), data.GetRadius());
+  node.SetAttribute(_T("start_radial"), data.GetStartRadial());
+  node.SetAttribute(_T("end_radial"), data.GetEndRadial());
+}
+
+static void
+Visit(WritableDataNode &node, const SymmetricSectorZone &data)
+{
+  node.SetAttribute(_T("type"), _T("SymmetricQuadrant"));
+  node.SetAttribute(_T("radius"), data.GetRadius());
+  node.SetAttribute(_T("angle"), data.GetSectorAngle());
+}
+
+static void
+Visit(WritableDataNode &node, const AnnularSectorZone &data)
+{
+  Visit(node, (const SectorZone &)data);
+  node.SetAttribute(_T("inner_radius"), data.GetInnerRadius());
+}
+
+static void
+Visit(WritableDataNode &node, const LineSectorZone &data)
+{
+  node.SetAttribute(_T("type"), _T("Line"));
+  node.SetAttribute(_T("length"), data.GetLength());
+}
+
+static void
+Visit(WritableDataNode &node, const CylinderZone &data)
+{
+  node.SetAttribute(_T("type"), _T("Cylinder"));
+  node.SetAttribute(_T("radius"), data.GetRadius());
+}
+
+static void
+Serialise(WritableDataNode &node, const ObservationZonePoint &data)
 {
   switch (data.GetShape()) {
   case ObservationZone::Shape::FAI_SECTOR:
@@ -103,11 +130,11 @@ Serialiser::Serialise(const ObservationZonePoint &data)
     break;
 
   case ObservationZone::Shape::SECTOR:
-    Visit((const SectorZone &)data);
+    Visit(node, (const SectorZone &)data);
     break;
 
   case ObservationZone::Shape::LINE:
-    Visit((const LineSectorZone &)data);
+    Visit(node, (const LineSectorZone &)data);
     break;
 
   case ObservationZone::Shape::MAT_CYLINDER:
@@ -115,7 +142,7 @@ Serialiser::Serialise(const ObservationZonePoint &data)
     break;
 
   case ObservationZone::Shape::CYLINDER:
-    Visit((const CylinderZone &)data);
+    Visit(node, (const CylinderZone &)data);
     break;
 
   case ObservationZone::Shape::CUSTOM_KEYHOLE: {
@@ -142,112 +169,48 @@ Serialiser::Serialise(const ObservationZonePoint &data)
     break;
 
   case ObservationZone::Shape::ANNULAR_SECTOR:
-    Visit((const AnnularSectorZone &)data);
+    Visit(node, (const AnnularSectorZone &)data);
     break;
 
   case ObservationZone::Shape::SYMMETRIC_QUADRANT:
-    Visit((const SymmetricSectorZone &)data);
+    Visit(node, (const SymmetricSectorZone &)data);
     break;
   }
 } 
 
-void
-Serialiser::Visit(const SectorZone &data)
+static void
+Serialise(WritableDataNode &node, const OrderedTaskPoint &data,
+          const TCHAR *name)
 {
-  node.SetAttribute(_T("type"), _T("Sector"));
-  node.SetAttribute(_T("radius"), data.GetRadius());
-  node.SetAttribute(_T("start_radial"), data.GetStartRadial());
-  node.SetAttribute(_T("end_radial"), data.GetEndRadial());
+  // do nothing
+  std::unique_ptr<WritableDataNode> child(node.AppendChild(_T("Point")));
+  child->SetAttribute(_T("type"), name);
+
+  std::unique_ptr<WritableDataNode> wchild(child->AppendChild(_T("Waypoint")));
+  Serialise(*wchild, data.GetWaypoint());
+
+  std::unique_ptr<WritableDataNode> ochild(child->AppendChild(_T("ObservationZone")));
+  Serialise(*ochild, data.GetObservationZone());
+
+  if (data.GetType() == TaskPointType::AST) {
+    const ASTPoint &ast = (const ASTPoint &)data;
+    if (ast.GetScoreExit())
+      child->SetAttribute(_T("score_exit"), true);
+  }
 }
 
-void
-Serialiser::Visit(const SymmetricSectorZone &data)
+static void
+Serialise(WritableDataNode &node, const OrderedTaskPoint &tp,
+          bool mode_optional_start)
 {
-  node.SetAttribute(_T("type"), _T("SymmetricQuadrant"));
-  node.SetAttribute(_T("radius"), data.GetRadius());
-  node.SetAttribute(_T("angle"), data.GetSectorAngle());
+  const TCHAR *name = GetName(tp, mode_optional_start);
+  assert(name != nullptr);
+  Serialise(node, tp, name);
 }
 
-void
-Serialiser::Visit(const AnnularSectorZone &data)
-{
-  Visit((const SectorZone&)data);
-  node.SetAttribute(_T("inner_radius"), data.GetInnerRadius());
-}
-
-void 
-Serialiser::Visit(const LineSectorZone &data)
-{
-  node.SetAttribute(_T("type"), _T("Line"));
-  node.SetAttribute(_T("length"), data.GetLength());
-}
-
-void 
-Serialiser::Visit(const CylinderZone &data)
-{
-  node.SetAttribute(_T("type"), _T("Cylinder"));
-  node.SetAttribute(_T("radius"), data.GetRadius());
-}
-
-void
-Serialiser::Serialise(const GeoPoint &data)
-{
-  node.SetAttribute(_T("longitude"), data.longitude);
-  node.SetAttribute(_T("latitude"), data.latitude);
-}
-
-void 
-Serialiser::Serialise(const Waypoint &data)
-{
-  node.SetAttribute(_T("name"), data.name.c_str());
-  node.SetAttribute(_T("id"), data.id);
-  node.SetAttribute(_T("comment"), data.comment.c_str());
-  node.SetAttribute(_T("altitude"), data.elevation);
-
-  std::unique_ptr<DataNode> child(node.AppendChild(_T("Location")));
-  Serialiser ser(*child);
-  ser.Serialise(data.location);
-}
-
-void 
-Serialiser::Serialise(const OrderedTaskSettings &data)
-{
-  node.SetAttribute(_T("aat_min_time"), data.aat_min_time);
-  node.SetAttribute(_T("start_requires_arm"),
-                    data.start_constraints.require_arm);
-  node.SetAttribute(_T("start_max_speed"), data.start_constraints.max_speed);
-  node.SetAttribute(_T("start_max_height"), data.start_constraints.max_height);
-  node.SetAttribute(_T("start_max_height_ref"),
-                       GetHeightRef(data.start_constraints.max_height_ref));
-  node.SetAttribute(_T("start_open_time"),
-                    data.start_constraints.open_time_span.GetStart());
-  node.SetAttribute(_T("start_close_time"),
-                    data.start_constraints.open_time_span.GetEnd());
-  node.SetAttribute(_T("finish_min_height"),
-                    data.finish_constraints.min_height);
-  node.SetAttribute(_T("finish_min_height_ref"),
-                       GetHeightRef(data.finish_constraints.min_height_ref));
-  node.SetAttribute(_T("fai_finish"), data.finish_constraints.fai_finish);
-}
-
-void 
-Serialiser::Serialise(const OrderedTask &task)
-{
-  node.SetAttribute(_T("type"), GetTaskFactoryType(task.GetFactoryType()));
-  node.SetAttribute(_T("name"), task.GetTaskName());
-  Serialise(task.GetOrderedTaskSettings());
-  mode_optional_start = false;
-
-  for (const auto &tp : task.GetPoints())
-    Serialise(tp);
-
-  mode_optional_start = true;
-  for (const auto &tp : task.GetOptionalStartPoints())
-    Serialise(tp);
-}
-
-const TCHAR*
-Serialiser::GetHeightRef(AltitudeReference height_ref) const
+gcc_const
+static const TCHAR *
+GetHeightRef(AltitudeReference height_ref)
 {
   switch(height_ref) {
   case AltitudeReference::AGL:
@@ -260,11 +223,12 @@ Serialiser::GetHeightRef(AltitudeReference height_ref) const
     /* not applicable here */
     break;
   }
-  return NULL;
+  return nullptr;
 }
 
-const TCHAR* 
-Serialiser::GetTaskFactoryType(TaskFactoryType type) const
+gcc_const
+static const TCHAR *
+GetTaskFactoryType(TaskFactoryType type)
 {
   switch(type) {
   case TaskFactoryType::FAI_GENERAL:
@@ -290,4 +254,39 @@ Serialiser::GetTaskFactoryType(TaskFactoryType type) const
   }
 
   gcc_unreachable();
+}
+
+static void
+Serialise(WritableDataNode &node, const OrderedTaskSettings &data)
+{
+  node.SetAttribute(_T("aat_min_time"), data.aat_min_time);
+  node.SetAttribute(_T("start_requires_arm"),
+                    data.start_constraints.require_arm);
+  node.SetAttribute(_T("start_max_speed"), data.start_constraints.max_speed);
+  node.SetAttribute(_T("start_max_height"), data.start_constraints.max_height);
+  node.SetAttribute(_T("start_max_height_ref"),
+                    GetHeightRef(data.start_constraints.max_height_ref));
+  node.SetAttribute(_T("start_open_time"),
+                    data.start_constraints.open_time_span.GetStart());
+  node.SetAttribute(_T("start_close_time"),
+                    data.start_constraints.open_time_span.GetEnd());
+  node.SetAttribute(_T("finish_min_height"),
+                    data.finish_constraints.min_height);
+  node.SetAttribute(_T("finish_min_height_ref"),
+                    GetHeightRef(data.finish_constraints.min_height_ref));
+  node.SetAttribute(_T("fai_finish"), data.finish_constraints.fai_finish);
+}
+
+void
+SaveTask(WritableDataNode &node, const OrderedTask &task)
+{
+  node.SetAttribute(_T("type"), GetTaskFactoryType(task.GetFactoryType()));
+  node.SetAttribute(_T("name"), task.GetTaskName());
+  Serialise(node, task.GetOrderedTaskSettings());
+
+  for (const auto &tp : task.GetPoints())
+    Serialise(node, tp, false);
+
+  for (const auto &tp : task.GetOptionalStartPoints())
+    Serialise(node, tp, true);
 }

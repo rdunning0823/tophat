@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,26 +25,27 @@ Copyright_License {
 #include "OS/FileUtil.hpp"
 #include "OS/PathName.hpp"
 #include "Compatibility/path.h"
+#include "Util/StringAPI.hpp"
 
 #include <assert.h>
 
 static void
 MakeTemporaryPath(TCHAR *path)
 {
-  assert(path != NULL);
+  assert(path != nullptr);
 
 #ifdef HAVE_POSIX
   _tcscat(path, _T(".tmp"));
 #else
   TCHAR *base = const_cast<TCHAR *>(BaseName(path));
-  if (base == NULL) {
+  if (base == nullptr) {
     /* dirty fallback */
     _tcscat(path, _T(DIR_SEPARATOR_S "tmp.tmp"));
     return;
   }
 
-  TCHAR *dot = _tcsrchr(base, '.');
-  if (dot != NULL)
+  auto *dot = StringFindLast(base, '.');
+  if (dot != nullptr)
     /* replace existing file name extension */
     _tcscpy(dot + 1, _T("tmp"));
   else
@@ -56,7 +57,7 @@ MakeTemporaryPath(TCHAR *path)
 FileTransaction::FileTransaction(const TCHAR *_path)
   :final_path(_path), temporary_path(_path)
 {
-  assert(_path != NULL);
+  assert(_path != nullptr);
 
   MakeTemporaryPath(temporary_path.buffer());
 

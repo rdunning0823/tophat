@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_LARGE_TEXT_WINDOW_HPP
 #define XCSOAR_SCREEN_LARGE_TEXT_WINDOW_HPP
 
-#include "Screen/Window.hpp"
+#include "NativeWindow.hpp"
 
 #ifndef USE_GDI
 #include "Util/tstring.hpp"
@@ -40,8 +40,6 @@ public:
     VerticalScroll();
 #ifdef USE_GDI
     style |= ES_LEFT | ES_MULTILINE | ES_READONLY;
-#else
-    text_style |= DT_LEFT | DT_WORDBREAK;
 #endif
   }
 
@@ -49,18 +47,6 @@ public:
     VerticalScroll();
 #ifdef USE_GDI
     style |= ES_LEFT | ES_MULTILINE | ES_READONLY;
-#else
-    text_style |= DT_LEFT | DT_WORDBREAK;
-#endif
-  }
-
-  void SetCenter() {
-#ifndef USE_GDI
-    text_style &= ~DT_LEFT;
-    text_style |= DT_CENTER;
-#else
-    style &= ~ES_LEFT;
-    style |= ES_CENTER;
 #endif
   }
 };
@@ -68,8 +54,10 @@ public:
 /**
  * A window showing large multi-line text.
  */
-class LargeTextWindow : public Window {
+class LargeTextWindow : public NativeWindow {
 #ifndef USE_GDI
+  const Font *font;
+
   tstring value;
 
   /**
@@ -79,15 +67,31 @@ class LargeTextWindow : public Window {
 #endif
 
 public:
+#if !defined(USE_GDI) && !defined(NDEBUG)
+  LargeTextWindow():font(nullptr) {}
+#endif
+
   void Create(ContainerWindow &parent, PixelRect rc,
               const LargeTextWindowStyle style=LargeTextWindowStyle());
 
 #ifndef USE_GDI
+  void SetFont(const Font &_font) {
+    AssertNoneLocked();
+    AssertThread();
+
+    font = &_font;
+  }
+
+  const Font &GetFont() const {
+    AssertThread();
+    assert(font != nullptr);
+
+    return *font;
+  }
+
   gcc_pure
   unsigned GetVisibleRows() const;
-#endif
 
-#ifndef USE_GDI
   gcc_pure
   unsigned GetRowCount() const;
 #else
@@ -109,10 +113,10 @@ public:
 
 #ifndef USE_GDI
 protected:
-  virtual void OnResize(PixelSize new_size) override;
-  virtual void OnPaint(Canvas &canvas) override;
-  virtual bool OnKeyCheck(unsigned key_code) const override;
-  virtual bool OnKeyDown(unsigned key_code) override;
+  void OnResize(PixelSize new_size) override;
+  void OnPaint(Canvas &canvas) override;
+  bool OnKeyCheck(unsigned key_code) const override;
+  bool OnKeyDown(unsigned key_code) override;
 #endif /* !USE_GDI */
 };
 

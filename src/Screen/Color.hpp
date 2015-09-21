@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -50,6 +50,7 @@ static constexpr Color COLOR_GRAY = Color(0x80, 0x80, 0x80);
 static constexpr Color COLOR_VERY_LIGHT_GRAY = Color(0xd8, 0xd8, 0xd8);
 static constexpr Color COLOR_LIGHT_GRAY = Color(0xc0, 0xc0, 0xc0);
 static constexpr Color COLOR_DARK_GRAY = Color(0x40, 0x40, 0x40);
+static constexpr Color COLOR_VERY_DARK_GRAY = Color(0x20, 0x20, 0x20);
 static constexpr Color COLOR_RED = Color(0xff, 0x00, 0x00);
 static constexpr Color COLOR_GREEN = Color(0x00, 0xff, 0x00);
 static constexpr Color COLOR_BLUE = Color(0x00, 0x00, 0xff);

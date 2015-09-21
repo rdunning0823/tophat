@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_DATA_FIELD_BOOLEAN_HPP
 
 #include "Base.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 class DataFieldBoolean final : public DataField {
 private:
@@ -35,12 +35,6 @@ private:
   StaticString<32> false_text;
 
 public:
-  DataFieldBoolean(bool Default, const TCHAR *TextTrue, const TCHAR *TextFalse,
-                   DataAccessCallback OnDataAccess)
-    :DataField(Type::BOOLEAN, true, OnDataAccess),
-     mValue(Default),
-     true_text(TextTrue), false_text(TextFalse) {}
-
   DataFieldBoolean(bool _value,
                    const TCHAR *_true_text, const TCHAR *_false_text,
                    DataFieldListener *listener=nullptr)
@@ -64,13 +58,13 @@ public:
   }
 
   /* virtual methods from class DataField */
-  virtual void Inc() override;
-  virtual void Dec() override;
-  virtual int GetAsInteger() const override;
-  virtual const TCHAR *GetAsString() const override;
-  virtual void SetAsInteger(int Value) override;
-  virtual void SetAsString(const TCHAR *Value) override;
-  virtual ComboList CreateComboList(const TCHAR *reference) const override;
+  void Inc() override;
+  void Dec() override;
+  int GetAsInteger() const override;
+  const TCHAR *GetAsString() const override;
+  void SetAsInteger(int Value) override;
+  void SetAsString(const TCHAR *Value) override;
+  ComboList CreateComboList(const TCHAR *reference) const override;
 
 private:
   gcc_pure

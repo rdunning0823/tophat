@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -61,7 +61,6 @@ HasDetails(const MapItem &item)
   case MapItem::LOCATION:
   case MapItem::ARRIVAL_ALTITUDE:
   case MapItem::SELF:
-  case MapItem::MARKER:
   case MapItem::THERMAL:
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   case MapItem::SKYLINES_TRAFFIC:
@@ -187,13 +186,12 @@ class MapItemListWidget final : public ListWidget, private ActionListener {
   const MapItemList &list;
 
   const DialogLook &dialog_look;
-  const MapLook &look;
-  const TrafficLook &traffic_look;
-  const FinalGlideBarLook &final_glide_look;
   const MapSettings &settings;
 
-  WndButton *details_button, *cancel_button, *goto_button;
-  WndButton *ack_button;
+  Button *details_button, *cancel_button, *goto_button;
+  Button *ack_button;
+  MapItemListRenderer renderer;
+
 
 public:
   void CreateButtons(WidgetDialog &dialog);
@@ -205,9 +203,10 @@ public:
                     const FinalGlideBarLook &_final_glide_look,
                     const MapSettings &_settings)
     :list(_list),
-     dialog_look(_dialog_look), look(_look),
-     traffic_look(_traffic_look), final_glide_look(_final_glide_look),
-     settings(_settings) {}
+     dialog_look(_dialog_look),
+     settings(_settings),
+     renderer(_look, _traffic_look, _final_glide_look,
+              _settings, CommonInterface::GetComputerSettings().utc_offset) {}
 
   unsigned GetCursorIndex() const {
     return GetList().GetCursorIndex();
@@ -299,11 +298,13 @@ MapItemListWidget::CreateButtons(WidgetDialog &dialog)
 void
 MapItemListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  UPixelScalar item_height = dialog_look.list.font_bold->GetHeight()
+/*  UPixelScalar item_height = dialog_look.list.font_bold->GetHeight()
     + Layout::Scale(6) + dialog_look.text_font->GetHeight();
   assert(item_height > 0);
 
-  CreateList(parent, dialog_look, rc, item_height);
+  CreateList(parent, dialog_look, rc, item_height);*/
+  CreateList(parent, dialog_look, rc,
+             renderer.CalculateLayout(dialog_look));
 
   GetList().SetLength(list.size());
   UpdateButtons();
@@ -322,11 +323,8 @@ MapItemListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
                                unsigned idx)
 {
   const MapItem &item = *list[idx];
-  MapItemListRenderer::Draw(canvas, rc, item,
-                            dialog_look, look, traffic_look,
-                            final_glide_look, settings,
-                            CommonInterface::GetComputerSettings().utc_offset,
-                            &CommonInterface::Basic().flarm.traffic);
+  renderer.Draw(canvas, rc, item,
+                &CommonInterface::Basic().flarm.traffic);
 
   if ((settings.item_list.add_arrival_altitude &&
        item.type == MapItem::Type::ARRIVAL_ALTITUDE) ||
@@ -340,7 +338,7 @@ MapItemListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
 void
 MapItemListWidget::OnActivateItem(unsigned index)
 {
-  details_button->OnClicked();
+  details_button->Click();
 }
 
 inline void
@@ -356,7 +354,7 @@ MapItemListWidget::OnGotoClicked()
 
   auto const &waypoint = ((const WaypointMapItem &)item).waypoint;
   protected_task_manager->DoGoto(waypoint);
-  cancel_button->OnClicked();
+  cancel_button->Click();
 }
 
 inline void
@@ -430,6 +428,7 @@ ShowMapItemListDialog(const MapItemList &list,
                     + portrait_spacer_height);
 
   widget.CreateButtons(dialog);
+  dialog.EnableCursorSelection();
 
   int result = dialog.ShowModal() == mrOK
     ? (int)widget.GetCursorIndex()
@@ -446,7 +445,6 @@ ShowMapItemDialog(const MapItem &item,
   case MapItem::LOCATION:
   case MapItem::ARRIVAL_ALTITUDE:
   case MapItem::SELF:
-  case MapItem::MARKER:
   case MapItem::THERMAL:
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   case MapItem::SKYLINES_TRAFFIC:

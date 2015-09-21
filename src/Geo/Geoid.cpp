@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ Copyright_License {
 
 #define EGM96SIZE 16200
 
-extern const uint8_t egm96data[] asm("_binary_egm96s_dem_start");
+extern "C" const uint8_t egm96s_dem[];
 
 fixed
 EGM96::LookupSeparation(const GeoPoint &pt)
@@ -49,5 +49,5 @@ EGM96::LookupSeparation(const GeoPoint &pt)
   if (offset < 0)
     return fixed(0);
 
-  return fixed((int)egm96data[offset] - 127);
+  return fixed((int)egm96s_dem[offset] - 127);
 }

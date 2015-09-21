@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,15 +22,18 @@ Copyright_License {
 */
 
 #include "FlarmProfile.hpp"
-#include "Profile.hpp"
+#include "Map.hpp"
 #include "FLARM/ColorDatabase.hpp"
 
 #include <string>
 
+#include <string.h>
+
 static void
-LoadColor(FlarmColorDatabase &db, const char *key, FlarmColor color)
+LoadColor(const ProfileMap &map,FlarmColorDatabase &db,
+          const char *key, FlarmColor color)
 {
-  const char *ids = Profile::Get(key);
+  const char *ids = map.Get(key);
   if (ids == nullptr)
     return;
 
@@ -50,18 +53,17 @@ LoadColor(FlarmColorDatabase &db, const char *key, FlarmColor color)
 }
 
 void
-Profile::Load(FlarmColorDatabase &db)
+Profile::Load(const ProfileMap &map, FlarmColorDatabase &db)
 {
-  LoadColor(db, "FriendsGreen", FlarmColor::GREEN);
-  LoadColor(db, "FriendsBlue", FlarmColor::BLUE);
-  LoadColor(db, "FriendsYellow", FlarmColor::YELLOW);
-  LoadColor(db, "FriendsMagenta", FlarmColor::MAGENTA);
+  LoadColor(map, db, "FriendsGreen", FlarmColor::GREEN);
+  LoadColor(map, db, "FriendsBlue", FlarmColor::BLUE);
+  LoadColor(map, db, "FriendsYellow", FlarmColor::YELLOW);
+  LoadColor(map, db, "FriendsMagenta", FlarmColor::MAGENTA);
 }
 
 void
-Profile::Save(const FlarmColorDatabase &db)
+Profile::Save(ProfileMap &map, const FlarmColorDatabase &db)
 {
-  char id[16];
   std::string ids[4];
 
   for (const auto &i : db) {
@@ -73,13 +75,13 @@ Profile::Save(const FlarmColorDatabase &db)
 
     unsigned color_index = (int)i.second - 1;
 
-    i.first.Format(id);
-    ids[color_index] += id;
+    char id_buffer[16];
+    ids[color_index] += i.first.Format(id_buffer);
     ids[color_index] += ',';
   }
 
-  Set("FriendsGreen", ids[0].c_str());
-  Set("FriendsBlue", ids[1].c_str());
-  Set("FriendsYellow", ids[2].c_str());
-  Set("FriendsMagenta", ids[3].c_str());
+  map.Set("FriendsGreen", ids[0].c_str());
+  map.Set("FriendsBlue", ids[1].c_str());
+  map.Set("FriendsYellow", ids[2].c_str());
+  map.Set("FriendsMagenta", ids[3].c_str());
 }

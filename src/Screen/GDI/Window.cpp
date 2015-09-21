@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@ Copyright_License {
 
 #include "Screen/Window.hpp"
 #include "Screen/ContainerWindow.hpp"
+#include "Screen/Font.hpp"
 #include "Screen/Debug.hpp"
-#include "Screen/GDI/PaintCanvas.hpp"
 #include "Event/Idle.hpp"
 #include "Asset.hpp"
 
@@ -45,32 +45,29 @@ Window::Create(ContainerWindow *parent, const TCHAR *cls, const TCHAR *text,
 
   DWORD style = window_style.style, ex_style = window_style.ex_style;
 
-  if (window_style.custom_painting)
-    EnableCustomPainting();
-
   hWnd = ::CreateWindowEx(ex_style, cls, text, style,
                           rc.left, rc.top,
                           rc.right - rc.left, rc.bottom - rc.top,
-                          parent != NULL ? parent->hWnd : NULL,
-                          NULL, NULL, this);
+                          parent != nullptr ? parent->hWnd : nullptr,
+                          nullptr, nullptr, this);
 
   /* this isn't good error handling, but this only happens if
      out-of-memory (we can't do anything useful) or if we passed wrong
      arguments - which is a bug */
-  assert(hWnd != NULL);
+  assert(hWnd != nullptr);
 }
 
 void
 Window::CreateMessageWindow()
 {
-  hWnd = ::CreateWindowEx(0, _T("PaintWindow"), NULL, 0, 0, 0, 0, 0,
+  hWnd = ::CreateWindowEx(0, _T("PaintWindow"), nullptr, 0, 0, 0, 0, 0,
 #ifdef _WIN32_WCE
-                          NULL,
+                          nullptr,
 #else
                           HWND_MESSAGE,
 #endif
-                          NULL, NULL, this);
-  assert(hWnd != NULL);
+                          nullptr, nullptr, this);
+  assert(hWnd != nullptr);
 }
 
 bool
@@ -92,7 +89,7 @@ Window::SetEnabled(bool enabled)
 
   ::EnableWindow(hWnd, enabled);
 
-  if (was_focused && ::GetFocus() == NULL) {
+  if (was_focused && ::GetFocus() == nullptr) {
     /* The window lost its keyboard focus because it got disabled; now
        the focus is in limbo, and can only be recovered by clicking on
        another control, which is impossible for Altair users (no touch
@@ -101,7 +98,7 @@ Window::SetEnabled(bool enabled)
        https://blogs.msdn.com/b/oldnewthing/archive/2004/08/04/208005.aspx */
 
     ContainerWindow *root = GetRootOwner();
-    if (root != NULL)
+    if (root != nullptr)
       /* to work around this problem, we pass focus to the main
          window, which will bounce it to the next dialog control; this
          kludge is needed because this Window doesn't know the dialog
@@ -114,7 +111,7 @@ Window::SetEnabled(bool enabled)
 void
 Window::Created(HWND _hWnd)
 {
-  assert(hWnd == NULL);
+  assert(hWnd == nullptr);
   hWnd = _hWnd;
 
   AssertThread();
@@ -130,11 +127,17 @@ Window::SetFont(const Font &_font)
                 (WPARAM)_font.Native(), MAKELPARAM(TRUE, 0));
 }
 
+bool
+Window::OnCommand(unsigned id, unsigned code)
+{
+  return false;
+}
+
 LRESULT
 Window::OnUnhandledMessage(HWND hWnd, UINT message,
                              WPARAM wParam, LPARAM lParam)
 {
-  return prev_wndproc != NULL
+  return prev_wndproc != nullptr
     ? ::CallWindowProc(prev_wndproc, hWnd, message, wParam, lParam)
     : ::DefWindowProc(hWnd, message, wParam, lParam);
 }
@@ -257,14 +260,6 @@ Window::OnMessage(HWND _hWnd, UINT message,
       return 0;
     break;
 
-  case WM_PAINT:
-    if (custom_painting) {
-      PaintCanvas canvas(*this);
-      OnPaint(canvas, canvas.get_dirty());
-      return 0;
-    }
-    break;
-
   case WM_GETDLGCODE:
     if (OnKeyCheck(wParam))
       return DLGC_WANTMESSAGE;
@@ -315,7 +310,7 @@ Window::WndProc(HWND _hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void
 Window::InstallWndProc()
 {
-  assert(prev_wndproc == NULL);
+  assert(prev_wndproc == nullptr);
 
   SetUserData(this);
   prev_wndproc = SetWndProc(WndProc);

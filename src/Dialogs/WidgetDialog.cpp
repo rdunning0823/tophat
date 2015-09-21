@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -47,6 +47,14 @@ WidgetDialog::WidgetDialog(const DialogLook &look)
    widget(GetClientAreaWindow()),
    changed(false)
 {
+}
+
+WidgetDialog::~WidgetDialog()
+{
+  /* we must override ~Window(), because in ~Window(), our own
+     OnDestroy() method won't be called (during object destruction,
+     this object loses its identity) */
+  Destroy();
 }
 
 void
@@ -147,7 +155,7 @@ WidgetDialog::AutoSize()
   const PixelRect parent_rc = GetParentClientRect();
   const PixelSize parent_size = parent_rc.GetSize();
 
-  widget.Prepare();
+  PrepareWidget();
 
   // Calculate the minimum size of the dialog
   PixelSize min_size = widget.Get()->GetMinimumSize();
@@ -220,7 +228,9 @@ WidgetDialog::ShowModal()
     widget.Move(buttons.UpdateLayout(GetNonFooterRect()));
 
   widget.Show();
-  return WndForm::ShowModal();
+  int result = WndForm::ShowModal();
+  widget.Hide();
+  return result;
 }
 
 void

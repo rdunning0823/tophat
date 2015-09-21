@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,10 +25,14 @@ Copyright_License {
 
 namespace ProfileKeys {
 
+const char UIScale[] = "UIScale";
+const char Password[] = "Password";
 const char AirspaceWarning[] = "AirspaceWarn";
+const char AirspaceWarningDialog[] = "AirspaceWarnDialog";
 const char AirspaceBlackOutline[] = "AirspaceBlackOutline";
 const char AirspaceTransparency[] = "AirspaceTransparency";
 const char AirspaceFillMode[] = "AirspaceFillMode";
+const char AirspaceLabelSelection[] = "AirspaceLabelSelection";
 const char AltMargin[] = "AltMargin";
 const char AltMode[] = "AltitudeMode";
 const char AltitudeUnitsValue[] = "AltitudeUnit";
@@ -64,8 +68,8 @@ const char HomeElevation[] = "HomeElevation";
 const char HomeElevationAvailable[] = "HomeElevationAvailable";
 const char LiftUnitsValue[] = "LiftUnit";
 const char PressureUnitsValue[] = "Pressure";
-const char WingLoadingUnitsValue[] = "WingLoadingUnits";
-const char MassUnitsValue[] = "MassUnits";
+const char WingLoadingUnitValue[] = "WingLoadingUnits";
+const char MassUnitValue[] = "MassUnits";
 const char LatLonUnits[] = "LatLonUnits";
 const char PolarID[] = "Polar";
 const char Polar[] = "PolarInformation";
@@ -93,7 +97,6 @@ const char WaypointFile[] = "WPFile"; // pL
 const char AdditionalWaypointFile[] = "AdditionalWPFile"; // pL
 const char WatchedWaypointFile[] = "WatchedWPFile"; // pL
 const char LanguageFile[] = "LanguageFile"; // pL
-const char StatusFile[] = "StatusFile"; // pL
 const char InputFile[] = "InputFile"; // pL
 const char PilotName[] = "PilotName";
 const char AircraftType[] = "AircraftType";
@@ -239,7 +242,7 @@ const char FlarmAutoZoom[] = "FlarmRadarAutoZoom";
 const char FlarmNorthUp[] = "FlarmRadarNorthUp";
 
 const char IgnoreNMEAChecksum[] = "IgnoreNMEAChecksum";
-const char DisplayOrientation[] = "DisplayOrientation";
+const char MapOrientation[] = "DisplayOrientation";
 
 const char ClimbMapScale[] = "ClimbMapScale";
 const char CruiseMapScale[] = "CruiseMapScale";
@@ -258,8 +261,10 @@ const char TrackingInterval[] = "TrackingInterval";
 const char TrackingVehicleType[] = "TrackingVehicleType";
 const char TrackingVehicleName[] = "TrackingVehicleName";
 const char SkyLinesTrackingEnabled[] = "SkyLinesTrackingEnabled";
+const char SkyLinesRoaming[] = "SkyLinesRoaming";
 const char SkyLinesTrackingInterval[] = "SkyLinesTrackingInterval";
 const char SkyLinesTrafficEnabled[] = "SkyLinesTrafficEnabled";
+const char SkyLinesNearTrafficEnabled[] = "SkyLinesNearTrafficEnabled";
 const char SkyLinesTrackingKey[] = "SkyLinesTrackingKey";
 const char LiveTrack24Enabled[] = "LiveTrack24Enabled";
 const char LiveTrack24Server[] = "LiveTrack24Server";
@@ -284,6 +289,6 @@ const char FilePickAndDownloadAreaFilter[] = "FilePickAndDownloadAreaFilter";
 const char FilePickAndDownloadSubAreaFilter[] = "FilePickAndDownloadSubAreaFilter";
 const char ScreensButtonLocation[] = "ScreensButtonLocation";
 const char WaypointSortDirection[] = "WaypointSortDirection";
-
+const char WaveAssistant[] = "WaveAssistant";
 
 }

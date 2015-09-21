@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,8 @@ Copyright_License {
 #include "Util/NumberParser.hpp"
 #include "Util/StringUtil.hpp"
 #include "DebugReplay.hpp"
+#include "Net/IPv4Address.hxx"
+#include "Net/StaticSocketAddress.hxx"
 
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
 #include "IO/Async/GlobalIOThread.hpp"
@@ -80,9 +82,14 @@ main(int argc, char *argv[])
   const char *host = args.ExpectNext();
   const char *key = args.ExpectNext();
 
-  SocketAddress address;
+  StaticSocketAddress address;
   if (!address.Lookup(host, "5597", SOCK_DGRAM)) {
     fprintf(stderr, "Failed to look up: %s\n", host);
+    return EXIT_FAILURE;
+  }
+
+  if (address.GetFamily() != AF_INET) {
+    fprintf(stderr, "Not an IPv4 address: %s\n", host);
     return EXIT_FAILURE;
   }
 
@@ -118,11 +125,9 @@ main(int argc, char *argv[])
 
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
     handler.Wait();
-#endif
   } else if (StringIsEqual(args.PeekNext(), "traffic")) {
-    client.SendTrafficRequest(true, true);
+    client.SendTrafficRequest(true, true, true);
 
-#ifdef HAVE_SKYLINES_TRACKING_HANDLER
     handler.Wait();
 #endif
   } else {

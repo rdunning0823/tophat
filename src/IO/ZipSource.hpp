@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,16 +45,16 @@ public:
   virtual ~ZipSource();
 
   bool error() const {
-    return file == NULL;
+    return file == nullptr;
   }
 
 public:
   /* virtual methods from class Source */
-  virtual long GetSize() const override;
+  long GetSize() const override;
 
 protected:
   /* virtual methods from class BufferedSource */
-  virtual unsigned Read(char *p, unsigned n) override;
+  unsigned Read(char *p, unsigned n) override;
 };
 
 #endif

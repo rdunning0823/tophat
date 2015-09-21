@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -79,12 +79,13 @@ public:
   }
 
   /**
+   * The geographical distance in meters of the given amount
+   * of pixels multiplied by 256.
+   *
    * @see RasterProjection::CoarsePixelDistance()
    */
   gcc_pure fixed
   PixelDistance(const GeoPoint &location, unsigned pixels) const {
-    /* factor 256 because the caller should pass a physical pixel
-       number, not interpolated */
     return projection.CoarsePixelDistance(location, pixels);
   }
 

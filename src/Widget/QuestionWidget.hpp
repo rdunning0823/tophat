@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -53,6 +53,8 @@ public:
   QuestionWidget(const TCHAR *_message, ActionListener &_listener,
                  unsigned num_rows_text);
 
+  void SetMessage(const TCHAR *_message);
+
   void AddButton(const TCHAR *caption, int id) {
     buttons.append({caption, id});
   }
@@ -63,7 +65,7 @@ public:
   void UpdateMessage(const TCHAR *_message);
 
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 };
 
 #endif

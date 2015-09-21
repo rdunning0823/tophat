@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ class ProtectedTaskManager;
 /**
  * A Widget that shows a few commands for a Waypoint.
  */
-struct WaypointCommandsWidget
+class WaypointCommandsWidget final
   : public RowFormWidget, ActionListener {
   WndForm *form;
 
@@ -50,10 +50,10 @@ public:
      waypoint(_waypoint), task_manager(_task_manager) {}
 
   /* methods from ActionListener */
-  virtual void OnAction(int id);
+  void OnAction(int id) override;
 
   /* methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 };
 
 #endif

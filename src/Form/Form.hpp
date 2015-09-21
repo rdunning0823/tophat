@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,10 +25,8 @@ Copyright_License {
 #define XCSOAR_FORM_FORM_HPP
 
 #include "ActionListener.hpp"
-#include "SubForm.hpp"
 #include "Screen/ContainerWindow.hpp"
-#include "Util/StaticString.hpp"
-#include "Util/tstring.hpp"
+#include "Util/StaticString.hxx"
 
 #include <functional>
 
@@ -47,7 +45,7 @@ enum ModalResult {
  * A WndForm represents a Window with a titlebar.
  * It is used to display the XML dialogs and MessageBoxes.
  */
-class WndForm : public ContainerWindow, public SubForm,
+class WndForm : public ContainerWindow,
                 public ActionListener
 {
   class ClientAreaWindow : public ContainerWindow {
@@ -59,11 +57,10 @@ class WndForm : public ContainerWindow, public SubForm,
 
   protected:
 #ifdef USE_GDI
-    virtual const Brush *OnChildColor(Window &window,
-                                      Canvas &canvas) override;
+    const Brush *OnChildColor(Window &window, Canvas &canvas) override;
 #endif
 
-    virtual void OnPaint(Canvas &canvas) override;
+    void OnPaint(Canvas &canvas) override;
   };
 
 public:
@@ -99,18 +96,13 @@ protected:
   KeyDownFunction key_down_function;
   CharacterFunction character_function;
 
-  /*
-   * Control which should get the focus by default
-   */
-  Window *default_focus;
-
   RasterPoint last_drag;
 
   /**
    * The OnPaint event is called when the button needs to be drawn
    * (derived from PaintWindow)
    */
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnPaint(Canvas &canvas) override;
 
   StaticString<256> caption;
 
@@ -168,28 +160,24 @@ public:
     force = _force;
   }
 
-  int GetModalResult() { return modal_result; }
-  int SetModalResult(int Value) {
+  void SetModalResult(int Value) {
     modal_result = Value;
-    return Value;
   }
 
   /** inherited from ActionListener */
-  virtual void OnAction(int id) override {
+  void OnAction(int id) override {
     SetModalResult(id);
   }
 
   /**
-   * @param mouse_allowed a Window which is allowed to get mouse
-   * input, even though the dialog is modal (a hack for dlgTarget)
-   */
-  int ShowModal();
-
-  /**
-   * Opens modeless dialog.  Dialog will close if mouse is clicked
+   * Enables "modeless": dialog will close if mouse is clicked
    * anywhere on screen outside the dialog
    */
-  int ShowModeless();
+  void SetModeless() {
+    modeless = true;
+  }
+
+  int ShowModal();
 
   const TCHAR *GetCaption() const {
     return caption.c_str();
@@ -199,17 +187,17 @@ public:
   void SetCaption(const TCHAR *_caption);
 
   /** from class Window */
-  virtual void OnCreate() override;
-  virtual void OnResize(PixelSize new_size) override;
-  virtual void OnDestroy() override;
+  void OnCreate() override;
+  void OnResize(PixelSize new_size) override;
+  void OnDestroy() override;
 
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
-  virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
-  virtual void OnCancelMode() override;
+  bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
+  bool OnMouseDown(PixelScalar x, PixelScalar y) override;
+  bool OnMouseUp(PixelScalar x, PixelScalar y) override;
+  void OnCancelMode() override;
 
 #ifdef WIN32
-  virtual bool OnCommand(unsigned id, unsigned code) override;
+  bool OnCommand(unsigned id, unsigned code) override;
 #endif
 
   void SetKeyDownFunction(KeyDownFunction function) {
@@ -222,14 +210,6 @@ public:
 
   void SetCharacterFunction(CharacterFunction function) {
     character_function = function;
-  }
-
-  void SetDefaultFocus(Window *_defaultFocus) {
-    default_focus = _defaultFocus;
-  }
-
-  Window *GetDefaultFocus() {
-    return default_focus;
   }
 
   /**

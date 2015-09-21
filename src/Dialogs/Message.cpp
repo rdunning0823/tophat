@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -44,11 +44,11 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
 
   SingleWindow &main_window = UIGlobals::GetMainWindow();
 
-  UPixelScalar dialog_width = Layout::Scale(220);
-  UPixelScalar dialog_height = Layout::Scale(160);
+  const unsigned dialog_width = Layout::Scale(220);
+  unsigned dialog_height = Layout::Scale(160);
 
-  UPixelScalar button_width = Layout::Scale(60);
-  UPixelScalar button_height = Layout::Scale(32);
+  const unsigned button_width = Layout::Scale(60u);
+  const unsigned button_height = Layout::Scale(32u);
 
   // Create dialog
   WindowStyle style;
@@ -78,15 +78,15 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
   text_frame->SetCaption(text);
   text_frame->SetAlignCenter();
 
-  UPixelScalar text_height = text_frame->GetTextHeight();
+  const unsigned text_height = text_frame->GetTextHeight();
   text_frame->Resize(dialog_width, text_height + Layout::GetTextPadding());
 
   const PixelSize root_size = main_window.GetSize();
 
   dialog_height = wf.GetTitleHeight() + Layout::Scale(10) + text_height +
       button_height + 3 * top_bottom_margin;
-  PixelScalar dialog_x = (root_size.cx - dialog_width) / 2;
-  PixelScalar dialog_y = (root_size.cy - dialog_height) / 2;
+  const int  dialog_x = (root_size.cx - dialog_width) / 2;
+  const int  dialog_y = (root_size.cy - dialog_height) / 2;
   wf.Move(dialog_x, dialog_y, dialog_width, dialog_height);
 
   PixelRect button_rc;
@@ -99,7 +99,7 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
   WindowStyle button_style;
   button_style.TabStop();
 
-  StaticArray<WndButton *, 10> buttons;
+  StaticArray<Button *, 10> buttons;
 
   unsigned button_flags = flags & 0x000f;
   if (button_flags == MB_OK ||
@@ -108,12 +108,13 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
       new WndSymbolButton(client_area, dialog_look.button, _T("_X"), button_rc,
                           button_style, wf, IDOK);
 
+
   if (button_flags == MB_YESNO ||
       button_flags == MB_YESNOCANCEL ||
       button_flags == MB_YESNOALL) {
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("Yes"), button_rc,
-                    button_style, wf, IDYES);
+      new Button(client_area, dialog_look.button, _("Yes"), button_rc,
+                 button_style, wf, IDYES);
 
     if (button_flags == MB_YESNOALL) {
       buttons.append() =
@@ -122,35 +123,35 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
     }
 
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("No"), button_rc,
-                    button_style, wf, IDNO);
+      new Button(client_area, dialog_look.button, _("No"), button_rc,
+                 button_style, wf, IDNO);
   }
 
   if (button_flags == MB_ABORTRETRYIGNORE ||
       button_flags == MB_RETRYCANCEL)
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("Retry"), button_rc,
-                    button_style, wf, IDRETRY);
+      new Button(client_area, dialog_look.button, _("Retry"), button_rc,
+                 button_style, wf, IDRETRY);
 
   if (button_flags == MB_OKCANCEL ||
       button_flags == MB_RETRYCANCEL ||
       button_flags == MB_YESNOCANCEL)
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("Cancel"), button_rc,
-                    button_style, wf, IDCANCEL);
+      new Button(client_area, dialog_look.button, _("Cancel"), button_rc,
+                 button_style, wf, IDCANCEL);
 
   if (button_flags == MB_ABORTRETRYIGNORE) {
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("Abort"), button_rc,
-                    button_style, wf, IDABORT);
+      new Button(client_area, dialog_look.button, _("Abort"), button_rc,
+                 button_style, wf, IDABORT);
 
     buttons.append() =
-      new WndButton(client_area, dialog_look.button, _("Ignore"), button_rc,
-                    button_style, wf, IDIGNORE);
+      new Button(client_area, dialog_look.button, _("Ignore"), button_rc,
+                 button_style, wf, IDIGNORE);
   }
 
-  UPixelScalar max_button_width = dialog_width / buttons.size();
-  PixelScalar button_x = max_button_width / 2 - button_width / 2;
+  const unsigned max_button_width = dialog_width / buttons.size();
+  int button_x = max_button_width / 2 - button_width / 2;
 
   // Move buttons to the right positions
   for (unsigned i = 0; i < buttons.size(); i++) {

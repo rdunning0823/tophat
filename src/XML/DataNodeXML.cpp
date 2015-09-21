@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,89 +21,58 @@
  */
 
 #include "DataNodeXML.hpp"
-#include "Util/StringUtil.hpp"
-#include "IO/TextWriter.hpp"
 #include "XML/Parser.hpp"
-
-#include <memory>
-
-DataNode *
-DataNodeXML::Load(const TCHAR* path)
-{
-  std::unique_ptr<XMLNode> child(XML::ParseFile(path));
-  if (!child)
-    return NULL;
-
-  return new DataNodeXML(std::move(*child));
-}
-
-void
-DataNodeXML::Serialise(TextWriter &writer) const
-{
-  node.Serialise(writer, true);
-}
+#include "Util/StringAPI.hpp"
 
 const TCHAR *
-DataNodeXML::GetName() const
+ConstDataNodeXML::GetName() const
 {
   return node.GetName();
 }
 
-DataNode*
-DataNodeXML::AppendChild(const TCHAR *name)
+WritableDataNode*
+WritableDataNodeXML::AppendChild(const TCHAR *name)
 {
-  return new DataNodeXML(node.AddChild(name, false));
+  return new WritableDataNodeXML(node.AddChild(name, false));
 }
 
-DataNode *
-DataNodeXML::GetChildNamed(const TCHAR *name) const
+ConstDataNode *
+ConstDataNodeXML::GetChildNamed(const TCHAR *name) const
 {
   const XMLNode *child = node.GetChildNode(name);
-  if (child == NULL)
-    return NULL;
+  if (child == nullptr)
+    return nullptr;
 
-  return new DataNodeXML(*child);
+  return new ConstDataNodeXML(*child);
 }
 
-DataNode::List
-DataNodeXML::ListChildren() const
+ConstDataNode::List
+ConstDataNodeXML::ListChildren() const
 {
   List list;
   for (auto i = node.begin(), end = node.end(); i != end; ++i)
-    list.push_back(new DataNodeXML(*i));
+    list.push_back(new ConstDataNodeXML(*i));
   return list;
 }
 
-DataNode::List
-DataNodeXML::ListChildrenNamed(const TCHAR *name) const
+ConstDataNode::List
+ConstDataNodeXML::ListChildrenNamed(const TCHAR *name) const
 {
   List list;
   for (auto i = node.begin(), end = node.end(); i != end; ++i)
     if (StringIsEqualIgnoreCase(i->GetName(), name))
-      list.push_back(new DataNodeXML(*i));
+      list.push_back(new ConstDataNodeXML(*i));
   return list;
 }
 
 void
-DataNodeXML::SetAttribute(const TCHAR *name, const TCHAR *value)
+WritableDataNodeXML::SetAttribute(const TCHAR *name, const TCHAR *value)
 {
   node.AddAttribute(name, value);
 }
 
 const TCHAR *
-DataNodeXML::GetAttribute(const TCHAR *name) const
+ConstDataNodeXML::GetAttribute(const TCHAR *name) const
 {
   return node.GetAttribute(name);
-}
-
-bool
-DataNodeXML::Save(const TCHAR *path)
-{
-  /// @todo make xml writing portable (unicode etc)
-  TextWriter writer(path);
-  if (!writer.IsOpen())
-    return false;
-
-  Serialise(writer);
-  return true;
 }

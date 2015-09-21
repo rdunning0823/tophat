@@ -1,14 +1,18 @@
-ifeq ($(TARGET),UNIX)
+ifneq ($(ZLIB_PREFIX),)
+
+# a zlib prefix was explicitly specified
+
+ZLIB_LDADD =
+ZLIB_LDLIBS = -L$(ZLIB_PREFIX)/lib -lz
+
+ZLIB_CPPFLAGS = -isystem$(ZLIB_PREFIX)/include
+
+else ifeq ($(TARGET),UNIX)
 
 # use the native zlib on UNIX
 
-ifeq ($(TARGET_IS_DARWIN),y)
-ZLIB_LDADD = /opt/local/lib/libz.a
-ZLIB_LDLIBS =
-else
 ZLIB_LDADD =
 ZLIB_LDLIBS = -lz
-endif
 
 ZLIB_CPPFLAGS =
 
@@ -18,8 +22,8 @@ else ifeq ($(TARGET),ANDROID)
 # android-ndk-*/docs/STABLE-APIS.html
 
 ZLIB_CPPFLAGS =
-ZLIB_LDADD = $(ANDROID_TARGET_ROOT)/usr/lib/libz.so
-ZLIB_LDLIBS =
+ZLIB_LDADD =
+ZLIB_LDLIBS = -lz
 
 else
 

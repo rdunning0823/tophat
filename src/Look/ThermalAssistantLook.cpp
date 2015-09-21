@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 */
 
 #include "ThermalAssistantLook.hpp"
-#include "StandardFonts.hpp"
+#include "FontDescription.hpp"
 #include "Screen/Layout.hpp"
 #include "Asset.hpp"
 
@@ -36,21 +36,21 @@ ThermalAssistantLook::Initialise(bool small, bool inverse)
   polygon_border_color = Color(0x00, 0x00, 0xFF);
 
 #ifdef ENABLE_OPENGL
-  polygon_brush.Set(polygon_fill_color.WithAlpha(128));
+  polygon_brush.Create(polygon_fill_color.WithAlpha(128));
 #else /* !OPENGL */
-  polygon_brush.Set(polygon_fill_color);
+  polygon_brush.Create(polygon_fill_color);
 #endif /* !OPENGL */
 
   UPixelScalar width = Layout::FastScale(small ? 1 : 2);
 #ifdef ENABLE_OPENGL
-  polygon_pen.Set(width, polygon_border_color.WithAlpha(128));
+  polygon_pen.Create(width, polygon_border_color.WithAlpha(128));
 #else /* !OPENGL */
-  polygon_pen.Set(width, polygon_border_color);
+  polygon_pen.Create(width, polygon_border_color);
 #endif /* !OPENGL */
-  inner_circle_pen.Set(1, circle_color);
-  outer_circle_pen.Set(Pen::DASH, 1, circle_color);
-  plane_pen.Set(width, inverse ? COLOR_WHITE : COLOR_BLACK);
+  inner_circle_pen.Create(1, circle_color);
+  outer_circle_pen.Create(Pen::DASH, 1, circle_color);
+  plane_pen.Create(width, inverse ? COLOR_WHITE : COLOR_BLACK);
 
-  overlay_font.Load(GetStandardFontFace(), Layout::FastScale(24));
-  circle_label_font.Load(GetStandardFontFace(), Layout::FastScale(12));
+  overlay_font.Load(FontDescription(Layout::FontScale(22)));
+  circle_label_font.Load(FontDescription(Layout::FontScale(10)));
 }

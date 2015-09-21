@@ -27,8 +27,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_DEREFERENCE_ITERATOR_HPP
-#define XCSOAR_DEREFERENCE_ITERATOR_HPP
+#ifndef DEREFERENCE_ITERATOR_HPP
+#define DEREFERENCE_ITERATOR_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -39,11 +39,13 @@
  */
 template<typename IT, typename VT=std::remove_pointer<typename IT::value_type>>
 class DereferenceIterator {
+  typedef std::iterator_traits<IT> Traits;
+
   IT original;
 
 public:
-  typedef typename IT::iterator_category iterator_category;
-  typedef typename IT::difference_type difference_type;
+  typedef typename Traits::iterator_category iterator_category;
+  typedef typename Traits::difference_type difference_type;
   typedef VT value_type;
   typedef VT *pointer;
   typedef VT &reference;

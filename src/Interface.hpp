@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,7 +30,6 @@ Copyright_License {
 
 struct UIState;
 class MainWindow;
-class StatusMessageList;
 
 /** 
  * Class to hold data/methods accessible by all interface subsystems
@@ -47,7 +46,6 @@ namespace CommonInterface {
   }
 
   // window.. make this protected TODO so have to subclass to get access
-  extern StatusMessageList status_messages;
   extern MainWindow *main_window;
 
   static inline bool MovementDetected() {

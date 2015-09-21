@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,7 +36,6 @@ WindStore::reset()
   windlist.Reset();
   update_clock = fixed(0);
   updated = true;
-  _lastAltitude = fixed(0);
 }
 
 void
@@ -52,7 +51,7 @@ WindStore::SlotMeasurement(const MoreData &info,
 void
 WindStore::SlotAltitude(const MoreData &info, DerivedInfo &derived)
 {
-  if ((fabs(info.nav_altitude - _lastAltitude) > fixed(100)) || updated) {
+  if (updated || (fabs(info.nav_altitude - _lastAltitude) > fixed(100))) {
     //only recalculate if there is a significant change
     recalculateWind(info, derived);
 

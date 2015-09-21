@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -62,7 +62,10 @@ class Replay final
 
   /**
    * If this value is not negative, then we're in fast-forward mode:
-   * replay is going as quickly as possible
+   * replay is going as quickly as possible.  This value denotes the
+   * time stamp when we will stop going fast-forward.  If
+   * #virtual_time is negative, then this is the duration, and
+   * #virtual_time will be added as soon as it is known.
    */
   fixed fast_forward;
 
@@ -147,7 +150,7 @@ public:
   }
 
 private:
-  virtual void OnTimer() override;
+  void OnTimer() override;
 };
 
 #endif

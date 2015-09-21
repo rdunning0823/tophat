@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,6 +29,8 @@ Copyright_License {
 #include "Simulator.hpp"
 #include "LocalPath.hpp"
 #include "Util/CharUtil.hpp"
+#include "Util/StringUtil.hpp"
+#include "Util/StringAPI.hpp"
 #include "Util/NumberParser.hpp"
 #include "Asset.hpp"
 
@@ -44,6 +46,10 @@ namespace CommandLine {
 
 #ifdef HAVE_CMDLINE_FULLSCREEN
   bool full_screen = false;
+#endif
+
+#ifdef HAVE_CMDLINE_REPLAY
+  const char *replay_path;
 #endif
 }
 
@@ -65,27 +71,28 @@ CommandLine::Parse(Args &args)
     if (s[1] == '-')
       s++;
 
-    if (strncmp(s, "-profile=", 9) == 0) {
+    if (StringIsEqual(s, "-profile=", 9)) {
       s += 9;
       PathName convert(s);
       Profile::SetFiles(convert);
-    } else if (strncmp(s, "-datapath=", 10) == 0) {
+    } else if (StringIsEqual(s, "-datapath=", 10)) {
       s += 10;
       PathName convert(s);
       SetPrimaryDataPath(convert);
-    }
+#ifdef HAVE_CMDLINE_REPLAY
+    } else if (StringIsEqual(s, "-replay=", 8)) {
+      replay_path = s + 8;
+#endif
 #ifdef SIMULATOR_AVAILABLE
-    else if (strcmp(s, "-simulator") == 0) {
+    } else if (StringIsEqual(s, "-simulator")) {
       global_simulator_flag = true;
       sim_set_in_cmd_line_flag = true;
-    }
-    else if (strcmp(s, "-fly") == 0) {
+    } else if (StringIsEqual(s, "-fly")) {
       global_simulator_flag=false;
       sim_set_in_cmd_line_flag=true;
-    }
 #endif
 #if !defined(_WIN32_WCE)
-    else if (isdigit(s[1])) {
+    } else if (isdigit(s[1])) {
       char *p;
       width = ParseUnsigned(s + 1, &p);
       if (*p != 'x' && *p != 'X')
@@ -94,33 +101,27 @@ CommandLine::Parse(Args &args)
       height = ParseUnsigned(s + 1, &p);
       if (*p != '\0')
         args.UsageError();
-    }
-    else if (strcmp(s, "-portrait") == 0) {
+    } else if (StringIsEqual(s, "-portrait")) {
       width = 480;
       height = 640;
-    }
-    else if (strcmp(s, "-square") == 0) {
+    } else if (StringIsEqual(s, "-square")) {
       width = 480;
       height = 480;
-    }
-    else if (strcmp(s, "-small") == 0) {
+    } else if (StringIsEqual(s, "-small")) {
       width = 320;
       height = 240;
-    }
 #endif
 #ifdef HAVE_CMDLINE_FULLSCREEN
-    else if (strcmp(s, "-fullscreen") == 0) {
+    } else if (StringIsEqual(s, "-fullscreen")) {
       full_screen = true;
-    }
 #endif
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__WINE__)
-    else if (strcmp(s, "-console") == 0) {
+    } else if (StringIsEqual(s, "-console")) {
       AllocConsole();
       freopen("CONOUT$", "wb", stdout);
-    }
 #endif
 #if !defined(ANDROID) && !defined(_WIN32_WCE)
-    else if (strncmp(s, "-dpi=", 5) == 0) {
+    } else if (StringIsEqual(s, "-dpi=", 5)) {
       unsigned x_dpi, y_dpi;
       char *p;
       x_dpi = ParseUnsigned(s + 5, &p);
@@ -136,12 +137,18 @@ CommandLine::Parse(Args &args)
         args.UsageError();
 
       Display::SetDPI(x_dpi, y_dpi);
-    }
 #endif
+#ifdef __APPLE__
+    } else if (StringStartsWith(s, "-psn")) {
+      /* The OS X launcher always supplies some process number argument.
+         Just ignore it.
+      */
+#endif
+    } else {
 #ifndef _WIN32
-    else
       args.UsageError();
 #endif
+    }
   }
 
 #if !defined(_WIN32_WCE)

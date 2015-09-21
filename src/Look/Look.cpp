@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,12 +25,9 @@ Copyright_License {
 #include "UISettings.hpp"
 
 void
-Look::Initialise(const Font &dialog_font, const Font &dialog_bold_font,
-                 const Font &dialog_small_font,
-                 const Font &map_font)
+Look::Initialise(const Font &map_font)
 {
-  dialog.Initialise(dialog_bold_font, dialog_font, dialog_small_font,
-                    dialog_bold_font, dialog_font, dialog_bold_font);
+  dialog.Initialise();
   traffic.Initialise(map_font);
   flarm_dialog.Initialise(traffic, false);
   gesture.Initialise();
@@ -40,28 +37,12 @@ Look::Initialise(const Font &dialog_font, const Font &dialog_bold_font,
 
 void
 Look::InitialiseConfigured(const UISettings &settings,
-                           const Font &dialog_font,
-                           const Font &dialog_bold_font,
-                           const Font &dialog_small_font,
                            const Font &map_font, const Font &map_bold_font,
-                           const Font &map_label_font,
-                           const Font &cdi_font,
-                           const Font &monospace_font,
-                           const Font &infobox_value_font,
-                           const Font &infobox_small_font,
-#ifndef GNAV
-                           const Font &infobox_unit_font,
-#endif
-                           const Font &infobox_title_font,
-                           const Font &infobox_comment_font)
+                           unsigned infobox_width)
 {
-  dialog.Initialise(dialog_bold_font, dialog_font, dialog_small_font,
-                    dialog_bold_font, dialog_font, dialog_bold_font);
-  terminal.Initialise(monospace_font);
+  dialog.Initialise();
+  terminal.Initialise();
   units.Initialise();
-  vario.Initialise(settings.info_boxes.inverse,
-                   settings.info_boxes.use_colors,
-                   infobox_title_font, cdi_font);
   cross_section.Initialise(map_font);
   horizon.Initialise();
   thermal_band.Initialise(settings.info_boxes.inverse,
@@ -69,13 +50,10 @@ Look::InitialiseConfigured(const UISettings &settings,
   trace_history.Initialise(settings.info_boxes.inverse);
   info_box.Initialise(settings.info_boxes.inverse,
                       settings.info_boxes.use_colors,
-                      infobox_value_font,
-                      infobox_small_font,
-#ifndef GNAV
-                      infobox_unit_font,
-#endif
-                      infobox_title_font,
-                      infobox_comment_font);
+                      infobox_width);
+  vario.Initialise(settings.info_boxes.inverse,
+                   settings.info_boxes.use_colors,
+                   info_box.title_font);
   wind_arrow_info_box.Initialise(map_bold_font, settings.info_boxes.inverse);
   flarm_gauge.Initialise(traffic, true, settings.info_boxes.inverse);
   thermal_assistant_gauge.Initialise(true, settings.info_boxes.inverse);
@@ -83,4 +61,10 @@ Look::InitialiseConfigured(const UISettings &settings,
   vario_bar.Initialise(map_font);
   map.Initialise(settings.map, map_font, map_bold_font);
   icon.Initialise();
+}
+
+void
+Look::ReinitialiseLayout(unsigned infobox_width)
+{
+  info_box.ReinitialiseLayout(infobox_width);
 }

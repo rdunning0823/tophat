@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "Device/Driver/LX.hpp"
-#include "Device/Driver/LX/Internal.hpp"
+#include "Internal.hpp"
 #include "Device/Config.hpp"
 
 static Device *
@@ -39,7 +39,7 @@ LXCreateOnPort(const DeviceConfig &config, Port &com_port)
 
 const struct DeviceRegister lx_driver = {
   _T("LX"),
-  _T("LX / Colibri"),
+  _T("LXNAV"),
   DeviceRegister::DECLARE | DeviceRegister::LOGGER |
   DeviceRegister::PASS_THROUGH |
   DeviceRegister::BULK_BAUD_RATE |

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@ Copyright_License {
 #include "GlideRatioComputer.hpp"
 #include "FlyingComputer.hpp"
 #include "CirclingComputer.hpp"
+#include "WaveComputer.hpp"
 #include "ThermalBandComputer.hpp"
 #include "Wind/Computer.hpp"
 #include "LiftDatabaseComputer.hpp"
@@ -56,6 +57,7 @@ class GlideComputerAirData {
 
   FlyingComputer flying_computer;
   CirclingComputer circling_computer;
+  WaveComputer wave_computer;
   ThermalBandComputer thermal_band_computer;
   WindComputer wind_computer;
   LiftDatabaseComputer lift_database_computer;

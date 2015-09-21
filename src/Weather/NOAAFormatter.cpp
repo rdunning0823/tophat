@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,16 +25,17 @@ Copyright_License {
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Language/Language.hpp"
+#include "Util/StringAPI.hpp"
 #include "Util/Macros.hpp"
 
-class LineSplitter
+class NOAALineSplitter
 {
   const TCHAR *start;
 
 public:
   typedef std::pair<const TCHAR *, unsigned> Range;
 
-  LineSplitter(const TCHAR *_start):start(_start) {}
+  NOAALineSplitter(const TCHAR *_start):start(_start) {}
 
   bool HasNext() const {
     return start != NULL && start[0] != _T('\0');
@@ -46,7 +47,7 @@ public:
     const TCHAR *line_start = start;
 
     // Search for next line break
-    const TCHAR *line_break = _tcschr(line_start, _T('\n'));
+    const auto *line_break = StringFind(line_start, _T('\n'));
     if (!line_break) {
       // if no line break was found
       start = NULL;
@@ -70,7 +71,7 @@ CheckTitle(const TCHAR *title, unsigned title_length, const TCHAR *check)
 
 static bool
 FormatDecodedMETARLine(const TCHAR *line, unsigned length,
-                       ParsedMETAR &parsed, tstring &output)
+                       const ParsedMETAR &parsed, tstring &output)
 {
   const TCHAR *end = line + length;
 
@@ -167,17 +168,11 @@ FormatDecodedMETARLine(const TCHAR *line, unsigned length,
     if (!parsed.visibility_available) {
       buffer.append(value, value_length);
     } else {
-      TCHAR vis_buffer[32];
-      if (parsed.visibility >= 9999) {
-        FormatUserDistanceSmart(fixed(10000),
-                                  vis_buffer);
-
-        buffer.AppendFormat(_("more than %s"), vis_buffer);
-      } else {
-        FormatUserDistanceSmart(fixed(parsed.visibility),
-                                  vis_buffer);
-        buffer += vis_buffer;
-      }
+      if (parsed.visibility >= 9999)
+        buffer.AppendFormat(_("more than %s"),
+                            FormatUserDistanceSmart(fixed(10000)).c_str());
+      else
+        buffer +=  FormatUserDistanceSmart(fixed(parsed.visibility));
     }
     output += buffer;
     output += '\n';
@@ -189,7 +184,7 @@ FormatDecodedMETARLine(const TCHAR *line, unsigned length,
     buffer.Format(_T("%s: "), _("Sky Conditions"));
 
     StaticString<64> _value;
-    _value.set(value, value_length);
+    _value.assign(value, value_length);
 
     buffer += gettext(_value);
 
@@ -203,7 +198,7 @@ FormatDecodedMETARLine(const TCHAR *line, unsigned length,
     buffer.Format(_T("%s: "), _("Weather"));
 
     StaticString<64> _value;
-    _value.set(value, value_length);
+    _value.assign(value, value_length);
 
     buffer += gettext(_value);
 
@@ -213,7 +208,7 @@ FormatDecodedMETARLine(const TCHAR *line, unsigned length,
   }
 
   StaticString<64> title;
-  title.set(line, title_length);
+  title.assign(line, title_length);
 
   StaticString<256> buffer;
   buffer.Format(_T("%s: "), gettext(title.c_str()));
@@ -226,7 +221,8 @@ FormatDecodedMETARLine(const TCHAR *line, unsigned length,
 }
 
 static void
-FormatDecodedMETAR(METAR &metar, ParsedMETAR &parsed, tstring &output)
+FormatDecodedMETAR(const METAR &metar, const ParsedMETAR &parsed,
+                   tstring &output)
 {
   /*
   00 ## Hamburg-Fuhlsbuettel, Germany (EDDH) 53-38N 010-00E 15M ##
@@ -240,7 +236,7 @@ FormatDecodedMETAR(METAR &metar, ParsedMETAR &parsed, tstring &output)
   08 ## Pressure (altimeter): 29.47 in. Hg (0998 hPa) ##
   */
 
-  LineSplitter lines(metar.decoded);
+  NOAALineSplitter lines(metar.decoded);
   for (unsigned i = 0; lines.HasNext(); ++i) {
     auto range = lines.Next();
 
@@ -269,7 +265,7 @@ FormatDecodedMETAR(METAR &metar, ParsedMETAR &parsed, tstring &output)
 }
 
 void
-NOAAFormatter::Format(NOAAStore::Item &station, tstring &output)
+NOAAFormatter::Format(const NOAAStore::Item &station, tstring &output)
 {
   output.reserve(2048);
 

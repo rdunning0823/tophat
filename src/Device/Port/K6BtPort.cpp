@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,8 +33,9 @@ Copyright_License {
 #include <stdio.h>
 #include <string.h>
 
-K6BtPort::K6BtPort(Port *_port, unsigned _baud_rate, DataHandler &_handler)
-  :Port(_handler), port(_port), baud_rate(_baud_rate)
+K6BtPort::K6BtPort(Port *_port, unsigned _baud_rate,
+                   PortListener *_listener, DataHandler &_handler)
+  :Port(_listener, _handler), port(_port), baud_rate(_baud_rate)
 {
 }
 
@@ -62,6 +63,8 @@ K6BtPort::WaitConnected(OperationEnvironment &env)
   if (!port->WaitConnected(env))
     return false;
 
+  // TODO: wrap the PortHandler, move initialisation to PortStateChanged()
+
   /* ensure that the K6Bt is not in command mode */
   SendCommand(NOP);
 
@@ -83,7 +86,7 @@ K6BtPort::Write(const void *_data, size_t length)
   size_t total = 0;
 
   const uint8_t *p;
-  while ((p = (const uint8_t *)memchr(data, ESCAPE, length)) != NULL) {
+  while ((p = (const uint8_t *)memchr(data, ESCAPE, length)) != nullptr) {
     size_t chunk = p - data + 1;
     size_t nbytes = port->Write(data, chunk);
     total += nbytes;

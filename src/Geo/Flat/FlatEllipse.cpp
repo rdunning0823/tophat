@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ FlatEllipse::FlatEllipse(const FlatPoint &_f1, const FlatPoint &_f2,
   // b.cos(t) = ap.y
 
   FlatPoint op = ap;
-  op.Subtract(p);
+  op -= p;
   op.Rotate(-theta);
   theta_initial = Angle::FromXY(op.x * b, op.y * a).AsDelta();
 }
@@ -72,7 +72,7 @@ FlatEllipse::Parametric(const fixed t) const
 
   FlatPoint res(a * cat, b * sat);
   res.Rotate(theta);
-  res.Add(p);
+  res += p;
   return res;
 }
 
@@ -91,11 +91,11 @@ FlatEllipse::Intersect(const FlatLine &line, FlatPoint &i1, FlatPoint &i2) const
   if (s_line.intersect_czero(a, i1, i2)) {
     i1.MultiplyY(ier);
     i1.Rotate(theta);
-    i1.Add(p);
+    i1 += p;
     
     i2.MultiplyY(ier);
     i2.Rotate(theta);
-    i2.Add(p);
+    i2 += p;
     
     return true;
   }

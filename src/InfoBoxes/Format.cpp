@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,19 +37,19 @@ InfoBoxData::SetValue(Angle _value, const TCHAR *suffix)
 {
   assert(suffix != NULL);
 
-  FormatBearing(value.buffer(), value.MAX_SIZE, _value, suffix);
+  FormatBearing(value.buffer(), value.capacity(), _value, suffix);
 }
 
 void
 InfoBoxData::SetValueFromBearingDifference(Angle delta)
 {
-  FormatAngleDelta(value.buffer(), value.MAX_SIZE, delta);
+  FormatAngleDelta(value.buffer(), value.capacity(), delta);
 }
 
 void
 InfoBoxData::SetValueFromGlideRatio(fixed gr)
 {
-  FormatGlideRatio(value.buffer(), value.MAX_SIZE, gr);
+  FormatGlideRatio(value.buffer(), value.capacity(), gr);
 }
 
 void
@@ -57,11 +57,11 @@ InfoBoxData::SetComment(Angle _value, const TCHAR *suffix)
 {
   assert(suffix != NULL);
 
-  FormatBearing(comment.buffer(), comment.MAX_SIZE, _value, suffix);
+  FormatBearing(comment.buffer(), comment.capacity(), _value, suffix);
 }
 
 void
 InfoBoxData::SetCommentFromBearingDifference(Angle delta)
 {
-  FormatAngleDelta(comment.buffer(), comment.MAX_SIZE, delta);
+  FormatAngleDelta(comment.buffer(), comment.capacity(), delta);
 }

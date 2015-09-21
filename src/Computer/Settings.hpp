@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ Copyright_License {
 #include "Plane/Plane.hpp"
 #include "Wind/Settings.hpp"
 #include "Audio/VegaVoiceSettings.hpp"
+#include "WaveSettings.hpp"
 
 #include <type_traits>
 
@@ -194,6 +195,8 @@ struct ComputerSettings {
   FeaturesSettings features;
 
   CirclingSettings circling;
+
+  WaveSettings wave;
 
   AverageEffTime average_eff_time;
 

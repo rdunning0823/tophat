@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -43,12 +43,6 @@ protected:
   int SpeedUp(bool keyup);
 
 public:
-  DataFieldInteger(const TCHAR *EditFormat, const TCHAR *DisplayFormat,
-                   int Min, int Max,
-                   int Default, int Step, DataAccessCallback OnDataAccess)
-    :NumberDataField(Type::INTEGER, true, EditFormat, DisplayFormat, OnDataAccess),
-     value(Default), min(Min), max(Max), step(Step) {}
-
   DataFieldInteger(const TCHAR *edit_format, const TCHAR *display_format,
                    int _min, int _max, int _value, int _step,
                    DataFieldListener *listener=nullptr)
@@ -68,15 +62,15 @@ public:
   }
 
   /* virtual methods from class DataField */
-  virtual void Inc() override;
-  virtual void Dec() override;
-  virtual int GetAsInteger() const override;
-  virtual const TCHAR *GetAsString() const override;
-  virtual const TCHAR *GetAsDisplayString() const override;
-  virtual void SetAsInteger(int value) override;
-  virtual void SetAsString(const TCHAR *value) override;
-  virtual ComboList CreateComboList(const TCHAR *reference) const override;
-  virtual void SetFromCombo(int iDataFieldIndex, TCHAR *sValue) override;
+  void Inc() override;
+  void Dec() override;
+  int GetAsInteger() const override;
+  const TCHAR *GetAsString() const override;
+  const TCHAR *GetAsDisplayString() const override;
+  void SetAsInteger(int value) override;
+  void SetAsString(const TCHAR *value) override;
+  ComboList CreateComboList(const TCHAR *reference) const override;
+  void SetFromCombo(int iDataFieldIndex, TCHAR *sValue) override;
 
 protected:
   void AppendComboValue(ComboList &combo_list, int value) const;

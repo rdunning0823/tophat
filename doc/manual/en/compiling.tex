@@ -25,6 +25,14 @@ To update your repository, type:
 git pull
 \end{verbatim*}
 
+To update third-party libraries used by XCSoar (such as
+\href{http://www.boost.org/}{Boost}), type:
+
+\begin{verbatim*}
+git submodule init
+git submodule update
+\end{verbatim*}
+
 For more information, please read to the git documentation.
 
 \section{Requirements}
@@ -66,8 +74,10 @@ similar operating systems:
 \item \href{http://libjpeg.sourceforge.net/}{libjpeg}
 \item OpenGL (Mesa)
 \item to run XCSoar, you need one of the following fonts (Debian
-  package): DejaVu (\texttt{ttf-dejavu}), Droid (\texttt{ttf-droid}),
-  Freefont (\texttt{ttf-freefont})
+  package): DejaVu (\texttt{fonts-dejavu}),
+  Roboto (\texttt{fonts-roboto}),
+  Droid (\texttt{fonts-droid}),
+  Freefont (\texttt{fonts-freefont-ttf})
 \end{itemize}
 
 The following command installs these on Debian:
@@ -81,7 +91,7 @@ apt-get install make g++ \
   libxml-parser-perl \
   librsvg2-bin xsltproc \
   imagemagick gettext \
-  ttf-dejavu
+  fonts-dejavu
 \end{verbatim*}
 
 To compile, run:
@@ -109,22 +119,41 @@ You may specify one of the following targets with \texttt{TARGET=x}:
 For Android, you need:
 
 \begin{itemize}
-\item \href{http://developer.android.com/sdk/}{Android SDK level 17}
-\item \href{http://developer.android.com/sdk/ndk/}{Android NDK r9}
+\item \href{http://developer.android.com/sdk/}{Android SDK level 22}
+\item \href{http://developer.android.com/sdk/ndk/}{Android NDK r10e}
 \item \href{http://www.vorbis.com/}{Ogg Vorbis}
 \item \href{http://ant.apache.org/}{Apache Ant}
+\item {Java Native tools 
+\begin{verbatim*}
+sudo apt-get install gcj-native-helper ant vorbis-tools
+\end{verbatim*}}
 \end{itemize}
 
 The \texttt{Makefile} assumes that the Android SDK is installed in
-\verb|~/opt/android-sdk-linux_x86| and the NDK is installed in
-\verb|~/opt/android-ndk-r9|.  You can use the options
+\verb|~/opt/android-sdk-linux| and the NDK is installed in
+\verb|~/opt/android-ndk-r10e|.  You can use the options
 \verb|ANDROID_SDK| and \verb|ANDROID_NDK| to override these paths.
+
+After installing Java you will have to install at least one Android Platform SDK using the Android SDK Manager:
+
+\begin{verbatim*}
+~/opt/android-sdk-linux/tools/android
+\end{verbatim*}
 
 Load/update the IOIO source code:
 
 \begin{verbatim*}
 git submodule init
 git submodule update
+\end{verbatim*}
+
+If you are using a 64-bit machine you might have a problem when you try to run the Android cross-compiler. 
+The cross-compiler is a 32bit version of the compiler and the build script might complain that the necessary 
+compiler is “not found”, which is obviously wrong since the file is there and accessible. Instead, the problem is
+that the supporting 32-bit libraries are missing, which can be fixed through the following command:
+
+\begin{verbatim*}
+sudo apt-get install ia32-libs
 \end{verbatim*}
 
 To compile, run:
@@ -198,8 +227,6 @@ Use one of the following targets:
 
 \begin{tabular}{lp{8cm}}
 
-\texttt{PPC2000} & PocketPC 2000 / Windows CE 3.0 \\
-
 \texttt{PPC2003} & PocketPC 2003 / Windows CE 4.0 \\
 
 \texttt{PPC2003X} & for XScale CPUs \\
@@ -212,75 +239,104 @@ Use one of the following targets:
 
 \end{tabular}
 
-\subsection{Compiling for Mac OS X}
+\subsection{Compiling for iOS and OS X}
 
-For Mac OS X, you need:
+For iOS and OS X, you can use the
+\href{https://github.com/felixhaedicke/DarwinToolchainBuilder}{DarwinToolchainBuilder}
+toolset. This toolset can be used regardless of whether compiling on OS X or on
+any other operaing system. The installation instructions for these the tools
+can be found in its
+\href{https://github.com/felixhaedicke/DarwinToolchainBuilder/blob/master/README.md}{README.md}.
 
+Furthermore, the following tools are required:
 \begin{itemize}
-\item GCC 4.6.2 or newer (http://hpc.sourceforge.net/, or homebrew, or Macports)
-\item \href{http://www.zlib.net/}{zlib}
-\item \href{http://curl.haxx.se/}{CURL}
-\item \href{http://www.libsdl.org/}{SDL}
-\item \href{http://www.libsdl.org/projects/SDL\_ttf/}{SDL\_ttf}
-\item \href{http://www.libpng.org/}{libpng}
-\item \href{http://libjpeg.sourceforge.net/}{libjpeg}
-\item \href{http://icns.sourceforge.net/}{libicns}
+\item png2icns from \href{http://icns.sourceforge.net}{libicns} to build for
+  OS X
+\item \href{https://alioth.debian.org/projects/dpkg}{dpkg} to build the iOS
+  Cydia package
+\item \href{http://cdrecord.org/private/cdrecord.html}{mkisofs} to build the
+  OS X DMG package
 \end{itemize}
+
+To compile for iOS / AArch64, run:
+
+\begin{verbatim*}
+make TARGET=IOS64 cydia-deb
+\end{verbatim*}
+
+To compile for iOS / ARMv7, run:
+
+\begin{verbatim*}
+make TARGET=IOS32 cydia-deb
+\end{verbatim*}
+
+To compile for OS X / x86\_64, run:
+
+\begin{verbatim*}
+make TARGET=OSX64 dmg
+\end{verbatim*}
+
+To compile for OS X / x86, run:
+
+\begin{verbatim*}
+make TARGET=OSX32 dmg
+\end{verbatim*}
+
+The \texttt{Makefile} assumes that the Darwin toolchain is installed in
+\verb|~/opt/darwin-toolchain| (only relevant if you are not compiling on OS X).
+You can use the option \verb|DARWIN_TOOLCHAIN| to override this path.
+To compile on Mac OS X, the directory where the library set (built with
+DarwinToolchainBuilder) for the current target is installed needs to be
+specified using the \verb|DARWIN_LIBS| option.
 
 \subsection{Compiling for the Raspberry Pi}
 
-To compile, run:
+You need an ARM toolchain.  For example, you can use the Debian
+package \verb|g++-5-arm-linux-gnueabihf|:
 
 \begin{verbatim*}
-make TARGET=PI
+make TARGET=PI TCSUFFIX=-5
 \end{verbatim*}
 
-This target is only used for cross-compiling on a (desktop) computer.
+To optimize for the Raspberry Pi 2 (which has an ARMv7 with NEON
+instead of an ARMv6):
+
+\begin{verbatim*}
+make TARGET=PI2 TCSUFFIX=-5
+\end{verbatim*}
+
+These targets are only used for cross-compiling on a (desktop)
+computer.
 If you compile on the Raspberry Pi, the default target will
 auto-detect the Pi.
 
-\subsection{Compiling for Kobo E-book Readers}
-
-You need an ARM toolchain.  For example, you can use this toolchain
-that was built for Debian Wheezy on AMD64:
-
-\begin{verbatim*}
-wget http://max.kellermann.name/download/xcsoar/devel/\
-x-tools/x-tools-arm-amd64-2013-12-11.tar.xz
-\end{verbatim*}
-\begin{verbatim*}
-tar xJfC x-tools-arm-amd64-2013-12-11.tar.xz $HOME
-\end{verbatim*}
-\begin{verbatim*}
-export PATH=$HOME/x-tools/arm-unknown-linux-gnueabi/bin:$PATH
-\end{verbatim*}
-
-There are precompiled toolchains for
-\href{http://max.kellermann.name/download/xcsoar/devel/x-tools/x-tools-arm-amd64-2013-12-11.tar.xz}{amd64}
-and for
-\href{http://max.kellermann.name/download/xcsoar/devel/x-tools/x-tools-arm-i386-2013-12-11.tar.xz}{i386}.
-
-You can build your own toolchain with
-\href{http://crosstool-ng.org/}{crosstool-ng}.  The above toolchain
-was built with crosstool-ng and this configuration file:
-\url{http://max.kellermann.name/download/xcsoar/devel/x-tools-arm.config}
-
-Download the
-\href{http://max.kellermann.name/download/xcsoar/devel/kobo/kobo-libs-2013-12-11.tar.xz}{Kobo
-  libraries} and unpack in \texttt{/opt}:
-
-\begin{verbatim*}
-wget http://max.kellermann.name/download/xcsoar/devel/\
-kobo/kobo-libs-2013-12-11.tar.xz
-\end{verbatim*}
-\begin{verbatim*}
-tar xJfC kobo-libs-2013-12-11.tar.xz /opt
-\end{verbatim*}
+\subsection{Compiling for the Cubieboard}
 
 To compile, run:
 
 \begin{verbatim*}
-make TARGET=KOBO
+make TARGET=CUBIE
+\end{verbatim*}
+
+This target is only used for cross-compiling on a (desktop) computer.
+If you compile on the Cubieboard, the default target will auto-detect
+the Cubieboard.
+
+\subsection{Compiling for Kobo E-book Readers}
+
+You need an ARM toolchain.  For example, you can use the Debian
+package \verb|g++-5-arm-linux-gnueabihf|.
+
+First build the third-party libraries:
+
+\begin{verbatim*}
+make TARGET=KOBO TCSUFFIX=-5 kobo-libs
+\end{verbatim*}
+
+To compile XCSoar, run:
+
+\begin{verbatim*}
+make TARGET=KOBO TCSUFFIX=-5
 \end{verbatim*}
 
 To build the kobo install file \texttt{KoboRoot.tgz}, you need the
@@ -293,9 +349,79 @@ apt-get install fakeroot ttf-bitstream-vera
 Then compile using this command:
 
 \begin{verbatim*}
-make TARGET=KOBO output/KOBO/KoboRoot.tgz
+make TARGET=KOBO TCSUFFIX=-5 output/KOBO/KoboRoot.tgz
 \end{verbatim*}
 
+For this, you need the Debian package \verb|libc6-armhf-cross|.
+
+\subsubsection{Building USB-OTG Kobo Kernel}
+
+To build a USB-OTG capable kernel for the Kobo, clone the git
+repository:
+
+\begin{verbatim*}
+git clone --branch kobo \
+  git://git.xcsoar.org/xcsoar/max/linux.git
+\end{verbatim*}
+
+Configure the kernel using the file \texttt{kobo/kernel/otg.config}
+from XCSoar's \texttt{git} repository.  Install a
+\href{http://openlinux.amlogic.com:8000/download/ARM/gnutools/arm-2010q1-202-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2}{gcc
+  4.4 cross compiler}, for example in \texttt{/opt}.
+
+Now type:
+
+\begin{verbatim*}
+make CROSS_COMPILE=/opt/arm-2010q1/bin/arm-none-linux-gnueabi- \
+  ARCH=arm uImage
+\end{verbatim*}
+
+Copy \texttt{uImage} to the Kobo.  Kernel images can be installed with
+the following command:
+
+\begin{verbatim*}
+dd if=/path/to/uImage of=/dev/mmcblk0 bs=512 seek=2048
+\end{verbatim*}
+
+Note that XCSoar's \texttt{rcS} script may overwrite the kernel image
+automatically under certain conditions.  To use a new kernel
+permanently, install it in \texttt{/opt/xcsoar/lib/kernel}.  Read the
+file \texttt{kobo/rcS} to find out more about this.
+
+To include kernel images in \texttt{KoboRoot.tgz}, copy
+\texttt{uImage.otg} and \texttt{uImage.kobo} to
+\texttt{/opt/kobo/kernel}.
+
+\subsection{Editing the Manuals}
+
+The XCSoar documententation, including the Developer Manual that you are 
+reading right now, is written using the TeX markup language. You can edit
+the source files with any text editor, although a specific TeX editor (e.g. LateXila) 
+makes it easier. 
+
+Source files are located in the en, fr, de, pl subdirectories of the doc/manual directory. 
+The Developer manual is in the doc/manual/en directory. The generated files are put into
+the output/manual directory.
+
+To generate the PDF manuals, you need the TexLive package, plus some European languages.
+
+The following command installs these on Debian:
+
+\begin{verbatim*}
+apt-get install texlive texlive-lang-french \
+  texlive-lang-polish texlive-lang-german \
+  texlive-extra-tools
+\end{verbatim*}
+
+The documentation is distributed as PDF files. Generating the PDFs from the 
+TeX files is done by typing:
+
+\begin{verbatim*}
+make manual
+\end{verbatim*}
+
+A lot of warnings are generated... this is normal. Check for the presence of PDF files 
+to ensure that the generation process was successful.
 \section{Options}
 
 \subsection{Parallel Build}
@@ -337,3 +463,16 @@ TARGET=UNIX DEBUG=n TARGET_OUTPUT_DIR=output/OPT
 
 It allows building both debug and non-debug incrementally, because two
 different output directories are used.
+
+\subsection{Compiling with ccache}
+
+To speed up the compilation of XCSoar we can use \texttt{ccache} to cache the 
+object files for us. All we have to do is install ccache and 
+add 
+\texttt{USE\_CCACHE=y} 
+to the make command line:
+
+\begin{verbatim*}
+sudo apt-get install ccache
+make TARGET=UNIX USE_CCACHE=y
+\end{verbatim*}

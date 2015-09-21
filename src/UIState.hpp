@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,8 +25,9 @@ Copyright_License {
 #define XCSOAR_UI_STATE_HPP
 
 #include "DisplayMode.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "PageState.hpp"
+#include "Weather/WeatherUIState.hpp"
 
 /**
  * The state of the user interface.
@@ -79,6 +80,7 @@ struct UIState {
    * Index, 0-4 of Top Hat main menu button index.  0 means hidden
    */
   unsigned main_menu_index;
+  WeatherUIState weather;
 
   void Clear();
 };

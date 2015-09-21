@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ class ReachIntersectionTest: public AbortIntersectionTest {
   const RoutePlannerGlue *route;
 
 public:
-  ReachIntersectionTest(): route(NULL) {};
+  ReachIntersectionTest():route(nullptr) {};
 
   void SetRoute(const RoutePlannerGlue *_route) {
     route = _route;
@@ -56,8 +56,6 @@ class ProtectedTaskManager: public Guard<TaskManager>
 protected:
   const TaskBehaviour &task_behaviour;
   ReachIntersectionTest intersection_test;
-
-  static const TCHAR default_task_path[];
 
 public:
   ProtectedTaskManager(TaskManager &_task_manager, const TaskBehaviour &tb);
@@ -92,22 +90,6 @@ public:
   bool TaskSave(const TCHAR *path);
 
   bool TaskSaveDefault();
-
-  /**
-   * Creates an ordered task based on the Default.tsk file
-   * Consumer's responsibility to delete task
-   *
-   * @param waypoints waypoint structure
-   * @param failfactory default task type used if Default.tsk is invalid
-   * @return OrderedTask from Default.tsk file or if Default.tsk is invalid
-   * or non-existent, returns empty task with defaults set by
-   * config task defaults
-   */
-  gcc_malloc
-  OrderedTask* TaskCreateDefault(const Waypoints *waypoints,
-                                 TaskFactoryType factory);
-
-  bool TaskSave(const TCHAR* path, const OrderedTask& task);
 
   /** Reset the tasks (as if never flown) */
   void Reset();

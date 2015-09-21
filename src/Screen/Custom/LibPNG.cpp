@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -91,7 +91,7 @@ LoadPNG(png_structp png_ptr, png_infop info_ptr,
 
   png_read_update_info(png_ptr, info_ptr);
   png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
-               &color_type, &interlace_type, NULL, NULL);
+               &color_type, &interlace_type, nullptr, nullptr);
 
   /* check the color type */
 

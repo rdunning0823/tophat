@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,30 +24,41 @@ Copyright_License {
 #ifndef XCSOAR_BUTTON_RENDERER_HPP
 #define XCSOAR_BUTTON_RENDERER_HPP
 
+#include "Compiler.h"
+
 struct PixelRect;
 struct ButtonLook;
 class Canvas;
 
-class ButtonRenderer
-{
+class ButtonFrameRenderer {
   const ButtonLook &look;
 
 public:
-  ButtonRenderer(const ButtonLook &_look):look(_look) {}
+  explicit ButtonFrameRenderer(const ButtonLook &_look):look(_look) {}
 
   const ButtonLook &GetLook() const {
     return look;
   }
 
-  /**
-   * @parm transparent. if True, the background is not drawn
-   * so the button is transparent
-   * @param transparent does not draw the background
-   * @param dimmed
-   */
-  void DrawButton(Canvas &canvas, PixelRect rc, bool focused, bool pressed,
-                  bool transparent = false, bool dimmed = false);
-  PixelRect GetDrawingRect(PixelRect rc, bool pressed);
+  gcc_const
+  static unsigned GetMargin();
+
+  void DrawButton(Canvas &canvas, PixelRect rc,
+                  bool focused, bool pressed) const;
+
+  gcc_pure
+  PixelRect GetDrawingRect(PixelRect rc, bool pressed) const;
+};
+
+class ButtonRenderer {
+public:
+  virtual ~ButtonRenderer() {}
+
+  gcc_pure
+  virtual unsigned GetMinimumButtonWidth() const;
+
+  virtual void DrawButton(Canvas &canvas, const PixelRect &rc,
+                          bool enabled, bool focused, bool pressed) const = 0;
 };
 
 #endif

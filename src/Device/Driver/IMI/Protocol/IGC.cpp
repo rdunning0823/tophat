@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -50,7 +50,7 @@ IMI::WriteString(const char *buffer, size_t max_length, FILE *file)
 {
   size_t length = max_length;
   const char *zero = (const char *)memchr(buffer, '\0', max_length);
-  if (zero != NULL)
+  if (zero != nullptr)
     length = zero - buffer;
 
   fwrite(buffer, sizeof(char), length, file);

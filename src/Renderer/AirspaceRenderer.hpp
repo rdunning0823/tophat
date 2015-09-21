@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -91,8 +91,8 @@ public:
   }
 
   void Clear() {
-    airspaces = NULL;
-    warning_manager = NULL;
+    airspaces = nullptr;
+    warning_manager = nullptr;
   }
 
   void Flush() {
@@ -101,8 +101,8 @@ public:
 #endif
   }
 
-#ifndef ENABLE_OPENGL
 private:
+#ifndef ENABLE_OPENGL
   bool DrawFill(Canvas &buffer_canvas, Canvas &stencil_canvas,
                 const WindowProjection &projection,
                 const AirspaceRendererSettings &settings,
@@ -120,10 +120,18 @@ private:
                    const WindowProjection &projection,
                    const AirspaceRendererSettings &settings,
                    const AirspacePredicate &visible) const;
-
-public:
 #endif
 
+  void DrawInternal(Canvas &canvas,
+#ifndef ENABLE_OPENGL
+                    Canvas &stencil_canvas,
+#endif
+                    const WindowProjection &projection,
+                    const AirspaceRendererSettings &settings,
+                    const AirspaceWarningCopy &awc,
+                    const AirspacePredicate &visible);
+
+public:
   /**
    * Draw airspaces selected by the given #AirspacePredicate.
    */

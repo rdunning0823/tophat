@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,6 +32,7 @@ WindComputer::Reset()
   circling_wind.Reset();
   wind_ekf.Reset();
   wind_store.reset();
+  ekf_active = false;
 }
 
 gcc_pure
@@ -50,6 +51,11 @@ WindComputer::Compute(const WindSettings &settings,
                       const GlidePolar &glide_polar,
                       const MoreData &basic, DerivedInfo &calculated)
 {
+  if (!settings.IsAutoWindEnabled()) {
+    calculated.estimated_wind_available.Clear();
+    return;
+  }
+
   if (!calculated.flight.flying)
     return;
 
@@ -59,13 +65,28 @@ WindComputer::Compute(const WindSettings &settings,
     if (result.IsValid())
       wind_store.SlotMeasurement(basic, result.wind, result.quality);
 
-    if (basic.airspeed_available && basic.airspeed_real &&
-        basic.true_airspeed > GetVTakeoffFallback(glide_polar)) {
+  if (basic.airspeed_available && basic.airspeed_real) {
+    if (basic.true_airspeed > GetVTakeoffFallback(glide_polar)) {
       WindEKFGlue::Result result = wind_ekf.Update(basic, calculated);
-      if (result.quality > 0)
+      if (result.quality > 0) {
         wind_store.SlotMeasurement(basic, result.wind, result.quality);
-    }
 
+        /* skip WindStore if EKF is used because EKF is already
+           filtered */
+        /* note that even though we don't use WindStore to obtain the
+           wind estimate, we still store the EKF wind vector to it for
+           the analysis dialog */
+        calculated.estimated_wind = result.wind;
+        calculated.estimated_wind_available.Update(basic.clock);
+        ekf_active = true;
+      }
+    }
+  } else
+    /* EKF cannot be used without airspeed */
+    ekf_active = false;
+
+  /* skip WindStore? */
+  if (!ekf_active)
     wind_store.SlotAltitude(basic, calculated);
   }
 }
@@ -103,8 +124,8 @@ WindComputer::Select(const WindSettings &settings,
     calculated.wind_available = settings.manual_wind_available;
     calculated.wind_source = DerivedInfo::WindSource::MANUAL;
 
-  } else if (calculated.estimated_wind_available.Modified(settings.manual_wind_available)
-             && settings.IsAutoWindEnabled()) {
+  } else if (calculated.estimated_wind_available.Modified(
+      settings.manual_wind_available) && settings.IsAutoWindEnabled()) {
     // auto wind when available and newer than manual wind
     calculated.wind = calculated.estimated_wind;
     calculated.wind_available = calculated.estimated_wind_available;

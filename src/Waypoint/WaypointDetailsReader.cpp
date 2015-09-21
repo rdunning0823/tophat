@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ Copyright_License {
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "IO/ConfiguredFile.hpp"
+#include "IO/LineReader.hpp"
 #include "Operation/Operation.hpp"
 
 #include <vector>
@@ -37,7 +38,7 @@ static const Waypoint *
 FindWaypoint(Waypoints &way_points, const TCHAR *name)
 {
   const Waypoint *wp = way_points.LookupName(name);
-  if (wp != NULL)
+  if (wp != nullptr)
     return wp;
 
   // TODO: Comments please! What is this supposed to do? Why do we need it?
@@ -46,15 +47,15 @@ FindWaypoint(Waypoints &way_points, const TCHAR *name)
   _tcscpy(buffer, name);
   _tcscpy(buffer + name_length, _T(" AF"));
   wp = way_points.LookupName(buffer);
-  if (wp != NULL)
+  if (wp != nullptr)
     return wp;
 
   _tcscpy(buffer + name_length, _T(" AD"));
   wp = way_points.LookupName(buffer);
-  if (wp != NULL)
+  if (wp != nullptr)
     return wp;
 
-  return NULL;
+  return nullptr;
 }
 
 static void
@@ -64,13 +65,13 @@ SetAirfieldDetails(Waypoints &way_points, const TCHAR *name,
                    const std::vector<tstring> &files_embed)
 {
   const Waypoint *wp = FindWaypoint(way_points, name);
-  if (wp == NULL)
+  if (wp == nullptr)
     return;
 
   Waypoint new_wp(*wp);
   new_wp.details = Details.c_str();
   new_wp.files_embed.assign(files_embed.begin(), files_embed.end());
-#ifdef ANDROID
+#ifdef HAVE_RUN_FILE
   new_wp.files_external.assign(files_external.begin(), files_external.end());
 #endif
   way_points.Replace(*wp, new_wp);
@@ -98,7 +99,7 @@ ParseAirfieldDetails(Waypoints &way_points, TLineReader &reader,
   operation.SetProgressRange(100);
 
   TCHAR *line;
-  while ((line = reader.ReadLine()) != NULL) {
+  while ((line = reader.ReadLine()) != nullptr) {
     if (line[0] == _T('[')) { // Look for start
       if (in_details)
         SetAirfieldDetails(way_points, name, details, files_external,
@@ -121,11 +122,11 @@ ParseAirfieldDetails(Waypoints &way_points, TLineReader &reader,
 
       operation.SetProgressPosition(reader.Tell() * 100 / filesize);
     } else if ((filename =
-                StringAfterPrefixCI(line, _T("image="))) != NULL) {
+                StringAfterPrefixCI(line, _T("image="))) != nullptr) {
       files_embed.emplace_back(filename);
     } else if ((filename =
-                StringAfterPrefixCI(line, _T("file="))) != NULL) {
-#ifdef ANDROID
+                StringAfterPrefixCI(line, _T("file="))) != nullptr) {
+#ifdef HAVE_RUN_FILE
       files_external.emplace_back(filename);
 #endif
     } else {
@@ -158,7 +159,7 @@ WaypointDetails::ReadFileFromProfile(Waypoints &way_points,
 {
   std::unique_ptr<TLineReader>
   reader(OpenConfiguredTextFile(ProfileKeys::AirfieldFile, _T("airfields.txt"),
-                                ConvertLineReader::AUTO));
+                                Charset::AUTO));
   if (reader)
     ReadFile(*reader, way_points, operation);
 }

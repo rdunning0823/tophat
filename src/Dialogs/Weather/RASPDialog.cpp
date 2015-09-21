@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,74 +24,135 @@ Copyright_License {
 #include "WeatherDialogs.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Widget/RowFormWidget.hpp"
-#include "Terrain/RasterWeather.hpp"
+#include "Terrain/RasterWeatherCache.hpp"
+#include "Terrain/RasterWeatherStore.hpp"
 #include "Form/Edit.hpp"
 #include "Form/DataField/Enum.hpp"
+#include "Form/DataField/Listener.hpp"
 #include "Components.hpp"
 #include "UIGlobals.hpp"
+#include "UIState.hpp"
+#include "ActionInterface.hpp"
 #include "Language/Language.hpp"
 
 #include <stdio.h>
 
-class RASPSettingsPanel final : public RowFormWidget {
+class RASPSettingsPanel final : public RowFormWidget, DataFieldListener {
   enum Controls {
     ITEM,
     TIME,
   };
 
+  RasterWeatherStore &rasp;
+
+  BrokenTime time;
+
 public:
-  RASPSettingsPanel():RowFormWidget(UIGlobals::GetDialogLook()) {}
+  RASPSettingsPanel(RasterWeatherStore &_rasp)
+    :RowFormWidget(UIGlobals::GetDialogLook()), rasp(_rasp) {}
+
+private:
+  void UpdateTimeControl();
+  void OnTimeModified(const DataFieldEnum &df);
 
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
+
+  /* virtual methods from DataFieldListener */
+  void OnModified(DataField &df) override {
+    if (IsDataField(ITEM, df))
+      UpdateTimeControl();
+    else if (IsDataField(TIME, df))
+      OnTimeModified((const DataFieldEnum &)df);
+  }
 };
+
+void
+RASPSettingsPanel::UpdateTimeControl()
+{
+  const DataFieldEnum &item = (const DataFieldEnum &)GetDataField(ITEM);
+
+  const unsigned item_index = item.GetValue();
+  SetRowEnabled(TIME, item_index > 0);
+
+  if (item_index > 0) {
+    DataFieldEnum &time_df = (DataFieldEnum &)GetDataField(TIME);
+    time_df.ClearChoices();
+    time_df.addEnumText(_("Now"));
+
+    rasp.ForEachTime(item_index, [&time_df](BrokenTime t){
+        TCHAR timetext[10];
+        _stprintf(timetext, _T("%02u:%02u"), t.hour, t.minute);
+        time_df.addEnumText(timetext, t.GetMinuteOfDay());
+      });
+
+    if (time.IsPlausible())
+      time_df.Set(time.GetMinuteOfDay());
+    GetControl(TIME).RefreshDisplay();
+  }
+}
+
+inline void
+RASPSettingsPanel::OnTimeModified(const DataFieldEnum &df)
+{
+  const unsigned value = df.GetValue();
+  time = value == 0
+    ? BrokenTime::Invalid()
+    : BrokenTime::FromMinuteOfDay(value);
+}
 
 void
 RASPSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
+  const WeatherUIState &state = CommonInterface::GetUIState().weather;
+  time = state.time;
+
   WndProperty *wp;
 
-  wp = AddEnum(_("Field"), nullptr);
+  wp = AddEnum(_("Field"), nullptr, this);
   DataFieldEnum *dfe = (DataFieldEnum *)wp->GetDataField();
   dfe->EnableItemHelp(true);
-  dfe->addEnumText(_("Terrain"));
-  for (unsigned i = 1; i < RasterWeather::MAX_WEATHER_MAP; i++) {
-    const TCHAR *label = RASP.ItemLabel(i);
-    if (label != NULL)
-      dfe->AddChoice(i, label, nullptr, RASP.ItemHelp(i));
+  for (unsigned i = 0; i < rasp.GetItemCount(); i++) {
+    const auto &mi = rasp.GetItemInfo(i);
+    const TCHAR *label = mi.label;
+    if (label != nullptr)
+      label = gettext(label);
+
+    const TCHAR *help = mi.help;
+    if (help != nullptr)
+      help = gettext(help);
+
+    dfe->AddChoice(i, mi.name, label, help);
   }
 
-  dfe->Set(RASP.GetParameter());
+  dfe->Set(state.map);
   wp->RefreshDisplay();
 
-  wp = AddEnum(_("Time"), nullptr);
-  dfe = (DataFieldEnum *)wp->GetDataField();
-  dfe->addEnumText(_("Now"));
-  for (unsigned i = 1; i < RasterWeather::MAX_WEATHER_TIMES; i++) {
-    if (RASP.isWeatherAvailable(i)) {
-      TCHAR timetext[10];
-      _stprintf(timetext, _T("%04d"), RASP.IndexToTime(i));
-      dfe->addEnumText(timetext, i);
-    }
-  }
-
-  dfe->Set(RASP.GetTime());
-  wp->RefreshDisplay();
+  AddEnum(_("Time"), nullptr, this);
+  UpdateTimeControl();
 }
 
 bool
 RASPSettingsPanel::Save(bool &_changed)
 {
-  RASP.SetParameter(GetValueInteger(ITEM));
-  RASP.SetTime(GetValueInteger(TIME));
+  WeatherUIState &state = CommonInterface::SetUIState().weather;
+
+  state.map = GetValueInteger(ITEM);
+  state.time = time;
+
+  ActionInterface::SendUIState(true);
+
   return true;
 }
 
 void
 dlgWeatherShowModal()
 {
-  RASPSettingsPanel *widget = new RASPSettingsPanel();
+  if (rasp == nullptr || rasp->GetItemCount() == 0)
+    return;
+
+  RASPSettingsPanel *widget = new RASPSettingsPanel(*rasp);
 
   WidgetDialog dialog(UIGlobals::GetDialogLook());
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Weather Forecast"), widget);
@@ -101,12 +162,7 @@ dlgWeatherShowModal()
 
 /*
   Todo:
-  - units conversion in routine
-  - load on demand
   - time based search
-  - fix dialog
-  - put label in map window as to what is displayed if not terrain
-      (next to AUX)
   - Draw a legend on screen?
   - Auto-advance time index of forecast if before current time
 */

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_WAYPOINT_LIST_FILTER_HPP
 #define XCSOAR_WAYPOINT_LIST_FILTER_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Math/fixed.hpp"
 #include "Math/Angle.hpp"
 
@@ -44,16 +44,16 @@ enum class TypeFilter: uint8_t {
   FINISH,
   FAI_TRIANGLE_LEFT,
   FAI_TRIANGLE_RIGHT,
+  USER,
   FILE_1,
   FILE_2,
+  MAP,
   LAST_USED,
 };
 
 struct WaypointFilter
 {
-  enum {
-    NAME_LENGTH = 10,
-  };
+  static constexpr size_t NAME_LENGTH = 10;
 
   StaticString<NAME_LENGTH + 1> name;
 
@@ -61,6 +61,18 @@ struct WaypointFilter
   Angle direction;
   TypeFilter type_index;
 
+  void Clear() {
+    name.clear();
+    distance = fixed(0);
+    direction = Angle::Native(fixed(-1));
+    type_index = TypeFilter::ALL;
+  }
+
+  gcc_pure
+  bool Matches(const Waypoint &waypoint, GeoPoint location,
+               const FAITrianglePointValidator &triangle_validator) const;
+
+private:
   static bool CompareType(const Waypoint &waypoint, TypeFilter type,
                           const FAITrianglePointValidator &triangle_validator);
 
@@ -75,9 +87,6 @@ struct WaypointFilter
   static bool CompareName(const Waypoint &waypoint, const TCHAR *name);
 
   bool CompareName(const Waypoint &waypoint) const;
-
-  bool Matches(const Waypoint &waypoint, GeoPoint location,
-               const FAITrianglePointValidator &triangle_validator) const;
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_DATA_FIELD_NUMBER_HPP
 
 #include "Base.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Compiler.h"
 
 class NumberDataField : public DataField {
@@ -37,10 +37,6 @@ public:
   void SetFormat(const TCHAR *text);
 
 protected:
-  NumberDataField(Type type, bool support_combo,
-                  const TCHAR *edit_format, const TCHAR *display_format,
-                  DataAccessCallback OnDataAccess);
-
   NumberDataField(Type type, bool support_combo,
                   const TCHAR *edit_format, const TCHAR *display_format,
                   DataFieldListener *listener=nullptr);

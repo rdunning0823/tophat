@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,15 +37,23 @@ static constexpr Angle max_fai_angle = Angle::Degrees(114);
 
 FAITrianglePointValidator::FAITrianglePointValidator(
     OrderedTask *ordered_task, const unsigned ordered_task_index)
-  :task(ordered_task), t_index(ordered_task_index), t_size(0),
-   leg1(fixed(0)), leg2(fixed(0)), leg3(fixed(0)),
-   fai_triangle_point_invalid(false)
+  :task(ordered_task), t_index(ordered_task_index), t_size(0)
 {
-  PrepareFAITest(ordered_task, ordered_task_index);
+  if (task != nullptr) {
+    t_size = task->TaskSize();
+    leg1 = t_size > 1
+      ? task->GetTaskPoint(1).GetVectorPlanned().distance : fixed(0);
+    leg2 = t_size > 2
+      ? task->GetTaskPoint(2).GetVectorPlanned().distance : fixed(0);
+    leg3 = t_size > 3
+      ? task->GetTaskPoint(3).GetVectorPlanned().distance : fixed(0);
+  }
+
+  fai_triangle_point_invalid = t_size > 4 || t_index > 3;
 }
 
 
-bool
+inline bool
 FAITrianglePointValidator::TestFAITriangle(const fixed d1, const fixed d2,
                                            const fixed d3,
                                            const FAITriangleSettings &settings)
@@ -56,7 +64,7 @@ FAITrianglePointValidator::TestFAITriangle(const fixed d1, const fixed d2,
   return FAITriangleRules::TestDistances(d1, d2, d3, settings);
 }
 
-bool
+inline bool
 FAITrianglePointValidator::IsFAIAngle(const GeoPoint &p0, const GeoPoint &p1,
                                       const GeoPoint &p2, bool right)
 {
@@ -77,11 +85,10 @@ FAITrianglePointValidator::IsFAITrianglePoint(const Waypoint& wp,
   if (fai_triangle_point_invalid)
     return false;
 
-  if (!task)
-    return true;
-
   if (t_size == 0)
     return true;
+
+  assert(task != nullptr);
 
   const FAITriangleSettings &settings =
     task->GetOrderedTaskSettings().fai_triangle;
@@ -173,34 +180,4 @@ FAITrianglePointValidator::IsFAITrianglePoint(const Waypoint& wp,
                             settings);
   }
   return true;
-}
-
-void
-FAITrianglePointValidator::PrepareFAITest(OrderedTask *ordered_task,
-                                          const unsigned ordered_task_index)
-{
-  task = ordered_task;
-  t_index = ordered_task_index;
-
-  fai_triangle_point_invalid = false;
-
-  if (ordered_task) {
-    t_size = task->TaskSize();
-    leg1 = t_size > 1
-      ? task->GetTaskPoint(1).GetVectorPlanned().distance : fixed(0);
-    leg2 = t_size > 2
-      ? task->GetTaskPoint(2).GetVectorPlanned().distance : fixed(0);
-    leg3 = t_size > 3
-      ? task->GetTaskPoint(3).GetVectorPlanned().distance : fixed(0);
-  } else {
-    leg1 = leg2 = leg3 = fixed(0);
-    t_size = 0;
-    t_index = 0;
-  }
-
-  if (t_size > 4)
-    fai_triangle_point_invalid = true;
-
-  if (t_index > 3)
-    fai_triangle_point_invalid = true;
 }

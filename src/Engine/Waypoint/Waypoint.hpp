@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,16 +23,17 @@
 #ifndef WAYPOINT_HPP
 #define WAYPOINT_HPP
 
+#include "Origin.hpp"
 #include "Util/tstring.hpp"
-#include "Util/DebugFlag.hpp"
 #include "Geo/GeoPoint.hpp"
 #include "Geo/Flat/FlatGeoPoint.hpp"
 #include "RadioFrequency.hpp"
 #include "Runway.hpp"
+#include "OS/RunFile.hpp"
 
 #include <forward_list>
 
-class TaskProjection;
+class FlatProjection;
 
 /**
  * Class for waypoints.  
@@ -56,6 +57,7 @@ struct Waypoint {
     POWERPLANT,
     OBSTACLE,
     THERMAL_HOTSPOT,
+    MARKER,
   };
 
   /**
@@ -97,7 +99,7 @@ struct Waypoint {
   FlatGeoPoint flat_location;
 
 #ifndef NDEBUG
-  DebugFlag flat_location_initialised;
+  bool flat_location_initialised;
 #endif
 
   /** Height AMSL (m) of waypoint terrain */
@@ -112,8 +114,9 @@ struct Waypoint {
   Type type;
   /** Flag types of this waypoint */
   Flags flags;
-  /** File number to store waypoint in (0,1), -1 to delete/ignore */
-  int8_t file_num;
+
+  /** File number to store waypoint in */
+  WaypointOrigin origin;
 
   /** Name of waypoint */
   tstring name;
@@ -123,7 +126,7 @@ struct Waypoint {
   tstring details;
   /** Additional files to be displayed in the WayointDetails dialog */
   std::forward_list<tstring> files_embed;
-#ifdef ANDROID
+#ifdef HAVE_RUN_FILE
   /** Additional files to be opened by external programs */
   std::forward_list<tstring> files_external;
 #endif
@@ -134,8 +137,12 @@ struct Waypoint {
    * @return Uninitialised object
    */
   Waypoint()
-    :runway(Runway::Null()), radio_frequency(RadioFrequency::Null()),
-     type(Type::NORMAL), flags(Flags::Defaults()), file_num(-1)
+    :
+#ifndef NDEBUG
+     flat_location_initialised(false),
+#endif
+     runway(Runway::Null()), radio_frequency(RadioFrequency::Null()),
+     type(Type::NORMAL), flags(Flags::Defaults()), origin(WaypointOrigin::NONE)
   {
   }
 
@@ -217,9 +224,9 @@ struct Waypoint {
   /**
    * Project geolocation to flat location
    *
-   * @param task_projection Projection to apply
+   * @param projection the projection to apply
    */
-  void Project(const TaskProjection& task_projection);
+  void Project(const FlatProjection &projection);
 
   /**
    * Get distance in internal flat projected units (fast)

@@ -7,10 +7,9 @@
 
 #ifdef FIXED_MATH
 
-static fixed::value_t const internal_pi=0x3243f6a8;
-static fixed::value_t const internal_two_pi=0x6487ed51;
-static fixed::value_t const internal_half_pi=0x1921fb54;
-static fixed::value_t const internal_quarter_pi=0xc90fdaa;
+static constexpr fixed::value_t internal_pi = 0x3243f6a8;
+static constexpr fixed::value_t internal_two_pi = 0x6487ed51;
+static constexpr fixed::value_t internal_half_pi = 0x1921fb54;
 
 fixed& fixed::operator%=(const fixed other)
 {
@@ -57,10 +56,8 @@ fixed& fixed::operator/=(fixed const divisor)
      The result is approximately the same, and for XCSoar, we can
      neglect the error. */
 
-  enum {
-    /** number of bits in a value_f */
-    bits = sizeof(value_t) * 8,
-  };
+  /** number of bits in a value_f */
+  constexpr unsigned bits = sizeof(value_t) * 8;
 
   unsigned shift = resolution_shift;
   value_t numerator = m_nVal, denominator = divisor.m_nVal;

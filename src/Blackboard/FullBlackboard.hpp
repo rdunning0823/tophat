@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,35 +25,14 @@ Copyright_License {
 #define XCSOAR_FULL_BLACKBOARD_HPP
 
 #include "BaseBlackboard.hpp"
-#include "ComputerSettingsBlackboard.hpp"
-#include "SystemSettings.hpp"
-#include "UISettings.hpp"
+#include "SettingsBlackboard.hpp"
 
 /**
  * A blackboard which contains all existing blackboards.  This is the
  * base class for InterfaceBlackboard, and may be used to pass
  * everything we have in one pointer.
  */
-class FullBlackboard
-  : public BaseBlackboard,
-    public ComputerSettingsBlackboard
-{
-protected:
-  SystemSettings system_settings;
-  UISettings ui_settings;
-
-public:
-  const SystemSettings &GetSystemSettings() const {
-    return system_settings;
-  }
-
-  const UISettings &GetUISettings() const {
-    return ui_settings;
-  }
-
-  const MapSettings &GetMapSettings() const {
-    return ui_settings.map;
-  }
+class FullBlackboard : public BaseBlackboard, public SettingsBlackboard {
 };
 
 #endif

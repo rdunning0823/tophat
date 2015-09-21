@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 #include "GeoPoint.hpp"
 #include "GeoVector.hpp"
 #include "Math.hpp"
+#include "SimplifiedMath.hpp"
 
 GeoPoint 
 GeoPoint::Parametric(const GeoPoint &delta, const fixed t) const
@@ -54,6 +55,14 @@ GeoPoint::DistanceBearing(const GeoPoint &other) const
   GeoVector gv;
   ::DistanceBearing(*this, other, &gv.distance, &gv.bearing);
   return gv;
+}
+
+fixed
+GeoPoint::DistanceS(const GeoPoint &other) const
+{
+  fixed distance;
+  ::DistanceBearingS(*this, other, &distance, nullptr);
+  return distance;
 }
 
 fixed 

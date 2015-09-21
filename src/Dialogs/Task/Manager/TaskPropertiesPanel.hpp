@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -52,17 +52,16 @@ public:
   void OnTaskTypeChange(DataFieldEnum &df);
 
   /* virtual methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual void ReClick() override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void ReClick() override;
+  void Show(const PixelRect &rc) override;
 
   /**
    * Saves the panel's properties of the task to the temporary task
    * so they can be used by other panels editing the task.
    * @return true
    */
-  virtual bool Leave() override;
+  bool Leave() override;
 
 protected:
   void RefreshView();
@@ -70,7 +69,7 @@ protected:
 
 private:
   /* virtual methods from DataFieldListener */
-  virtual void OnModified(DataField &df) override;
+  void OnModified(DataField &df) override;
 };
 
 #endif

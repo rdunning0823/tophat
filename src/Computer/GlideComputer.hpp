@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -125,6 +125,10 @@ public:
     return task_computer.GetTraceComputer();
   }
 
+  const ProtectedTaskManager &GetProtectedTaskManager() const {
+    return task_computer.GetProtectedTaskManager();
+  }
+
   const ProtectedRoutePlanner &GetProtectedRoutePlanner() const {
     return task_computer.GetProtectedRoutePlanner();
   }
@@ -137,7 +141,7 @@ public:
     return stats_computer.GetFlightStats();
   }
 
-  const Retrospective &GetRetrospective() {
+  const Retrospective &GetRetrospective() const {
     return retrospective;
   }
 

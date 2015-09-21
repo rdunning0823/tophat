@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,22 +25,27 @@ Copyright_License {
 #include "Engine/Airspace/AirspaceAltitude.hpp"
 #include "Units/Units.hpp"
 #include "Units/Descriptor.hpp"
-#include "Util/StringUtil.hpp"
+#include "Util/StringFormat.hpp"
 
 #include <string.h>
 
 void
 AirspaceFormatter::FormatAltitudeShort(TCHAR *buffer,
-                                       const AirspaceAltitude &altitude)
+                                       const AirspaceAltitude &altitude,
+                                       bool include_unit)
 {
   switch (altitude.reference) {
   case AltitudeReference::AGL:
     if (!positive(altitude.altitude_above_terrain))
       _tcscpy(buffer, _T("GND"));
     else
-      StringFormatUnsafe(buffer, _T("%d %s AGL"),
-                         iround(Units::ToUserAltitude(altitude.altitude_above_terrain)),
-                         Units::GetAltitudeName());
+      if (include_unit)
+        StringFormatUnsafe(buffer, _T("%d %s AGL"),
+                           iround(Units::ToUserAltitude(altitude.altitude_above_terrain)),
+                           Units::GetAltitudeName());
+      else
+        StringFormatUnsafe(buffer, _T("%d AGL"),
+                           iround(Units::ToUserAltitude(altitude.altitude_above_terrain)));
     break;
 
   case AltitudeReference::STD:
@@ -48,9 +53,13 @@ AirspaceFormatter::FormatAltitudeShort(TCHAR *buffer,
     break;
 
   case AltitudeReference::MSL:
-    StringFormatUnsafe(buffer, _T("%d %s"),
-                       iround(Units::ToUserAltitude(altitude.altitude)),
-                       Units::GetAltitudeName());
+    if (include_unit)
+      StringFormatUnsafe(buffer, _T("%d %s"),
+                         iround(Units::ToUserAltitude(altitude.altitude)),
+                         Units::GetAltitudeName());
+    else
+      StringFormatUnsafe(buffer, _T("%d"),
+                         iround(Units::ToUserAltitude(altitude.altitude)));
     break;
 
   case AltitudeReference::NONE:

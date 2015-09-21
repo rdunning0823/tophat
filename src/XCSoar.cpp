@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ Copyright_License {
 #include "Compiler.h"
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Init.hpp"
-#include "Net/Init.hpp"
+#include "Net/HTTP/Init.hpp"
 #include "UtilsSystem.hpp"
 #include "ResourceLoader.hpp"
 #include "Language/Language.hpp"
@@ -55,6 +55,13 @@ Copyright_License {
 /* this is necessary on Mac OS X, to let libSDL bootstrap Quartz
    before entering our main() */
 #include <SDL_main.h>
+#endif
+
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#if !TARGET_OS_IPHONE
+#import <AppKit/AppKit.h>
+#endif
 #endif
 
 #include <assert.h>
@@ -103,7 +110,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         int nCmdShow)
 #endif
 {
-#ifdef WIN32
+#ifdef USE_WIN32_RESOURCES
   ResourceLoader::Init(hInstance);
 #endif
 
@@ -127,6 +134,11 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   ScreenGlobalInit screen_init;
 
+#if defined(__APPLE__) && !TARGET_OS_IPHONE
+  // We do not want the ugly non-localized main menu which SDL creates
+  [NSApp setMainMenu: [[NSMenu alloc] init]];
+#endif
+
 #ifdef WIN32
   /* try to make the UI most responsive */
   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
@@ -142,10 +154,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   if (Startup())
     ret = CommonInterface::main_window->RunEventLoop();
 
-  if (CommonInterface::main_window != nullptr) {
-    CommonInterface::main_window->Destroy();
-    delete CommonInterface::main_window;
-  }
+  Shutdown();
 
   DeinitialiseIOThread();
 
@@ -157,6 +166,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   Net::Deinitialise();
 
   assert(!ExistsAnyThread());
+
+#if defined(__APPLE__) && TARGET_OS_IPHONE
+  /* For some reason, the app process does not exit on iOS, but a black
+   * screen remains, if the process is not explicitly terminated */
+  exit(ret);
+#endif
 
   return ret;
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,21 +24,21 @@ Copyright_License {
 #ifndef XCSOAR_DEBUG_REPLAY_IGC_HPP
 #define XCSOAR_DEBUG_REPLAY_IGC_HPP
 
-#include "DebugReplay.hpp"
+#include "DebugReplayFile.hpp"
 #include "IGC/IGCExtensions.hpp"
 #include "Replay/CatmullRomInterpolator.hpp"
+#include "IO/FileLineReader.hpp"
 
-class NLineReader;
 struct IGCFix;
 
-class DebugReplayIGC : public DebugReplay {
+class DebugReplayIGC : public DebugReplayFile {
   IGCExtensions extensions;
   fixed virtual_time;
   CatmullRomInterpolator *cli;
 
 public:
-  DebugReplayIGC(NLineReader *reader)
-    :DebugReplay(reader), virtual_time(fixed(-1)) {
+  DebugReplayIGC(FileLineReaderA *_reader)
+    : DebugReplayFile(_reader), virtual_time(fixed(-1)) {
     extensions.clear();
     cli = new CatmullRomInterpolator(fixed(0.98));
     cli->Reset();
@@ -47,11 +47,13 @@ public:
     delete cli;
   }
 
-  /**
-   * Process next line, or virtual line if fixes more than 1 second apart
-   */
+public:
+    /**
+     * Process next line, or virtual line if fixes more than 1 second apart
+     */
   virtual bool Next();
 
+  static DebugReplay* Create(const char *input_file);
 
 protected:
   void CopyFromFix(const IGCFix &fix);

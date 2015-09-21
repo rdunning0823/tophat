@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,7 +32,8 @@ import java.io.OutputStream;
  */
 abstract class AbstractAndroidPort implements AndroidPort {
   private final String name;
-  private InputListener listener;
+  private PortListener portListener;
+  private InputListener inputListener;
   private InputThread input;
   private OutputThread output;
 
@@ -57,19 +58,24 @@ abstract class AbstractAndroidPort implements AndroidPort {
   }
 
   protected synchronized void set(InputStream _input, OutputStream _output) {
-    input = new InputThread(name, listener, _input);
+    input = new InputThread(name, inputListener, _input);
     output = new OutputThread(name, _output);
     output.setTimeout(5000);
+    stateChanged();
   }
 
   protected void setWriteTimeout(int timeout_ms) {
     output.setTimeout(timeout_ms);
   }
 
-  @Override public void setListener(InputListener _listener) {
-    listener = _listener;
+  @Override public void setListener(PortListener _listener) {
+    portListener = _listener;
+  }
+
+  @Override public void setInputListener(InputListener _listener) {
+    inputListener = _listener;
     if (input != null)
-      input.setListener(listener);
+      input.setListener(_listener);
   }
 
   @Override public void close() {
@@ -80,6 +86,8 @@ abstract class AbstractAndroidPort implements AndroidPort {
     OutputThread o = stealOutput();
     if (o != null)
       o.close();
+
+    stateChanged();
   }
 
   @Override public int getState() {
@@ -99,5 +107,11 @@ abstract class AbstractAndroidPort implements AndroidPort {
     return o != null
       ? o.write(data, length)
       : -1;
+  }
+
+  protected final void stateChanged() {
+    PortListener portListener = this.portListener;
+    if (portListener != null)
+      portListener.portStateChanged();
   }
 }

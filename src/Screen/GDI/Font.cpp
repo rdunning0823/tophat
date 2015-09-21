@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,37 +25,20 @@ Copyright_License {
 #include "Screen/Debug.hpp"
 #include "Screen/BufferCanvas.hpp"
 #include "Screen/AnyCanvas.hpp"
+#include "Look/FontDescription.hpp"
 #include "Asset.hpp"
 
 #include <assert.h>
 
 bool
-Font::Load(const TCHAR* facename, UPixelScalar height, bool bold, bool italic)
-{
-  LOGFONT font;
-  memset((char *)&font, 0, sizeof(LOGFONT));
-
-  _tcscpy(font.lfFaceName, facename);
-  font.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-  font.lfHeight = (long)height;
-  font.lfWeight = (long)(bold ? FW_BOLD : FW_MEDIUM);
-  font.lfItalic = italic;
-  if (IsAltair()) // better would be: if (screen.dpi() < 100)
-    font.lfQuality = NONANTIALIASED_QUALITY;
-  else
-    font.lfQuality = ANTIALIASED_QUALITY;
-  return Font::Load(font);
-}
-
-bool
-Font::Load(const LOGFONT &log_font)
+Font::Load(const FontDescription &d)
 {
   assert(IsScreenInitialized());
 
   Destroy();
 
-  font = ::CreateFontIndirect(&log_font);
-  if (font == NULL)
+  font = ::CreateFontIndirect(&(const LOGFONT &)d);
+  if (font == nullptr)
     return false;
 
   if (GetObjectType(font) != OBJ_FONT) {
@@ -106,10 +89,10 @@ Font::CalculateHeights()
     rec.bottom = tm.tmHeight;
     buffer.DrawOpaqueText(0, 0, rec, _T("M"));
 
-    UPixelScalar top = tm.tmHeight, bottom = 0;
+    unsigned top = tm.tmHeight, bottom = 0;
 
-    for (UPixelScalar x = 0; x < (UPixelScalar)tm.tmAveCharWidth; ++x) {
-      for (UPixelScalar y = 0; y < (UPixelScalar)tm.tmHeight; ++y) {
+    for (unsigned x = 0; x < (unsigned)tm.tmAveCharWidth; ++x) {
+      for (unsigned y = 0; y < (unsigned)tm.tmHeight; ++y) {
         if (buffer.GetPixel(x, y) != white) {
           if (top > y)
             top = y;
@@ -129,7 +112,7 @@ Font::CalculateHeights()
 void
 Font::Destroy()
 {
-  if (font != NULL) {
+  if (font != nullptr) {
     assert(IsScreenInitialized());
 
 #ifndef NDEBUG
@@ -138,6 +121,6 @@ Font::Destroy()
       ::DeleteObject(font);
     assert(success);
 
-    font = NULL;
+    font = nullptr;
   }
 }

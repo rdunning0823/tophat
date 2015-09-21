@@ -3,7 +3,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,28 +25,25 @@ Copyright_License {
 #ifndef TOPOGRAPHY_XSHAPE_HPP
 #define TOPOGRAPHY_XSHAPE_HPP
 
-#include "Util/NonCopyable.hpp"
-#include "Geo/GeoPoint.hpp"
+#include "Util/ConstBuffer.hxx"
 #include "Geo/GeoBounds.hpp"
 #include "shapelib/mapserver.h"
 #include "shapelib/mapshape.h"
 #ifdef ENABLE_OPENGL
-#include "Screen/Point.hpp"
 #include "Topography/XShapePoint.hpp"
 #endif
 
 #include <tchar.h>
 
-class XShape : private NonCopyable {
-  enum { MAX_LINES = 32 };
+struct GeoPoint;
+
+class XShape {
+  static constexpr unsigned MAX_LINES = 32;
 #ifdef ENABLE_OPENGL
-  enum { THINNING_LEVELS = 4 };
+  static constexpr unsigned THINNING_LEVELS = 4;
 #endif
 
   GeoBounds bounds;
-#ifdef ENABLE_OPENGL
-  GeoPoint center;
-#endif
 
   unsigned char type;
 
@@ -80,6 +77,12 @@ class XShape : private NonCopyable {
    * level, which contains the number of points for each line.
    */
   unsigned short *index_count[THINNING_LEVELS];
+
+  /**
+   * The start offset in the #GLArrayBuffer (vertex buffer object).
+   * It is managed by #TopographyFileRenderer.
+   */
+  mutable unsigned offset;
 #else // !ENABLE_OPENGL
   GeoPoint *points;
 #endif
@@ -87,15 +90,28 @@ class XShape : private NonCopyable {
   TCHAR *label;
 
 public:
-  XShape(shapefileObj *shpfile, int i, int label_field=-1);
+  XShape(shapefileObj *shpfile, const GeoPoint &file_center, int i,
+         int label_field=-1);
+
+  XShape(const XShape &) = delete;
+
   ~XShape();
 
 #ifdef ENABLE_OPENGL
+  void SetOffset(unsigned _offset) const {
+    offset = _offset;
+  }
+
+  unsigned GetOffset() const {
+    return offset;
+  }
+
 protected:
-  bool BuildIndices(unsigned thinning_level, unsigned min_distance);
+  bool BuildIndices(unsigned thinning_level, ShapeScalar min_distance);
 
 public:
-  const unsigned short *get_indices(int thinning_level, unsigned min_distance,
+  const unsigned short *get_indices(int thinning_level,
+                                    ShapeScalar min_distance,
                                     const unsigned short *&count) const;
 #endif
 
@@ -103,22 +119,12 @@ public:
     return bounds;
   }
 
-#ifdef ENABLE_OPENGL
-  const GeoPoint &get_center() const {
-    return center;
-  }
-#endif
-
   MS_SHAPE_TYPE get_type() const {
     return (MS_SHAPE_TYPE)type;
   }
 
-  unsigned get_number_of_lines() const {
-    return num_lines;
-  }
-
-  const unsigned short *get_lines() const {
-    return lines;
+  ConstBuffer<unsigned short> GetLines() const {
+    return { lines, num_lines };
   }
 
 #ifdef ENABLE_OPENGL
@@ -132,27 +138,6 @@ public:
   const TCHAR *get_label() const {
     return label;
   }
-
-#ifdef ENABLE_OPENGL
-  /**
-   * Convert a GeoPoint into a ShapePoint.
-   */
-  ShapePoint geo_to_shape(const GeoPoint &location) const {
-    return geo_to_shape(center, location);
-  }
-
-  /**
-   * Get the offset of the shape center from the screen center in ShapePoint
-   * scale.
-   */
-  ShapePoint shape_translation(const GeoPoint &screen_center) const {
-    return geo_to_shape(screen_center, center);
-  }
-
-private:
-  gcc_pure
-  ShapePoint geo_to_shape(const GeoPoint &origin, const GeoPoint &point) const;
-#endif
 };
 
 #endif

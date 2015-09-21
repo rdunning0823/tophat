@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -35,42 +35,27 @@ class ContainerWindow;
  */
 class MenuBar {
 public:
-  enum {
-    MAX_BUTTONS = 32,
-  };
+  static constexpr unsigned MAX_BUTTONS = 32;
 
 protected:
-  class Button : public WndSymbolButton {
+  class Button : public ::Button {
     unsigned event;
 
   public:
-    Button(ContainerWindow &parent, const ButtonLook &look,
-           const TCHAR *Caption,
-           const PixelRect &rc, const ButtonWindowStyle style)
-    :WndSymbolButton(parent, look,
-                     Caption,
-                     rc, style, NULL) {};
-
     void SetEvent(unsigned _event) {
       event = _event;
     }
 
     virtual bool OnClicked();
-
-#ifdef USE_GDI
-  protected:
-    virtual LRESULT OnMessage(HWND hWnd, UINT message,
-                               WPARAM wParam, LPARAM lParam);
-#endif
   };
 
-  Button *buttons[MAX_BUTTONS];
+  Button buttons[MAX_BUTTONS];
 
 public:
-  MenuBar(ContainerWindow &parent);
+  MenuBar(ContainerWindow &parent, const ButtonLook &look);
 
 public:
-  void SetFont(const Font &font);
+
   /**
    * @param i
    * @param enabled
@@ -83,7 +68,7 @@ public:
   void HideButton(unsigned i);
 
   bool IsButtonEnabled(unsigned i) const {
-    return buttons[i]->IsEnabled();
+    return buttons[i].IsEnabled();
   }
 
   /**

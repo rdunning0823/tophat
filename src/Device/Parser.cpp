@@ -3,7 +3,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,8 +33,7 @@ Copyright_License {
 #include "Units/System.hpp"
 #include "Driver/FLARM/StaticParser.hpp"
 
-NMEAParser::NMEAParser(bool _ignore_checksum)
-  :ignore_checksum(_ignore_checksum)
+NMEAParser::NMEAParser()
 {
   Reset();
 }
@@ -55,7 +54,7 @@ NMEAParser::ParseLine(const char *string, NMEAInfo &info)
   if (string[0] != '$')
     return false;
 
-  if (!ignore_checksum && !NMEAChecksum(string))
+  if (!NMEAChecksum(string))
     return false;
 
   NMEAInputLine line(string);
@@ -75,6 +74,9 @@ NMEAParser::ParseLine(const char *string, NMEAInfo &info)
 
     if (StringIsEqual(type + 3, "GGA"))
       return GGA(line, info);
+
+    if (StringIsEqual(type + 3, "HDM"))
+      return HDM(line, info);
   }
 
   // if (proprietary sentence) ...
@@ -354,8 +356,8 @@ NMEAParser::GLL(NMEAInputLine &line, NMEAInfo &info)
     info.location = location;
 
   info.gps.real = real;
-#ifdef ANDROID
-  info.gps.android_internal_gps = false;
+#if defined(ANDROID) || defined(__APPLE__)
+  info.gps.nonexpiring_internal_gps = false;
 #endif
 
   return true;
@@ -411,6 +413,26 @@ NMEAParser::ReadTime(NMEAInputLine &line, BrokenTime &broken_time,
   return true;
 }
 
+/**
+ * Parses unsigned floating-point deviation angle value in degrees.
+ * and applies deviation sign from following E/W char
+ */
+static bool
+ReadVariation(NMEAInputLine &line, Angle &value_r)
+{
+  fixed value;
+  if (!line.ReadChecked(value))
+    return false;
+  char ch = line.ReadOneChar();
+  if (ch == 'W')
+    value = -value;
+  else if (ch != 'E')
+    return false;
+
+  value_r = Angle::Degrees(value);
+  return true;
+}
+
 bool
 NMEAParser::RMC(NMEAInputLine &line, NMEAInfo &info)
 {
@@ -451,6 +473,9 @@ NMEAParser::RMC(NMEAInputLine &line, NMEAInfo &info)
   // JMW get date info first so TimeModify is accurate
   ReadDate(line, info.date_time_utc);
 
+  Angle variation;
+  bool variation_available = ReadVariation(line, variation);
+
   if (!TimeHasAdvanced(this_time, info))
     return true;
 
@@ -473,10 +498,44 @@ NMEAParser::RMC(NMEAInputLine &line, NMEAInfo &info)
     info.track_available.Update(info.clock);
   }
 
+  if (!variation_available)
+    info.variation_available.Clear();
+  else if (variation_available) {
+    info.variation = variation;
+    info.variation_available.Update(info.clock);
+  }
+
   info.gps.real = real;
-#ifdef ANDROID
-  info.gps.android_internal_gps = false;
+#if defined(ANDROID) || defined(__APPLE__)
+  info.gps.nonexpiring_internal_gps = false;
 #endif
+
+  return true;
+}
+
+/**
+ * Parse HDM NMEA sentence.
+ */
+bool
+NMEAParser::HDM(NMEAInputLine &line, NMEAInfo &info)
+{
+  /*
+   * $HCHDM,238.5,M*hh/CR/LF
+   *
+   * Field Number:
+   *  1) Magnetic Heading to one decimal place
+   *  2) M (Magnetic)
+   *  3) Checksum
+   */
+  Angle heading;
+  bool heading_available = ReadBearing(line, heading);
+
+  if (!heading_available)
+    info.heading_available.Clear();
+  else if (heading_available) {
+    info.heading = heading;
+    info.heading_available.Update(info.clock);
+  }
 
   return true;
 }
@@ -554,8 +613,8 @@ NMEAParser::GGA(NMEAInputLine &line, NMEAInfo &info)
   */
 
   info.gps.real = real;
-#ifdef ANDROID
-  info.gps.android_internal_gps = false;
+#if defined(ANDROID) || defined(__APPLE__)
+  info.gps.nonexpiring_internal_gps = false;
 #endif
 
   gps.hdop = line.Read(fixed(0));

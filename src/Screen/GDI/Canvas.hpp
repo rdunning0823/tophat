@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_GDI_CANVAS_HPP
 #define XCSOAR_SCREEN_GDI_CANVAS_HPP
 
-#include "Math/Angle.hpp"
 #include "Screen/Brush.hpp"
 #include "Screen/Color.hpp"
 #include "Screen/Font.hpp"
@@ -36,9 +35,10 @@ Copyright_License {
 #include <windows.h>
 #include <tchar.h>
 
+class Angle;
+
 /**
  * Base drawable canvas class
- * 
  */
 class Canvas {
 protected:
@@ -46,10 +46,10 @@ protected:
   PixelSize size;
 
 public:
-  Canvas():dc(NULL), compatible_dc(NULL) {}
+  Canvas():dc(nullptr), compatible_dc(nullptr) {}
   Canvas(HDC _dc, PixelSize new_size)
-    :dc(_dc), compatible_dc(NULL), size(new_size) {
-    assert(dc != NULL);
+    :dc(_dc), compatible_dc(nullptr), size(new_size) {
+    assert(dc != nullptr);
   }
 
   ~Canvas() {
@@ -61,35 +61,35 @@ public:
 
 protected:
   void Destroy() {
-    if (compatible_dc != NULL) {
+    if (compatible_dc != nullptr) {
       ::DeleteDC(compatible_dc);
-      compatible_dc = NULL;
+      compatible_dc = nullptr;
     }
   }
 
   void Create(HDC _dc, PixelSize new_size) {
-    assert(_dc != NULL);
+    assert(_dc != nullptr);
     assert(new_size.cx > 0);
     assert(new_size.cy > 0);
 
     Destroy();
 
     dc = _dc;
-    compatible_dc = NULL;
+    compatible_dc = nullptr;
     size = new_size;
   }
 
   HDC GetCompatibleDC() {
     assert(IsDefined());
 
-    if (compatible_dc == NULL)
+    if (compatible_dc == nullptr)
       compatible_dc = ::CreateCompatibleDC(dc);
     return compatible_dc;
   }
 
 public:
   bool IsDefined() const {
-    return dc != NULL;
+    return dc != nullptr;
   }
 
   operator HDC() const {
@@ -252,7 +252,7 @@ public:
     /* this hack allows filling a rectangle with a solid color,
        without the need to create a HBRUSH */
     ::SetBkColor(dc, color);
-    ::ExtTextOut(dc, rc.left, rc.top, ETO_OPAQUE, &rc, _T(""), 0, NULL);
+    ::ExtTextOut(dc, rc.left, rc.top, ETO_OPAQUE, &rc, _T(""), 0, nullptr);
   }
 
   void DrawFilledRectangle(const PixelRect &rc, const Color color) {
@@ -302,7 +302,7 @@ public:
   void ClearWhite() {
     assert(IsDefined());
 
-    ::BitBlt(dc, 0, 0, GetWidth(), GetHeight(), NULL, 0, 0, WHITENESS);
+    ::BitBlt(dc, 0, 0, GetWidth(), GetHeight(), nullptr, 0, 0, WHITENESS);
   }
 
   void DrawRoundRectangle(int left, int top, int right, int bottom,
@@ -383,13 +383,6 @@ public:
     ::DrawFocusRect(dc, &rc);
   }
 
-  void DrawButton(PixelRect rc, bool down) {
-    assert(IsDefined());
-
-    ::DrawFrameControl(dc, &rc, DFC_BUTTON,
-                       DFCS_BUTTONPUSH | (down ? DFCS_PUSHED : 0));
-  }
-
   gcc_pure
   const PixelSize CalcTextSize(const TCHAR *text, size_t length) const;
 
@@ -429,7 +422,7 @@ public:
             HDC src, int src_x, int src_y,
             DWORD dwRop=SRCCOPY) {
     assert(IsDefined());
-    assert(src != NULL);
+    assert(src != nullptr);
 
     ::BitBlt(dc, dest_x, dest_y, dest_width, dest_height,
              src, src_x, src_y, dwRop);
@@ -467,7 +460,7 @@ public:
                unsigned src_width, unsigned src_height,
                DWORD dwRop=SRCCOPY) {
     assert(IsDefined());
-    assert(src != NULL);
+    assert(src != nullptr);
 
     ::StretchBlt(dc, dest_x, dest_y, dest_width, dest_height,
                  src, src_x, src_y, src_width, src_height,
@@ -508,7 +501,7 @@ public:
                int src_x, int src_y,
                unsigned src_width, unsigned src_height) {
     assert(IsDefined());
-    assert(src != NULL);
+    assert(src != nullptr);
 
     Stretch(dest_x, dest_y, dest_width, dest_height,
             src, src_x, src_y, src_width, src_height,

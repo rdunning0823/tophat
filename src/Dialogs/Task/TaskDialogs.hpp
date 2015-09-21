@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,8 +31,14 @@ struct DialogLook;
 void
 dlgTaskManagerShowModal();
 
+/**
+ * Show a dialog that lets the user edit a task point (and lets him
+ * navigate to other task points).
+ *
+ * @return true if the task was modified
+ */
 bool
-dlgTaskPointShowModal(OrderedTask **task, const unsigned index);
+dlgTaskPointShowModal(OrderedTask &task, const unsigned index);
 
 /**
  * dialog with task properties needed for American task rules
@@ -46,11 +52,18 @@ dlgTaskListUsShowModal(OrderedTask** task, bool &task_changed);
 void
 dlgTaskPropertiesUsShowModal(const DialogLook &look, OrderedTask** task,
                              bool &task_changed);
+
+/**
+ * Show a dialog that lets the user mutate one task point to another
+ * type.
+ *
+ * @return true if the task was modified
+ */
 bool
-dlgTaskPointType(OrderedTask **task, unsigned index);
+dlgTaskPointType(OrderedTask &task, unsigned index);
 
 bool
-dlgTaskOptionalStarts(OrderedTask **task);
+dlgTaskOptionalStarts(OrderedTask &task);
 
 /**
  * Shows map display zoomed to target point

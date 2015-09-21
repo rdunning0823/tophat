@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,9 +36,9 @@ public:
   void Hide();
 
   /* virtual methods from class OperationEnvironment */
-  virtual void SetText(const TCHAR *text) override;
-  virtual void SetProgressRange(unsigned range) override;
-  virtual void SetProgressPosition(unsigned position) override;
+  void SetText(const TCHAR *text) override;
+  void SetProgressRange(unsigned range) override;
+  void SetProgressPosition(unsigned position) override;
 };
 
 #endif

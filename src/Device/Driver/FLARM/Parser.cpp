@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Device.hpp"
 #include "Util/Macros.hpp"
+#include "Util/StringAPI.hpp"
 #include "NMEA/InputLine.hpp"
 #include "NMEA/Checksum.hpp"
 
@@ -37,7 +38,7 @@ FlarmDevice::ParsePFLAC(NMEAInputLine &line)
   char name[80];
   line.Read(name, 80);
 
-  if (strcmp(name, "ERROR") == 0)
+  if (StringIsEqual(name, "ERROR"))
     // ignore error responses...
     return true;
 
@@ -61,7 +62,7 @@ FlarmDevice::ParseNMEA(const char *_line, NMEAInfo &info)
   char type[16];
   line.Read(type, 16);
 
-  if (strcmp(type, "$PFLAC") == 0)
+  if (StringIsEqual(type, "$PFLAC"))
     return ParsePFLAC(line);
   else
     return false;

@@ -1,8 +1,8 @@
 /*
-Copyright_License {
+  Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,156 +24,225 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
 #include "Look/ButtonLook.hpp"
-#include "Screen/Key.h"
-#include "Screen/Canvas.hpp"
+#include "Event/KeyCode.hpp"
 #include "Asset.hpp"
+#include "Renderer/TextButtonRenderer.hpp"
+#include "Hardware/Vibrator.hpp"
 
-WndButton::WndButton(ContainerWindow &parent, const ButtonLook &look,
-                     const TCHAR *Caption, const PixelRect &rc,
-                     ButtonWindowStyle style,
-                     ClickNotifyCallback _click_callback)
-  :renderer(look),
-   draw_focus_override(false),
-   listener(NULL),
-   click_callback(_click_callback)
-{
-  style.EnableCustomPainting();
-  ButtonWindow::Create(parent, Caption, rc, style);
+Button::~Button() {
+  /* we must override ~Window(), because in ~Window(), our own
+     OnDestroy() method won't be called (during object destruction,
+     this object loses its identity) */
+  Destroy();
 }
-
-WndButton::WndButton(ContainerWindow &parent, const ButtonLook &look,
-                     const TCHAR *caption, const PixelRect &rc,
-                     ButtonWindowStyle style,
-                     ActionListener &_listener, int _id)
-  :renderer(look), draw_focus_override(false), listener(nullptr),
-   click_callback(nullptr)
-{
-  Create(parent, caption, rc, style, _listener, _id);
-}
-
-WndButton::WndButton(const ButtonLook &_look)
-  :renderer(_look), draw_focus_override(false), listener(nullptr),
-   click_callback(nullptr) {}
 
 void
-WndButton::Create(ContainerWindow &parent,
-                  tstring::const_pointer caption, const PixelRect &rc,
-                  ButtonWindowStyle style,
-                  ActionListener &_listener, int _id) {
-  assert(click_callback == nullptr);
+Button::Create(ContainerWindow &parent,
+               const PixelRect &rc,
+               WindowStyle style,
+               ButtonRenderer *_renderer)
+{
+  dragging = down = selected = false;
+  renderer = _renderer;
 
+  PaintWindow::Create(parent, rc, style);
+}
+
+void
+Button::Create(ContainerWindow &parent, const ButtonLook &look,
+               const TCHAR *caption, const PixelRect &rc,
+               WindowStyle style)
+{
+  Create(parent, rc, style, new TextButtonRenderer(look, caption));
+}
+
+void
+Button::Create(ContainerWindow &parent, const PixelRect &rc,
+               WindowStyle style, ButtonRenderer *_renderer,
+               ActionListener &_listener, int _id)
+{
   listener = &_listener;
-
-  style.EnableCustomPainting();
-#ifdef USE_GDI
-  /* use BaseButtonWindow::COMMAND_BOUNCE_ID */
   id = _id;
-  ButtonWindow::Create(parent, caption, rc, style);
-#else
-  /* our custom SDL/OpenGL button doesn't need this hack */
-  ButtonWindow::Create(parent, caption, _id, rc, style);
+
+  Create(parent, rc, style, _renderer);
+}
+
+void
+Button::Create(ContainerWindow &parent, const ButtonLook &look,
+               const TCHAR *caption, const PixelRect &rc,
+               WindowStyle style,
+               ActionListener &_listener, int _id) {
+  Create(parent, rc, style,
+         new TextButtonRenderer(look, caption),
+         _listener, _id);
+}
+
+void
+Button::SetCaption(const TCHAR *caption)
+{
+  assert(caption != nullptr);
+
+  TextButtonRenderer &r = *(TextButtonRenderer *)renderer;
+  r.SetCaption(caption);
+
+  Invalidate();
+}
+
+void
+Button::SetSelected(bool _selected)
+{
+  if (_selected == selected)
+    return;
+
+  selected = _selected;
+  Invalidate();
+}
+
+unsigned
+Button::GetMinimumWidth() const
+{
+  return renderer->GetMinimumButtonWidth();
+}
+
+void
+Button::SetDown(bool _down)
+{
+  if (_down == down)
+    return;
+
+#ifdef HAVE_VIBRATOR
+  VibrateShort();
 #endif
+
+  down = _down;
+  Invalidate();
 }
 
 bool
-WndButton::OnClicked()
+Button::OnClicked()
 {
-  if (listener != NULL) {
-#ifndef USE_GDI
-    unsigned id = GetID();
-#endif
+  if (listener != nullptr) {
     listener->OnAction(id);
     return true;
   }
 
-  // Call the OnClick function
-  if (click_callback != NULL) {
-    click_callback();
+  return false;
+}
+
+void
+Button::Click()
+{
+  SetDown(false);
+  OnClicked();
+}
+
+void
+Button::OnDestroy()
+{
+  assert(renderer != nullptr);
+
+  delete renderer;
+
+  PaintWindow::OnDestroy();
+}
+
+bool
+Button::OnKeyCheck(unsigned key_code) const
+{
+  switch (key_code) {
+  case KEY_RETURN:
     return true;
+
+  default:
+    return PaintWindow::OnKeyCheck(key_code);
   }
-
-  return ButtonWindow::OnClicked();
 }
 
-#ifdef USE_GDI
-
-void
-WndButton::OnSetFocus()
+bool
+Button::OnKeyDown(unsigned key_code)
 {
-  ButtonWindow::OnSetFocus();
+  switch (key_code) {
+  case KEY_RETURN:
+  case KEY_SPACE:
+    Click();
+    return true;
 
-  /* GDI's "BUTTON" class on Windows CE Core (e.g. Altair) does not
-     repaint when the window gets focus, but our custom style requires
-     it */
-  ::InvalidateRect(hWnd, NULL, false);
-}
-
-void
-WndButton::OnKillFocus()
-{
-  ButtonWindow::OnKillFocus();
-
-  /* GDI's "BUTTON" class does not repaint when the window loses
-     focus, but our custom style requires it */
-  ::InvalidateRect(hWnd, NULL, false);
-}
-
-#endif
-
-void
-WndButton::OnPaint(Canvas &canvas)
-{
-  const ButtonLook &look = renderer.GetLook();
-
-  const bool pressed = IsDown();
-  const bool focused = draw_focus_override ||
-      (HasCursorKeys() ? (HasFocus() | pressed) : pressed);
-
-  PixelRect rc = canvas.GetRect();
-  renderer.DrawButton(canvas, rc, focused, pressed);
-
-  // If button has text on it
-  const tstring caption = GetText();
-  if (caption.empty())
-    return;
-
-  rc = renderer.GetDrawingRect(rc, pressed);
-
-  canvas.SetBackgroundTransparent();
-
-  if (!IsEnabled())
-    canvas.SetTextColor(look.disabled.color);
-  else if (focused)
-    canvas.SetTextColor(look.focused.foreground_color);
-  else
-    canvas.SetTextColor(look.standard.foreground_color);
-
-  canvas.Select(*look.font);
-
-#ifndef USE_GDI
-  unsigned style = GetTextStyle();
-
-  canvas.DrawFormattedText(&rc, caption.c_str(), style);
-#else
-  unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
-
-  PixelRect text_rc = rc;
-  canvas.DrawFormattedText(&text_rc, caption.c_str(), style | DT_CALCRECT);
-  text_rc.right = rc.right;
-
-  PixelScalar offset = rc.bottom - text_rc.bottom;
-  if (offset > 0) {
-    offset /= 2;
-    text_rc.top += offset;
-    text_rc.bottom += offset;
+  default:
+    return PaintWindow::OnKeyDown(key_code);
   }
+}
 
-  canvas.DrawFormattedText(&text_rc, caption.c_str(), style);
-#endif
+bool
+Button::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
+{
+  if (dragging) {
+    SetDown(IsInside(x, y));
+    return true;
+  } else
+    return PaintWindow::OnMouseMove(x, y, keys);
+}
+
+bool
+Button::OnMouseDown(PixelScalar x, PixelScalar y)
+{
+  if (IsTabStop())
+    SetFocus();
+
+  SetDown(true);
+  SetCapture();
+  dragging = true;
+  return true;
+}
+
+bool
+Button::OnMouseUp(PixelScalar x, PixelScalar y)
+{
+  if (!dragging)
+    return true;
+
+  dragging = false;
+  ReleaseCapture();
+
+  if (!down)
+    return true;
+
+  Click();
+  return true;
 }
 
 void
-WndButton::SetFocusedOverride(bool focus_override)
+Button::OnSetFocus()
 {
-  draw_focus_override = focus_override;
+  PaintWindow::OnSetFocus();
+  Invalidate();
+}
+
+void
+Button::OnKillFocus()
+{
+  PaintWindow::OnKillFocus();
+  Invalidate();
+}
+
+void
+Button::OnCancelMode()
+{
+  dragging = false;
+  SetDown(false);
+
+  PaintWindow::OnCancelMode();
+}
+
+void
+Button::OnPaint(Canvas &canvas)
+{
+  assert(renderer != nullptr);
+
+  const bool pressed = down;
+  const bool focused = draw_focus_override  || (HasCursorKeys()
+    ? HasFocus() || (selected && !HasPointer())
+    : pressed);
+
+  renderer->DrawButton(canvas, GetClientRect(),
+                       IsEnabled(), focused, pressed);
 }

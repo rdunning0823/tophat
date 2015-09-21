@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,7 +31,6 @@ Copyright_License {
 #include "Screen/Icon.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Layout.hpp"
-#include "Logger/Logger.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Renderer/TextInBox.hpp"
@@ -39,7 +38,8 @@ Copyright_License {
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "Engine/Task/Points/TaskWaypoint.hpp"
 #include "Screen/UnitSymbol.hpp"
-#include "Terrain/RasterWeather.hpp"
+#include "Terrain/RasterWeatherCache.hpp"
+#include "Terrain/RasterWeatherStore.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "UIState.hpp"
@@ -47,6 +47,7 @@ Copyright_License {
 #include "Terrain/RasterTerrain.hpp"
 #include "Util/Macros.hpp"
 #include "Util/Clamp.hpp"
+#include "Util/StringAPI.hpp"
 #include "Look/GestureLook.hpp"
 #include "Input/InputEvents.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
@@ -68,7 +69,7 @@ GlueMapWindow::DrawGesture(Canvas &canvas) const
     return;
 
   const TCHAR *gesture = gestures.GetGesture();
-  if (gesture != NULL && !InputEvents::IsGesture(gesture))
+  if (gesture != nullptr && !InputEvents::IsGesture(gesture))
     canvas.Select(gesture_look.invalid_pen);
   else
     canvas.Select(gesture_look.pen);
@@ -306,12 +307,9 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
   if (terrain) {
     short elevation = terrain->GetTerrainHeight(location);
     if (!RasterBuffer::IsSpecial(elevation)) {
-      StaticString<64> elevation_short, elevation_long;
-      FormatUserAltitude(fixed(elevation),
-                                elevation_short.buffer(), elevation_short.MAX_SIZE);
-
+      StaticString<64> elevation_long;
       elevation_long = _("Elevation: ");
-      elevation_long += elevation_short;
+      elevation_long += FormatUserAltitude(fixed(elevation));
 
       TextInBox(canvas, elevation_long, x, y, mode,
                 render_projection.GetScreenWidth(),
@@ -339,8 +337,8 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
 
   TCHAR *start = buffer;
   while (true) {
-    TCHAR *newline = _tcschr(start, _T('\n'));
-    if (newline != NULL)
+    auto *newline = StringFind(start, _T('\n'));
+    if (newline != nullptr)
       *newline = _T('\0');
 
     TextInBox(canvas, start, x, y, mode,
@@ -349,7 +347,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
 
     y += height;
 
-    if (newline == NULL)
+    if (newline == nullptr)
       break;
 
     start = newline + 1;
@@ -389,7 +387,7 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc_unadjusted,
 
   const Font &font = *look.overlay_font;
   canvas.Select(font);
-  TextInBox(canvas, txt, x, y, mode, rc, NULL);
+  TextInBox(canvas, txt, x, y, mode, rc, nullptr);
 }
 
 
@@ -565,7 +563,6 @@ GlueMapWindow::DrawVario(Canvas &canvas, const PixelRect &rc) const
   vario_bar_renderer.Draw(canvas, rc, Basic(), Calculated(),
                           GetComputerSettings().polar.glide_polar_task,
                           true); //NOTE: AVG enabled for now, make it configurable ;
-
 }
 
 void
@@ -631,7 +628,7 @@ GlueMapWindow::DrawThermalBand(Canvas &canvas, const PixelRect &rc,
   tb_rect.bottom = (rc.bottom-rc.top) / 5 + tb_rect.top;
 
   const ThermalBandRenderer &renderer = thermal_band_renderer;
-  if (task != NULL) {
+  if (task != nullptr) {
     ProtectedTaskManager::Lease task_manager(*task);
     renderer.DrawThermalBand(Basic(),
                              Calculated(),

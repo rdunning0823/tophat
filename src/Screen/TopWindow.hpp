@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,13 +34,17 @@ Copyright_License {
 #include "Screen/Custom/DoubleClick.hpp"
 #endif
 
+#ifdef ENABLE_OPENGL
+#include "Screen/Features.hpp"
+#endif
+
 #ifdef ANDROID
 #include "Thread/Mutex.hpp"
 #include "Thread/Cond.hpp"
 
 struct Event;
 
-#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#elif defined(USE_POLL_EVENT)
 struct Event;
 #elif defined(ENABLE_SDL)
 union SDL_Event;
@@ -48,20 +52,50 @@ union SDL_Event;
 
 #include <tchar.h>
 
+#ifdef ENABLE_SDL
+#include <SDL_version.h>
+#endif
+
+#ifdef SOFTWARE_ROTATE_DISPLAY
+enum class DisplayOrientation : uint8_t;
+#endif
+
 #ifndef USE_GDI
 class TopCanvas;
 #endif
 
+#ifdef USE_X11
+#define Font X11Font
+#define Window X11Window
+#define Display X11Display
+#include <X11/X.h>
+#ifdef USE_GLX
+#include <GL/glx.h>
+#undef NoValue
+#endif
+#undef Font
+#undef Window
+#undef Display
+#undef Expose
+#undef KeyPress
+struct _XDisplay;
+#endif
+
 class TopWindowStyle : public WindowStyle {
-#ifdef ENABLE_SDL
+#if defined(ENABLE_SDL) || defined(USE_X11)
   bool full_screen;
+#endif
+#ifdef ENABLE_SDL
   bool resizable;
 #endif
 
 public:
   TopWindowStyle()
+#if defined(ENABLE_SDL) || defined(USE_X11)
+    :full_screen(false)
+#endif
 #ifdef ENABLE_SDL
-    :full_screen(false), resizable(false)
+    , resizable(false)
 #endif
   {
     Popup();
@@ -69,21 +103,24 @@ public:
 
   TopWindowStyle(const WindowStyle other)
     :WindowStyle(other)
+#if defined(ENABLE_SDL) || defined(USE_X11)
+    , full_screen(false)
+#endif
 #ifdef ENABLE_SDL
-    , full_screen(false), resizable(false)
+    , resizable(false)
 #endif
   {
     Popup();
   }
 
   void FullScreen() {
-#ifdef ENABLE_SDL
+#if defined(ENABLE_SDL) || defined(USE_X11)
     full_screen = true;
 #endif
   }
 
   bool GetFullScreen() const {
-#ifdef ENABLE_SDL
+#if defined(ENABLE_SDL) || defined(USE_X11)
     return full_screen;
 #else
     return false;
@@ -112,6 +149,17 @@ public:
  * A top-level full-screen window.
  */
 class TopWindow : public ContainerWindow {
+#ifdef USE_X11
+  _XDisplay *x_display;
+  X11Window x_window;
+#ifdef USE_GLX
+  GLXFBConfig *fb_cfg;
+#endif
+#elif defined(USE_WAYLAND)
+  struct wl_display *native_display;
+  struct wl_egl_window *native_window;
+#endif
+
 #ifndef USE_GDI
   TopCanvas *screen;
 
@@ -165,6 +213,10 @@ class TopWindow : public ContainerWindow {
 #endif
 #endif /* USE_GDI */
 
+#ifdef HAVE_HIGHDPI_SUPPORT
+  float point_to_real_x = 1, point_to_real_y = 1;
+#endif
+
 public:
 #ifdef HAVE_AYGSHELL_DLL
   const AYGShellDLL ayg_shell_dll;
@@ -191,6 +243,13 @@ public:
               TopWindowStyle style=TopWindowStyle());
 #endif
 
+#if defined(USE_X11) || defined(USE_WAYLAND)
+private:
+  void CreateNative(const TCHAR *text, PixelSize size, TopWindowStyle style);
+
+public:
+#endif
+
 #ifdef _WIN32_WCE
   void Destroy();
 #endif
@@ -204,8 +263,8 @@ public:
   void CheckResize() {}
 #endif
 
-#ifndef USE_GDI
-#if defined(ANDROID) || defined(USE_FB) || defined(USE_EGL) || defined(USE_VFB)
+#if !defined(USE_GDI) && !(defined(ENABLE_SDL) && (SDL_MAJOR_VERSION >= 2))
+#if defined(ANDROID) || defined(USE_FB) || defined(USE_EGL) || defined(USE_GLX) || defined(USE_VFB)
   void SetCaption(gcc_unused const TCHAR *caption) {}
 #else
   void SetCaption(const TCHAR *caption);
@@ -251,13 +310,20 @@ public:
   }
 #endif
 
+#ifdef USE_GDI
   void Fullscreen();
+#endif
 
 #ifndef USE_GDI
-  virtual void Invalidate() override;
+  void Invalidate() override;
 
 protected:
   void Expose();
+
+#if defined(USE_X11) || defined(USE_WAYLAND)
+  void EnableCapture() override;
+  void DisableCapture() override;
+#endif
 
 public:
 #endif /* !USE_GDI */
@@ -278,10 +344,15 @@ public:
 #endif
   }
 
-#if defined(ANDROID) || defined(USE_CONSOLE)
+#if defined(ANDROID) || defined(USE_POLL_EVENT)
   bool OnEvent(const Event &event);
 #elif defined(ENABLE_SDL)
   bool OnEvent(const SDL_Event &event);
+#endif
+
+#if defined(USE_X11) || defined(USE_WAYLAND)
+  gcc_pure
+  bool IsVisible() const;
 #endif
 
 #ifdef ANDROID
@@ -315,6 +386,19 @@ public:
   void RefreshSize() {}
 #endif
 
+#ifdef SOFTWARE_ROTATE_DISPLAY
+  void SetDisplayOrientation(DisplayOrientation orientation);
+#endif
+
+#ifdef HAVE_HIGHDPI_SUPPORT
+protected:
+  template<typename T>
+  void PointToReal(T& x, T& y) const {
+    x = static_cast<T>(static_cast<float>(x) * point_to_real_x);
+    y = static_cast<T>(static_cast<float>(y) * point_to_real_y);
+  }
+#endif
+
 protected:
   virtual bool OnActivate();
   virtual bool OnDeactivate();
@@ -322,20 +406,20 @@ protected:
   virtual bool OnClose();
 
 #ifdef KOBO
-  virtual void OnDestroy() override;
+  void OnDestroy() override;
 #endif
 
 #ifdef DRAW_MOUSE_CURSOR
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnPaint(Canvas &canvas) override;
 #endif
 
 #ifdef USE_GDI
-  virtual LRESULT OnMessage(HWND _hWnd, UINT message,
-                             WPARAM wParam, LPARAM lParam) override;
+  LRESULT OnMessage(HWND _hWnd, UINT message,
+                    WPARAM wParam, LPARAM lParam) override;
 #endif
 
 #ifndef USE_GDI
-  virtual void OnResize(PixelSize new_size) override;
+  void OnResize(PixelSize new_size) override;
 #endif
 
 #ifdef ANDROID

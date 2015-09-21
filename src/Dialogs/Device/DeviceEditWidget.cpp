@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 */
 
 #include "DeviceEditWidget.hpp"
+#include "Dialogs/ComboPicker.hpp"
 #include "UIGlobals.hpp"
 #include "Compiler.h"
 #include "Util/Macros.hpp"
@@ -31,8 +32,10 @@
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Boolean.hpp"
 #include "Form/DataField/String.hpp"
+#include "Form/DataField/ComboList.hpp"
 #include "Device/Register.hpp"
 #include "Device/Driver.hpp"
+#include "Device/Features.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Interface.hpp"
 
@@ -45,22 +48,22 @@
 #endif
 
 #ifdef ANDROID
-#include "Java/Global.hpp"
+#include "Java/Global.hxx"
 #include "Android/BluetoothHelper.hpp"
 #include "Asset.hpp"
 #include "Android/Nook.hpp"
 #include "Android/Product.hpp"
 #include "Device/Port/AndroidIOIOUartPort.hpp"
+#include "ScanBluetoothLeDialog.hpp"
 #endif
 
 enum ControlIndex {
   Port, BaudRate, BulkBaudRate,
   IP_ADDRESS,
   TCPPort,
-  I2CBus, I2CAddr, PressureUsage, Driver,
+  I2CBus, I2CAddr, PressureUsage, Driver, UseSecondDriver, SecondDriver,
   SyncFromDevice, SyncToDevice,
   K6Bt,
-  IgnoreCheckSum,
 };
 
 static constexpr struct {
@@ -71,8 +74,10 @@ static constexpr struct {
 #ifdef _WIN32_WCE
   { DeviceConfig::PortType::AUTO, N_("GPS Intermediate Driver") },
 #endif
-#ifdef ANDROID
+#ifdef HAVE_INTERNAL_GPS
   { DeviceConfig::PortType::INTERNAL, N_("Built-in GPS & sensors") },
+#endif
+#ifdef ANDROID
   { DeviceConfig::PortType::RFCOMM_SERVER, N_("Bluetooth server") },
   { DeviceConfig::PortType::DROIDSOAR_V2, _T("DroidSoar V2") },
 #ifndef NDEBUG
@@ -337,6 +342,7 @@ FillTCPPorts(DataFieldEnum &dfe)
   dfe.addEnumText(_T("4353"), 4353);
   dfe.addEnumText(_T("10110"), 10110);
   dfe.addEnumText(_T("4352"), 4352);
+  dfe.addEnumText(_T("2000"), 2000);
 }
 
 static void
@@ -408,6 +414,41 @@ SetPort(DataFieldEnum &df, const DeviceConfig &config)
       break;
     }
   }
+}
+
+static bool
+EditPortCallback(const TCHAR *caption, DataField &_df,
+                 const TCHAR *help_text)
+{
+  DataFieldEnum &df = (DataFieldEnum &)_df;
+
+  ComboList combo_list = df.CreateComboList(nullptr);
+
+#ifdef ANDROID
+  static constexpr int SCAN_BLUETOOTH_LE = -1;
+  if (BluetoothHelper::HasLe(Java::GetEnv()))
+    combo_list.Append(SCAN_BLUETOOTH_LE, _("Bluetooth LE"));
+#endif
+
+  int i = ComboPicker(caption, combo_list, help_text);
+  if (i < 0)
+    return false;
+
+  const ComboList::Item &item = combo_list[i];
+
+#ifdef ANDROID
+  if (item.int_value == SCAN_BLUETOOTH_LE) {
+    char address[32];
+    if (!ScanBluetoothLeDialog(address, sizeof(address)))
+        return false;
+
+    SetPort(df, DeviceConfig::PortType::RFCOMM, address);
+    return true;
+  }
+#endif
+
+  df.SetFromCombo(item.int_value, item.string_value);
+  return true;
 }
 
 DeviceEditWidget::DeviceEditWidget(const DeviceConfig &_config)
@@ -494,12 +535,6 @@ DeviceEditWidget::SetConfig(const DeviceConfig &_config)
   k6bt_df.Set(config.k6bt);
   k6bt_control.RefreshDisplay();
 
-  WndProperty &ignore_checksum_control = GetControl(IgnoreCheckSum);
-  DataFieldBoolean &ignore_checksum_df =
-      *(DataFieldBoolean *)ignore_checksum_control.GetDataField();
-  ignore_checksum_df.Set(config.ignore_checksum);
-  ignore_checksum_control.RefreshDisplay();
-
   UpdateVisibilities();
 }
 
@@ -561,6 +596,22 @@ GetPortType(const DataField &df)
   return (DeviceConfig::PortType)(port >> 16);
 }
 
+gcc_pure
+static bool
+CanPassThrough(const DataField &df)
+{
+  const TCHAR *driver_name = df.GetAsString();
+  if (driver_name == nullptr)
+    return false;
+
+  const struct DeviceRegister *driver = FindDriverByName(driver_name);
+  if (driver == nullptr)
+    return false;
+
+  return driver->HasPassThrough();
+}
+
+
 void
 DeviceEditWidget::UpdateVisibilities()
 {
@@ -583,13 +634,18 @@ DeviceEditWidget::UpdateVisibilities()
                 type != DeviceConfig::PortType::NUNCHUCK);
   SetRowAvailable(PressureUsage, DeviceConfig::IsPressureSensor(type));
   SetRowVisible(Driver, DeviceConfig::UsesDriver(type));
+
+  SetRowVisible(UseSecondDriver, DeviceConfig::UsesDriver(type)
+                && CanPassThrough(GetDataField(Driver)));
+  SetRowVisible(SecondDriver, DeviceConfig::UsesDriver(type)
+                && CanPassThrough(GetDataField(Driver))
+                && GetValueBoolean(UseSecondDriver));
+
   SetRowVisible(SyncFromDevice, DeviceConfig::UsesDriver(type) &&
                 CanReceiveSettings(GetDataField(Driver)));
   SetRowVisible(SyncToDevice, DeviceConfig::UsesDriver(type) &&
                 CanSendSettings(GetDataField(Driver)));
   SetRowAvailable(K6Bt, maybe_bluetooth);
-
-  SetRowVisible(IgnoreCheckSum, DeviceConfig::UsesDriver(type));
 }
 
 void
@@ -599,7 +655,8 @@ DeviceEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   DataFieldEnum *port_df = new DataFieldEnum(this);
   FillPorts(*port_df, config);
-  Add(_("Port"), NULL, port_df);
+  auto *port_control = Add(_("Port"), NULL, port_df);
+  port_control->SetEditCallback(EditPortCallback);
 
   DataFieldEnum *baud_rate_df = new DataFieldEnum(this);
   FillBaudRates(*baud_rate_df);
@@ -656,6 +713,21 @@ DeviceEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   Add(_("Driver"), NULL, driver_df);
 
+  // for a passthrough device, offer additional driver
+  AddBoolean(_("Passthrough device"),
+             _("This option lets you configure if this device has a passed "
+               " through device connected."),
+             config.use_second_device, this);
+
+  DataFieldEnum *driver2_df = new DataFieldEnum(this);
+  for (unsigned i = 0; (driver = GetDriverByIndex(i)) != nullptr; i++)
+    driver2_df->addEnumText(driver->name, driver->display_name);
+
+  driver2_df->Sort(1);
+  driver2_df->Set(config.driver2_name);
+
+  Add(_("Second Driver"), nullptr, driver2_df);
+
   AddBoolean(_("Sync. from device"),
              _("This option lets you configure if XCSoar should use settings "
                "like the MacCready value, bugs and ballast from the device."),
@@ -672,12 +744,6 @@ DeviceEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _("Enable this if you use a K6Bt to connect the device."),
              config.k6bt, this);
   SetExpertRow(K6Bt);
-
-  AddBoolean(_("Ignore checksum"),
-             _("If your GPS device outputs invalid NMEA checksums, this will "
-               "allow it's data to be used anyway."),
-             config.ignore_checksum, this);
-  SetExpertRow(IgnoreCheckSum);
 
   UpdateVisibilities();
 }
@@ -718,7 +784,7 @@ FinishPortField(DeviceConfig &config, const DataFieldEnum &df)
   case DeviceConfig::PortType::PTY:
     /* Serial Port */
     if (new_type == config.port_type &&
-        _tcscmp(config.path, df.GetAsString()) == 0)
+        StringIsEqual(config.path, df.GetAsString()))
       return false;
 
     config.port_type = new_type;
@@ -728,7 +794,7 @@ FinishPortField(DeviceConfig &config, const DataFieldEnum &df)
   case DeviceConfig::PortType::RFCOMM:
     /* Bluetooth */
     if (new_type == config.port_type &&
-        _tcscmp(config.bluetooth_mac, df.GetAsString()) == 0)
+        StringIsEqual(config.bluetooth_mac, df.GetAsString()))
       return false;
 
     config.port_type = new_type;
@@ -767,8 +833,7 @@ DeviceEditWidget::Save(bool &_changed)
   }
 
   if (config.UsesIPAddress())
-    changed |= SaveValue(IP_ADDRESS, config.ip_address.buffer(),
-                         config.ip_address.MAX_SIZE);
+    changed |= SaveValue(IP_ADDRESS, config.ip_address);
 
   if (config.UsesTCPPort())
     changed |= SaveValue(TCPPort, config.tcp_port);
@@ -780,8 +845,7 @@ DeviceEditWidget::Save(bool &_changed)
   }
 
   if (config.UsesDriver()) {
-    changed |= SaveValue(Driver, config.driver_name.buffer(),
-                         config.driver_name.MAX_SIZE);
+    changed |= SaveValue(Driver, config.driver_name);
 
     if (CanReceiveSettings(GetDataField(Driver)))
       changed |= SaveValue(SyncFromDevice, config.sync_from_device);
@@ -789,7 +853,11 @@ DeviceEditWidget::Save(bool &_changed)
     if (CanSendSettings(GetDataField(Driver)))
       changed |= SaveValue(SyncToDevice, config.sync_to_device);
 
-    changed |= SaveValue(IgnoreCheckSum, config.ignore_checksum);
+    if (CanPassThrough(GetDataField(Driver))) {
+      changed |= SaveValue(UseSecondDriver, config.use_second_device);
+      changed |= SaveValue(SecondDriver, config.driver2_name.buffer(),
+                           config.driver2_name.CAPACITY);
+    }
   }
 
   if (CommonInterface::Basic().sensor_calibration_available)
@@ -803,7 +871,7 @@ void
 DeviceEditWidget::OnModified(DataField &df)
 {
   if (IsDataField(Port, df) || IsDataField(Driver, df) ||
-      IsDataField(K6Bt, df))
+      IsDataField(UseSecondDriver, df) || IsDataField(K6Bt, df))
     UpdateVisibilities();
 
   if (listener != NULL)

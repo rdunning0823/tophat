@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,8 +29,8 @@ IsAncestor(const Window *maybe_ancestor, const Window *w)
 {
   while (true) {
     const ContainerWindow *parent = w->GetParent();
-    if (parent == NULL)
-      return NULL;
+    if (parent == nullptr)
+      return nullptr;
 
     if (parent == maybe_ancestor)
       return parent;
@@ -47,7 +47,7 @@ SingleWindow::FilterMouseEvent(RasterPoint pt,
   while (true) {
     const Window *child =
       const_cast<ContainerWindow *>(container)->EventChildAt(pt.x, pt.y);
-    if (child == NULL)
+    if (child == nullptr)
       /* no receiver for the event */
       return false;
 
@@ -56,7 +56,7 @@ SingleWindow::FilterMouseEvent(RasterPoint pt,
       return true;
 
     const ContainerWindow *next = IsAncestor(allowed, child);
-    if (next == NULL)
+    if (next == nullptr)
       return false;
 
     container = next;

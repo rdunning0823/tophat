@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,19 +28,17 @@ Copyright_License {
 #include "Weather/NOAAStore.hpp"
 
 class Canvas;
+class TwoTextRowsRenderer;
 struct NOAALook;
-struct DialogLook;
 
 namespace NOAAListRenderer
 {
-  gcc_pure
-  UPixelScalar GetHeight(const DialogLook &dialog_look);
+  void Draw(Canvas &canvas, const PixelRect rc, const NOAAStore::Item &station,
+            const TwoTextRowsRenderer &row_renderer);
 
   void Draw(Canvas &canvas, const PixelRect rc, const NOAAStore::Item &station,
-            const DialogLook &dialog_look);
-
-  void Draw(Canvas &canvas, const PixelRect rc, const NOAAStore::Item &station,
-            const NOAALook &look, const DialogLook &dialog_look);
+            const NOAALook &look,
+            const TwoTextRowsRenderer &row_renderer);
 }
 
 #endif

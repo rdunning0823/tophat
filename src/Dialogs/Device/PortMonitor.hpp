@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,14 +24,9 @@ Copyright_License {
 #ifndef XCSOAR_PORT_MONITOR_DIALOG_HPP
 #define XCSOAR_PORT_MONITOR_DIALOG_HPP
 
-struct DialogLook;
-struct TerminalLook;
-class SingleWindow;
 class DeviceDescriptor;
 
 void
-ShowPortMonitor(SingleWindow &parent, const DialogLook &dialog_look,
-                const TerminalLook &terminal_look,
-                DeviceDescriptor &device);
+ShowPortMonitor(DeviceDescriptor &device);
 
 #endif

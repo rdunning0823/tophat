@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -40,15 +40,15 @@ enum ControlIndex {
 };
 
 static constexpr StaticEnumChoice orientation_list[] = {
-  { (unsigned)DisplayOrientation::TRACK_UP, N_("Track up"),
+  { (unsigned)MapOrientation::TRACK_UP, N_("Track up"),
     N_("The moving map display will be rotated so the glider's track is oriented up.") },
-  { (unsigned)DisplayOrientation::HEADING_UP, N_("Heading up"),
+  { (unsigned)MapOrientation::HEADING_UP, N_("Heading up"),
     N_("The moving map display will be rotated so the glider's heading is oriented up.") },
-  { (unsigned)DisplayOrientation::NORTH_UP, N_("North up"),
+  { (unsigned)MapOrientation::NORTH_UP, N_("North up"),
     N_("The moving map display will always be orientated north to south and the glider icon will be rotated to show its course.") },
-  { (unsigned)DisplayOrientation::TARGET_UP, N_("Target up"),
+  { (unsigned)MapOrientation::TARGET_UP, N_("Target up"),
     N_("The moving map display will be rotated so the navigation target is oriented up.") },
-  { (unsigned)DisplayOrientation::WIND_UP, N_("Wind up"),
+  { (unsigned)MapOrientation::WIND_UP, N_("Wind up"),
     N_("The moving map display will be rotated so the wind is always oriented up to down. (can be useful for wave flying)") },
   { 0 }
 };
@@ -82,11 +82,11 @@ private:
 void
 MapDisplayConfigPanel::UpdateVisibilities()
 {
-  auto orientation = (DisplayOrientation)GetValueInteger(OrientationCruise);
+  auto orientation = (MapOrientation)GetValueInteger(OrientationCruise);
 
   SetRowVisible(MAP_SHIFT_BIAS,
-                orientation == DisplayOrientation::NORTH_UP ||
-                orientation == DisplayOrientation::WIND_UP);
+                orientation == MapOrientation::NORTH_UP ||
+                orientation == MapOrientation::WIND_UP);
 }
 
 void

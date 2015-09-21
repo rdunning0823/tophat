@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,111 +23,17 @@
 
 #include "NanoLogger.hpp"
 #include "Device/Port/Port.hpp"
-#include "Device/Driver.hpp"
-#include "Device/Internal.hpp"
+#include "Device/RecordedFlight.hpp"
+#include "Device/Util/NMEAWriter.hpp"
+#include "Device/Util/NMEAReader.hpp"
 #include "Operation/Operation.hpp"
-#include "Util/FifoBuffer.hpp"
 #include "Time/TimeoutClock.hpp"
-#include "NMEA/Checksum.hpp"
 #include "NMEA/InputLine.hpp"
 
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-class PortNMEAReader {
-  Port &port;
-  OperationEnvironment &env;
-  FifoBuffer<char, 256u> buffer;
-
-public:
-  PortNMEAReader(Port &_port, OperationEnvironment &_env)
-    :port(_port), env(_env) {}
-
-protected:
-  bool Fill(TimeoutClock &timeout) {
-    const auto dest = buffer.Write();
-    if (dest.IsEmpty())
-      /* already full */
-      return false;
-
-    size_t nbytes = port.WaitAndRead(dest.data, dest.length, env, timeout);
-    if (nbytes == 0)
-      return false;
-
-    buffer.Append(nbytes);
-    return true;
-  }
-
-  char *GetLine() {
-    const auto src = buffer.Read();
-    char *const end = src.data + src.length;
-
-    /* a NMEA line starts with a dollar symbol ... */
-    char *dollar = std::find(src.data, end, '$');
-    if (dollar == end) {
-      buffer.Clear();
-      return nullptr;
-    }
-
-    char *start = dollar + 1;
-
-    /* ... and ends with an asterisk */
-    char *asterisk = std::find(start, end, '*');
-    if (asterisk + 3 > end)
-      /* need more data */
-      return nullptr;
-
-    /* verify the checksum following the asterisk (two hex digits) */
-
-    const uint8_t calculated_checksum = NMEAChecksum(start, asterisk - start);
-
-    const char checksum_buffer[3] = { asterisk[1], asterisk[2], 0 };
-    char *endptr;
-    const uint8_t parsed_checksum = strtoul(checksum_buffer, &endptr, 16);
-    if (endptr != checksum_buffer + 2 ||
-        parsed_checksum != calculated_checksum) {
-      buffer.Clear();
-      return nullptr;
-    }
-
-    buffer.Consume(asterisk + 3 - src.data);
-
-    *asterisk = 0;
-    return start;
-  }
-
-public:
-  void Flush() {
-    port.Flush();
-    buffer.Clear();
-  }
-
-  char *ReadLine(TimeoutClock &timeout) {
-    while (true) {
-      char *line = GetLine();
-      if (line != nullptr)
-        return line;
-
-      if (!Fill(timeout))
-        return nullptr;
-    }
-  }
-
-  char *ExpectLine(const char *prefix, TimeoutClock &timeout) {
-    const size_t prefix_length = strlen(prefix);
-
-    while (true) {
-      char *line = ReadLine(timeout);
-      if (line == nullptr)
-        return nullptr;
-
-      if (memcmp(line, prefix, prefix_length) == 0)
-        return line + prefix_length;
-    }
-  }
-};
 
 static bool
 RequestLogbookInfo(Port &port, OperationEnvironment &env)
@@ -136,14 +42,14 @@ RequestLogbookInfo(Port &port, OperationEnvironment &env)
 }
 
 static char *
-ReadLogbookLine(PortNMEAReader &reader, TimeoutClock &timeout)
+ReadLogbookLine(PortNMEAReader &reader, TimeoutClock timeout)
 {
   return reader.ExpectLine("PLXVC,LOGBOOK,A,", timeout);
 }
 
 static int
 GetNumberOfFlights(Port &port, PortNMEAReader &reader,
-                   OperationEnvironment &env, TimeoutClock &timeout)
+                   OperationEnvironment &env, TimeoutClock timeout)
 {
   reader.Flush();
 
@@ -264,7 +170,7 @@ ParseLogbookContent(const char *_line, RecordedFlightInfo &info)
 
 static bool
 ReadLogbookContent(PortNMEAReader &reader, RecordedFlightInfo &info,
-                   TimeoutClock &timeout)
+                   TimeoutClock timeout)
 {
   while (true) {
     const char *line = ReadLogbookLine(reader, timeout);
@@ -278,7 +184,7 @@ ReadLogbookContent(PortNMEAReader &reader, RecordedFlightInfo &info,
 
 static bool
 ReadLogbookContents(PortNMEAReader &reader, RecordedFlightList &flight_list,
-                    unsigned n, TimeoutClock &timeout)
+                    unsigned n, TimeoutClock timeout)
 {
   while (n-- > 0) {
     if (!ReadLogbookContent(reader, flight_list.append(), timeout))
@@ -292,7 +198,7 @@ static bool
 GetLogbookContents(Port &port, PortNMEAReader &reader,
                    RecordedFlightList &flight_list,
                    unsigned start, unsigned n,
-                   OperationEnvironment &env, TimeoutClock &timeout)
+                   OperationEnvironment &env, TimeoutClock timeout)
 {
   reader.Flush();
 
@@ -402,21 +308,36 @@ DownloadFlightInner(Port &port, const char *filename, FILE *file,
 
     const unsigned start = i;
     const unsigned end = start + nrequest;
-
-    /* send request to Nano */
-
-    reader.Flush();
-    if (!RequestFlight(port, filename, start, end, env))
-      return false;
+    unsigned request_retry_count = 0;
 
     /* read the requested lines and save to file */
 
-    TimeoutClock timeout(2000);
     while (i != end) {
+      if (i == start) {
+        /* send request range to Nano */
+        reader.Flush();
+        if (!RequestFlight(port, filename, start, end, env))
+          return false;
+        request_retry_count++;
+      }
+
+      TimeoutClock timeout(2000);
       const char *line = reader.ExpectLine("PLXVC,FLIGHT,A,", timeout);
-      if (line == nullptr ||
-          !HandleFlightLine(line, file, i, row_count))
-        return false;
+      if (line == nullptr || !HandleFlightLine(line, file, i, row_count)) {
+        if (request_retry_count > 5)
+          return false;
+
+        /* Discard data which might still be in-transit, e.g. buffered
+           inside a bluetooth dongle */
+        port.FullFlush(env, 200, 2000);
+
+        /* If we already received parts of the request range correctly break
+           out of the loop to calculate new request range */
+        if (i != start)
+          break;
+
+        /* No valid reply received (i==start) - request same range again */
+      }
     }
 
     if (i > row_count)
@@ -439,7 +360,7 @@ Nano::DownloadFlight(Port &port, const RecordedFlightInfo &flight,
   port.StopRxThread();
 
   FILE *file = _tfopen(path, _T("wb"));
-  if (file == NULL)
+  if (file == nullptr)
     return false;
 
   bool success = DownloadFlightInner(port, flight.internal.lx.nano_filename,

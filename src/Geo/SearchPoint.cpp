@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,9 +21,9 @@
  */
 
 #include "SearchPoint.hpp"
-#include "Flat/TaskProjection.hpp"
+#include "Flat/FlatProjection.hpp"
 
-SearchPoint::SearchPoint(const GeoPoint &loc, const TaskProjection &tp)
+SearchPoint::SearchPoint(const GeoPoint &loc, const FlatProjection &tp)
   :location(loc), flat_location(tp.ProjectInteger(loc))
 #ifndef NDEBUG
   , projected(true)
@@ -31,7 +31,7 @@ SearchPoint::SearchPoint(const GeoPoint &loc, const TaskProjection &tp)
 {
 }
 
-SearchPoint::SearchPoint(const FlatGeoPoint &floc, const TaskProjection &tp)
+SearchPoint::SearchPoint(const FlatGeoPoint &floc, const FlatProjection &tp)
   :location(tp.Unproject(floc)), flat_location(floc)
 #ifndef NDEBUG
   , projected(true)
@@ -40,7 +40,7 @@ SearchPoint::SearchPoint(const FlatGeoPoint &floc, const TaskProjection &tp)
 }
 
 void
-SearchPoint::Project(const TaskProjection &tp)
+SearchPoint::Project(const FlatProjection &tp)
 {
   flat_location = tp.ProjectInteger(location);
 

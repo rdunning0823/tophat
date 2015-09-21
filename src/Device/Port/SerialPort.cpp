@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,8 +39,8 @@ Copyright_License {
 #include <tchar.h>
 #include <stdio.h>
 
-SerialPort::SerialPort(DataHandler &_handler)
-  :BufferedPort(_handler)
+SerialPort::SerialPort(PortListener *_listener, DataHandler &_handler)
+  :BufferedPort(_listener, _handler), StoppableThread("SerialPort")
 {
 }
 
@@ -82,14 +82,14 @@ SerialPort::Open(const TCHAR *path, unsigned _baud_rate)
   hPort = CreateFile(path,
                      GENERIC_READ | GENERIC_WRITE, // Access (read-write) mode
                      0,            // Share mode
-                     NULL,         // Pointer to the security attribute
+                     nullptr, // Pointer to the security attribute
                      OPEN_EXISTING,// How to open the serial port
 #ifdef _WIN32_WCE
                      FILE_ATTRIBUTE_NORMAL, // Port attributes
 #else
                      FILE_FLAG_OVERLAPPED, // Overlapped I/O
 #endif
-                     NULL);        // Handle to port with attribute to copy
+                     nullptr); // Handle to port with attribute to copy
 
   // If it fails to open the port, return false.
   if (hPort == INVALID_HANDLE_VALUE) {
@@ -142,6 +142,8 @@ SerialPort::Open(const TCHAR *path, unsigned _baud_rate)
 
   StoppableThread::Start();
 
+  StateChanged();
+
   return true;
 }
 
@@ -164,7 +166,7 @@ SerialPort::Drain()
 
   ::SetCommMask(hPort, EV_ERR|EV_TXEMPTY);
   DWORD events;
-  return WaitCommEvent(hPort, &events, NULL) &&
+  return WaitCommEvent(hPort, &events, nullptr) &&
     (events & EV_TXEMPTY) != 0;
 }
 
@@ -351,7 +353,7 @@ SerialPort::Run()
     }
 
     // Read the data from the serial port.
-    if (!ReadFile(hPort, inbuf, 1024, &dwBytesTransferred, NULL) ||
+    if (!ReadFile(hPort, inbuf, 1024, &dwBytesTransferred, nullptr) ||
         dwBytesTransferred == 0) {
       Sleep(100);
       continue;
@@ -388,8 +390,8 @@ SerialPort::Write(const void *data, size_t length)
     Sleep(100);
 #endif
 
-  // lpNumberOfBytesWritten : This parameter can be NULL only when the lpOverlapped parameter is not NULL.
-  if (!::WriteFile(hPort, data, length, &NumberOfBytesWritten, NULL))
+  // lpNumberOfBytesWritten : This parameter can be nullptr only when the lpOverlapped parameter is not nullptr.
+  if (!::WriteFile(hPort, data, length, &NumberOfBytesWritten, nullptr))
     return 0;
 
   return NumberOfBytesWritten;

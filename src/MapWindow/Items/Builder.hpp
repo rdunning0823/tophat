@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,7 +36,6 @@ class Waypoints;
 struct MoreData;
 struct DerivedInfo;
 class ProtectedTaskManager;
-class ProtectedMarkers;
 struct TrafficList;
 struct ThermalLocatorInfo;
 struct NMEAInfo;
@@ -65,7 +64,6 @@ public:
                           const AirspaceRendererSettings &renderer_settings,
                           const MoreData &basic, const DerivedInfo &calculated);
   void AddTaskOZs(const ProtectedTaskManager &task);
-  void AddMarkers(const ProtectedMarkers &marks);
   void AddTraffic(const TrafficList &flarm);
   void AddSkyLinesTraffic();
   void AddThermals(const ThermalLocatorInfo &thermals,

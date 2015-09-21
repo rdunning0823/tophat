@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ TargetMapWindow::TargetPaintDrag(Canvas &canvas, const RasterPoint drag_last)
 bool
 TargetMapWindow::TargetDragged(const int x, const int y)
 {
-  assert(task != NULL);
+  assert(task != nullptr);
 
   GeoPoint gp = projection.ScreenToGeo(x, y);
 
@@ -64,7 +64,7 @@ TargetMapWindow::TargetDragged(const int x, const int y)
 bool
 TargetMapWindow::isClickOnTarget(const RasterPoint pc) const
 {
-  if (task == NULL)
+  if (task == nullptr)
     return false;
 
   ProtectedTaskManager::Lease task_manager(*task);
@@ -73,7 +73,7 @@ TargetMapWindow::isClickOnTarget(const RasterPoint pc) const
     return false;
 
   const GeoPoint gp = projection.ScreenToGeo(pc.x, pc.y);
-  if (projection.GeoToScreenDistance(gp.Distance(t)) < Layout::GetHitRadius())
+  if (projection.GeoToScreenDistance(gp.DistanceS(t)) < Layout::GetHitRadius())
     return true;
 
   return false;
@@ -82,7 +82,7 @@ TargetMapWindow::isClickOnTarget(const RasterPoint pc) const
 bool
 TargetMapWindow::isInSector(const int x, const int y)
 {
-  assert(task != NULL);
+  assert(task != nullptr);
 
   GeoPoint gp = projection.ScreenToGeo(x, y);
 

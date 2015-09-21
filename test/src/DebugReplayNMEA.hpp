@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,27 +24,31 @@ Copyright_License {
 #ifndef XCSOAR_DEBUG_REPLAY_NMEA_HPP
 #define XCSOAR_DEBUG_REPLAY_NMEA_HPP
 
-#include "DebugReplay.hpp"
+#include "DebugReplayFile.hpp"
 #include "Device/Parser.hpp"
 #include "Time/ReplayClock.hpp"
 
 #include <memory>
 
-class NLineReader;
+class FileLineReaderA;
 class Device;
 struct DeviceRegister;
 
-class DebugReplayNMEA : public DebugReplay {
+
+class DebugReplayNMEA : public DebugReplayFile {
   std::unique_ptr<Device> device;
 
   NMEAParser parser;
 
   ReplayClock clock;
 
-public:
-  DebugReplayNMEA(NLineReader *reader, const DeviceRegister *driver);
+private:
+  DebugReplayNMEA(FileLineReaderA *_reader, const DeviceRegister *driver);
 
+public:
   virtual bool Next();
+
+  static DebugReplay* Create(const char *input_file, const tstring &driver_name);
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -35,14 +35,14 @@ private:
 public:
   XCOM760Device(Port &_port):port(_port) {}
 
-public:
-  virtual bool PutVolume(unsigned volume, OperationEnvironment &env) override;
-  virtual bool PutActiveFrequency(RadioFrequency frequency,
-                                  const TCHAR *name,
-                                  OperationEnvironment &env) override;
-  virtual bool PutStandbyFrequency(RadioFrequency frequency,
-                                   const TCHAR *name,
-                                   OperationEnvironment &env) override;
+  /* virtual methods from class Device */
+  bool PutVolume(unsigned volume, OperationEnvironment &env) override;
+  bool PutActiveFrequency(RadioFrequency frequency,
+                          const TCHAR *name,
+                          OperationEnvironment &env) override;
+  bool PutStandbyFrequency(RadioFrequency frequency,
+                           const TCHAR *name,
+                           OperationEnvironment &env) override;
 };
 
 bool
@@ -76,6 +76,7 @@ XCOM760Device::PutStandbyFrequency(RadioFrequency frequency,
   sprintf(szTmp, "$TXSF=%u.%03u\r\n",
           frequency.GetKiloHertz() / 1000,
           frequency.GetKiloHertz() % 1000);
+  port.Write(szTmp);
   return true;
 }
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,6 +26,18 @@ Copyright_License {
 #include "IGC/IGCParser.hpp"
 #include "IGC/IGCFix.hpp"
 #include "Units/System.hpp"
+
+DebugReplay*
+DebugReplayIGC::Create(const char *input_file) {
+  FileLineReaderA *reader = new FileLineReaderA(input_file);
+  if (reader->error()) {
+    delete reader;
+    fprintf(stderr, "Failed to open %s\n", input_file);
+    return nullptr;
+  }
+
+  return new DebugReplayIGC(reader);
+}
 
 bool
 DebugReplayIGC::Next()
@@ -106,25 +118,18 @@ DebugReplayIGC::CopyFromFix(const IGCFix &fix)
   basic.alive.Update(basic.clock);
   basic.location = fix.location;
 
-  if (fix.gps_valid)
+  if (fix.gps_valid) {
     basic.location_available.Update(basic.clock);
-  else
-    basic.location_available.Clear();
-
-  if (fix.gps_altitude != 0) {
     basic.gps_altitude = fixed(fix.gps_altitude);
-
-    if (fix.gps_valid)
-      basic.gps_altitude_available.Update(basic.clock);
-    else
-      basic.gps_altitude_available.Clear();
-  } else
+    basic.gps_altitude_available.Update(basic.clock);
+  } else {
+    basic.location_available.Clear();
     basic.gps_altitude_available.Clear();
+  }
 
   if (fix.pressure_altitude != 0) {
-    basic.pressure_altitude = basic.baro_altitude = fixed(fix.pressure_altitude);
+    basic.pressure_altitude = fixed(fix.pressure_altitude);
     basic.pressure_altitude_available.Update(basic.clock);
-    basic.baro_altitude_available.Update(basic.clock);
   }
 
   if (fix.enl >= 0) {

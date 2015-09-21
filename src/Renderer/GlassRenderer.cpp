@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,7 +27,10 @@ Copyright_License {
 #if defined(EYE_CANDY) && defined(ENABLE_OPENGL)
 
 #include "Screen/OpenGL/Scissor.hpp"
+#include "Screen/OpenGL/VertexPointer.hpp"
 #include "Util/Macros.hpp"
+
+#include <algorithm>
 
 #endif
 
@@ -55,26 +58,18 @@ DrawGlassBackground(Canvas &canvas, const PixelRect &rc, Color color)
     { center.x - 1024 + size, center.y + 1024 + size },
   };
 
-  glVertexPointer(2, GL_VALUE, 0, vertices);
+  const ScopeVertexPointer vp(vertices);
 
   const Color colors[] = {
     shadow, color,
     shadow, color,
   };
 
-  glEnableClientState(GL_COLOR_ARRAY);
-
-#ifdef HAVE_GLES
-  glColorPointer(4, GL_FIXED, 0, colors);
-#else
-  glColorPointer(4, GL_UNSIGNED_BYTE, 0, colors);
-#endif
+  const ScopeColorPointer cp(colors);
 
   static_assert(ARRAY_SIZE(vertices) == ARRAY_SIZE(colors),
                 "Array size mismatch");
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, ARRAY_SIZE(vertices));
-
-  glDisableClientState(GL_COLOR_ARRAY);
 #endif
 }

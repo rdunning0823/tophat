@@ -14,22 +14,30 @@ endif
 
 ifeq ($(ENABLE_SDL),y)
 
+# Currently the default is not to use SDL2, but SDL 1.2, except for iOS,
+# where no official SDL 1.2 release is available. And for OS X, because
+# SDL 1.2 has compatibility issues with recent OSX SDK versions.
+ifeq ($(TARGET_IS_DARWIN),y)
+USE_SDL2 ?= y
+else
+USE_SDL2 ?= n
+endif
+
+ifeq ($(TARGET_IS_DARWIN),y)
+COREGRAPHICS = y
+else
 LIBPNG = y
 LIBJPEG = y
+endif
 FREETYPE = y
 
+ifeq ($(USE_SDL2),y)
+$(eval $(call pkg-config-library,SDL,sdl2))
+SDL_CPPFLAGS := $(patsubst -I%,-isystem %,$(SDL_CPPFLAGS))
+else
 $(eval $(call pkg-config-library,SDL,sdl))
+endif
 
 SDL_CPPFLAGS += -DENABLE_SDL
 
-ifeq ($(TARGET_IS_DARWIN),y)
-# the pkg-config file on MacPorts is broken, we must convert all -l
-# flags to link static libraries instead
-SDL_LDADD := $(patsubst -l%,/opt/local/lib/lib%.a,$(filter -l%,$(SDL_LDLIBS)))
-SDL_LDLIBS := $(filter-out -l% -R% -L%,$(SDL_LDLIBS))
-
-SDL_LDADD += /opt/local/lib/libbz2.a /opt/local/lib/libz.a
-SDL_LDADD += /opt/local/lib/libfreetype.a
-SDL_LDADD += /opt/local/lib/libxcb.a /opt/local/lib/libXau.a /opt/local/lib/libXdmcp.a
-endif
 endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "Tracking/LiveTrack24.hpp"
-#include "Net/Init.hpp"
+#include "Net/HTTP/Init.hpp"
 #include "Time/BrokenDateTime.hpp"
 #include "Units/System.hpp"
 #include "OS/Args.hpp"
@@ -62,7 +62,7 @@ TestTracking(int argc, char *argv[])
 
   printf("Starting tracking ... ");
   bool result = StartTracking(session, username.c_str(), password.c_str(), 10,
-                              VehicleType::GLIDER, "Hornet");
+                              VehicleType::GLIDER, _T("Hornet"));
   printf(result ? "done\n" : "failed\n");
   if (!result)
     return false;

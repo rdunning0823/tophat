@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@ Copyright_License {
 
 #include "../Shared/TimerQueue.hpp"
 #include "../Shared/Event.hpp"
-#include "Util/NonCopyable.hpp"
 #include "Thread/Mutex.hpp"
 #include "Thread/Cond.hpp"
 
@@ -34,7 +33,7 @@ Copyright_License {
 
 class Window;
 
-class EventQueue : private NonCopyable {
+class EventQueue {
   std::queue<Event> events;
 
   /**
@@ -47,10 +46,12 @@ class EventQueue : private NonCopyable {
   Mutex mutex;
   Cond cond;
 
-  bool running;
+  bool quit;
 
 public:
   EventQueue();
+
+  EventQueue(const EventQueue &) = delete;
 
   /**
    * Returns the monotonic clock in microseconds.  This method is only
@@ -61,8 +62,12 @@ public:
     return now_us;
   }
 
+  bool IsQuit() const {
+    return quit;
+  }
+
   void Quit() {
-    running = false;
+    quit = true;
   }
 
   void Push(const Event &event);

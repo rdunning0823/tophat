@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,15 +25,16 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Components.hpp"
 #include "Profile/Profile.hpp"
-#include "Profile/ProfileKeys.hpp"
+#include "Profile/Current.hpp"
+#include "Profile/Settings.hpp"
 #include "Asset.hpp"
 #include "Simulator.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Terrain/RasterTerrain.hpp"
-#include "Terrain/RasterWeather.hpp"
+#include "Terrain/RasterWeatherStore.hpp"
 #include "Input/InputEvents.hpp"
 #include "Input/InputQueue.hpp"
-#include "Dialogs/Dialogs.h"
+#include "Dialogs/StartupDialog.hpp"
 #include "Dialogs/dlgSimulatorPrompt.hpp"
 #include "Language/LanguageGlue.hpp"
 #include "Language/Language.hpp"
@@ -47,9 +48,8 @@ Copyright_License {
 #include "Waypoint/WaypointDetailsReader.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "MapWindow/GlueMapWindow.hpp"
-#include "Markers/Markers.hpp"
-#include "Markers/ProtectedMarkers.hpp"
 #include "Device/device.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Topography/TopographyStore.hpp"
 #include "Topography/TopographyGlue.hpp"
 #include "Audio/VarioGlue.hpp"
@@ -60,13 +60,12 @@ Copyright_License {
 #include "Computer/GlideComputerInterface.hpp"
 #include "Computer/Events.hpp"
 #include "Monitor/AllMonitors.hpp"
-#include "StatusMessage.hpp"
 #include "MergeThread.hpp"
 #include "CalculationThread.hpp"
 #include "Replay/Replay.hpp"
 #include "LocalPath.hpp"
 #include "IO/FileCache.hpp"
-#include "Net/DownloadManager.hpp"
+#include "Net/HTTP/DownloadManager.hpp"
 #include "Hardware/AltairControl.hpp"
 #include "Hardware/DisplayDPI.hpp"
 #include "Hardware/DisplayGlue.hpp"
@@ -82,6 +81,7 @@ Copyright_License {
 
 #include "Task/TaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
+#include "Task/DefaultTask.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Operation/VerboseOperationEnvironment.hpp"
 #include "PageActions.hpp"
@@ -98,11 +98,11 @@ Copyright_License {
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
+#include "Screen/OpenGL/Dynamic.hpp"
 #else
 #include "DrawThread.hpp"
 #endif
 
-static Markers *marks;
 static TaskManager *task_manager;
 static GlideComputerEvents *glide_computer_events;
 static AllMonitors *all_monitors;
@@ -116,10 +116,10 @@ LoadProfile()
     return false;
 
   Profile::Load();
-  Profile::Use();
+  Profile::Use(Profile::map);
 
-  Units::SetConfig(CommonInterface::GetUISettings().units);
-  SetUserCoordinateFormat(CommonInterface::GetUISettings().coordinate_format);
+  Units::SetConfig(CommonInterface::GetUISettings().format.units);
+  SetUserCoordinateFormat(CommonInterface::GetUISettings().format.coordinate_format);
 
 #ifdef HAVE_MODEL_TYPE
   global_model_type = CommonInterface::GetSystemSettings().model_type;
@@ -133,18 +133,14 @@ AfterStartup()
 {
   StartupLogFreeRamAndStorage();
 
-  CommonInterface::status_messages.Startup(true);
-
   if (is_simulator()) {
     InputEvents::processGlideComputer(GCE_STARTUP_SIMULATOR);
   } else {
     InputEvents::processGlideComputer(GCE_STARTUP_REAL);
   }
 
-  const TaskFactoryType task_type_default =
-    CommonInterface::GetComputerSettings().task.task_type_default;
-  OrderedTask *defaultTask =
-    protected_task_manager->TaskCreateDefault(&way_points, task_type_default);
+  OrderedTask *defaultTask = LoadDefaultTask(CommonInterface::GetComputerSettings().task,
+                                             &way_points);
   if (defaultTask) {
     {
       ScopeSuspendAllThreads suspend;
@@ -158,14 +154,15 @@ AfterStartup()
 
   task_manager->Resume();
 
+#ifdef USE_GDI
   CommonInterface::main_window->Fullscreen();
+#endif
+
   InfoBoxManager::SetDirty();
 
   dlgStartupAssistantShowModal(true);
 
   ForceCalculation();
-
-  CommonInterface::status_messages.Startup(false);
 }
 
 /**
@@ -201,7 +198,7 @@ Startup()
     style.Resizable();
 
   MainWindow *const main_window = CommonInterface::main_window =
-    new MainWindow(CommonInterface::status_messages);
+    new MainWindow();
   main_window->Create(SystemWindowSize(), style);
   if (!main_window->IsDefined())
     return false;
@@ -214,6 +211,9 @@ Startup()
 #ifdef HAVE_OES_DRAW_TEXTURE
             "oesdt=%d "
 #endif
+#ifdef HAVE_DYNAMIC_MULTI_DRAW_ARRAYS
+            "mda=%d "
+#endif
             "npot=%d vbo=%d fbo=%d stencil=%#x",
 #ifdef HAVE_DYNAMIC_EGL
              OpenGL::egl,
@@ -221,12 +221,16 @@ Startup()
 #ifdef HAVE_OES_DRAW_TEXTURE
             OpenGL::oes_draw_texture,
 #endif
+#ifdef HAVE_DYNAMIC_MULTI_DRAW_ARRAYS
+            GLExt::HaveMultiDrawElements(),
+#endif
              OpenGL::texture_non_power_of_two,
              OpenGL::vertex_buffer_object,
             OpenGL::frame_buffer_object,
             OpenGL::render_buffer_stencil);
 #endif
 
+  CommonInterface::SetUISettings().SetDefaults();
   main_window->Initialise();
 
 #ifdef SIMULATOR_AVAILABLE
@@ -250,7 +254,6 @@ Startup()
 
   CommonInterface::SetSystemSettings().SetDefaults();
   CommonInterface::SetComputerSettings().SetDefaults();
-  CommonInterface::SetUISettings().SetDefaults();
   CommonInterface::SetUIState().Clear();
 
   const auto &computer_settings = CommonInterface::GetComputerSettings();
@@ -276,7 +279,6 @@ Startup()
 
   ReadLanguageFile();
 
-  CommonInterface::status_messages.LoadFile();
   InputEvents::readFile();
 
   // Initialize DeviceBlackboard
@@ -290,11 +292,8 @@ Startup()
   }
 #endif
 
-  DeviceListInitialise();
-
-  // Initialize Markers
-  marks = new Markers();
-  protected_marks = new ProtectedMarkers(*marks);
+  devices = new MultipleDevices();
+  device_blackboard->SetDevices(*devices);
 
 #ifdef HAVE_AYGSHELL_DLL
   const AYGShellDLL &ayg = main_window->ayg_shell_dll;
@@ -337,11 +336,18 @@ Startup()
 
   replay = new Replay(logger, *protected_task_manager);
 
+#ifdef HAVE_CMDLINE_REPLAY
+  if (CommandLine::replay_path != nullptr)
+    replay->Start(CommandLine::replay_path);
+#endif
+
+
   GlidePolar &gp = CommonInterface::SetComputerSettings().polar.glide_polar_task;
   gp = GlidePolar(fixed(0));
   gp.SetMC(computer_settings.task.safety_mc);
   gp.SetBugs(computer_settings.polar.degradation_factor);
-  PlaneGlue::FromProfile(CommonInterface::SetComputerSettings().plane);
+  PlaneGlue::FromProfile(CommonInterface::SetComputerSettings().plane,
+                         Profile::map);
   PlaneGlue::Synchronize(computer_settings.plane,
                          CommonInterface::SetComputerSettings(), gp);
   task_manager->SetGlidePolar(gp);
@@ -368,7 +374,8 @@ Startup()
 
   // Scan for weather forecast
   LogFormat("RASP load");
-  RASP.ScanAll(CommonInterface::Basic().location, operation);
+  rasp = new RasterWeatherStore();
+  rasp->ScanAll(CommonInterface::Basic().location, operation);
 
   // Reads the airspace files
   ReadAirspace(airspace_database, terrain, computer_settings.pressure,
@@ -404,7 +411,7 @@ Startup()
   operation.SetText(_("Initialising display"));
 
   GlueMapWindow *map_window = main_window->GetMap();
-  if (map_window != NULL) {
+  if (map_window != nullptr) {
     map_window->SetWaypoints(&way_points);
     map_window->SetTask(protected_task_manager);
     map_window->SetRoutePlanner(&glide_computer->GetProtectedRoutePlanner());
@@ -413,9 +420,7 @@ Startup()
 
     map_window->SetTopography(topography);
     map_window->SetTerrain(terrain);
-    map_window->SetWeather(&RASP);
-    map_window->SetMarks(protected_marks);
-    map_window->SetLogger(logger);
+    map_window->SetWeather(rasp);
 
 #ifdef HAVE_NOAA
     map_window->SetNOAAStore(noaa_store);
@@ -514,22 +519,26 @@ Shutdown()
   global_running = false;
 
 #ifdef HAVE_TRACKING
-  if (tracking != NULL)
+  if (tracking != nullptr)
     tracking->StopAsync();
 #endif
 
   // Stop logger and save igc file
   operation.SetText(_("Shutdown, saving logs..."));
-  logger->GUIStopLogger(CommonInterface::Basic(), true);
+  if (logger != nullptr)
+    logger->GUIStopLogger(CommonInterface::Basic(), true);
 
   delete flight_logger;
-  flight_logger = NULL;
+  flight_logger = nullptr;
 
   delete all_monitors;
   all_monitors = nullptr;
 
-  live_blackboard.RemoveListener(*glide_computer_events);
-  delete glide_computer_events;
+  if (glide_computer_events != nullptr) {
+    live_blackboard.RemoveListener(*glide_computer_events);
+    delete glide_computer_events;
+    glide_computer_events = nullptr;
+  }
 
   SaveFlarmColors();
 
@@ -545,28 +554,40 @@ Shutdown()
   Net::DownloadManager::BeginDeinitialise();
 #endif
 #ifndef ENABLE_OPENGL
-  draw_thread->BeginStop();
+  if (draw_thread != nullptr)
+    draw_thread->BeginStop();
 #endif
-  calculation_thread->BeginStop();
-  merge_thread->BeginStop();
+
+  if (calculation_thread != nullptr)
+    calculation_thread->BeginStop();
+
+  if (merge_thread != nullptr)
+    merge_thread->BeginStop();
 
   // Wait for the calculations thread to finish
   LogFormat("Waiting for calculation thread");
 
-  merge_thread->Join();
-  delete merge_thread;
-  merge_thread = NULL;
+  if (merge_thread != nullptr) {
+    merge_thread->Join();
+    delete merge_thread;
+    merge_thread = nullptr;
+  }
 
-  calculation_thread->Join();
-  delete calculation_thread;
-  calculation_thread = NULL;
+  if (calculation_thread != nullptr) {
+    calculation_thread->Join();
+    delete calculation_thread;
+    calculation_thread = nullptr;
+  }
 
   //  Wait for the drawing thread to finish
 #ifndef ENABLE_OPENGL
   LogFormat("Waiting for draw thread");
 
-  draw_thread->Join();
-  delete draw_thread;
+  if (draw_thread != nullptr) {
+    draw_thread->Join();
+    delete draw_thread;
+    draw_thread = nullptr;
+  }
 #endif
 
   LogFormat("delete MapWindow");
@@ -579,7 +600,8 @@ Shutdown()
   operation.SetText(_("Shutdown, saving task..."));
 
   LogFormat("Save default task");
-  protected_task_manager->TaskSaveDefault();
+  if (protected_task_manager != nullptr)
+    protected_task_manager->TaskSaveDefault();
 
   // Clear waypoint database
   way_points.Clear();
@@ -587,15 +609,15 @@ Shutdown()
   operation.SetText(_("Shutdown, please wait..."));
 
   // Clear weather database
-  RASP.Close();
+  delete rasp;
+  rasp = nullptr;
 
   // Clear terrain database
 
   delete terrain;
+  terrain = nullptr;
   delete topography;
-
-  delete protected_marks;
-  delete marks;
+  topography = nullptr;
 
   // Close any device connections
   devShutdown();
@@ -603,25 +625,32 @@ Shutdown()
   NMEALogger::Shutdown();
 
   delete replay;
+  replay = nullptr;
 
-  DeviceListDeinitialise();
-
+  delete devices;
+  devices = nullptr;
   delete device_blackboard;
-  device_blackboard = NULL;
+  device_blackboard = nullptr;
 
-  protected_task_manager->SetRoutePlanner(NULL);
+  if (protected_task_manager != nullptr) {
+    protected_task_manager->SetRoutePlanner(nullptr);
+    delete protected_task_manager;
+    protected_task_manager = nullptr;
+  }
 
-  delete protected_task_manager;
   delete task_manager;
+  task_manager = nullptr;
 
 #ifdef HAVE_NOAA
   delete noaa_store;
+  noaa_store = nullptr;
 #endif
 
 #ifdef HAVE_TRACKING
-  if (tracking != NULL) {
+  if (tracking != nullptr) {
     tracking->WaitStopped();
     delete tracking;
+    tracking = nullptr;
   }
 #endif
 
@@ -634,8 +663,11 @@ Shutdown()
   operation.Hide();
 
   delete glide_computer;
+  glide_computer = nullptr;
   delete task_events;
+  task_events = nullptr;
   delete logger;
+  logger = nullptr;
 
   // Clear airspace database
   airspace_database.Clear();
@@ -644,6 +676,7 @@ Shutdown()
   DeinitTrafficGlobals();
 
   delete file_cache;
+  file_cache = nullptr;
 
   LogFormat("Close Windows - main");
   main_window->Destroy();

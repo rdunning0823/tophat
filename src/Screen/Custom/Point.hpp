@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,45 +24,24 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_CUSTOM_POINT_HPP
 #define XCSOAR_SCREEN_CUSTOM_POINT_HPP
 
+#include "Math/Point2D.hpp"
+
 struct PixelSize;
 
-struct RasterPoint {
+struct RasterPoint : Point2D<PixelScalar> {
   /**
    * Type to be used by vector math, where a range of
    * max(GLvalue)*max(GLvalue) is needed.
    */
-  typedef int SquareType;
-  PixelScalar x, y;
+  typedef int product_type;
 
   RasterPoint() = default;
 
-  constexpr RasterPoint(int _x, int _y)
-    :x(_x), y(_y) {}
+  template<typename... Args>
+  constexpr RasterPoint(Args&&... args)
+    :Point2D<PixelScalar>(args...) {}
 
-  bool operator==(const RasterPoint &other) const {
-    return x == other.x && y == other.y;
-  }
-
-  bool operator!=(const RasterPoint &other) const {
-    return !(*this == other);
-  }
-
-  constexpr RasterPoint operator+(RasterPoint other) const {
-    return { x + other.x, y + other.y };
-  }
-
-  RasterPoint &operator+=(RasterPoint other) {
-    x += other.x;
-    y += other.y;
-    return *this;
-  }
-
-  RasterPoint &operator-=(RasterPoint other) {
-    x -= other.x;
-    y -= other.y;
-    return *this;
-  }
-
+  using Point2D<PixelScalar>::operator+;
   constexpr RasterPoint operator+(PixelSize size) const;
 };
 
@@ -91,6 +70,14 @@ RasterPoint::operator+(PixelSize size) const {
   return { x + size.cx, y + size.cy };
 }
 
+/**
+ * @brief PixelRect structure and operations
+ *
+ * Provides support for creating and manipulating PixelRect structures
+ *
+ * @note This structure follows the GDI convention of the {right, bottom} coordinates being
+ * immediately outside the rectangle being specified.
+ */
 struct PixelRect {
   PixelScalar left, top, right, bottom;
 

@@ -3,7 +3,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,30 +25,15 @@ Copyright_License {
 #ifndef TOPOGRAPHY_XSHAPE_POINT_HPP
 #define TOPOGRAPHY_XSHAPE_POINT_HPP
 
-#include "Screen/Point.hpp"
+#include "Math/Point2D.hpp"
 
-typedef int32_t ShapeScalar;
-struct ShapePoint {
-  /**
-   * Type to be used by vector math, where a range of
-   * max(ShapeScalar)*max(ShapeScalar) is needed.
-   */
-  typedef float SquareType;
-  ShapeScalar x, y;
+struct ShapePoint : FloatPoint {
+  ShapePoint() = default;
 
-  bool operator==(const ShapePoint &other) const {
-    return x == other.x && y == other.y;
-  }
-
-  bool operator!=(const ShapePoint &other) const {
-    return !(*this == other);
-  }
+  template<typename... Args>
+  constexpr ShapePoint(Args&&... args):FloatPoint(args...) {}
 };
 
-static inline unsigned
-manhattan_distance(ShapePoint a, ShapePoint b)
-{
-  return abs(a.x - b.x) + abs(a.y - b.y);
-}
+typedef ShapePoint::scalar_type ShapeScalar;
 
 #endif

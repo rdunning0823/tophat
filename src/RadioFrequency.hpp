@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@ public:
     return { 0 };
   }
 
-  bool IsDefined() const {
+  constexpr bool IsDefined() const {
     return value != 0;
   }
 
@@ -70,8 +70,13 @@ public:
     value = 0;
   }
 
+#ifdef NDEBUG
+  constexpr
+#endif
   unsigned GetKiloHertz() const {
+#ifndef NDEBUG
     assert(IsDefined());
+#endif
 
     return BASE_KHZ + value;
   }

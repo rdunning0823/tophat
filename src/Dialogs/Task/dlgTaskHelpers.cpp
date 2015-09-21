@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ Copyright_License {
 #include "Units/Units.hpp"
 #include "Task/TypeStrings.hpp"
 #include "Task/ValidationErrorStrings.hpp"
-#include "Task/ProtectedTaskManager.hpp"
+#include "Task/SaveFile.hpp"
 #include "Task/ObservationZones/CylinderZone.hpp"
 #include "Task/ObservationZones/SectorZone.hpp"
 #include "Task/ObservationZones/LineSectorZone.hpp"
@@ -37,7 +37,6 @@ Copyright_License {
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Engine/Task/Points/Type.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
-#include "Components.hpp"
 #include "LocalPath.hpp"
 #include "OS/FileUtil.hpp"
 #include "Formatter/UserUnits.hpp"
@@ -291,21 +290,20 @@ OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* buffer)
 bool
 OrderedTaskSave(OrderedTask &task)
 {
-  assert(protected_task_manager != nullptr);
-
   TCHAR fname[69] = _T("");
   CopyString(fname, task.GetTaskName(), StringLength(task.GetTaskName()) + 1);
 
   if (!TextEntryDialog(fname, 64, _("Enter a task name")))
     return false;
 
-  task.SetTaskName(fname);
+  task.SetName(fname);
   TCHAR path[MAX_PATH];
   LocalPath(path, _T("tasks"));
   Directory::Create(path);
 
   _tcscat(fname, _T(".tsk"));
+  task.SetName(StaticString<64>(fname));
   LocalPath(path, _T("tasks"), fname);
-  protected_task_manager->TaskSave(path, task);
+  SaveTask(path, task);
   return true;
 }

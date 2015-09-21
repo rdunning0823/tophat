@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -97,7 +97,7 @@ ATCReferencePanel::UpdateValues()
   TCHAR buffer[64];
   if (location.IsValid()) {
     FormatGeoPoint(location, buffer, ARRAY_SIZE(buffer),
-                   CommonInterface::GetUISettings().coordinate_format);
+                   CommonInterface::GetUISettings().format.coordinate_format);
     location_string = buffer;
   } else
     location_string = _T("---");

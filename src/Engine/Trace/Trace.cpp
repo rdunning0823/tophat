@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,8 +29,7 @@ Copyright_License {
 
 Trace::Trace(const unsigned _no_thin_time, const unsigned max_time,
              const unsigned max_size)
-  :chronological_list(ListHead::empty()),
-   cached_size(0),
+  :cached_size(0),
    max_time(max_time),
    no_thin_time(_no_thin_time),
    max_size(max_size),
@@ -43,17 +42,17 @@ void
 Trace::clear()
 {
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
 
   average_delta_distance = 0;
   average_delta_time = 0;
 
   delta_list.clear();
-  chronological_list.Clear();
+  chronological_list.clear_and_dispose(MakeDisposer());
   cached_size = 0;
 
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
 
   ++modify_serial;
   ++append_serial;
@@ -76,48 +75,39 @@ void
 Trace::UpdateDelta(TraceDelta &td)
 {
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
 
-  if (chronological_list.IsEdge(td))
+  if (&td == &chronological_list.front() ||
+      &td == &chronological_list.back())
     return;
 
-  const TraceDelta &previous = td.GetPrevious();
-  const TraceDelta &next = td.GetNext();
+  const auto ci = chronological_list.iterator_to(td);
+  const TraceDelta &previous = *std::prev(ci);
+  const TraceDelta &next = *std::next(ci);
 
-  TraceDelta temp_td = td;
-  temp_td.SetDisconnected();
-
-  td.Replace(temp_td);
-
-  // erase old one
-  auto i = delta_list.find(td);
-  assert(i != delta_list.end());
-  delta_list.erase(i);
-
-  // insert new in sorted position
-  temp_td.Update(previous.point, next.point);
-  TraceDelta &new_td = Insert(temp_td);
-  new_td.SetDisconnected();
-  temp_td.Replace(new_td);
+  delta_list.erase(delta_list.iterator_to(td));
+  td.Update(previous.point, next.point);
+  delta_list.insert(td);
 }
 
 void
-Trace::EraseInside(TraceDelta::iterator it)
+Trace::EraseInside(DeltaList::iterator it)
 {
   assert(cached_size > 0);
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
   assert(it != delta_list.end());
 
   const TraceDelta &td = *it;
   assert(!td.IsEdge());
 
-  TraceDelta &previous = const_cast<TraceDelta &>(td.GetPrevious());
-  TraceDelta &next = const_cast<TraceDelta &>(td.GetNext());
+  const auto ci = chronological_list.iterator_to(td);
+  TraceDelta &previous = const_cast<TraceDelta &>(*std::prev(ci));
+  TraceDelta &next = const_cast<TraceDelta &>(*std::next(ci));
 
   // now delete the item
-  td.RemoveConst();
-  delta_list.erase(it);
+  chronological_list.erase(chronological_list.iterator_to(td));
+  delta_list.erase_and_dispose(it, MakeDisposer());
   --cached_size;
 
   // and update the deltas
@@ -129,16 +119,16 @@ bool
 Trace::EraseDelta(const unsigned target_size, const unsigned recent)
 {
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
 
-  if (size() < 2)
+  if (size() <= 2)
     return false;
 
   bool modified = false;
 
   const unsigned recent_time = GetRecentTime(recent);
 
-  TraceDelta::iterator candidate = delta_list.begin();
+  auto candidate = delta_list.begin();
   while (size() > target_size) {
     const TraceDelta &td = *candidate;
     if (!td.IsEdge() && td.point.GetTime() < recent_time) {
@@ -162,12 +152,13 @@ Trace::EraseEarlierThan(const unsigned p_time)
     return false;
 
   do {
-    TraceDelta &td = GetFront();
-    td.Remove();
+    auto ci = chronological_list.begin();
+    TraceDelta &td = *ci;
+    chronological_list.erase(ci);
 
     auto i = delta_list.find(td);
     assert(i != delta_list.end());
-    delta_list.erase(i);
+    delta_list.erase_and_dispose(i, MakeDisposer());
 
     --cached_size;
   } while (!empty() && GetFront().point.GetTime() < p_time);
@@ -191,11 +182,11 @@ Trace::EraseLaterThan(const unsigned min_time)
   while (!empty() && GetBack().point.GetTime() > min_time) {
     TraceDelta &td = GetBack();
 
-    td.Remove();
+    chronological_list.erase(chronological_list.iterator_to(td));
 
     auto i = delta_list.find(td);
     assert(i != delta_list.end());
-    delta_list.erase(i);
+    delta_list.erase_and_dispose(i, MakeDisposer());
 
     --cached_size;
   }
@@ -206,42 +197,25 @@ Trace::EraseLaterThan(const unsigned min_time)
     EraseStart(GetBack());
 }
 
-Trace::TraceDelta &
-Trace::Insert(const TraceDelta &td) {
-  TraceDelta::iterator it = delta_list.insert(td);
-
-  /* std::set doesn't allow modification of an item, but we
-     override that */
-  TraceDelta &new_td = const_cast<TraceDelta &>(*it);
-  return new_td;
-}
-
 /**
  * Update start node (and neighbour) after min time pruning
  */
 void
-Trace::EraseStart(TraceDelta &td_start) {
-  TraceDelta temp_td = td_start;
-  temp_td.SetDisconnected();
-  td_start.Replace(temp_td);
+Trace::EraseStart(TraceDelta &td)
+{
+  delta_list.erase(delta_list.iterator_to(td));
 
-  auto i_start = delta_list.find(td_start);
-  assert(i_start != delta_list.end());
-  delta_list.erase(i_start);
+  td.elim_distance = null_delta;
+  td.elim_time = null_time;
 
-  temp_td.elim_distance = null_delta;
-  temp_td.elim_time = null_time;
-
-  TraceDelta &new_td = Insert(temp_td);
-  new_td.SetDisconnected();
-  temp_td.Replace(new_td);
+  delta_list.insert(td);
 }
 
 void
 Trace::push_back(const TracePoint &point)
 {
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
 
   if (empty()) {
     // first point determines origin for flat projection
@@ -270,14 +244,17 @@ Trace::push_back(const TracePoint &point)
 
   assert(size() < max_size);
 
-  TraceDelta &td = Insert(point);
-  td.point.Project(task_projection);
-  td.InsertBefore(chronological_list);
+  TraceDelta *td = allocator.allocate(1);
+  allocator.construct(td, point);
+  td->point.Project(task_projection);
+
+  delta_list.insert(*td);
+  chronological_list.push_back(*td);
 
   ++cached_size;
 
-  if (!chronological_list.IsFirst(td))
-    UpdateDelta(td.GetPrevious());
+  if (td != &chronological_list.front())
+    UpdateDelta(*std::prev(chronological_list.iterator_to(*td)));
 
   ++append_serial;
 }
@@ -289,8 +266,8 @@ Trace::CalcAverageDeltaDistance(const unsigned no_thin) const
   unsigned acc = 0;
   unsigned counter = 0;
 
-  const ChronologicalConstIterator end = chronological_list.end();
-  for (ChronologicalConstIterator it = chronological_list.begin();
+  const auto end = chronological_list.end();
+  for (auto it = chronological_list.begin();
        it != end && it->point.GetTime() < r; ++it, ++counter)
     acc += it->delta_distance;
 
@@ -307,8 +284,8 @@ Trace::CalcAverageDeltaTime(const unsigned no_thin) const
   unsigned counter = 0;
 
   /* find the last item before the "r" timestamp */
-  const ChronologicalConstIterator end = chronological_list.end();
-  ChronologicalConstIterator it;
+  const auto end = chronological_list.end();
+  ChronologicalList::const_iterator it;
   for (it = chronological_list.begin(); it != end && it->point.GetTime() < r; ++it)
     ++counter;
 
@@ -361,7 +338,7 @@ void
 Trace::Thin()
 {
   assert(cached_size == delta_list.size());
-  assert(cached_size == chronological_list.Count());
+  assert(cached_size == chronological_list.size());
   assert(size() == max_size);
 
   Thin2();

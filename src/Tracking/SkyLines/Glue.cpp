@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,11 @@ Copyright_License {
 
 #include "Glue.hpp"
 #include "Settings.hpp"
+#include "Queue.hpp"
+#include "Assemble.hpp"
 #include "NMEA/Info.hpp"
+#include "Net/State.hpp"
+#include "Net/IPv4Address.hxx"
 
 #ifdef HAVE_POSIX
 #include "IO/Async/GlobalIOThread.hpp"
@@ -32,15 +36,84 @@ Copyright_License {
 #include <assert.h>
 
 SkyLinesTracking::Glue::Glue()
-  :interval(0), clock(fixed(10))
+  :interval(0),
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
-  , traffic_clock(fixed(60)), traffic_enabled(false)
+   traffic_enabled(false),
+   near_traffic_enabled(false),
 #endif
+   roaming(true),
+   queue(nullptr)
 {
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   assert(io_thread != nullptr);
   client.SetIOThread(io_thread);
 #endif
+}
+
+SkyLinesTracking::Glue::~Glue()
+{
+  delete queue;
+}
+
+inline bool
+SkyLinesTracking::Glue::IsConnected() const
+{
+  switch (GetNetState()) {
+  case NetState::UNKNOWN:
+  case NetState::DISCONNECTED:
+    return false;
+
+  case NetState::CONNECTED:
+    return true;
+
+  case NetState::ROAMING:
+    return roaming;
+  }
+
+  assert(false);
+  gcc_unreachable();
+}
+
+inline void
+SkyLinesTracking::Glue::SendFixes(const NMEAInfo &basic)
+{
+  assert(client.IsDefined());
+
+  if (!basic.time_available) {
+    clock.Reset();
+    return;
+  }
+
+  if (!IsConnected()) {
+    if (clock.CheckAdvance(basic.time, fixed(interval))) {
+      /* queue the packet, send it later */
+      if (queue == nullptr)
+        queue = new Queue();
+      queue->Push(ToFix(client.GetKey(), basic));
+    }
+
+    return;
+  }
+
+  if (queue != nullptr) {
+    /* send queued fix packets, 8 at a time */
+    unsigned n = 8;
+    while (n-- > 0) {
+      const auto &packet = queue->Peek();
+      if (!client.SendPacket(packet))
+        break;
+
+      queue->Pop();
+      if (queue->IsEmpty()) {
+        delete queue;
+        queue = nullptr;
+        break;
+      }
+    }
+
+    return;
+  } else if (clock.CheckAdvance(basic.time, fixed(interval)))
+    client.SendFix(basic);
 }
 
 void
@@ -49,41 +122,38 @@ SkyLinesTracking::Glue::Tick(const NMEAInfo &basic)
   if (!client.IsDefined())
     return;
 
-  if (!basic.time_available) {
-    clock.Reset();
-#ifdef HAVE_SKYLINES_TRACKING_HANDLER
-    traffic_clock.Reset();
-#endif
+  if (basic.location_available && !basic.gps.real)
+    /* disable in simulator/replay */
     return;
-  }
 
-  if (clock.CheckAdvance(basic.time))
-    client.SendFix(basic);
+  SendFixes(basic);
 
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
-  if (traffic_enabled && traffic_clock.CheckAdvance(basic.time))
-    client.SendTrafficRequest(true, true);
+  if (traffic_enabled && traffic_clock.CheckAdvance(basic.clock, fixed(60)))
+    client.SendTrafficRequest(true, true, near_traffic_enabled);
 #endif
 }
 
 void
 SkyLinesTracking::Glue::SetSettings(const Settings &settings)
 {
-  client.SetKey(settings.key);
-
-  if (interval != settings.interval) {
-    interval = settings.interval;
-    clock = GPSClock(fixed(std::max(settings.interval, 1u)));
+  if (!settings.enabled || settings.key == 0) {
+    client.Close();
+    return;
   }
 
-  if (!settings.enabled)
-    client.Close();
-  else if (!client.IsDefined())
+  client.SetKey(settings.key);
+
+  interval = settings.interval;
+
+  if (!client.IsDefined())
     // TODO: fix hard-coded IP address:
-    client.Open(SocketAddress::MakeIPv4Port(95, 128, 34, 172,
-                                            Client::GetDefaultPort()));
+    client.Open(IPv4Address(95, 128, 34, 172, Client::GetDefaultPort()));
 
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   traffic_enabled = settings.traffic_enabled;
+  near_traffic_enabled = settings.near_traffic_enabled;
 #endif
+
+  roaming = settings.roaming;
 }

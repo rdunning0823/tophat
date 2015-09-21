@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #include "Time.hpp"
 #include "ComboList.hpp"
 #include "Formatter/TimeFormatter.hpp"
-#include "Util/StringUtil.hpp"
+#include "Util/StringFormat.hpp"
 #include "Util/NumberParser.hpp"
 #include "Asset.hpp"
 
@@ -95,10 +95,9 @@ DataFieldTime::SetFromCombo(int data_field_index, TCHAR *value_string)
 void
 DataFieldTime::AppendComboValue(ComboList &combo_list, int value) const
 {
-  TCHAR buffer[128], buffer2[32];
-  FormatTimespanSmart(buffer, value, max_tokens);
+  TCHAR buffer2[32];
   StringFormatUnsafe(buffer2, _T("%d"), value);
-  combo_list.Append(value, buffer2, buffer);
+  combo_list.Append(value, buffer2, FormatTimespanSmart(value, max_tokens));
 }
 
 ComboList
@@ -132,7 +131,7 @@ DataFieldTime::CreateComboList(const TCHAR *reference_string) const
         /* the current value is not listed - insert it here */
         AppendComboValue(combo_list, reference);
 
-      combo_list.ComboPopupItemSavedIndex = combo_list.size();
+      combo_list.current_index = combo_list.size();
       found_current = true;
     }
 
@@ -143,7 +142,7 @@ DataFieldTime::CreateComboList(const TCHAR *reference_string) const
     /* the current value out of range - append it here */
     last = reference;
     AppendComboValue(combo_list, reference);
-    combo_list.ComboPopupItemSavedIndex = combo_list.size();
+    combo_list.current_index = combo_list.size();
   }
 
   if (last < max)

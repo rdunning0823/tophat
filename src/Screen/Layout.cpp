@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,62 +23,110 @@ Copyright_License {
 
 #include "Screen/Layout.hpp"
 #include "Hardware/DisplayDPI.hpp"
+#include "Hardware/DisplaySize.hpp"
 
 #include <algorithm>
 
 namespace Layout
 {
   bool landscape = false;
-  int scale = 1;
+  unsigned min_screen_pixels = 512;
+  unsigned scale = 1;
   unsigned scale_1024 = 1024;
   unsigned small_scale = 1024;
   unsigned pen_width_scale = 1024;
-  UPixelScalar text_padding = 2;
-  UPixelScalar minimum_control_height = 20, maximum_control_height = 44;
-  UPixelScalar hit_radius = 10;
+  unsigned pt_scale = 1024;
+  unsigned vpt_scale = 1024;
+  unsigned font_scale = 1024;
+  unsigned text_padding = 2;
+  unsigned minimum_control_height = 20, maximum_control_height = 44;
+  unsigned hit_radius = 10;
 }
 
-unsigned
-Layout::GetXDPI()
+/**
+ * Is the given pixel size smaller than 5 inch?
+ */
+static constexpr bool
+IsSmallScreen(unsigned size, unsigned dpi)
 {
-  return Display::GetXDPI();
+  return size < dpi * 5;
+}
+
+/**
+ * Is the small edge smaller than 5 inch?
+ */
+static constexpr bool
+IsSmallScreen(unsigned width, unsigned height,
+              unsigned x_dpi, unsigned y_dpi)
+{
+  return width < height
+    ? IsSmallScreen(width, x_dpi)
+    : IsSmallScreen(height, y_dpi);
+}
+
+/**
+ * Is the small edge smaller than 5 inch?
+ */
+static constexpr bool
+IsSmallScreen(PixelSize size,
+              unsigned x_dpi, unsigned y_dpi)
+{
+  return IsSmallScreen(size.cx, size.cy, x_dpi, y_dpi);
 }
 
 void
-Layout::Initialize(PixelSize new_size)
+Layout::Initialize(PixelSize new_size, unsigned ui_scale)
 {
   const unsigned width = new_size.cx, height = new_size.cy;
 
+  min_screen_pixels = std::min(width, height);
   landscape = width > height;
   const bool square = width == height;
 
   if (!ScaleSupported())
     return;
 
-  const unsigned x_dpi = GetXDPI();
+  const unsigned x_dpi = Display::GetXDPI();
+  const unsigned y_dpi = Display::GetYDPI();
+  const bool is_small_screen = IsSmallScreen(Display::GetSize(new_size),
+                                             x_dpi, y_dpi);
 
-  unsigned minsize = std::min(width, height);
   // always start w/ shortest dimension
   // square should be shrunk
-  scale_1024 = std::max(1024U, minsize * 1024 / (square ? 320 : 240));
+  scale_1024 = std::max(1024U, min_screen_pixels * 1024 / (square ? 320 : 240));
   scale = scale_1024 / 1024;
 
   small_scale = (scale_1024 - 1024) / 2 + 1024;
 
   pen_width_scale = std::max(1024u, x_dpi * 1024u / 80u);
 
-  text_padding = Scale(2);
+  pt_scale = 1024 * y_dpi / 72;
 
-  minimum_control_height = Scale(30);
+  vpt_scale = pt_scale;
+  if (is_small_screen)
+    /* small screens (on portable devices) use a smaller font because
+       the viewing distance is usually smaller */
+    vpt_scale = vpt_scale * 2 / 3;
 
-  if (UseTouchScreenLayout()) {
+  font_scale = 1024 * y_dpi * ui_scale / 72 / 100;
+  if (is_small_screen)
+    /* small screens (on portable devices) use a smaller font because
+       the viewing distance is usually smaller */
+    font_scale = font_scale * 2 / 3;
+
+  text_padding = VptScale(2);
+
+  minimum_control_height = std::min(FontScale(23),
+                                    min_screen_pixels / 12);
+
+  if (HasTouchScreen()) {
     /* larger rows for touch screens */
-    maximum_control_height = Display::GetYDPI() * 3 / 7;
+    maximum_control_height = PtScale(30);
     if (maximum_control_height < minimum_control_height)
       maximum_control_height = minimum_control_height;
   } else {
     maximum_control_height = minimum_control_height;
   }
 
-  hit_radius = x_dpi / (UseTouchScreenLayout() ? 3 : 12);
+  hit_radius = PtScale(HasTouchScreen() ? 24 : 6);
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,6 +30,7 @@ Copyright_License {
 #include <stddef.h>
 
 class OperationEnvironment;
+class PortListener;
 class DataHandler;
 class TimeoutClock;
 
@@ -66,10 +67,12 @@ public:
   };
 
 protected:
+  PortListener *const listener;
+
   DataHandler &handler;
 
 public:
-  Port(DataHandler &_handler);
+  Port(PortListener *_listener, DataHandler &_handler);
   virtual ~Port();
 
   /**
@@ -272,6 +275,13 @@ public:
    */
   WaitResult WaitForChar(const char token, OperationEnvironment &env,
                          unsigned timeout_ms);
+
+protected:
+  /**
+   * Implementations should call this method whenever the return value
+   * of GetState() would change.
+   */
+  void StateChanged();
 };
 
 #endif

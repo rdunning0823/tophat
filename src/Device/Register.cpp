@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -48,7 +48,6 @@ Copyright_License {
 #include "Device/Driver/Flytec.hpp"
 #include "Device/Driver/ILEC.hpp"
 #include "Device/Driver/Westerboer.hpp"
-#include "Device/Driver/WesterboerVW921.hpp"
 #include "Device/Driver/FLARM.hpp"
 #include "Device/Driver/FlyNet.hpp"
 #include "Device/Driver/CProbe.hpp"
@@ -56,12 +55,14 @@ Copyright_License {
 #include "Device/Driver/BlueFlyVario.hpp"
 #include "Device/Driver/OpenVario.hpp"
 #include "Device/Driver/Vaulter.hpp"
+#include "Device/Driver/ATR833.hpp"
 #include "Util/Macros.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <assert.h>
 #include <string.h>
 
-/** NULL terminated array of available device drivers. */
+/** nullptr terminated array of available device drivers. */
 static const struct DeviceRegister *const driver_list[] = {
   // IMPORTANT: ADD NEW ONES TO BOTTOM OF THIS LIST
   &generic_driver, // MUST BE FIRST
@@ -87,7 +88,6 @@ static const struct DeviceRegister *const driver_list[] = {
   &westerboer_driver,
   &imi_driver,
   &flarm_driver,
-  &westerboer_vw921_driver,
   &flynet_driver,
   &gt_altimeter_driver,
   &c_probe_driver,
@@ -97,7 +97,10 @@ static const struct DeviceRegister *const driver_list[] = {
   &cai_lnav_driver,
   &open_vario_driver,
   &vaulter_driver,
-  NULL
+  /* disabled due to http://bugs.xcsoar.org/ticket/3585 and
+     http://bugs.xcsoar.org/ticket/3586 - scheduled for deletion */
+  &atr833_driver,
+  nullptr
 };
 
 const struct DeviceRegister *
@@ -111,9 +114,9 @@ GetDriverByIndex(unsigned i)
 const struct DeviceRegister *
 FindDriverByName(const TCHAR *name)
 {
-  for (auto i = driver_list; *i != NULL; ++i) {
+  for (auto i = driver_list; *i != nullptr; ++i) {
     const DeviceRegister &driver = **i;
-    if (_tcscmp(driver.name, name) == 0)
+    if (StringIsEqual(driver.name, name))
       return &driver;
   }
 
@@ -123,11 +126,11 @@ FindDriverByName(const TCHAR *name)
 const TCHAR *
 FindDriverDisplayName(const TCHAR *name)
 {
-  assert(name != NULL);
+  assert(name != nullptr);
 
-  for (auto i = driver_list; *i != NULL; ++i) {
+  for (auto i = driver_list; *i != nullptr; ++i) {
     const DeviceRegister &driver = **i;
-    if (_tcscmp(driver.name, name) == 0)
+    if (StringIsEqual(driver.name, name))
       return driver.display_name;
   }
 

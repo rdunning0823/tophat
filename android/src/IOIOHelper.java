@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -66,6 +66,8 @@ final class IOIOHelper implements IOIOConnectionHolder,
     final String[] bootstraps = new String[]{
       "ioio.lib.impl.SocketIOIOConnectionBootstrap",
       "ioio.lib.android.accessory.AccessoryConnectionBootstrap",
+      "ioio.lib.android.bluetooth.BluetoothIOIOConnectionBootstrap",
+      "ioio.lib.android.device.DeviceConnectionBootstrap",
     };
 
     IOIOConnectionRegistry.addBootstraps(bootstraps);

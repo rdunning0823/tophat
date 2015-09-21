@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -74,6 +74,11 @@ struct BrokenDate {
     return year > other.year ||
       (year == other.year && (month > other.month ||
                               (month == other.month && day > other.day)));
+  }
+
+  constexpr
+  bool operator<(const BrokenDate other) const {
+    return other > *this;
   }
 
   /**

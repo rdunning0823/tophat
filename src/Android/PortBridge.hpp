@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,13 +24,17 @@ Copyright_License {
 #ifndef XCSOAR_ANDROID_PORT_BRIDGE_HPP
 #define XCSOAR_ANDROID_PORT_BRIDGE_HPP
 
-#include "Java/Object.hpp"
+#include "Java/Object.hxx"
 
+#include <stddef.h>
+
+class PortListener;
 class DataHandler;
 
 class PortBridge : protected Java::Object {
   static jmethodID close_method;
   static jmethodID setListener_method;
+  static jmethodID setInputListener_method;
   static jmethodID getState_method;
   static jmethodID drain_method;
   static jmethodID getBaudRate_method, setBaudRate_method;
@@ -56,7 +60,8 @@ public:
     env->CallVoidMethod(Get(), close_method);
   }
 
-  void setListener(JNIEnv *env, DataHandler *handler);
+  void setListener(JNIEnv *env, PortListener *listener);
+  void setInputListener(JNIEnv *env, DataHandler *handler);
 
   int getState(JNIEnv *env) {
     return env->CallIntMethod(Get(), getState_method);

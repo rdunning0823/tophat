@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "LargeTextWidget.hpp"
 #include "Screen/LargeTextWindow.hpp"
+#include "Screen/Key.h"
 #include "Look/DialogLook.hpp"
 
 void
@@ -41,7 +42,7 @@ LargeTextWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   LargeTextWindow *w = new LargeTextWindow();
   w->Create(parent, rc, style);
-  w->SetFont(*look.text_font);
+  w->SetFont(look.text_font);
   if (text != nullptr)
     w->SetText(text);
 
@@ -54,4 +55,19 @@ LargeTextWidget::Unprepare()
   DeleteWindow();
 }
 
+bool
+LargeTextWidget::KeyPress(unsigned key_code)
+{
+  switch (key_code) {
+  case KEY_UP:
+    ((LargeTextWindow &)GetWindow()).ScrollVertically(-3);
+    return true;
 
+  case KEY_DOWN:
+    ((LargeTextWindow &)GetWindow()).ScrollVertically(3);
+    return true;
+
+  default:
+    return false;
+  }
+}

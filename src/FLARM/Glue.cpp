@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,8 +29,10 @@ Copyright_License {
 #include "Components.hpp"
 #include "MergeThread.hpp"
 #include "IO/DataFile.hpp"
+#include "IO/LineReader.hpp"
 #include "IO/TextWriter.hpp"
 #include "Profile/FlarmProfile.hpp"
+#include "Profile/Current.hpp"
 #include "LogFile.hpp"
 
 /**
@@ -81,7 +83,7 @@ LoadFlarmDatabases()
 
   LoadSecondary(traffic_databases->flarm_names);
   LoadFLARMnet(traffic_databases->flarm_net);
-  Profile::Load(traffic_databases->flarm_colors);
+  Profile::Load(Profile::map, traffic_databases->flarm_colors);
 
   merge_thread->Resume();
 }
@@ -90,7 +92,7 @@ void
 SaveFlarmColors()
 {
   if (traffic_databases != nullptr)
-    Profile::Save(traffic_databases->flarm_colors);
+    Profile::Save(Profile::map, traffic_databases->flarm_colors);
 }
 
 /**

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,15 +25,15 @@ Copyright_License {
 #define XCSOAR_DIALOG_LOOK_HPP
 
 #include "ButtonLook.hpp"
+#include "CheckBoxLook.hpp"
 #include "Screen/Color.hpp"
 #include "Screen/Pen.hpp"
 #include "Screen/Brush.hpp"
+#include "Screen/Font.hpp"
 
 #ifdef EYE_CANDY
 #include "Screen/Bitmap.hpp"
 #endif
-
-class Font;
 
 struct DialogLook {
   struct {
@@ -53,7 +53,7 @@ struct DialogLook {
 
   Brush background_brush;
 
-  const Font *text_font, *small_font;
+  Font text_font, bold_font, small_font;
 
   struct {
     Color background_color, text_color;
@@ -111,11 +111,9 @@ struct DialogLook {
   } list;
 
   ButtonLook button;
+  CheckBoxLook check_box;
 
-  void Initialise(const Font &caption_font,
-                  const Font &text_font, const Font &small_font,
-                  const Font &button_font,
-                  const Font &list_font, const Font &list_font_bold);
+  void Initialise();
 
   void SetBackgroundColor(Color color);
 };

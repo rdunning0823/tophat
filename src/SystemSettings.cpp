@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ SystemSettings::SetDefaults()
     devices[2].path = _T("COM2:");
     devices[2].baud_rate = 38400;
     devices[2].driver_name = _T("NmeaOut");
-  } else if (IsAndroid()) {
+  } else if (IsAndroid() || IsApple()) {
     devices[0].port_type = DeviceConfig::PortType::INTERNAL;
   } else {
     devices[0].port_type = DeviceConfig::PortType::SERIAL;

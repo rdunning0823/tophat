@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -117,9 +117,6 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
                                settings.airspace, basic,
                                calculated);
 
-  if (marks && visible_projection.GetMapScale() <= fixed(30000))
-    builder.AddMarkers(*marks);
-
   if (visible_projection.GetMapScale() <= fixed(4000))
     builder.AddThermals(calculated.thermal_locator, basic, calculated);
 
@@ -152,7 +149,7 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
   ShowMapItemListDialog(list,
                         UIGlobals::GetDialogLook(), look, traffic_look,
                         final_glide_bar_renderer.GetLook(), settings,
-                        glide_computer != NULL
-                        ? &glide_computer->GetAirspaceWarnings() : NULL);
+                        glide_computer != nullptr
+                        ? &glide_computer->GetAirspaceWarnings() : nullptr);
   return true;
 }

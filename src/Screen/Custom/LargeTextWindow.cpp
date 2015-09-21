@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@ Copyright_License {
 #include "Screen/Features.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
+#include "Util/StringAPI.hpp"
 
 #include <string.h>
 
@@ -51,7 +52,7 @@ LargeTextWindow::GetRowCount() const
 
   const TCHAR *str = value.c_str();
   unsigned row_count = 1;
-  while ((str = _tcschr(str, _T('\n'))) != NULL) {
+  while ((str = StringFind(str, _T('\n'))) != nullptr) {
     str++;
     row_count++;
   }
@@ -119,7 +120,11 @@ LargeTextWindow::OnPaint(Canvas &canvas)
   canvas.SetTextColor(COLOR_BLACK);
 
   rc.top -= origin * GetFont().GetHeight();
-  canvas.DrawFormattedText(&rc, value.c_str(), GetTextStyle());
+
+#ifndef USE_GDI
+  canvas.Select(GetFont());
+#endif
+  canvas.DrawFormattedText(&rc, value.c_str(), DT_LEFT | DT_WORDBREAK);
 }
 
 bool
@@ -158,7 +163,7 @@ LargeTextWindow::SetText(const TCHAR *text)
 {
   AssertNoneLocked();
 
-  if (text != NULL)
+  if (text != nullptr)
     value = text;
   else
     value.clear();

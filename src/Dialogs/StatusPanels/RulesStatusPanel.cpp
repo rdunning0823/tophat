@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -60,16 +60,13 @@ RulesStatusPanel::Refresh()
           ? _("Yes") : _T("No"));
 
   if (start_stats.task_started) {
-    FormatLocalTimeHHMM(Temp, (int)start_stats.time,
-                        settings.utc_offset);
-    SetText(StartTime, Temp);
+    SetText(StartTime,
+            FormatLocalTimeHHMM((int)start_stats.time, settings.utc_offset));
 
-    FormatUserTaskSpeed(start_stats.ground_speed,
-                               Temp, ARRAY_SIZE(Temp));
-    SetText(StartSpeed, Temp);
+    SetText(StartSpeed,
+            FormatUserTaskSpeed(start_stats.ground_speed));
 
-    FormatUserAltitude(start_stats.altitude, Temp, ARRAY_SIZE(Temp));
-    SetText(StartHeight, Temp);
+    SetText(StartHeight, FormatUserAltitude(start_stats.altitude));
   } else {
     ClearValue(StartTime);
     ClearValue(StartSpeed);
@@ -93,8 +90,7 @@ RulesStatusPanel::Refresh()
 
   SetText(StartPoint, Temp);
 
-  FormatUserAltitude(finish_height, Temp, ARRAY_SIZE(Temp));
-  SetText(FinishAlt, Temp);
+  SetText(FinishAlt, FormatUserAltitude(finish_height));
 }
 
 void

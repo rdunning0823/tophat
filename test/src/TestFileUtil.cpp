@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,8 +22,7 @@
 
 #include "OS/FileUtil.hpp"
 #include "TestUtil.hpp"
-
-#include <string.h>
+#include "Util/StringAPI.hpp"
 
 class TestingFileVisitor: public File::Visitor
 {
@@ -38,13 +37,13 @@ public:
   void
   Visit(const TCHAR* path, const TCHAR* filename)
   {
-    if (!_tcscmp(filename, _T("a.txt"))) {
+    if (StringIsEqual(filename, _T("a.txt"))) {
       ok(true, "a.txt");
-    } else if (!_tcscmp(filename, _T("b.txt"))) {
+    } else if (StringIsEqual(filename, _T("b.txt"))) {
       ok(true, "b.txt");
-    } else if (!_tcscmp(filename, _T("c.tx"))) {
+    } else if (StringIsEqual(filename, _T("c.tx"))) {
       ok(!filtered, "c.tx");
-    } else if (!_tcscmp(filename, _T("d.txt"))) {
+    } else if (StringIsEqual(filename, _T("d.txt"))) {
       ok(recursive, "d.txt");
     } else {
       ok(false, "unexpected file");

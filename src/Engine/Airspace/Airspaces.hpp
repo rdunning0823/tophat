@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@
 #include "AirspacesInterface.hpp"
 #include "AirspaceActivity.hpp"
 #include "Predicate/AirspacePredicate.hpp"
-#include "Util/NonCopyable.hpp"
+#include "Util/Serial.hpp"
 #include "Geo/Flat/TaskProjection.hpp"
 #include "Atmosphere/Pressure.hpp"
 #include "Compiler.h"
@@ -62,7 +62,7 @@ class AirspaceIntersectionVisitor;
  *     O(n)
  */
 
-class Airspaces : public AirspacesInterface, private NonCopyable {
+class Airspaces : public AirspacesInterface {
   AtmosphericPressure qnh;
   AirspaceActivity activity_mask;
 
@@ -73,8 +73,14 @@ class Airspaces : public AirspacesInterface, private NonCopyable {
 
   std::deque<AbstractAirspace *> tmp_as;
 
+  /**
+   * This attribute keeps track of changes to this project.  It is
+   * used by the renderer cache.
+   */
+  Serial serial;
+
 public:
-  /** 
+  /**
    * Constructor.
    * Note this class can't safely be copied (yet)
    *
@@ -86,12 +92,18 @@ public:
   Airspaces(bool _owns_children=true)
     :qnh(AtmosphericPressure::Zero()), owns_children(_owns_children) {}
 
+  Airspaces(const Airspaces &) = delete;
+
   /**
    * Destructor.
    * This also destroys Airspace objects contained in the tree or temporary buffer
    */
   ~Airspaces() {
     Clear();
+  }
+
+  const Serial &GetSerial() const {
+    return serial;
   }
 
   /**
@@ -188,14 +200,6 @@ public:
   void VisitInside(const GeoPoint &location, AirspaceVisitor &visitor) const;
 
   /**
-   * Find the nearest airspace that matches the specified condition.
-   */
-  gcc_pure
-  const Airspace *FindNearest(const GeoPoint &location,
-                              const AirspacePredicate &condition =
-                                    AirspacePredicate::always_true) const;
-
-  /**
    * Search for airspaces within range of the aircraft.
    *
    * @param location location of aircraft, from which to search
@@ -242,7 +246,7 @@ public:
     return airspace_tree.end();
   }
 
-  const TaskProjection &GetProjection() const {
+  const FlatProjection &GetProjection() const {
     return task_projection;
   }
 

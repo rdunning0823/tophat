@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,13 +27,15 @@ Copyright_License {
 #include "Point.hpp"
 #include "Util/NonCopyable.hpp"
 #include "Util/SliceAllocator.hpp"
-#include "Util/ListHead.hpp"
-#include "Util/CastIterator.hpp"
 #include "Util/Serial.hpp"
 #include "Geo/Flat/TaskProjection.hpp"
 #include "Compiler.h"
 
-#include <set>
+#include <boost/intrusive/list.hpp>
+#include <boost/intrusive/set.hpp>
+
+#include <algorithm>
+
 #include <assert.h>
 #include <stdlib.h>
 
@@ -52,13 +54,17 @@ class TracePointerVector;
  */
 class Trace : private NonCopyable
 {
-  struct TraceDelta : public ListHead {
+  struct TraceDelta
+    : boost::intrusive::set_base_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>,
+      boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>> {
+
     /**
      * Function used to points for sorting by deltas.
      * Ranking is primarily by distance delta; for equal distances, rank by
      * time delta.
      * This is like a modified Douglas-Peuker algorithm
      */
+    gcc_pure
     static bool DeltaRank(const TraceDelta &x, const TraceDelta &y) {
       // distance is king
       if (x.elim_distance < y.elim_distance)
@@ -85,18 +91,11 @@ class Trace : private NonCopyable
     }
 
     struct DeltaRankOp {
-      bool operator()(const TraceDelta &s1, const TraceDelta &s2) {
+      gcc_pure
+      bool operator()(const TraceDelta &s1, const TraceDelta &s2) const {
         return DeltaRank(s1, s2);
       }
     };
-
-    /* using std::multiset, not because we need multiple values (we
-       don't), but to avoid std::set's overhead for duplicate
-       elimination */
-    typedef std::multiset<TraceDelta, DeltaRankOp,
-                          GlobalSliceAllocator<TraceDelta, 128u> > List;
-    typedef List::iterator iterator;
-    typedef List::const_iterator const_iterator;
 
     TracePoint point;
 
@@ -104,7 +103,7 @@ class Trace : private NonCopyable
     unsigned elim_distance;
     unsigned delta_distance;
 
-    TraceDelta(const TracePoint &p)
+    explicit TraceDelta(const TracePoint &p)
       :point(p),
        elim_time(null_time), elim_distance(null_delta),
        delta_distance(0) {}
@@ -124,22 +123,6 @@ class Trace : private NonCopyable
      */
     bool IsEdge() const {
       return elim_time == null_time;
-    }
-
-    TraceDelta &GetPrevious() {
-      return *(TraceDelta *)ListHead::GetPrevious();
-    }
-
-    TraceDelta &GetNext() {
-      return *(TraceDelta *)ListHead::GetNext();
-    }
-
-    const TraceDelta &GetPrevious() const {
-      return *(const TraceDelta *)ListHead::GetPrevious();
-    }
-
-    const TraceDelta &GetNext() const {
-      return *(const TraceDelta *)ListHead::GetNext();
     }
 
     void Update(const TracePoint &p_last, const TracePoint &p_next) {
@@ -185,10 +168,19 @@ class Trace : private NonCopyable
     }
   };
 
-  typedef CastIterator<const TraceDelta, ListHead::const_iterator> ChronologicalConstIterator;
+  /* using multiset, not because we need multiple values (we don't),
+     but to avoid set's overhead for duplicate elimination */
+  typedef boost::intrusive::multiset<TraceDelta,
+                                     boost::intrusive::compare<TraceDelta::DeltaRankOp>,
+                                     boost::intrusive::constant_time_size<false>> DeltaList;
 
-  TraceDelta::List delta_list;
-  ListHead chronological_list;
+  typedef boost::intrusive::list<TraceDelta,
+                                 boost::intrusive::constant_time_size<false>> ChronologicalList;
+
+  SliceAllocator<TraceDelta, 128u> allocator;
+
+  DeltaList delta_list;
+  ChronologicalList chronological_list;
   unsigned cached_size;
 
   TaskProjection task_projection;
@@ -203,6 +195,25 @@ class Trace : private NonCopyable
 
   Serial append_serial, modify_serial;
 
+  template<typename Alloc>
+  struct Disposer {
+    Alloc &alloc;
+
+    void operator()(typename Alloc::pointer td) {
+      alloc.destroy(td);
+      alloc.deallocate(td, 1);
+    }
+  };
+
+  template<typename Alloc>
+  static Disposer<Alloc> MakeDisposer(Alloc &alloc) {
+    return {alloc};
+  }
+
+  Disposer<decltype(allocator)> MakeDisposer() {
+    return MakeDisposer(allocator);
+  }
+
 public:
   /**
    * Constructor.  Task projection is updated after first call to append().
@@ -212,9 +223,13 @@ public:
    * @param max_time Time window size (seconds), null_time for unlimited
    * @param max_size Maximum number of points that can be stored
    */
-  Trace(const unsigned no_thin_time = 0,
-        const unsigned max_time = null_time,
-        const unsigned max_size = 1000);
+  explicit Trace(const unsigned no_thin_time = 0,
+                 const unsigned max_time = null_time,
+                 const unsigned max_size = 1000);
+
+  ~Trace() {
+    clear();
+  }
 
 protected:
   /**
@@ -247,7 +262,7 @@ protected:
    * @param tree Tree to remove from
    *
    */
-  void EraseInside(TraceDelta::iterator it);
+  void EraseInside(DeltaList::iterator it);
 
   /**
    * Erase elements based on delta metric until the size is
@@ -282,8 +297,6 @@ protected:
    * work around slight time warps.
    */
   void EraseLaterThan(const unsigned min_time);
-
-  TraceDelta &Insert(const TraceDelta &td);
 
   /**
    * Update start node (and neighbour) after min time pruning
@@ -387,13 +400,13 @@ public:
   const TracePoint &front() const {
     assert(!empty());
 
-    return static_cast<const TraceDelta *>(chronological_list.GetNext())->point;
+    return chronological_list.front().point;
   }
 
   const TracePoint &back() const {
     assert(!empty());
 
-    return static_cast<const TraceDelta *>(chronological_list.GetPrevious())->point;
+    return chronological_list.back().point;
   }
 
 private:
@@ -423,13 +436,13 @@ private:
   TraceDelta &GetFront() {
     assert(!empty());
 
-    return *static_cast<TraceDelta *>(chronological_list.GetNext());
+    return chronological_list.front();
   }
 
   TraceDelta &GetBack() {
     assert(!empty());
 
-    return *static_cast<TraceDelta *>(chronological_list.GetPrevious());
+    return chronological_list.back();
   }
 
   gcc_pure
@@ -452,17 +465,15 @@ public:
   }
 
 public:
-  class const_iterator {
+  class const_iterator : public ChronologicalList::const_iterator {
     friend class Trace;
 
-    ListHead::const_iterator iterator;
-
-    const_iterator(ListHead::const_iterator _iterator)
-      :iterator(_iterator) {}
+    const_iterator(ChronologicalList::const_iterator &&_iterator)
+      :ChronologicalList::const_iterator(std::move(_iterator)) {}
 
   public:
-    typedef ListHead::const_iterator::iterator_category iterator_category;
-    typedef ptrdiff_t difference_type;
+    using ChronologicalList::const_iterator::iterator_category;
+    using ChronologicalList::const_iterator::difference_type;
     typedef const TracePoint value_type;
     typedef const TracePoint *pointer;
     typedef const TracePoint &reference;
@@ -470,58 +481,28 @@ public:
     const_iterator() = default;
 
     const TracePoint &operator*() const {
-      const TraceDelta &td = (const TraceDelta &)*iterator;
+      const TraceDelta &td = ChronologicalList::const_iterator::operator*();
       return td.point;
     }
 
     const TracePoint *operator->() const {
-      const TraceDelta &td = (const TraceDelta &)*iterator;
+      const TraceDelta &td = ChronologicalList::const_iterator::operator*();
       return &td.point;
-    }
-
-    const_iterator &operator++() {
-      ++iterator;
-      return *this;
-    }
-
-    const_iterator operator++(int) {
-      const_iterator old = *this;
-      iterator++;
-      return old;
-    }
-
-    const_iterator &operator--() {
-      --iterator;
-      return *this;
-    }
-
-    const_iterator operator--(int) {
-      const_iterator old = *this;
-      iterator--;
-      return old;
     }
 
     const_iterator &NextSquareRange(unsigned sq_resolution,
                                     const const_iterator &end) {
-      const TracePoint &previous = ((const TraceDelta &)*iterator).point;
+      const TracePoint &previous = **this;
       while (true) {
-        ++iterator;
+        ++*this;
 
-        if (iterator == end.iterator)
+        if (*this == end)
           return *this;
 
-        const TraceDelta &td = (const TraceDelta &)*iterator;
+        const TraceDelta &td = (const TraceDelta &)**this;
         if (td.point.FlatSquareDistanceTo(previous) >= sq_resolution)
           return *this;
       }
-    }
-
-    bool operator==(const const_iterator &other) const {
-      return iterator == other.iterator;
-    }
-
-    bool operator!=(const const_iterator &other) const {
-      return iterator != other.iterator;
     }
   };
 
@@ -531,72 +512,6 @@ public:
 
   const_iterator end() const {
     return chronological_list.end();
-  }
-
-  class const_reverse_iterator {
-    friend class Trace;
-
-    ListHead::const_reverse_iterator iterator;
-
-    const_reverse_iterator(ListHead::const_reverse_iterator _iterator)
-      :iterator(_iterator) {}
-
-  public:
-    typedef std::forward_iterator_tag iterator_category;
-    typedef ptrdiff_t difference_type;
-    typedef const TracePoint value_type;
-    typedef const TracePoint *pointer;
-    typedef const TracePoint &reference;
-
-    const_reverse_iterator() = default;
-
-    const TracePoint &operator*() const {
-      const TraceDelta &td = (const TraceDelta &)*iterator;
-      return td.point;
-    }
-
-    const TracePoint *operator->() const {
-      const TraceDelta &td = (const TraceDelta &)*iterator;
-      return &td.point;
-    }
-
-    const_reverse_iterator &operator++() {
-      ++iterator;
-      return *this;
-    }
-
-    const_reverse_iterator operator++(int) {
-      const_reverse_iterator old = *this;
-      iterator++;
-      return old;
-    }
-
-    const_reverse_iterator &operator--() {
-      --iterator;
-      return *this;
-    }
-
-    const_reverse_iterator operator--(int) {
-      const_reverse_iterator old = *this;
-      iterator--;
-      return old;
-    }
-
-    bool operator==(const const_reverse_iterator &other) const {
-      return iterator == other.iterator;
-    }
-
-    bool operator!=(const const_reverse_iterator &other) const {
-      return iterator != other.iterator;
-    }
-  };
-
-  const_reverse_iterator rbegin() const {
-    return chronological_list.rbegin();
-  }
-
-  const_reverse_iterator rend() const {
-    return chronological_list.rend();
   }
 
   const TaskProjection &GetProjection() const {

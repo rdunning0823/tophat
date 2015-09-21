@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -48,6 +48,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.webkit.MimeTypeMap;
 
+class EGLException extends Exception {
+  public EGLException(String _msg) {
+    super(_msg);
+  }
+};
+
 /**
  * A #View which calls the native part of XCSoar.
  */
@@ -55,7 +61,7 @@ class NativeView extends SurfaceView
   implements SurfaceHolder.Callback, Runnable {
   private static final String TAG = "TopHat";
 
-  Handler quitHandler;
+  final Handler quitHandler, errorHandler;
 
   Resources resources;
 
@@ -74,10 +80,12 @@ class NativeView extends SurfaceView
 
   Thread thread;
 
-  public NativeView(Activity context, Handler _quitHandler) {
+  public NativeView(Activity context, Handler _quitHandler,
+                    Handler _errorHandler) {
     super(context);
 
     quitHandler = _quitHandler;
+    errorHandler = _errorHandler;
 
     resources = context.getResources();
 
@@ -96,11 +104,13 @@ class NativeView extends SurfaceView
     thread.start();
   }
 
-  private void initGL(SurfaceHolder holder) {
+  private void initGL(SurfaceHolder holder) throws EGLException {
     /* initialize display */
 
     egl = (EGL10)EGLContext.getEGL();
     display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+    if (display == EGL10.EGL_NO_DISPLAY)
+      throw new EGLException("eglGetDisplay() failed");
 
     Log.d(TAG, "EGL vendor: " +
           egl.eglQueryString(display, EGL10.EGL_VENDOR));
@@ -110,7 +120,8 @@ class NativeView extends SurfaceView
           egl.eglQueryString(display, EGL10.EGL_EXTENSIONS));
 
     int[] version = new int[2];
-    egl.eglInitialize(display, version);
+    if (!egl.eglInitialize(display, version))
+      throw new EGLException("eglInitialize() failed: " + egl.eglGetError());
 
     /* choose a configuration */
 
@@ -134,7 +145,9 @@ class NativeView extends SurfaceView
 
     int numConfigs = num_config[0];
     EGLConfig[] configs = new EGLConfig[numConfigs];
-    egl.eglChooseConfig(display, configSpec, configs, numConfigs, num_config);
+    if (!egl.eglChooseConfig(display, configSpec,
+                             configs, numConfigs, num_config))
+      throw new EGLException("eglChooseConfig() failed: " + egl.eglGetError());
 
     EGLConfig closestConfig = null;
     int closestDistance = 1000;
@@ -153,6 +166,9 @@ class NativeView extends SurfaceView
       }
     }
 
+    if (closestConfig == null)
+      throw new EGLException("eglChooseConfig() failed");
+
     Log.d(TAG, "EGLConfig: red="+
           findConfigAttrib(closestConfig, EGL10.EGL_RED_SIZE, 0) +
           " green=" + findConfigAttrib(closestConfig, EGL10.EGL_GREEN_SIZE, 0) +
@@ -163,12 +179,33 @@ class NativeView extends SurfaceView
 
     /* initialize context and surface */
 
+    final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
+    final int contextClientVersion = getEglContextClientVersion();
+    int[] contextAttribList = null;
+    if (contextClientVersion != 1)
+      /* the default EGL_CONTEXT_CLIENT_VERSION is 1, so we need to
+       * specify this only if using GLES2; some old Androids (e.g. HTC
+       * Magic) will fail eglCreateContext() with EGL_BAD_ATTRIBUTE if
+       * EGL_CONTEXT_CLIENT_VERSION is specified */
+      contextAttribList = new int[]{
+        EGL_CONTEXT_CLIENT_VERSION, getEglContextClientVersion(),
+        EGL10.EGL_NONE
+      };
+
     context = egl.eglCreateContext(display, closestConfig,
-                                   EGL10.EGL_NO_CONTEXT, null);
+                                   EGL10.EGL_NO_CONTEXT, contextAttribList);
+    if (context == EGL10.EGL_NO_CONTEXT)
+      throw new EGLException("eglCreateContext() failed: " +
+                             egl.eglGetError());
 
     surface = egl.eglCreateWindowSurface(display, closestConfig,
                                          holder, null);
-    egl.eglMakeCurrent(display, surface, surface, context);
+    if (surface == EGL10.EGL_NO_SURFACE)
+      throw new EGLException("eglCreateWindowSurface() failed: " +
+                             egl.eglGetError());
+
+    if (!egl.eglMakeCurrent(display, surface, surface, context))
+      throw new EGLException("eglMakeCurrent() failed: " + egl.eglGetError());
 
     GL10 gl = (GL10)context.getGL();
     Log.d(TAG, "OpenGL vendor: " + gl.glGetString(GL10.GL_VENDOR));
@@ -185,7 +222,7 @@ class NativeView extends SurfaceView
       initGL(getHolder());
       return true;
     } catch (Exception e) {
-      Log.e(TAG, "initGL error: " + e);
+      Log.e(TAG, "initGL error", e);
       deinitSurface();
       return false;
     }
@@ -233,7 +270,14 @@ class NativeView extends SurfaceView
   }
 
   @Override public void run() {
-    initGL(getHolder());
+    try {
+      initGL(getHolder());
+    } catch (Exception e) {
+      Log.e(TAG, "initGL error", e);
+      errorHandler.sendMessage(errorHandler.obtainMessage(0, e));
+      deinitSurface();
+      return;
+    }
 
     android.graphics.Rect r = getHolder().getSurfaceFrame();
     DisplayMetrics metrics = new DisplayMetrics();
@@ -248,6 +292,8 @@ class NativeView extends SurfaceView
     Log.d(TAG, "sending message to quitHandler");
     quitHandler.sendMessage(quitHandler.obtainMessage());
   }
+
+  protected native int getEglContextClientVersion();
 
   protected native boolean initializeNative(Context context,
                                             int width, int height,
@@ -289,48 +335,48 @@ class NativeView extends SurfaceView
   }
 
   /**
-   * Loads the specified bitmap resource as OpenGL texture.
-   *
-   * @param alpha expect a GL_ALPHA texture?
-   * @param result an array of 5 integers: texture id, width, height,
-   * allocated width, allocated height (all output)
-   * @return true on success
+   * Loads the specified bitmap resource.
    */
-  private boolean loadResourceTexture(String name, boolean alpha,
-                                      int[] result) {
+  private Bitmap loadResourceBitmap(String name) {
     /* find the resource */
     int resourceId = resources.getIdentifier(name, "drawable", "org.tophat");
     if (resourceId == 0) {
       resourceId = resources.getIdentifier(name, "drawable",
                                            "org.tophat.testing");
       if (resourceId == 0)
-        return false;
+        return null;
     }
 
     /* load the Bitmap from the resource */
     BitmapFactory.Options opts = new BitmapFactory.Options();
     opts.inScaled = false;
 
-    Bitmap bmp = BitmapFactory.decodeResource(resources, resourceId, opts);
-
-    return BitmapUtil.bitmapToOpenGL(bmp, alpha, result);
+    return BitmapFactory.decodeResource(resources, resourceId, opts);
   }
 
   /**
-   * Loads an image from filesystem as OpenGL texture.
-   *
-   * @param result an array of 5 integers: texture id, width, height,
-   * allocated width, allocated height (all output)
-   * @return true on success
+   * Loads an image from filesystem.
    */
-  private boolean loadFileTexture(String pathName, int[] result) {
+  private Bitmap loadFileBitmap(String pathName) {
     /* load the Bitmap from filesystem */
     BitmapFactory.Options opts = new BitmapFactory.Options();
     opts.inScaled = false;
 
-    Bitmap bmp = BitmapFactory.decodeFile(pathName, opts);
+    return BitmapFactory.decodeFile(pathName, opts);
+  }
 
-    return BitmapUtil.bitmapToOpenGL(bmp, false, result);
+  /**
+   * Loads the specified #Bitmap as OpenGL texture.
+   *
+   * @param alpha expect a GL_ALPHA texture?
+   * @param result an array of 5 integers: texture id, width, height,
+   * allocated width, allocated height (all output)
+   * @return true on success
+   */
+  private boolean bitmapToTexture(Bitmap bmp, boolean alpha, int[] result) {
+    /* pass a copy because bitmapToOpenGL() recycles the given
+       Bitmap */
+    return BitmapUtil.bitmapToOpenGL(bmp, false, alpha, result);
   }
 
   /**
@@ -351,8 +397,12 @@ class NativeView extends SurfaceView
       intent.setDataAndType(Uri.fromFile(file), mimeType);
       getContext().startActivity(intent);
     } catch (Exception e) {
-      Log.e(TAG, "NativeView.openFile('" + pathName + "') error: " + e);
+      Log.e(TAG, "NativeView.openFile('" + pathName + "') error", e);
     }
+  }
+
+  private int getNetState() {
+    return NetUtil.getNetState();
   }
 
   private void swap() {

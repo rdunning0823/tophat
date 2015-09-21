@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@ Copyright_License {
 
 #include <assert.h>
 
-#ifdef WIN32
+#ifdef USE_WIN32_RESOURCES
 
 #include <windows.h>
 
@@ -35,7 +35,7 @@ static HINSTANCE ResourceLoaderInstance;
 void
 ResourceLoader::Init(HINSTANCE hInstance)
 {
-  assert(ResourceLoaderInstance == NULL);
+  assert(ResourceLoaderInstance == nullptr);
 
   ResourceLoaderInstance = hInstance;
 }
@@ -43,19 +43,18 @@ ResourceLoader::Init(HINSTANCE hInstance)
 #else /* !WIN32 */
 
 #include "resource_data.h"
-
-#include <string.h>
+#include "Util/StringAPI.hpp"
 
 #endif /* !WIN32 */
 
 ResourceLoader::Data
 ResourceLoader::Load(const TCHAR *name, const TCHAR *type)
 {
-#ifdef WIN32
-  assert(ResourceLoaderInstance != NULL);
+#ifdef USE_WIN32_RESOURCES
+  assert(ResourceLoaderInstance != nullptr);
 
   HRSRC resource = ::FindResource(ResourceLoaderInstance, name, type);
-  if (resource == NULL)
+  if (resource == nullptr)
     return Data::Null();
 
   DWORD size = ::SizeofResource(ResourceLoaderInstance, resource);
@@ -63,18 +62,18 @@ ResourceLoader::Load(const TCHAR *name, const TCHAR *type)
     return Data::Null();
 
   HGLOBAL handle = ::LoadResource(ResourceLoaderInstance, resource);
-  if (handle == NULL)
+  if (handle == nullptr)
     return Data::Null();
 
   LPVOID data = LockResource(handle);
-  if (data == NULL)
+  if (data == nullptr)
     return Data::Null();
 
   return Data(data, size);
 #else
 
   for (unsigned i = 0; !named_resources[i].data.IsNull(); ++i)
-    if (_tcscmp(named_resources[i].name, name) == 0)
+    if (StringIsEqual(named_resources[i].name, name))
       return named_resources[i].data;
 
   return Data::Null();
@@ -86,7 +85,7 @@ ResourceLoader::Load(const TCHAR *name, const TCHAR *type)
 ResourceLoader::Data
 ResourceLoader::Load(ResourceId id)
 {
-#ifdef WIN32
+#ifdef USE_WIN32_RESOURCES
   return Load(MAKEINTRESOURCE((unsigned)id), RT_BITMAP);
 #else
   return id;
@@ -95,7 +94,7 @@ ResourceLoader::Load(ResourceId id)
 
 #endif
 
-#ifdef WIN32
+#ifdef USE_WIN32_RESOURCES
 HBITMAP
 ResourceLoader::LoadBitmap2(ResourceId id)
 {

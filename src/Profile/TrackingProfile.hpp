@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,13 +31,14 @@ struct LiveTrack24Settings;
 #endif
 
 struct TrackingSettings;
+class ProfileMap;
 
 namespace Profile {
 #ifdef HAVE_LIVETRACK24
-  void Load(LiveTrack24Settings &settings);
+  void Load(const ProfileMap &map, LiveTrack24Settings &settings);
 #endif
 
-  void Load(TrackingSettings &settings);
+  void Load(const ProfileMap &map, TrackingSettings &settings);
 };
 
 #endif

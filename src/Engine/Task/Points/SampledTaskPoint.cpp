@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,16 +26,20 @@
 
 SampledTaskPoint::SampledTaskPoint(const GeoPoint &location,
                                    const bool b_scored)
-  :boundary_scored(b_scored), past(false)
+  :boundary_scored(b_scored), past(false),
+   nominal_points(1, location)
 {
-  nominal_points.push_back(location);
+#ifndef NDEBUG
+  search_max.SetInvalid();
+  search_min.SetInvalid();
+#endif
 }
 
 // SAMPLES
 
 bool
 SampledTaskPoint::AddInsideSample(const AircraftState& state,
-                                  const TaskProjection &projection)
+                                  const FlatProjection &projection)
 {
   assert(state.location.IsValid());
 
@@ -61,7 +65,7 @@ SampledTaskPoint::AddInsideSample(const AircraftState& state,
 
 void
 SampledTaskPoint::ClearSampleAllButLast(const AircraftState& ref_last,
-                                            const TaskProjection &projection)
+                                        const FlatProjection &projection)
 {
   if (HasSampled()) {
     sampled_points.clear();
@@ -73,7 +77,7 @@ SampledTaskPoint::ClearSampleAllButLast(const AircraftState& ref_last,
 // BOUNDARY
 
 void
-SampledTaskPoint::UpdateOZ(const TaskProjection &projection,
+SampledTaskPoint::UpdateOZ(const FlatProjection &projection,
                            const OZBoundary &_boundary)
 {
   search_max = search_min = nominal_points.front();
@@ -88,7 +92,7 @@ SampledTaskPoint::UpdateOZ(const TaskProjection &projection,
 // SAMPLES + BOUNDARY
 
 void
-SampledTaskPoint::UpdateProjection(const TaskProjection &projection)
+SampledTaskPoint::UpdateProjection(const FlatProjection &projection)
 {
   search_max.Project(projection);
   search_min.Project(projection);
@@ -106,6 +110,8 @@ SampledTaskPoint::Reset()
 const SearchPointVector &
 SampledTaskPoint::GetSearchPoints() const
 {
+  assert(!boundary_points.empty());
+
   if (HasSampled())
     return sampled_points;
 

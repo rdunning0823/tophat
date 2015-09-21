@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,34 +21,35 @@ Copyright_License {
 }
 */
 
-#include "Profile/TerrainConfig.hpp"
-#include "Profile/ProfileKeys.hpp"
-#include "Profile/Profile.hpp"
+#include "TerrainConfig.hpp"
+#include "ProfileKeys.hpp"
+#include "Map.hpp"
 #include "Terrain/TerrainSettings.hpp"
 
 void
-Profile::LoadTerrainRendererSettings(TerrainRendererSettings &settings)
+Profile::LoadTerrainRendererSettings(const ProfileMap &map,
+                                     TerrainRendererSettings &settings)
 {
-  Get(ProfileKeys::DrawTerrain, settings.enable);
+  map.Get(ProfileKeys::DrawTerrain, settings.enable);
 
   uint8_t Temp = (uint8_t)settings.slope_shading;
-  if (!Get(ProfileKeys::SlopeShadingType, Temp)) {
+  if (!map.Get(ProfileKeys::SlopeShadingType, Temp)) {
     bool old_profile_setting = true;
-    if (Get(ProfileKeys::SlopeShading, old_profile_setting))
+    if (map.Get(ProfileKeys::SlopeShading, old_profile_setting))
       // 0: OFF, 3: Wind
       Temp = old_profile_setting ? 3 : 0;
   }
   settings.slope_shading = (SlopeShading)Temp;
 
-  Get(ProfileKeys::TerrainContrast, settings.contrast);
-  Get(ProfileKeys::TerrainBrightness, settings.brightness);
+  map.Get(ProfileKeys::TerrainContrast, settings.contrast);
+  map.Get(ProfileKeys::TerrainBrightness, settings.brightness);
 
   unsigned short ramp;
-  if (Get(ProfileKeys::TerrainRamp, ramp) &&
+  if (map.Get(ProfileKeys::TerrainRamp, ramp) &&
       ramp < TerrainRendererSettings::NUM_RAMPS)
     settings.ramp = ramp;
 
   uint8_t contours = (uint8_t)settings.contours;
-  if (Get(ProfileKeys::TerrainContours, contours))
+  if (map.Get(ProfileKeys::TerrainContours, contours))
     settings.contours = (Contours)contours;
 }

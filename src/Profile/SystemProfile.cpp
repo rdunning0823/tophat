@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,18 +21,19 @@ Copyright_License {
 }
 */
 
-#include "Profile/SystemProfile.hpp"
-#include "Profile/DeviceConfig.hpp"
-#include "Profile/Profile.hpp"
+#include "SystemProfile.hpp"
+#include "DeviceConfig.hpp"
+#include "Map.hpp"
+#include "ProfileKeys.hpp"
 #include "SystemSettings.hpp"
 
 void
-Profile::Load(SystemSettings &settings)
+Profile::Load(const ProfileMap &map, SystemSettings &settings)
 {
   for (unsigned i = 0; i < settings.devices.size(); ++i)
-    GetDeviceConfig(i, settings.devices[i]);
+    GetDeviceConfig(map, i, settings.devices[i]);
 
 #ifdef HAVE_MODEL_TYPE
-  Profile::GetEnum(ProfileKeys::AppInfoBoxModel, settings.model_type);
+  map.GetEnum(ProfileKeys::AppInfoBoxModel, settings.model_type);
 #endif
 }

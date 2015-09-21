@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,9 +32,8 @@ Copyright_License {
 #endif
 
 #ifdef ANDROID
-#include "Util/tstring.hpp"
 #include "Screen/OpenGL/Surface.hpp"
-#include "ResourceId.hpp"
+#include <jni.h>
 #endif
 
 #ifdef USE_GDI
@@ -82,13 +81,9 @@ public:
 
 protected:
 #ifdef ANDROID
-  /** resource id */
-  ResourceId id;
+  jobject bmp;
 
   Type type;
-
-  /** filename for external images (id=0) */
-  tstring pathName;
 #endif
 
 #ifdef ENABLE_OPENGL
@@ -107,13 +102,13 @@ public:
   Bitmap()
     :
 #ifdef ANDROID
-    id(ResourceId::Null()),
+    bmp(nullptr),
 #endif
-    texture(NULL), interpolation(false) {}
+    texture(nullptr), interpolation(false) {}
 #elif defined(USE_MEMORY_CANVAS)
   constexpr Bitmap():buffer(WritableImageBuffer<BitmapPixelTraits>::Empty()) {}
 #else
-  Bitmap():bitmap(NULL) {}
+  Bitmap():bitmap(nullptr) {}
 #endif
 
   explicit Bitmap(ResourceId id);
@@ -130,12 +125,14 @@ public:
   Bitmap &operator=(const Bitmap &other) = delete;
 public:
   bool IsDefined() const {
-#ifdef ENABLE_OPENGL
-    return texture != NULL;
+#ifdef ANDROID
+    return bmp != nullptr;
+#elif defined(ENABLE_OPENGL)
+    return texture != nullptr;
 #elif defined(USE_MEMORY_CANVAS)
     return buffer.data != nullptr;
 #else
-    return bitmap != NULL;
+    return bitmap != nullptr;
 #endif
   }
 
@@ -154,6 +151,14 @@ public:
 
   unsigned GetHeight() const {
     return buffer.height;
+  }
+#else
+  unsigned GetWidth() const {
+    return GetSize().cx;
+  }
+
+  unsigned GetHeight() const {
+    return GetSize().cy;
   }
 #endif
 
@@ -179,6 +184,7 @@ public:
 
   void Reset();
 
+  gcc_pure
   const PixelSize GetSize() const;
 
 #ifdef ENABLE_OPENGL
@@ -199,11 +205,8 @@ public:
 
 #ifdef ANDROID
 private:
-  /**
-   * Load the texture again after the OpenGL surface has been
-   * recreated.
-   */
-  bool Reload();
+  bool Set(JNIEnv *env, jobject _bmp, Type _type);
+  bool MakeTexture();
 
   /* from GLSurfaceListener */
   virtual void SurfaceCreated() override;

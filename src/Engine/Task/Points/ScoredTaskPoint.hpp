@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -118,7 +118,7 @@ public:
    */
   bool TransitionExit(const AircraftState &ref_now,
                       const AircraftState &ref_last,
-                      const TaskProjection &projection);
+                      const FlatProjection &projection);
 
   /** Retrieve location to be used for the scored task. */
   gcc_pure
@@ -129,7 +129,9 @@ public:
    * This is always the scored best location for prior-active task points.
    */
   gcc_pure
-  const GeoPoint &GetLocationTravelled() const;
+  const GeoPoint &GetLocationTravelled() const {
+    return GetLocationMin();
+  }
 
 protected:
   /**

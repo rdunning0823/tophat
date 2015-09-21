@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ Copyright_License {
 #endif
 
 #if defined(KOBO) && defined(USE_FB)
+#include "Kobo/Model.hpp"
 #include "mxcfb.h"
 #endif
 
@@ -44,6 +45,32 @@ Copyright_License {
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+
+static unsigned
+TranslateDimension(unsigned value)
+{
+#ifdef KOBO
+  if (value == 1024 && DetectKoboModel() == KoboModel::AURA)
+    /* the Kobo Aura announces 1024 pixel rows, but the physical
+       display only shows 1014 */
+    value -= 10;
+#endif
+
+  return value;
+}
+
+static unsigned
+GetWidth(const struct fb_var_screeninfo &vinfo)
+{
+  return TranslateDimension(vinfo.xres);
+}
+
+static unsigned
+GetHeight(const struct fb_var_screeninfo &vinfo)
+{
+  return TranslateDimension(vinfo.yres);
+}
+
 #endif
 
 void
@@ -172,7 +199,7 @@ TopCanvas::Create(PixelSize new_size,
   ioctl(fd, MXCFB_SET_UPDATE_SCHEME, UPDATE_SCHEME_QUEUE_AND_MERGE);
 #endif
 
-  const unsigned width = vinfo.xres, height = vinfo.yres;
+  const auto width = ::GetWidth(vinfo), height = ::GetHeight(vinfo);
 #elif defined(USE_VFB)
   const unsigned width = new_size.cx, height = new_size.cy;
 #else
@@ -191,7 +218,8 @@ TopCanvas::CheckResize()
   struct fb_var_screeninfo vinfo;
   ioctl(fd, FBIOGET_VSCREENINFO, &vinfo);
 
-  if (vinfo.xres == buffer.width && vinfo.yres == buffer.height)
+  const auto new_width = ::GetWidth(vinfo), new_height = ::GetHeight(vinfo);
+  if (new_width == buffer.width && new_height == buffer.height)
     return false;
 
   /* yes, they did change: update the size and allocate a new buffer */
@@ -202,7 +230,7 @@ TopCanvas::CheckResize()
   map_pitch = finfo.line_length;
 
   buffer.Free();
-  buffer.Allocate(vinfo.xres, vinfo.yres);
+  buffer.Allocate(new_width, new_height);
   return true;
 }
 
@@ -212,11 +240,6 @@ void
 TopCanvas::OnResize(PixelSize new_size)
 {
   // TODO: is this even possible?
-}
-
-void
-TopCanvas::Fullscreen()
-{
 }
 
 Canvas

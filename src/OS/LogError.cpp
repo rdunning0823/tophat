@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -47,8 +47,8 @@ LogLastError(const TCHAR *fmt, ...)
   TCHAR msg[256];
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, error, 0, msg, ARRAY_SIZE(msg), NULL);
-  TrimRight(msg);
+                nullptr, error, 0, msg, ARRAY_SIZE(msg), nullptr);
+  StripRight(msg);
 
   LogFormat(_T("%s: %s"), buffer, msg);
 }

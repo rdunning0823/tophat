@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,8 +34,9 @@ public:
   TaskMiscPanel(TaskManagerDialog &dialog,
                 OrderedTask **_active_task, bool *_task_modified);
 
-  virtual void ReClick() override;
-  virtual void Show(const PixelRect &rc) override;
+  /* virtual methods from class Widget */
+  void ReClick() override;
+  void Show(const PixelRect &rc) override;
 };
 
 #endif

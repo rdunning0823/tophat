@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "NativeVoltageListener.hpp"
 #include "VoltageListener.hpp"
-#include "Java/Class.hpp"
+#include "Java/Class.hxx"
 #include "org_tophat_NativeVoltageListener.h"
 
 #include <stddef.h>
@@ -75,7 +75,7 @@ NativeVoltageListener::Deinitialise(JNIEnv *env)
 jobject
 NativeVoltageListener::Create(JNIEnv *env, VoltageListener &listener)
 {
-  assert(cls != NULL);
+  assert(cls != nullptr);
 
   return env->NewObject(cls, ctor, (jlong)&listener);
 }

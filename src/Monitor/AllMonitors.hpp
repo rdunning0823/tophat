@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,12 +27,18 @@ Copyright_License {
 #include "Blackboard/BlackboardListener.hpp"
 #include "RateLimiter.hpp"
 #include "TaskStartMonitor.hpp"
+#include "WindMonitor.hpp"
+#include "AirspaceWarningMonitor.hpp"
+#include "TaskConstraintsMonitor.hpp"
 
 /**
  * A container that combines all monitor classes.
  */
 class AllMonitors final : NullBlackboardListener, RateLimiter {
   TaskStartMonitor task_start;
+  WindMonitor wind;
+  AirspaceWarningMonitor airspace_warnings;
+  TaskConstraintsMonitor task_constraints;
 
 public:
   AllMonitors();
@@ -40,10 +46,16 @@ public:
 
   void Reset() {
     task_start.Reset();
+    wind.Reset();
+    airspace_warnings.Reset();
+    task_constraints.Reset();
   }
 
   void Check() {
     task_start.Check();
+    wind.Check();
+    airspace_warnings.Check();
+    task_constraints.Check();
   }
 
 private:

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,13 @@ Copyright_License {
 #include "Canvas.hpp"
 #include "Texture.hpp"
 #include "Scope.hpp"
+
+#ifdef USE_GLSL
+#include "Shaders.hpp"
+#include "Program.hpp"
+#else
 #include "Compatibility.hpp"
+#endif
 
 #include <assert.h>
 
@@ -66,7 +72,7 @@ RawBitmap::~RawBitmap()
 void
 RawBitmap::SurfaceCreated()
 {
-  if (texture == NULL) {
+  if (texture == nullptr) {
     texture = new GLTexture(corrected_width, height);
     texture->EnableInterpolation();
   }
@@ -76,7 +82,7 @@ void
 RawBitmap::SurfaceDestroyed()
 {
   delete texture;
-  texture = NULL;
+  texture = nullptr;
 
   dirty = true;
 }
@@ -110,8 +116,12 @@ RawBitmap::StretchTo(unsigned width, unsigned height,
 {
   GLTexture &texture = BindAndGetTexture();
 
+#ifdef USE_GLSL
+  OpenGL::texture_shader->Use();
+#else
+  const GLEnable<GL_TEXTURE_2D> scope;
   OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  GLEnable scope(GL_TEXTURE_2D);
-  dest_canvas.Stretch(0, 0, dest_width, dest_height,
-                      texture, 0, 0, width, height);
+#endif
+
+  texture.Draw(0, 0, dest_width, dest_height, 0, 0, width, height);
 }

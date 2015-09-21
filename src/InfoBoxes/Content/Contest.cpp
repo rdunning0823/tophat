@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,6 +31,34 @@ Copyright_License {
 #include "InfoBoxes/Panel/Panel.hpp"
 
 #include <tchar.h>
+
+static void
+ShowAnalysis8()
+{
+  dlgAnalysisShowModal(UIGlobals::GetMainWindow(),
+                       UIGlobals::GetLook(),
+                       CommonInterface::Full(), *glide_computer,
+                       &airspace_database,
+                       terrain, AnalysisPage::OLC);
+}
+
+static Widget *
+LoadAnalysis8Panel(unsigned id)
+{
+  return new CallbackWidget(ShowAnalysis8);
+}
+
+static constexpr
+InfoBoxPanel analysis8_infobox_panels[] = {
+  { N_("Analysis"), LoadAnalysis8Panel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentOLC::GetDialogContent()
+{
+  return analysis8_infobox_panels;
+}
 
 void
 InfoBoxContentOLC::Update(InfoBoxData &data)

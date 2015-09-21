@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "Asset.hpp"
 #include "Util/Macros.hpp"
-#include "LogFile.hpp"
 #include "UtilsSystem.hpp"
 #include "LocalPath.hpp"
 #include "IO/FileHandle.hpp"
@@ -33,7 +32,14 @@ Copyright_License {
 #include "Util/StaticString.hpp"
 #include "Util/StringUtil.hpp"
 
-#if defined(WIN32) && (!defined(__GNUC__) || defined(_WIN32_WCE))
+#ifdef USE_CONSOLE
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
+#endif
+
+#ifdef _WIN32_WCE
+#include "LogFile.hpp"
+
 #include <windows.h>
 #include <winioctl.h>
 #endif
@@ -65,16 +71,15 @@ SetAssetNumber(const TCHAR *p)
 
   return true;
 }
-#endif
 
 static bool
 ReadCompaqID()
 {
-#if defined(_WIN32_WCE)
   PROCESS_INFORMATION pi;
 
-  if (CreateProcess(_T("\\windows\\CreateAssetFile.exe"), NULL, NULL, NULL,
-                    FALSE, 0, NULL, NULL, NULL, &pi)) {
+  if (CreateProcess(_T("\\windows\\CreateAssetFile.exe"),
+                    nullptr, nullptr, nullptr,
+                    FALSE, 0, nullptr, nullptr, nullptr, &pi)) {
     WaitForSingleObject(pi.hProcess, 1000);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
@@ -88,9 +93,6 @@ ReadCompaqID()
   size_t length = file.Read(buffer, ARRAY_SIZE(buffer) - 1, sizeof(buffer[0]));
   buffer[length] = _T('\0');
   return SetAssetNumber(buffer);
-#else
-  return false;
-#endif
 }
 
 static bool
@@ -124,7 +126,7 @@ ReadRegistrationNumber()
 static bool
 ReadUUID()
 {
-#if defined(_WIN32_WCE) && defined(IOCTL_HAL_GET_DEVICEID) && defined(FILE_DEVICE_HAL)
+#if defined(IOCTL_HAL_GET_DEVICEID) && defined(FILE_DEVICE_HAL)
   BOOL fRes;
 
 #define GUIDBuffsize 100
@@ -201,9 +203,12 @@ ReadUUID()
 #endif
 }
 
+#endif
+
 void
 ReadAssetNumber()
 {
+#ifdef _WIN32_WCE
   if (ReadCompaqID()) {
     LogFormat(_T("Asset ID: %s (compaq)"), asset_number);
   } else if (ReadUUID()) {
@@ -213,7 +218,36 @@ ReadAssetNumber()
   } else if (ReadRegistrationNumber()){
     LogFormat(_T("Asset ID: %s (registration number)"), asset_number);
   } else {
+#endif
     _tcscpy(asset_number, _T("AAA"));
+#ifdef _WIN32_WCE
     LogFormat(_T("Asset ID: %s (fallback)"), asset_number);
   }
+#endif
 }
+
+#if defined(USE_CONSOLE) && !defined(KOBO)
+
+bool
+HasPointer()
+{
+  return event_queue->HasPointer();
+}
+
+#endif
+
+#ifdef USE_LIBINPUT
+
+bool
+HasTouchScreen()
+{
+  return event_queue->HasTouchScreen();
+}
+
+bool
+HasKeyboard()
+{
+  return event_queue->HasKeyboard();
+}
+
+#endif

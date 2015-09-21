@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,9 +27,20 @@ Copyright_License {
 #include "Screen/OpenGL/Extension.hpp"
 #include "Screen/OpenGL/Features.hpp"
 #include "Screen/OpenGL/Shapes.hpp"
+#include "Dynamic.hpp"
 #include "FBO.hpp"
 #include "Screen/Custom/Cache.hpp"
+#include "Math/Point2D.hpp"
 #include "Asset.hpp"
+#include "DisplayOrientation.hpp"
+
+#ifdef USE_EGL
+#include "Screen/EGL/System.hpp"
+#endif
+
+#ifdef USE_GLSL
+#include "Shaders.hpp"
+#endif
 
 #ifdef ANDROID
 #include "Android/Main.hpp"
@@ -40,7 +51,19 @@ Copyright_License {
 #include "EGL.hpp"
 #endif
 
+#ifdef USE_GLSL
+#include <glm/gtc/matrix_transform.hpp>
+#endif
+
+#include <algorithm>
+
+#include <assert.h>
 #include <string.h>
+#include <dlfcn.h>
+
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
 
 void
 OpenGL::Initialise()
@@ -74,7 +97,7 @@ SupportsNonPowerOfTwoTexturesGLES()
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 11, 11, 0,
-                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, nullptr);
     glDeleteTextures(1, &id);
 
     /* see if there is a complaint */
@@ -88,68 +111,9 @@ SupportsNonPowerOfTwoTexturesGLES()
 
 gcc_pure
 static bool
-IsVendor(const char *_vendor)
-{
-  const char *vendor = (const char *)glGetString(GL_VENDOR);
-  return vendor != nullptr && strcmp(vendor, _vendor) == 0;
-}
-
-gcc_pure
-static bool
-IsRenderer(const char *_renderer)
-{
-  const char *renderer = (const char *)glGetString(GL_RENDERER);
-  return renderer != nullptr && strcmp(renderer, _renderer) == 0;
-}
-
-gcc_pure
-static bool
-IsVivanteGC600()
-{
-  /* found on StreetMate GTA-50-3D */
-  return IsVendor("Vivante Corporation") &&
-    IsRenderer("GC600 Graphics Engine");
-}
-
-gcc_pure
-static bool
-IsVivanteGC800()
-{
-  /* note: this is a Vivante GPU, but its driver declares Marvell as
-     its vendor (found on Samsung GT-S5690) */
-  return IsVendor("Marvell Technology Group Ltd") &&
-    IsRenderer("GC800 Graphics Engine");
-}
-
-gcc_pure
-static bool
-IsVivanteGC1000()
-{
-  return IsVendor("Vivante Corporation") &&
-    IsRenderer("GC1000 Graphics Engine");
-}
-
-/**
- * Is this OpenGL driver blacklisted for OES_draw_texture?
- *
- * This is a workaround to disable OES_draw_texture on certain Vivante
- * GPUs because they are known to be buggy: when combined with
- * GL_COLOR_LOGIC_OP, the left quarter of the texture is not drawn
- */
-gcc_pure
-static bool
-IsBlacklistedOESDrawTexture()
-{
-  return IsAndroid() && (IsVivanteGC600() || IsVivanteGC800() ||
-                         IsVivanteGC1000());
-}
-
-gcc_pure
-static bool
 CheckOESDrawTexture()
 {
-  return OpenGL::IsExtensionSupported("GL_OES_draw_texture") &&
-    !IsBlacklistedOESDrawTexture();
+  return OpenGL::IsExtensionSupported("GL_OES_draw_texture");
 }
 
 #endif
@@ -167,7 +131,7 @@ EnableVBO()
      crashes instantly, see
      http://code.google.com/p/android/issues/detail?id=4273 */
   const char *version = (const char *)glGetString(GL_VERSION);
-  return version != NULL && strstr(version, "ES-CM 1.0") == NULL;
+  return version != nullptr && strstr(version, "ES-CM 1.0") == nullptr;
 }
 #endif
 
@@ -206,7 +170,11 @@ CheckDepthStencil()
     return GL_DEPTH24_STENCIL8_OES;
 
   /* not supported */
+#ifdef HAVE_GLES2
+  return GL_NONE;
+#else
   return GL_NONE_OES;
+#endif
 
 #else
 
@@ -227,17 +195,28 @@ static GLenum
 CheckStencil()
 {
 #ifdef HAVE_GLES
+#if !defined(__APPLE__) || !TARGET_OS_IPHONE
   if (OpenGL::IsExtensionSupported("GL_OES_stencil1"))
     return GL_STENCIL_INDEX1_OES;
 
   if (OpenGL::IsExtensionSupported("GL_OES_stencil4"))
     return GL_STENCIL_INDEX4_OES;
+#endif
 
-  if (OpenGL::IsExtensionSupported("GL_OES_stencil8"))
+  if (OpenGL::IsExtensionSupported("GL_OES_stencil8")) {
+#ifdef HAVE_GLES2
+    return GL_STENCIL_INDEX8;
+#else
     return GL_STENCIL_INDEX8_OES;
+#endif
+  }
 
   /* not supported */
+#ifdef HAVE_GLES2
+  return GL_NONE;
+#else
   return GL_NONE_OES;
+#endif
 
 #else
 
@@ -276,6 +255,33 @@ OpenGL::SetupContext()
   vertex_buffer_object = EnableVBO();
 #endif
 
+#ifdef HAVE_OES_MAPBUFFER
+  mapbuffer = IsExtensionSupported("GL_OES_mapbuffer");
+#endif
+
+#ifdef HAVE_DYNAMIC_MAPBUFFER
+  if (mapbuffer) {
+    GLExt::map_buffer = (PFNGLMAPBUFFEROESPROC)
+      eglGetProcAddress("glMapBufferOES");
+    GLExt::unmap_buffer = (PFNGLUNMAPBUFFEROESPROC)
+      eglGetProcAddress("glUnmapBufferOES");
+    if (GLExt::map_buffer == nullptr || GLExt::unmap_buffer == nullptr)
+      mapbuffer = false;
+  }
+#endif
+
+#ifdef HAVE_DYNAMIC_MULTI_DRAW_ARRAYS
+  if (IsExtensionSupported("GL_EXT_multi_draw_arrays")) {
+    GLExt::multi_draw_arrays = (PFNGLMULTIDRAWARRAYSEXTPROC)
+      dlsym(RTLD_DEFAULT, "glMultiDrawArraysEXT");
+    GLExt::multi_draw_elements = (PFNGLMULTIDRAWELEMENTSEXTPROC)
+      dlsym(RTLD_DEFAULT, "glMultiDrawElementsEXT");
+  } else {
+    GLExt::multi_draw_arrays = nullptr;
+    GLExt::multi_draw_elements = nullptr;
+  }
+#endif
+
   frame_buffer_object = CheckFBO() && FBO::Initialise();
   if (frame_buffer_object) {
     render_buffer_depth_stencil = CheckDepthStencil();
@@ -288,35 +294,135 @@ OpenGL::SetupContext()
 
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_DITHER);
+#ifndef HAVE_GLES2
   glDisable(GL_LIGHTING);
+#endif
 
+#ifndef USE_GLSL
   glEnableClientState(GL_VERTEX_ARRAY);
+#endif
 
   InitShapes();
+
+#ifdef USE_GLSL
+  InitShaders();
+#endif
 }
 
 void
-OpenGL::SetupViewport(unsigned width, unsigned height)
+OpenGL::SetupViewport(Point2D<unsigned> size)
 {
-  screen_width = width;
-  screen_height = height;
+  window_size = size;
+  viewport_size = size;
 
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, size.x, size.y);
+
+#ifdef USE_GLSL
+  projection_matrix = glm::ortho<float>(0, size.x, size.y, 0, -1, 1);
+  UpdateShaderProjectionMatrix();
+#else
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 #ifdef HAVE_GLES
-  glOrthox(0, width << 16, height << 16, 0, -(1<<16), 1<<16);
+  glOrthox(0, size.x << 16, size.y << 16, 0, -(1<<16), 1<<16);
 #else
-  glOrtho(0, width, height, 0, -1, 1);
+  glOrtho(0, size.x, size.y, 0, -1, 1);
 #endif
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+#endif
+}
+
+/**
+ * Determine the projection rotation angle (in degrees) of the
+ * specified orientation.
+ */
+gcc_const
+static GLfloat
+OrientationToRotation(DisplayOrientation orientation)
+{
+  switch (orientation) {
+  case DisplayOrientation::DEFAULT:
+  case DisplayOrientation::LANDSCAPE:
+    return 0;
+
+  case DisplayOrientation::PORTRAIT:
+    return 90;
+
+  case DisplayOrientation::REVERSE_LANDSCAPE:
+    return 180;
+
+  case DisplayOrientation::REVERSE_PORTRAIT:
+    return 270;
+  }
+
+  assert(false);
+  gcc_unreachable();
+}
+
+/**
+ * Swap x and y if the given orientation specifies it.
+ */
+static void
+OrientationSwap(Point2D<unsigned> &p, DisplayOrientation orientation)
+{
+  switch (orientation) {
+  case DisplayOrientation::DEFAULT:
+  case DisplayOrientation::LANDSCAPE:
+  case DisplayOrientation::REVERSE_LANDSCAPE:
+    break;
+
+  case DisplayOrientation::PORTRAIT:
+  case DisplayOrientation::REVERSE_PORTRAIT:
+    std::swap(p.x, p.y);
+    break;
+  }
+}
+
+void
+OpenGL::SetupViewport(Point2D<unsigned> &size, DisplayOrientation orientation)
+{
+  window_size = size;
+
+  glViewport(0, 0, size.x, size.y);
+
+#ifdef USE_GLSL
+  projection_matrix = glm::rotate(glm::mat4(),
+                                  OrientationToRotation(orientation),
+                                  glm::vec3(0, 0, 1));
+  OrientationSwap(size, orientation);
+  projection_matrix = glm::ortho<float>(0, size.x, size.y, 0, -1, 1);
+  UpdateShaderProjectionMatrix();
+#else
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glRotatef(OrientationToRotation(orientation), 0, 0, 1);
+  OrientationSwap(size, orientation);
+#ifdef HAVE_GLES
+  glOrthox(0, size.x << 16, size.y << 16, 0, -(1<<16), 1<<16);
+#else
+  glOrtho(0, size.x, size.y, 0, -1, 1);
+#endif
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+#endif
+
+  viewport_size = size;
+
+#ifdef SOFTWARE_ROTATE_DISPLAY
+  OpenGL::display_orientation = orientation;
+#endif
 }
 
 void
 OpenGL::Deinitialise()
 {
+#ifdef USE_GLSL
+  DeinitShaders();
+#endif
+
   DeinitShapes();
 
   TextCache::Flush();

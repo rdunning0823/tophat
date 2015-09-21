@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,6 +30,7 @@ Copyright_License {
 #include "Form/DataField/Listener.hpp"
 #include "Language/Language.hpp"
 #include "Tracking/TrackingSettings.hpp"
+#include "Net/State.hpp"
 #include "Form/DataField/Base.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Screen/Layout.hpp"
@@ -40,9 +41,13 @@ Copyright_License {
 enum ControlIndex {
 #ifdef HAVE_SKYLINES_TRACKING
   SL_ENABLED,
+#ifdef HAVE_NET_STATE_ROAMING
+  SL_ROAMING,
+#endif
   SL_INTERVAL,
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   SL_TRAFFIC_ENABLED,
+  SL_NEAR_TRAFFIC_ENABLED,
 #endif
   SL_KEY,
 #endif
@@ -89,9 +94,14 @@ private:
 void
 TrackingConfigPanel::SetSkyLinesEnabled(bool enabled)
 {
+#ifdef HAVE_NET_STATE_ROAMING
+  SetRowEnabled(SL_ROAMING, enabled);
+#endif
   SetRowEnabled(SL_INTERVAL, enabled);
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   SetRowEnabled(SL_TRAFFIC_ENABLED, enabled);
+  SetRowEnabled(SL_NEAR_TRAFFIC_ENABLED,
+                enabled && GetValueBoolean(SL_TRAFFIC_ENABLED));
 #endif
   SetRowEnabled(SL_KEY, enabled);
 }
@@ -124,6 +134,14 @@ TrackingConfigPanel::OnModified(DataField &df)
   }
 #endif
 
+#ifdef HAVE_SKYLINES_TRACKING_HANDLER
+  if (IsDataField(SL_TRAFFIC_ENABLED, df)) {
+    const DataFieldBoolean &dfb = (const DataFieldBoolean &)df;
+    SetRowEnabled(SL_NEAR_TRAFFIC_ENABLED, dfb.GetAsBoolean());
+    return;
+  }
+#endif
+
 #ifdef HAVE_LIVETRACK24
   if (IsDataField(LT24Enabled, df)) {
     const DataFieldBoolean &dfb = (const DataFieldBoolean &)df;
@@ -131,6 +149,30 @@ TrackingConfigPanel::OnModified(DataField &df)
   }
 #endif
 }
+
+#ifdef HAVE_SKYLINES_TRACKING
+
+static constexpr StaticEnumChoice tracking_intervals[] = {
+  { 1, _T("1 sec") },
+  { 2, _T("2 sec") },
+  { 3, _T("3 sec") },
+  { 5, _T("5 sec") },
+  { 10, _T("10 sec") },
+  { 15, _T("15 sec") },
+  { 20, _T("20 sec") },
+  { 30, _T("30 sec") },
+  { 45, _T("45 sec") },
+  { 60, _T("1 min") },
+  { 120, _T("2 min") },
+  { 180, _T("3 min") },
+  { 300, _T("5 min") },
+  { 600, _T("10 min") },
+  { 900, _T("15 min") },
+  { 1200, _T("20 min") },
+  { 0 },
+};
+
+#endif
 
 #ifdef HAVE_LIVETRACK24
 
@@ -162,14 +204,21 @@ TrackingConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
 #ifdef HAVE_SKYLINES_TRACKING
-  AddBoolean(_T("SkyLines"), NULL, settings.skylines.enabled, this);
-  AddTime(_("Tracking Interval"), NULL, 5, 1200, 5,
+  AddBoolean(_T("SkyLines"), nullptr, settings.skylines.enabled, this);
+#ifdef HAVE_NET_STATE_ROAMING
+  AddBoolean(_T("Roaming"), nullptr, settings.skylines.roaming, this);
+#endif
+  AddEnum(_("Tracking Interval"), nullptr, tracking_intervals,
           settings.skylines.interval);
 
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   AddBoolean(_("Track friends"),
              _("Download the position of your friends live from the SkyLines server."),
              settings.skylines.traffic_enabled, this);
+
+  AddBoolean(_("Show nearby traffic"),
+             _("Download the position of your nearby traffic live from the SkyLines server."),
+             settings.skylines.near_traffic_enabled, this);
 #endif
 
   StaticString<64> buffer;
@@ -177,7 +226,7 @@ TrackingConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     buffer.UnsafeFormat(_T("%llX"), (unsigned long long)settings.skylines.key);
   else
     buffer.clear();
-  AddText(_T("Key"), NULL, buffer);
+  AddText(_T("Key"), nullptr, buffer);
 #endif
 
 #if defined(HAVE_SKYLINES_TRACKING) && defined(HAVE_LIVETRACK24)
@@ -217,7 +266,7 @@ SaveKey(const RowFormWidget &form, unsigned idx, const char *profile_key,
         uint64_t &value_r)
 {
   const TCHAR *const s = form.GetValueString(idx);
-  uint64_t value = ParseUint64(s, NULL, 16);
+  uint64_t value = ParseUint64(s, nullptr, 16);
   if (value == value_r)
     return false;
 
@@ -242,12 +291,17 @@ TrackingConfigPanel::Save(bool &_changed)
                            settings.vehicleType);
 
   changed |= SaveValue(TrackingVehicleName, ProfileKeys::TrackingVehicleName,
-                       settings.vehicle_name.buffer(), settings.vehicle_name.MAX_SIZE);
+                       settings.vehicle_name);
 #endif
 
 #ifdef HAVE_SKYLINES_TRACKING
   changed |= SaveValue(SL_ENABLED, ProfileKeys::SkyLinesTrackingEnabled,
                        settings.skylines.enabled);
+
+#ifdef HAVE_NET_STATE_ROAMING
+  changed |= SaveValue(SL_ROAMING, ProfileKeys::SkyLinesRoaming,
+                       settings.skylines.roaming);
+#endif
 
   changed |= SaveValue(SL_INTERVAL, ProfileKeys::SkyLinesTrackingInterval,
                        settings.skylines.interval);
@@ -255,6 +309,9 @@ TrackingConfigPanel::Save(bool &_changed)
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
   changed |= SaveValue(SL_TRAFFIC_ENABLED, ProfileKeys::SkyLinesTrafficEnabled,
                        settings.skylines.traffic_enabled);
+  changed |= SaveValue(SL_NEAR_TRAFFIC_ENABLED,
+                       ProfileKeys::SkyLinesNearTrafficEnabled,
+                       settings.skylines.near_traffic_enabled);
 #endif
 
   changed |= SaveKey(*this, SL_KEY, ProfileKeys::SkyLinesTrackingKey,
@@ -265,13 +322,13 @@ TrackingConfigPanel::Save(bool &_changed)
   changed |= SaveValue(LT24Enabled, ProfileKeys::LiveTrack24Enabled, settings.livetrack24.enabled);
 
   changed |= SaveValue(LT24Server, ProfileKeys::LiveTrack24Server,
-                       settings.livetrack24.server.buffer(), settings.livetrack24.server.MAX_SIZE);
+                       settings.livetrack24.server);
 
   changed |= SaveValue(LT24Username, ProfileKeys::LiveTrack24Username,
-                       settings.livetrack24.username.buffer(), settings.livetrack24.username.MAX_SIZE);
+                       settings.livetrack24.username);
 
   changed |= SaveValue(LT24Password, ProfileKeys::LiveTrack24Password,
-                       settings.livetrack24.password.buffer(), settings.livetrack24.password.MAX_SIZE);
+                       settings.livetrack24.password);
 #endif
 
   _changed |= changed;

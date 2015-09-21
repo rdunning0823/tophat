@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,6 +33,8 @@
 
 struct TaskBehaviour;
 struct OrderedTaskSettings;
+class FlatProjection;
+class GeoBounds;
 
 /**
  * Abstract compound specialisation of TaskLeg and ScoredTaskPoint,
@@ -121,8 +123,8 @@ public:
     return GetType() != TaskPointType::FINISH;
   }
 
-  virtual void SetTaskBehaviour(const TaskBehaviour &tb) {}
-  virtual void SetOrderedTaskSettings(const OrderedTaskSettings &otb) {}
+  virtual void SetTaskBehaviour(gcc_unused const TaskBehaviour &tb) {}
+  virtual void SetOrderedTaskSettings(gcc_unused const OrderedTaskSettings &otb) {}
 
   /**
    * Set previous/next task points.
@@ -213,18 +215,19 @@ public:
   virtual bool Equals(const OrderedTaskPoint &other) const;
 
   /**
-   * Update a TaskProjection to include this taskpoint and observation zone.
+   * Update a GeoBounds to include this taskpoint and observation
+   * zone.
    *
-   * @param task_projection Projection to update
+   * @param bounds GeoBounds to update
    */
-  void ScanProjection(TaskProjection &task_projection) const;
+  void ScanBounds(GeoBounds &bounds) const;
 
-  void UpdateOZ(const TaskProjection &projection);
+  void UpdateOZ(const FlatProjection &projection);
 
   /**
    * Update the bounding box in flat projected coordinates
    */
-  void UpdateBoundingBox(const TaskProjection &task_projection);
+  void UpdateBoundingBox(const FlatProjection &projection);
 
   /**
    * Test whether a boundingbox overlaps with this oz
@@ -254,7 +257,7 @@ public:
    * @return True if internal state changed
    */
   virtual bool UpdateSampleNear(const AircraftState &state,
-                                const TaskProjection &projection);
+                                const FlatProjection &projection);
 
   /**
    * Perform updates to samples as required if known to be far from the OZ
@@ -264,8 +267,8 @@ public:
    *
    * @return True if internal state changed
    */
-  virtual bool UpdateSampleFar(const AircraftState &state,
-                               const TaskProjection &projection) {
+  virtual bool UpdateSampleFar(gcc_unused const AircraftState &state,
+                               gcc_unused const FlatProjection &projection) {
     return false;
   }
 
@@ -285,21 +288,21 @@ protected:
 
 public:
   /* virtual methods from class TaskPoint */
-  virtual const GeoPoint &GetLocationRemaining() const override {
+  const GeoPoint &GetLocationRemaining() const override {
     return ScoredTaskPoint::GetLocationRemaining();
   }
-  virtual GeoVector GetVectorRemaining(const GeoPoint &reference) const override {
+  GeoVector GetVectorRemaining(gcc_unused const GeoPoint &reference) const override {
     return TaskLeg::GetVectorRemaining();
   }
-  virtual GeoVector GetNextLegVector() const override;
+  GeoVector GetNextLegVector() const override;
 
 protected:
   /* virtual methods from class ScoredTaskPoint */
-  virtual bool CheckEnterTransition(const AircraftState &ref_now,
-                                    const AircraftState &ref_last) const override;
+  bool CheckEnterTransition(const AircraftState &ref_now,
+                            const AircraftState &ref_last) const override;
 
-  virtual bool CheckExitTransition(const AircraftState &ref_now,
-                                   const AircraftState &ref_last) const  override{
+  bool CheckExitTransition(const AircraftState &ref_now,
+                           const AircraftState &ref_last) const override{
     return CheckEnterTransition(ref_last, ref_now);
   }
 };

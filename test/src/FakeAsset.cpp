@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,5 +26,31 @@ Copyright_License {
 #ifdef HAVE_MODEL_TYPE
 
 ModelType global_model_type = ModelType::GENERIC;
+
+#endif
+
+#if defined(USE_CONSOLE) && !defined(KOBO)
+
+bool
+HasPointer()
+{
+  return !IsAltair();
+}
+
+#endif
+
+#ifdef USE_LIBINPUT
+
+bool
+HasTouchScreen()
+{
+  return IsAndroid() || (IsWindowsCE() && !IsAltair()) || IsKobo() || IsIOS();
+}
+
+bool
+HasKeyboard()
+{
+  return !IsEmbedded();
+}
 
 #endif

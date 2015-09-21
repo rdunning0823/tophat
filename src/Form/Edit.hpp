@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,17 +37,22 @@ class ContainerWindow;
  * an editable field (the Editor).
  */
 class WndProperty : public WindowControl {
+  typedef bool (*EditCallback)(const TCHAR *caption, DataField &df,
+                               const TCHAR *help_text);
+
   const DialogLook &look;
 
   /** Position of the Editor Control */
   PixelRect edit_rc;
 
   /** Width reserved for the caption of the Control */
-  PixelScalar caption_width;
+  int caption_width;
 
   tstring value;
 
-  DataField *mDataField;
+  DataField *data_field;
+
+  EditCallback edit_callback;
 
   bool read_only;
 
@@ -71,11 +76,15 @@ public:
               const PixelRect &rc, int CaptionWidth,
               const WindowStyle style);
 
+  WndProperty(const DialogLook &_look);
+
   /** Destructor */
   ~WndProperty();
 
-protected:
-  int CallSpecial();
+  void Create(ContainerWindow &parent, const PixelRect &rc,
+              const TCHAR *_caption,
+              unsigned _caption_width,
+              const WindowStyle style);
 
 public:
   /**
@@ -83,9 +92,9 @@ public:
    * font.
    */
   gcc_pure
-  UPixelScalar GetRecommendedCaptionWidth() const;
+  unsigned GetRecommendedCaptionWidth() const;
 
-  void SetCaptionWidth(PixelScalar caption_width);
+  void SetCaptionWidth(int caption_width);
 
   void RefreshDisplay();
 
@@ -117,25 +126,23 @@ public:
    * available, then the ComboPicker  will be launched, otherwise, the
    * focus and cursor is set to the control.
    *
-   * @return false on failure
+   * @return true if the value has been modified
    */
   bool BeginEditing();
 
 protected:
-  virtual void OnResize(PixelSize new_size) override;
-  virtual void OnSetFocus() override;
-  virtual void OnKillFocus() override;
+  void OnResize(PixelSize new_size) override;
+  void OnSetFocus() override;
+  void OnKillFocus() override;
 
-  virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y,
-                           unsigned keys) override;
+  bool OnMouseDown(PixelScalar x, PixelScalar y) override;
+  bool OnMouseUp(PixelScalar x, PixelScalar y) override;
+  bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
 
-  virtual bool OnKeyCheck(unsigned key_code) const override;
-  virtual bool OnKeyDown(unsigned key_code) override;
-  virtual bool OnKeyUp(unsigned key_code) override;
+  bool OnKeyCheck(unsigned key_code) const override;
+  bool OnKeyDown(unsigned key_code) override;
 
-  virtual void OnCancelMode() override;
+  void OnCancelMode() override;
 
 public:
   /**
@@ -143,7 +150,7 @@ public:
    * @return The Control's DataField
    */
   DataField *GetDataField() {
-    return mDataField;
+    return data_field;
   }
 
   /**
@@ -151,10 +158,14 @@ public:
    * @return The Control's DataField
    */
   const DataField *GetDataField() const {
-    return mDataField;
+    return data_field;
   }
 
   void SetDataField(DataField *Value);
+
+  void SetEditCallback(EditCallback _ec) {
+    edit_callback = _ec;
+  }
 
   /**
    * Sets the Editors text to the given Value
@@ -173,7 +184,7 @@ private:
    * The OnPaint event is called when the button needs to be drawn
    * (derived from PaintWindow)
    */
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnPaint(Canvas &canvas) override;
 
   /** Increases the Editor value */
   int IncValue();

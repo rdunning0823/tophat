@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ Copyright_License {
 void
 MapWindow::DrawTask(Canvas &canvas)
 {
-  if (task == NULL)
+  if (task == nullptr)
     return;
 
   /* RLD bearing is invalid if GPS not connected and in non-sim mode,
@@ -69,7 +69,8 @@ MapWindow::DrawTask(Canvas &canvas)
                              will be used only if active, so it's ok */
                           task_manager->GetOrderedTask().GetTaskProjection(),
                           ozv, draw_bearing, target_visibility,
-                          Basic().location_available, Basic().location);
+                          Basic().location_available
+                          ? Basic().location : GeoPoint::Invalid());
     tpv.SetTaskFinished(Calculated().task_stats.task_finished);
     TaskRenderer dv(tpv, render_projection.GetScreenBounds());
     dv.Draw(*task, ordered_task);
@@ -136,8 +137,8 @@ MapWindow::DrawTaskOffTrackIndicator(Canvas &canvas)
   for (fixed d = fixed(1) / 4; d <= fixed(1); d += fixed(1) / 4) {
     dloc = FindLatitudeLongitude(start, Basic().track, distance_max * d);
     
-    fixed distance0 = start.Distance(dloc);
-    fixed distance1 = target.Distance(dloc);
+    fixed distance0 = start.DistanceS(dloc);
+    fixed distance1 = target.DistanceS(dloc);
     fixed distance = fixed(distance0 + distance1) / vec.distance;
     int idist = iround((distance - fixed(1)) * 100);
     

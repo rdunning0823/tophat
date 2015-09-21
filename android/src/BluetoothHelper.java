@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,10 +25,15 @@ package org.tophat;
 
 import java.util.UUID;
 import java.util.Set;
+
 import android.util.Log;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.pm.PackageManager;
 
 /**
  * A library that constructs Bluetooth ports.  It is called by C++
@@ -40,6 +45,11 @@ final class BluetoothHelper {
         UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
   private static final BluetoothAdapter adapter;
+
+  /**
+   * Does this device support Bluetooth Low Energy?
+   */
+  private static boolean hasLe;
 
   static {
     BluetoothAdapter _adapter;
@@ -53,7 +63,9 @@ final class BluetoothHelper {
     adapter = _adapter;
   }
 
-  public static void Initialize() {
+  public static void Initialize(Context context) {
+    hasLe = adapter != null && android.os.Build.VERSION.SDK_INT >= 18 &&
+      context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
   }
 
   public static boolean isEnabled() {
@@ -107,7 +119,16 @@ final class BluetoothHelper {
     return addresses;
   }
 
-  public static AndroidPort connect(String address) {
+  public static boolean startLeScan(BluetoothAdapter.LeScanCallback cb) {
+    return hasLe && adapter.startLeScan(cb);
+  }
+
+  public static void stopLeScan(BluetoothAdapter.LeScanCallback cb) {
+    if (hasLe)
+      adapter.stopLeScan(cb);
+  }
+
+  public static AndroidPort connect(Context context, String address) {
     if (adapter == null)
       return null;
 
@@ -116,9 +137,19 @@ final class BluetoothHelper {
       if (device == null)
         return null;
 
-      BluetoothSocket socket =
-        device.createRfcommSocketToServiceRecord(THE_UUID);
-      return new BluetoothClientPort(socket);
+      if (hasLe && BluetoothDevice.DEVICE_TYPE_LE == device.getType()) {
+        Log.d(TAG, String.format(
+            "Bluetooth device \"%s\" (%s) is a LE device, trying to connect using GATT...",
+             device.getName(), device.getAddress()));
+        BluetoothGattClientPort gattClientPort
+          = new BluetoothGattClientPort(device);
+        gattClientPort.startConnect(context);
+        return gattClientPort;
+      } else {
+        BluetoothSocket socket =
+            device.createRfcommSocketToServiceRecord(THE_UUID);
+        return new BluetoothClientPort(socket);
+      }
     } catch (Exception e) {
       Log.e(TAG, "Failed to connect to Bluetooth", e);
       return null;

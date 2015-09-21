@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,7 +33,8 @@ import android.util.Log;
  * objects.
  */
 class MultiPort implements AndroidPort, InputListener {
-  private InputListener listener;
+  private PortListener portListener;
+  private InputListener inputListener;
 
   private static final String TAG = "TopHat";
 
@@ -80,11 +81,16 @@ class MultiPort implements AndroidPort, InputListener {
     checkValid();
 
     ports.add(port);
-    port.setListener(this);
+    port.setListener(portListener);
+    port.setInputListener(this);
   }
 
-  @Override public void setListener(InputListener _listener) {
-    listener = _listener;
+  @Override public void setListener(PortListener _listener) {
+    portListener = _listener;
+  }
+
+  @Override public void setInputListener(InputListener _listener) {
+    inputListener = _listener;
   }
 
   @Override public synchronized void close() {
@@ -133,8 +139,14 @@ class MultiPort implements AndroidPort, InputListener {
   }
 
   @Override public void dataReceived(byte[] data, int length) {
-    InputListener l = listener;
+    InputListener l = inputListener;
     if (l != null)
       l.dataReceived(data, length);
+  }
+
+  protected void stateChanged() {
+    PortListener portListener = this.portListener;
+    if (portListener != null)
+      portListener.portStateChanged();
   }
 }

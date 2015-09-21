@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,40 +33,8 @@ class Font;
  */
 namespace Fonts
 {
-  /**
-   * The default font settings, as determined by GetDefaults().
-   */
-  extern FontSettings default_settings;
-
-#ifndef GNAV
-  /**
-   * The font settings that are effectively used.  This is different
-   * from #default_settings if the user has configured custom fonts.
-   */
-  extern FontSettings effective_settings;
-#endif
-
-  /**
-   * Fonts for user interfaces such as dialogs, pop-up messages etc.
-   */
-  extern Font dialog, dialog_bold, dialog_small;
-
-  extern Font infobox;
-  extern Font infobox_small;
-#ifndef GNAV
-  extern Font infobox_units;
-#endif
-
-  extern Font title;
-  extern Font comment;
-  extern Font cdi;
-  extern Font monospace;
-
   extern Font map;
   extern Font map_bold;
-  extern Font map_label;
-  extern Font map_label_important;
-  extern Font map_overlay_button;
 
   bool Load(const FontSettings &settings);
 

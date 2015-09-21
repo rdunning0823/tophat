@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,11 +32,10 @@ Copyright_License {
 #include "Screen/OpenGL/Init.hpp"
 #endif
 
-#ifdef USE_FREETYPE
-#include "Screen/FreeType/Init.hpp"
-#endif
-
 #include <SDL.h>
+#if SDL_MAJOR_VERSION >= 2
+#include <SDL_hints.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,21 +51,32 @@ ScreenGlobalInit::ScreenGlobalInit()
     exit(EXIT_FAILURE);
   }
 
+#if defined(HAVE_GLES) && SDL_MAJOR_VERSION >= 2
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#ifdef HAVE_GLES2
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
+#endif
+
+#if SDL_MAJOR_VERSION >= 2
+  // Keep screen on (works on iOS, and maybe for other platforms)
+  SDL_SetHint(SDL_HINT_IDLE_TIMER_DISABLED, "1");
+#endif
+
   if (HasTouchScreen())
     SDL_ShowCursor (SDL_FALSE);
 
+#if SDL_MAJOR_VERSION < 2
   ::SDL_EnableKeyRepeat(250, 50);
   ::SDL_EnableUNICODE(true);
+#endif
 
 #if defined(ENABLE_OPENGL)
   ::SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   ::SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
 
   OpenGL::Initialise();
-#endif
-
-#ifdef USE_FREETYPE
-  FreeType::Initialise();
 #endif
 
   Font::Initialise();
@@ -85,9 +95,7 @@ ScreenGlobalInit::~ScreenGlobalInit()
   OpenGL::Deinitialise();
 #endif
 
-#ifdef USE_FREETYPE
-  FreeType::Deinitialise();
-#endif
+  Font::Deinitialise();
 
   ::SDL_Quit();
 

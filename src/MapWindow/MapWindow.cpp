@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Topography/CachedTopographyRenderer.hpp"
 #include "Terrain/RasterTerrain.hpp"
-#include "Terrain/RasterWeather.hpp"
+#include "Terrain/RasterWeatherCache.hpp"
 #include "Computer/GlideComputer.hpp"
 #include "Operation/Operation.hpp"
 
@@ -40,19 +40,19 @@ MapWindow::MapWindow(const MapLook &_look,
                      const TrafficLook &_traffic_look)
   :look(_look),
    follow_mode(FOLLOW_SELF),
-   waypoints(NULL),
-   topography(NULL), topography_renderer(NULL),
-   terrain(NULL),
+   waypoints(nullptr),
+   topography(nullptr), topography_renderer(nullptr),
+   terrain(nullptr),
    terrain_radius(fixed(0)),
-   weather(NULL),
+   weather(nullptr),
    traffic_look(_traffic_look),
-   waypoint_renderer(NULL, look.waypoint),
+   waypoint_renderer(nullptr, look.waypoint),
    airspace_renderer(look.airspace),
+   airspace_label_renderer(look.airspace),
    trail_renderer(look.trail),
-   task(NULL), route_planner(NULL), glide_computer(NULL),
-   marks(NULL),
+   task(nullptr), route_planner(nullptr), glide_computer(nullptr),
 #ifdef HAVE_NOAA
-   noaa_store(NULL),
+   noaa_store(nullptr),
 #endif
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
    skylines_data(nullptr),
@@ -67,7 +67,10 @@ MapWindow::MapWindow(const MapLook &_look,
 
 MapWindow::~MapWindow()
 {
+  Destroy();
+
   delete topography_renderer;
+  delete weather;
 }
 
 void
@@ -91,9 +94,9 @@ void
 MapWindow::SetGlideComputer(GlideComputer *_gc)
 {
   glide_computer = _gc;
-  airspace_renderer.SetAirspaceWarnings(glide_computer != NULL
+  airspace_renderer.SetAirspaceWarnings(glide_computer != nullptr
                                         ? &glide_computer->GetAirspaceWarnings()
-                                        : NULL);
+                                        : nullptr);
 }
 
 void
@@ -125,7 +128,7 @@ MapWindow::ReadBlackboard(const MoreData &nmea_info,
 unsigned
 MapWindow::UpdateTopography(unsigned max_update)
 {
-  if (topography != NULL && GetMapSettings().topography_enabled)
+  if (topography != nullptr && GetMapSettings().topography_enabled)
     return topography->ScanVisibility(visible_projection, max_update);
   else
     return 0;
@@ -134,13 +137,13 @@ MapWindow::UpdateTopography(unsigned max_update)
 bool
 MapWindow::UpdateTerrain()
 {
-  if (terrain == NULL)
+  if (terrain == nullptr)
     return false;
 
   GeoPoint location = visible_projection.GetGeoScreenCenter();
   fixed radius = visible_projection.GetScreenWidthMeters() / 2;
   if (terrain_radius >= radius && terrain_center.IsValid() &&
-      terrain_center.Distance(location) < fixed(1000))
+      terrain_center.DistanceS(location) < fixed(1000))
     return false;
 
   // always service terrain even if it's not used by the map,
@@ -160,14 +163,15 @@ MapWindow::UpdateTerrain()
 bool
 MapWindow::UpdateWeather()
 {
-  // always service weather even if it's not used by the map,
-  // because it's potentially used by other calculations
-
-  if (weather == NULL || !Calculated().date_time_local.IsTimePlausible())
+  if (weather == nullptr || !Calculated().date_time_local.IsTimePlausible())
     return false;
 
+  const WeatherUIState &state = GetUIState().weather;
+  weather->SetParameter(state.map);
+  weather->SetTime(state.time);
+
   QuietOperationEnvironment operation;
-  weather->Reload(Calculated().date_time_local.GetSecondOfDay(), operation);
+  weather->Reload(Calculated().date_time_local, operation);
   weather->SetViewCenter(visible_projection.GetGeoScreenCenter(),
                          visible_projection.GetScreenWidthMeters() / 2);
   return weather->IsDirty();
@@ -205,9 +209,9 @@ MapWindow::SetTopography(TopographyStore *_topography)
   topography = _topography;
 
   delete topography_renderer;
-  topography_renderer = topography != NULL
-    ? new CachedTopographyRenderer(*topography)
-    : NULL;
+  topography_renderer = topography != nullptr
+    ? new CachedTopographyRenderer(*topography, look.topography)
+    : nullptr;
 }
 
 void
@@ -219,10 +223,13 @@ MapWindow::SetTerrain(RasterTerrain *_terrain)
 }
 
 void
-MapWindow::SetWeather(RasterWeather *_weather)
+MapWindow::SetWeather(const RasterWeatherStore *_weather)
 {
-  weather = _weather;
-  background.SetWeather(_weather);
+  delete weather;
+  weather = _weather != nullptr
+    ? new RasterWeatherCache(*_weather)
+    : nullptr;
+  background.SetWeather(weather);
 }
 
 void

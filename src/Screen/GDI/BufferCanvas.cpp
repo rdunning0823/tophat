@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -58,21 +58,21 @@ void
 BufferCanvas::Destroy()
 {
   VirtualCanvas::Destroy();
-  if (bitmap != NULL) {
+  if (bitmap != nullptr) {
 #ifndef NDEBUG
     bool success =
 #endif
       ::DeleteObject(bitmap);
     assert(success);
 
-    bitmap = NULL;
+    bitmap = nullptr;
   }
 }
 
 void
 BufferCanvas::Resize(PixelSize new_size)
 {
-  assert(dc != NULL);
+  assert(dc != nullptr);
 
   if (new_size == size)
     return;

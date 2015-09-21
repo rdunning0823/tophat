@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "Form/Control.hpp"
-#include "Form/Internal.hpp"
 #include "Screen/Key.h"
 #include "Dialogs/HelpDialog.hpp"
 
@@ -44,13 +43,13 @@ void
 WindowControl::SetHelpText(const TCHAR *Value)
 {
   free(help_text);
-  help_text = Value != NULL ? _tcsdup(Value) : NULL;
+  help_text = Value != nullptr ? _tcsdup(Value) : nullptr;
 }
 
 void
 WindowControl::SetCaption(const TCHAR *Value)
 {
-  if (Value == NULL)
+  if (Value == nullptr)
     Value = _T("");
 
   if (!caption.equals(Value)) {
@@ -68,24 +67,4 @@ WindowControl::OnHelp()
   }
 
   return false;
-}
-
-bool
-WindowControl::OnKeyDown(unsigned key_code)
-{
-  KeyTimer(true, key_code);
-
-  return PaintWindow::OnKeyDown(key_code);
-}
-
-bool
-WindowControl::OnKeyUp(unsigned key_code)
-{
-  // JMW: detect long enter release
-  // VENTA4: PNAs don't have Enter, so it should be better to find an alternate solution
-  // activate tool tips if hit return for long time
-  if (KeyTimer(false, key_code) && key_code == KEY_RETURN && OnHelp())
-    return true;
-
-  return PaintWindow::OnKeyUp(key_code);
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@ Copyright_License {
 */
 
 #include "UtilsSettings.hpp"
+#include "Profile/Current.hpp"
 #include "Protection.hpp"
 #include "Look/Look.hpp"
-#include "Look/GlobalFonts.hpp"
 #include "MainWindow.hpp"
 #include "Computer/Settings.hpp"
 #include "MapSettings.hpp"
@@ -121,8 +121,8 @@ SettingsLeave(const UISettings &old_ui_settings)
        (e.g. the cross section) */
     main_window.SetBottomWidget(nullptr);
 
-    main_window.SetTerrain(NULL);
-    glide_computer->SetTerrain(NULL);
+    main_window.SetTerrain(nullptr);
+    glide_computer->SetTerrain(nullptr);
 
     // re-load terrain
     delete terrain;
@@ -141,7 +141,7 @@ SettingsLeave(const UISettings &old_ui_settings)
     WaypointDetails::ReadFileFromProfile(way_points, operation);
   }
 
-  if (WaypointFileChanged && protected_task_manager != NULL) {
+  if (WaypointFileChanged && protected_task_manager != nullptr) {
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
     OrderedTask *task = lease->Clone(CommonInterface::GetComputerSettings().task);
     if (task) {
@@ -162,7 +162,8 @@ SettingsLeave(const UISettings &old_ui_settings)
                           CommonInterface::SetComputerSettings().poi,
                           CommonInterface::SetComputerSettings().team_code,
                           device_blackboard, WaypointFileChanged);
-    WaypointGlue::SaveHome(CommonInterface::GetComputerSettings().poi,
+    WaypointGlue::SaveHome(Profile::map,
+                           CommonInterface::GetComputerSettings().poi,
                            CommonInterface::GetComputerSettings().team_code);
 
     UISettings &ui_settings_set = CommonInterface::SetUISettings();
@@ -172,17 +173,17 @@ SettingsLeave(const UISettings &old_ui_settings)
   }
 
   if (TopographyFileChanged) {
-    main_window.SetTopography(NULL);
+    main_window.SetTopography(nullptr);
     topography->Reset();
     LoadConfiguredTopography(*topography, operation);
     main_window.SetTopography(topography);
   }
 
   if (AirspaceFileChanged) {
-    if (glide_computer != NULL)
+    if (glide_computer != nullptr)
       glide_computer->GetAirspaceWarnings().Clear();
 
-    if (glide_computer != NULL)
+    if (glide_computer != nullptr)
       glide_computer->ClearAirspaces();
 
     airspace_database.Clear();
@@ -196,8 +197,8 @@ SettingsLeave(const UISettings &old_ui_settings)
 
   const UISettings &ui_settings = CommonInterface::GetUISettings();
 
-  Units::SetConfig(ui_settings.units);
-  SetUserCoordinateFormat(ui_settings.coordinate_format);
+  Units::SetConfig(ui_settings.format.units);
+  SetUserCoordinateFormat(ui_settings.format.coordinate_format);
 
   const MapSettings &old_settings_map = old_ui_settings.map;
   const MapSettings &settings_map = ui_settings.map;
@@ -207,8 +208,7 @@ SettingsLeave(const UISettings &old_ui_settings)
     main_window.SetLook().map.trail.Initialise(settings_map.trail);
 
   if (settings_map.waypoint.landable_style != old_settings_map.waypoint.landable_style)
-    main_window.SetLook().map.waypoint.Initialise(settings_map.waypoint,
-                                                  Fonts::map, Fonts::map_bold);
+    main_window.SetLook().map.waypoint.Reinitialise(settings_map.waypoint);
 
   ResumeAllThreads();
   main_window.ResumeThreads();

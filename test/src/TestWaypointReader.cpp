@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,8 @@
 #include "Units/System.hpp"
 #include "TestUtil.hpp"
 #include "Util/tstring.hpp"
+#include "Util/StringAPI.hpp"
+#include "Util/ExtractParameters.hpp"
 #include "Operation/Operation.hpp"
 
 #include <vector>
@@ -40,139 +42,134 @@ TestExtractParameters()
 
   // test basic functionality
 
-  n = WaypointReaderBase::ExtractParameters(_T(""), buffer, params, 64);
+  n = ExtractParameters(_T(""), buffer, params, 64);
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("")) == 0);
+  ok1(StringIsEqual(params[0], _T("")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo"), buffer, params, 64);
+  n = ExtractParameters(_T("foo"), buffer, params, 64);
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo,bar"), buffer, params, 64);
+  n = ExtractParameters(_T("foo,bar"), buffer, params, 64);
   ok1(n == 2);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
-  ok1(_tcscmp(params[1], _T("bar")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
+  ok1(StringIsEqual(params[1], _T("bar")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo,bar"), buffer, params, 1);
+  n = ExtractParameters(_T("foo,bar"), buffer, params, 1);
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo,bar,"), buffer, params, 64);
+  n = ExtractParameters(_T("foo,bar,"), buffer, params, 64);
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
-  ok1(_tcscmp(params[1], _T("bar")) == 0);
-  ok1(_tcscmp(params[2], _T("")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
+  ok1(StringIsEqual(params[1], _T("bar")));
+  ok1(StringIsEqual(params[2], _T("")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo,bar,,"), buffer, params, 64);
+  n = ExtractParameters(_T("foo,bar,,"), buffer, params, 64);
   ok1(n == 4);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
-  ok1(_tcscmp(params[1], _T("bar")) == 0);
-  ok1(_tcscmp(params[2], _T("")) == 0);
-  ok1(_tcscmp(params[3], _T("")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
+  ok1(StringIsEqual(params[1], _T("bar")));
+  ok1(StringIsEqual(params[2], _T("")));
+  ok1(StringIsEqual(params[3], _T("")));
 
 
   // with qoutes but no quote handling
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo,comma\",\"bar\""),
-                                      buffer, params, 64);
+  n = ExtractParameters(_T("\"foo,comma\",\"bar\""), buffer, params, 64);
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("\"foo")) == 0);
-  ok1(_tcscmp(params[1], _T("comma\"")) == 0);
-  ok1(_tcscmp(params[2], _T("\"bar\"")) == 0);
+  ok1(StringIsEqual(params[0], _T("\"foo")));
+  ok1(StringIsEqual(params[1], _T("comma\"")));
+  ok1(StringIsEqual(params[2], _T("\"bar\"")));
 
 
   // quote handling
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"\""),
+  n = ExtractParameters(_T("\"\""),
                                       buffer, params, 64, false, _T('"'));
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("")) == 0);
+  ok1(StringIsEqual(params[0], _T("")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"\"\""),
+  n = ExtractParameters(_T("\"\"\""),
                                       buffer, params, 64, false, _T('"'));
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("\"")) == 0);
+  ok1(StringIsEqual(params[0], _T("\"")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"\"\"\""),
+  n = ExtractParameters(_T("\"\"\"\""),
                                       buffer, params, 64, false, _T('"'));
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("\"")) == 0);
+  ok1(StringIsEqual(params[0], _T("\"")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo,comma\",\"bar\""),
+  n = ExtractParameters(_T("\"foo,comma\",\"bar\""),
                                       buffer, params, 64, false, _T('"'));
   ok1(n == 2);
-  ok1(_tcscmp(params[0], _T("foo,comma")) == 0);
-  ok1(_tcscmp(params[1], _T("bar")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo,comma")));
+  ok1(StringIsEqual(params[1], _T("bar")));
 
 
   // no quotes, whitespace removal
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo bar"),
-                                      buffer, params, 64, true);
+  n = ExtractParameters(_T("foo bar"), buffer, params, 64, true);
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("foo bar")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo bar")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("foo , bar, baz"),
-                                      buffer, params, 64, true);
+  n = ExtractParameters(_T("foo , bar, baz"), buffer, params, 64, true);
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
-  ok1(_tcscmp(params[1], _T("bar")) == 0);
-  ok1(_tcscmp(params[2], _T("baz")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
+  ok1(StringIsEqual(params[1], _T("bar")));
+  ok1(StringIsEqual(params[2], _T("baz")));
 
-  n = WaypointReaderBase::ExtractParameters(_T(" foo  ,  bar  , baz "),
-                                      buffer, params, 64, true);
+  n = ExtractParameters(_T(" foo  ,  bar  , baz "), buffer, params, 64, true);
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
-  ok1(_tcscmp(params[1], _T("bar")) == 0);
-  ok1(_tcscmp(params[2], _T("baz")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
+  ok1(StringIsEqual(params[1], _T("bar")));
+  ok1(StringIsEqual(params[2], _T("baz")));
 
-  n = WaypointReaderBase::ExtractParameters(_T(" foo\"  , \" bar \"  , \"baz "),
-                                      buffer, params, 64, true);
+  n = ExtractParameters(_T(" foo\"  , \" bar \"  , \"baz "),
+                        buffer, params, 64, true);
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("foo\"")) == 0);
-  ok1(_tcscmp(params[1], _T("\" bar \"")) == 0);
-  ok1(_tcscmp(params[2], _T("\"baz")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo\"")));
+  ok1(StringIsEqual(params[1], _T("\" bar \"")));
+  ok1(StringIsEqual(params[2], _T("\"baz")));
 
   // quote handling, whitespace removal
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo \" , \" bar\", \" baz\""),
-                                      buffer, params, 64, true, _T('"'));
+  n = ExtractParameters(_T("\"foo \" , \" bar\", \" baz\""),
+                        buffer, params, 64, true, _T('"'));
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("foo ")) == 0);
-  ok1(_tcscmp(params[1], _T(" bar")) == 0);
-  ok1(_tcscmp(params[2], _T(" baz")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo ")));
+  ok1(StringIsEqual(params[1], _T(" bar")));
+  ok1(StringIsEqual(params[2], _T(" baz")));
 
-  n = WaypointReaderBase::ExtractParameters(
-                            _T(" \" foo  \"  ,  \"  bar  \"  , \" baz \" "),
-                            buffer, params, 64, true, _T('"'));
+  n = ExtractParameters(_T(" \" foo  \"  ,  \"  bar  \"  , \" baz \" "),
+                        buffer, params, 64, true, _T('"'));
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T(" foo  ")) == 0);
-  ok1(_tcscmp(params[1], _T("  bar  ")) == 0);
-  ok1(_tcscmp(params[2], _T(" baz ")) == 0);
+  ok1(StringIsEqual(params[0], _T(" foo  ")));
+  ok1(StringIsEqual(params[1], _T("  bar  ")));
+  ok1(StringIsEqual(params[2], _T(" baz ")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo\",\"\",\"bar\""),
-                                      buffer, params, 64, true, _T('"'));
+  n = ExtractParameters(_T("\"foo\",\"\",\"bar\""), buffer, params, 64,
+                        true, _T('"'));
   ok1(n == 3);
-  ok1(_tcscmp(params[0], _T("foo")) == 0);
-  ok1(_tcscmp(params[1], _T("")) == 0);
-  ok1(_tcscmp(params[2], _T("bar")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo")));
+  ok1(StringIsEqual(params[1], _T("")));
+  ok1(StringIsEqual(params[2], _T("bar")));
 
   // missing end quote
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo, bar"),
-                                      buffer, params, 64, true, _T('"'));
+  n = ExtractParameters(_T("\"foo, bar"), buffer, params, 64,
+                        true, _T('"'));
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("foo, bar")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo, bar")));
 
   // embedded quotes and commas
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo, \"bar\"\""),
-                                      buffer, params, 64, true, _T('"'));
+  n = ExtractParameters(_T("\"foo, \"bar\"\""), buffer, params, 64,
+                        true, _T('"'));
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("foo, \"bar\"")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo, \"bar\"")));
 
-  n = WaypointReaderBase::ExtractParameters(_T("\"foo, \"\"bar\"\"\""),
-                                      buffer, params, 64, true, _T('"'));
+  n = ExtractParameters(_T("\"foo, \"\"bar\"\"\""), buffer, params, 64,
+                        true, _T('"'));
   ok1(n == 1);
-  ok1(_tcscmp(params[0], _T("foo, \"bar\"")) == 0);
+  ok1(StringIsEqual(params[0], _T("foo, \"bar\"")));
 }
 
 typedef std::vector<Waypoint> wp_vector;
@@ -180,14 +177,10 @@ typedef std::vector<Waypoint> wp_vector;
 static bool
 TestWaypointFile(const TCHAR* filename, Waypoints &way_points, unsigned num_wps)
 {
-  WaypointReader f(filename, 0);
-  if (!ok1(!f.Error())) {
-    skip(3, 0, "opening waypoint file failed");
-    return false;
-  }
-
   NullOperationEnvironment operation;
-  if(!ok1(f.Parse(way_points, operation))) {
+  if (!ok1(ReadWaypointFile(filename, way_points,
+                            WaypointFactory(WaypointOrigin::NONE),
+                            operation))) {
     skip(2, 0, "parsing waypoint file failed");
     return false;
   }
@@ -529,7 +522,7 @@ int main(int argc, char **argv)
 {
   wp_vector org_wp = CreateOriginalWaypoints();
 
-  plan_tests(315);
+  plan_tests(307);
 
   TestExtractParameters();
 

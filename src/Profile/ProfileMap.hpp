@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_PROFILE_MAP_HPP
 #define XCSOAR_PROFILE_MAP_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StringBuffer.hxx"
 #include "Math/fixed.hpp"
 
 #include <tchar.h>
@@ -112,15 +112,13 @@ namespace Profile {
 
   template<size_t max>
   static inline bool
-  Get(const char *key, StaticString<max> &value)
+  Get(const char *key, StringBuffer<TCHAR, max> &value)
   {
-    return Get(key, value.buffer(), value.MAX_SIZE);
+    return Get(key, value.data(), value.capacity());
   }
 
   bool Exists(const char *key);
   void Clear();
-
-  void Export(KeyValueFileWriter &writer);
 }
 
 #endif

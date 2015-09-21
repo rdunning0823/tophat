@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -48,9 +48,9 @@ Window::AssertThread() const
 #ifdef ENABLE_OPENGL
   assert(pthread_equal(pthread_self(), OpenGL::thread));
 #elif defined(USE_GDI)
-  assert(hWnd != NULL);
+  assert(hWnd != nullptr);
   assert(!::IsWindow(hWnd) ||
-         ::GetWindowThreadProcessId(hWnd, NULL) == ::GetCurrentThreadId());
+         ::GetWindowThreadProcessId(hWnd, nullptr) == ::GetCurrentThreadId());
 #endif
 }
 
@@ -60,8 +60,8 @@ Window::AssertThreadOrUndefined() const
 #ifdef ENABLE_OPENGL
   assert(pthread_equal(pthread_self(), OpenGL::thread));
 #elif defined(USE_GDI)
-  assert(hWnd == NULL || !::IsWindow(hWnd) ||
-         ::GetWindowThreadProcessId(hWnd, NULL) == ::GetCurrentThreadId());
+  assert(hWnd == nullptr || !::IsWindow(hWnd) ||
+         ::GetWindowThreadProcessId(hWnd, nullptr) == ::GetCurrentThreadId());
 #endif
 }
 
@@ -85,10 +85,10 @@ Window::Destroy()
 
   /* the OnDestroy() method must have cleared the variable by
      now */
-  assert(prev_wndproc == NULL || hWnd == NULL);
+  assert(prev_wndproc == nullptr || hWnd == nullptr);
 
-  hWnd = NULL;
-  prev_wndproc = NULL;
+  hWnd = nullptr;
+  prev_wndproc = nullptr;
 #endif /* USE_GDI */
 }
 
@@ -98,25 +98,25 @@ Window::GetRootOwner()
   assert(IsDefined());
 
 #ifndef USE_GDI
-  if (parent == NULL)
+  if (parent == nullptr)
     /* no parent?  We must be a ContainerWindow instance */
     return (ContainerWindow *)this;
 
   ContainerWindow *root = parent;
-  while (root->parent != NULL)
+  while (root->parent != nullptr)
     root = root->parent;
 
   return root;
 #else /* USE_GDI */
 #ifndef _WIN32_WCE
   HWND hRoot = ::GetAncestor(hWnd, GA_ROOTOWNER);
-  if (hRoot == NULL)
-    return NULL;
+  if (hRoot == nullptr)
+    return nullptr;
 #else
   HWND hRoot = hWnd;
   while (true) {
     HWND hParent = ::GetParent(hRoot);
-    if (hParent == NULL)
+    if (hParent == nullptr)
       break;
     hRoot = hParent;
   }
@@ -142,16 +142,16 @@ Window::OnDestroy()
   if (capture)
     ReleaseCapture();
 
-  if (parent != NULL) {
+  if (parent != nullptr) {
     parent->RemoveChild(*this);
-    parent = NULL;
+    parent = nullptr;
   }
 
   event_queue->Purge(*this);
 #else /* USE_GDI */
-  assert(hWnd != NULL);
+  assert(hWnd != nullptr);
 
-  hWnd = NULL;
+  hWnd = nullptr;
 #endif /* USE_GDI */
 }
 
@@ -236,12 +236,6 @@ Window::OnCharacter(unsigned ch)
   return false;
 }
 
-bool
-Window::OnCommand(unsigned id, unsigned code)
-{
-  return false;
-}
-
 void
 Window::OnCancelMode()
 {
@@ -282,15 +276,4 @@ bool
 Window::OnUser(unsigned id)
 {
   return false;
-}
-
-void
-Window::OnPaint(Canvas &canvas)
-{
-}
-
-void
-Window::OnPaint(Canvas &canvas, const PixelRect &dirty)
-{
-  OnPaint(canvas);
 }

@@ -33,6 +33,9 @@
 
 #include "mapserver.h"
 
+#ifdef SHAPELIB_DISABLED
+#include "mapthread.h"
+#endif
 
 
 #include <stdio.h>
@@ -47,7 +50,7 @@
  */
 
 #ifdef USE_FRIBIDI
-#if (defined(_WIN32) && !defined(__CYGWIN__)) || defined(USE_FRIBIDI2)
+#if (defined(_WIN32) && !defined(__CYGWIN__)) || defined(HAVE_FRIBIDI2)
 #include "fribidi.h"
 #else
 #include <fribidi/fribidi.h>
@@ -61,10 +64,9 @@
 #endif
 
 #include "mapentities.h"
-
 #endif /* SHAPELIB_DISABLED */
 
-#ifdef NEED_STRRSTR
+#ifndef HAVE_STRRSTR
 /*
 ** Copyright (c) 2000-2004  University of Illinois Board of Trustees
 ** Copyright (c) 2000-2005  Mark D. Roth
@@ -119,7 +121,7 @@ char *strrstr(char *string, char *find)
 }
 #endif
 
-#ifdef NEED_STRLCAT
+#ifndef HAVE_STRLCAT
 /*
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
  *
@@ -171,7 +173,7 @@ size_t strlcat(char *dst, const char *src, size_t siz)
 }
 #endif
 
-#ifdef NEED_STRLCPY
+#ifndef HAVE_STRLCPY
 /*
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
  * All rights reserved.
@@ -231,7 +233,7 @@ strlcpy(char *dst, const char *src, size_t siz)
 }
 #endif
 
-#ifdef NEED_STRCASESTR
+#ifndef HAVE_STRCASESTR
 /*-
  * Copyright (c) 1990, 1993
  *  The Regents of the University of California.  All rights reserved.
@@ -283,7 +285,7 @@ char *strcasestr(const char *s, const char *find)
 }
 #endif
 
-#ifdef NEED_STRDUP
+#ifndef HAVE_STRDUP
 char  *strdup(char *s)
 {
   char  *s1;
@@ -299,7 +301,7 @@ char  *strdup(char *s)
 }
 #endif
 
-#ifdef NEED_STRNCASECMP
+#ifndef HAVE_STRNCASECMP
 int strncasecmp(const char *s1, const char *s2, int len)
 {
   register const char *cp1, *cp2;
@@ -337,7 +339,7 @@ int strncasecmp(const char *s1, const char *s2, int len)
 }
 #endif
 
-#ifdef NEED_STRCASECMP
+#ifndef HAVE_STRCASECMP
 int strcasecmp(const char *s1, const char *s2)
 {
   register const char *cp1, *cp2;
@@ -796,11 +798,9 @@ char **msStringSplit(const char *string, char ch, int *num_tokens)
   }
 
   token = (char **) msSmallMalloc(sizeof(char *)*n);
-  if(!token) return(NULL);
 
   k = 0;
   token[k] = (char *)msSmallMalloc(sizeof(char)*(length+1));
-  if(!token[k]) return(NULL);
 
   j = 0;
   last_ch='\0';
@@ -814,7 +814,6 @@ char **msStringSplit(const char *string, char ch, int *num_tokens)
 
       k++;
       token[k] = (char *)msSmallMalloc(sizeof(char)*(length+1));
-      if(!token[k]) return(NULL);
 
       j = 0;
     } else {
@@ -866,7 +865,7 @@ char ** msStringSplitComplex( const char * pszString,
   int         bStripLeadSpaces = (nFlags & MS_STRIPLEADSPACES);
   int         bStripEndSpaces = (nFlags & MS_STRIPENDSPACES);
 
-  pszToken = (char *) msSmallMalloc(sizeof(char*)*10);;
+  pszToken = (char *) msSmallMalloc(sizeof(char)*10);;
   nTokenMax = 10;
 
   while( pszString != NULL && *pszString != '\0' ) {
@@ -932,7 +931,7 @@ char ** msStringSplitComplex( const char * pszString,
        */
       if( nTokenLen >= nTokenMax-3 ) {
         nTokenMax = nTokenMax * 2 + 10;
-        pszToken = (char *) msSmallRealloc(pszToken, sizeof(char*)*nTokenMax);
+        pszToken = (char *) msSmallRealloc(pszToken, sizeof(char)*nTokenMax);
       }
 
       pszToken[nTokenLen] = *pszString;
@@ -994,7 +993,7 @@ char **msStringTokenize( const char *pszLine, const char *pszDelim,
 {
   char **papszResult = NULL;
   int n = 1, iChar, nLength = strlen(pszLine), iTokenChar = 0, bInQuotes = MS_FALSE;
-  char *pszToken = (char *) msSmallMalloc(sizeof(char*)*(nLength+1));
+  char *pszToken = (char *) msSmallMalloc(sizeof(char)*(nLength+1));
   int nDelimLen = strlen(pszDelim);
 
   /* Compute the number of tokens */
@@ -1024,7 +1023,7 @@ char **msStringTokenize( const char *pszLine, const char *pszDelim,
     } else if( !bInQuotes && strncmp(pszLine+iChar,pszDelim,nDelimLen) == 0 ) {
       pszToken[iTokenChar++] = '\0';
       papszResult[n] = pszToken;
-      pszToken = (char *) msSmallMalloc(sizeof(char*)*(nLength+1));
+      pszToken = (char *) msSmallMalloc(sizeof(char)*(nLength+1));
       iChar += nDelimLen - 1;
       iTokenChar = 0;
       n++;
@@ -1201,8 +1200,8 @@ void msDecodeHTMLEntities(const char *string)
     pszBuffer = (char*)string;
 
   bufferSize = strlen(pszBuffer);
-  pszReplace = (char*) msSmallMalloc(bufferSize);
-  pszEnd = (char*) msSmallMalloc(bufferSize);
+  pszReplace = (char*) msSmallMalloc(bufferSize+1);
+  pszEnd = (char*) msSmallMalloc(bufferSize+1);
 
   while((pszAmp = strchr(pszBuffer, '&')) != NULL) {
     /* Get the &...; */
@@ -1497,7 +1496,7 @@ int msHexToInt(char *hex)
 char *msGetFriBidiEncodedString(const char *string, const char *encoding)
 {
   FriBidiChar logical[MAX_STR_LEN];
-  FriBidiCharType base = FRIBIDI_TYPE_ON;
+  FriBidiParType base;
   size_t len;
 
 #ifdef FRIBIDI_NO_CHARSETS
@@ -1613,14 +1612,20 @@ char *msGetEncodedString(const char *string, const char *encoding)
   const char *inp;
   char *outp, *out = NULL;
   size_t len, bufsize, bufleft, iconv_status;
+  assert(encoding);
 
 #ifdef USE_FRIBIDI
-  if(fribidi_parse_charset ((char*)encoding))
-    return msGetFriBidiEncodedString(string, encoding);
+  msAcquireLock(TLOCK_FRIBIDI);
+  if(fribidi_parse_charset ((char*)encoding)) {
+    char *ret = msGetFriBidiEncodedString(string, encoding);
+    msReleaseLock(TLOCK_FRIBIDI);
+    return ret;
+  }
+  msReleaseLock(TLOCK_FRIBIDI);
 #endif
   len = strlen(string);
 
-  if (len == 0 || (encoding && strcasecmp(encoding, "UTF-8")==0))
+  if (len == 0 || strcasecmp(encoding, "UTF-8")==0)
     return msStrdup(string);    /* Nothing to do: string already in UTF-8 */
 
   cd = iconv_open("UTF-8", encoding);

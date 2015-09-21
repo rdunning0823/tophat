@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #include "WaypointReaderSeeYou.hpp"
 #include "Units/System.hpp"
 #include "Waypoint/Waypoints.hpp"
+#include "Util/ExtractParameters.hpp"
 #include "Util/Macros.hpp"
 
 #include <stdlib.h>
@@ -159,8 +160,7 @@ ParseStyle(const TCHAR* src, Waypoint::Type &type)
 }
 
 bool
-WaypointReaderSeeYou::ParseLine(const TCHAR* line, const unsigned linenum,
-                              Waypoints &waypoints)
+WaypointReaderSeeYou::ParseLine(const TCHAR* line, Waypoints &waypoints)
 {
   enum {
     iName = 0,
@@ -174,12 +174,17 @@ WaypointReaderSeeYou::ParseLine(const TCHAR* line, const unsigned linenum,
     iDescription = 10,
   };
 
-  if (linenum == 0)
-    ignore_following = false;
+  if (first) {
+    first = false;
+
+    /* skip first line if it doesn't begin with a quotation character
+       (usually the field order line) */
+    if (line[0] != _T('\"'))
+      return true;
+  }
 
   // If (end-of-file or comment)
   if (StringIsEmpty(line) ||
-      StringStartsWith(line, _T("**")) ||
       StringStartsWith(line, _T("*")))
     // -> return without error condition
     return true;
@@ -189,13 +194,8 @@ WaypointReaderSeeYou::ParseLine(const TCHAR* line, const unsigned linenum,
     /* line too long for buffer */
     return false;
 
-  // Skip first line if it doesn't begin with a quotation character
-  // (usually the field order line)
-  if (linenum == 0 && line[0] != _T('\"'))
-    return true;
-
   // If task marker is reached ignore all following lines
-  if (_tcsstr(line, _T("-----Related Tasks-----")) == line)
+  if (StringStartsWith(line, _T("-----Related Tasks-----")))
     ignore_following = true;
   if (ignore_following)
     return true;
@@ -211,20 +211,19 @@ WaypointReaderSeeYou::ParseLine(const TCHAR* line, const unsigned linenum,
       iLongitude >= n_params)
     return false;
 
-  Waypoint new_waypoint;
+  GeoPoint location;
 
   // Latitude (e.g. 5115.900N)
-  if (!ParseAngle(params[iLatitude], new_waypoint.location.latitude, true))
+  if (!ParseAngle(params[iLatitude], location.latitude, true))
     return false;
 
   // Longitude (e.g. 00715.900W)
-  if (!ParseAngle(params[iLongitude], new_waypoint.location.longitude, false))
+  if (!ParseAngle(params[iLongitude], location.longitude, false))
     return false;
 
-  new_waypoint.location.Normalize(); // ensure longitude is within -180:180
+  location.Normalize(); // ensure longitude is within -180:180
 
-  new_waypoint.file_num = file_num;
-  new_waypoint.original_id = 0;
+  Waypoint new_waypoint = factory.Create(location);
 
   // Name (e.g. "Some Turnpoint")
   if (*params[iName] == _T('\0'))
@@ -235,7 +234,7 @@ WaypointReaderSeeYou::ParseLine(const TCHAR* line, const unsigned linenum,
   /// @todo configurable behaviour
   if ((iElevation >= n_params ||
       !ParseAltitude(params[iElevation], new_waypoint.elevation)) &&
-      !CheckAltitude(new_waypoint))
+      !factory.FallbackElevation(new_waypoint))
     return false;
 
   // Style (e.g. 5)

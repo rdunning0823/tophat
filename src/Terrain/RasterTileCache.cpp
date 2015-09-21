@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -77,13 +77,13 @@ RasterTileCache::PollTiles(int x, int y, unsigned radius)
      the screen will be loaded in advance */
   radius += 256;
 
-  enum {
-    /**
-     * Maximum number of tiles loaded at a time, to reduce system load
-     * peaks.
-    */
-    MAX_ACTIVATE = MAX_ACTIVE_TILES > 32 ? 16 : MAX_ACTIVE_TILES / 2,
-  };
+  /**
+   * Maximum number of tiles loaded at a time, to reduce system load
+   * peaks.
+   */
+  constexpr unsigned MAX_ACTIVATE = MAX_ACTIVE_TILES > 32
+    ? 16
+    : MAX_ACTIVE_TILES / 2;
 
   /* query all tiles; all tiles which are either in range or already
      loaded are added to RequestTiles */

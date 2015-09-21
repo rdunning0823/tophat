@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,14 +33,11 @@ class GeoBounds;
 
 class SearchPointVector: public std::vector<SearchPoint> {
 public:
-  SearchPointVector() = default;
-  SearchPointVector(const_iterator begin, const_iterator end)
-    :std::vector<SearchPoint>(begin, end) {}
+  template<typename... Args>
+  SearchPointVector(Args&&... args)
+    :std::vector<SearchPoint>(std::forward<Args>(args)...) {}
 
   bool PruneInterior();
-
-  gcc_pure
-  bool IsConvex() const;
 
   /**
    * Apply convex pruning algorithm with increasing tolerance
@@ -50,7 +47,7 @@ public:
    */
   bool ThinToSize(const unsigned max_size);
 
-  void Project(const TaskProjection &tp);
+  void Project(const FlatProjection &tp);
 
   gcc_pure
   FlatGeoPoint NearestPoint(const FlatGeoPoint &p) const;

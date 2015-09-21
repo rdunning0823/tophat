@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "Waypoint/WaypointReader.hpp"
+#include "Waypoint/Factory.hpp"
 #include "Waypoint/Waypoints.hpp"
 #include "Engine/Waypoint/WaypointVisitor.hpp"
 #include "OS/ConvertPathName.hpp"
@@ -36,15 +37,11 @@ static bool
 LoadWaypoints(const char *_path, Waypoints &waypoints)
 {
   PathName path(_path);
-  WaypointReader parser(path, 0);
-  if (parser.Error()) {
-    fprintf(stderr, "WayPointParser::SetFile() has failed\n");
-    return false;
-  }
 
   NullOperationEnvironment operation;
-  if (!parser.Parse(waypoints, operation)) {
-    fprintf(stderr, "WayPointParser::Parse() has failed\n");
+  if (!ReadWaypointFile(path, waypoints, WaypointFactory(WaypointOrigin::NONE),
+                        operation)) {
+    fprintf(stderr, "ReadWaypointFile() failed\n");
     return false;
   }
 

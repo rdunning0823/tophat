@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,20 +22,46 @@ Copyright_License {
 */
 
 #include "OS/PathName.hpp"
+#include "Compatibility/path.h"
 #include "Util/StringUtil.hpp"
+#include "Util/StringAPI.hpp"
+#include "Util/CharUtil.hpp"
 
 #include <assert.h>
 #include <string.h>
 #include <algorithm>
 
+#ifdef WIN32
+
+gcc_pure gcc_nonnull_all
+static constexpr bool
+IsDrive(const TCHAR *p)
+{
+  return IsAlphaASCII(p[0]) && p[1] == ':';
+}
+
+#endif
+
+bool
+IsAbsolutePath(const TCHAR *p)
+{
+#ifdef WIN32
+  if (IsDrive(p) && IsDirSeparator(p[2]))
+    return true;
+#endif
+
+  return IsDirSeparator(*p);
+
+}
+
 gcc_pure
 static const TCHAR *
 LastSeparator(const TCHAR *path)
 {
-  const TCHAR *p = _tcsrchr(path, _T('/'));
+  const auto *p = StringFindLast(path, _T('/'));
 #ifdef WIN32
-  const TCHAR *backslash = _tcsrchr(path, _T('\\'));
-  if (p == NULL || backslash > p)
+  const auto *backslash = StringFindLast(path, _T('\\'));
+  if (p == nullptr || backslash > p)
     p = backslash;
 #endif
   return p;
@@ -51,12 +77,12 @@ LastSeparator(TCHAR *path)
 bool
 IsBaseName(const TCHAR *path)
 {
-  assert(path != NULL);
+  assert(path != nullptr);
 
 #ifdef WIN32
-  return _tcspbrk(path, _T("/\\")) == NULL;
+  return _tcspbrk(path, _T("/\\")) == nullptr;
 #else
-  return _tcschr(path, _T('/')) == NULL;
+  return StringFind(path, _T('/')) == nullptr;
 #endif
 }
 
@@ -64,11 +90,11 @@ const TCHAR *
 BaseName(const TCHAR *path)
 {
   const TCHAR *p = LastSeparator(path);
-  if (p != NULL)
+  if (p != nullptr)
     path = p + 1;
 
   if (StringIsEmpty(path))
-    return NULL;
+    return nullptr;
 
   return path;
 }
@@ -77,7 +103,7 @@ const TCHAR *
 DirName(const TCHAR *gcc_restrict path, TCHAR *gcc_restrict buffer)
 {
   const TCHAR *p = LastSeparator(path);
-  if (p == NULL || p == path)
+  if (p == nullptr || p == path)
     return _T(".");
 
   TCHAR *end = std::copy(path, p, buffer);
@@ -89,7 +115,7 @@ void
 ReplaceBaseName(TCHAR *path, const TCHAR *new_base)
 {
   TCHAR *q = LastSeparator(path);
-  if (q != NULL)
+  if (q != nullptr)
     ++q;
   else
     q = path;

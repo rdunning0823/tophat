@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,11 +28,11 @@ Copyright_License {
 
 #ifdef HAVE_POSIX
 
-#include "OS/FileDescriptor.hpp"
+#include "OS/UniqueFileDescriptor.hxx"
 
 class PosixFileSource : public BufferedSource<char, 4096u> {
 private:
-  FileDescriptor fd;
+  UniqueFileDescriptor fd;
 
 public:
   PosixFileSource(const char *path);
@@ -50,11 +50,11 @@ public:
 
 public:
   /* virtual methods from class Source */
-  virtual long GetSize() const override;
+  long GetSize() const override;
 
 protected:
   /* virtual methods from class BufferedSource */
-  virtual unsigned Read(char *p, unsigned n) override;
+  unsigned Read(char *p, unsigned n) override;
 };
 
 #endif /* HAVE_POSIX */
@@ -84,16 +84,16 @@ public:
    * Rewind the file to the beginning.
    */
   bool Rewind() {
-    return ::SetFilePointer(handle, 0, NULL, FILE_BEGIN) == 0;
+    return ::SetFilePointer(handle, 0, nullptr, FILE_BEGIN) == 0;
   }
 
 public:
   /* virtual methods from class Source */
-  virtual long GetSize() const override;
+  long GetSize() const override;
 
 protected:
   /* virtual methods from class BufferedSource */
-  virtual unsigned Read(char *p, unsigned n) override;
+  unsigned Read(char *p, unsigned n) override;
 };
 
 #endif /* WIN32 */

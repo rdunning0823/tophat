@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,14 +39,17 @@ namespace Units
     gcc_const
     const TCHAR* GetName(unsigned i);
 
+    gcc_const
     const UnitSetting& Read(unsigned i);
 
+    gcc_const
     unsigned Count();
 
     /**
      * Only the units part of the structure is addressed.
      * @return Index + 1 if an equivalent set is found, else 0.
      */
+    gcc_pure
     unsigned EqualsPresetUnits(const UnitSetting &config);
   }
 }

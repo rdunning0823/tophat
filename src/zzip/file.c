@@ -236,7 +236,7 @@ zzip_file_open(ZZIP_DIR * dir, zzip_char_t * name, int o_mode)
             case 8:            /* inflate */
                 break;
             default:
-                { err = ZZIP_UNSUPP_COMPR; goto error; }
+                { /*err = ZZIP_UNSUPP_COMPR; */ goto error; }
             }
 
             if (dir->cache.locked == NULL)
@@ -250,7 +250,7 @@ zzip_file_open(ZZIP_DIR * dir, zzip_char_t * name, int o_mode)
             } else
             {
                 if (! (fp = (ZZIP_FILE *) calloc(1, sizeof(*fp))))
-                    { err =  ZZIP_OUTOFMEM; goto error; }
+                    { /* err =  ZZIP_OUTOFMEM; */ goto error; }
             }
 
             fp->dir = dir;
@@ -264,7 +264,7 @@ zzip_file_open(ZZIP_DIR * dir, zzip_char_t * name, int o_mode)
             } else
             {
                 if (! (fp->buf32k = (char *) malloc(ZZIP_32K)))
-                    { err = ZZIP_OUTOFMEM; goto error; }
+                    { /* err = ZZIP_OUTOFMEM; */ goto error; }
             }
 
             if (dir->cache.locked == &self)
@@ -276,13 +276,13 @@ zzip_file_open(ZZIP_DIR * dir, zzip_char_t * name, int o_mode)
              */
 
             if (zzip_file_saveoffset(dir->currentfp) < 0)
-                { err = ZZIP_DIR_SEEK; goto error; }
+                { /* err = ZZIP_DIR_SEEK; */ goto error; }
 
             fp->offset = hdr->d_off;
             dir->currentfp = fp;
 
             if (dir->io->fd.seeks(dir->fd, hdr->d_off, SEEK_SET) < 0)
-                { err = ZZIP_DIR_SEEK; goto error; }
+                { /* err = ZZIP_DIR_SEEK; */ goto error; }
 
             {
                 /* skip local header - should test tons of other info,
@@ -292,14 +292,14 @@ zzip_file_open(ZZIP_DIR * dir, zzip_char_t * name, int o_mode)
 
                 dataoff = dir->io->fd.read(dir->fd, (void *) p, sizeof(*p));
                 if (dataoff < (zzip_ssize_t) sizeof(*p))
-                    { err = ZZIP_DIR_READ;  goto error; }
+                    { /* err = ZZIP_DIR_READ; */ goto error; }
                 if (! zzip_file_header_check_magic(p))   /* PK\3\4 */
-                    { err = ZZIP_CORRUPTED; goto error; }
+                    { /* err = ZZIP_CORRUPTED; */ goto error; }
 
                 dataoff = zzip_file_header_sizeof_tail(p);
 
                 if (dir->io->fd.seeks(dir->fd, dataoff, SEEK_CUR) < 0)
-                    { err = ZZIP_DIR_SEEK; goto error; }
+                    { /* err = ZZIP_DIR_SEEK; */ goto error; }
 
                 fp->dataoffset = dir->io->fd.tells(dir->fd);
                 fp->usize = hdr->d_usize;
@@ -515,6 +515,36 @@ zzip_read(ZZIP_FILE * fp, void *buf, zzip_size_t len)
 #endif /* ZZIP_DISABLED */
         return v;
     }
+}
+
+static zzip_size_t
+zzip_pread_fallback(ZZIP_FILE *file, void *ptr, zzip_size_t size,
+                    zzip_off_t offset)
+{
+    zzip_off_t new_offset = zzip_seek(file, offset, SEEK_SET);
+    if (new_offset < 0)
+        return -1;
+
+    return zzip_read(file, ptr, size);
+}
+
+zzip_size_t
+zzip_pread(ZZIP_FILE *file, void *ptr, zzip_size_t size, zzip_off_t offset)
+{
+   if (file->dir == NULL) {
+#ifdef __linux__
+       return pread(file->fd, ptr, size, offset);
+#else
+       return zzip_pread_fallback(file, ptr, size, offset);
+#endif
+#ifdef __linux__
+   } else if (file->method == 0) {
+       offset += file->dataoffset;
+       return pread(file->dir->fd, ptr, size, offset);
+#endif
+   } else {
+       return zzip_pread_fallback(file, ptr, size, offset);
+   }
 }
 
 /** => zzip_read
@@ -1096,7 +1126,6 @@ zzip_seek(ZZIP_FILE * fp, zzip_off_t offset, int whence)
 
     if (fp->method == 0)
     {                           /* unstore, just lseek relatively */
-        ofs = fp->io->fd.tells(dir->fd);
         ofs = fp->io->fd.seeks(dir->fd, read_size, SEEK_CUR);
         if (ofs > 0)
         {                       /* readjust from beginning of file */

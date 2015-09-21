@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -234,9 +234,10 @@ MD5::Process512(const uint8_t *s512in)
   state.d += d;
 }
 
-void
+char *
 MD5::GetDigest(char *buffer) const
 {
   sprintf(buffer, "%08x%08x%08x%08x",
           ByteSwap32(state.a), ByteSwap32(state.b), ByteSwap32(state.c), ByteSwap32(state.d));
+  return buffer + DIGEST_LENGTH;
 }

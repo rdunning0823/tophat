@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,24 +22,10 @@
 
 #include "FlatLine.hpp"
 
-#define sgn(x,y) (negative(x) ? -y : y)
-
-FlatPoint
-FlatLine::ave() const
+static constexpr fixed
+sgn(fixed x, fixed y)
 {
-  return (p1 + p2).Half();
-}
-
-fixed
-FlatLine::dx() const
-{
-  return p2.x - p1.x;
-}
-
-fixed
-FlatLine::dy() const
-{
-  return p2.y - p1.y;
+  return negative(x) ? -y : y;
 }
 
 fixed
@@ -70,15 +56,15 @@ FlatLine::dsq() const
 void
 FlatLine::sub(const FlatPoint&p)
 {
-  p1.Subtract(p);
-  p2.Subtract(p);
+  p1 -= p;
+  p2 -= p;
 }
 
 void
 FlatLine::add(const FlatPoint&p)
 {
-  p1.Add(p);
-  p2.Add(p);
+  p1 += p;
+  p2 += p;
 }
 
 Angle

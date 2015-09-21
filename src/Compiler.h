@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2014 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,8 +21,8 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_COMPILER_H
-#define XCSOAR_COMPILER_H
+#ifndef COMPILER_H
+#define COMPILER_H
 
 #define GCC_MAKE_VERSION(major, minor, patchlevel) ((major) * 10000 + (minor) * 100 + patchlevel)
 
@@ -72,8 +72,8 @@ Copyright_License {
  * Are we building with the specified version of clang or newer?
  */
 #define CLANG_CHECK_VERSION(major, minor) \
-	(defined(__clang__) && \
-	 CLANG_VERSION >= GCC_MAKE_VERSION(major, minor, 0))
+  (defined(__clang__) && \
+   CLANG_VERSION >= GCC_MAKE_VERSION(major, minor, 0))
 
 #if CLANG_OR_GCC_VERSION(4,0)
 

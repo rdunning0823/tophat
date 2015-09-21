@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,24 +27,24 @@ Copyright_License {
 
 #include "WaypointReaderBase.hpp"
 
-class WaypointReaderSeeYou: 
-  public WaypointReaderBase 
-{
+/**
+ * Parses a SeeYou waypoint file.
+ *
+ * @see http://data.naviter.si/docs/cup_format.pdf
+ */
+class WaypointReaderSeeYou final : public WaypointReaderBase {
+  bool first;
+
   bool ignore_following;
 
 public:
-  WaypointReaderSeeYou(const int _file_num,
-                     bool _compressed = false)
-    :WaypointReaderBase(_file_num, _compressed) {}
+  explicit WaypointReaderSeeYou(WaypointFactory _factory)
+    :WaypointReaderBase(_factory),
+     first(true), ignore_following(false) {}
 
 protected:
-  /**
-   * Parses a SeeYou waypoint file line
-   * @see parseLine()
-   * @see http://data.naviter.si/docs/cup_format.pdf
-   */
-  bool ParseLine(const TCHAR* line, const unsigned linenum,
-                 Waypoints &way_points);
+  /* virtual methods from class WaypointReaderBase */
+  bool ParseLine(const TCHAR* line, Waypoints &way_points) override;
 };
 
 #endif

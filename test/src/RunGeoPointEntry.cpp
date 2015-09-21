@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -43,10 +43,9 @@ Main()
   if (!GeoPointEntryDialog(_T("The caption"), value, format, true))
     return;
 
-  if (value.IsValid()) {
-    TCHAR buffer[64];
-    _tprintf(_T("%s\n"), FormatGeoPoint(value, buffer, ARRAY_SIZE(buffer),
-                                        CoordinateFormat::DDMMSS));
-  } else
+  if (value.IsValid())
+    _tprintf(_T("%s\n"),
+             FormatGeoPoint(value, CoordinateFormat::DDMMSS).c_str());
+  else
     printf("invalid\n");
 }

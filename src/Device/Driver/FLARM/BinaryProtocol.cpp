@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ bool
 FLARM::SendEscaped(Port &port, const void *buffer, size_t length,
                    OperationEnvironment &env, unsigned timeout_ms)
 {
-  assert(buffer != NULL);
+  assert(buffer != nullptr);
   assert(length > 0);
 
   const TimeoutClock timeout(timeout_ms);
@@ -84,14 +84,14 @@ FLARM::SendEscaped(Port &port, const void *buffer, size_t length,
 
 static uint8_t *
 ReceiveSomeUnescape(Port &port, uint8_t *buffer, size_t length,
-                    OperationEnvironment &env, const TimeoutClock &timeout)
+                    OperationEnvironment &env, const TimeoutClock timeout)
 {
   /* read "length" bytes from the port, optimistically assuming that
      there are no escaped bytes */
 
   size_t nbytes = port.WaitAndRead(buffer, length, env, timeout);
   if (nbytes == 0)
-    return NULL;
+    return nullptr;
 
   /* unescape in-place */
 
@@ -104,7 +104,7 @@ ReceiveSomeUnescape(Port &port, uint8_t *buffer, size_t length,
       if (src == end) {
         /* at the end of the buffer; need to read one more byte */
         if (port.WaitRead(env, timeout.GetRemainingOrZero()) != Port::WaitResult::READY)
-          return NULL;
+          return nullptr;
 
         ch = port.GetChar();
       } else
@@ -116,7 +116,7 @@ ReceiveSomeUnescape(Port &port, uint8_t *buffer, size_t length,
         *buffer++ = FLARM::ESCAPE;
       else
         /* unknown escape */
-        return NULL;
+        return nullptr;
     } else
       /* "harmless" byte */
       *buffer++ = *src++;
@@ -132,7 +132,7 @@ bool
 FLARM::ReceiveEscaped(Port &port, void *buffer, size_t length,
                       OperationEnvironment &env, unsigned timeout_ms)
 {
-  assert(buffer != NULL);
+  assert(buffer != nullptr);
   assert(length > 0);
 
   const TimeoutClock timeout(timeout_ms);
@@ -141,7 +141,7 @@ FLARM::ReceiveEscaped(Port &port, void *buffer, size_t length,
   uint8_t *p = (uint8_t *)buffer, *end = p + length;
   while (p < end) {
     p = ReceiveSomeUnescape(port, p, end - p, env, timeout);
-    if (p == NULL)
+    if (p == nullptr)
       return false;
   }
 
@@ -164,7 +164,8 @@ FLARM::FrameHeader
 FLARM::PrepareFrameHeader(unsigned sequence_number, MessageType message_type,
                           const void *data, size_t length)
 {
-  assert((data != NULL && length > 0) || (data == NULL && length == 0));
+  assert((data != nullptr && length > 0) ||
+         (data == nullptr && length == 0));
 
   FrameHeader header;
   header.SetLength(8 + length);

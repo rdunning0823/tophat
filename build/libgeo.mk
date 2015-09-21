@@ -10,6 +10,7 @@ GEO_SOURCES := \
 	$(GEO_SRC_DIR)/ConvexHull/PolygonInterior.cpp \
 	$(GEO_SRC_DIR)/Memento/DistanceMemento.cpp \
 	$(GEO_SRC_DIR)/Memento/GeoVectorMemento.cpp \
+	$(GEO_SRC_DIR)/Flat/FlatProjection.cpp \
 	$(GEO_SRC_DIR)/Flat/TaskProjection.cpp \
 	$(GEO_SRC_DIR)/Flat/FlatBoundingBox.cpp \
 	$(GEO_SRC_DIR)/Flat/FlatGeoPoint.cpp \
@@ -18,6 +19,7 @@ GEO_SOURCES := \
 	$(GEO_SRC_DIR)/Flat/FlatEllipse.cpp \
 	$(GEO_SRC_DIR)/Flat/FlatLine.cpp \
 	$(GEO_SRC_DIR)/Math.cpp \
+	$(GEO_SRC_DIR)/SimplifiedMath.cpp \
 	$(GEO_SRC_DIR)/GeoPoint.cpp \
 	$(GEO_SRC_DIR)/GeoVector.cpp \
 	$(GEO_SRC_DIR)/GeoBounds.cpp \

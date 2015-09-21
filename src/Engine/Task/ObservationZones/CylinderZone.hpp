@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -93,23 +93,23 @@ public:
   }
 
   /* virtual methods from class ObservationZone */
-  virtual bool IsInSector(const GeoPoint &location) const override {
+  bool IsInSector(const GeoPoint &location) const override {
     return DistanceTo(location) <= radius;
   }
 
-  virtual bool TransitionConstraint(const GeoPoint &location,
-                                    const GeoPoint &last_location) const override {
+  bool TransitionConstraint(gcc_unused const GeoPoint &location,
+                            gcc_unused const GeoPoint &last_location) const override {
     return true;
   }
 
-  virtual OZBoundary GetBoundary() const override;
-  virtual fixed ScoreAdjustment() const override;
+  OZBoundary GetBoundary() const override;
+  fixed ScoreAdjustment() const override;
 
   /* virtual methods from class ObservationZonePoint */
-  virtual bool Equals(const ObservationZonePoint &other) const override;
-  virtual GeoPoint GetRandomPointInSector(const fixed mag) const override;
+  bool Equals(const ObservationZonePoint &other) const override;
+  GeoPoint GetRandomPointInSector(const fixed mag) const override;
 
-  virtual ObservationZonePoint *Clone(const GeoPoint &_reference) const override {
+  ObservationZonePoint *Clone(const GeoPoint &_reference) const override {
     return new CylinderZone(*this, _reference);
   }
 };

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -51,10 +51,12 @@ IOThread::Stop()
 
   /* wait for the thread to finish */
   Join();
+
+  loop.Remove(pipe.GetReadFD());
 }
 
 void
-IOThread::LockAdd(int fd, unsigned mask, FileEventHandler &handler)
+IOThread::LockAdd(FileDescriptor fd, unsigned mask, FileEventHandler &handler)
 {
   loop.Lock();
   const bool old_modified = loop.IsModified();
@@ -67,7 +69,7 @@ IOThread::LockAdd(int fd, unsigned mask, FileEventHandler &handler)
 }
 
 void
-IOThread::LockRemove(int fd)
+IOThread::LockRemove(FileDescriptor fd)
 {
   loop.Lock();
   const bool old_modified = loop.IsModified();
@@ -105,7 +107,7 @@ IOThread::Run()
 }
 
 bool
-IOThread::OnFileEvent(int fd, unsigned mask)
+IOThread::OnFileEvent(FileDescriptor fd, unsigned mask)
 {
   assert(fd == pipe.GetReadFD());
 

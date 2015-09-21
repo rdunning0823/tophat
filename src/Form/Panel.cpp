@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,13 +24,14 @@ Copyright_License {
 #include "Form/Panel.hpp"
 #include "Look/DialogLook.hpp"
 
-PanelControl::PanelControl(ContainerWindow &parent, const DialogLook &look,
-                           const PixelRect &rc,
-                           const WindowStyle style)
+void
+PanelControl::Create(ContainerWindow &parent, const DialogLook &look,
+                     const PixelRect &rc,
+                     const WindowStyle style)
 {
-  Create(parent, rc,
 #ifdef HAVE_CLIPPING
-         look.background_color,
+  SolidContainerWindow::Create(parent, rc, look.background_color, style);
+#else
+  ContainerWindow::Create(parent, rc, style);
 #endif
-         style);
 }

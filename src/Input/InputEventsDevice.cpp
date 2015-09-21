@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,12 +22,11 @@ Copyright_License {
 */
 
 #include "InputEvents.hpp"
-#include "UIGlobals.hpp"
-#include "Look/Look.hpp"
 #include "Dialogs/Device/DeviceListDialog.hpp"
 #include "Device/device.hpp"
-#include "Device/List.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Device/Descriptor.hpp"
+#include "Components.hpp"
 #include "Operation/PopupOperationEnvironment.hpp"
 #include "Simulator.hpp"
 
@@ -55,7 +54,7 @@ InputEvents::eventSendNMEAPort1(const TCHAR *misc)
 
   if (misc != NULL && i < NUMDEV) {
     PopupOperationEnvironment env;
-    device_list[i]->WriteNMEA(misc, env);
+    (*devices)[i].WriteNMEA(misc, env);
   }
 }
 
@@ -66,7 +65,7 @@ InputEvents::eventSendNMEAPort2(const TCHAR *misc)
 
   if (misc != NULL && i < NUMDEV) {
     PopupOperationEnvironment env;
-    device_list[i]->WriteNMEA(misc, env);
+    (*devices)[i].WriteNMEA(misc, env);
   }
 }
 
@@ -76,7 +75,7 @@ InputEvents::eventDevice(const TCHAR *misc)
   assert(misc != NULL);
 
   if (StringIsEqual(misc, _T("list")))
-    ShowDeviceList(UIGlobals::GetLook().terminal);
+    ShowDeviceList();
 }
 
 

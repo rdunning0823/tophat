@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,13 +24,13 @@ Copyright_License {
 #ifndef XCSOAR_IO_BUFFERED_SOURCE_HPP
 #define XCSOAR_IO_BUFFERED_SOURCE_HPP
 
-#include "Util/FifoBuffer.hpp"
+#include "Util/StaticFifoBuffer.hpp"
 #include "Source.hpp"
 
 template<class T, unsigned size>
 class BufferedSource : public Source<T> {
 private:
-  FifoBuffer<T, size> buffer;
+  StaticFifoBuffer<T, size> buffer;
   long position;
 
 public:
@@ -40,23 +40,23 @@ protected:
   virtual unsigned Read(T *p, unsigned n) = 0;
 
 public:
-  virtual typename Source<T>::Range Read() override {
+  typename Source<T>::Range Read() override {
+    buffer.Shift();
     auto r = buffer.Write();
     if (!r.IsEmpty()) {
-      unsigned n = Read(r.data, r.length);
+      unsigned n = Read(r.data, r.size);
       buffer.Append(n);
     }
 
-    r = buffer.Read();
-    return typename Source<T>::Range(r.data, r.length);
+    return buffer.Read();
   }
 
-  virtual void Consume(unsigned n) override {
+  void Consume(unsigned n) override {
     buffer.Consume(n);
     position += n;
   }
 
-  virtual long Tell() const override {
+  long Tell() const override {
     return position;
   }
 };

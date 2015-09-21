@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,17 +22,14 @@ Copyright_License {
 */
 
 #include "Dialogs/Dialogs.h"
-#include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/XML.hpp"
-#include "Form/Form.hpp"
-#include "Form/Button.hpp"
-#include "Screen/LargeTextWindow.hpp"
-#include "Screen/Layout.hpp"
-#include "Screen/Key.h"
-#include "LocalPath.hpp"
+#include "Dialogs/WidgetDialog.hpp"
+#include "Widget/ArrowPagerWidget.hpp"
+#include "Widget/LargeTextWidget.hpp"
+#include "Look/DialogLook.hpp"
 #include "UIGlobals.hpp"
 #include "Util/StringUtil.hpp"
 #include "IO/DataFile.hpp"
+#include "IO/LineReader.hpp"
 #include "Language/Language.hpp"
 #include "Compiler.h"
 
@@ -43,28 +40,15 @@ Copyright_License {
 #define MAXTITLE 200
 #define MAXDETAILS 5000
 
-static int page = 0;
-static WndForm *wf = NULL;
-static LargeTextWindow *wDetails = NULL;
-
-#define MAXLINES 100
 #define MAXLISTS 20
-static unsigned nTextLines;
 static int nLists = 0;
 static TCHAR *ChecklistText[MAXTITLE];
 static TCHAR *ChecklistTitle[MAXTITLE];
 
 static void
-NextPage(int Step)
+UpdateCaption(WndForm &form, unsigned page)
 {
   TCHAR buffer[80];
-
-  page += Step;
-  if (page >= nLists)
-    page = 0;
-  if (page < 0)
-    page = nLists - 1;
-
   _tcscpy(buffer, _("Checklist"));
 
   if (ChecklistTitle[page] &&
@@ -73,54 +57,8 @@ NextPage(int Step)
     _tcscat(buffer, _T(": "));
     _tcscat(buffer, ChecklistTitle[page]);
   }
-  wf->SetCaption(buffer);
 
-  wDetails->SetText(ChecklistText[page]);
-}
-
-static void
-OnNextClicked()
-{
-  NextPage(+1);
-}
-
-static void
-OnPrevClicked()
-{
-  NextPage(-1);
-}
-
-static bool
-FormKeyDown(unsigned key_code)
-{
-  switch (key_code) {
-  case KEY_UP:
-    wDetails->ScrollVertically(-3);
-    return true;
-
-  case KEY_DOWN:
-    wDetails->ScrollVertically(3);
-    return true;
-
-  case KEY_LEFT:
-#ifdef GNAV
-  case '6':
-#endif
-    ((WndButton *)wf->FindByName(_T("cmdPrev")))->SetFocus();
-    NextPage(-1);
-    return true;
-
-  case KEY_RIGHT:
-#ifdef GNAV
-  case '7':
-#endif
-    ((WndButton *)wf->FindByName(_T("cmdNext")))->SetFocus();
-    NextPage(+1);
-    return true;
-
-  default:
-    return false;
-  }
+  form.SetCaption(buffer);
 }
 
 static void
@@ -182,7 +120,7 @@ LoadChecklist()
     } else {
       // append text to details string
       Details.append(TempString);
-      Details.Append(_T('\n'));
+      Details.push_back(_T('\n'));
     }
   }
 
@@ -193,39 +131,33 @@ LoadChecklist()
   }
 }
 
-static constexpr CallBackTableEntry CallBackTable[] = {
-  DeclareCallBackEntry(OnNextClicked),
-  DeclareCallBackEntry(OnPrevClicked),
-  DeclareCallBackEntry(NULL)
-};
-
 void
 dlgChecklistShowModal()
 {
+  static unsigned int current_page = 0;
   static bool first = true;
   if (first) {
     LoadChecklist();
     first = false;
   }
 
-  wf = LoadDialog(CallBackTable, UIGlobals::GetMainWindow(),
-                      Layout::landscape ?
-                      _T("IDR_XML_CHECKLIST_L") : _T("IDR_XML_CHECKLIST"));
-  if (!wf)
-    return;
+  const DialogLook &look = UIGlobals::GetDialogLook();
 
-  nTextLines = 0;
+  WidgetDialog dialog(look);
 
-  wf->SetKeyDownFunction(FormKeyDown);
+  ArrowPagerWidget widget(dialog, look.button);
+  for (int i = 0; i < nLists; ++i)
+    widget.Add(new LargeTextWidget(look, ChecklistText[i]));
+  widget.SetCurrent(current_page);
 
-  wDetails = (LargeTextWindow *)wf->FindByName(_T("frmDetails"));
-  assert(wDetails != NULL);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Checklist"), &widget);
 
-  page = 0;
-  NextPage(0); // JMW just to turn proper pages on/off
+  widget.SetPageFlippedCallback([&dialog, &widget](){
+      UpdateCaption(dialog, widget.GetCurrentIndex());
+    });
+  UpdateCaption(dialog, widget.GetCurrentIndex());
 
-  wf->ShowModal();
-
-  delete wf;
+  dialog.ShowModal();
+  dialog.StealWidget();
+  current_page = widget.GetCurrentIndex();
 }
-

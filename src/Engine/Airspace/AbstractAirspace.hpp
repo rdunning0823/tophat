@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 #ifndef ABSTRACTAIRSPACE_HPP
 #define ABSTRACTAIRSPACE_HPP
 
+#include "Util/TriState.hpp"
 #include "Util/tstring.hpp"
 #include "AirspaceAltitude.hpp"
 #include "AirspaceClass.hpp"
@@ -42,7 +43,7 @@ class AtmosphericPressure;
 class AirspaceAircraftPerformance;
 struct AirspaceInterceptSolution;
 class FlatBoundingBox;
-class TaskProjection;
+class FlatProjection;
 class AirspaceIntersectionVector;
 
 /** Abstract base class for airspace regions */
@@ -56,11 +57,11 @@ public:
 private:
   const Shape shape;
 
-protected:
   /** Airspace class */
   AirspaceClass type;
 
-  bool m_is_convex;
+protected:
+  mutable TriState is_convex;
   mutable bool active;
 
   /** Base of airspace */
@@ -91,15 +92,15 @@ public:
     return shape;
   }
 
-  /** 
+  /**
    * Compute bounding box enclosing the airspace.  Rounds up/down
    * so discretisation ensures bounding box is indeed enclosing.
-   * 
-   * @param task_projection Projection used for flat-earth representation
-   * 
+   *
+   * @param projection Projection used for flat-earth representation
+   *
    * @return Enclosing bounding box
    */
-  const FlatBoundingBox GetBoundingBox(const TaskProjection& task_projection);
+  const FlatBoundingBox GetBoundingBox(const FlatProjection &projection);
 
   GeoBounds GetGeoBounds() const;
 
@@ -110,43 +111,51 @@ public:
    * @return Location of reference point
    */
   gcc_pure
+  virtual const GeoPoint GetReferenceLocation() const = 0;
+
+  /**
+   * Get geometric center of airspace.
+   *
+   * @return center
+   */
+  gcc_pure
   virtual const GeoPoint GetCenter() const = 0;
 
-  /** 
+  /**
    * Checks whether an observer is inside the airspace (no altitude taken into account)
    * This is slow because it uses geodesic calculations
-   * 
+   *
    * @param loc State about which to test inclusion
-   * 
+   *
    * @return true if observer is inside airspace boundary
    */
   gcc_pure
   virtual bool Inside(const GeoPoint &loc) const = 0;
 
-  /** 
+  /**
    * Checks whether an observer is inside the airspace (altitude is taken into account)
    * This calls inside(state.location) so can be slow.
-   * 
+   *
    * @param state State about which to test inclusion
-   * 
+   *
    * @return true if aircraft is inside airspace boundaries
    */
   gcc_pure
-  virtual bool Inside(const AircraftState &state) const;
+  bool Inside(const AircraftState &state) const;
 
-  /** 
+  /**
    * Checks whether a line intersects with the airspace.
    * Can be approximate by using flat-earth representation internally.
-   * 
+   *
    * @param g1 Location of origin of search vector
    * @param end the end of the search vector
-   * 
+   *
    * @return Vector of intersection pairs if the line intersects the airspace
    */
   gcc_pure
   virtual AirspaceIntersectionVector Intersects(const GeoPoint &g1,
                                                 const GeoPoint &end,
-                                                const TaskProjection &projection) const = 0;
+                                                const FlatProjection &projection) const = 0;
 
   /**
    * Find location of closest point on boundary to a reference
@@ -157,11 +166,11 @@ public:
    */
   gcc_pure
   virtual GeoPoint ClosestPoint(const GeoPoint &loc,
-                                const TaskProjection &projection) const = 0;
+                                const FlatProjection &projection) const = 0;
 
-  /** 
-   * Set terrain altitude for AGL-referenced airspace altitudes 
-   * 
+  /**
+   * Set terrain altitude for AGL-referenced airspace altitudes
+   *
    * @param alt Height above MSL of terrain (m) at center
    */
   void SetGroundLevel(const fixed alt);
@@ -173,9 +182,9 @@ public:
     return altitude_base.NeedGroundLevel() || altitude_top.NeedGroundLevel();
   }
 
-  /** 
-   * Set QNH pressure for FL-referenced airspace altitudes 
-   * 
+  /**
+   * Set QNH pressure for FL-referenced airspace altitudes
+   *
    * @param press Atmospheric pressure model and QNH
    */
   void SetFlightLevel(const AtmosphericPressure &press);
@@ -195,14 +204,13 @@ public:
    * @param _base Lower limit
    * @param _top Upper limit
    */
-  void SetProperties(const tstring &_Name, const AirspaceClass _Type,
+  void SetProperties(tstring &&_name, const AirspaceClass _Type,
                      const AirspaceAltitude &_base,
                      const AirspaceAltitude &_top) {
-    name = _Name;
+    name = std::move(_name);
     type = _Type;
     altitude_base = _base;
     altitude_top = _top;
-    radio = _T("");
   }
 
   /**
@@ -223,9 +231,9 @@ public:
     days_of_operation = mask;
   }
 
-  /** 
+  /**
    * Get type of airspace
-   * 
+   *
    * @return Type/class of airspace
    */
   AirspaceClass GetType() const {
@@ -297,13 +305,13 @@ public:
    */
   bool Intercept(const AircraftState &state,
                  const GeoPoint &end,
-                 const TaskProjection &projection,
+                 const FlatProjection &projection,
                  const AirspaceAircraftPerformance &perf,
                  AirspaceInterceptSolution &solution) const;
 
 #ifdef DO_PRINT
-  friend std::ostream& operator<< (std::ostream &f,
-                                   const AbstractAirspace &as);
+  friend std::ostream &operator<<(std::ostream &f,
+                                  const AbstractAirspace &as);
 #endif
 
   gcc_pure
@@ -323,7 +331,9 @@ public:
    * @return Text version of radio frequency
    */
   gcc_pure
-  const tstring GetRadioText() const;
+  const tstring &GetRadioText() const {
+    return radio;
+  }
 
   /**
    * Accessor for airspace shape
@@ -344,7 +354,7 @@ public:
    * from within a visit method.
    */
   gcc_pure
-  const SearchPointVector &GetClearance(const TaskProjection &projection) const;
+  const SearchPointVector &GetClearance(const FlatProjection &projection) const;
   void ClearClearance() const;
 
   gcc_pure
@@ -354,7 +364,7 @@ public:
 
 protected:
   /** Project border */
-  virtual void Project(const TaskProjection &tp);
+  void Project(const FlatProjection &tp);
 
 private:
   /**

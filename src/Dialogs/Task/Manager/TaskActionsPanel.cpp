@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -58,6 +58,8 @@ TaskActionsPanel::SaveTask()
     if (!OrderedTaskSave(**active_task))
       return;
 
+    *task_modified = true;
+    dialog.UpdateCaption();
     DirtyTaskListPanel();
   } else {
     ShowMessageBox(getTaskValidationErrors(
@@ -69,7 +71,6 @@ TaskActionsPanel::SaveTask()
 inline void
 TaskActionsPanel::OnBrowseClicked()
 {
-  dialog.RestoreTaskView();
   parent.SetCurrent(1);
 }
 
@@ -119,22 +120,6 @@ TaskActionsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   if (is_simulator())
     /* cannot communicate with real devices in simulator mode */
     SetRowEnabled(DECLARE, false);
-}
-
-void
-TaskActionsPanel::Show(const PixelRect &rc)
-{
-  dialog.ShowTaskView();
-
-  RowFormWidget::Show(rc);
-}
-
-void
-TaskActionsPanel::Hide()
-{
-  dialog.ResetTaskView();
-
-  RowFormWidget::Hide();
 }
 
 void

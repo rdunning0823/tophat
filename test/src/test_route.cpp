@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,8 +21,6 @@
 */
 
 #include "Printing.hpp"
-#define DO_PRINT
-#include "test_debug.hpp"
 #include "harness_airspace.hpp"
 #include "Route/AirspaceRoute.hpp"
 #include "Engine/Airspace/AirspaceAircraftPerformance.hpp"
@@ -35,6 +33,9 @@
 #include "OS/FileUtil.hpp"
 #include "Compatibility/path.h"
 #include "Operation/Operation.hpp"
+#include "test_debug.hpp"
+
+#include <fstream>
 
 #include <string.h>
 

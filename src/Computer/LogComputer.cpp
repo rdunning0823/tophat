@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,8 +29,7 @@ Copyright_License {
 #include "Logger/Logger.hpp"
 
 LogComputer::LogComputer()
-  :log_clock(fixed(5)),
-   logger(NULL) {}
+  :logger(NULL) {}
 
 void
 LogComputer::Reset()
@@ -52,7 +51,7 @@ LogComputer::Run(const MoreData &basic, const DerivedInfo &calculated,
 {
   const bool location_jump = basic.location_available &&
     last_location.IsValid() &&
-    basic.location.Distance(last_location) > fixed(200);
+    basic.location.DistanceS(last_location) > fixed(200);
 
   last_location = basic.location_available
     ? basic.location : GeoPoint::Invalid();
@@ -62,16 +61,16 @@ LogComputer::Run(const MoreData &basic, const DerivedInfo &calculated,
     return false;
 
   // log points more often in circling mode
-  log_clock.SetDT(fixed(calculated.circling
-                        ? settings_logger.time_step_circling
-                        : settings_logger.time_step_cruise));
-
+  unsigned period;
   if (fast_log_num) {
-    log_clock.SetDT(fixed(1));
+    period = 1;
     fast_log_num--;
-  }
+  } else
+    period = calculated.circling
+      ? settings_logger.time_step_circling
+      : settings_logger.time_step_cruise;
 
-  if (log_clock.CheckAdvance(basic.time) && logger != NULL)
+  if (log_clock.CheckAdvance(basic.time, period) && logger != nullptr)
       logger->LogPoint(basic);
 
   return true;

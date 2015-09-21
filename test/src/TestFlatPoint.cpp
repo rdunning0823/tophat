@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -46,12 +46,12 @@ int main(int argc, char **argv)
   ok1(equals(p2.y, 4));
 
   // test sub()
-  p2.Subtract(p1);
+  p2 -= p1;
   ok1(equals(p2.x, 0));
   ok1(equals(p2.y, 3));
 
   // test add()
-  p2.Add(p3);
+  p2 += p3;
   ok1(equals(p2.x, 3));
   ok1(equals(p2.y, 13));
 

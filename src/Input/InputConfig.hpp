@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,11 +27,18 @@ Copyright_License {
 #include "InputQueue.hpp"
 #include "Menu/MenuData.hpp"
 #include "Util/RadixTree.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/TrivialArray.hpp"
 
 #include <assert.h>
 #include <tchar.h>
+
+#ifdef ENABLE_SDL
+#include <SDL_version.h>
+#if SDL_MAJOR_VERSION >= 2
+#include <SDL_keycode.h>
+#endif
+#endif
 
 struct InputConfig {
   // Sensible maximums
@@ -40,7 +47,9 @@ struct InputConfig {
   static constexpr unsigned MAX_MODE_STRING = 24;
 #ifdef ENABLE_SDL
   static constexpr unsigned MAX_KEY = 400;
-#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#elif defined(USE_X11)
+  static constexpr unsigned MAX_KEY = 0x100;
+#elif defined(USE_POLL_EVENT)
   static constexpr unsigned MAX_KEY = 0600;
 #else
   static constexpr unsigned MAX_KEY = 255;
@@ -64,6 +73,20 @@ struct InputConfig {
 
   // Key map to Event - Keys (per mode) mapped to events
   unsigned short Key2Event[MAX_MODE][MAX_KEY];		// Points to Events location
+#if defined(ENABLE_SDL) && (SDL_MAJOR_VERSION >= 2)
+  /* In SDL2, keycodes without character representations are large values,
+  AND-ed with SDLK_SCANCODE_MASK (0x40000000). A seperate array is therefore
+  used here and the keycode is stored here with an index without
+  SDLK_SCANCODE_MASK. */
+  unsigned short Key2EventNonChar[MAX_MODE][MAX_KEY];
+#endif
+
+#ifdef USE_X11
+  /**
+   * Same as #Key2Event but with key code offset 0xff00.
+   */
+  unsigned short Key2EventFF00[MAX_MODE][MAX_KEY];
+#endif
 
   RadixTree<unsigned> Gesture2Event;
 
@@ -129,14 +152,52 @@ struct InputConfig {
   unsigned GetKeyEvent(unsigned mode, unsigned key_code) const {
     assert(mode < MAX_MODE);
 
-    if (key_code >= MAX_KEY)
+    unsigned key_code_idx = key_code;
+    auto key_2_event = Key2Event;
+#if defined(ENABLE_SDL) && (SDL_MAJOR_VERSION >= 2)
+    if (key_code & SDLK_SCANCODE_MASK) {
+      key_code_idx = key_code & ~SDLK_SCANCODE_MASK;
+      key_2_event = Key2EventNonChar;
+    }
+#endif
+
+#ifdef USE_X11
+    if (key_code_idx >= 0xff00) {
+      key_code_idx -= 0xff00;
+      key_2_event = Key2EventFF00;
+    }
+#endif
+
+    if (key_code_idx >= MAX_KEY)
       return 0;
 
-    if (mode > 0 && Key2Event[mode][key_code] != 0)
-      return Key2Event[mode][key_code];
+    if (mode > 0 && key_2_event[mode][key_code_idx] != 0)
+      return key_2_event[mode][key_code_idx];
 
     /* fall back to the default mode */
-    return Key2Event[0][key_code];
+    return key_2_event[0][key_code_idx];
+  }
+
+  void SetKeyEvent(unsigned mode, unsigned key_code, unsigned event_id) {
+    assert(mode < MAX_MODE);
+
+    auto key_2_event = Key2Event;
+#if defined(ENABLE_SDL) && (SDL_MAJOR_VERSION >= 2)
+    if (key_code & SDLK_SCANCODE_MASK) {
+      key_2_event = Key2EventNonChar;
+      key_code &= ~SDLK_SCANCODE_MASK;
+    }
+#endif
+
+#ifdef USE_X11
+    if (key_code >= 0xff00) {
+      key_code -= 0xff00;
+      key_2_event = Key2EventFF00;
+    }
+#endif
+
+    if (key_code < MAX_KEY)
+      key_2_event[mode][key_code] = event_id;
   }
 
   gcc_pure

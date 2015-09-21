@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Screen/AntiFlickerWindow.hpp"
 #include "Blackboard/FullBlackboard.hpp"
+#include "Math/Point2D.hpp"
 
 struct VarioLook;
 struct UnitsLook;
@@ -33,18 +34,17 @@ class ContainerWindow;
 
 class GaugeVario : public AntiFlickerWindow
 {
-  enum {
-    NARROWS = 3,
-    YOFFSET = 36,
+  static constexpr unsigned NARROWS = 3;
+  static constexpr int YOFFSET = 36;
 
-    /** 5 m/s */
-    GAUGEVARIORANGE = 5,
+  /** 5 m/s */
+  static constexpr int GAUGEVARIORANGE = 5;
 
-    /** degrees total sweep */
-    GAUGEVARIOSWEEP = 90,
+  /** degrees total sweep */
+  static constexpr int GAUGEVARIOSWEEP = 90;
 
-    gmax = GAUGEVARIOSWEEP + 2,
-  };
+  static constexpr int gmax = GAUGEVARIOSWEEP + 2;
+  static constexpr int gmin = -gmax;
 
   struct DrawInfo {
     bool initialised;
@@ -61,9 +61,9 @@ class GaugeVario : public AntiFlickerWindow
   const UnitsLook &units_look;
 
 private:
-  const UPixelScalar nlength0, nlength1, nwidth, nline;
-  PixelScalar xoffset;
-  PixelScalar yoffset;
+  const unsigned nlength0, nlength1, nwidth, nline;
+
+  Point2D<int> offset;
 
   bool dirty;
 
@@ -122,10 +122,10 @@ protected:
 
 private:
   void RenderZero(Canvas &canvas);
-  void RenderValue(Canvas &canvas, PixelScalar x, PixelScalar y,
+  void RenderValue(Canvas &canvas, int x, int y,
                    DrawInfo *diValue, DrawInfo *diLabel,
                    fixed Value, const TCHAR *Label);
-  void RenderSpeedToFly(Canvas &canvas, PixelScalar x, PixelScalar y);
+  void RenderSpeedToFly(Canvas &canvas, int x, int y);
   void RenderBallast(Canvas &canvas);
   void RenderBugs(Canvas &canvas);
   int  ValueToNeedlePos(fixed Value);

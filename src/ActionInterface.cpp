@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ XCSoarInterface::ExchangeDeviceBlackboard()
 void
 ActionInterface::SendGetComputerSettings()
 {
-  assert(calculation_thread != NULL);
+  assert(calculation_thread != nullptr);
 
   main_window->SetComputerSettings(GetComputerSettings());
 
@@ -111,10 +111,10 @@ ActionInterface::SetBallast(fixed ballast, bool to_devices)
   polar.SetBallast(ballast);
 
   // send to calculation thread and trigger recalculation
-  if (protected_task_manager != NULL)
+  if (protected_task_manager != nullptr)
     protected_task_manager->SetGlidePolar(polar);
 
-  if (calculation_thread != NULL) {
+  if (calculation_thread != nullptr) {
     calculation_thread->SetComputerSettings(GetComputerSettings());
     calculation_thread->ForceTrigger();
   }
@@ -140,10 +140,10 @@ ActionInterface::SetBugs(fixed bugs, bool to_devices)
   GlidePolar &polar = SetComputerSettings().polar.glide_polar_task;
 
   // send to calculation thread and trigger recalculation
-  if (protected_task_manager != NULL)
+  if (protected_task_manager != nullptr)
     protected_task_manager->SetGlidePolar(polar);
 
-  if (calculation_thread != NULL) {
+  if (calculation_thread != nullptr) {
     calculation_thread->SetComputerSettings(GetComputerSettings());
     calculation_thread->ForceTrigger();
   }
@@ -176,10 +176,10 @@ ActionInterface::SetMacCready(fixed mc, bool to_devices)
 
   /* send to calculation thread and trigger recalculation */
 
-  if (protected_task_manager != NULL)
+  if (protected_task_manager != nullptr)
     protected_task_manager->SetGlidePolar(polar);
 
-  if (calculation_thread != NULL) {
+  if (calculation_thread != nullptr) {
     calculation_thread->SetComputerSettings(GetComputerSettings());
     calculation_thread->ForceTrigger();
   }
@@ -221,9 +221,6 @@ ActionInterface::OffsetManualMacCready(fixed offset, bool to_devices)
 void
 ActionInterface::SendMapSettings(const bool trigger_draw)
 {
-  // trigger_draw: asks for an immediate exchange of blackboard data
-  // (via ProcessTimer()) rather than waiting for the idle timer every 500ms
-
   if (trigger_draw) {
     main_window->UpdateGaugeVisibility();
     InfoBoxManager::ProcessTimer();
@@ -241,6 +238,15 @@ ActionInterface::SendMapSettings(const bool trigger_draw)
   }
 
   // TODO: trigger refresh if the settings are changed
+}
+
+void
+ActionInterface::SendUIState(const bool trigger_draw)
+{
+  main_window->SetUIState(GetUIState());
+
+  if (trigger_draw)
+    main_window->FullRedraw();
 }
 
 gcc_pure

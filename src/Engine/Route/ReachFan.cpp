@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,17 +39,16 @@ ReachFan::Solve(const AGeoPoint origin, const RoutePolars &rpolars,
 {
   Reset();
 
-  // initialise task_proj
-  task_proj.Reset(origin);
-  task_proj.Update();
+  // initialise projection
+  projection = FlatProjection(origin);
 
   const short h = terrain
     ? terrain->GetHeight(origin)
     : RasterBuffer::TERRAIN_INVALID;
   const RoughAltitude h2(RasterBuffer::IsSpecial(h) ? 0 : h);
 
-  ReachFanParms parms(rpolars, task_proj, (int)terrain_base, terrain);
-  const AFlatGeoPoint ao(task_proj.ProjectInteger(origin), origin.altitude);
+  ReachFanParms parms(rpolars, projection, (int)terrain_base, terrain);
+  const AFlatGeoPoint ao(projection.ProjectInteger(origin), origin.altitude);
 
   if (!RasterBuffer::IsInvalid(h) &&
       (origin.altitude <= h2 + rpolars.GetSafetyHeight())) {
@@ -85,7 +84,7 @@ ReachFan::IsInside(const GeoPoint origin, const bool turning) const
   if (root.IsEmpty())
     return false;
 
-  const FlatGeoPoint p = task_proj.ProjectInteger(origin);
+  const FlatGeoPoint p = projection.ProjectInteger(origin);
   return root.IsInsideTree(p, turning);
 }
 
@@ -96,8 +95,8 @@ ReachFan::FindPositiveArrival(const AGeoPoint dest, const RoutePolars &rpolars,
   if (root.IsEmpty())
     return false;
 
-  const FlatGeoPoint d(task_proj.ProjectInteger(dest));
-  const ReachFanParms parms(rpolars, task_proj, (int)terrain_base);
+  const FlatGeoPoint d(projection.ProjectInteger(dest));
+  const ReachFanParms parms(rpolars, projection, (int)terrain_base);
 
   result_r.Clear();
 
@@ -131,6 +130,6 @@ ReachFan::AcceptInRange(const GeoBounds &bounds,
   if (root.IsEmpty())
     return;
 
-  const FlatBoundingBox bb = task_proj.Project(bounds);
-  root.AcceptInRange(bb, task_proj, visitor);
+  const FlatBoundingBox bb = projection.Project(bounds);
+  root.AcceptInRange(bb, projection, visitor);
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,51 +22,14 @@ Copyright_License {
 */
 
 #include "AircraftRenderer.hpp"
+#include "RotatedPolygonRenderer.hpp"
 #include "Screen/Canvas.hpp"
 #include "Look/AircraftLook.hpp"
 #include "MapSettings.hpp"
-#include "Util/Macros.hpp"
 #include "Asset.hpp"
 #include "Math/Angle.hpp"
-#ifdef ENABLE_OPENGL
-#include "Screen/OpenGL/CanvasRotateShift.hpp"
-#else
-#include "Math/Screen.hpp"
-#endif
 
 #include <algorithm>
-
-class RotatedPolygonRenderer {
-#ifdef ENABLE_OPENGL
-  const RasterPoint *points;
-  CanvasRotateShift rotate_shift;
-#else
-  RasterPoint points[64];
-#endif
-
-public:
-  RotatedPolygonRenderer(const RasterPoint *src, unsigned n,
-                         const RasterPoint pos, const Angle angle)
-#ifdef ENABLE_OPENGL
-    :points(src), rotate_shift(pos, angle)
-#endif
-  {
-#ifndef ENABLE_OPENGL
-    assert(n <= ARRAY_SIZE(points));
-
-    std::copy(src, src + n, points);
-    PolygonRotateShift(points, n, pos.x, pos.y, angle);
-#endif
-  }
-
-  void Draw(Canvas &canvas, unsigned start, unsigned n) const {
-#ifndef ENABLE_OPENGL
-    assert(start + n <= ARRAY_SIZE(points));
-#endif
-
-    canvas.DrawPolygon(points + start, n);
-  }
-};
 
 static void
 DrawMirroredPolygon(const RasterPoint *src, unsigned points,
@@ -76,7 +39,7 @@ DrawMirroredPolygon(const RasterPoint *src, unsigned points,
   RasterPoint dst[64];
   assert(2 * points <= ARRAY_SIZE(dst));
 
-  std::copy(src, src + points, dst);
+  std::copy_n(src, points, dst);
   for (unsigned i = 0; i < points; ++i) {
     dst[2 * points - i - 1].x = -dst[i].x;
     dst[2 * points - i - 1].y = dst[i].y;
@@ -84,7 +47,7 @@ DrawMirroredPolygon(const RasterPoint *src, unsigned points,
 #ifdef ENABLE_OPENGL
   CanvasRotateShift rotate_shift(pos, angle, 50);
 #else
-  PolygonRotateShift(dst, 2 * points, pos.x, pos.y, angle, 50);
+  PolygonRotateShift(dst, 2 * points, pos, angle, 50);
 #endif
   canvas.DrawPolygon(dst, 2 * points);
 }

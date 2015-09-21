@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@ Copyright_License {
 #define XCSOAR_DEVICE_SOCKET_PORT_HPP
 
 #include "BufferedPort.hpp"
-#include "OS/SocketDescriptor.hpp"
-#include "IO/Async/FileEventHandler.hpp"
+#include "Net/SocketDescriptor.hpp"
+#include "IO/Async/SocketEventHandler.hpp"
 
 #ifndef HAVE_POSIX
 #include "IO/Async/SocketThread.hpp"
@@ -35,7 +35,7 @@ Copyright_License {
 /**
  * A UDP listener port class.
  */
-class SocketPort : public BufferedPort, protected FileEventHandler {
+class SocketPort : public BufferedPort, protected SocketEventHandler {
   SocketDescriptor socket;
 
 #ifndef HAVE_POSIX
@@ -51,8 +51,9 @@ public:
    * @param handler the callback object for input received on the
    * port
    */
-  SocketPort(DataHandler &handler)
-    :BufferedPort(handler)
+  SocketPort(PortListener *_listener, DataHandler &_handler)
+    :BufferedPort(_listener, _handler),
+     socket(SocketDescriptor::Undefined())
 #ifndef HAVE_POSIX
     , thread(socket, *this)
 #endif
@@ -66,7 +67,7 @@ public:
   /**
    * Make the object use the specified socket.
    */
-  void Set(SocketDescriptor &&socket);
+  void Set(SocketDescriptor &&_socket);
 
 protected:
   /**
@@ -90,8 +91,8 @@ public:
   virtual size_t Write(const void *data, size_t length) override;
 
 protected:
-  /* virtual methods from class FileEventHandler */
-  virtual bool OnFileEvent(int fd, unsigned mask) override;
+  /* virtual methods from class SocketEventHandler */
+  bool OnSocketEvent(SocketDescriptor s, unsigned mask) override;
 };
 
 #endif

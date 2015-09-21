@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -46,6 +46,8 @@ public:
   static constexpr unsigned READ = IOLoop::READ;
   static constexpr unsigned WRITE = IOLoop::WRITE;
 
+  IOThread():Thread("IOThread") {}
+
   /**
    * Start the thread.  This method should be called after creating
    * this object.
@@ -64,7 +66,7 @@ public:
    * This method is not thread-safe, it may only be called from within
    * the thread.
    */
-  void Add(int fd, unsigned mask, FileEventHandler &handler) {
+  void Add(FileDescriptor fd, unsigned mask, FileEventHandler &handler) {
     loop.Add(fd, mask, handler);
   }
 
@@ -74,18 +76,18 @@ public:
    * This method is not thread-safe, it may only be called from within
    * the thread.
    */
-  void Remove(int fd) {
+  void Remove(FileDescriptor fd) {
     loop.Remove(fd);
   }
 
-  void Set(int fd, unsigned mask, FileEventHandler &handler) {
+  void Set(FileDescriptor fd, unsigned mask, FileEventHandler &handler) {
     loop.Set(fd, mask, handler);
   }
 
   /**
    * A thread-safe version of Add().
    */
-  void LockAdd(int fd, unsigned mask, FileEventHandler &handler);
+  void LockAdd(FileDescriptor fd, unsigned mask, FileEventHandler &handler);
 
   /**
    * A thread-safe version of Remove().
@@ -93,12 +95,12 @@ public:
    * This method is synchronous: after this call, the handler is
    * guaranteed to be not running.
    */
-  void LockRemove(int fd);
+  void LockRemove(FileDescriptor fd);
 
   /**
    * A thread-safe version of Set().
    */
-  void LockSet(int fd, unsigned mask, FileEventHandler &handler) {
+  void LockSet(FileDescriptor fd, unsigned mask, FileEventHandler &handler) {
     if (mask != 0)
       LockAdd(fd, mask, handler);
     else
@@ -107,10 +109,10 @@ public:
 
 protected:
   /* virtual methods from Thread */
-  virtual void Run() override;
+  void Run() override;
 
   /* virtual methods from FileEventHandler */
-  virtual bool OnFileEvent(int fd, unsigned mask) override;
+  bool OnFileEvent(FileDescriptor fd, unsigned mask) override;
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@ Copyright_License {
 #include "Interface.hpp"
 #include "GlideComputerConfigPanel.hpp"
 #include "Language/Language.hpp"
-#include "Form/Form.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "UtilsSettings.hpp"
@@ -39,6 +38,7 @@ enum ControlIndex {
   EnableExternalTriggerCruise,
   AverEffTime,
   PredictWindDrift,
+  WaveAssistant,
 };
 
 class GlideComputerConfigPanel final : public RowFormWidget {
@@ -114,6 +114,9 @@ GlideComputerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _("Account for wind drift for the predicted circling duration. This reduces the arrival height for legs with head wind."),
              task_behaviour.glide.predict_wind_drift);
   SetExpertRow(PredictWindDrift);
+
+  AddBoolean(_("Wave assistant"), nullptr,
+             settings_computer.wave.enabled);
 }
 
 bool
@@ -141,6 +144,9 @@ GlideComputerConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(PredictWindDrift, ProfileKeys::PredictWindDrift,
                        task_behaviour.glide.predict_wind_drift);
+
+  changed |= SaveValue(WaveAssistant, ProfileKeys::WaveAssistant,
+                       settings_computer.wave.enabled);
 
   _changed |= changed;
 

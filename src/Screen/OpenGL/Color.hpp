@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,10 @@ Copyright_License {
 #include "Screen/PortableColor.hpp"
 #include "Features.hpp"
 #include "System.hpp"
+
+#ifdef USE_GLSL
+#include "Shaders.hpp"
+#endif
 
 #include <stdint.h>
 
@@ -62,11 +66,15 @@ class Color {
   static constexpr Component MAX = 0xff;
 #endif
 
+  static constexpr GLfloat ExportFloat(Component value) {
+    return GLfloat(value) / GLfloat(MAX);
+  }
+
   Component r, g, b, a;
 
   struct Internal {};
 
-  constexpr Color(Internal dummy,
+  constexpr Color(Internal,
                   Component _r, Component _g, Component _b, Component _a)
     :r(_r), g(_g), b(_b), a(_a) {}
 
@@ -81,6 +89,12 @@ public:
      a(MAX) {}
 
   Color() = default;
+
+#ifdef HAVE_GLES
+  static constexpr GLenum TYPE = GL_FIXED;
+#else
+  static constexpr GLenum TYPE = GL_UNSIGNED_BYTE;
+#endif
 
   /**
    * Returns the red part of the color
@@ -175,11 +189,25 @@ public:
                  Alpha());
   }
 
+#ifdef USE_GLSL
+  void Uniform(GLint location) const {
+    glUniform4f(location, ExportFloat(r), ExportFloat(g),
+                ExportFloat(b), ExportFloat(a));
+  }
+
+  void VertexAttrib(GLint index) const {
+    glVertexAttrib4f(index, ExportFloat(r), ExportFloat(g),
+                     ExportFloat(b), ExportFloat(a));
+  }
+#endif
+
   /**
    * Configures this color in the OpenGL context.
    */
-  void Set() const {
-#ifdef HAVE_GLES
+  void Bind() const {
+#ifdef USE_GLSL
+    VertexAttrib(OpenGL::Attribute::COLOR);
+#elif defined(HAVE_GLES)
     /* on Android, glColor4ub() is not implemented, and we're forced
        to use floating point math for something as trivial as
        configuring a RGB color value */
@@ -213,6 +241,27 @@ public:
   bool operator !=(const Color other) const
   {
     return !(*this == other);
+  }
+};
+
+struct ScopeColorPointer {
+  ScopeColorPointer(const Color *p) {
+#ifdef USE_GLSL
+    glEnableVertexAttribArray(OpenGL::Attribute::COLOR);
+    glVertexAttribPointer(OpenGL::Attribute::COLOR, 4, Color::TYPE,
+                          GL_FALSE, 0, p);
+#else
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(4, Color::TYPE, 0, p);
+#endif
+  }
+
+  ~ScopeColorPointer() {
+#ifdef USE_GLSL
+    glDisableVertexAttribArray(OpenGL::Attribute::COLOR);
+#else
+    glDisableClientState(GL_COLOR_ARRAY);
+#endif
   }
 };
 

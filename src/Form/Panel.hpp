@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -47,13 +47,21 @@ class PanelControl :
 #endif
 {
 public:
+  PanelControl() = default;
+
   /**
    * Constructor of the PanelControl class
    * @param owner Parent ContainerControl
    */
   PanelControl(ContainerWindow &parent, const DialogLook &look,
                const PixelRect &rc,
-               const WindowStyle style=WindowStyle());
+               const WindowStyle style=WindowStyle()) {
+    Create(parent, look, rc, style);
+  }
+
+  void Create(ContainerWindow &parent, const DialogLook &look,
+              const PixelRect &rc,
+              const WindowStyle style=WindowStyle());
 };
 
 #endif

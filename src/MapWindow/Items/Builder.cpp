@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,8 +39,6 @@ Copyright_License {
 #include "NMEA/Aircraft.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/ProtectedRoutePlanner.hpp"
-#include "Markers/ProtectedMarkers.hpp"
-#include "Markers/Markers.hpp"
 #include "NMEA/ThermalLocator.hpp"
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
@@ -148,7 +146,7 @@ MapItemListBuilder::AddLocation(const NMEAInfo &basic,
     vector.SetInvalid();
 
   short elevation;
-  if (terrain != NULL)
+  if (terrain != nullptr)
     elevation = terrain->GetTerrainHeight(location);
   else
     elevation = RasterBuffer::TERRAIN_INVALID;
@@ -166,7 +164,7 @@ MapItemListBuilder::AddArrivalAltitudes(
 
   // Calculate terrain elevation if possible
   short elevation;
-  if (terrain != NULL)
+  if (terrain != nullptr)
     elevation = terrain->GetTerrainHeight(location);
   else
     elevation = RasterBuffer::TERRAIN_INVALID;
@@ -194,7 +192,7 @@ MapItemListBuilder::AddArrivalAltitudes(
 void
 MapItemListBuilder::AddSelfIfNear(const GeoPoint &self, Angle bearing)
 {
-  if (!list.full() && location.Distance(self) < range)
+  if (!list.full() && location.DistanceS(self) < range)
     list.append(new SelfMapItem(self, bearing));
 }
 
@@ -214,7 +212,7 @@ MapItemListBuilder::AddVisibleAirspace(
     const MoreData &basic, const DerivedInfo &calculated)
 {
   AirspaceWarningList warnings;
-  if (warning_manager != NULL)
+  if (warning_manager != nullptr)
     warnings.Fill(*warning_manager);
 
   const AircraftState aircraft = ToAircraftState(basic, calculated);
@@ -253,23 +251,6 @@ MapItemListBuilder::AddTaskOZs(const ProtectedTaskManager &task)
   }
 }
 
-void
-MapItemListBuilder::AddMarkers(const ProtectedMarkers &marks)
-{
-  ProtectedMarkers::Lease lease(marks);
-  unsigned i = 0;
-
-  for (const auto &m : (const Markers &)lease) {
-    if (list.full())
-      break;
-
-    if (location.Distance(m.location) < range)
-      list.append(new MarkerMapItem(i, m));
-
-    i++;
-  }
-}
-
 #ifdef HAVE_NOAA
 void
 MapItemListBuilder::AddWeatherStations(NOAAStore &store)
@@ -280,7 +261,7 @@ MapItemListBuilder::AddWeatherStations(NOAAStore &store)
 
     if (it->parsed_metar_available &&
         it->parsed_metar.location_available &&
-        location.Distance(it->parsed_metar.location) < range)
+        location.DistanceS(it->parsed_metar.location) < range)
       list.checked_append(new WeatherStationMapItem(it));
   }
 }
@@ -293,7 +274,7 @@ MapItemListBuilder::AddTraffic(const TrafficList &flarm)
     if (list.full())
       break;
 
-    if (location.Distance(t.location) < range) {
+    if (location.DistanceS(t.location) < range) {
       auto color = FlarmFriends::GetFriendColor(t.id);
       list.append(new TrafficMapItem(t.id, color));
     }
@@ -314,7 +295,7 @@ MapItemListBuilder::AddSkyLinesTraffic()
       break;
 
     if (i.second.location.IsValid() &&
-        location.Distance(i.second.location) < range) {
+        location.DistanceS(i.second.location) < range) {
       const uint32_t id = i.first;
       auto name_i = data.user_names.find(id);
       const TCHAR *name;
@@ -327,6 +308,7 @@ MapItemListBuilder::AddSkyLinesTraffic()
         name = name_i->second.c_str();
 
       list.append(new SkyLinesTrafficMapItem(id, i.second.time_of_day_ms,
+                                             i.second.altitude,
                                              name));
     }
   }
@@ -350,7 +332,7 @@ MapItemListBuilder::AddThermals(const ThermalLocatorInfo &thermals,
       ? t.CalculateAdjustedLocation(basic.nav_altitude, calculated.wind)
       : t.location;
 
-    if (location.Distance(loc) < range)
+    if (location.DistanceS(loc) < range)
       list.append(new ThermalMapItem(t));
   }
 }

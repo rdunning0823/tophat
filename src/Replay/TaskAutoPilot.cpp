@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -251,7 +251,7 @@ TaskAutoPilot::IsFarFromTarget(const TaskAccessor& task,
   // are we considered close to the target?
 
   if (task.IsEmpty() || !task.GetLegStats().remaining.IsDefined())
-    return w[0].Distance(state.location) > state.ground_speed;
+    return w[0].DistanceS(state.location) > state.ground_speed;
 
   bool d_far = task.GetLegStats().remaining.GetDistance() > fixed(100);
 
@@ -264,7 +264,7 @@ TaskAutoPilot::IsFarFromTarget(const TaskAccessor& task,
   if (HasTarget(task))
     return d_far || !entered;
 
-  fixed dc = w[0].Distance(state.location);
+  fixed dc = w[0].DistanceS(state.location);
   if (awp == 0)
     return (dc > state.ground_speed);
 

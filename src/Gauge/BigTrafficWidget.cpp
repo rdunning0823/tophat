@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,7 +27,8 @@
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
-#include "Form/SymbolButton.hpp"
+#include "Form/Button.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIState.hpp"
 #include "UIGlobals.hpp"
 #include "PageActions.hpp"
@@ -337,7 +338,7 @@ FlarmTrafficControl::PaintTaskDirection(Canvas &canvas) const
   triangle[3].x = triangle[0].x;
   triangle[3].y = triangle[0].y;
 
-  PolygonRotateShift(triangle, 4, radar_mid.x, radar_mid.y,
+  PolygonRotateShift(triangle, 4, radar_mid,
                      task_direction - (enable_north_up ?
                                        Angle::Zero() : heading));
 
@@ -884,6 +885,21 @@ TrafficWidget::UpdateButtons()
 #endif
 }
 
+#ifndef GNAV
+
+static Button *
+NewSymbolButton(ContainerWindow &parent, const ButtonLook &look,
+                const TCHAR *caption,
+                const PixelRect &rc,
+                ActionListener &listener, int id)
+{
+  return new Button(parent, rc, WindowStyle(),
+                    new SymbolButtonRenderer(look, caption),
+                    listener, id);
+}
+
+#endif
+
 void
 TrafficWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
 {
@@ -894,25 +910,20 @@ TrafficWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
   const PixelRect rc = GetContainer().GetClientRect();
 
 #ifndef GNAV
-  zoom_in_button = new WndSymbolButton(GetContainer(), look.dialog.button,
-                                       _T("+"), rc, ButtonWindowStyle(),
-                                       *this, ZOOM_IN);
-  zoom_out_button = new WndSymbolButton(GetContainer(), look.dialog.button,
-                                        _T("-"), rc, ButtonWindowStyle(),
-                                        *this, ZOOM_OUT);
-  previous_item_button = new WndSymbolButton(GetContainer(),
-                                             look.dialog.button,
-                                             _T("<"), rc, ButtonWindowStyle(),
-                                             *this, PREVIOUS_ITEM);
-  next_item_button = new WndSymbolButton(GetContainer(), look.dialog.button,
-                                         _T(">"), rc, ButtonWindowStyle(),
-                                         *this, NEXT_ITEM);
-  details_button = new WndButton(GetContainer(), look.dialog.button,
-                                 _("Details"), rc, ButtonWindowStyle(),
-                                 *this, DETAILS);
-  close_button = new WndSymbolButton(GetContainer(), look.dialog.button,
-                                     _T("_X"), rc, ButtonWindowStyle(),
-                                     *this, CLOSE);
+  zoom_in_button = NewSymbolButton(GetContainer(), look.dialog.button,
+                                   _T("+"), rc, *this, ZOOM_IN);
+  zoom_out_button = NewSymbolButton(GetContainer(), look.dialog.button,
+                                    _T("-"), rc, *this, ZOOM_OUT);
+  previous_item_button = NewSymbolButton(GetContainer(), look.dialog.button,
+                                         _T("<"), rc, *this, PREVIOUS_ITEM);
+  next_item_button = NewSymbolButton(GetContainer(), look.dialog.button,
+                                     _T(">"), rc, *this, NEXT_ITEM);
+  details_button = new Button(GetContainer(), look.dialog.button,
+                              _("Details"), rc, WindowStyle(),
+                              *this, DETAILS);
+  close_button = new Button(GetContainer(), look.dialog.button,
+                            _T("_X"), rc, WindowStyle(),
+                            *this, CLOSE);
 #endif
 
   WindowStyle style;

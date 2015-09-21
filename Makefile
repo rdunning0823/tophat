@@ -29,6 +29,8 @@
 #
 #   EYE_CANDY   "n" disables eye candy rendering.
 #
+#   ICF         "y" enables Identical Code Folding (gold --icf=all)
+#
 #   DEBUG       If set to "y", the debugging version of XCSoar is built
 #               (default is "y")
 #
@@ -47,6 +49,9 @@
 #   ANALYZER    "y" to support the clang analyzer
 #
 #   LLVM        "y" to compile LLVM bitcode with clang
+#
+#   WGS84       "y" to use WGS84 instead of FAI sphere for distance calculations.
+#               This is enabled by default.
 #
 #   LIBCXX      "y" to compile with libc++, or the absolute path of the
 #               libc++ svn/git working directory.
@@ -70,8 +75,6 @@ include $(topdir)/build/detect.mk
 include $(topdir)/build/targets.mk
 include $(topdir)/build/pkgconfig.mk
 include $(topdir)/build/languages.mk
-include $(topdir)/build/resource.mk
-include $(topdir)/build/libdata.mk
 include $(topdir)/build/options.mk
 include $(topdir)/build/debug.mk
 include $(topdir)/build/coverage.mk
@@ -81,9 +84,12 @@ ifeq ($(HEADLESS),y)
 else
 include $(topdir)/build/vfb.mk
 include $(topdir)/build/fb.mk
+include $(topdir)/build/wayland.mk
 include $(topdir)/build/egl.mk
+include $(topdir)/build/glx.mk
 include $(topdir)/build/opengl.mk
 include $(topdir)/build/sdl.mk
+include $(topdir)/build/udev.mk
 endif
 
 include $(topdir)/build/flags.mk
@@ -91,18 +97,28 @@ include $(topdir)/build/charset.mk
 include $(topdir)/build/warnings.mk
 include $(topdir)/build/compile.mk
 include $(topdir)/build/link.mk
+include $(topdir)/build/resource.mk
+include $(topdir)/build/libdata.mk
 include $(topdir)/build/java.mk
 include $(topdir)/build/android.mk
 include $(topdir)/build/llvm.mk
 include $(topdir)/build/tools.mk
 include $(topdir)/build/version.mk
+include $(topdir)/build/darwin.mk
+include $(topdir)/build/ios.mk
 include $(topdir)/build/osx.mk
 include $(topdir)/build/generate.mk
 include $(topdir)/build/doxygen.mk
 include $(topdir)/build/manual.mk
 
+include $(topdir)/build/libboost.mk
+INCLUDES += $(BOOST_CPPFLAGS)
+
+ifneq ($(MAKECMDGOALS),kobo-libs) # kludge to allow bootstrapping kobo-libs
+
 # Create libraries for zzip, jasper and compatibility stuff
 include $(topdir)/build/libresource.mk
+include $(topdir)/build/liblook.mk
 include $(topdir)/build/libstdcxx.mk
 include $(topdir)/build/libutil.mk
 include $(topdir)/build/libmath.mk
@@ -130,6 +146,7 @@ include $(topdir)/build/libevent.mk
 include $(topdir)/build/freetype.mk
 include $(topdir)/build/libpng.mk
 include $(topdir)/build/libjpeg.mk
+include $(topdir)/build/coregraphics.mk
 include $(topdir)/build/screen.mk
 include $(topdir)/build/libthread.mk
 include $(topdir)/build/form.mk
@@ -138,6 +155,8 @@ include $(topdir)/build/libaudio.mk
 include $(topdir)/build/libterrain.mk
 include $(topdir)/build/harness.mk
 
+endif
+
 include $(topdir)/build/setup.mk
 include $(topdir)/build/launch.mk
 include $(topdir)/build/vali.mk
@@ -145,6 +164,8 @@ include $(topdir)/build/main.mk
 include $(topdir)/build/kobo.mk
 include $(topdir)/build/test.mk
 include $(topdir)/build/hot.mk
+
+include $(topdir)/build/python.mk
 
 # Load local-config a second time
 # to set (override) choices for GXX and friends.

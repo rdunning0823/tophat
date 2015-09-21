@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -71,7 +71,7 @@ gcc_visibility_default
 void
 Java_org_tophat_EventBridge_onKeyDown(JNIEnv *env, jclass cls, jint key_code)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 
@@ -88,7 +88,7 @@ gcc_visibility_default
 void
 Java_org_tophat_EventBridge_onKeyUp(JNIEnv *env, jclass cls, jint key_code)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 
@@ -101,7 +101,7 @@ void
 Java_org_tophat_EventBridge_onMouseDown(JNIEnv *env, jclass cls,
                                         jint x, jint y)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 
@@ -114,7 +114,7 @@ void
 Java_org_tophat_EventBridge_onMouseUp(JNIEnv *env, jclass cls,
                                       jint x, jint y)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 
@@ -127,7 +127,7 @@ void
 Java_org_tophat_EventBridge_onMouseMove(JNIEnv *env, jclass cls,
                                         jint x, jint y)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 
@@ -140,7 +140,7 @@ gcc_visibility_default
 void
 Java_org_tophat_EventBridge_onPointerDown(JNIEnv *env, jclass cls)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 
@@ -152,7 +152,7 @@ gcc_visibility_default
 void
 Java_org_tophat_EventBridge_onPointerUp(JNIEnv *env, jclass cls)
 {
-  if (event_queue == NULL)
+  if (event_queue == nullptr)
     /* XCSoar not yet initialised */
     return;
 

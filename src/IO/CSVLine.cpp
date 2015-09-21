@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,11 +22,11 @@ Copyright_License {
 */
 
 #include "NMEA/InputLine.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <algorithm>
 
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
 
 static const char *
@@ -42,7 +42,7 @@ size_t
 CSVLine::Skip()
 {
   const char* _seperator = strchr(data, ',');
-  if (_seperator != NULL && _seperator < end) {
+  if (_seperator != nullptr && _seperator < end) {
     size_t length = _seperator - data;
     data = _seperator + 1;
     return length;
@@ -83,7 +83,7 @@ CSVLine::ReadCompare(const char *value)
   size_t length = strlen(value);
   char buffer[length + 2];
   Read(buffer, length + 2);
-  return strcmp(buffer, value) == 0;
+  return StringIsEqual(buffer, value);
 }
 
 long

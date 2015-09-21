@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -72,8 +72,8 @@ InputEvents::DoQueuedEvents()
 
   // copy the queue first, blocking
   mutexEventQueue.Lock();
-  std::copy(GCE_Queue, GCE_Queue + MAX_GCE_QUEUE, GCE_Queue_copy);
-  std::fill(GCE_Queue, GCE_Queue + MAX_GCE_QUEUE, -1);
+  std::copy_n(GCE_Queue, MAX_GCE_QUEUE, GCE_Queue_copy);
+  std::fill_n(GCE_Queue, MAX_GCE_QUEUE, -1);
   mutexEventQueue.Unlock();
 
   // process each item in the queue

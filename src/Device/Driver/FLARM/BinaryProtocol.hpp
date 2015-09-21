@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -135,7 +135,8 @@ namespace FLARM {
    */
   FrameHeader PrepareFrameHeader(unsigned sequence_number,
                                  MessageType message_type,
-                                 const void *data = NULL, size_t length = 0);
+                                 const void *data = nullptr,
+                                 size_t length = 0);
 
   /**
    * Sends the specified data stream to the FLARM using the escaping algorithm

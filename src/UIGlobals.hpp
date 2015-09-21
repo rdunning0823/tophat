@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ struct Look;
 struct DialogLook;
 struct IconLook;
 struct MapLook;
+struct FormatSettings;
 
 /**
  * This namespace provides helper functions to access generic global
@@ -63,6 +64,9 @@ namespace UIGlobals {
 
   gcc_const
   const DialogLook &GetDialogLook();
+
+  gcc_const
+  const FormatSettings &GetFormatSettings();
 
   gcc_const
   const IconLook &GetIconLook();

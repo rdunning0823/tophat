@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,14 +27,13 @@ Copyright_License {
 #include "Form/DataField/Listener.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
-#include "Form/Form.hpp"
-#include "Form/DataField/Base.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
 enum ControlIndex {
   WaypointLabels,
   WaypointArrivalHeightDisplay,
+  WaypointLabelStyle,
   WaypointLabelSelection,
   AppIndLandable,
   AppUseSWLandablesRendering,
@@ -126,9 +125,19 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
           wp_arrival_list, (unsigned)settings.arrival_height_display);
   SetExpertRow(WaypointArrivalHeightDisplay);
 
+  static constexpr StaticEnumChoice wp_label_list[] = {
+    { (unsigned)LabelShape::ROUNDED_BLACK, N_("Rounded rectangle"), nullptr },
+    { (unsigned)LabelShape::OUTLINED_INVERTED, N_("Outlined"), nullptr },
+    { 0 }
+  };
+
+  AddEnum(_("Label style"), nullptr, wp_label_list,
+          (unsigned)settings.landable_render_mode);
+  SetExpertRow(WaypointLabelStyle);
+
   static constexpr StaticEnumChoice wp_selection_list[] = {
     { (unsigned)WaypointRendererSettings::LabelSelection::ALL,
-      N_("All"), N_("All waypoint labels will be displayed.") },
+      N_("All"), N_("All labels will be displayed.") },
     { (unsigned)WaypointRendererSettings::LabelSelection::TASK_AND_AIRFIELD,
       N_("Task waypoints & airfields"),
       N_("All waypoints part of a task and all airfields will be displayed.") },
@@ -139,12 +148,12 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
       N_("Task waypoints"),
       N_("All waypoints part of a task will be displayed.") },
     { (unsigned)WaypointRendererSettings::LabelSelection::NONE,
-      N_("None"), N_("No waypoint labels will be displayed.") },
+      N_("None"), N_("No labels will be displayed.") },
     { 0 }
   };
 
   AddEnum(_("Label visibility"),
-          _("Determines what waypoint labels are displayed for each waypoint (space permitting)."),
+          _("Determines what labels are displayed."),
           wp_selection_list, (unsigned)settings.label_selection);
   SetExpertRow(WaypointLabelSelection);
 
@@ -202,6 +211,9 @@ WaypointDisplayConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(WaypointArrivalHeightDisplay, ProfileKeys::WaypointArrivalHeightDisplay,
                            settings.arrival_height_display);
+
+  changed |= SaveValueEnum(WaypointLabelStyle, ProfileKeys::WaypointLabelStyle,
+                           settings.landable_render_mode);
 
   changed |= SaveValueEnum(WaypointLabelSelection, ProfileKeys::WaypointLabelSelection,
                            settings.label_selection);

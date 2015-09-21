@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -52,8 +52,8 @@ FlarmComputer::Process(FlarmData &flarm, const FlarmData &last_flarm,
     GeoPoint plon = basic.location;
     plon.longitude += delta_lon;
 
-    fixed dlat = basic.location.Distance(plat);
-    fixed dlon = basic.location.Distance(plon);
+    fixed dlat = basic.location.DistanceS(plat);
+    fixed dlon = basic.location.DistanceS(plon);
 
     if (positive(fabs(dlat)) && positive(fabs(dlon))) {
       north_to_latitude = delta_lat.Degrees() / dlat;

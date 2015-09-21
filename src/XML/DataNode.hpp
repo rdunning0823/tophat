@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@
 #define DATANODE_HPP
 
 #include "Math/fixed.hpp"
-#include "Util/NonCopyable.hpp"
 
 #include <list>
 
@@ -39,12 +38,16 @@ class RoughTimeSpan;
  * Class used as generic node for tree-structured data.
  * 
  */
-class DataNode : private NonCopyable
-{
+class ConstDataNode {
 public:
-  typedef std::list<DataNode *> List;
+  typedef std::list<ConstDataNode *> List;
 
-  virtual ~DataNode();
+  ConstDataNode() = default;
+
+  ConstDataNode(const ConstDataNode &) = delete;
+  ConstDataNode &operator=(const ConstDataNode &) = delete;
+
+  virtual ~ConstDataNode();
 
   /**
    * Retrieve name of this node
@@ -54,22 +57,13 @@ public:
   virtual const TCHAR *GetName() const = 0;
 
   /**
-   * Add child to this node
-   *
-   * @param name Name of child
-   *
-   * @return Pointer to new child
-   */
-  virtual DataNode* AppendChild(const TCHAR *name) = 0;
-
-  /**
    * Retrieve child by name
    *
    * @param name Name of child
    *
-   * @return Pointer to child if found, or NULL
+   * @return Pointer to child if found, or nullptr
    */
-  virtual DataNode *GetChildNamed(const TCHAR *name) const = 0;
+  virtual ConstDataNode *GetChildNamed(const TCHAR *name) const = 0;
 
   /**
    * Obtains a list of all children.  The caller is responsible for
@@ -85,67 +79,11 @@ public:
   virtual List ListChildrenNamed(const TCHAR *name) const = 0;
 
   /**
-   * Writes the canonical serialised form of this node to a
-   * TextWriter.
-   *
-   * @param writer the destination file
-   */
-  virtual void Serialise(TextWriter &writer) const = 0;
-
-  /**
-   * Set named attribute value
-   *
-   * @param name Name of attribute
-   * @param value Value of attribute
-   */
-  virtual void SetAttribute(const TCHAR *name, const TCHAR *value) = 0;
-
-  /**
-   * Set named attribute value, with numeric to text conversion
-   *
-   * @param name Name of attribute
-   * @param value Value (fixed)
-   */
-  void SetAttribute(const TCHAR *name, fixed value);
-
-  void SetAttribute(const TCHAR *name, Angle value);
-
-  /**
-   * Set named attribute value, with numeric to text conversion
-   *
-   * @param name Name of attribute
-   * @param value Value (int)
-   */
-  void SetAttribute(const TCHAR *name, int value);
-
-  /**
-   * Set named attribute value, with numeric to text conversion
-   *
-   * @param name Name of attribute
-   * @param value Value (unsigned int)
-   */
-  void SetAttribute(const TCHAR *name, unsigned value);
-
-  /**
-   * Set named attribute value, with numeric to text conversion
-   *
-   * @param name Name of attribute
-   * @param value Value (boolean)
-   */
-  void SetAttribute(const TCHAR *name, bool value);
-
-  /**
-   * Set named attribute value.  No-op if the #RoughTime object is
-   * invalid.
-   */
-  void SetAttribute(const TCHAR *name, RoughTime value);
-
-  /**
    * Retrieve named attribute value
    *
    * @param name Name of attribute
    *
-   * @return the value or NULL if it does not exist
+   * @return the value or nullptr if it does not exist
    */
   virtual const TCHAR *GetAttribute(const TCHAR *name) const = 0;
 
@@ -197,6 +135,76 @@ public:
   gcc_pure
   RoughTimeSpan GetAttributeRoughTimeSpan(const TCHAR *start_name,
                                           const TCHAR *end_name) const;
+};
+
+/**
+ * Class used as generic node for tree-structured data.
+ */
+class WritableDataNode {
+public:
+  WritableDataNode() = default;
+
+  WritableDataNode(const WritableDataNode &) = delete;
+  WritableDataNode &operator=(const WritableDataNode &) = delete;
+
+  virtual ~WritableDataNode();
+
+  /**
+   * Add child to this node
+   *
+   * @param name Name of child
+   *
+   * @return Pointer to new child
+   */
+  virtual WritableDataNode *AppendChild(const TCHAR *name) = 0;
+
+  /**
+   * Set named attribute value
+   *
+   * @param name Name of attribute
+   * @param value Value of attribute
+   */
+  virtual void SetAttribute(const TCHAR *name, const TCHAR *value) = 0;
+
+  /**
+   * Set named attribute value, with numeric to text conversion
+   *
+   * @param name Name of attribute
+   * @param value Value (fixed)
+   */
+  void SetAttribute(const TCHAR *name, fixed value);
+
+  void SetAttribute(const TCHAR *name, Angle value);
+
+  /**
+   * Set named attribute value, with numeric to text conversion
+   *
+   * @param name Name of attribute
+   * @param value Value (int)
+   */
+  void SetAttribute(const TCHAR *name, int value);
+
+  /**
+   * Set named attribute value, with numeric to text conversion
+   *
+   * @param name Name of attribute
+   * @param value Value (unsigned int)
+   */
+  void SetAttribute(const TCHAR *name, unsigned value);
+
+  /**
+   * Set named attribute value, with numeric to text conversion
+   *
+   * @param name Name of attribute
+   * @param value Value (boolean)
+   */
+  void SetAttribute(const TCHAR *name, bool value);
+
+  /**
+   * Set named attribute value.  No-op if the #RoughTime object is
+   * invalid.
+   */
+  void SetAttribute(const TCHAR *name, RoughTime value);
 };
 
 #endif

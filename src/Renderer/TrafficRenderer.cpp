@@ -2,7 +2,7 @@
  Copyright_License {
 
  XCSoar Glide Computer - http://www.xcsoar.org/
- Copyright (C) 2000-2013 The XCSoar Project
+ Copyright (C) 2000-2015 The XCSoar Project
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@
 #include "Look/TrafficLook.hpp"
 #include "FLARM/Traffic.hpp"
 #include "Math/Screen.hpp"
-#include "Asset.hpp"
+#include "Util/Macros.hpp"
 
 void
 TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
@@ -79,7 +79,7 @@ TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
     canvas.SelectBlackPen();
 
   // Rotate and shift the arrow to the right position and angle
-  PolygonRotateShift(Arrow, arrow_size, pt.x, pt.y, angle);
+  PolygonRotateShift(Arrow, arrow_size, pt, angle);
 
   // Draw the arrow
   canvas.DrawPolygon(Arrow, arrow_size);

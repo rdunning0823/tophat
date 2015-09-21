@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -42,8 +42,10 @@ class DownloadUtil extends BroadcastReceiver {
   }
 
   static void Deinitialise(Context context) {
-    context.unregisterReceiver(instance);
-    instance = null;
+    if (instance != null) {
+      context.unregisterReceiver(instance);
+      instance = null;
+    }
   }
 
   /**
@@ -161,6 +163,10 @@ class DownloadUtil extends BroadcastReceiver {
     query.setFilterByStatus(DownloadManager.STATUS_FAILED |
                             DownloadManager.STATUS_SUCCESSFUL);
     Cursor c = dm.query(query);
+
+    if (c == null)
+      /* should not happen, but has been observed on Android 2.3 */
+      return;
 
     if (!c.moveToFirst())
       return;

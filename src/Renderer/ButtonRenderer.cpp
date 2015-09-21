@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,58 +22,88 @@ Copyright_License {
 */
 
 #include "ButtonRenderer.hpp"
-#include "Screen/Color.hpp"
 #include "Screen/Canvas.hpp"
-#include "Screen/Pen.hpp"
+#include "Screen/Layout.hpp"
 #include "Look/ButtonLook.hpp"
-#include "Screen/Util.hpp"
+#include "Util/Macros.hpp"
 
-#if defined(ENABLE_OPENGL) | defined(KOBO)
-
-void
-ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
-                           bool pressed, bool transparent, bool dimmed)
+unsigned
+ButtonFrameRenderer::GetMargin()
 {
-
-  const ButtonLook::StateLook &_look = (focused || pressed) ? look.focused :
-      (dimmed ? look.dimmed : look.standard);
-
-  DrawButtonFancy(canvas, rc, _look.dark_border_pen, _look.light_border_pen,
-                  _look.background_color, focused, pressed, transparent);
+  return Layout::VptScale(2);
 }
 
-#else
-
 void
-ButtonRenderer::DrawButton(Canvas &canvas, PixelRect rc, bool focused,
-                           bool pressed, bool transparent, bool dimmed)
+ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
+                                bool focused, bool pressed) const
 {
-  const ButtonLook::StateLook &_look = focused ? look.focused :
-      (dimmed ? look.dimmed : look.standard);
+  const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
 
-  if (!transparent)
-    canvas.DrawFilledRectangle(rc, _look.background_color);
+  canvas.DrawFilledRectangle(rc, _look.background_color);
 
-  canvas.Select(pressed ? _look.dark_border_pen : _look.light_border_pen);
-  canvas.DrawTwoLinesExact(rc.left, rc.bottom - 2, rc.left, rc.top, rc.right - 2,
-                           rc.top);
-  canvas.DrawTwoLinesExact(rc.left + 1, rc.bottom - 3, rc.left + 1, rc.top + 1,
-                           rc.right - 3, rc.top + 1);
+  const unsigned margin = GetMargin();
 
-  canvas.Select(pressed ? _look.light_border_pen : _look.dark_border_pen);
-  canvas.DrawTwoLinesExact(rc.left + 1, rc.bottom - 1, rc.right - 1, rc.bottom - 1,
-                           rc.right - 1, rc.top + 1);
-  canvas.DrawTwoLinesExact(rc.left + 2, rc.bottom - 2, rc.right - 2, rc.bottom - 2,
-                           rc.right - 2, rc.top + 2);
+  if (margin < 4) {
+    /* draw 1-pixel lines */
+
+    canvas.Select(pressed ? _look.dark_border_pen : _look.light_border_pen);
+    for (unsigned i = 0; i < margin; ++i)
+      canvas.DrawTwoLinesExact(rc.left + i, rc.bottom - 2 - i,
+                               rc.left + i, rc.top + i,
+                               rc.right - 2 - i, rc.top + i);
+
+    canvas.Select(pressed ? _look.light_border_pen : _look.dark_border_pen);
+    for (unsigned i = 0; i < margin; ++i)
+      canvas.DrawTwoLinesExact(rc.left + 1 + i, rc.bottom - 1 - i,
+                               rc.right - 1 - i, rc.bottom - 1 - i,
+                               rc.right - 1 - i, rc.top + 1 + i);
+  } else {
+    /* at 4 pixels or more, it's more efficient to draw a filled
+       polygon */
+
+    const RasterPoint p1[] = {
+      RasterPoint(rc.left, rc.top),
+      RasterPoint(rc.right, rc.top),
+      RasterPoint(rc.right - margin, rc.top + margin),
+      RasterPoint(rc.left + margin, rc.top + margin),
+      RasterPoint(rc.left + margin, rc.bottom - margin),
+      RasterPoint(rc.left, rc.bottom),
+    };
+
+    canvas.SelectNullPen();
+    canvas.Select(pressed
+                  ? _look.dark_border_brush
+                  : _look.light_border_brush);
+    canvas.DrawTriangleFan(p1, ARRAY_SIZE(p1));
+
+    const RasterPoint p2[] = {
+      RasterPoint(rc.right, rc.bottom),
+      RasterPoint(rc.right, rc.top),
+      RasterPoint(rc.right - margin, rc.top + margin),
+      RasterPoint(rc.right - margin, rc.bottom - margin),
+      RasterPoint(rc.left + margin, rc.bottom - margin),
+      RasterPoint(rc.left, rc.bottom),
+    };
+
+    canvas.Select(pressed
+                  ? _look.light_border_brush
+                  : _look.dark_border_brush);
+    canvas.DrawTriangleFan(p2, ARRAY_SIZE(p2));
 }
-#endif
+}
 
 PixelRect
-ButtonRenderer::GetDrawingRect(PixelRect rc, bool pressed)
+ButtonFrameRenderer::GetDrawingRect(PixelRect rc, bool pressed) const
 {
   rc.Grow(-2);
   if (pressed)
     rc.Offset(1, 1);
 
   return rc;
+}
+
+unsigned
+ButtonRenderer::GetMinimumButtonWidth() const
+{
+  return Layout::GetMaximumControlHeight();
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,13 +24,17 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_DISPATCHER_HPP
 #define XCSOAR_DEVICE_DISPATCHER_HPP
 
-#include "Port/LineHandler.hpp"
+#include "Device/Util/LineHandler.hpp"
 #include "Compiler.h"
+
+class MultipleDevices;
 
 /**
  * A #DataHandler that dispatches incoming data to all NMEA outputs.
  */
 class DeviceDispatcher final : public PortLineHandler {
+  MultipleDevices &devices;
+
   /**
    * The device index that should be excluded.  It is this
    * dispatcher's own index.
@@ -38,10 +42,11 @@ class DeviceDispatcher final : public PortLineHandler {
   unsigned exclude;
 
 public:
-  DeviceDispatcher(unsigned _exclude):exclude(_exclude) {}
+  DeviceDispatcher(MultipleDevices &_devices, unsigned _exclude)
+    :devices(_devices), exclude(_exclude) {}
 
   /* virtual methods from DataHandler */
-  virtual void LineReceived(const char *line);
+  void LineReceived(const char *line) override;
 };
 
 #endif

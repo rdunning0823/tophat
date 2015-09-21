@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,10 +21,10 @@ Copyright_License {
 }
 */
 
-#include "Android/Environment.hpp"
-#include "Java/Class.hpp"
-#include "Java/String.hpp"
-#include "Java/File.hpp"
+#include "Environment.hpp"
+#include "Java/Class.hxx"
+#include "Java/String.hxx"
+#include "Java/File.hxx"
 #include "Util/StringUtil.hpp"
 
 namespace Environment {
@@ -45,7 +45,7 @@ Environment::Initialise(JNIEnv *env)
   getExternalStoragePublicDirectory_method =
     env->GetStaticMethodID(cls, "getExternalStoragePublicDirectory",
                            "(Ljava/lang/String;)Ljava/io/File;");
-  if (getExternalStoragePublicDirectory_method == NULL)
+  if (getExternalStoragePublicDirectory_method == nullptr)
     /* needs API level 8 */
     env->ExceptionClear();
 }
@@ -59,8 +59,8 @@ Environment::Deinitialise(JNIEnv *env)
 static jstring
 ToAbsolutePathChecked(JNIEnv *env, jobject file)
 {
-  if (file == NULL)
-    return NULL;
+  if (file == nullptr)
+    return nullptr;
 
   jstring path = Java::File::getAbsolutePath(env, file);
   env->DeleteLocalRef(file);
@@ -81,8 +81,8 @@ Environment::getExternalStorageDirectory(char *buffer, size_t max_size)
   JNIEnv *env = Java::GetEnv();
 
   jstring value = ::getExternalStorageDirectory(env);
-  if (value == NULL)
-    return NULL;
+  if (value == nullptr)
+    return nullptr;
 
   Java::String value2(env, value);
   value2.CopyTo(env, buffer, max_size);
@@ -92,9 +92,9 @@ Environment::getExternalStorageDirectory(char *buffer, size_t max_size)
 static jstring
 getExternalStoragePublicDirectory(JNIEnv *env, const char *type)
 {
-  if (Environment::getExternalStoragePublicDirectory_method == NULL)
+  if (Environment::getExternalStoragePublicDirectory_method == nullptr)
     /* needs API level 8 */
-    return NULL;
+    return nullptr;
 
   Java::String type2(env, type);
   jobject file = env->CallStaticObjectMethod(Environment::cls,
@@ -109,8 +109,8 @@ Environment::getExternalStoragePublicDirectory(char *buffer, size_t max_size,
 {
   JNIEnv *env = Java::GetEnv();
   jstring path = ::getExternalStoragePublicDirectory(env, type);
-  if (path == NULL)
-    return NULL;
+  if (path == nullptr)
+    return nullptr;
 
   Java::String path2(env, path);
   path2.CopyTo(env, buffer, max_size);

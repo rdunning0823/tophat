@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -72,19 +72,23 @@ TargetMapWindow::TargetMapWindow(const WaypointLook &waypoint_look,
                                  const AirspaceLook &_airspace_look,
                                  const TrailLook &_trail_look,
                                  const TaskLook &_task_look,
-                                 const AircraftLook &_aircraft_look)
+                                 const AircraftLook &_aircraft_look,
+                                 const TopographyLook &_topography_look)
   :task_look(_task_look),
    aircraft_look(_aircraft_look),
-   topography_renderer(NULL),
+   topography_look(_topography_look),
+   topography_renderer(nullptr),
    airspace_renderer(_airspace_look),
-   way_point_renderer(NULL, waypoint_look),
+   way_point_renderer(nullptr, waypoint_look),
    trail_renderer(_trail_look),
-   task(NULL)
+   task(nullptr)
 {
 }
 
 TargetMapWindow::~TargetMapWindow()
 {
+  Destroy();
+
   delete topography_renderer;
 }
 
@@ -108,14 +112,14 @@ TargetMapWindow::RenderTerrain(Canvas &canvas)
 void
 TargetMapWindow::RenderTopography(Canvas &canvas)
 {
-  if (topography_renderer != NULL && GetMapSettings().topography_enabled)
+  if (topography_renderer != nullptr && GetMapSettings().topography_enabled)
     topography_renderer->Draw(canvas, projection);
 }
 
 void
 TargetMapWindow::RenderTopographyLabels(Canvas &canvas)
 {
-  if (topography_renderer != NULL && GetMapSettings().topography_enabled)
+  if (topography_renderer != nullptr && GetMapSettings().topography_enabled)
     topography_renderer->DrawLabels(canvas, projection, label_block);
 }
 
@@ -136,7 +140,7 @@ TargetMapWindow::RenderAirspace(Canvas &canvas)
 void
 TargetMapWindow::DrawTask(Canvas &canvas)
 {
-  if (task == NULL)
+  if (task == nullptr)
     return;
 
   ProtectedTaskManager::Lease task_manager(*task);
@@ -151,7 +155,8 @@ TargetMapWindow::DrawTask(Canvas &canvas)
                              will be used only if active, so it's ok */
                           task_manager->GetOrderedTask().GetTaskProjection(),
                           ozv, false, TaskPointRenderer::ALL,
-                          Basic().location_available, Basic().location);
+                          Basic().location_available
+                          ? Basic().location : GeoPoint::Invalid());
     tpv.SetTaskFinished(Calculated().task_stats.task_finished);
     TaskRenderer dv(tpv, projection.GetScreenBounds());
     dv.Draw(*task, ordered_task);
@@ -170,13 +175,13 @@ TargetMapWindow::DrawWaypoints(Canvas &canvas)
                             GetComputerSettings().polar,
                             GetComputerSettings().task,
                             Basic(), Calculated(),
-                            task, NULL);
+                            task, nullptr);
 }
 
 void
 TargetMapWindow::RenderTrail(Canvas &canvas)
 {
-  if (glide_computer == NULL)
+  if (glide_computer == nullptr)
     return;
 
   unsigned min_time = std::max(0, (int)Basic().time - 600);
@@ -254,9 +259,9 @@ void
 TargetMapWindow::SetTopograpgy(TopographyStore *topography)
 {
   delete topography_renderer;
-  topography_renderer = topography != NULL
-    ? new TopographyRenderer(*topography)
-    : NULL;
+  topography_renderer = topography != nullptr
+    ? new TopographyRenderer(*topography, topography_look)
+    : nullptr;
 }
 
 static fixed
@@ -345,10 +350,10 @@ TargetMapWindow::OnCreate()
 void
 TargetMapWindow::OnDestroy()
 {
-  SetTerrain(NULL);
-  SetTopograpgy(NULL);
-  SetAirspaces(NULL);
-  SetWaypoints(NULL);
+  SetTerrain(nullptr);
+  SetTopograpgy(nullptr);
+  SetAirspaces(nullptr);
+  SetWaypoints(nullptr);
 
 #ifndef ENABLE_OPENGL
   buffer_canvas.Destroy();

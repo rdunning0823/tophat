@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ Copyright_License {
 #include "NMEA/Derived.hpp"
 #include "Computer/Settings.hpp"
 #include "Math/SunEphemeris.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/Macros.hpp"
 #include "Language/Language.hpp"
 #include "Interface.hpp"
@@ -113,7 +113,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     FormatBearing(bearing_buffer.buffer(), bearing_buffer.MAX_SIZE,
                   vector.bearing);
     buffer.AppendFormat(_T(" / %s"), bearing_buffer.c_str());
-    AddReadOnly(_("Distance / bearing"), NULL, buffer);
+    AddReadOnly(_("Distance / bearing"), nullptr, buffer);
   }
 
   if (basic.location_available && basic.NavAltitudeAvailable() &&
@@ -155,7 +155,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   FormatUserAltitude(waypoint.elevation,
                      buffer.buffer(), buffer.MAX_SIZE);
-  AddReadOnly(_("Elevation"), NULL, buffer);
+  AddReadOnly(_("Elevation"), nullptr, buffer);
 
   if (FormatGeoPoint(waypoint.location,
                      buffer.buffer(), buffer.MAX_SIZE) != nullptr)
@@ -195,7 +195,8 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     buffer += length_buffer;
   }
   if (!buffer.empty())
-    AddReadOnly(_("Runway"), NULL, buffer);
+    AddReadOnly(_("Runway"), nullptr, buffer);
 
-  AddReadOnly(_(" "), NULL, waypoint.comment.c_str());
+  if (!waypoint.comment.empty())
+    AddMultiLine(waypoint.comment.c_str());
 }

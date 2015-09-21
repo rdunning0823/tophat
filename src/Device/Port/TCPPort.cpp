@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,15 +33,19 @@ TCPPort::~TCPPort()
 {
   SocketPort::Close();
 
-#ifdef HAVE_POSIX
-  if (listener.IsDefined())
-    io_thread->LockRemove(listener.Get());
-#else
+#ifndef HAVE_POSIX
   if (thread.IsDefined()) {
     thread.BeginStop();
     thread.Join();
   }
 #endif
+
+  if (listener.IsDefined()) {
+#ifdef HAVE_POSIX
+    io_thread->LockRemove(listener.ToFileDescriptor());
+#endif
+    listener.Close();
+  }
 }
 
 bool
@@ -52,10 +56,11 @@ TCPPort::Open(unsigned port)
 
   /* register the socket in then IOThread or the SocketThread */
 #ifdef HAVE_POSIX
-  io_thread->LockAdd(listener.Get(), Poll::READ, *this);
+  io_thread->LockAdd(listener.ToFileDescriptor(), Poll::READ, *this);
 #else
   thread.Start();
 #endif
+  StateChanged();
   return true;
 }
 
@@ -72,11 +77,11 @@ TCPPort::GetState() const
 }
 
 bool
-TCPPort::OnFileEvent(int fd, unsigned mask)
+TCPPort::OnSocketEvent(SocketDescriptor _socket, unsigned mask)
 {
   assert(listener.IsDefined());
 
-  if (fd == listener.Get()) {
+  if (_socket == listener) {
     /* connection should never be defined here */
     assert(SocketPort::GetState() == PortState::FAILED);
 
@@ -108,7 +113,7 @@ TCPPort::OnFileEvent(int fd, unsigned mask)
   } else {
     /* this event affects the connection socket */
 
-    if (!SocketPort::OnFileEvent(fd, mask)) {
+    if (!SocketPort::OnSocketEvent(_socket, mask)) {
       /* the connection was closed; continue listening on incoming
          connections */
 
@@ -116,7 +121,7 @@ TCPPort::OnFileEvent(int fd, unsigned mask)
       /* close the connection, unregister the event, and reinstate the
          listener socket */
       SocketPort::Close();
-      io_thread->Add(listener.Get(), Poll::READ, *this);
+      io_thread->Add(listener.ToFileDescriptor(), Poll::READ, *this);
 #else
       /* we must not call SocketPort::Close() here because it may
          deadlock, waiting forever for this thread to finish; instead,

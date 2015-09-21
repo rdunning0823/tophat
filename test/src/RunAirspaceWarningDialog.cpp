@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@ Copyright_License {
 */
 
 #define ENABLE_DIALOG
+#define ENABLE_MAIN_WINDOW
 
 #include "Main.hpp"
-#include "Screen/SingleWindow.hpp"
 #include "Interface.hpp"
 #include "Dialogs/Airspace/Airspace.hpp"
 #include "Dialogs/Airspace/AirspaceWarningDialog.hpp"
@@ -64,7 +64,7 @@ LoadFiles(Airspaces &airspace_database)
   NullOperationEnvironment operation;
 
   std::unique_ptr<TLineReader> reader(OpenConfiguredTextFile(ProfileKeys::AirspaceFile,
-                                                             ConvertLineReader::AUTO));
+                                                             Charset::AUTO));
   if (reader) {
     AirspaceParser parser(airspace_database);
     parser.Parse(*reader, operation);
@@ -85,15 +85,10 @@ Main()
 
   AirspaceInterceptSolution ais;
   for (unsigned i = 0; i < 5 && it != airspace_database.end(); ++i, ++it)
-    airspace_warning.GetWarning(*it->GetAirspace())
+    airspace_warning.GetWarning(it->GetAirspace())
       .UpdateSolution((AirspaceWarning::State)i, ais);
 
-  SingleWindow main_window;
-  main_window.Create(_T("RunAirspaceWarningDialog"),
-                     {640, 480});
-  main_window.Show();
-
-  dlgAirspaceWarningsShowModal(main_window, *airspace_warnings);
+  dlgAirspaceWarningsShowModal(*airspace_warnings);
 
   delete airspace_warnings;
 }

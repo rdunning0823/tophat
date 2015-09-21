@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef DIALOGS_TEXT_ENTRY_HPP
 #define DIALOGS_TEXT_ENTRY_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StringBuffer.hxx"
 #include "Math/fixed.hpp"
 
 #include <functional>
@@ -43,23 +43,23 @@ TextEntryDialog(TCHAR *text, size_t size,
 
 template<size_t N>
 static inline bool
-TextEntryDialog(StaticString<N> &text,
+TextEntryDialog(StringBuffer<TCHAR, N> &text,
                 const TCHAR *caption=NULL,
                 AllowedCharacters accb=AllowedCharacters(),
                 bool default_shift_state = true)
 {
-  return TextEntryDialog(text.buffer(), text.MAX_SIZE,
+  return TextEntryDialog(text.data(), text.capacity(),
                          caption, accb, default_shift_state);
 }
 
 template<size_t N>
 static inline bool
-TextEntryDialog(StaticString<N> &text,
+TextEntryDialog(StringBuffer<TCHAR, N> &text,
                 const TCHAR *caption,
                 bool default_shift_state)
 {
   AllowedCharacters accb=AllowedCharacters();
-  return TextEntryDialog(text.buffer(), text.MAX_SIZE,
+  return TextEntryDialog(text.data(), text.capacity(),
                          caption, accb, default_shift_state);
 }
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@ class TaskListPanel final
    */
   bool more;
 
-  WndButton *more_button;
+  Button *more_button;
   TextWidget &summary;
   /**
    * pointer to parent form if not used in task manager environment
@@ -124,10 +124,10 @@ public:
   void OnMoreClicked();
   void OnCancelClicked();
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual void Unprepare() override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void Unprepare() override;
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
 
 protected:
   const OrderedTask *get_cursor_task();
@@ -137,21 +137,20 @@ protected:
 
 private:
   /* virtual methods from ActionListener */
-  virtual void OnAction(int id) override;
+  void OnAction(int id) override;
 
   /* virtual methods from class ListControl::Handler */
-  virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
-                           unsigned idx) override;
+  void OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned idx) override;
 
-  virtual void OnCursorMoved(unsigned index) override {
+  void OnCursorMoved(unsigned index) override {
     RefreshView();
   }
 
-  virtual bool CanActivateItem(unsigned index) const override {
+  bool CanActivateItem(unsigned index) const override {
       return true;
   }
 
-  virtual void OnActivateItem(unsigned index) override {
+  void OnActivateItem(unsigned index) override {
     LoadTask();
   }
 };
@@ -272,11 +271,11 @@ TaskListPanel::LoadTask()
   delete *active_task;
   *active_task = temptask;
   if ((*active_task)->GetTaskNameIsBlank()) {
-    StaticString<100>name;
+    StaticString<64>name;
     name = get_cursor_name();
 
     CleanName(name.buffer());
-    (*active_task)->SetTaskName(name.c_str());
+    (*active_task)->SetName(name.c_str());
   }
 
   RefreshView();

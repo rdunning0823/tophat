@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,6 +26,10 @@ Copyright_License {
 
 #include <SDL_version.h>
 #include <SDL_events.h>
+
+#if SDL_MAJOR_VERSION >= 2
+#include "Util/UTF8.hpp"
+#endif
 
 #include <assert.h>
 
@@ -58,15 +62,32 @@ struct Event {
     return event.key.keysym.sym;
   }
 
-  bool IsCharacter() const {
-    return IsKeyDown() && event.key.keysym.unicode != 0;
+#if SDL_MAJOR_VERSION >= 2
+  size_t GetCharacterCount() const {
+    return event.type == SDL_TEXTINPUT && *event.text.text ?
+      LengthUTF8(event.text.text) : 0;
   }
 
-  unsigned GetCharacter() const {
-    assert(IsCharacter());
+  unsigned GetCharacter(size_t characterIdx) const {
+    assert(characterIdx < GetCharacterCount());
+
+    std::pair<unsigned, const char *> next = NextUTF8(event.text.text);
+    for (size_t i = 0; i < characterIdx; ++i)
+      next = NextUTF8(next.second);
+    return next.first;
+  }
+#else
+  size_t GetCharacterCount() const {
+    return (IsKeyDown() && event.key.keysym.unicode != 0) ? 1 : 0;
+  }
+
+  unsigned GetCharacter(size_t characterIdx) const {
+    assert(GetCharacterCount() == 1);
+    assert(characterIdx == 0);
 
     return event.key.keysym.unicode;
   }
+#endif
 
   bool IsMouseDown() const {
     return event.type == SDL_MOUSEBUTTONDOWN;

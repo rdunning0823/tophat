@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -101,19 +101,19 @@ FlightStatisticsRenderer::RenderOLC(Canvas &canvas, const PixelRect rc,
     return;
   }
 
-  TaskProjection task_projection(trail_renderer.GetBounds(nmea_info.location));
+  GeoBounds bounds(nmea_info.location);
+  trail_renderer.ScanBounds(bounds);
 
   /* scan all solutions to make sure they are all visible */
   for (unsigned i = 0; i < 3; ++i) {
     if (contest.GetResult(i).IsDefined()) {
       const ContestTraceVector &solution = contest.GetSolution(i);
       for (auto j = solution.begin(), end = solution.end(); j != end; ++j)
-        task_projection.Scan(j->location);
+        bounds.Extend(j->location);
     }
   }
 
-
-  const ChartProjection proj(rc, task_projection);
+  const ChartProjection proj(rc, TaskProjection(bounds));
 
   {
     // draw place names found in the retrospective task
@@ -225,8 +225,10 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
                            : _T("%s: %s (Free)\r\n%s (Triangle)\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
                        _("Distance"), distance, distance_fai,
                        _("Score"), (double)result_free.score, _("pts"),
-                       _("Time"), timetext1,
-                       _("Speed"), speed);
+                       _("Time"),
+                       FormatSignedTimeHHMM((int)result_free.time).c_str(),
+                       _("Speed"),
+                       FormatUserTaskSpeed(result_free.GetSpeed()).c_str());
   } else {
     unsigned result_index;
     switch (settings.contest) {
@@ -256,8 +258,10 @@ FlightStatisticsRenderer::CaptionOLC(TCHAR *buffer,
                            : _T("%s: %s\r\n%s: %.1f %s\r\n%s: %s\r\n%s: %s\r\n"))),
                        _("Distance"), distance,
                        _("Score"), (double)result_olc.score, _("pts"),
-                       _("Time"), timetext1,
-                       _("Speed"), speed);
+                       _("Time"),
+                       FormatSignedTimeHHMM((int)result_olc.time).c_str(),
+                       _("Speed"),
+                       FormatUserTaskSpeed(result_olc.GetSpeed()).c_str());
   }
 }
 
@@ -288,12 +292,13 @@ FlightStatisticsRenderer::RenderTask(Canvas &canvas, const PixelRect rc,
     TaskPointRenderer tpv(canvas, proj, map_look.task,
                           task.GetTaskProjection(),
                           ozv, false, TaskPointRenderer::ALL,
-                          nmea_info.location_available, nmea_info.location);
+                          nmea_info.location_available
+                          ? nmea_info.location : GeoPoint::Invalid());
     ::TaskRenderer dv(tpv, proj.GetScreenBounds());
     dv.Draw(task, task);
   }
 
-  if (trace_computer != NULL)
+  if (trace_computer != nullptr)
     trail_renderer.Draw(canvas, *trace_computer, proj, 0);
 
   if (nmea_info.location_available) {
@@ -314,36 +319,37 @@ FlightStatisticsRenderer::CaptionTask(TCHAR *sTmp, const DerivedInfo &derived)
     _tcscpy(sTmp, _("No task"));
   } else {
     const fixed d_remaining = derived.task_stats.total.remaining.GetDistance();
-    TCHAR timetext1[100];
-    TCHAR timetext2[100];
     if (task_stats.has_targets) {
-      FormatSignedTimeHHMM(timetext1, (int)task_stats.total.time_remaining_start);
-      FormatSignedTimeHHMM(timetext2, (int)common.aat_time_remaining);
+      const auto timetext1 = FormatSignedTimeHHMM((int)task_stats.total.time_remaining_start);
+      const auto timetext2 = FormatSignedTimeHHMM((int)common.aat_time_remaining);
 
       if (Layout::landscape) {
         StringFormatUnsafe(sTmp,
                            _T("%s:\r\n  %s\r\n%s:\r\n  %s\r\n%s:\r\n  %5.0f %s\r\n%s:\r\n  %5.0f %s\r\n"),
-                           _("Task to go"), timetext1, _("AAT to go"), timetext2,
+                           _("Task to go"), timetext1.c_str(),
+                           _("AAT to go"), timetext2.c_str(),
                            _("Distance to go"),
                            (double)Units::ToUserDistance(d_remaining),
                            Units::GetDistanceName(), _("Target speed"),
-                           (double)Units::ToUserTaskSpeed(common.aat_speed_remaining),
+                           (double)Units::ToUserTaskSpeed(common.aat_speed_target),
                            Units::GetTaskSpeedName());
       } else {
         StringFormatUnsafe(sTmp,
                            _T("%s: %s\r\n%s: %s\r\n%s: %5.0f %s\r\n%s: %5.0f %s\r\n"),
-                           _("Task to go"), timetext1, _("AAT to go"), timetext2,
+                           _("Task to go"), timetext1.c_str(),
+                           _("AAT to go"), timetext2.c_str(),
                            _("Distance to go"),
                            (double)Units::ToUserDistance(d_remaining),
                            Units::GetDistanceName(),
                            _("Target speed"),
-                           (double)Units::ToUserTaskSpeed(common.aat_speed_remaining),
+                           (double)Units::ToUserTaskSpeed(common.aat_speed_target),
                            Units::GetTaskSpeedName());
       }
     } else {
-      FormatSignedTimeHHMM(timetext1, (int)task_stats.total.time_remaining_now);
       StringFormatUnsafe(sTmp, _T("%s: %s\r\n%s: %5.0f %s\r\n"),
-                         _("Task to go"), timetext1, _("Distance to go"),
+                         _("Task to go"),
+                         FormatSignedTimeHHMM((int)task_stats.total.time_remaining_now).c_str(),
+                         _("Distance to go"),
                          (double)Units::ToUserDistance(d_remaining),
                          Units::GetDistanceName());
     }

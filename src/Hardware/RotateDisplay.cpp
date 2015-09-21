@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "RotateDisplay.hpp"
+#include "DisplayOrientation.hpp"
 
 #ifdef ANDROID
 #include "Android/Main.hpp"
@@ -34,9 +35,16 @@ Copyright_License {
 #include "Kobo/System.hpp"
 #endif
 
-#ifdef WIN32
-#include "Screen/RootDC.hpp"
+#ifdef ENABLE_OPENGL
+#include "Screen/OpenGL/Features.hpp"
+#ifdef SOFTWARE_ROTATE_DISPLAY
+#include "UIGlobals.hpp"
+#include "Screen/SingleWindow.hpp"
+#include "Screen/OpenGL/Globals.hpp"
+#endif
+#endif
 
+#ifdef WIN32
 #include <windows.h>
 #endif
 
@@ -62,8 +70,8 @@ Display::RotateInitialize()
   DeviceMode.dmFields = DM_DISPLAYORIENTATION;
 
   // get current rotation
-  if (ChangeDisplaySettingsEx(NULL, &DeviceMode, NULL, CDS_TEST, NULL) ==
-      DISP_CHANGE_SUCCESSFUL)
+  if (ChangeDisplaySettingsEx(nullptr, &DeviceMode, nullptr,
+                              CDS_TEST, nullptr) == DISP_CHANGE_SUCCESSFUL)
     initial_orientation = DeviceMode.dmDisplayOrientation;
   else
     initial_orientation = DMDO_0;
@@ -99,23 +107,28 @@ Display::RotateSupported()
   dm.dmSize = sizeof(dm);
   dm.dmFields = DM_DISPLAYQUERYORIENTATION;
 
-  if (ChangeDisplaySettingsEx(NULL, &dm, NULL, CDS_TEST, NULL) !=
+  if (ChangeDisplaySettingsEx(nullptr, &dm, nullptr, CDS_TEST, nullptr) !=
       DISP_CHANGE_SUCCESSFUL)
     return false;
 
   return dm.dmDisplayOrientation != DMDO_0;
 #elif defined(ANDROID) || defined(KOBO)
   return true;
+#elif defined(SOFTWARE_ROTATE_DISPLAY)
+  /* rotate supported via glRotatef() (OpenGL projection matrix) */
+
+  /* we need FBO so BufferCanvas can avoid using Canvas::CopyToTexture() */
+  return OpenGL::frame_buffer_object && OpenGL::render_buffer_stencil;
 #else
   return false;
 #endif
 }
 
 bool
-Display::Rotate(DisplaySettings::Orientation orientation)
+Display::Rotate(DisplayOrientation orientation)
 {
 #if !defined(ANDROID) && !defined(KOBO)
-  if (orientation == DisplaySettings::Orientation::DEFAULT)
+  if (orientation == DisplayOrientation::DEFAULT)
     /* leave it as it is */
     return true;
 #endif
@@ -129,23 +142,23 @@ Display::Rotate(DisplaySettings::Orientation orientation)
   /* determine the new rotation */
 
   switch (orientation) {
-  case DisplaySettings::Orientation::PORTRAIT:
+  case DisplayOrientation::PORTRAIT:
     DeviceMode.dmDisplayOrientation = native_landscape
       ? DMDO_90
       : initial_orientation;
     break;
 
-  case DisplaySettings::Orientation::LANDSCAPE:
+  case DisplayOrientation::LANDSCAPE:
     DeviceMode.dmDisplayOrientation = native_landscape
       ? initial_orientation
       : DMDO_270;
     break;
 
-  case DisplaySettings::Orientation::REVERSE_PORTRAIT:
+  case DisplayOrientation::REVERSE_PORTRAIT:
     DeviceMode.dmDisplayOrientation = (native_landscape ? DMDO_270 : DMDO_180);
     break;
 
-  case DisplaySettings::Orientation::REVERSE_LANDSCAPE:
+  case DisplayOrientation::REVERSE_LANDSCAPE:
     DeviceMode.dmDisplayOrientation = (native_landscape ? DMDO_180 : DMDO_90);
     break;
 
@@ -155,29 +168,29 @@ Display::Rotate(DisplaySettings::Orientation orientation)
 
   /* apply the new rotation */
 
-  return ChangeDisplaySettingsEx(NULL, &DeviceMode, NULL,
-                                 CDS_RESET, NULL) == DISP_CHANGE_SUCCESSFUL;
+  return ChangeDisplaySettingsEx(nullptr, &DeviceMode, nullptr,
+                                 CDS_RESET, nullptr) == DISP_CHANGE_SUCCESSFUL;
 #elif defined(ANDROID)
-  if (native_view == NULL)
+  if (native_view == nullptr)
     return false;
 
   NativeView::ScreenOrientation android_orientation;
   switch (orientation) {
-  case DisplaySettings::Orientation::PORTRAIT:
+  case DisplayOrientation::PORTRAIT:
     android_orientation = NativeView::ScreenOrientation::PORTRAIT;
     break;
 
-  case DisplaySettings::Orientation::LANDSCAPE:
+  case DisplayOrientation::LANDSCAPE:
     android_orientation = NativeView::ScreenOrientation::LANDSCAPE;
     break;
 
-  case DisplaySettings::Orientation::REVERSE_PORTRAIT:
+  case DisplayOrientation::REVERSE_PORTRAIT:
     android_orientation = IsGalaxyTab22() ?
                           NativeView::ScreenOrientation::REVERSE_PORTRAIT_GT :
                           NativeView::ScreenOrientation::REVERSE_PORTRAIT;
     break;
 
-  case DisplaySettings::Orientation::REVERSE_LANDSCAPE:
+  case DisplayOrientation::REVERSE_LANDSCAPE:
     android_orientation = IsGalaxyTab22() ?
                           NativeView::ScreenOrientation::REVERSE_LANDSCAPE_GT :
                           NativeView::ScreenOrientation::REVERSE_LANDSCAPE;
@@ -192,25 +205,31 @@ Display::Rotate(DisplaySettings::Orientation orientation)
   const char *rotate = "3";
 
   switch (orientation) {
-  case DisplaySettings::Orientation::DEFAULT:
-  case DisplaySettings::Orientation::PORTRAIT:
+  case DisplayOrientation::DEFAULT:
+  case DisplayOrientation::PORTRAIT:
     break;
 
-  case DisplaySettings::Orientation::REVERSE_PORTRAIT:
+  case DisplayOrientation::REVERSE_PORTRAIT:
     rotate = "1";
     break;
 
-  case DisplaySettings::Orientation::LANDSCAPE:
+  case DisplayOrientation::LANDSCAPE:
     rotate = "0";
     break;
 
-  case DisplaySettings::Orientation::REVERSE_LANDSCAPE:
+  case DisplayOrientation::REVERSE_LANDSCAPE:
     rotate = "2";
     break;
   };
 
   WriteKoboScreenOrientation(rotate);
   return File::WriteExisting("/sys/class/graphics/fb0/rotate", rotate);
+#elif defined(SOFTWARE_ROTATE_DISPLAY)
+  if (!RotateSupported())
+    return false;
+
+  UIGlobals::GetMainWindow().SetDisplayOrientation(orientation);
+  return true;
 #else
   return false;
 #endif
@@ -226,12 +245,12 @@ Display::RotateRestore()
   dm.dmFields = DM_DISPLAYORIENTATION;
   dm.dmDisplayOrientation = initial_orientation;
 
-  return ChangeDisplaySettingsEx(NULL, &dm, NULL,
-                                 CDS_RESET, NULL) == DISP_CHANGE_SUCCESSFUL;
+  return ChangeDisplaySettingsEx(nullptr, &dm, nullptr,
+                                 CDS_RESET, nullptr) == DISP_CHANGE_SUCCESSFUL;
 #elif defined(ANDROID)
   return native_view->setRequestedOrientation(NativeView::ScreenOrientation::SENSOR);
 #elif defined(KOBO)
-  return Rotate(DisplaySettings::Orientation::DEFAULT);
+  return Rotate(DisplayOrientation::DEFAULT);
 #else
   return false;
 #endif

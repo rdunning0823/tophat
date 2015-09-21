@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -50,16 +50,8 @@ public:
     return bitmap.IsDefined();
   }
 
-  /**
-   * @param id the resource id
-   * @param big_id larger resource id
-   * @param big2_id extra large resource id
-   * @param center flag
-   */
-  void LoadResource(ResourceId id, ResourceId big_id,
-                    ResourceId big2_id, bool center=true);
-
   void LoadResource(ResourceId id, ResourceId big_id = ResourceId::Null(),
+                    ResourceId bigger_id = ResourceId::Null(),
                     bool center=true);
 
   void Reset() {
@@ -71,8 +63,7 @@ public:
     Draw(canvas, pt.x, pt.y);
   }
 
-protected:
-  void CalculateLayout(bool center);
+  void Draw(Canvas &canvas, const PixelRect &rc, bool inverse) const;
 };
 
 #endif

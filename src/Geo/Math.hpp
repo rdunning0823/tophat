@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,33 +32,10 @@ Copyright_License {
 #define XCSOAR_GEO_MATH_HPP
 
 #include "Math/fixed.hpp"
-#include "Math/Angle.hpp"
-#include "Constants.hpp"
 #include "Compiler.h"
 
 struct GeoPoint;
-
-/**
- * Convert a distance on earth's surface [m] to the according Angle,
- * assuming the earth is a sphere.
- */
-constexpr
-static inline Angle
-EarthDistanceToAngle(fixed distance)
-{
-  return Angle::Radians(distance / REARTH);
-}
-
-/**
- * Convert an angle to the according distance on earth's surface [m],
- * assuming the earth is a sphere.
- */
-constexpr
-static inline fixed
-AngleToEarthDistance(Angle angle)
-{
-  return angle.Radians() * REARTH;
-}
+class Angle;
 
 /**
  * Finds cross track error in meters and closest point P4 between P3
@@ -120,6 +97,9 @@ Middle(const GeoPoint &a, const GeoPoint &b);
 
 /** 
  * Calculate and add distances between point 1 and 2, and point 2 and 3.
+ * Warning: this method uses spherical calculations only! That's ok since
+ *          it's only used to calculate alternate airports, which is no
+ *          distance-critical task.
  * 
  * @param loc1 Location 1
  * @param loc2 Location 2

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,6 +39,20 @@ BrokenTime
 BrokenTime::FromSecondOfDayChecked(unsigned second_of_day)
 {
   return FromSecondOfDay(second_of_day % (3600u * 24u));
+}
+
+BrokenTime
+BrokenTime::FromMinuteOfDay(unsigned minute_of_day)
+{
+  assert(minute_of_day < 60u * 24u);
+
+  return BrokenTime(minute_of_day / 60u, minute_of_day % 60u);
+}
+
+BrokenTime
+BrokenTime::FromMinuteOfDayChecked(unsigned minute_of_day)
+{
+  return FromMinuteOfDay(minute_of_day % (60u * 24u));
 }
 
 BrokenTime

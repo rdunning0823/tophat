@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Topography/TopographyStore.hpp"
 #include "Topography/TopographyFile.hpp"
+#include "Util/StringAPI.hpp"
 #include "Util/StringUtil.hpp"
 #include "Util/ConvertString.hpp"
 #include "IO/LineReader.hpp"
@@ -58,8 +59,6 @@ static constexpr LOOKUP_ICON icon_list[] = {
   { "town", IDB_TOWN, IDB_TOWN_HD },
   { "mark", IDB_MARK, IDB_MARK_HD },
   { "terrainwarning", IDB_TERRAINWARNING, IDB_TERRAINWARNING_HD },
-  { "logger", IDB_LOGGER, IDB_LOGGER_HD },
-  { "loggeroff", IDB_LOGGEROFF, IDB_LOGGEROFF_HD },
   { "airport_reachable", IDB_AIRPORT_REACHABLE, IDB_AIRPORT_REACHABLE_HD },
   { "airport_unreachable",
     IDB_AIRPORT_UNREACHABLE, IDB_AIRPORT_UNREACHABLE_HD },
@@ -91,8 +90,21 @@ static constexpr LOOKUP_ICON icon_list[] = {
   { "mountain_pass", IDB_MOUNTAIN_PASS, IDB_MOUNTAIN_PASS_HD },
   { "weather_station", IDB_WEATHER_STATION, IDB_WEATHER_STATION_HD },
   { "thermal_hotspot", IDB_THERMAL_HOTSPOT, IDB_THERMAL_HOTSPOT_HD },
-  { NULL, ResourceId::Null(), ResourceId::Null() }
+  { nullptr, ResourceId::Null(), ResourceId::Null() }
 };
+
+fixed
+TopographyStore::GetNextScaleThreshold(fixed map_scale) const
+{
+  fixed result(-1);
+  for (auto *file : files) {
+    fixed threshold = file->GetNextScaleThreshold(map_scale);
+    if (threshold > result)
+      result = threshold;
+  }
+
+  return result;
+}
 
 unsigned
 TopographyStore::ScanVisibility(const WindowProjection &m_projection,
@@ -104,8 +116,8 @@ TopographyStore::ScanVisibility(const WindowProjection &m_projection,
   // we will make sure we update at least one cache per call
   // to make sure eventually everything gets refreshed
   unsigned num_updated = 0;
-  for (auto it = files.begin(), end = files.end(); it != end; ++it) {
-    if ((*it)->Update(m_projection)) {
+  for (auto *file : files) {
+    if (file->Update(m_projection)) {
       ++num_updated;
       if (num_updated >= max_update)
         break;
@@ -119,8 +131,10 @@ TopographyStore::ScanVisibility(const WindowProjection &m_projection,
 void
 TopographyStore::LoadAll()
 {
-  for (const auto &i : files)
-    i->LoadAll();
+  for (const auto &i : files) {
+    TopographyFile &file = *i;
+    file.LoadAll();
+  }
 }
 
 TopographyStore::~TopographyStore()
@@ -137,7 +151,7 @@ TopographyStore::Load(OperationEnvironment &operation, NLineReader &reader,
   // Create buffer for the shape filenames
   // (shape_filename will be modified with the shape_filename_end pointer)
   char shape_filename[MAX_PATH];
-  if (directory != NULL) {
+  if (directory != nullptr) {
     const WideToACPConverter narrow_directory(directory);
     strcpy(shape_filename, narrow_directory);
     strcat(shape_filename, DIR_SEPARATOR_S);
@@ -155,7 +169,7 @@ TopographyStore::Load(OperationEnvironment &operation, NLineReader &reader,
   // Iterate through shape files in the "topology.tpl" file until
   // end or max. file number reached
   char *line;
-  while (!files.full() && (line = reader.ReadLine()) != NULL) {
+  while (!files.full() && (line = reader.ReadLine()) != nullptr) {
     // .tpl Line format: filename,range,icon,field,r,g,b,pen_width,label_range,important_range,alpha
 
     // Ignore comments (lines starting with *) and empty lines
@@ -164,7 +178,7 @@ TopographyStore::Load(OperationEnvironment &operation, NLineReader &reader,
 
     // Find first comma to extract shape filename
     char *p = strchr(line, ',');
-    if (p == NULL || p == line)
+    if (p == nullptr || p == line)
       // If no comma was found -> ignore this line/shapefile
       continue;
 
@@ -202,7 +216,7 @@ TopographyStore::Load(OperationEnvironment &operation, NLineReader &reader,
 
     if (strlen(icon_name) > 0) {
       const LOOKUP_ICON *ip = icon_list;
-      while (ip->name != NULL) {
+      while (ip->name != nullptr) {
         if (StringIsEqual(ip->name, icon_name)) {
           icon = ip->resource_id;
           big_icon = ip->big_resource_id;
@@ -292,8 +306,8 @@ TopographyStore::Load(OperationEnvironment &operation, NLineReader &reader,
 void
 TopographyStore::Reset()
 {
-  for (auto it = files.begin(), end = files.end(); it != end; ++it)
-    delete *it;
+  for (auto *file : files)
+    delete file;
 
   files.clear();
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #include "Waypoint/Waypoint.hpp"
 #include "Engine/Task/Shapes/FAITrianglePointValidator.hpp"
 
-bool
+inline bool
 WaypointFilter::CompareType(const Waypoint &waypoint, TypeFilter type,
                             const FAITrianglePointValidator &triangle_validator)
 {
@@ -54,28 +54,34 @@ WaypointFilter::CompareType(const Waypoint &waypoint, TypeFilter type,
   case TypeFilter::FAI_TRIANGLE_RIGHT:
     return triangle_validator.IsFAITrianglePoint(waypoint, true);
 
+  case TypeFilter::USER:
+    return waypoint.origin == WaypointOrigin::USER;
+
   case TypeFilter::FILE_1:
-    return waypoint.file_num == 1;
+    return waypoint.origin == WaypointOrigin::PRIMARY;
 
   case TypeFilter::FILE_2:
-    return waypoint.file_num == 2;
+    return waypoint.origin == WaypointOrigin::ADDITIONAL;
+
+  case TypeFilter::MAP:
+    return waypoint.origin == WaypointOrigin::MAP;
 
   case TypeFilter::LAST_USED:
     return false;
   }
 
-  /* not reachable */
+  gcc_unreachable();
   return false;
 }
 
-bool
+inline bool
 WaypointFilter::CompareType(const Waypoint &waypoint,
                             const FAITrianglePointValidator &triangle_validator) const
 {
   return CompareType(waypoint, type_index, triangle_validator);
 }
 
-bool
+inline bool
 WaypointFilter::CompareDirection(const Waypoint &waypoint, Angle angle,
                                      GeoPoint location)
 {
@@ -88,20 +94,20 @@ WaypointFilter::CompareDirection(const Waypoint &waypoint, Angle angle,
   return direction_error < fixed(18);
 }
 
-bool
+inline bool
 WaypointFilter::CompareDirection(const Waypoint &waypoint,
                                  GeoPoint location) const
 {
   return CompareDirection(waypoint, direction, location);
 }
 
-bool
+inline bool
 WaypointFilter::CompareName(const Waypoint &waypoint, const TCHAR *name)
 {
   return StringIsEqualIgnoreCase(waypoint.name.c_str(), name, _tcslen(name));
 }
 
-bool
+inline bool
 WaypointFilter::CompareName(const Waypoint &waypoint) const
 {
   return CompareName(waypoint, name);

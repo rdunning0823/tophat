@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,7 +31,8 @@ Copyright_License {
 #include <tchar.h>
 
 struct GeoPoint;
-class RGB8Color;
+template<typename T> class StringPointer;
+template<typename T> class AllocatedString;
 
 namespace Profile
 {
@@ -75,40 +76,6 @@ namespace Profile
   bool GetPath(const char *key, TCHAR *value);
   void SetPath(const char *key, const TCHAR *value);
   bool GetPathIsEqual(const char *key, const TCHAR *value);
-
-  /**
-   * Gets a path from the profile and return its base name only.
-   */
-  gcc_pure
-  const TCHAR *GetPathBase(const char *key);
-
-  /**
-   * Load a GeoPoint from the profile.
-   */
-  bool GetGeoPoint(const char *key, GeoPoint &value);
-
-  /**
-   * Save a GeoPoint to the profile.  It is stored as a string,
-   * longitude and latitude formatted in degrees separated by a space
-   * character.
-   */
-  void SetGeoPoint(const char *key, const GeoPoint &value);
-
-  /**
-   * Load a Color from the profile.
-   */
-  bool GetColor(const char *key, RGB8Color &value);
-
-  /**
-   * Save a Color to the profile.  It is stored as a RGB hex string
-   * e.g. #123456
-   */
-  void SetColor(const char *key, const RGB8Color value);
-
-  /**
-   * Adjusts the application settings according to the profile settings
-   */
-  void Use();
 };
 
 #endif

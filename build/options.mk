@@ -19,6 +19,8 @@ TARGET_CPPFLAGS += -DEYE_CANDY
 WINDRESFLAGS += -DEYE_CANDY
 endif
 
+ICF ?= n
+
 # show map renderer times?
 STOP_WATCH ?= n
 ifeq ($(STOP_WATCH),y)
@@ -53,4 +55,8 @@ TESTING = n
 ifeq ($(TESTING),y)
   TARGET_CPPFLAGS += -DTESTING
   TARGET_CPPFLAGS += -DBETA_FEATURE
+endif
+
+ifneq ($(WGS84),n)
+TARGET_CPPFLAGS += -DUSE_WGS84
 endif

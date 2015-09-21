@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ Copyright_License {
 #include "Renderer/LabelBlock.hpp"
 #include "Screen/StopWatch.hpp"
 #include "MapWindowBlackboard.hpp"
+#include "Renderer/AirspaceLabelRenderer.hpp"
 #include "Renderer/BackgroundRenderer.hpp"
 #include "Renderer/WaypointRenderer.hpp"
 #include "Renderer/TrailRenderer.hpp"
@@ -45,8 +46,8 @@ struct TrafficLook;
 class TopographyStore;
 class CachedTopographyRenderer;
 class RasterTerrain;
-class RasterWeather;
-class ProtectedMarkers;
+class RasterWeatherStore;
+class RasterWeatherCache;
 class Waypoints;
 class Airspaces;
 class ProtectedTaskManager;
@@ -120,7 +121,7 @@ protected:
   GeoPoint terrain_center;
   fixed terrain_radius;
 
-  RasterWeather *weather;
+  RasterWeatherCache *weather;
 
   const TrafficLook &traffic_look;
 
@@ -128,14 +129,13 @@ protected:
   WaypointRenderer waypoint_renderer;
 
   AirspaceRenderer airspace_renderer;
+  AirspaceLabelRenderer airspace_label_renderer;
 
   TrailRenderer trail_renderer;
 
   ProtectedTaskManager *task;
   const ProtectedRoutePlanner *route_planner;
   GlideComputer *glide_computer;
-
-  ProtectedMarkers *marks;
 
 #ifdef HAVE_NOAA
   NOAAStore *noaa_store;
@@ -245,15 +245,12 @@ public:
 
   void SetAirspaces(Airspaces *airspaces) {
     airspace_renderer.SetAirspaces(airspaces);
+    airspace_label_renderer.SetAirspaces(airspaces);
   }
 
   void SetTopography(TopographyStore *_topography);
   void SetTerrain(RasterTerrain *_terrain);
-  void SetWeather(RasterWeather *_weather);
-
-  void SetMarks(ProtectedMarkers *_marks) {
-    marks = _marks;
-  }
+  void SetWeather(const RasterWeatherStore *_weather);
 
 #ifdef HAVE_NOAA
   void SetNOAAStore(NOAAStore *_noaa_store) {
@@ -291,6 +288,10 @@ public:
     visible_projection.SetGeoLocation(location);
   }
 
+  void UpdateScreenBounds() {
+    visible_projection.UpdateScreenBounds();
+  }
+
 protected:
   void DrawBestCruiseTrack(Canvas &canvas,
                            const RasterPoint aircraft_pos) const;
@@ -315,6 +316,7 @@ protected:
   void DrawTask(Canvas &canvas);
   void DrawRoute(Canvas &canvas);
   void DrawTaskOffTrackIndicator(Canvas &canvas);
+  void DrawWaves(Canvas &canvas);
   virtual void DrawThermalEstimate(Canvas &canvas) const;
 
   void DrawGlideThroughTerrain(Canvas &canvas) const;
@@ -383,11 +385,7 @@ private:
    * @param canvas The drawing canvas
    */
   void RenderAirspace(Canvas &canvas);
-  /**
-   * Renders the markers
-   * @param canvas The drawing canvas
-   */
-  void RenderMarkers(Canvas &canvas);
+
   /**
    * Renders the NOAA stations
    * @param canvas The drawing canvas

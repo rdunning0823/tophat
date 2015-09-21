@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -128,7 +128,7 @@ SafetyFactorsConfigPanel::Save(bool &_changed)
     settings_computer.polar.SetDegradationFactor(fixed(1) - degradation / 100);
     Profile::Set(ProfileKeys::PolarDegradation,
                  settings_computer.polar.degradation_factor);
-    if (protected_task_manager != NULL)
+    if (protected_task_manager != nullptr)
       protected_task_manager->SetGlidePolar(settings_computer.polar.glide_polar_task);
     changed = true;
   }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "OS/FileUtil.hpp"
+#include "Util/StringAPI.hpp"
 #include "Util/StringUtil.hpp"
 #include "Util/ConvertString.hpp"
 #include "Compatibility/path.h"
@@ -47,7 +48,7 @@ Directory::Create(const TCHAR* path)
 #ifdef HAVE_POSIX
   mkdir(path, 0777);
 #else /* !HAVE_POSIX */
-  CreateDirectory(path, NULL);
+  CreateDirectory(path, nullptr);
 #endif /* !HAVE_POSIX */
 }
 
@@ -60,7 +61,7 @@ Directory::Exists(const TCHAR* path)
   if (stat(narrow_path, &st) != 0)
     return false;
 
-  return (st.st_mode & S_IFDIR);
+  return S_ISDIR(st.st_mode);
 #else
   DWORD attributes = GetFileAttributes(path);
   return attributes != INVALID_FILE_ATTRIBUTES &&
@@ -77,7 +78,7 @@ Directory::Exists(const TCHAR* path)
 static bool
 IsDots(const TCHAR* str)
 {
-  return !(_tcscmp(str, _T(".")) && _tcscmp(str, _T("..")));
+  return StringIsEqual(str, _T(".")) || StringIsEqual(str, _T(".."));
 }
 #endif
 
@@ -164,7 +165,7 @@ ScanDirectories(File::Visitor &visitor, bool recursive,
 {
 #ifdef HAVE_POSIX
   DIR *dir = opendir(sPath);
-  if (dir == NULL)
+  if (dir == nullptr)
     return false;
 
   TCHAR FileName[MAX_PATH];
@@ -173,7 +174,7 @@ ScanDirectories(File::Visitor &visitor, bool recursive,
   FileName[FileNameLength++] = '/';
 
   struct dirent *ent;
-  while ((ent = readdir(dir)) != NULL) {
+  while ((ent = readdir(dir)) != nullptr) {
     // omit '.', '..' and any other files/directories starting with '.'
     if (*ent->d_name == _T('.'))
       continue;
@@ -362,13 +363,13 @@ bool
 File::Touch(const TCHAR *path)
 {
 #ifdef HAVE_POSIX
-  return utime(path, NULL) == 0;
+  return utime(path, nullptr) == 0;
 #else
   /// @see http://msdn.microsoft.com/en-us/library/windows/desktop/ms724205(v=vs.85).aspx
 
   // Create a file handle
-  HANDLE handle = ::CreateFile(path, GENERIC_WRITE, 0, NULL,
-                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE handle = ::CreateFile(path, GENERIC_WRITE, 0, nullptr,
+                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
   if (handle == INVALID_HANDLE_VALUE)
     return false;
@@ -382,7 +383,8 @@ File::Touch(const TCHAR *path)
   ::SystemTimeToFileTime(&st, &ft);
 
   // Sets last-write time of the file to the converted current system time
-  bool result = ::SetFileTime(handle, (LPFILETIME)NULL, (LPFILETIME)NULL, &ft);
+  bool result = ::SetFileTime(handle, (LPFILETIME)nullptr, (LPFILETIME)nullptr,
+                              &ft);
 
   CloseHandle(handle);
 

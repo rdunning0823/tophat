@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ BestCruiseArrowRenderer::Draw(Canvas &canvas, const TaskLook &look,
   RasterPoint arrow[] = { { -1, -40 }, { -1, -62 }, { -6, -62 }, {  0, -70 },
                           {  6, -62 }, {  1, -62 }, {  1, -40 }, { -1, -40 } };
 
-  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pos.x, pos.y,
+  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pos,
                      best_cruise_angle - screen_angle);
   canvas.DrawPolygon(arrow, ARRAY_SIZE(arrow));
 }

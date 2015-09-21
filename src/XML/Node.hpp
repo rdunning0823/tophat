@@ -38,13 +38,10 @@
 
 #include <assert.h>
 #include <tchar.h>
-#include <stdlib.h>
 
 class TextWriter;
 
-struct XMLNode {
-//  friend class XMLNode;
-protected:
+class XMLNode {
   /**
    * To allow shallow copy and "intelligent/smart" pointers (automatic
    * delete).
@@ -65,7 +62,7 @@ protected:
         :name(_name, name_length), value(_value, value_length) {}
     };
 
-    /** Element name (=NULL if root) */
+    /** Element name (=nullptr if root) */
     tstring name;
 
     /** Whether node is an XML declaration - '<?xml ?>' */
@@ -80,24 +77,13 @@ protected:
     /** Array of attributes */
     std::forward_list<Attribute> attributes;
 
-    unsigned ref_count;
-
     Data(const TCHAR *_name, bool _is_declaration)
       :name(_name),
-       is_declaration(_is_declaration),
-       ref_count(1) {}
+       is_declaration(_is_declaration) {}
 
     Data(const TCHAR *_name, size_t name_length, bool _is_declaration)
       :name(_name, name_length),
-       is_declaration(_is_declaration),
-       ref_count(1) {}
-
-    ~Data() {
-      assert(ref_count == 0);
-    }
-
-    void Ref();
-    void Unref();
+       is_declaration(_is_declaration) {}
 
     bool HasChildren() const {
       return !children.empty() || !text.empty();
@@ -149,7 +135,7 @@ public:
    * name of the node
    */
   const TCHAR *GetName() const {
-    assert(d != NULL);
+    assert(d != nullptr);
 
     return d->name.c_str();
   }
@@ -165,23 +151,23 @@ public:
   }
 
   /**
-   * @return the first child node, or NULL if there is none
+   * @return the first child node, or nullptr if there is none
    */
   gcc_pure
   const XMLNode *GetFirstChild() const {
-    return d != NULL && !d->children.empty()
+    return d != nullptr && !d->children.empty()
       ? &d->children.front()
-      : NULL;
+      : nullptr;
   }
 
   /**
-   * @return the first child node, or NULL if there is none
+   * @return the first child node, or nullptr if there is none
    */
   gcc_pure
   XMLNode *GetFirstChild() {
-    return d != NULL && !d->children.empty()
+    return d != nullptr && !d->children.empty()
       ? &d->children.front()
-      : NULL;
+      : nullptr;
   }
 
 public:
@@ -193,7 +179,7 @@ public:
   const XMLNode *GetChildNode(const TCHAR *name) const;
 
   /**
-   * @return ith attribute content with specific name (return a NULL
+   * @return ith attribute content with specific name (return a nullptr
    * if failing)
    */
   gcc_pure
@@ -211,45 +197,40 @@ public:
 
   gcc_pure
   bool IsDeclaration() const {
-    assert(d != NULL);
+    assert(d != nullptr);
 
     return d->is_declaration;
   }
 
   // to allow shallow copy:
   ~XMLNode() {
-    if (d != NULL)
-      d->Unref();
+    delete d;
   }
 
-  /**
-   * Shallow copy.
-   */
-  XMLNode(const XMLNode &A);
+  XMLNode(const XMLNode &A) = delete;
 
   XMLNode(XMLNode &&other)
     :d(other.d) {
-    other.d = NULL;
+    other.d = nullptr;
   }
 
   /**
    * Shallow copy.
    */
-  XMLNode &operator=(const XMLNode& A);
+  XMLNode &operator=(const XMLNode& A) = delete;
 
   XMLNode &operator=(XMLNode &&other) {
     Data *old = d;
     d = other.d;
-    other.d = NULL;
+    other.d = nullptr;
 
-    if (old != NULL)
-      old->Unref();
+    delete old;
 
     return *this;
   }
 
   constexpr
-  XMLNode(): d(NULL) {}
+  XMLNode(): d(nullptr) {}
 
   // The strings given as parameters for these 4 methods will be free'd by the XMLNode class:
 
@@ -270,16 +251,16 @@ public:
   }
 
   void AddAttribute(const TCHAR *name, const TCHAR *value) {
-    assert(name != NULL);
-    assert(value != NULL);
+    assert(name != nullptr);
+    assert(value != nullptr);
 
     d->AddAttribute(name, value);
   }
 
   void AddAttribute(const TCHAR *name, size_t name_length,
                     const TCHAR *value, size_t value_length) {
-    assert(name != NULL);
-    assert(value != NULL);
+    assert(name != nullptr);
+    assert(value != nullptr);
 
     d->AddAttribute(name, name_length, value, value_length);
   }

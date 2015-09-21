@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,9 +24,17 @@ Copyright_License {
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Globals.hpp"
 #include "Screen/OpenGL/Features.hpp"
+#include "VertexPointer.hpp"
 #include "Asset.hpp"
 #include "Scope.hpp"
 #include "Compiler.h"
+
+#ifdef USE_GLSL
+#include "Shapes.hpp"
+#include "Program.hpp"
+
+#include <glm/gtc/type_ptr.hpp>
+#endif
 
 #ifdef HAVE_OES_DRAW_TEXTURE
 #include <GLES/glext.h>
@@ -184,7 +192,7 @@ GLTexture::DrawOES(PixelScalar dest_x, PixelScalar dest_y,
   /* glDrawTexiOES() circumvents the projection settings, thus we must
      roll our own translation */
   glDrawTexiOES(OpenGL::translate.x + dest_x,
-                OpenGL::screen_height - OpenGL::translate.y - dest_y - dest_height,
+                OpenGL::viewport_size.y - OpenGL::translate.y - dest_y - dest_height,
                 0, dest_width, dest_height);
 }
 
@@ -211,7 +219,7 @@ GLTexture::Draw(PixelScalar dest_x, PixelScalar dest_y,
     { dest_x + int(dest_width), dest_y + int(dest_height) },
   };
 
-  glVertexPointer(2, GL_VALUE, 0, vertices);
+  const ScopeVertexPointer vp(vertices);
 
   const PixelSize allocated = GetAllocatedSize();
   GLfloat x0 = (GLfloat)src_x / allocated.cx;
@@ -226,10 +234,23 @@ GLTexture::Draw(PixelScalar dest_x, PixelScalar dest_y,
     x1, y1,
   };
 
+#ifdef USE_GLSL
+  glEnableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
+  glVertexAttribPointer(OpenGL::Attribute::TEXCOORD, 2, GL_FLOAT, GL_FALSE,
+                        0, coord);
+#else
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glTexCoordPointer(2, GL_FLOAT, 0, coord);
+#endif
+
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+#ifdef USE_GLSL
+  glDisableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
+  OpenGL::solid_shader->Use();
+#else
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#endif
 }
 
 #ifdef HAVE_OES_DRAW_TEXTURE
@@ -244,7 +265,7 @@ GLTexture::DrawFlippedOES(PixelRect dest, PixelRect src) const
   /* glDrawTexiOES() circumvents the projection settings, thus we must
      roll our own translation */
   glDrawTexiOES(OpenGL::translate.x + dest.left,
-                OpenGL::screen_height - OpenGL::translate.y - dest.bottom,
+                OpenGL::viewport_size.y - OpenGL::translate.y - dest.bottom,
                 0, dest.right - dest.left, dest.bottom - dest.top);
 }
 
@@ -267,7 +288,7 @@ GLTexture::DrawFlipped(PixelRect dest, PixelRect src) const
     dest.GetBottomRight(),
   };
 
-  glVertexPointer(2, GL_VALUE, 0, vertices);
+  const ScopeVertexPointer vp(vertices);
 
   const PixelSize allocated = GetAllocatedSize();
   GLfloat x0 = (GLfloat)src.left / allocated.cx;
@@ -282,8 +303,21 @@ GLTexture::DrawFlipped(PixelRect dest, PixelRect src) const
     x1, y0,
   };
 
+#ifdef USE_GLSL
+  glEnableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
+  glVertexAttribPointer(OpenGL::Attribute::TEXCOORD, 2, GL_FLOAT, GL_FALSE,
+                        0, coord);
+#else
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glTexCoordPointer(2, GL_FLOAT, 0, coord);
+#endif
+
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+#ifdef USE_GLSL
+  glDisableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
+  OpenGL::solid_shader->Use();
+#else
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#endif
 }

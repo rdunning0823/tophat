@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@ TaskOptTarget::TaskOptTarget(const std::vector<OrderedTaskPoint*>& tps,
                              const GlideSettings &settings,
                              const GlidePolar &_gp,
                              AATPoint &_tp_current,
-                             const TaskProjection &projection,
+                             const FlatProjection &projection,
                              StartPoint *_ts)
   :ZeroFinder(fixed(0.02), fixed(0.98), fixed(TOLERANCE_OPT_TARGET)),
    tm(tps.cbegin(), tps.cend(), activeTaskPoint, settings, _gp,

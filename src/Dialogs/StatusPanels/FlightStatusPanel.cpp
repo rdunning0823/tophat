@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "FlightStatusPanel.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Interface.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/AngleFormatter.hpp"
@@ -45,24 +45,17 @@ FlightStatusPanel::Refresh()
   const NMEAInfo &basic = CommonInterface::Basic();
   const DerivedInfo &calculated = CommonInterface::Calculated();
 
-  StaticString<32> buffer;
+  if (basic.location_available)
+    SetText(Location, FormatGeoPoint(basic.location));
+  else
+    ClearText(Location);
 
-  if (basic.location_available) {
-    FormatGeoPoint(basic.location, buffer.buffer(), buffer.MAX_SIZE);
-    SetText(Location, buffer);
-  } else
-    SetText(Location, _T(""));
+  if (basic.gps_altitude_available)
+    SetText(Altitude, FormatUserAltitude(basic.gps_altitude));
+  else
+    ClearText(Altitude);
 
-  if (basic.gps_altitude_available) {
-    FormatUserAltitude(basic.gps_altitude,
-                              buffer.buffer(), buffer.MAX_SIZE);
-    SetText(Altitude, buffer);
-  } else
-    SetText(Altitude, _T(""));
-
-  FormatUserAltitude(calculated.max_height_gain,
-                            buffer.buffer(), buffer.MAX_SIZE);
-  SetText(MaxHeightGain, buffer);
+  SetText(MaxHeightGain, FormatUserAltitude(calculated.max_height_gain));
 
   if (nearest_waypoint) {
     GeoVector vec(basic.location,
@@ -70,11 +63,9 @@ FlightStatusPanel::Refresh()
 
     SetText(Near, nearest_waypoint->name.c_str());
 
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE, vec.bearing, _T(""));
-    SetText(Bearing, buffer);
+    SetText(Bearing, FormatBearing(vec.bearing).c_str());
 
-    FormatUserDistanceSmart(vec.distance, buffer.buffer());
-    SetText(Distance, buffer);
+    SetText(Distance, FormatUserDistanceSmart(vec.distance));
   } else {
     SetText(Near, _T("-"));
     SetText(Bearing, _T("-"));

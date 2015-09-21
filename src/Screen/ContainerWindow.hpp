@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ protected:
 
   /**
    * The active child window is used to find the focused window.  If
-   * this attribute is NULL, then the focused window is not an
+   * this attribute is nullptr, then the focused window is not an
    * (indirect) child window of this one.
    */
   Window *active_child;
@@ -66,27 +66,27 @@ public:
 
 protected:
 #ifndef USE_GDI
-  virtual void OnDestroy() override;
-  virtual void OnCancelMode() override;
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y,
-                           unsigned keys) override;
-  virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseDouble(PixelScalar x, PixelScalar y) override;
-  virtual bool OnMouseWheel(PixelScalar x, PixelScalar y,
-                            int delta) override;
+  void OnDestroy() override;
+  void OnCancelMode() override;
+  bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
+  bool OnMouseDown(PixelScalar x, PixelScalar y) override;
+  bool OnMouseUp(PixelScalar x, PixelScalar y) override;
+  bool OnMouseDouble(PixelScalar x, PixelScalar y) override;
+  bool OnMouseWheel(PixelScalar x, PixelScalar y, int delta) override;
 
 #ifdef HAVE_MULTI_TOUCH
-  virtual bool OnMultiTouchDown() override;
-  virtual bool OnMultiTouchUp() override;
+  bool OnMultiTouchDown() override;
+  bool OnMultiTouchUp() override;
 #endif
 
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnPaint(Canvas &canvas) override;
 #else /* USE_GDI */
   virtual const Brush *OnChildColor(Window &window, Canvas &canvas);
 
-  virtual LRESULT OnMessage(HWND hWnd, UINT message,
-                             WPARAM wParam, LPARAM lParam) override;
+  LRESULT OnMessage(HWND hWnd, UINT message,
+                    WPARAM wParam, LPARAM lParam) override;
+
+  virtual void OnPaint(gcc_unused Canvas &canvas) {}
 #endif
 
 public:
@@ -131,22 +131,22 @@ public:
   Window *EventChildAt(PixelScalar x, PixelScalar y);
 
   void SetActiveChild(Window &child);
-  virtual void SetFocus() override;
-  virtual void ClearFocus() override;
+  void SetFocus() override;
+  void ClearFocus() override;
 
   /**
    * Override the Window::GetFocusedWindow() method, and search in
    * the active child window.
    */
   gcc_pure
-  virtual Window *GetFocusedWindow() override;
+  Window *GetFocusedWindow() override;
 
   gcc_pure
   WindowReference GetFocusedWindowReference();
 
   void SetChildCapture(Window *window);
   void ReleaseChildCapture(Window *window);
-  virtual void ClearCapture() override;
+  void ClearCapture() override;
 
 protected:
   gcc_pure

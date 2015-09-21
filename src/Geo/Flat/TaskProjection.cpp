@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,138 +21,42 @@
  */
 
 #include "TaskProjection.hpp"
-#include "FlatGeoPoint.hpp"
-#include "FlatPoint.hpp"
-#include "FlatBoundingBox.hpp"
-#include "Geo/GeoBounds.hpp"
-#include "Geo/Math.hpp"
 
 #include <algorithm>
 #include <cassert>
 
-// scaling for flat earth integer representation, gives approximately 50m resolution
-#ifdef RADIANS
-static constexpr int fixed_scale = 57296;
-#else
-static constexpr int fixed_scale = 1000;
-#endif
-static constexpr fixed inv_scale(1.0/fixed_scale);
+TaskProjection::TaskProjection(const GeoBounds &_bounds)
+  :bounds(_bounds)
+{
+  SetCenter(bounds.GetCenter());
+}
 
 void
 TaskProjection::Reset(const GeoPoint &ref)
 {
+  FlatProjection::SetInvalid();
   bounds = GeoBounds(ref);
-  location_mid = ref;
-
-#ifndef NDEBUG
-  initialised = true;
-#endif
 }
 
 bool
 TaskProjection::Update()
 {
-  assert(initialised);
+  assert(bounds.IsValid());
 
-  GeoPoint old_loc = location_mid;
+  GeoPoint old_center = GetCenter();
+  GeoPoint new_center = bounds.GetCenter();
+  if (new_center == old_center)
+    return false;
 
-  location_mid = bounds.GetCenter();
-  cos_midloc = location_mid.latitude.fastcosine() * fixed_scale;
-  r_cos_midloc = fixed(1)/cos_midloc;
-  approx_scale = Unproject(FlatGeoPoint(0,-1)).Distance(Unproject(FlatGeoPoint(0,1))) / 2;
-
-  return !(old_loc == location_mid);
-}
-
-FlatPoint
-TaskProjection::ProjectFloat(const GeoPoint& tp) const
-{
-  assert(initialised);
-
-  return FlatPoint((tp.longitude - location_mid.longitude)
-                   .AsDelta().Native() * cos_midloc,
-                   (tp.latitude - location_mid.latitude)
-                   .AsDelta().Native() * fixed_scale);
-}
-
-GeoPoint 
-TaskProjection::Unproject(const FlatPoint& fp) const
-{
-  assert(initialised);
-
-  GeoPoint tp;
-  tp.longitude = (Angle::Native(fp.x*r_cos_midloc)+location_mid.longitude).AsDelta();
-  tp.latitude = (Angle::Native(fp.y*inv_scale)+location_mid.latitude).AsDelta();
-  return tp;
-}
-
-FlatGeoPoint 
-TaskProjection::ProjectInteger(const GeoPoint& tp) const
-{
-  assert(initialised);
-
-  FlatPoint f = ProjectFloat(tp);
-  return FlatGeoPoint(iround(f.x), iround(f.y));
-}
-
-GeoPoint 
-TaskProjection::Unproject(const FlatGeoPoint& fp) const
-{
-  assert(initialised);
-
-  return GeoPoint(Angle::Native(fp.longitude * r_cos_midloc)
-                  + location_mid.longitude,
-                  Angle::Native(fp.latitude * inv_scale)
-                  + location_mid.latitude);
-}
-
-fixed
-TaskProjection::ProjectRangeFloat(const GeoPoint &tp, const fixed range) const
-{
-  assert(initialised);
-
-  GeoPoint fr = ::FindLatitudeLongitude(tp, Angle::Zero(), range);
-  FlatPoint f = ProjectFloat(fr);
-  FlatPoint p = ProjectFloat(tp);
-  return fabs(f.y - p.y);
-}
-
-unsigned
-TaskProjection::ProjectRangeInteger(const GeoPoint &tp, const fixed range) const
-{
-  assert(initialised);
-
-  return iround(ProjectRangeFloat(tp, range));
+  SetCenter(new_center);
+  return true;
 }
 
 fixed
 TaskProjection::ApproxRadius() const
 {
-  assert(initialised);
+  assert(bounds.IsValid());
 
-  return std::max(GetCenter().Distance(bounds.GetSouthWest()),
-                  GetCenter().Distance(bounds.GetNorthEast()));
+  return std::max(GetCenter().DistanceS(bounds.GetSouthWest()),
+                  GetCenter().DistanceS(bounds.GetNorthEast()));
 }
-
-GeoBounds
-TaskProjection::Unproject(const FlatBoundingBox& bb) const
-{
-  assert(initialised);
-
-  return GeoBounds(Unproject(FlatGeoPoint(bb.bb_ll.longitude,
-                                          bb.bb_ur.latitude)),
-                   Unproject(FlatGeoPoint(bb.bb_ur.longitude,
-                                          bb.bb_ll.latitude)));
-}
-
-FlatBoundingBox
-TaskProjection::Project(const GeoBounds& bb) const
-{
-  assert(initialised);
-
-  FlatBoundingBox fb(ProjectInteger(bb.GetSouthWest()),
-                     ProjectInteger(bb.GetNorthEast()));
-  fb.ExpandByOne(); // prevent rounding
-  return fb;
-}
-

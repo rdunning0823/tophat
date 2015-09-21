@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,11 +27,13 @@
 #include "Screen/Canvas.hpp"
 #include "Look/CrossSectionLook.hpp"
 #include "Terrain/RasterTerrain.hpp"
+#include "MapSettings.hpp"
 #include "Units/Units.hpp"
 #include "NMEA/Aircraft.hpp"
 #include "Navigation/Aircraft.hpp"
 #include "Engine/GlideSolvers/GlideState.hpp"
 #include "Engine/GlideSolvers/MacCready.hpp"
+#include "Language/Language.hpp"
 
 CrossSectionRenderer::CrossSectionRenderer(const CrossSectionLook &_look,
                                            const AirspaceLook &_airspace_look,
@@ -46,13 +48,13 @@ CrossSectionRenderer::ReadBlackboard(const MoreData &_gps_info,
                                      const DerivedInfo &_calculated_info,
                                      const GlideSettings &_glide_settings,
                                      const GlidePolar &_glide_polar,
-                                     const AirspaceRendererSettings &ar_settings)
+                                     const MapSettings &map_settings)
 {
   gps_info = _gps_info;
   calculated_info = _calculated_info;
   glide_settings = _glide_settings;
   glide_polar = _glide_polar;
-  airspace_renderer.SetSettings(ar_settings);
+  airspace_renderer.SetSettings(map_settings.airspace);
 }
 
 void
@@ -68,7 +70,7 @@ CrossSectionRenderer::Paint(Canvas &canvas, const PixelRect rc) const
   ChartRenderer chart(chart_look, canvas, rc);
 
   if (!vec.IsValid() || !start.IsValid()) {
-    chart.DrawNoData();
+    chart.DrawNoData(_("Not moving"));
     return;
   }
 

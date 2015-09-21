@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,24 +34,22 @@ Copyright_License {
 TaskPointRenderer::TaskPointRenderer(Canvas &_canvas,
                                      const WindowProjection &_projection,
                                      const TaskLook &_task_look,
-                                     const TaskProjection &_task_projection,
+                                     const FlatProjection &_flat_projection,
                                      OZRenderer &_ozv,
                                      bool _draw_bearing,
                                      TargetVisibility _target_visibility,
-                                     bool _location_available,
                                      const GeoPoint &_location)
   :canvas(_canvas), m_proj(_projection),
    map_canvas(_canvas, _projection,
               _projection.GetScreenBounds().Scale(fixed(1.1))),
    task_look(_task_look),
-   task_projection(_task_projection),
+   flat_projection(_flat_projection),
    draw_bearing(_draw_bearing),
    target_visibility(_target_visibility),
    index(0),
    ozv(_ozv),
    active_index(0),
    location(_location),
-   location_available(_location_available),
    task_finished(false),
    mode_optional_start(false)
 {
@@ -116,7 +114,7 @@ TaskPointRenderer::IsTargetVisible(const TaskPoint &tp) const
 void
 TaskPointRenderer::DrawBearing(const TaskPoint &tp)
 {
-  if (!location_available || !draw_bearing || !PointCurrent())
+  if (!location.IsValid() || !draw_bearing || !PointCurrent())
     return;
 
   canvas.Select(task_look.bearing_pen);
@@ -154,7 +152,7 @@ TaskPointRenderer::DrawTaskLine(const GeoPoint &start, const GeoPoint &end)
                                   fixed(p_end.x - p_start.x)).AsBearing();
 
   ScreenClosestPoint(p_start, p_end, m_proj.GetScreenOrigin(), &p_p, Layout::Scale(25));
-  PolygonRotateShift(Arrow, 2, p_p.x, p_p.y, ang);
+  PolygonRotateShift(Arrow, 2, p_p, ang);
   Arrow[2] = Arrow[1];
   Arrow[1] = p_p;
 
@@ -168,7 +166,7 @@ TaskPointRenderer::DrawIsoline(const AATPoint &tp)
   if (!tp.valid() || !IsTargetVisible(tp))
     return;
 
-  AATIsolineSegment seg(tp, task_projection);
+  AATIsolineSegment seg(tp, flat_projection);
   if (!seg.IsValid())
     return;
 
@@ -177,7 +175,7 @@ TaskPointRenderer::DrawIsoline(const AATPoint &tp)
   GeoPoint start = seg.Parametric(fixed(0));
   GeoPoint end = seg.Parametric(fixed(1));
 
-  if (m_proj.GeoToScreenDistance(start.Distance(end)) <= 2)
+  if (m_proj.GeoToScreenDistance(start.DistanceS(end)) <= 2)
     return;
 
   RasterPoint screen[21];
@@ -221,7 +219,7 @@ TaskPointRenderer::Draw(const TaskPoint &tp, Layer layer)
 
   switch (tp.GetType()) {
   case TaskPointType::UNORDERED:
-    if (layer == LAYER_LEG && location_available)
+    if (layer == LAYER_LEG && location.IsValid())
       DrawTaskLine(location, tp.GetLocationRemaining());
 
     if (layer == LAYER_SYMBOLS)

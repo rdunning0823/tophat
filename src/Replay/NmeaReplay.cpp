@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,14 +34,13 @@
 NmeaReplay::NmeaReplay(NLineReader *_reader, const DeviceConfig &config)
   :reader(_reader),
    parser(new NMEAParser()),
-   device(NULL)
+   device(nullptr)
 {
   parser->SetReal(false);
-  parser->SetIgnoreChecksum(config.ignore_checksum);
 
   const struct DeviceRegister *driver = FindDriverByName(config.driver_name);
-  assert(driver != NULL);
-  if (driver->CreateOnPort != NULL) {
+  assert(driver != nullptr);
+  if (driver->CreateOnPort != nullptr) {
     DeviceConfig config;
     config.Clear();
     device = driver->CreateOnPort(config, port);
@@ -62,8 +61,8 @@ NmeaReplay::ParseLine(const char *line, NMEAInfo &data)
 {
   data.clock = clock.NextClock(data.time_available ? data.time : fixed(-1));
 
-  if ((device != NULL && device->ParseNMEA(line, data)) ||
-      (parser != NULL && parser->ParseLine(line, data))) {
+  if ((device != nullptr && device->ParseNMEA(line, data)) ||
+      (parser != nullptr && parser->ParseLine(line, data))) {
     data.gps.replay = true;
     data.alive.Update(data.clock);
 
@@ -77,7 +76,7 @@ NmeaReplay::ReadUntilRMC(NMEAInfo &data)
 {
   char *buffer;
 
-  while ((buffer = reader->ReadLine()) != NULL) {
+  while ((buffer = reader->ReadLine()) != nullptr) {
     ParseLine(buffer, data);
 
     if ((StringLength(buffer) >= 6 &&

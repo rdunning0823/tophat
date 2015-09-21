@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "ProgressWindow.hpp"
 #include "Screen/Layout.hpp"
+#include "Look/FontDescription.hpp"
 #include "Resources.hpp"
 
 #ifdef USE_GDI
@@ -41,14 +42,14 @@ ProgressWindow::ProgressWindow(ContainerWindow &parent)
   style.Hide();
   Create(parent, rc, style);
 
-  UPixelScalar width = rc.right - rc.left, height = rc.bottom - rc.top;
+  const unsigned width = rc.right - rc.left, height = rc.bottom - rc.top;
 
   // Load progress bar background
   bitmap_progress_border.Load(IDB_PROGRESSBORDER);
 
   // Determine text height
 #ifndef USE_GDI
-  font.Load(_T("Droid Sans"), Layout::SmallScale(10));
+  font.Load(FontDescription(Layout::FontScale(10)));
   text_height = font.GetHeight();
 #else
   VirtualCanvas canvas({1, 1});
@@ -56,8 +57,8 @@ ProgressWindow::ProgressWindow(ContainerWindow &parent)
 #endif
 
   // Make progress bar height proportional to window height
-  UPixelScalar progress_height = height / 20;
-  UPixelScalar progress_horizontal_border = progress_height / 2;
+  const unsigned progress_height = height / 20;
+  const unsigned progress_horizontal_border = progress_height / 2;
   progress_border_height = progress_height * 2;
 
   // Initialize message text field
@@ -66,7 +67,7 @@ ProgressWindow::ProgressWindow(ContainerWindow &parent)
   message_rc.top = message_rc.bottom - text_height;
   TextWindowStyle message_style;
   message_style.center();
-  message.Create(*this, NULL, message_rc, message_style);
+  message.Create(*this, nullptr, message_rc, message_style);
 
 #ifndef USE_GDI
   message.SetFont(font);
@@ -81,7 +82,9 @@ ProgressWindow::ProgressWindow(ContainerWindow &parent)
   ProgressBarStyle pb_style;
   progress_bar.Create(*this, pb_rc, pb_style);
 
+#ifdef USE_GDI
   message.InstallWndProc(); // needed for OnChildColor()
+#endif
 
   // Set progress bar step size and range
   SetRange(0, 1000);
@@ -137,8 +140,8 @@ ProgressWindow::OnResize(PixelSize new_size)
   ContainerWindow::OnResize(new_size);
 
   // Make progress bar height proportional to window height
-  UPixelScalar progress_height = new_size.cy / 20;
-  UPixelScalar progress_horizontal_border = progress_height / 2;
+  const unsigned progress_height = new_size.cy / 20;
+  const unsigned progress_horizontal_border = progress_height / 2;
   progress_border_height = progress_height * 2;
 
   if (message.IsDefined())
@@ -161,8 +164,8 @@ ProgressWindow::OnPaint(Canvas &canvas)
   canvas.Clear(background_color);
 
   // Determine window size
-  const UPixelScalar window_width = canvas.GetWidth();
-  const UPixelScalar window_height = canvas.GetHeight();
+  const unsigned window_width = canvas.GetWidth();
+  const unsigned window_height = canvas.GetHeight();
 
   PixelRect logo_rect;
   logo_rect.left = 0;

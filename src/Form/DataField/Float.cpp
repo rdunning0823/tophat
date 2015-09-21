@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -141,7 +141,7 @@ DataFieldFloat::SetFromCombo(int iDataFieldIndex, TCHAR *sValue)
 void
 DataFieldFloat::AppendComboValue(ComboList &combo_list, fixed value) const
 {
-  TCHAR a[edit_format.MAX_SIZE], b[display_format.MAX_SIZE];
+  TCHAR a[edit_format.capacity()], b[display_format.capacity()];
   _stprintf(a, edit_format, (double)value);
   _stprintf(b, display_format, (double)value, unit.c_str());
   combo_list.Append(combo_list.size(), a, b);
@@ -208,7 +208,7 @@ DataFieldFloat::CreateComboList(const TCHAR *reference_string) const
     }
 
     if (!found_current && reference <= i + epsilon) {
-      combo_list.ComboPopupItemSavedIndex = combo_list.size();
+      combo_list.current_index = combo_list.size();
 
       if (reference < i - epsilon)
         /* the current value is not listed - insert it here */
@@ -223,7 +223,7 @@ DataFieldFloat::CreateComboList(const TCHAR *reference_string) const
   if (reference > last + epsilon) {
     /* the current value out of range - append it here */
     last = reference;
-    combo_list.ComboPopupItemSavedIndex = combo_list.size();
+    combo_list.current_index = combo_list.size();
     AppendComboValue(combo_list, reference);
   }
 

@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,22 +23,22 @@
 #include "Airspace.hpp"
 #include "AbstractAirspace.hpp"
 #include "AirspaceIntersectionVector.hpp"
-#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/Flat/FlatProjection.hpp"
 
-void 
+void
 Airspace::Destroy()
 {
   delete airspace;
 }
 
-Airspace::Airspace(AbstractAirspace& airspace,
-                   const TaskProjection& tp):
-  FlatBoundingBox(airspace.GetBoundingBox(tp)),
-  airspace(&airspace)
+Airspace::Airspace(AbstractAirspace &airspace,
+                   const FlatProjection &tp)
+  :FlatBoundingBox(airspace.GetBoundingBox(tp)),
+   airspace(&airspace)
 {
 }
 
-Airspace::Airspace(const GeoPoint &loc, const TaskProjection &task_projection,
+Airspace::Airspace(const GeoPoint &loc, const FlatProjection &task_projection,
                    const fixed range)
   :FlatBoundingBox(task_projection.ProjectInteger(loc),
                    task_projection.ProjectRangeInteger(loc, range)),
@@ -47,95 +47,74 @@ Airspace::Airspace(const GeoPoint &loc, const TaskProjection &task_projection,
 }
 
 Airspace::Airspace(const GeoPoint &ll, const GeoPoint &ur,
-                   const TaskProjection &task_projection)
+                   const FlatProjection &task_projection)
   :FlatBoundingBox(task_projection.ProjectInteger(ll),
                    task_projection.ProjectInteger(ur)),
    airspace(nullptr)
 {
 }
 
-bool 
+bool
 Airspace::IsInside(const AircraftState &loc) const
 {
-  if (airspace) {
-    return airspace->Inside(loc);
-  } else {
-    return false;
-  }
+  assert(airspace != nullptr);
+  return airspace->Inside(loc);
 }
 
 
-bool 
+bool
 Airspace::IsInside(const GeoPoint &loc) const
 {
-  if (airspace) {
-    return airspace->Inside(loc);
-  } else {
-    return false;
-  }
+  assert(airspace != nullptr);
+  return airspace->Inside(loc);
 }
 
-
-bool 
-Airspace::Intersects(const FlatRay& ray) const
+bool
+Airspace::Intersects(const FlatRay &ray) const
 {
   return FlatBoundingBox::Intersects(ray);
 }
 
 
 AirspaceIntersectionVector
-Airspace::Intersects(const GeoPoint& g1, const GeoPoint &end,
-                     const TaskProjection &projection) const
+Airspace::Intersects(const GeoPoint &g1, const GeoPoint &end,
+                     const FlatProjection &projection) const
 {
-  if (airspace) {
-    return airspace->Intersects(g1, end, projection);
-  } else {
-    AirspaceIntersectionVector null;
-    return null;
-  }
+  assert(airspace != nullptr);
+  return airspace->Intersects(g1, end, projection);
 }
 
-void 
+void
 Airspace::SetGroundLevel(const fixed alt) const
 {
-  if (airspace) 
-    airspace->SetGroundLevel(alt);
-  else
-    assert(1);
+  assert(airspace != nullptr);
+  airspace->SetGroundLevel(alt);
 }
 
 bool
 Airspace::NeedGroundLevel() const
 {
-  if (airspace)
-    return airspace->NeedGroundLevel();
-  else
-    return false;
+  assert(airspace != nullptr);
+  return airspace->NeedGroundLevel();
 }
 
-void 
+void
 Airspace::SetFlightLevel(const AtmosphericPressure &press) const
 {
-  if (airspace) 
-    airspace->SetFlightLevel(press);
-  else
-    assert(1);
+  assert(airspace != nullptr);
+  airspace->SetFlightLevel(press);
 }
 
 void
 Airspace::SetActivity(const AirspaceActivity mask) const
 {
-  if (airspace)
-    airspace->SetActivity(mask);
-  else
-    assert(1);
+  assert(airspace != nullptr);
+  airspace->SetActivity(mask);
 }
 
 void
 Airspace::ClearClearance() const
 {
-  if (airspace)
-    airspace->ClearClearance();
-  else
-    assert(1);
+  assert(airspace != nullptr);
+  airspace->ClearClearance();
 }

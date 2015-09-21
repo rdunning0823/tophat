@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Form/CharacterButton.hpp"
 #include "Look/ButtonLook.hpp"
+#include "Util/CharUtil.hpp"
 
 #ifndef _UNICODE
 #include "Util/UTF8.hpp"
@@ -34,15 +35,23 @@ void
 CharacterButton::Create(ContainerWindow &parent, const ButtonLook &look,
                         const TCHAR *text, PixelRect rc,
                         OnCharacterCallback _on_character, unsigned _character,
-                        const ButtonWindowStyle style)
+                        const WindowStyle style)
 {
   assert(_on_character);
 
   on_character = _on_character;
   character = _character;
 
-  ButtonWindow::Create(parent, text, rc, style);
-  SetFont(*look.font);
+  Button::Create(parent, look, text, rc, style);
+}
+
+unsigned
+CharacterButton::GetUpperCharacter() const
+{
+  unsigned result = character;
+  if (result < 0x80 && IsLowerAlphaASCII((TCHAR)result))
+    result -= 'a' - 'A';
+  return result;
 }
 
 void
@@ -59,7 +68,7 @@ CharacterButton::SetCharacter(unsigned _character)
   char buffer[7];
   *UnicodeToUTF8(character, buffer) = '\0';
 #endif
-  SetText(buffer);
+  SetCaption(buffer);
 }
 
 bool

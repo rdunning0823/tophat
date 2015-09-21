@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -124,25 +124,18 @@ TeamCodeWidget::Update(const MoreData &basic, const DerivedInfo &calculated)
   const TeamInfo &teamcode_info = calculated;
   const TeamCodeSettings &settings =
     CommonInterface::GetComputerSettings().team_code;
-  StaticString<100> buffer;
 
-  if (teamcode_info.teammate_available && basic.track_available) {
-    FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE,
-                     teamcode_info.teammate_vector.bearing - basic.track);
-  } else {
-    buffer = _T("---");
-  }
-
-  SetText(RELATIVE_BEARING, buffer);
+  SetText(RELATIVE_BEARING,
+          teamcode_info.teammate_available && basic.track_available
+          ? FormatAngleDelta(teamcode_info.teammate_vector.bearing - basic.track).c_str()
+          : _T("---"));
 
   if (teamcode_info.teammate_available) {
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE,
-                  teamcode_info.teammate_vector.bearing);
-    SetText(BEARING, buffer);
+    SetText(BEARING,
+            FormatBearing(teamcode_info.teammate_vector.bearing).c_str());
 
-    FormatUserDistanceSmart(teamcode_info.teammate_vector.distance,
-                            buffer.buffer());
-    SetText(RANGE, buffer);
+    SetText(RANGE,
+            FormatUserDistanceSmart(teamcode_info.teammate_vector.distance));
   }
 
   SetText(OWN_CODE, teamcode_info.own_teammate_code.GetCode());
@@ -165,7 +158,7 @@ TeamCodeWidget::OnSetWaypointClicked()
 {
   const Waypoint* wp =
     ShowWaypointListDialog(CommonInterface::Basic().location);
-  if (wp != NULL) {
+  if (wp != nullptr) {
     CommonInterface::SetComputerSettings().team_code.team_code_reference_waypoint = wp->id;
     Profile::Set(ProfileKeys::TeamcodeRefWaypoint, wp->id);
   }
@@ -182,7 +175,7 @@ TeamCodeWidget::OnCodeClicked()
   if (!TextEntryDialog(newTeammateCode, 7))
     return;
 
-  TrimRight(newTeammateCode);
+  StripRight(newTeammateCode);
 
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;
@@ -196,7 +189,7 @@ TeamCodeWidget::OnFlarmLockClicked()
 {
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;
-  TCHAR newTeamFlarmCNTarget[settings.team_flarm_callsign.MAX_SIZE];
+  TCHAR newTeamFlarmCNTarget[settings.team_flarm_callsign.capacity()];
   _tcscpy(newTeamFlarmCNTarget, settings.team_flarm_callsign.c_str());
 
   if (!TextEntryDialog(newTeamFlarmCNTarget, 4))

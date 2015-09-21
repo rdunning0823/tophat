@@ -7,16 +7,17 @@
 
 #else
 
-#include "Util/ConstBuffer.hpp"
+#include <stddef.h>
+#include <stdint.h>
+
+#include "Util/ConstBuffer.hxx"
 
 #define MAKE_RESOURCE(name, id) \
-  extern const char resource_ ## id[]; \
-  extern const char resource_ ## id ## _size[]; \
-  static constexpr ResourceId name(resource_ ##id, resource_ ##id ## _size);
+  extern "C" uint8_t resource_ ## id[]; \
+  extern "C" const size_t resource_ ## id ## _size; \
+  static constexpr ResourceId name(resource_ ##id, &resource_ ## id ## _size);
 
 #endif
-
-#define GET_ICON(scale, hd2, hd, lo) scale > 1 ? (scale > 3 ? hd2 : hd) : lo
 
 MAKE_RESOURCE(IDB_LANDABLE, 139);
 MAKE_RESOURCE(IDB_LANDABLE_HD, 5139);
@@ -59,12 +60,6 @@ MAKE_RESOURCE(IDB_GPSSTATUS2_HD2, 54257);
 MAKE_RESOURCE(IDB_ABORT, 269);
 MAKE_RESOURCE(IDB_ABORT_HD, 5269);
 MAKE_RESOURCE(IDB_ABORT_HD2, 54269);
-MAKE_RESOURCE(IDB_LOGGER, 271);
-MAKE_RESOURCE(IDB_LOGGER_HD, 5271);
-MAKE_RESOURCE(IDB_LOGGER_HD2, 54271);
-MAKE_RESOURCE(IDB_LOGGEROFF, 272);
-MAKE_RESOURCE(IDB_LOGGEROFF_HD, 5272);
-MAKE_RESOURCE(IDB_LOGGEROFF_HD2, 54272);
 MAKE_RESOURCE(IDB_UNIT_KM, 284);
 MAKE_RESOURCE(IDB_UNIT_SM, 285);
 MAKE_RESOURCE(IDB_UNIT_NM, 286);

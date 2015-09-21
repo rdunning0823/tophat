@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,12 +24,13 @@ Copyright_License {
 #ifndef XCSOAR_ANDROID_TEXT_UTIL_HPP
 #define XCSOAR_ANDROID_TEXT_UTIL_HPP
 
-#include "Java/Object.hpp"
+#include "Java/Object.hxx"
 #include "Compiler.h"
 
 #include <utility>
 
 struct PixelSize;
+class FontDescription;
 
 class TextUtil : protected Java::Object {
   static JNIEnv *env;
@@ -46,8 +47,7 @@ public:
   static void Deinitialise(JNIEnv *env);
 
   gcc_malloc
-  static TextUtil *create(const char *facename, int height,
-                          bool bold, bool italic);
+  static TextUtil *create(const FontDescription &d);
 
   gcc_pure
   PixelSize getTextBounds(const char *text) const;

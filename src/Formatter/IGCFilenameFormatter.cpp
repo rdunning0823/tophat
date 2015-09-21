@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "IGCFilenameFormatter.hpp"
 #include "Time/BrokenDate.hpp"
-#include "Util/StringUtil.hpp"
+#include "Util/StringFormat.hpp"
 
 #include <assert.h>
 #include <string.h>
@@ -92,7 +92,7 @@ FormatIGCFilename(TCHAR* buffer, const BrokenDate &date,
   TCHAR logger_id_t[4];
   /* poor man's char->TCHAR converted; this works because we know
      we're dealing with ASCII only */
-  std::copy(logger_id, logger_id + 4, logger_id_t);
+  std::copy_n(logger_id, 4, logger_id_t);
 
   FormatIGCFilename(buffer, date, (TCHAR)manufacturer, logger_id_t,
                     flight_number);
@@ -112,8 +112,8 @@ FormatIGCFilenameLong(TCHAR* buffer, const BrokenDate &date,
   TCHAR manufacturer_t[4], logger_id_t[4];
   /* poor man's char->TCHAR converted; this works because we know
      we're dealing with ASCII only */
-  std::copy(manufacturer, manufacturer + 4, manufacturer_t);
-  std::copy(logger_id, logger_id + 4, logger_id_t);
+  std::copy_n(manufacturer, 4, manufacturer_t);
+  std::copy_n(logger_id, 4, logger_id_t);
 
   FormatIGCFilenameLong(buffer, date, manufacturer_t, logger_id_t,
                         flight_number);

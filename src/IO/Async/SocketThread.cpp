@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,8 +22,8 @@ Copyright_License {
 */
 
 #include "SocketThread.hpp"
-#include "FileEventHandler.hpp"
-#include "OS/SocketDescriptor.hpp"
+#include "SocketEventHandler.hpp"
+#include "Net/SocketDescriptor.hpp"
 
 #include <assert.h>
 
@@ -34,7 +34,7 @@ SocketThread::Run()
     assert(socket.IsDefined());
 
     int ret = socket.WaitReadable(500);
-    if ((ret > 0 && !handler.OnFileEvent(socket.Get(), 0)) ||
+    if ((ret > 0 && !handler.OnSocketEvent(socket, 0)) ||
         ret < 0)
       break;
   }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,6 +29,8 @@ Copyright_License {
 #include "WaypointRendererSettings.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Util/Macros.hpp"
+
+#include <algorithm>
 
 gcc_pure
 static const MaskedIcon &
@@ -57,6 +59,8 @@ GetWaypointIcon(const WaypointLook &look, const Waypoint &wp,
     return look.power_plant_icon;
   case Waypoint::Type::THERMAL_HOTSPOT:
     return look.thermal_hotspot_icon;
+  case Waypoint::Type::MARKER:
+    return look.marker_icon;
   default:
     if (in_task) {
       return look.task_turn_point_icon;
@@ -91,7 +95,7 @@ static void
 DrawLandableRunway(Canvas &canvas, const RasterPoint &pt,
                    const Angle angle, fixed radius, fixed width)
 {
-  if (radius <= fixed(0))
+  if (!positive(radius))
     return;
 
   const auto sc = angle.SinCos();
@@ -141,9 +145,9 @@ WaypointIconRenderer::DrawLandable(const Waypoint &waypoint,
   }
 
   // SW rendering of landables
-  fixed scale = fixed(Layout::SmallScale(settings.landable_rendering_scale)) /
-                fixed(150);
-  fixed radius = fixed(10) * scale;
+  fixed scale = fixed(std::max(Layout::VptScale(settings.landable_rendering_scale),
+                               110u)) / 177;
+  fixed radius = 10 * scale;
 
   canvas.SelectBlackPen();
 

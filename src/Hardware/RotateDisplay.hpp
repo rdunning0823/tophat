@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,8 +24,11 @@ Copyright_License {
 #ifndef XCSOAR_HARDWARE_ROTATE_DISPLAY_HPP
 #define XCSOAR_HARDWARE_ROTATE_DISPLAY_HPP
 
-#include "DisplaySettings.hpp"
 #include "Compiler.h"
+
+#include <stdint.h>
+
+enum class DisplayOrientation : uint8_t;
 
 namespace Display {
   void RotateInitialize();
@@ -37,7 +40,7 @@ namespace Display {
    * Change the orientation of the screen.
    */
   bool
-  Rotate(DisplaySettings::Orientation orientation);
+  Rotate(DisplayOrientation orientation);
 
   /**
    * Restores the display rotation setting.

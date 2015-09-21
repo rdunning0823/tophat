@@ -12,6 +12,7 @@
 #define XCSOAR_SCREEN_RAW_BITMAP_HPP
 
 #include "PortableColor.hpp"
+#include "OS/ByteOrder.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Surface.hpp"
@@ -52,22 +53,23 @@ struct BGRColor
   constexpr BGRColor(uint8_t R, uint8_t G, uint8_t B)
     :value(R, G, B) {}
 
-#elif defined(USE_MEMORY_CANVAS) || defined(ENABLE_SDL)
+#elif defined(USE_MEMORY_CANVAS) || defined(ENABLE_SDL) || defined(USE_EGL) || defined(USE_GLX)
 
-#if !defined(__i386__) && !defined(__x86_64__) && !defined(__ARMEL__)
+#if IS_BIG_ENDIAN
   /* big-endian */
   uint8_t dummy;
   RGB8Color value;
 
   constexpr BGRColor(uint8_t R, uint8_t G, uint8_t B)
     :dummy(), value(R, G, B) {}
-#else /* little endian */
+#else
+  /* little-endian */
   BGR8Color value;
   uint8_t dummy;
 
   constexpr BGRColor(uint8_t R, uint8_t G, uint8_t B)
     :value(R, G, B), dummy() {}
-#endif /* little endian */
+#endif
 
 #else /* !SDL */
 
@@ -217,8 +219,8 @@ public:
 #ifdef ENABLE_OPENGL
 private:
   /* from GLSurfaceListener */
-  virtual void SurfaceCreated() override;
-  virtual void SurfaceDestroyed() override;
+  void SurfaceCreated() override;
+  void SurfaceDestroyed() override;
 #endif
 };
 

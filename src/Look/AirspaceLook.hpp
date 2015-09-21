@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -67,12 +67,21 @@ struct AirspaceLook {
   MaskedIcon intercept_icon;
 
   /**
+   * look for labels
+   */
+  Pen label_pen;
+  Brush label_brush;
+  Color label_text_color;
+
+  /**
    * The font used to render the airspace name.
    */
   const Font *name_font;
 
   void Initialise(const AirspaceRendererSettings &settings,
                   const Font &_name_font);
+
+  void Reinitialise(const AirspaceRendererSettings &settings);
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -57,6 +57,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 #include "Asset.hpp"
 #include "Menu/MenuData.hpp"
 #include "IO/ConfiguredFile.hpp"
+#include "IO/LineReader.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Pan.hpp"
 #include "UIState.hpp"

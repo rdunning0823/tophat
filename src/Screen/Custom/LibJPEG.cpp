@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "LibJPEG.hpp"
 #include "UncompressedImage.hpp"
+#include "Util/ContainerCast.hxx"
 #include "Compiler.h"
 
 #include <algorithm>
@@ -42,6 +43,7 @@ struct JPEGErrorManager {
   jmp_buf setjmp_buffer;
 
   JPEGErrorManager() {
+    jpeg_std_error(&base);
     base.error_exit = ErrorExit;
   }
 
@@ -52,26 +54,23 @@ struct JPEGErrorManager {
 
   gcc_noreturn
   static void ErrorExit(j_common_ptr _cinfo) {
-    /* cast to void first to suppress bogus -Wcast-align warning
-       ("cast increases required alignment of target type") - the
-       parameter type of this callback is wrong */
-    void *cinfo = (void *)_cinfo;
-    JPEGErrorManager *err = reinterpret_cast<JPEGErrorManager *>(cinfo);
-    err->ErrorExit();
+    JPEGErrorManager &err = ContainerCast(*_cinfo->err,
+                                          &JPEGErrorManager::base);
+    err.ErrorExit();
   }
 };
 
 UncompressedImage
-LoadJPEGFile(const char *path)
+LoadJPEGFile(const TCHAR *path)
 {
-  FILE *file = fopen(path, "rb");
+  FILE *file = _tfopen(path, _T("rb"));
   if (file == nullptr)
     return UncompressedImage::Invalid();
 
   struct jpeg_decompress_struct cinfo;
 
   JPEGErrorManager err;
-  cinfo.err = jpeg_std_error(&err.base);
+  cinfo.err = &err.base;
   if (setjmp(err.setjmp_buffer)) {
     jpeg_destroy_decompress(&cinfo);
     fclose(file);
@@ -117,7 +116,7 @@ LoadJPEGFile(const char *path)
   while (cinfo.output_scanline < height) {
     jpeg_read_scanlines(&cinfo, rowptr, (JDIMENSION)1);
 
-    p = std::copy(row, row + row_size, p);
+    p = std::copy_n(row, row_size, p);
   }
 
   assert(p == image_buffer + image_buffer_size);

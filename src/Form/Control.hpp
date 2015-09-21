@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_FORM_CONTROL_HPP
 
 #include "Screen/PaintWindow.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 #include <tchar.h>
 
@@ -36,9 +36,6 @@ struct DialogLook;
  * including the forms/windows itself, using the ContainerControl.
  */
 class WindowControl : public PaintWindow {
-public:
-  typedef void (*HelpCallback)(WindowControl *Sender);
-
 protected:
   /** Caption/Text of the Control */
   StaticString<254> caption;
@@ -54,20 +51,6 @@ public:
   virtual ~WindowControl();
 
   /**
-   * The OnKeyDown event is called when a key is pressed while the
-   * control is focused
-   * (derived from Window)
-   */
-  virtual bool OnKeyDown(unsigned key_code) override;
-
-  /**
-   * The OnKeyUp event is called when a key is released while the
-   * control is focused
-   * (derived from Window)
-   */
-  virtual bool OnKeyUp(unsigned key_code) override;
-
-  /**
    * Does this control have a help text?
    */
   bool HasHelp() const {
@@ -75,9 +58,7 @@ public:
   }
 
   /**
-   * Opens up a help dialog if a help text exists, or otherwise calls the
-   * function defined by mOnHelpCallback
-   * @return
+   * Opens up a help dialog if a help text exists
    */
   bool OnHelp();
 

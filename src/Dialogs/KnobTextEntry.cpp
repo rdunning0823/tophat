@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -154,7 +154,7 @@ KnobTextEntryWindow::OnPaint(Canvas &canvas)
 
   // Do the actual painting of the text
   const DialogLook &look = UIGlobals::GetDialogLook();
-  canvas.Select(*look.text_font);
+  canvas.Select(look.text_font);
 
   PixelSize tsize = canvas.CalcTextSize(buffer);
   PixelSize tsizec = canvas.CalcTextSize(buffer, cursor);
@@ -264,7 +264,7 @@ KnobTextEntry(TCHAR *text, size_t width,
   widget.CreateButtons(dialog);
 
   if (dialog.ShowModal() == mrOK) {
-    TrimRight(widget.GetValue());
+    StripRight(widget.GetValue());
     CopyString(text, widget.GetValue(), width);
   }
 

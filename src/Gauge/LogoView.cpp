@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #include "LogoView.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
+#include "Look/FontDescription.hpp"
 #include "Resources.hpp"
 #include "Version.hpp"
 #include "Language/Language.hpp"
@@ -37,7 +38,7 @@ LogoView::LogoView()
    title(IDB_TITLE), big_title(IDB_TITLE_HD)
 {
 #ifndef USE_GDI
-  font.Load(_T("Droid Sans"), Layout::Scale(9));
+  font.Load(FontDescription(Layout::FontScale(10)));
 #endif
 
   big_logo.EnableInterpolation();
@@ -68,19 +69,13 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   else
     orientation = PORTRAIT;
 
-  // Load logo
-  const Bitmap &bitmap_logo =
-      (orientation == LANDSCAPE && width >= 510 && height >= 170) ||
-      (orientation == PORTRAIT && width >= 330 && height >= 250) ||
-      (orientation == SQUARE && width >= 210 && height >= 210) ?
-      big_logo : logo;
-
-  // Adjust the title to larger screens
-  const Bitmap &bitmap_title =
-      (orientation == LANDSCAPE && width >= 510 && height >= 170) ||
-      (orientation == PORTRAIT && width >= 330 && height >= 250) ||
-      (orientation == SQUARE && width >= 210 && height >= 210) ?
-      big_title : title;
+  /* load bitmaps */
+  const bool use_big =
+    (orientation == LANDSCAPE && width >= 510 && height >= 170) ||
+    (orientation == PORTRAIT && width >= 330 && height >= 250) ||
+    (orientation == SQUARE && width >= 210 && height >= 210);
+  const Bitmap &bitmap_logo = use_big ? big_logo : logo;
+  const Bitmap &bitmap_title = use_big ? big_title : title;
 
   // Determine logo size
   PixelSize logo_size = bitmap_logo.GetSize();

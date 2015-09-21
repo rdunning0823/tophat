@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,18 +23,18 @@ Copyright_License {
 
 #include "Dispatcher.hpp"
 #include "Descriptor.hpp"
-#include "List.hpp"
+#include "MultipleDevices.hpp"
 
 void
 DeviceDispatcher::LineReceived(const char *line)
 {
-  for (unsigned i = 0; i < NUMDEV; ++i) {
-    if (i == exclude)
+  unsigned i = 0;
+  for (DeviceDescriptor *device : devices) {
+    if (i++ == exclude)
       /* don't loop back a device's input to itself */
       continue;
 
-    DeviceDescriptor *device = device_list[i];
-    if (device == NULL)
+    if (device == nullptr)
       continue;
 
     device->ForwardLine(line);

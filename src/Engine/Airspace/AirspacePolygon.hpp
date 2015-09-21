@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -31,11 +31,9 @@
 #endif
 
 /** General polygon form airspace */
-class AirspacePolygon: 
-  public AbstractAirspace 
-{
+class AirspacePolygon final : public AbstractAirspace {
 public:
-  /** 
+  /**
    * Constructor.  For testing, pts vector is a cloud of points,
    * and the airspace polygon becomes the convex hull border.
    *
@@ -46,43 +44,20 @@ public:
    */
   AirspacePolygon(const std::vector<GeoPoint> &pts, const bool prune = false);
 
-  /**
-   * Get arbitrary center or reference point for use in determining
-   * overall center location of all airspaces
-   *
-   * @return Location of reference point
-   */
-  const GeoPoint GetCenter() const;
-
-  /** 
-   * Checks whether an aircraft is inside the airspace.
-   * This is slow because it uses geodesic calculations
-   * 
-   * @param loc State about which to test inclusion
-   * 
-   * @return true if aircraft is inside airspace boundary
-   */
-  bool Inside(const GeoPoint &loc) const;
-
-  /** 
-   * Checks whether a line intersects with the airspace.
-   * Can be approximate by using flat-earth representation internally.
-   * 
-   * @param g1 Location of origin of search vector
-   * 
-   * @return Vector of intersection pairs if the line intersects the airspace
-   */
-  virtual AirspaceIntersectionVector Intersects(const GeoPoint &g1,
-                                                const GeoPoint &end,
-                                                const TaskProjection &projection) const;
-
-  virtual GeoPoint ClosestPoint(const GeoPoint &loc,
-                                const TaskProjection &projection) const;
+  /* virtual methods from class AbstractAirspace */
+  const GeoPoint GetReferenceLocation() const override;
+  const GeoPoint GetCenter() const override;
+  bool Inside(const GeoPoint &loc) const override;
+  AirspaceIntersectionVector Intersects(const GeoPoint &g1,
+                                        const GeoPoint &end,
+                                        const FlatProjection &projection) const override;
+  GeoPoint ClosestPoint(const GeoPoint &loc,
+                        const FlatProjection &projection) const override;
 
 public:
 #ifdef DO_PRINT
-  friend std::ostream& operator<< (std::ostream& f, 
-                                   const AirspacePolygon& as);
+  friend std::ostream &operator<<(std::ostream &f,
+                                  const AirspacePolygon &as);
 #endif
 };
 

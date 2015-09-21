@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ Copyright_License {
 #include "Widget.hpp"
 #include "Form/CharacterButton.hpp"
 #include "Form/ActionListener.hpp"
+#include "Form/Button.hpp"
 
 #include <tchar.h>
 
@@ -48,13 +49,13 @@ protected:
 
   OnCharacterCallback_t on_character;
 
-  UPixelScalar button_width;
-  UPixelScalar button_height;
+  unsigned button_width;
+  unsigned button_height;
 
   unsigned num_buttons;
   CharacterButton buttons[MAX_BUTTONS];
 
-  WndSymbolButton *shift_button;
+  Button shift_button;
   bool shift_state;
 
   const bool show_shift_button;
@@ -74,18 +75,19 @@ public:
   void SetAllowedCharacters(const TCHAR *allowed);
 
 private:
+  void PrepareSize(const PixelRect &rc);
   void OnResize(const PixelRect &rc);
 
   gcc_pure
-  ButtonWindow *FindButton(unsigned ch);
+  Button *FindButton(unsigned ch);
 
-  void MoveButton(unsigned ch, PixelScalar left, PixelScalar top);
-  void ResizeButton(unsigned ch, UPixelScalar width, UPixelScalar height);
+  void MoveButton(unsigned ch, int left, int top);
+  void ResizeButton(unsigned ch, unsigned width, unsigned height);
   void ResizeButtons();
   void SetButtonsSize();
   void MoveButtonsToRow(const PixelRect &rc,
                         const TCHAR *buttons, unsigned row,
-                        PixelScalar offset_left = 0);
+                        int offset_left = 0);
   void MoveButtons(const PixelRect &rc);
 
   gcc_pure
@@ -100,17 +102,16 @@ private:
 
 public:
   /* virtual methods from class Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual void Unprepare() override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
-  virtual void Move(const PixelRect &rc) override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
+  void Move(const PixelRect &rc) override;
 
 private:
   void OnShiftClicked();
 
   /* virtual methods from ActionListener */
-  virtual void OnAction(int id) override;
+  void OnAction(int id) override;
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,16 +24,14 @@ Copyright_License {
 #include "Form/ScrollBar.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
-#include "Screen/Window.hpp"
+#include "Screen/PaintWindow.hpp"
 #include "Asset.hpp"
 #include "Util/Macros.hpp"
 
 #include <assert.h>
 
-using std::min;
-
-ScrollBar::ScrollBar()
-  :dragging(false)
+ScrollBar::ScrollBar(const ButtonLook &_button_look)
+  :button_renderer(_button_look), dragging(false)
 {
   // Reset the ScrollBar on creation
   Reset();
@@ -50,7 +48,7 @@ ScrollBar::SetSize(const PixelSize size)
     width = Layout::Scale(24);
   else if (HasPointer())
     /* with a mouse, the scroll bar can be smaller */
-    width = Layout::SmallScale(16);
+    width = Layout::GetMinimumControlHeight();
   else
     // thin for ALTAIR b/c no touch screen
     width = Layout::SmallScale(12);
@@ -152,8 +150,8 @@ ScrollBar::Paint(Canvas &canvas) const
   canvas.DrawExactLine(down_arrow_rect.left, down_arrow_rect.top - 1,
                        down_arrow_rect.right, down_arrow_rect.top - 1);
 
-  canvas.DrawButton(up_arrow_rect, false);
-  canvas.DrawButton(down_arrow_rect, false);
+  button_renderer.DrawButton(canvas, up_arrow_rect, false, false);
+  button_renderer.DrawButton(canvas, down_arrow_rect, false, false);
 
   canvas.SelectNullPen();
   canvas.SelectBlackBrush();
@@ -192,7 +190,7 @@ ScrollBar::Paint(Canvas &canvas) const
     PixelRect rc_slider2 = rc_slider;
     ++rc_slider2.left;
     ++rc_slider2.top;
-    canvas.DrawButton(rc_slider2, false);
+    button_renderer.DrawButton(canvas, rc_slider2, dragging, dragging);
   }
 
   // fill the rest with darker gray
@@ -210,7 +208,7 @@ ScrollBar::Paint(Canvas &canvas) const
 }
 
 void
-ScrollBar::DragBegin(Window *w, unsigned y)
+ScrollBar::DragBegin(PaintWindow *w, unsigned y)
 {
   // Make sure that we are not dragging already
   assert(!dragging);
@@ -220,10 +218,11 @@ ScrollBar::DragBegin(Window *w, unsigned y)
   // ... and remember that we are dragging now
   dragging = true;
   w->SetCapture();
+  w->Invalidate(rc_slider);
 }
 
 void
-ScrollBar::DragEnd(Window *w)
+ScrollBar::DragEnd(PaintWindow *w)
 {
   // If we are not dragging right now -> nothing to end
   if (!dragging)
@@ -232,6 +231,7 @@ ScrollBar::DragEnd(Window *w)
   // Realize that we are not dragging anymore
   dragging = false;
   w->ReleaseCapture();
+  w->Invalidate(rc_slider);
 }
 
 unsigned

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -42,10 +42,6 @@ private:
   void InstallWndProc();
 
 public:
-  PaintWindow() {
-    EnableCustomPainting();
-  }
-
 #ifdef USE_GDI
   static bool register_class(HINSTANCE hInstance);
 #endif
@@ -77,7 +73,7 @@ public:
   constexpr
   static bool SupportsPartialRedraw() {
 #ifdef USE_GDI
-    /* we can use the GDI function InvalidateRect() with a non-NULL
+    /* we can use the GDI function InvalidateRect() with a non-nullptr
        RECT */
     return true;
 #else
@@ -97,7 +93,7 @@ public:
 #ifndef USE_GDI
     Window::Invalidate();
 #else
-    ::InvalidateRect(hWnd, NULL, false);
+    ::InvalidateRect(hWnd, nullptr, false);
 #endif
   }
 
@@ -105,12 +101,26 @@ public:
    * Invalidates a part of the visible area and schedules a repaint
    * (which will occur in the main thread).
    */
-  void Invalidate(const PixelRect &rect) {
+  void Invalidate(gcc_unused const PixelRect &rect) {
 #ifndef USE_GDI
     Invalidate();
 #else
     ::InvalidateRect(hWnd, &rect, false);
 #endif
+  }
+
+#ifdef USE_GDI
+protected:
+  /* virtual methods from class Window */
+  LRESULT OnMessage(HWND hWnd, UINT message,
+                    WPARAM wParam, LPARAM lParam) override;
+#endif
+
+  /* virtual methods from class PaintWindow */
+  virtual void OnPaint(Canvas &canvas) = 0;
+
+  virtual void OnPaint(Canvas &canvas, gcc_unused const PixelRect &dirty) {
+    OnPaint(canvas);
   }
 };
 

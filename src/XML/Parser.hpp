@@ -32,9 +32,8 @@
 #include "Compiler.h"
 
 #include <tchar.h>
-#include <stddef.h>
 
-struct XMLNode;
+class XMLNode;
 
 namespace XML {
   /** Enumeration for XML parse errors. */
@@ -58,8 +57,8 @@ namespace XML {
     unsigned line, column;
   };
 
-  XMLNode *ParseString(const TCHAR *xml_string, Results *pResults=NULL);
-  XMLNode *ParseFile(const TCHAR *path, Results *pResults=NULL);
+  XMLNode *ParseString(const TCHAR *xml_string, Results *pResults=nullptr);
+  XMLNode *ParseFile(const TCHAR *path, Results *pResults=nullptr);
 
   /**
    * Parse XML errors into a user friendly string.

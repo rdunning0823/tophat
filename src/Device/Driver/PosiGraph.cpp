@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,8 +45,8 @@ public:
   PGDevice(Port &_port, unsigned baud_rate, unsigned bulk_baud_rate)
     :LXDevice(_port, baud_rate, bulk_baud_rate) {}
 
-public:
-  virtual bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
+  /* virtual methods from class Device */
+  bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
 };
 
 static bool
@@ -85,6 +85,7 @@ PGCreateOnPort(const DeviceConfig &config, Port &com_port)
 const struct DeviceRegister posigraph_driver = {
   _T("PosiGraph Logger"),
   _T("PosiGraph Logger"),
-  DeviceRegister::DECLARE | DeviceRegister::BULK_BAUD_RATE,
+  DeviceRegister::DECLARE | DeviceRegister::BULK_BAUD_RATE |
+  DeviceRegister::LOGGER,
   PGCreateOnPort,
 };

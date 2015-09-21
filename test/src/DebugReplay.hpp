@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,15 +34,11 @@ Copyright_License {
 #include "Logger/Settings.hpp"
 #include "Util/StaticString.hpp"
 #include "IGC/IGCParser.hpp"
+#include "Atmosphere/Pressure.hpp"
 
-class NLineReader;
-class Device;
-struct DeviceRegister;
 
 class DebugReplay {
 protected:
-  NLineReader *reader;
-
   GlidePolar glide_polar;
 
   BasicComputer computer;
@@ -67,6 +63,8 @@ protected:
 
   WrapClock wrap_clock;
 
+  AtmosphericPressure qnh;
+
 public:
   /**
    *  for pilot name
@@ -75,17 +73,18 @@ public:
 
   GliderType glider_type;
 
-public:
-  DebugReplay(NLineReader *reader);
+  DebugReplay();
+
   virtual ~DebugReplay();
 
-  gcc_pure
-  long Size() const;
-
-  gcc_pure
-  long Tell() const;
-
+  virtual long Size() const = 0;
+  virtual long Tell() const = 0;
   virtual bool Next() = 0;
+
+  /* Return a detail level for this fix - only used for skylines */
+  virtual int Level() const {
+    return 0;
+  }
 
   const MoreData &Basic() const {
     return computed_basic;
@@ -103,17 +102,19 @@ public:
     return calculated;
   }
 
+  FlyingComputer &SetFlyingComputer() {
+    return flying_computer;
+  }
+
+  void SetQNH(const AtmosphericPressure _qnh) {
+    qnh = _qnh;
+  }
+
 protected:
   void Compute();
 };
 
 DebugReplay *
 CreateDebugReplay(Args &args);
-
-DebugReplay *
-CreateDebugReplayIGC(const char *input_file);
-
-DebugReplay *
-CreateDebugReplayNMEA(const tstring &driver_name, const char *input_file);
 
 #endif

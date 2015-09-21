@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -97,20 +97,21 @@ inline void
 AirspaceIntersectionVisitorSlice::RenderBox(const PixelRect rc,
                                             AirspaceClass type) const
 {
-  if (AirspacePreviewRenderer::PrepareFill(
-                                           canvas, type, airspace_look, settings)) {
+  if (AirspacePreviewRenderer::PrepareFill(canvas, type, airspace_look,
+                                           settings)) {
+    const auto &class_settings = settings.classes[type];
 
     // Draw thick brushed outlines
-    PixelScalar border_width = Layout::Scale(10);
-    if ((rc.right - rc.left) > border_width * 2 &&
-        (rc.bottom - rc.top) > border_width * 2 &&
-        settings.classes[type].fill_mode ==
-        AirspaceClassRendererSettings::FillMode::PADDING) {
+    const int border_width = class_settings.fill_mode ==
+      AirspaceClassRendererSettings::FillMode::PADDING
+      ? Layout::ScalePenWidth(10)
+      : 0;
+
+    if (border_width > 0 &&
+        (rc.right - rc.left) > border_width * 2 &&
+        (rc.bottom - rc.top) > border_width * 2) {
       PixelRect border = rc;
-      border.left += border_width;
-      border.right -= border_width;
-      border.top += border_width;
-      border.bottom -= border_width;
+      border.Grow(-border_width);
 
       // Left border
       canvas.Rectangle(rc.left, rc.top, border.left, rc.bottom);
@@ -132,8 +133,8 @@ AirspaceIntersectionVisitorSlice::RenderBox(const PixelRect rc,
   }
 
   // Use transparent brush and type-dependent pen for the outlines
-  if (AirspacePreviewRenderer::PrepareOutline(
-                                              canvas, type, airspace_look, settings))
+  if (AirspacePreviewRenderer::PrepareOutline(canvas, type, airspace_look,
+                                              settings))
     canvas.Rectangle(rc.left, rc.top, rc.right, rc.bottom);
 }
 

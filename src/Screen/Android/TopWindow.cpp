@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -100,7 +100,7 @@ TopWindow::RefreshSize()
 void
 TopWindow::OnResize(PixelSize new_size)
 {
-  if (native_view != NULL) {
+  if (native_view != nullptr) {
     native_view->SetSize(new_size.cx, new_size.cy);
     screen->OnResize(new_size);
   }
@@ -150,7 +150,7 @@ match_pause_and_resume(const Event &event, void *ctx)
 void
 TopWindow::Pause()
 {
-  event_queue->Purge(match_pause_and_resume, NULL);
+  event_queue->Purge(match_pause_and_resume, nullptr);
   event_queue->Push(Event::PAUSE);
 
   paused_mutex.Lock();
@@ -162,7 +162,7 @@ TopWindow::Pause()
 void
 TopWindow::Resume()
 {
-  event_queue->Purge(match_pause_and_resume, NULL);
+  event_queue->Purge(match_pause_and_resume, nullptr);
   event_queue->Push(Event::RESUME);
 }
 
@@ -173,7 +173,6 @@ TopWindow::OnEvent(const Event &event)
     Window *w;
 
   case Event::NOP:
-  case Event::QUIT:
   case Event::TIMER:
   case Event::USER:
   case Event::CALLBACK:
@@ -181,14 +180,14 @@ TopWindow::OnEvent(const Event &event)
 
   case Event::KEY_DOWN:
     w = GetFocusedWindow();
-    if (w == NULL)
+    if (w == nullptr)
       w = this;
 
     return w->OnKeyDown(event.param);
 
   case Event::KEY_UP:
     w = GetFocusedWindow();
-    if (w == NULL)
+    if (w == nullptr)
       w = this;
 
     return w->OnKeyUp(event.param);
@@ -206,6 +205,9 @@ TopWindow::OnEvent(const Event &event)
     double_click.Moved(event.point);
 
     return OnMouseUp(event.point.x, event.point.y);
+
+  case Event::MOUSE_WHEEL:
+    return OnMouseWheel(event.point.x, event.point.y, (int)event.param);
 
   case Event::POINTER_DOWN:
     return OnMultiTouchDown();
@@ -262,5 +264,5 @@ TopWindow::RunEventLoop()
 void
 TopWindow::PostQuit()
 {
-  event_queue->Push(Event::QUIT);
+  event_queue->Quit();
 }

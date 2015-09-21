@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -117,9 +117,6 @@ CompareMapItems(const MapItem *a, const MapItem *b)
     return AirspaceAltitude::SortHighest(
         ((const AirspaceMapItem *)a)->airspace->GetBase(),
         ((const AirspaceMapItem *)b)->airspace->GetBase());
-
-  if (a->type == MapItem::MARKER && b->type == MapItem::MARKER)
-    return ((const MarkerMapItem *)a)->id < ((const MarkerMapItem *)b)->id;
 
 #ifdef HAVE_NOAA
   if (a->type == MapItem::WEATHER && b->type == MapItem::WEATHER)

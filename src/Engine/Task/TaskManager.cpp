@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -186,22 +186,18 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
       ordered_task->GetOrderedTaskSettings().aat_min_time -
       task_stats.total.time_elapsed;
 
-    if (task_stats.total.remaining.IsDefined() &&
-        positive(common_stats.aat_time_remaining))
-      common_stats.aat_speed_remaining =
-          fixed(task_stats.total.remaining.GetDistance()) /
-          common_stats.aat_time_remaining;
-    else
-      common_stats.aat_speed_remaining = fixed(-1);
+    fixed aat_time = ordered_task->GetOrderedTaskSettings().aat_min_time +
+      fixed(task_behaviour.optimise_targets_margin);
 
-    fixed aat_min_time = ordered_task->GetOrderedTaskSettings().aat_min_time;
-
-    if (positive(aat_min_time)) {
-      common_stats.aat_speed_max = task_stats.distance_max / aat_min_time;
-      common_stats.aat_speed_min = task_stats.distance_min / aat_min_time;
+    if (positive(aat_time)) {
+      common_stats.aat_speed_max = task_stats.distance_max / aat_time;
+      common_stats.aat_speed_min = task_stats.distance_min / aat_time;
+      common_stats.aat_speed_target =
+        task_stats.total.planned.GetDistance() / aat_time;
     } else {
       common_stats.aat_speed_max = fixed(-1);
       common_stats.aat_speed_min = fixed(-1);
+      common_stats.aat_speed_target = fixed(-1);
     }
 
     const StartConstraints &start_constraints =

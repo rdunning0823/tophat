@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_LANGUAGE_GLUE_HPP
 
 #include <tchar.h>
+
 void
 InitLanguage();
 
@@ -42,6 +43,7 @@ CloseLanguageFile();
 const TCHAR *
 GetActiveLanguageName();
 
+
 #if defined(HAVE_POSIX) && !defined(ANDROID) && !defined(KOBO) && !defined(__APPLE__)
 
 /**
@@ -54,17 +56,19 @@ GetActiveLanguageName();
 
 #define HAVE_BUILTIN_LANGUAGES
 
-#endif
+#include <stddef.h>
 #include <tchar.h>
 
 struct BuiltinLanguage {
   unsigned language;
-  const void *begin, *size;
+  const void * const begin;
+  const size_t size;
   const TCHAR *resource;
   const TCHAR *name;
 };
 
-
 extern const BuiltinLanguage language_table[];
+
+#endif
 
 #endif

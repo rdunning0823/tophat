@@ -1,6 +1,6 @@
 /*
  * XCSoar Glide Computer - http://www.xcsoar.org/
- * Copyright (C) 2000-2013 The XCSoar Project
+ * Copyright (C) 2000-2015 The XCSoar Project
  * A detailed list of copyright holders can be found in the file "AUTHORS".
  *
  * Redistribution and use in source and binary forms, with or without
@@ -192,8 +192,8 @@ namespace SkyLinesTracking {
     uint32_t flags;
 
     /**
-     * Millisecond of day (UTC).  May be bigger than 24*60*60 if the
-     * flight has wrapped midnight.
+     * Millisecond of day (UTC).  May be bigger than 24*60*60*1000 if
+     * the flight has wrapped midnight.
      */
     uint32_t time;
 
@@ -255,6 +255,13 @@ namespace SkyLinesTracking {
      * the same club.
      */
     static const uint32_t FLAG_CLUB = 0x2;
+
+    /**
+     * The client wants to receive information about all traffic near
+     * the location he submitted recently in a #FixPacket.  The server
+     * chooses a reasonable range.
+     */
+    static const uint32_t FLAG_NEAR = 0x4;
 
     Header header;
 

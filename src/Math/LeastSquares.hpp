@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -48,8 +48,10 @@ Copyright_License {
 #ifndef _LEASTSQS_H
 #define _LEASTSQS_H
 
-#include "Util/StaticArray.hpp"
+#include "Util/TrivialArray.hpp"
 #include "Math/fixed.hpp"
+
+#include <type_traits>
 
 /**
  * A solver for least squares problems
@@ -74,7 +76,6 @@ Copyright_License {
  */
 class LeastSquares
 {
-public:
   fixed sum_xi, sum_yi, sum_xi_2, sum_xi_yi;
 
   unsigned sum_n;
@@ -122,23 +123,109 @@ public:
     {}
   };
 
-  StaticArray<Slot, 1000> slots;
+  TrivialArray<Slot, 1000> slots;
 
-  LeastSquares();
-
+public:
   bool IsEmpty() const {
     return sum_n == 0;
   }
 
+  bool HasResult() const {
+    return sum_n >= 2;
+  }
+
+  unsigned GetCount() const {
+    return sum_n;
+  }
+
+  /**
+   * Reset the LeastSquares calculator.
+   */
   void Reset();
 
-  void LeastSquaresUpdate();
-  void LeastSquaresUpdate(fixed y);
-  void LeastSquaresUpdate(fixed x, fixed y, fixed weight = fixed(1));
+  fixed GetGradient() const {
+    return m;
+  }
 
-  void LeastSquaresErrorUpdate();
+  fixed GetMinX() const {
+    return x_min;
+  }
 
-  void LeastSquaresAdd(fixed x, fixed y, fixed weight = fixed(1));
+  fixed GetMaxX() const {
+    return x_max;
+  }
+
+  fixed GetMiddleX() const {
+    return Half(x_min + x_max);
+  }
+
+  fixed GetMinY() const {
+    return y_min;
+  }
+
+  fixed GetMaxY() const {
+    return y_max;
+  }
+
+  fixed GetAverageY() const {
+    return y_ave;
+  }
+
+  fixed GetYAt(fixed x) const {
+    return x * m + b;
+  }
+
+  fixed GetYAtMinX() const {
+    return GetYAt(GetMinX());
+  }
+
+  fixed GetYAtMaxX() const {
+    return GetYAt(GetMaxX());
+  }
+
+  const TrivialArray<Slot, 1000> &GetSlots() const {
+    return slots;
+  }
+
+  /**
+   * Add a new data point to the values and calculate least squares
+   * average (assumes x = sum_n + 1).
+   *
+   * @param y y-Value of the new data point
+   */
+  void Update(fixed y);
+
+  /**
+   * Add a new data point to the values and calculate least squares
+   * average.
+   *
+   * @param x x-Value of the new data point
+   * @param y y-Value of the new data point
+   * @param weight Weight of the new data point (optional)
+   */
+  void Update(fixed x, fixed y, fixed weight = fixed(1));
+
+private:
+  /**
+   * Calculate the least squares average.
+   */
+  void Compute();
+
+  /**
+   * Calculates the LeastSquaresError.
+   */
+  void UpdateError();
+
+  /**
+   * Add a new data point to the values.
+   *
+   * @param x x-Value of the new data point
+   * @param y y-Value of the new data point
+   * @param weight Weight of the new data point (optional)
+   */
+  void Add(fixed x, fixed y, fixed weight = fixed(1));
 };
+
+static_assert(std::is_trivial<LeastSquares>::value, "type is not trivial");
 
 #endif // _LEASTSQS_H

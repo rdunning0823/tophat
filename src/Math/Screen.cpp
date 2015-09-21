@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,8 +29,6 @@ Copyright_License {
 #include "Util/Clamp.hpp"
 
 #include <algorithm>
-
-// note these use static vars! not thread-safe
 
 void
 ScreenClosestPoint(const RasterPoint &p1, const RasterPoint &p2,
@@ -68,48 +66,45 @@ ScreenClosestPoint(const RasterPoint &p1, const RasterPoint &p2,
   }
 }
 
+/*
+ * Divide x by 2^12, rounded to nearest integer.
+ */
 static int
 roundshift(int x)
 {
   if (x > 0) {
-    x += 512;
+    x += 2048;
   } else if (x < 0) {
-    x -= 512;
+    x -= 2048;
   }
-  return x >> 10;
-}
-
-gcc_const
-static int
-FastScale(int x)
-{
-  if (!Layout::ScaleSupported())
-    return x;
-
-  return x * Layout::scale;
+  return x >> 12;
 }
 
 void
-PolygonRotateShift(RasterPoint *poly, const int n,
-                   const PixelScalar xs, const PixelScalar ys,
-                   Angle angle, const int scale)
+PolygonRotateShift(RasterPoint *poly,
+                   const int n,
+                   const RasterPoint shift,
+                   Angle angle,
+                   int scale,
+                   const bool use_fast_scale)
 {
-  static Angle lastangle = Angle::Native(fixed(-1));
-  static int cost = 1024, sint = 0;
-  static int last_scale = 0;
-  angle = angle.AsBearing();
-
-  if ((angle != lastangle) || (last_scale != scale)) {
-    lastangle = angle;
-    last_scale = scale;
-    if (scale == 100) {
-      cost = FastScale(angle.ifastcosine());
-      sint = FastScale(angle.ifastsine());
-    } else {
-      cost = FastScale(angle.ifastcosine() * scale) / 100;
-      sint = FastScale(angle.ifastsine() * scale) / 100;
-    }
-  }
+  const int xs = shift.x, ys = shift.y;
+  if (use_fast_scale)
+    scale = Layout::FastScale(scale);
+  /*
+   * About the scaling...
+   *  - We want to divide the raster points by 100 in order to scale the
+   *    range +/-50 to the size 'scale'.
+   *  - The fast trig functions return 10-bit fraction fixed point values.
+   *    I.e. we need to divide by 2^10 to convert to regular integers.
+   *  - In total we need to divide by (2^10)*100. This is equal to (2^12)*25.
+   *  - For precision we want to divide as late as possible, but for speed
+   *    we want to avoid the division operation. Therefore we divide by 25
+   *    early but outside the loop, and divide by 2^12 late, inside the
+   *    loop using roundshift.
+   */
+  const int cost = angle.ifastcosine() * scale / 25;
+  const int sint = angle.ifastsine() * scale / 25;
 
   RasterPoint *p = poly;
   const RasterPoint *pe = poly + n;
@@ -122,4 +117,3 @@ PolygonRotateShift(RasterPoint *poly, const int n,
     p++;
   }
 }
-

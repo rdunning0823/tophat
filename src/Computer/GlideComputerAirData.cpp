@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -61,6 +61,7 @@ GlideComputerAirData::ResetFlight(DerivedInfo &calculated,
     flying_computer.Reset();
 
   circling_computer.Reset();
+  wave_computer.Reset();
 
   thermal_band_computer.Reset();
   wind_computer.Reset();
@@ -94,6 +95,9 @@ GlideComputerAirData::ProcessVertical(const MoreData &basic,
   circling_computer.TurnRate(calculated, basic,
                              calculated.flight);
   Turning(basic, calculated, settings);
+
+  wave_computer.Compute(basic, calculated.flight,
+                        calculated.wave, settings.wave);
 
   wind_computer.Compute(settings.wind, settings.polar.glide_polar_task,
                         basic, calculated);
@@ -206,7 +210,7 @@ GlideComputerAirData::CruiseGR(const MoreData &basic, DerivedInfo &calculated)
       calculated.cruise_start_time = basic.time;
     } else {
       fixed DistanceFlown =
-        basic.location.Distance(calculated.cruise_start_location);
+        basic.location.DistanceS(calculated.cruise_start_location);
 
       calculated.cruise_gr =
           UpdateGR(calculated.cruise_gr, DistanceFlown,

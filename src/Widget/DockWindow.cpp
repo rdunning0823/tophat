@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,12 +28,11 @@ void
 DockWindow::SetWidget(Widget *_widget)
 {
   assert(IsDefined());
-
-  DeleteWidget();
+  assert(widget == nullptr);
 
   widget = _widget;
 
-  if (widget != NULL) {
+  if (widget != nullptr) {
     const PixelRect rc = GetClientRect();
     widget->Initialise(*this, rc);
     widget->Prepare(*this, rc);
@@ -42,23 +41,37 @@ DockWindow::SetWidget(Widget *_widget)
 }
 
 void
-DockWindow::DeleteWidget()
+DockWindow::UnprepareWidget()
 {
-  if (widget == NULL)
-    return;
+  assert(widget != nullptr);
 
   widget->Hide();
   widget->Unprepare();
+}
+
+void
+DockWindow::DeleteWidget()
+{
+  if (widget == nullptr)
+    return;
+
+  UnprepareWidget();
   delete widget;
-  widget = NULL;
+  widget = nullptr;
 }
 
 void
 DockWindow::MoveWidget()
 {
-  assert(widget != NULL);
+  assert(widget != nullptr);
 
   widget->Move(GetClientRect());
+}
+
+bool
+DockWindow::SaveWidget(bool &changed)
+{
+  return widget == nullptr || widget->Save(changed);
 }
 
 void
@@ -66,13 +79,6 @@ DockWindow::OnResize(PixelSize new_size)
 {
   ContainerWindow::OnResize(new_size);
 
-  if (widget != NULL)
+  if (widget != nullptr)
     widget->Move(GetClientRect());
-}
-
-void
-DockWindow::OnDestroy()
-{
-  DeleteWidget();
-  ContainerWindow::OnDestroy();
 }

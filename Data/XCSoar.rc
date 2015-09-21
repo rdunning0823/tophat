@@ -33,8 +33,6 @@ HI_RES_AWARE CEUX {1}
 #define HATCH_BITMAP(name, file)
 #endif
 
-#define XMLDIALOG(name, path) name XMLDIALOG DISCARDABLE "../output/data/dialogs/" path ".xml.gz"
-
 #define SOUND(name, file) name WAVE DISCARDABLE "sound/" file ".wav"
 
 // --- Icons ---
@@ -200,12 +198,6 @@ BITMAP_GRAPHIC(IDB_LAUNCHER2, "launcher_red_224_2")
 BITMAP_GRAPHIC(IDB_LAUNCHER1, "launcher_224_1")
 BITMAP_GRAPHIC(IDB_LAUNCHER2, "launcher_224_2")
 #endif
-BITMAP_ICON(IDB_LOGGER, "icon_logging")
-BITMAP_ICON(IDB_LOGGER_HD, "icon_logging_160")
-BITMAP_ICON(IDB_LOGGER_HD2, "icon_logging_420")
-BITMAP_ICON(IDB_LOGGEROFF, "icon_logging_off")
-BITMAP_ICON(IDB_LOGGEROFF_HD, "icon_logging_off_160")
-BITMAP_ICON(IDB_LOGGEROFF_HD2, "icon_logging_off_420")
 BITMAP_ICON(IDB_MAPSCALE_LEFT, "scalearrow_left")
 BITMAP_ICON(IDB_MAPSCALE_RIGHT, "scalearrow_right")
 BITMAP_ICON(IDB_MAPSCALE_LEFT_HD, "scalearrow_left_160")
@@ -337,24 +329,8 @@ SOUND(IDR_WAV_DRIP, "beep_drip")
 #endif
 
 // --- XML Dialogs ---
-XMLDIALOG(IDR_XML_ANALYSIS, "dlgAnalysis")
-XMLDIALOG(IDR_XML_ANALYSIS_L, "dlgAnalysis_L")
-XMLDIALOG(IDR_XML_CHECKLIST, "dlgChecklist")
-XMLDIALOG(IDR_XML_CHECKLIST_L, "dlgChecklist_L")
 XMLDIALOG(IDR_XML_CONFIGURATION, "dlgConfiguration")
 XMLDIALOG(IDR_XML_CONFIGURATION_L, "dlgConfiguration_L")
-XMLDIALOG(IDR_XML_CONFIG_WAYPOINTS, "dlgConfigWaypoints")
-XMLDIALOG(IDR_XML_CONFIG_WAYPOINTS_L, "dlgConfigWaypoints_L")
-XMLDIALOG(IDR_XML_CREDITS, "dlgCredits")
-XMLDIALOG(IDR_XML_CREDITS_L, "dlgCredits_L")
-XMLDIALOG(IDR_XML_FLARMTRAFFICDETAILS, "dlgFlarmTrafficDetails")
-XMLDIALOG(IDR_XML_FLARMTRAFFICDETAILS_L, "dlgFlarmTrafficDetails_L")
-XMLDIALOG(IDR_XML_TARGET, "dlgTarget")
-XMLDIALOG(IDR_XML_TARGET_L, "dlgTarget_L")
-XMLDIALOG(IDR_XML_VARIO, "dlgVario")
-XMLDIALOG(IDR_XML_VARIO_L, "dlgVario_L")
-XMLDIALOG(IDR_XML_WAYPOINTDETAILS, "dlgWaypointDetails")
-XMLDIALOG(IDR_XML_WAYPOINTDETAILS_L, "dlgWaypointDetails_L")
 XMLDIALOG(IDR_XML_WAYPOINTSELECTSIMPLE, "WaypointListSimple")
 XMLDIALOG(IDR_XML_WAYPOINTSELECTSIMPLE_L, "WaypointListSimple_L")
 
@@ -364,5 +340,3 @@ XMLDIALOG(IDR_XML_TASKPOINT, "dlgTaskPoint")
 XMLDIALOG(IDR_XML_TASKPOINT_L, "dlgTaskPoint_L")
 XMLDIALOG(IDR_XML_TASKEDITOR, "dlgTaskEditor")
 XMLDIALOG(IDR_XML_TASKEDITOR_L, "dlgTaskEditor_L")
-
-

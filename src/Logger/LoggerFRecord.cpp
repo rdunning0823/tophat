@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@ Copyright_License {
 */
 
 #include "Logger/LoggerFRecord.hpp"
+
+#include <string.h>
 
 /*
  * From FAI_Tech_Spec_Gnss.pdf 
@@ -48,47 +50,43 @@ Copyright_License {
 void
 LoggerFRecord::Reset()
 {
-  update_needed = true;
-
   satellite_ids_available = false;
-  std::fill_n(satellite_ids, GPSState::MAXSATELLITES, 0);
 
   clock.Reset(); // reset clock / timer
-  clock.SetDT(fixed(1)); // 1 sec so it appears at top of each file
+}
+
+inline bool
+LoggerFRecord::CheckSatellitesChanged(const GPSState &gps) const
+{
+  return gps.satellite_ids_available != satellite_ids_available ||
+    (satellite_ids_available &&
+     memcmp(gps.satellite_ids, satellite_ids, sizeof(satellite_ids)) != 0);
 }
 
 bool
 LoggerFRecord::Update(const GPSState &gps, fixed time, bool nav_warning)
 {
   // Accelerate to 30 seconds if bad signal
-  if (!gps.satellites_used_available || gps.satellites_used < 3 || nav_warning)
-    clock.SetDT(fixed(ACCELERATED_UPDATE_TIME));
-   
-  // Check whether we still have satellite information
-  bool available_changed =
-      gps.satellite_ids_available != satellite_ids_available;
+  const fixed period = IsBadSignal(gps) || nav_warning
+    ? fixed(ACCELERATED_UPDATE_TIME)
+    : fixed(DEFAULT_UPDATE_TIME);
 
   // We need an update if
   // 1) the satellite information availability changed or
   // 2) satellite information is available and the IDs have changed
-  update_needed = update_needed || available_changed ||
-      (satellite_ids_available &&
-       memcmp(gps.satellite_ids, satellite_ids, sizeof(satellite_ids)) != 0);
+  if (CheckSatellitesChanged(gps))
+    clock.Reset();
 
   // Check whether it's time for a new F record yet. Only if
   // 1) the last F record is a certain time ago and
   // 2) something has changed since then
-  if (!clock.CheckAdvance(time) || !update_needed)
+  if (!clock.CheckAdvance(time, period))
     return false;
 
   // Save the current satellite information for next time
   satellite_ids_available = gps.satellite_ids_available;
   if (satellite_ids_available)
     memcpy(satellite_ids, gps.satellite_ids, sizeof(satellite_ids));
-
-  update_needed = false;
-
-  clock.SetDT(fixed(DEFAULT_UPDATE_TIME));
 
   return true;
 }

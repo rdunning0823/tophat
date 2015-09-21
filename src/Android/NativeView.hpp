@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,10 +24,13 @@ Copyright_License {
 #ifndef XCSOAR_ANDROID_NATIVE_VIEW_HPP
 #define XCSOAR_ANDROID_NATIVE_VIEW_HPP
 
-#include "Java/Object.hpp"
-#include "Java/Class.hpp"
-#include "Java/String.hpp"
+#include "Java/Object.hxx"
+#include "Java/Class.hxx"
+#include "Java/String.hxx"
+
+#ifndef NO_SCREEN
 #include "Screen/Point.hpp"
+#endif
 
 #include <assert.h>
 
@@ -37,13 +40,18 @@ class NativeView {
 
   unsigned width, height;
   unsigned xdpi, ydpi;
-  unsigned sdk_version;
   char product[20];
 
-  jmethodID init_surface_method, deinit_surface_method;
-  jmethodID setRequestedOrientationID;
-  jmethodID swap_method, load_resource_texture_method;
-  jmethodID load_file_texture_method, open_file_method;
+  static Java::TrivialClass cls;
+  static jfieldID textureNonPowerOfTwo_field;
+  static jmethodID init_surface_method, deinit_surface_method;
+  static jmethodID setRequestedOrientationID;
+  static jmethodID swap_method;
+  static jmethodID loadResourceBitmap_method;
+  static jmethodID loadFileBitmap_method;
+  static jmethodID bitmapToTexture_method;
+  static jmethodID open_file_method;
+  static jmethodID getNetState_method;
 
 public:
   /**
@@ -67,34 +75,26 @@ public:
     REVERSE_PORTRAIT_GT = 8,
   };
 
+  static void Initialise(JNIEnv *env);
+  static void Deinitialise(JNIEnv *env);
+
   NativeView(JNIEnv *_env, jobject _obj, unsigned _width, unsigned _height,
              unsigned _xdpi, unsigned _ydpi,
-             unsigned _sdk_version, jstring _product)
+             jstring _product)
     :env(_env), obj(env, _obj),
      width(_width), height(_height),
-     xdpi(_xdpi), ydpi(_ydpi),
-     sdk_version(_sdk_version) {
+     xdpi(_xdpi), ydpi(_ydpi) {
     Java::String::CopyTo(env, _product, product, sizeof(product));
-    Java::Class cls(env, "org/tophat/NativeView");
-    init_surface_method = env->GetMethodID(cls, "initSurface", "()Z");
-    deinit_surface_method = env->GetMethodID(cls, "deinitSurface", "()V");
-    setRequestedOrientationID =
-      env->GetMethodID(cls, "setRequestedOrientation", "(I)Z");
-    swap_method = env->GetMethodID(cls, "swap", "()V");
-    load_resource_texture_method = env->GetMethodID(cls, "loadResourceTexture",
-                                                    "(Ljava/lang/String;Z[I)Z");
-    load_file_texture_method = env->GetMethodID(cls, "loadFileTexture",
-                                                "(Ljava/lang/String;[I)Z");
-    open_file_method = env->GetMethodID(cls, "openFile",
-                                        "(Ljava/lang/String;)V");
   }
 
   unsigned GetWidth() const { return width; }
   unsigned GetHeight() const { return height; }
 
+#ifndef NO_SCREEN
   PixelSize GetSize() const {
     return { width, height };
   }
+#endif
 
   unsigned GetXDPI() const {
     return xdpi;
@@ -107,10 +107,6 @@ public:
   void SetSize(unsigned _width, unsigned _height) {
     width = _width;
     height = _height;
-  }
-
-  int GetAPILevel() {
-    return sdk_version;
   }
 
   const char *GetProduct() {
@@ -133,26 +129,21 @@ public:
     env->CallVoidMethod(obj, swap_method);
   }
 
-  bool loadResourceTexture(const char *name, jboolean alpha, jint *result) {
+  jobject loadResourceBitmap(const char *name) {
     Java::String name2(env, name);
-    jintArray result2 = env->NewIntArray(5);
-
-    bool success = env->CallBooleanMethod(obj, load_resource_texture_method,
-                                          name2.Get(), alpha, result2);
-    if (success)
-      env->GetIntArrayRegion(result2, 0, 5, result);
-
-    env->DeleteLocalRef(result2);
-
-    return success;
+    return env->CallObjectMethod(obj, loadResourceBitmap_method, name2.Get());
   }
 
-  bool loadFileTexture(const char *pathName, jint *result) {
-    Java::String pathName2(env, pathName);
+  jobject loadFileBitmap(const char *path) {
+    Java::String path2(env, path);
+    return env->CallObjectMethod(obj, loadFileBitmap_method, path2.Get());
+  }
+
+  bool bitmapToTexture(jobject bmp, bool alpha, jint *result) {
     jintArray result2 = env->NewIntArray(5);
 
-    bool success = env->CallBooleanMethod(obj, load_file_texture_method,
-                                          pathName2.Get(), result2);
+    bool success = env->CallBooleanMethod(obj, bitmapToTexture_method,
+                                          bmp, alpha, result2);
     if (success)
       env->GetIntArrayRegion(result2, 0, 5, result);
 
@@ -162,16 +153,17 @@ public:
   }
 
   void SetTexturePowerOfTwo(bool value) {
-    Java::Class cls(env, env->GetObjectClass(obj));
-    jfieldID id = env->GetStaticFieldID(cls, "textureNonPowerOfTwo", "Z");
-    assert(id);
-
-    env->SetStaticBooleanField(cls, id, value);
+    env->SetStaticBooleanField(cls, textureNonPowerOfTwo_field, value);
   }
 
   void openFile(const char *pathName) {
     Java::String pathName2(env, pathName);
     env->CallVoidMethod(obj, open_file_method, pathName2.Get());
+  }
+
+  gcc_pure
+  int getNetState() const {
+    return env->CallIntMethod(obj, getNetState_method);
   }
 };
 

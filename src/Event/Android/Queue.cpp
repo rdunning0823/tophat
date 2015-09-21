@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,13 +26,13 @@ Copyright_License {
 
 EventQueue::EventQueue()
  :now_us(MonotonicClockUS()),
-  running(true) {}
+  quit(false) {}
 
 void
 EventQueue::Push(const Event &event)
 {
   ScopeLock protect(mutex);
-  if (!running)
+  if (quit)
     return;
 
   events.push(event);
@@ -43,15 +43,11 @@ bool
 EventQueue::Pop(Event &event)
 {
   ScopeLock protect(mutex);
-  if (!running || events.empty())
+  if (quit || events.empty())
     return false;
 
   event = events.front();
   events.pop();
-
-  if (event.type == Event::QUIT)
-    Quit();
-
   return true;
 }
 
@@ -72,7 +68,7 @@ bool
 EventQueue::Wait(Event &event)
 {
   ScopeLock protect(mutex);
-  if (!running)
+  if (quit)
     return false;
 
   if (events.empty())
@@ -93,10 +89,6 @@ EventQueue::Wait(Event &event)
 
   event = events.front();
   events.pop();
-
-  if (event.type == Event::QUIT)
-    Quit();
-
   return true;
 }
 

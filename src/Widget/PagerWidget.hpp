@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,11 +28,15 @@ Copyright_License {
 #include "Util/StaticArray.hpp"
 #include "Screen/Point.hpp"
 
+#include <functional>
+
 /**
  * A #Widget that host multiple other widgets, displaying one at a
  * time.
  */
 class PagerWidget : public Widget {
+  typedef std::function<void()> PageFlippedCallback;
+
   struct Child {
     Widget *widget;
 
@@ -55,9 +59,18 @@ class PagerWidget : public Widget {
   unsigned current;
   StaticArray<Child, 32u> children;
 
+  PageFlippedCallback page_flipped_callback;
+
 public:
   PagerWidget():initialised(false) {}
   virtual ~PagerWidget();
+
+  void SetPageFlippedCallback(PageFlippedCallback &&_page_flipped_callback) {
+    assert(!page_flipped_callback);
+    assert(_page_flipped_callback);
+
+    page_flipped_callback = std::move(_page_flipped_callback);
+  }
 
   const PixelRect &GetPosition() const {
     return position;
@@ -153,23 +166,24 @@ public:
     return SetCurrent(i, true);
   }
 
-  /* methods from Widget */
-  virtual PixelSize GetMinimumSize() const override;
-  virtual PixelSize GetMaximumSize() const override;
-  virtual void Initialise(ContainerWindow &parent,
-                          const PixelRect &rc) override;
-  virtual void Prepare(ContainerWindow &parent,
-                       const PixelRect &rc) override;
-  virtual void Unprepare() override;
-  virtual bool Save(bool &changed) override;
-  virtual bool Click() override;
-  virtual void ReClick() override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
-  virtual bool Leave() override;
-  virtual void Move(const PixelRect &rc) override;
-  virtual bool SetFocus() override;
-  virtual bool KeyPress(unsigned key_code) override;
+  /* virtual methods from class Widget */
+  PixelSize GetMinimumSize() const override;
+  PixelSize GetMaximumSize() const override;
+  void Initialise(ContainerWindow &parent, const PixelRect &rc) override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void Unprepare() override;
+  bool Save(bool &changed) override;
+  bool Click() override;
+  void ReClick() override;
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
+  bool Leave() override;
+  void Move(const PixelRect &rc) override;
+  bool SetFocus() override;
+  bool KeyPress(unsigned key_code) override;
+
+protected:
+  virtual void OnPageFlipped();
 };
 
 #endif

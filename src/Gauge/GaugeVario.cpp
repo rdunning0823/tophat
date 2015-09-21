@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/UnitSymbol.hpp"
 #include "Screen/Layout.hpp"
-#include "Screen/FastPixelRotation.hpp"
+#include "Math/FastRotation.hpp"
 #include "Units/Units.hpp"
 #include "Util/Clamp.hpp"
 
@@ -64,14 +64,14 @@ void
 GaugeVario::OnPaintBuffer(Canvas &canvas)
 {
   const PixelRect rc = GetClientRect();
-  const UPixelScalar width = rc.right - rc.left;
-  const UPixelScalar height = rc.bottom - rc.top;
+  const unsigned width = rc.right - rc.left;
+  const unsigned height = rc.bottom - rc.top;
 
   if (!IsPersistent() || !layout_initialised) {
-    UPixelScalar value_height = 4 + look.value_font->GetCapitalHeight()
+    unsigned value_height = 4 + look.value_font.GetCapitalHeight()
       + look.text_font->GetCapitalHeight();
 
-    middle_position.y = yoffset - value_height / 2;
+    middle_position.y = offset.y - value_height / 2;
     middle_position.x = rc.right;
     top_position.y = middle_position.y - value_height;
     top_position.x = rc.right;
@@ -174,9 +174,9 @@ GaugeVario::OnPaintBuffer(Canvas &canvas)
 
 gcc_const
 static RasterPoint
-TransformRotatedPoint(RasterPoint pt, PixelScalar xoffset, PixelScalar yoffset)
+TransformRotatedPoint(Point2D<int> pt, Point2D<int> offset)
 {
-  return { pt.x + xoffset, (pt.y * 112 / 100) + yoffset + 1 };
+  return { pt.x + offset.x, (pt.y * 112 / 100) + offset.y + 1 };
 }
 
 void
@@ -185,17 +185,17 @@ GaugeVario::MakePolygon(const int i)
   RasterPoint *bit = getPolygon(i);
   RasterPoint *bline = &lines[i + gmax];
 
-  const FastPixelRotation r(Angle::Degrees(i));
+  const FastIntegerRotation r(Angle::Degrees(i));
 
-  bit[0] = TransformRotatedPoint(r.Rotate(-xoffset + nlength0, nwidth),
-                                 xoffset, yoffset);
-  bit[1] = TransformRotatedPoint(r.Rotate(-xoffset + nlength1, 0),
-                                 xoffset, yoffset);
-  bit[2] = TransformRotatedPoint(r.Rotate(-xoffset + nlength0, -nwidth),
-                                 xoffset, yoffset);
+  bit[0] = TransformRotatedPoint(r.Rotate(-offset.x + nlength0, nwidth),
+                                 offset);
+  bit[1] = TransformRotatedPoint(r.Rotate(-offset.x + nlength1, 0),
+                                 offset);
+  bit[2] = TransformRotatedPoint(r.Rotate(-offset.x + nlength0, -nwidth),
+                                 offset);
 
-  *bline = TransformRotatedPoint(r.Rotate(-xoffset + nline, 0),
-                                 xoffset, yoffset);
+  *bline = TransformRotatedPoint(r.Rotate(-offset.x + nline, 0),
+                                 offset);
 }
 
 RasterPoint *
@@ -207,7 +207,7 @@ GaugeVario::getPolygon(int i)
 void
 GaugeVario::MakeAllPolygons()
 {
-  for (int i = -gmax; i <= gmax; i++)
+  for (int i = gmin; i <= gmax; i++)
     MakePolygon(i);
 }
 
@@ -215,8 +215,8 @@ void
 GaugeVario::RenderClimb(Canvas &canvas)
 {
   const PixelRect rc = GetClientRect();
-  PixelScalar x = rc.right - Layout::Scale(14);
-  PixelScalar y = rc.bottom - Layout::Scale(24);
+  int x = rc.right - Layout::Scale(14);
+  int y = rc.bottom - Layout::Scale(24);
 
   if (!dirty)
     return;
@@ -236,22 +236,26 @@ GaugeVario::RenderZero(Canvas &canvas)
   else
     canvas.SelectBlackPen();
 
-  canvas.DrawLine(0, yoffset, Layout::Scale(17), yoffset);
-  canvas.DrawLine(0, yoffset + 1, Layout::Scale(17), yoffset + 1);
+  canvas.DrawLine(0, offset.y, Layout::Scale(17), offset.y);
+  canvas.DrawLine(0, offset.y + 1, Layout::Scale(17), offset.y + 1);
 }
 
 int
 GaugeVario::ValueToNeedlePos(fixed Value)
 {
-  static fixed degrees_per_unit = fixed(GAUGEVARIOSWEEP) / GAUGEVARIORANGE;
+  constexpr fixed degrees_per_unit =
+    fixed(GAUGEVARIOSWEEP) / GAUGEVARIORANGE;
+
   int i;
 
   if (!needle_initialised){
     MakeAllPolygons();
     needle_initialised = true;
   }
+
+
   i = iround(Value * degrees_per_unit);
-  i = Clamp(i, -int(gmax), int(gmax));
+  i = Clamp(i, int(gmin), int(gmax));
   return i;
 }
 
@@ -307,7 +311,7 @@ GaugeVario::RenderNeedle(Canvas &canvas, int i, bool average, bool clear)
 
 // TODO code: Optimise vario rendering, this is slow
 void
-GaugeVario::RenderValue(Canvas &canvas, PixelScalar x, PixelScalar y,
+GaugeVario::RenderValue(Canvas &canvas, int x, int y,
                         DrawInfo *value_info, DrawInfo *label_info,
                         fixed value, const TCHAR *label)
 {
@@ -325,12 +329,12 @@ GaugeVario::RenderValue(Canvas &canvas, PixelScalar x, PixelScalar y,
 
     value_info->rc.left = value_info->rc.right;
     // update back rect with max label size
-    value_info->rc.bottom = value_info->rc.top + look.value_font->GetCapitalHeight();
+    value_info->rc.bottom = value_info->rc.top + look.value_font.GetCapitalHeight();
 
     value_info->text_position.x = value_info->rc.left;
     value_info->text_position.y = value_info->rc.top
-                         + look.value_font->GetCapitalHeight()
-                         - look.value_font->GetAscentHeight();
+                         + look.value_font.GetCapitalHeight()
+                         - look.value_font.GetAscentHeight();
 
     value_info->last_value = fixed(-9999);
     value_info->last_text[0] = '\0';
@@ -360,7 +364,7 @@ GaugeVario::RenderValue(Canvas &canvas, PixelScalar x, PixelScalar y,
 
   canvas.SetBackgroundTransparent();
 
-  if (!IsPersistent() || (dirty && _tcscmp(label_info->last_text, label) != 0)) {
+  if (!IsPersistent() || (dirty && !StringIsEqual(label_info->last_text, label))) {
     canvas.SetTextColor(look.dimmed_text_color);
     canvas.Select(*look.text_font);
     tsize = canvas.CalcTextSize(label);
@@ -383,7 +387,7 @@ GaugeVario::RenderValue(Canvas &canvas, PixelScalar x, PixelScalar y,
     canvas.SetBackgroundColor(look.background_color);
     canvas.SetTextColor(look.text_color);
     _stprintf(buffer, _T("%.1f"), (double)value);
-    canvas.Select(*look.value_font);
+    canvas.Select(look.value_font);
     tsize = canvas.CalcTextSize(buffer);
     value_info->text_position.x = value_info->rc.right - tsize.cx;
 
@@ -410,7 +414,7 @@ GaugeVario::RenderValue(Canvas &canvas, PixelScalar x, PixelScalar y,
 }
 
 void
-GaugeVario::RenderSpeedToFly(Canvas &canvas, PixelScalar x, PixelScalar y)
+GaugeVario::RenderSpeedToFly(Canvas &canvas, int x, int y)
 {
   if (!Basic().airspeed_available ||
       !Basic().total_energy_vario_available)
@@ -419,14 +423,14 @@ GaugeVario::RenderSpeedToFly(Canvas &canvas, PixelScalar x, PixelScalar y)
   static fixed last_v_diff;
   fixed v_diff;
 
-  const UPixelScalar arrow_y_size = Layout::Scale(3);
-  const UPixelScalar arrow_x_size = Layout::Scale(7);
+  const unsigned arrow_y_size = Layout::Scale(3);
+  const unsigned arrow_x_size = Layout::Scale(7);
 
   const PixelRect rc = GetClientRect();
 
-  PixelScalar nary = NARROWS * arrow_y_size;
-  PixelScalar ytop = rc.top + YOFFSET + nary; // JMW
-  PixelScalar ybottom = rc.bottom - YOFFSET - nary - Layout::FastScale(1);
+  int nary = NARROWS * arrow_y_size;
+  int ytop = rc.top + YOFFSET + nary; // JMW
+  int ybottom = rc.bottom - YOFFSET - nary - Layout::FastScale(1);
 
   ytop += Layout::Scale(14);
   ybottom -= Layout::Scale(14);
@@ -720,8 +724,8 @@ GaugeVario::OnResize(PixelSize new_size)
   AntiFlickerWindow::OnResize(new_size);
 
   /* trigger reinitialisation */
-  xoffset = new_size.cx;
-  yoffset = new_size.cy / 2;
+  offset.x = new_size.cx;
+  offset.y = new_size.cy / 2;
   layout_initialised = false;
   needle_initialised = false;
   ballast_initialised = false;

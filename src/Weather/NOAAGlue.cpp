@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ NOAAStore::LoadFromString(const char *string)
     const char *next = strchr(s, _T(','));
     if ((next != NULL && next - s == 4) || (next == NULL && strlen(s) == 4)) {
       char code[5];
-      std::copy(s, s+4, code);
+      std::copy_n(s, 4, code);
       code[4] = '\0';
       if (IsValidCode(code))
         AddStation(code);
@@ -63,7 +63,7 @@ NOAAStore::SaveToProfile()
   char buffer[120], *p = buffer;
   for (auto i = begin(), e = end(); i != e; ++i) {
     const char *code = i->code;
-    p = std::copy(code, code + strlen(code), p);
+    p = std::copy_n(code, strlen(code), p);
     *p++ = _T(',');
   }
 

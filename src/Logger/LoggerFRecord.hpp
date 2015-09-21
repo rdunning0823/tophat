@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_LOGGER_FRECORD_HPP
 
 #include "Time/GPSClock.hpp"
-#include "NMEA/Info.hpp"
+#include "NMEA/GPSState.hpp"
 
 class LoggerFRecord
 {
@@ -34,15 +34,11 @@ class LoggerFRecord
   static constexpr int ACCELERATED_UPDATE_TIME = 30;
 
   GPSClock clock;
-  bool update_needed;
 
   bool satellite_ids_available;
   int satellite_ids[GPSState::MAXSATELLITES];
 
 public:
-  LoggerFRecord()
-    :clock(fixed(DEFAULT_UPDATE_TIME)) {}
-
   /**
    * Returns true if the IGCWriter is supposed to write a new F record to
    * the IGC file or false if no update is needed.
@@ -50,6 +46,15 @@ public:
   bool Update(const GPSState &gps, fixed time, bool nav_warning);
 
   void Reset();
+
+private:
+  gcc_pure
+  static bool IsBadSignal(const GPSState &gps) {
+    return !gps.satellites_used_available || gps.satellites_used < 3;
+  }
+
+  gcc_pure
+  bool CheckSatellitesChanged(const GPSState &gps) const;
 };
 
 #endif

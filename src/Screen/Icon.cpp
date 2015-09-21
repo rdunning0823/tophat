@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,54 +28,80 @@ Copyright_License {
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Scope.hpp"
+
+#ifdef USE_GLSL
+#include "Screen/OpenGL/Shaders.hpp"
+#include "Screen/OpenGL/Program.hpp"
+#else
 #include "Screen/OpenGL/Compatibility.hpp"
 #endif
+#endif
 
+#include <algorithm>
 
-
-void
-MaskedIcon::LoadResource(ResourceId id, ResourceId big_id, bool center)
+gcc_const
+static unsigned
+IconStretchFixed10(unsigned source_dpi)
 {
-  ResourceId big2_id = ResourceId::Null();
-  LoadResource(id, big_id, big2_id, center);
+  /* the icons were designed for PDAs at short eye distance; the 3/2
+     factor reverses the 2/3 factor applied by Layout::Initialize()
+     for small screens */
+  return Layout::VptScale(72 * 1024 * 3 / 2) / source_dpi;
 }
+
+#ifndef ENABLE_OPENGL
+
+gcc_const
+static unsigned
+IconStretchInteger(unsigned source_dpi)
+{
+  return std::max((IconStretchFixed10(source_dpi) + 512) >> 10,
+                  1u);
+}
+
+#endif
 
 void
 MaskedIcon::LoadResource(ResourceId id, ResourceId big_id,
-                         ResourceId big2_id, bool center)
+                         ResourceId bigger_id, bool center)
 {
-  if (Layout::ScaleEnabled()) { /* Layout::scale > 1 */
-    if (Layout::scale >= 3) {
-      if (big2_id.IsDefined())
-        bitmap.Load(big2_id);
-      else if (big_id.IsDefined())
-        bitmap.LoadStretch(big_id, Layout::scale - 1); /* stretch not implmented */
-      else
-        bitmap.LoadStretch(big_id, Layout::scale);
-    } else if (big_id.IsDefined())
-      bitmap.Load(big_id);
-    else
-      bitmap.LoadStretch(id, Layout::FastScale(1));
+#ifdef ENABLE_OPENGL
+  unsigned stretch = 1024;
+#endif
+
+  if (Layout::ScaleEnabled()) {
+    unsigned source_dpi = 96;
+    if (Layout::scale >= 4)
+      if (bigger_id.IsDefined()) {
+        id = bigger_id;
+        source_dpi = 384;
+      } else if (big_id.IsDefined()) {
+        id = big_id;
+        source_dpi = 192;
+      }
+    else if (Layout::scale >= 2)
+      if (big_id.IsDefined()) {
+        id = big_id;
+        source_dpi = 192;
+      }
+#ifdef ENABLE_OPENGL
+    stretch = IconStretchFixed10(source_dpi);
+    bitmap.Load(id);
+    bitmap.EnableInterpolation();
+#else
+    bitmap.LoadStretch(id, IconStretchInteger(source_dpi));
+#endif
   } else
     bitmap.Load(id);
 
-#ifdef ENABLE_OPENGL
-  /* postpone CalculateLayout() call, because the OpenGL surface may
-     be absent now */
-  size.cx = 0;
-  size.cy = center;
-#else
   assert(IsDefined());
 
-  CalculateLayout(center);
-#endif
-}
-
-void
-MaskedIcon::CalculateLayout(bool center)
-{
   size = bitmap.GetSize();
-#ifndef ENABLE_OPENGL
+#ifdef ENABLE_OPENGL
+  /* let the GPU stretch on-the-fly */
+  size.cx = size.cx * stretch >> 10;
+  size.cy = size.cy * stretch >> 10;
+#else
   /* left half is mask, right half is icon */
   size.cx /= 2;
 #endif
@@ -95,18 +121,19 @@ MaskedIcon::Draw(Canvas &canvas, PixelScalar x, PixelScalar y) const
   assert(IsDefined());
 
 #ifdef ENABLE_OPENGL
-  if (size.cx == 0)
-    /* hack: do the postponed layout calcuation now */
-    const_cast<MaskedIcon *>(this)->CalculateLayout((bool)size.cy);
-
+#ifdef USE_GLSL
+  OpenGL::texture_shader->Use();
+#else
+  const GLEnable<GL_TEXTURE_2D> scope;
   OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
 
-  const GLEnable scope(GL_TEXTURE_2D);
   const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   GLTexture &texture = *bitmap.GetNative();
   texture.Bind();
-  texture.Draw(x - origin.x, y - origin.y);
+  texture.Draw(x - origin.x, y - origin.y, size.cx, size.cy,
+               0, 0, texture.GetWidth(), texture.GetHeight());
 #else
 
 #ifdef USE_GDI
@@ -121,4 +148,54 @@ MaskedIcon::Draw(Canvas &canvas, PixelScalar x, PixelScalar y) const
   canvas.CopyAnd(x - origin.x, y - origin.y, size.cx, size.cy,
                   bitmap, size.cx, 0);
 #endif
+}
+
+void
+MaskedIcon::Draw(Canvas &canvas, const PixelRect &rc, bool inverse) const
+{
+  const int offsetx = (rc.right - rc.left - size.cx) / 2;
+  const int offsety = (rc.bottom - rc.top - size.cy) / 2;
+
+#ifdef ENABLE_OPENGL
+#ifdef USE_GLSL
+  if (inverse)
+    OpenGL::invert_shader->Use();
+  else
+    OpenGL::texture_shader->Use();
+#else
+  const GLEnable<GL_TEXTURE_2D> scope;
+
+  if (inverse) {
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+
+    /* invert the texture color */
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
+
+    /* copy the texture alpha */
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_TEXTURE);
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+  } else
+    /* simple copy */
+    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
+
+  const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  GLTexture &texture = *bitmap.GetNative();
+  texture.Bind();
+  texture.Draw(rc.left + offsetx, rc.top + offsety, size.cx, size.cy,
+               0, 0, texture.GetWidth(), texture.GetHeight());
+#else
+  if (inverse) // black background
+    canvas.CopyNotOr(rc.left + offsetx, rc.top + offsety, size.cx, size.cy,
+                     bitmap, size.cx, 0);
+
+  else
+    canvas.CopyAnd(rc.left + offsetx, rc.top + offsety, size.cx, size.cy,
+                   bitmap, size.cx, 0);
+#endif
+
 }

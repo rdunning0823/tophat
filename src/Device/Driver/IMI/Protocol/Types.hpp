@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -388,7 +388,7 @@ namespace IMI
   } gcc_packed;
 }
 
-#define IMICOMM_MSG_HEADER_SIZE ((size_t)(&(((TMsg *)NULL)->payload)))
+#define IMICOMM_MSG_HEADER_SIZE ((size_t)(&(((TMsg *)nullptr)->payload)))
 #define IMICOMM_MAKEBIGPARAM(param1, param2) ((((unsigned)(param1 & 0xFF)) << 16) | (unsigned)(param2 & 0xFFFF))
 #define IMICOMM_BIGPARAM1(param) ((IMIBYTE)((param) >> 16))
 #define IMICOMM_BIGPARAM2(param) ((IMIWORD)(param))

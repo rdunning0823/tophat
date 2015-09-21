@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,6 +28,10 @@ Copyright_License {
 
 #include <tchar.h>
 
+gcc_pure gcc_nonnull_all
+bool
+IsAbsolutePath(const TCHAR *path);
+
 /**
  * Is this path a "base name", i.e. is there no path separate?
  * Behaviour is undefined when the string is empty.
@@ -38,7 +42,7 @@ IsBaseName(const TCHAR *path);
 
 /**
  * Returns the base name of the specified path, i.e. the part after
- * the last separator.  May return NULL if there is no base name.
+ * the last separator.  May return nullptr if there is no base name.
  */
 gcc_pure
 const TCHAR *

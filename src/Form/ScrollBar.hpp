@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,13 +25,16 @@ Copyright_License {
 #define XCSOAR_FORM_SCROLL_BAR_HPP
 
 #include "Screen/Point.hpp"
+#include "Renderer/ButtonRenderer.hpp"
 
 #include <algorithm>
 
-class Window;
+class PaintWindow;
 class Canvas;
 
 class ScrollBar {
+  ButtonFrameRenderer button_renderer;
+
 protected:
   /** Whether the slider is currently being dragged */
   bool dragging;
@@ -43,7 +46,7 @@ protected:
 
 public:
   /** Constructor of the ScrollBar class */
-  ScrollBar();
+  explicit ScrollBar(const ButtonLook &button_look);
 
   /** Returns the width of the ScrollBar */
   int GetWidth() const {
@@ -185,14 +188,14 @@ public:
    * @param w The Window object the ScrollBar is belonging to
    * @param y y-Coordinate
    */
-  void DragBegin(Window *w, unsigned y);
+  void DragBegin(PaintWindow *w, unsigned y);
 
   /**
    * Should be called when stopping to drag
    * (Called by ListControl::OnMouseUp)
    * @param w The Window object the ScrollBar is belonging to
    */
-  void DragEnd(Window *w);
+  void DragEnd(PaintWindow *w);
 
   /**
    * Should be called while dragging

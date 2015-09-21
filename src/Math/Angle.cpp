@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -46,15 +46,11 @@ Angle::ToDMM(unsigned &dd, unsigned &mm, unsigned &mmm,
 {
   is_positive = !negative(value);
 
-  unsigned value = uround(AbsoluteDegrees() * 3600);
-
-  mmm = (float) (value % 60) / 0.06;
-  value /= 60;
-
-  mm = value % 60;
-  value /= 60;
-
-  dd = value;
+  unsigned value = (unsigned) (AbsoluteDegrees() * 60000);
+  dd = value / 60000;
+  value %= 60000;
+  mm = value / 1000;
+  mmm = value % 1000;
 }
 
 int

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_IO_SOURCE_HPP
 #define XCSOAR_IO_SOURCE_HPP
 
+#include "Util/WritableBuffer.hxx"
 #include "Compiler.h"
 
 #include <utility>
@@ -36,25 +37,9 @@ template<class T>
 class Source {
 public:
   /**
-   * A portion of this object's buffer.  The first item is the start
-   * of the buffer, and the second item is the number of available
-   * words.
+   * A portion of this object's buffer.
    */
-  struct Range {
-    T *data;
-
-    unsigned length;
-
-    Range() = default;
-
-    constexpr
-    Range(T *_data, unsigned _length):data(_data), length(_length) {}
-
-    constexpr
-    bool IsEmpty() const {
-      return length == 0;
-    }
-  };
+  typedef WritableBuffer<T> Range;
 
 public:
   virtual ~Source() {}

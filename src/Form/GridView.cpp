@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,75 +22,43 @@ Copyright_License {
 */
 
 #include "Form/GridView.hpp"
-#include "Screen/Canvas.hpp"
-#include "Screen/Layout.hpp"
-#include "Screen/Key.h"
-#include "Screen/Window.hpp"
 
-#include <assert.h>
-
-GridView::GridView(ContainerWindow &parent, PixelRect rc,
-                   const DialogLook &_look,
-                   const WindowStyle style)
- :look(_look)
+void
+GridView::Create(ContainerWindow &parent, const DialogLook &look,
+                 const PixelRect &rc, const WindowStyle style,
+                 unsigned _column_width, unsigned _row_height)
 {
-  Create(parent, rc, style);
-
-  column_width = Layout::Scale(78);
-  row_height = Layout::Scale(42);
-  horizontal_spacing = Layout::Scale(0);
-  vertical_spacing = Layout::Scale(0);
-  num_columns = (rc.right - rc.left + horizontal_spacing)
-    / (column_width + horizontal_spacing);
-  if (num_columns == 0)
-    num_columns = 1;
-  num_rows = (rc.bottom - rc.top + vertical_spacing)
-    / (row_height + vertical_spacing);
-  if (num_rows == 0)
-    num_rows = 1;
+  column_width = _column_width;
+  row_height = _row_height;
+  PanelControl::Create(parent, look, rc, style);
   current_page = 0;
-}
-
-void
-GridView::SetItems(const TrivialArray<Window *, MAX_ITEMS> &items)
-{
-  (TrivialArray<Window *, MAX_ITEMS> &)this->items = items;
-  RefreshLayout();
-}
-
-void
-GridView::SetNumRows(unsigned _numRows)
-{
-  num_rows = _numRows;
-  RefreshLayout();
 }
 
 void
 GridView::RefreshLayout()
 {
   const PixelRect rc = GetClientRect();
-  unsigned maxColumns = (rc.right - rc.left + horizontal_spacing)
+  const unsigned width = rc.right - rc.left;
+  const unsigned height = rc.bottom - rc.top;
+
+  constexpr unsigned horizontal_spacing = 0;
+  constexpr unsigned vertical_spacing = 0;
+
+  num_columns = (width + horizontal_spacing)
     / (column_width + horizontal_spacing);
-  if (maxColumns == 0)
-    maxColumns = 1;
-
-  unsigned maxRows = (rc.bottom - rc.top + vertical_spacing)
+  if (num_columns == 0)
+    num_columns = 1;
+  num_rows = (height + vertical_spacing)
     / (row_height + vertical_spacing);
-  if (maxRows == 0)
-    maxRows = 1;
-
-  if (maxColumns < num_columns)
-     num_columns = maxColumns;
-
-  if (maxRows < num_rows)
-    num_rows = maxRows;
+  if (num_rows == 0)
+    num_rows = 1;
 
   unsigned pageSize = num_columns * num_rows;
 
   // Center grid in the client area
-  unsigned reminderH = rc.right - rc.left + horizontal_spacing
+  unsigned reminderH = width + horizontal_spacing
     - num_columns * (column_width + horizontal_spacing);
-  unsigned reminderV = rc.bottom - rc.top + vertical_spacing
+  unsigned reminderV = height + vertical_spacing
     - num_rows * (row_height + vertical_spacing);
   unsigned leftOrigin = rc.left + reminderH / 2;
   unsigned topOrigin= rc.top + reminderV / 2;
@@ -192,7 +160,7 @@ GridView::ShowNextPage(Direction direction)
     } else if (focusPos != -1) {
 #ifdef USE_GDI
       HWND oldFocusHwnd = ::GetFocus();
-      if (oldFocusHwnd != NULL)
+      if (oldFocusHwnd != nullptr)
         ::SendMessage(oldFocusHwnd, WM_CANCELMODE, 0, 0);
 #else
       items[focusPos]->ClearFocus();
@@ -288,11 +256,9 @@ GridView::MoveFocus(Direction direction)
   }
 }
 
-#ifdef USE_GDI
 void
-GridView::OnPaint(Canvas &canvas)
+GridView::OnResize(PixelSize new_size)
 {
-  canvas.Clear(look.background_color);
+  PanelControl::OnResize(new_size);
+  RefreshLayout();
 }
-#endif
-

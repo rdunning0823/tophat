@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@ Copyright_License {
 */
 
 #include "Device.hpp"
-#include "Device/Internal.hpp"
 #include "NMEA/Derived.hpp"
 
 #include <stdio.h>
@@ -35,8 +34,8 @@ bool
 FlarmDevice::SendSetting(const char *name, const char *value,
                          OperationEnvironment &env)
 {
-  assert(name != NULL);
-  assert(value != NULL);
+  assert(name != nullptr);
+  assert(value != nullptr);
 
   /* erase the old value from the settings map, because we expect to
      receive the new one now */

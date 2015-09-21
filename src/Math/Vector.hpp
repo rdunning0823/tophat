@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,15 +25,13 @@ Copyright_License {
 #define VECTOR_HPP
 
 #include "Math/fixed.hpp"
+#include "Point2D.hpp"
 #include "Geo/SpeedVector.hpp"
 
-struct Vector {
-  fixed x;
-  fixed y;
-
+struct Vector : Point2D<fixed> {
   Vector() = default;
 
-  constexpr Vector(fixed _x, fixed _y):x(_x), y(_y) {}
+  constexpr Vector(fixed _x, fixed _y):Point2D<fixed>(_x, _y) {}
 
   Vector(Angle bearing, fixed norm) {
     auto sc = bearing.SinCos();

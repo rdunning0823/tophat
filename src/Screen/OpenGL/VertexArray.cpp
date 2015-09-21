@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,31 +24,10 @@ Copyright_License {
 #include "Screen/OpenGL/VertexArray.hpp"
 #include "Math/FastTrig.hpp"
 
-#include <assert.h>
-
-GLCircleVertices::GLCircleVertices(GLvalue center_x, GLvalue center_y,
-                                   GLvalue radius)
-{
-  assert(4096 % SIZE == 0);  // implies: assert(SIZE % 2 == 0)
-  RasterPoint *p = v, *p2 = v + (SIZE/2);
-
-  for (unsigned i = 0; i < SIZE/2; ++i) {
-    int offset_x = ISINETABLE[(i * (4096 / SIZE) + 1024) & 0xfff] * (int)radius / 1024.;
-    int offset_y = ISINETABLE[i * (4096 / SIZE)] * (int)radius / 1024.;
-
-    p->x = center_x + offset_x;
-    p->y = center_y + offset_y;
-    ++p;
-    p2->x = center_x - offset_x;
-    p2->y = center_y - offset_y;
-    ++p2;
-  }
-}
-
 GLDonutVertices::GLDonutVertices(GLvalue center_x, GLvalue center_y,
                                  GLvalue radius_inner, GLvalue radius_outer)
 {
-  assert(4096 % CIRCLE_SIZE == 0);
+  static_assert(4096 % CIRCLE_SIZE == 0, "Wrong CIRCLE_SIZE");
   RasterPoint *p = v, *p2 = v + CIRCLE_SIZE;
 
   for (unsigned i = 0; i < CIRCLE_SIZE/2; ++i) {

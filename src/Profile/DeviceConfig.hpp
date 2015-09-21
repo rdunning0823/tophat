@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,12 +24,15 @@ Copyright_License {
 #ifndef XCSOAR_PROFILE_DEVICE_CONFIG_HPP
 #define XCSOAR_PROFILE_DEVICE_CONFIG_HPP
 
+class ProfileMap;
 struct DeviceConfig;
 
 namespace Profile
 {
-  void GetDeviceConfig(unsigned n, DeviceConfig &config);
-  void SetDeviceConfig(unsigned n, const DeviceConfig &config);
+  void GetDeviceConfig(const ProfileMap &map, unsigned n,
+                       DeviceConfig &config);
+  void SetDeviceConfig(ProfileMap &map, unsigned n,
+                       const DeviceConfig &config);
 };
 
 #endif

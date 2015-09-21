@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -148,32 +148,31 @@ InfoBoxContentBarogram::OnCustomPaint(Canvas &canvas, const PixelRect &rc)
 }
 
 static void
-ShowAnalysis0()
+ShowAnalysisBarograph()
 {
   dlgAnalysisShowModal(UIGlobals::GetMainWindow(),
                        UIGlobals::GetLook(),
                        CommonInterface::Full(), *glide_computer,
-                       protected_task_manager,
                        &airspace_database,
-                       terrain, 0);
+                       terrain, AnalysisPage::BAROGRAPH);
 }
 
 static Widget *
-LoadAnalysis0Panel(unsigned id)
+LoadAnalysisBarographPanel(unsigned id)
 {
-  return new CallbackWidget(ShowAnalysis0);
+  return new CallbackWidget(ShowAnalysisBarograph);
 }
 
 static constexpr
-InfoBoxPanel analysis0_infobox_panels[] = {
-  { N_("Analysis"), LoadAnalysis0Panel },
+InfoBoxPanel analysis_barograph_infobox_panels[] = {
+  { N_("Analysis"), LoadAnalysisBarographPanel },
   { nullptr, nullptr }
 };
 
 const InfoBoxPanel *
 InfoBoxContentBarogram::GetDialogContent()
 {
-  return analysis0_infobox_panels;
+  return analysis_barograph_infobox_panels;
 }
 
 void

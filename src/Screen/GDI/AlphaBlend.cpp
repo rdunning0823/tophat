@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,19 +36,19 @@ AlphaBlend_t alpha_blend_pointer;
 void
 AlphaBlendInit()
 {
-  assert(coredll == NULL);
+  assert(coredll == nullptr);
 
   coredll = new DynamicLibrary(_T("coredll"));
   if (!coredll->IsDefined()) {
     delete coredll;
-    coredll = NULL;
+    coredll = nullptr;
     return;
   }
 
   alpha_blend_pointer = (AlphaBlend_t)coredll->Lookup(_T("AlphaBlend"));
-  if (alpha_blend_pointer == NULL) {
+  if (alpha_blend_pointer == nullptr) {
     delete coredll;
-    coredll = NULL;
+    coredll = nullptr;
   }
 }
 

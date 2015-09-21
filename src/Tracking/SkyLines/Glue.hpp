@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ Copyright_License {
 
 namespace SkyLinesTracking {
   struct Settings;
+  class Queue;
 
   class Glue {
     Client client;
@@ -38,10 +39,16 @@ namespace SkyLinesTracking {
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
     GPSClock traffic_clock;
     bool traffic_enabled;
+    bool near_traffic_enabled;
 #endif
+
+    bool roaming;
+
+    Queue *queue;
 
   public:
     Glue();
+    ~Glue();
 
 #ifdef HAVE_SKYLINES_TRACKING_HANDLER
     void SetHandler(Handler *handler) {
@@ -53,9 +60,17 @@ namespace SkyLinesTracking {
 
     void Tick(const NMEAInfo &basic);
 
+#ifdef HAVE_SKYLINES_TRACKING_HANDLER
     void RequestUserName(uint32_t user_id) {
       client.SendUserNameRequest(user_id);
     }
+#endif
+
+  private:
+    gcc_pure
+    bool IsConnected() const;
+
+    void SendFixes(const NMEAInfo &basic);
   };
 }
 

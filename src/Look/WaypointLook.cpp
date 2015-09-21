@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -40,15 +40,24 @@ WaypointLook::Initialise(const WaypointRendererSettings &settings,
   power_plant_icon.LoadResource(IDB_POWER_PLANT, IDB_POWER_PLANT_HD, IDB_POWER_PLANT_HD2);
   obstacle_icon.LoadResource(IDB_OBSTACLE, IDB_OBSTACLE_HD, IDB_OBSTACLE_HD2);
   thermal_hotspot_icon.LoadResource(IDB_THERMAL_HOTSPOT, IDB_THERMAL_HOTSPOT_HD, IDB_THERMAL_HOTSPOT_HD2);
+  marker_icon.LoadResource(IDB_MARK, IDB_MARK_HD, IDB_MARK_HD2);
+  reachable_brush.Create(COLOR_GREEN);
+  terrain_unreachable_brush.Create(LightColor(COLOR_RED));
+  unreachable_brush.Create(COLOR_RED);
+  white_brush.Create(COLOR_WHITE);
+  light_gray_brush.Create(COLOR_LIGHT_GRAY);
+  magenta_brush.Create(COLOR_MAGENTA);
+  orange_brush.Create(COLOR_ORANGE);
 
-  reachable_brush.Set(COLOR_GREEN);
-  terrain_unreachable_brush.Set(LightColor(COLOR_RED));
-  unreachable_brush.Set(COLOR_RED);
-  white_brush.Set(COLOR_WHITE);
-  light_gray_brush.Set(COLOR_LIGHT_GRAY);
-  magenta_brush.Set(COLOR_MAGENTA);
-  orange_brush.Set(COLOR_ORANGE);
+  Reinitialise(settings);
 
+  font = &_font;
+  bold_font = &_bold_font;
+}
+
+void
+WaypointLook::Reinitialise(const WaypointRendererSettings &settings)
+{
   switch (settings.landable_style) {
   case WaypointRendererSettings::LandableStyle::PURPLE_CIRCLE:
     airport_reachable_icon.LoadResource(IDB_REACHABLE, IDB_REACHABLE_HD, IDB_REACHABLE_HD2);
@@ -89,7 +98,4 @@ WaypointLook::Initialise(const WaypointRendererSettings &settings,
                                     IDB_OUTFIELD_UNREACHABLE2_HD, IDB_OUTFIELD_UNREACHABLE2_HD2);
     break;
   }
-
-  font = &_font;
-  bold_font = &_bold_font;
 }

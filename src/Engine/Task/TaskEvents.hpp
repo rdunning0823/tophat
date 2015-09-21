@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,15 +23,17 @@
 #ifndef TASKEVENTS_HPP
 #define TASKEVENTS_HPP
 
+#include "Compiler.h"
+
 class TaskWaypoint;
 struct Waypoint;
 
 /**
  * Class used to provide feedback based on events that can be triggered
  * by the task system.  Typically this would be specialised by the client
- * to hook up to end-user code. 
+ * to hook up to end-user code.
  */
-class TaskEvents 
+class TaskEvents
 {
 public:
   /**
@@ -39,14 +41,14 @@ public:
    *
    * @param tp The turnpoint entered
    */
-  virtual void EnterTransition(const TaskWaypoint& tp) {}
+  virtual void EnterTransition(gcc_unused const TaskWaypoint& tp) {}
 
   /**
    * Called when the aircraft exits a turnpoint observation zone
    *
    * @param tp The turnpoint the aircraft has exited
    */
-  virtual void ExitTransition(const TaskWaypoint &tp) {}
+  virtual void ExitTransition(gcc_unused const TaskWaypoint &tp) {}
 
   /**
    * Called when auto-advance has changed the active
@@ -55,15 +57,8 @@ public:
    * @param tp The turnpoint that is now active after auto-advance
    * @param i The task sequence number after auto-advance
    */
-  virtual void ActiveAdvanced(const TaskWaypoint &tp, const int i) {}
-  
-  /**
-   * Called when a task is invalid due to improper construction
-   * (e.g. no finish point etc)
-   *
-   * @param error Text of error message
-   */
-  virtual void ConstructionError(const char* error) {}
+  virtual void ActiveAdvanced(gcc_unused const TaskWaypoint &tp,
+                              gcc_unused const int i) {}
 
   /**
    * Called when a task point can be advanced but the advance needs
@@ -71,7 +66,7 @@ public:
    *
    * @param tp The taskpoint waiting to be armed
    */
-  virtual void RequestArm(const TaskWaypoint &tp) {}
+  virtual void RequestArm(gcc_unused const TaskWaypoint &tp) {}
 
   /**
    * Called when orderd task has started

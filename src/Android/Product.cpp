@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,9 +24,9 @@ Copyright_License {
 #include "Product.hpp"
 #include "Main.hpp"
 #include "NativeView.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <assert.h>
-#include <string.h>
 
 bool has_cursor_keys;
 
@@ -39,9 +39,9 @@ IsGalaxyTab22()
 {
   assert(native_view);
 
-  return native_view->GetAPILevel() == 8 &&
-    (strcmp(native_view->GetProduct(), "GT-P1000") == 0 ||
-     strcmp(native_view->GetProduct(), "GT-P1010") == 0);
+  return android_api_level == 8 &&
+    (StringIsEqual(native_view->GetProduct(), "GT-P1000") ||
+     StringIsEqual(native_view->GetProduct(), "GT-P1010"));
 }
 
 #endif

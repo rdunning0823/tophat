@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Max Kellermann <max@duempel.org>,
+ * Copyright (C) 2011-2015 Max Kellermann <max@duempel.org>,
  *                    Tobias Bieniek <Tobias.Bieniek@gmx.de>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,16 +35,35 @@
 
 #include <stdint.h>
 
-#ifdef __linux__
-#include <features.h>
-
-#if defined(ANDROID) || (defined(__GLIBC__) && ((__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 9) || __GLIBC__ >= 3))
-/* the byte swap macros were added in glibc 2.9 */
-#define HAVE_BYTESWAP_H
-#include <byteswap.h>
-#include <endian.h>
+#if defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
+/* well-known little-endian */
+#  define IS_LITTLE_ENDIAN true
+#  define IS_BIG_ENDIAN false
+#elif defined(__MIPSEB__)
+/* well-known big-endian */
+#  define IS_LITTLE_ENDIAN false
+#  define IS_BIG_ENDIAN true
+#elif defined(__APPLE__)
+/* compile-time check for MacOS */
+#  include <machine/endian.h>
+#  if BYTE_ORDER == LITTLE_ENDIAN
+#    define IS_LITTLE_ENDIAN true
+#    define IS_BIG_ENDIAN false
+#  else
+#    define IS_LITTLE_ENDIAN false
+#    define IS_BIG_ENDIAN true
+#  endif
+#else
+/* generic compile-time check */
+#  include <endian.h>
+#  if __BYTE_ORDER == __LITTLE_ENDIAN
+#    define IS_LITTLE_ENDIAN true
+#    define IS_BIG_ENDIAN false
+#  else
+#    define IS_LITTLE_ENDIAN false
+#    define IS_BIG_ENDIAN true
+#  endif
 #endif
-#endif /* !__linux__ */
 
 /* x86 always allows unaligned access */
 #if defined(__i386__) || defined(__x86_64__) || \
@@ -60,279 +79,174 @@
 #endif
 #endif
 
-gcc_const
-static inline uint16_t
-ByteSwap16(uint16_t value)
+static inline constexpr bool
+IsLittleEndian()
 {
-#ifdef HAVE_BYTESWAP_H
-  return bswap_16(value);
-#else
-  return (value >> 8) | (value << 8);
-#endif
+  return IS_LITTLE_ENDIAN;
 }
 
-gcc_const
-static inline uint32_t
-ByteSwap32(uint32_t value)
+static inline constexpr bool
+IsBigEndian()
 {
-#ifdef HAVE_BYTESWAP_H
-  return bswap_32(value);
-#else
+  return IS_BIG_ENDIAN;
+}
+
+static inline constexpr uint16_t
+GenericByteSwap16(uint16_t value)
+{
+  return (value >> 8) | (value << 8);
+}
+
+static inline constexpr uint32_t
+GenericByteSwap32(uint32_t value)
+{
   return (value >> 24) | ((value >> 8) & 0x0000ff00) |
     ((value << 8) & 0x00ff0000) | (value << 24);
+}
+
+static inline constexpr uint64_t
+GenericByteSwap64(uint64_t value)
+{
+  return uint64_t(GenericByteSwap32(uint32_t(value >> 32)))
+    | (uint64_t(GenericByteSwap32(value)) << 32);
+}
+
+static inline constexpr uint16_t
+ByteSwap16(uint16_t value)
+{
+#if CLANG_OR_GCC_VERSION(4,8)
+  return __builtin_bswap16(value);
+#else
+  return GenericByteSwap16(value);
 #endif
 }
 
-gcc_const
-static inline uint64_t
+static inline constexpr uint32_t
+ByteSwap32(uint32_t value)
+{
+#if CLANG_OR_GCC_VERSION(4,3)
+  return __builtin_bswap32(value);
+#else
+  return GenericByteSwap32(value);
+#endif
+}
+
+static inline constexpr uint64_t
 ByteSwap64(uint64_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return bswap_64(value);
+#if CLANG_OR_GCC_VERSION(4,3)
+  return __builtin_bswap64(value);
 #else
-  return uint64_t(ByteSwap32(uint32_t(value >> 32)))
-    | (uint64_t(ByteSwap32(value)) << 32);
+  return GenericByteSwap64(value);
 #endif
 }
 
 /**
  * Converts a 16bit value from big endian to the system's byte order
  */
-gcc_const
-static inline uint16_t
+static inline constexpr uint16_t
 FromBE16(uint16_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-#ifdef __BIONIC__
-  return betoh16(value);
-#else
-  return be16toh(value);
-#endif
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return ByteSwap16(value);
-#else
-  /* generic big-endian */
-  return value;
-#endif
+  return IsBigEndian() ? value : ByteSwap16(value);
 }
 
 /**
  * Converts a 32bit value from big endian to the system's byte order
  */
-gcc_const
-static inline uint32_t
+static inline constexpr uint32_t
 FromBE32(uint32_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-#ifdef __BIONIC__
-  return betoh32(value);
-#else
-  return be32toh(value);
-#endif
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return ByteSwap32(value);
-#else
-  /* generic big-endian */
-  return value;
-#endif
+  return IsBigEndian() ? value : ByteSwap32(value);
 }
 
 /**
  * Converts a 64bit value from big endian to the system's byte order
  */
-gcc_const
-static inline uint64_t
+static inline constexpr uint64_t
 FromBE64(uint64_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-#ifdef __BIONIC__
-  return betoh64(value);
-#else
-  return be64toh(value);
-#endif
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return ByteSwap64(value);
-#else
-  /* generic big-endian */
-  return value;
-#endif
+  return IsBigEndian() ? value : ByteSwap64(value);
 }
 
 /**
  * Converts a 16bit value from little endian to the system's byte order
  */
-gcc_const
-static inline uint16_t
+static inline constexpr uint16_t
 FromLE16(uint16_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-#ifdef __BIONIC__
-  return letoh16(value);
-#else
-  return le16toh(value);
-#endif
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return value;
-#else
-  /* generic big-endian */
-  return ByteSwap16(value);
-#endif
+  return IsLittleEndian() ? value : ByteSwap16(value);
 }
 
 /**
  * Converts a 32bit value from little endian to the system's byte order
  */
-gcc_const
-static inline uint32_t
+static inline constexpr uint32_t
 FromLE32(uint32_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-#ifdef __BIONIC__
-  return letoh32(value);
-#else
-  return le32toh(value);
-#endif
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return value;
-#else
-  /* generic big-endian */
-  return ByteSwap32(value);
-#endif
+  return IsLittleEndian() ? value : ByteSwap32(value);
 }
 
 /**
  * Converts a 64bit value from little endian to the system's byte order
  */
-gcc_const
-static inline uint64_t
+static inline constexpr uint64_t
 FromLE64(uint64_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-#ifdef __BIONIC__
-  return letoh64(value);
-#else
-  return le64toh(value);
-#endif
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return value;
-#else
-  /* generic big-endian */
-  return ByteSwap64(value);
-#endif
+  return IsLittleEndian() ? value : ByteSwap64(value);
 }
 
 /**
  * Converts a 16bit value from the system's byte order to big endian
  */
-gcc_const
-static inline uint16_t
+static inline constexpr uint16_t
 ToBE16(uint16_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return htobe16(value);
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return ByteSwap16(value);
-#else
-  /* generic big-endian */
-  return value;
-#endif
+  return IsBigEndian() ? value : ByteSwap16(value);
 }
 
 /**
  * Converts a 32bit value from the system's byte order to big endian
  */
-gcc_const
-static inline uint32_t
+static inline constexpr uint32_t
 ToBE32(uint32_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return htobe32(value);
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return ByteSwap32(value);
-#else
-  /* generic big-endian */
-  return value;
-#endif
+  return IsBigEndian() ? value : ByteSwap32(value);
 }
 
 /**
  * Converts a 64bit value from the system's byte order to big endian
  */
-gcc_const
-static inline uint64_t
+static inline constexpr uint64_t
 ToBE64(uint64_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return htobe64(value);
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return ByteSwap64(value);
-#else
-  /* generic big-endian */
-  return value;
-#endif
+  return IsBigEndian() ? value : ByteSwap64(value);
 }
 
 /**
  * Converts a 16bit value from the system's byte order to little endian
  */
-gcc_const
-static inline uint16_t
+static inline constexpr uint16_t
 ToLE16(uint16_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return htole16(value);
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return value;
-#else
-  /* generic big-endian */
-  return ByteSwap16(value);
-#endif
+  return IsLittleEndian() ? value : ByteSwap16(value);
 }
 
 /**
  * Converts a 32bit value from the system's byte order to little endian
  */
-gcc_const
-static inline uint32_t
+static inline constexpr uint32_t
 ToLE32(uint32_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return htole32(value);
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return value;
-#else
-  /* generic big-endian */
-  return ByteSwap32(value);
-#endif
+  return IsLittleEndian() ? value : ByteSwap32(value);
 }
 
 /**
  * Converts a 64bit value from the system's byte order to little endian
  */
-gcc_const
-static inline uint64_t
+static inline constexpr uint64_t
 ToLE64(uint64_t value)
 {
-#ifdef HAVE_BYTESWAP_H
-  return htole64(value);
-#elif defined(__i386__) || defined(__x86_64__) || defined(__ARMEL__)
-  /* generic little-endian */
-  return value;
-#else
-  /* generic big-endian */
-  return ByteSwap64(value);
-#endif
+  return IsLittleEndian() ? value : ByteSwap64(value);
 }
 
 gcc_pure

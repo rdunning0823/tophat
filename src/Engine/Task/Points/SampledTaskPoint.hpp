@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@
 #include "Geo/SearchPointVector.hpp"
 #include "Compiler.h"
 
-class TaskProjection;
+class FlatProjection;
 class OZBoundary;
 struct GeoPoint;
 struct AircraftState;
@@ -89,6 +89,8 @@ public:
    */
   gcc_pure
   const GeoPoint &GetLocationMax() const {
+    assert(search_max.IsValid());
+
     return search_max.GetLocation();
   };
 
@@ -99,6 +101,8 @@ public:
    * @return Location of minimum distance node
    */
   const GeoPoint &GetLocationMin() const {
+    assert(search_min.IsValid());
+
     return search_min.GetLocation();
   };
 
@@ -111,7 +115,7 @@ public:
    * Construct boundary polygon from internal representation of observation zone.
    * Also updates projection.
    */
-  void UpdateOZ(const TaskProjection &projection, const OZBoundary &boundary);
+  void UpdateOZ(const FlatProjection &projection, const OZBoundary &boundary);
 
 protected:
   /**
@@ -121,7 +125,7 @@ protected:
    * @return True if internal state changed
    */
   bool AddInsideSample(const AircraftState &state,
-                       const TaskProjection &projection);
+                       const FlatProjection &projection);
 
 public:
   /**
@@ -149,6 +153,8 @@ public:
    * Retrieve boundary points polygon
    */
   const SearchPointVector &GetBoundaryPoints() const {
+    assert(!boundary_points.empty());
+
     return boundary_points;
   }
 
@@ -175,14 +181,14 @@ protected:
    * last sample prior to crossing the start.
    */
   void ClearSampleAllButLast(const AircraftState &state,
-                             const TaskProjection &projection);
+                             const FlatProjection &projection);
 
 private:
   /**
    * Re-project boundary and interior sample polygons.
    * Must be called if task_projection changes.
    */
-  void UpdateProjection(const TaskProjection &projection);
+  void UpdateProjection(const FlatProjection &projection);
 
 public:
   /**

@@ -27,11 +27,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_RADIX_TREE_HPP
-#define XCSOAR_RADIX_TREE_HPP
+#ifndef RADIX_TREE_HPP
+#define RADIX_TREE_HPP
 
-#include "Util/NonCopyable.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "StringUtil.hpp"
 #include "tstring.hpp"
 
@@ -187,7 +186,7 @@ class RadixTree {
    * property of radix trees).  When inserting a node starting with
    * the same character, the node has to be splitted.
    */
-  struct Node : private NonCopyable {
+  struct Node {
     StaticString<8> label;
     Node *next_sibling, *children;
     LeafList leaves;
@@ -196,6 +195,9 @@ class RadixTree {
     Node(const TCHAR *_label)
       :label(_label),
        next_sibling(nullptr), children(nullptr) {}
+
+    Node(const Node &) = delete;
+
     ~Node() {
       delete next_sibling;
       delete children;
@@ -208,10 +210,10 @@ class RadixTree {
      */
     Node *CreateLeaf(const TCHAR *label, const T &value) const {
       Node *top = new Node(label), *bottom = top;
-      while (_tcslen(label) >= Node::label.MAX_SIZE) {
+      while (_tcslen(label) >= Node::label.CAPACITY) {
         /* label too long for the Node's StaticString, create another
            child Node */
-        label += Node::label.MAX_SIZE - 1;
+        label += Node::label.CAPACITY - 1;
         Node *node = new Node(label);
         bottom->children = node;
         bottom = node;

@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -128,6 +128,10 @@ TestTime()
   ok1(BrokenTime::FromSecondOfDay(44130) == BrokenTime(12, 15, 30));
   ok1(BrokenTime::FromSecondOfDayChecked(130530) == BrokenTime(12, 15, 30));
 
+  ok1(BrokenTime(12, 15, 30).GetMinuteOfDay() == 735);
+  ok1(BrokenTime::FromMinuteOfDay(735) == BrokenTime(12, 15));
+  ok1(BrokenTime::FromMinuteOfDayChecked(735) == BrokenTime(12, 15));
+
   ok1(BrokenTime(12, 15) + 120 == BrokenTime(12, 17));
   ok1(BrokenTime(23, 59) + 120 == BrokenTime(0, 1));
   ok1(BrokenTime(23, 59) + 120 == BrokenTime(0, 1));
@@ -179,7 +183,7 @@ TestDateTime()
 
 int main(int argc, char **argv)
 {
-  plan_tests(102);
+  plan_tests(105);
 
   TestDate();
   TestTime();

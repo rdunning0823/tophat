@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,17 +37,21 @@ Copyright_License {
 #include "Util/UTF8.hpp"
 #endif
 
+#ifdef UNICODE
+#include "Util/ConvertString.hpp"
+#endif
+
 #include <algorithm>
 #include <assert.h>
 #include <string.h>
 #include <winuser.h>
 
-class SDLRasterCanvas : public RasterCanvas<SDLPixelTraits> {
+class SDLRasterCanvas : public RasterCanvas<ActivePixelTraits> {
 public:
-  SDLRasterCanvas(WritableImageBuffer<SDLPixelTraits> buffer)
-    :RasterCanvas<SDLPixelTraits>(buffer) {}
+  SDLRasterCanvas(WritableImageBuffer<ActivePixelTraits> buffer)
+    :RasterCanvas<ActivePixelTraits>(buffer) {}
 
-  static constexpr SDLPixelTraits::color_type Import(Color color) {
+  static constexpr ActivePixelTraits::color_type Import(Color color) {
 #ifdef GREYSCALE
     return Luminosity8(color.GetLuminosity());
 #else
@@ -106,7 +110,7 @@ void
 Canvas::DrawPolyline(const RasterPoint *p, unsigned cPoints)
 {
   SDLRasterCanvas canvas(buffer);
-  ::DrawPolyline(canvas, SDLPixelTraits(), pen,
+  ::DrawPolyline(canvas, ActivePixelTraits(), pen,
                  p, cPoints, false);
 }
 
@@ -129,11 +133,11 @@ Canvas::DrawPolygon(const RasterPoint *lppt, unsigned cPoints)
       canvas.FillPolygon(points, cPoints, color);
     else
       canvas.FillPolygon(points, cPoints, color,
-                         AlphaPixelOperations<SDLPixelTraits>(brush.GetColor().Alpha()));
+                         AlphaPixelOperations<ActivePixelTraits>(brush.GetColor().Alpha()));
   }
 
   if (IsPenOverBrush())
-    ::DrawPolyline(canvas, SDLPixelTraits(), pen,
+    ::DrawPolyline(canvas, ActivePixelTraits(), pen,
                    lppt, cPoints, true);
 }
 
@@ -170,7 +174,7 @@ Canvas::DrawCircle(int x, int y, unsigned radius)
       canvas.FillCircle(x, y, radius, color);
     else
       canvas.FillCircle(x, y, radius, color,
-                        AlphaPixelOperations<SDLPixelTraits>(brush.GetColor().Alpha()));
+                        AlphaPixelOperations<ActivePixelTraits>(brush.GetColor().Alpha()));
   }
 
   if (IsPenOverBrush()) {
@@ -216,22 +220,25 @@ Canvas::DrawKeyhole(int x, int y,
 const PixelSize
 Canvas::CalcTextSize(const TCHAR *text) const
 {
-  assert(text != NULL);
-#ifndef UNICODE
+  assert(text != nullptr);
+#ifdef UNICODE
+  const WideToUTF8Converter text2(text);
+#else
+  const char* text2 = text;
   assert(ValidateUTF8(text));
 #endif
 
   PixelSize size = { 0, 0 };
 
-  if (font == NULL)
+  if (font == nullptr)
     return size;
 
   /* see if the TextCache can handle this request */
-  size = TextCache::LookupSize(*font, text);
+  size = TextCache::LookupSize(*font, text2);
   if (size.cy > 0)
     return size;
 
-  return TextCache::GetSize(*font, text);
+  return TextCache::GetSize(*font, text2);
 }
 
 static TextCache::Result
@@ -243,7 +250,11 @@ RenderText(const Font *font, const TCHAR *text)
   assert(font->IsDefined());
 
 #ifdef USE_FREETYPE
+#ifdef UNICODE
+  return TextCache::Get(*font, WideToUTF8Converter(text));
+#else
   return TextCache::Get(*font, text);
+#endif
 #endif
 }
 
@@ -290,7 +301,7 @@ Canvas::DrawClippedText(int x, int y, unsigned max_width, const TCHAR *text)
 void
 Canvas::DrawText(int x, int y, const TCHAR *text)
 {
-  assert(text != NULL);
+  assert(text != nullptr);
 #ifndef UNICODE
   assert(ValidateUTF8(text));
 #endif
@@ -302,14 +313,14 @@ Canvas::DrawText(int x, int y, const TCHAR *text)
   SDLRasterCanvas canvas(buffer);
 
   if (background_mode == OPAQUE) {
-    OpaqueAlphaPixelOperations<SDLPixelTraits, GreyscalePixelTraits>
+    OpaqueAlphaPixelOperations<ActivePixelTraits, GreyscalePixelTraits>
       opaque(canvas.Import(background_color), canvas.Import(text_color));
     canvas.CopyRectangle<decltype(opaque), GreyscalePixelTraits>
       (x, y, s.width, s.height,
        GreyscalePixelTraits::const_pointer_type(s.data),
        s.pitch, opaque);
   } else {
-    ColoredAlphaPixelOperations<SDLPixelTraits, GreyscalePixelTraits>
+    ColoredAlphaPixelOperations<ActivePixelTraits, GreyscalePixelTraits>
       transparent(canvas.Import(text_color));
     canvas.CopyRectangle<decltype(transparent), GreyscalePixelTraits>
       (x, y, s.width, s.height,
@@ -321,7 +332,7 @@ Canvas::DrawText(int x, int y, const TCHAR *text)
 void
 Canvas::DrawTransparentText(int x, int y, const TCHAR *text)
 {
-  assert(text != NULL);
+  assert(text != nullptr);
 #ifndef UNICODE
   assert(ValidateUTF8(text));
 #endif
@@ -331,7 +342,7 @@ Canvas::DrawTransparentText(int x, int y, const TCHAR *text)
     return;
 
   SDLRasterCanvas canvas(buffer);
-  ColoredAlphaPixelOperations<SDLPixelTraits, GreyscalePixelTraits>
+  ColoredAlphaPixelOperations<ActivePixelTraits, GreyscalePixelTraits>
     transparent(canvas.Import(text_color));
   canvas.CopyRectangle<decltype(transparent), GreyscalePixelTraits>
     (x, y, s.width, s.height,
@@ -414,7 +425,7 @@ Canvas::CopyTransparentWhite(int dest_x, int dest_y,
     return;
 
   SDLRasterCanvas canvas(buffer);
-  TransparentPixelOperations<SDLPixelTraits> operations(canvas.Import(COLOR_WHITE));
+  TransparentPixelOperations<ActivePixelTraits> operations(canvas.Import(COLOR_WHITE));
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.buffer.At(src_x, src_y), src.buffer.pitch,
                        operations);
@@ -432,7 +443,7 @@ Canvas::StretchNot(const Bitmap &_src)
   const unsigned dest_height = GetHeight();
 
   SDLRasterCanvas canvas(buffer);
-  BitNotPixelOperations<SDLPixelTraits> operations;
+  BitNotPixelOperations<ActivePixelTraits> operations;
 
   canvas.ScaleRectangle(dest_x, dest_y, dest_width, dest_height,
                         src.At(src_x, src_y), src.pitch, src.width, src.height,
@@ -521,7 +532,7 @@ Canvas::StretchMono(int dest_x, int dest_y,
 
   SDLRasterCanvas canvas(buffer);
 
-  OpaqueTextPixelOperations<SDLPixelTraits, GreyscalePixelTraits>
+  OpaqueTextPixelOperations<ActivePixelTraits, GreyscalePixelTraits>
     opaque(canvas.Import(fg_color), canvas.Import(bg_color));
 
   canvas.ScaleRectangle<decltype(opaque), GreyscalePixelTraits>
@@ -540,7 +551,7 @@ Canvas::CopyNot(int dest_x, int dest_y,
 
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.At(src_x, src_y), src.pitch,
-                       BitNotPixelOperations<SDLPixelTraits>());
+                       BitNotPixelOperations<ActivePixelTraits>());
 }
 
 void
@@ -552,7 +563,7 @@ Canvas::CopyOr(int dest_x, int dest_y,
 
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.At(src_x, src_y), src.pitch,
-                       BitOrPixelOperations<SDLPixelTraits>());
+                       BitOrPixelOperations<ActivePixelTraits>());
 }
 
 void
@@ -564,7 +575,7 @@ Canvas::CopyNotOr(int dest_x, int dest_y,
 
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.At(src_x, src_y), src.pitch,
-                       BitNotOrPixelOperations<SDLPixelTraits>());
+                       BitNotOrPixelOperations<ActivePixelTraits>());
 }
 
 void
@@ -587,7 +598,7 @@ Canvas::CopyAnd(int dest_x, int dest_y,
 
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.At(src_x, src_y), src.pitch,
-                       BitAndPixelOperations<SDLPixelTraits>());
+                       BitAndPixelOperations<ActivePixelTraits>());
 }
 
 void
@@ -652,7 +663,7 @@ Canvas::AlphaBlend(int dest_x, int dest_y,
 
   SDLRasterCanvas canvas(buffer);
 
-  AlphaPixelOperations<SDLPixelTraits> operations(alpha);
+  AlphaPixelOperations<ActivePixelTraits> operations(alpha);
 
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.At(src_x, src_y), src.pitch,
@@ -685,9 +696,9 @@ Canvas::AlphaBlendNotWhite(int dest_x, int dest_y,
 
   SDLRasterCanvas canvas(buffer);
 
-  NotWhiteCondition<SDLPixelTraits> c;
-  NotWhiteAlphaPixelOperations<SDLPixelTraits> operations(c,
-                                                          PortableAlphaPixelOperations<SDLPixelTraits>(alpha));
+  NotWhiteCondition<ActivePixelTraits> c;
+  NotWhiteAlphaPixelOperations<ActivePixelTraits> operations(c,
+                                                             PortableAlphaPixelOperations<ActivePixelTraits>(alpha));
 
   canvas.CopyRectangle(dest_x, dest_y, dest_width, dest_height,
                        src.At(src_x, src_y), src.pitch,

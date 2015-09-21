@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,8 +25,7 @@
 #include "harness_airspace.hpp"
 #include "test_debug.hpp"
 #include "Airspace/AirspaceIntersectionVisitor.hpp"
-#include "Airspace/AirspaceNearestSort.hpp"
-#include "Airspace/AirspaceSoonestSort.hpp"
+#include "Airspace/SoonestAirspace.hpp"
 #include "Geo/GeoVector.hpp"
 #include "Formatter/AirspaceFormatter.hpp"
 #include "OS/FileUtil.hpp"
@@ -204,13 +203,13 @@ public:
 
 class AirspaceVisitorClosest final : public AirspaceVisitor {
   std::ofstream *fout;
-  const TaskProjection &projection;
+  const FlatProjection &projection;
   const AircraftState& state;
   const AirspaceAircraftPerformance &m_perf;
 
 public:
   AirspaceVisitorClosest(const char* fname,
-                         const TaskProjection &_projection,
+                         const FlatProjection &_projection,
                          const AircraftState &_state,
                          const AirspaceAircraftPerformance &perf):
     fout(NULL),
@@ -272,13 +271,6 @@ void scan_airspaces(const AircraftState state,
   const fixed range(20000.0);
 
   Directory::Create(_T("output/results"));
-  AirspaceVisitorPrint pvn("output/results/res-bb-nearest.txt",
-                           do_report);
-  const Airspace *nearest = airspaces.FindNearest(state.location);
-  if (nearest != nullptr) {
-    AirspaceVisitor &v = pvn;
-    v.Visit(*nearest);
-  }
 
   {
     AirspaceVisitorPrint pvisitor("output/results/res-bb-range.txt",
@@ -309,21 +301,8 @@ void scan_airspaces(const AircraftState state,
   }
 
   {
-    AirspaceNearestSort ans(state.location);
-    const AbstractAirspace* as = ans.find_nearest(airspaces, range);
-    if (do_report) {
-      std::ofstream fout("output/results/res-bb-sortednearest.txt");
-      if (as) {
-        fout << *as << "\n";
-      } else {
-        fout << "# no nearest found\n";
-      }
-    }
-  }
-
-  {
-    AirspaceSoonestSort ans(state, perf);
-    const AbstractAirspace* as = ans.find_nearest(airspaces);
+    const auto *as = FindSoonestAirspace(airspaces, state, perf,
+                                         AirspacePredicateTrue());
     if (do_report) {
       std::ofstream fout("output/results/res-bb-sortedsoonest.txt");
       if (as) {

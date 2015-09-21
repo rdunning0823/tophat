@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -43,6 +43,9 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Screen/Canvas.hpp"
 #include "Math/Angle.hpp"
+#include "Look/Look.hpp"
+#include "Widget/CallbackWidget.hpp"
+#include "Renderer/NextArrowRenderer.hpp"
 
 #include <tchar.h>
 #include <stdio.h>
@@ -477,6 +480,15 @@ UpdateInfoBoxFinalAltitudeDiff(InfoBoxData &data)
 }
 
 void
+UpdateInfoBoxFinalMC0AltitudeDiff(InfoBoxData &data)
+{
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+
+  SetValueFromAltDiff(data, task_stats,
+                      task_stats.total.solution_mc0);
+}
+
+void
 UpdateInfoBoxFinalAltitudeRequire(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
@@ -810,14 +822,14 @@ UpdateInfoBoxTaskAASpeed(InfoBoxData &data)
   const TaskStats &task_stats = calculated.ordered_task_stats;
   const CommonStats &common_stats = calculated.common_stats;
 
-  if (!task_stats.has_targets || !positive(common_stats.aat_speed_remaining)) {
+  if (!task_stats.has_targets || !positive(common_stats.aat_speed_target)) {
     data.SetInvalid();
     return;
   }
 
   // Set Value
   data.SetValue(_T("%2.0f"),
-                    Units::ToUserTaskSpeed(common_stats.aat_speed_remaining));
+                    Units::ToUserTaskSpeed(common_stats.aat_speed_target));
 
   // Set Unit
   data.SetValueUnit(Units::current.task_speed_unit);
@@ -1060,4 +1072,67 @@ UpdateInfoBoxStartOpenArrival(InfoBoxData &data)
     data.SetValueColor(2);
     data.SetComment(_("Waiting"));
   }
+}
+
+/*
+ * The NextArrow infobox contains an arrow pointing at the next waypoint.
+ * This function updates the text fields in the infobox.
+ */
+void
+InfoBoxContentNextArrow::Update(InfoBoxData &data)
+{
+  // use proper non-terminal next task stats
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+  const GeoVector &vector_remaining = task_stats.current_leg.vector_remaining;
+
+  // Check if data is valid
+  bool distance_valid = task_stats.task_valid && vector_remaining.IsValid();
+  bool angle_valid = distance_valid && basic.track_available;
+
+  // Set title. Use waypoint name if available.
+  const Waypoint *way_point = protected_task_manager != nullptr
+    ? protected_task_manager->GetActiveWaypoint()
+    : nullptr;
+  if (!way_point)
+    data.SetTitle(_("Next arrow"));
+  else
+    data.SetTitle(way_point->name.c_str());
+
+  // Set value
+  if (angle_valid)
+    data.SetCustom(); // Enables OnCustomPaint
+  else
+    data.SetInvalid();
+
+  // Set comment
+  if (distance_valid)
+    data.SetCommentFromDistance(vector_remaining.distance);
+  else
+    data.SetCommentInvalid();
+}
+
+/*
+ * The NextArrow infobox contains an arrow pointing at the next waypoint.
+ * This function renders the arrow.
+ */
+void
+InfoBoxContentNextArrow::OnCustomPaint(Canvas &canvas, const PixelRect &rc)
+{
+  // use proper non-terminal next task stats
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+  const GeoVector &vector_remaining = task_stats.current_leg.vector_remaining;
+
+  // We exit immediately if this function is called when all data isn't
+  // available. This can happen e.g. while state is being changed.
+  if (!task_stats.task_valid
+      || !vector_remaining.IsValid()
+      || !basic.track_available)
+    return;
+
+  Angle bd = vector_remaining.bearing - basic.track;
+
+  NextArrowRenderer renderer(UIGlobals::GetLook().wind_arrow_info_box);
+  renderer.DrawArrow(canvas, rc, bd);
 }

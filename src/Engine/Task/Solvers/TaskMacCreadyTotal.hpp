@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -67,15 +67,15 @@ public:
 
 private:
   /* virtual methods from class TaskMacCready */
-  virtual fixed get_min_height(const AircraftState &aircraft) const override {
+  fixed get_min_height(gcc_unused const AircraftState &aircraft) const override {
     return fixed(0);
   }
 
-  virtual GlideResult SolvePoint(const TaskPoint &tp,
-                                 const AircraftState &aircraft,
-                                 fixed minH) const override;
+  GlideResult SolvePoint(const TaskPoint &tp,
+                         const AircraftState &aircraft,
+                         fixed minH) const override;
 
-  virtual AircraftState get_aircraft_start(const AircraftState &aircraft) const override;
+  AircraftState get_aircraft_start(const AircraftState &aircraft) const override;
 };
 
 

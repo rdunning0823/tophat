@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,13 +25,14 @@ Copyright_License {
 #define TOPOGRAPHY_FILE_RENDERER_HPP
 
 #include "Screen/Pen.hpp"
-#include "Screen/Brush.hpp"
 #include "Screen/Icon.hpp"
-#include "Util/NonCopyable.hpp"
 #include "Util/Serial.hpp"
 #include "Geo/GeoBounds.hpp"
 
-#ifndef ENABLE_OPENGL
+#ifdef ENABLE_OPENGL
+#include "Screen/OpenGL/Surface.hpp"
+#else
+#include "Screen/Brush.hpp"
 #include "Topography/ShapeRenderer.hpp"
 #endif
 
@@ -39,23 +40,34 @@ Copyright_License {
 
 class TopographyFile;
 class Canvas;
+class GLFallbackArrayBuffer;
 class WindowProjection;
 class LabelBlock;
 class XShape;
 struct GeoPoint;
+struct TopographyLook;
 
 /**
  * Class used to manage and render vector topography layers
  */
-class TopographyFileRenderer : private NonCopyable {
+class TopographyFileRenderer final
+#ifdef ENABLE_OPENGL
+  : GLSurfaceListener
+#endif
+{
   const TopographyFile &file;
+
+  const TopographyLook &look;
 
 #ifndef ENABLE_OPENGL
   mutable ShapeRenderer shape_renderer;
 #endif
 
   Pen pen;
+
+#ifndef ENABLE_OPENGL
   Brush brush;
+#endif
 
   MaskedIcon icon;
 
@@ -64,8 +76,18 @@ class TopographyFileRenderer : private NonCopyable {
 
   std::vector<const XShape *> visible_shapes, visible_labels;
 
+#ifdef ENABLE_OPENGL
+  GLFallbackArrayBuffer *array_buffer;
+  Serial array_buffer_serial;
+#endif
+
 public:
-  TopographyFileRenderer(const TopographyFile &file);
+  TopographyFileRenderer(const TopographyFile &file,
+                         const TopographyLook &look);
+
+  TopographyFileRenderer(const TopographyFileRenderer &) = delete;
+
+  ~TopographyFileRenderer();
 
   /**
    * Paints the polygons, lines and points/icons in the TopographyFile
@@ -89,8 +111,13 @@ private:
   void UpdateVisibleShapes(const WindowProjection &projection);
 
 #ifdef ENABLE_OPENGL
+  void UpdateArrayBuffer();
+
   void PaintPoint(Canvas &canvas, const WindowProjection &projection,
-                  const XShape &shape, float *opengl_matrix) const;
+                  const XShape &shape, const float *opengl_matrix) const;
+
+  virtual void SurfaceCreated() override;
+  virtual void SurfaceDestroyed() override;
 #else
   void PaintPoint(Canvas &canvas, const WindowProjection &projection,
                   const unsigned short *lines, const unsigned short *end_lines,

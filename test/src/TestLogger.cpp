@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -42,8 +42,8 @@ CheckTextFile(const TCHAR *path, const char *const* expect)
 
     ok1(*expect != NULL);
 
-    if (strncmp(*expect, "HFFTYFRTYPE:", 12) == 0) {
-      ok1(strncmp(line, "HFFTYFRTYPE:", 12) == 0);
+    if (StringIsEqual(*expect, "HFFTYFRTYPE:", 12)) {
+      ok1(StringIsEqual(line, "HFFTYFRTYPE:", 12));
     } else {
       if (strcmp(line, *expect)) {
         printf("# \"%s\" fails to match with \"%s\"\n", line, *expect);

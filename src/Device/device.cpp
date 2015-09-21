@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,8 +24,10 @@ Copyright_License {
 // 20070413:sgi add NmeaOut support, allow nmea chaining an double port platforms
 
 #include "device.hpp"
-#include "Device/List.hpp"
+#include "Features.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Device/Descriptor.hpp"
+#include "Components.hpp"
 #include "LogFile.hpp"
 #include "Interface.hpp"
 #include "Operation/PopupOperationEnvironment.hpp"
@@ -93,11 +95,10 @@ DeviceConfigOverlaps(const DeviceConfig &a, const DeviceConfig &b)
   gcc_unreachable();
 }
 
+template<typename I>
 gcc_pure
 static bool
-DeviceConfigOverlaps(const DeviceConfig &config,
-                     const DeviceDescriptor *const*begin,
-                     const DeviceDescriptor *const*const end)
+DeviceConfigOverlaps(const DeviceConfig &config, I begin, I end)
 {
   return ExistsIf(begin, end,
                   [&config](const DeviceDescriptor *d) {
@@ -114,7 +115,7 @@ devStartup()
 
   bool none_available = true;
   for (unsigned i = 0; i < NUMDEV; ++i) {
-    DeviceDescriptor &device = *device_list[i];
+    DeviceDescriptor &device = (*devices)[i];
     const DeviceConfig &config = settings.devices[i];
     if (!config.IsAvailable()) {
       device.ClearConfig();
@@ -123,7 +124,7 @@ devStartup()
 
     none_available = false;
 
-    if (DeviceConfigOverlaps(config, device_list, device_list + i)) {
+    if (DeviceConfigOverlaps(config, devices->begin(), devices->begin() + i)) {
       device.ClearConfig();
       continue;
     }
@@ -132,8 +133,7 @@ devStartup()
   }
 
   if (none_available && HasAndroidInternalGPS()) {
-#ifdef ANDROID
-
+#ifdef HAVE_INTERNAL_GPS
     /* fall back to built-in GPS when no configured device is
        available on this platform */
     LogFormat("Falling back to built-in GPS");
@@ -142,7 +142,7 @@ devStartup()
     config.Clear();
     config.port_type = DeviceConfig::PortType::INTERNAL;
 
-    DeviceDescriptor &device = *device_list[0];
+    DeviceDescriptor &device = (*devices)[0];
     devInitOne(device, config);
 #endif
   }
@@ -151,30 +151,32 @@ devStartup()
 void
 VarioWriteNMEA(const TCHAR *text, OperationEnvironment &env)
 {
-  for (unsigned i = 0; i < NUMDEV; i++)
-    if (device_list[i]->IsVega())
-      device_list[i]->WriteNMEA(text, env);
+  for (DeviceDescriptor *i : *devices)
+    if (i->IsVega())
+      i->WriteNMEA(text, env);
 }
 
 DeviceDescriptor *
 devVarioFindVega()
 {
-  for (unsigned i = 0; i < NUMDEV; i++)
-    if (device_list[i]->IsVega())
-      return device_list[i];
+  for (DeviceDescriptor *i : *devices)
+    if (i->IsVega())
+      return i;
 
-  return NULL;
+  return nullptr;
 }
 
 void
 devShutdown()
 {
+  if (devices == nullptr)
+    return;
+
   // Stop COM devices
   LogFormat("Stop COM devices");
 
-  for (unsigned i = 0; i < NUMDEV; i++) {
-    device_list[i]->Close();
-  }
+  for (DeviceDescriptor *i : *devices)
+    i->Close();
 }
 
 void

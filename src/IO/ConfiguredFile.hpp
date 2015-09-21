@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,12 @@ Copyright_License {
 #ifndef XCSOAR_IO_CONFIGURED_FILE_HPP
 #define XCSOAR_IO_CONFIGURED_FILE_HPP
 
-#include "ConvertLineReader.hpp"
+#include "Charset.hpp"
+
+#include <tchar.h>
+
+class NLineReader;
+class TLineReader;
 
 /**
  * Opens a file whose name is configured in the profile.
@@ -44,12 +49,12 @@ OpenConfiguredTextFileA(const char *profile_key);
  * @param profile_key the profile key which is used to read the
  * file name
  * @param cs the character set of the input file
- * @return a TLineReader which must be deleted by the caller; NULL if
+ * @return a TLineReader which must be deleted by the caller; nullptr if
  * there is no such setting, or if an error occurred opening the file
  */
 TLineReader *
 OpenConfiguredTextFile(const char *profile_key,
-                       ConvertLineReader::charset cs=ConvertLineReader::UTF8);
+                       Charset cs=Charset::UTF8);
 
 /**
  * Opens a file whose name is configured in the profile.  If there is
@@ -60,11 +65,11 @@ OpenConfiguredTextFile(const char *profile_key,
  * @param in_map_file if no profile setting is found, attempt to open
  * this file from inside the map file
  * @param cs the character set of the input file
- * @return a TLineReader which must be deleted by the caller; NULL if
+ * @return a TLineReader which must be deleted by the caller; nullptr if
  * there is no such setting, or if an error occurred opening the file
  */
 TLineReader *
 OpenConfiguredTextFile(const char *profile_key, const TCHAR *in_map_file,
-                       ConvertLineReader::charset cs=ConvertLineReader::UTF8);
+                       Charset cs=Charset::UTF8);
 
 #endif

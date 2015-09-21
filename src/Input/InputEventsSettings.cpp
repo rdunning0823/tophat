@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,6 +28,8 @@ Copyright_License {
 #include "Message.hpp"
 #include "Profile/Profile.hpp"
 #include "Profile/ProfileKeys.hpp"
+#include "Profile/Settings.hpp"
+#include "Profile/Current.hpp"
 #include "Util/Macros.hpp"
 #include "Util/EnumCast.hpp"
 #include "Units/Units.hpp"
@@ -266,7 +268,7 @@ InputEvents::eventProfileLoad(const TCHAR *misc)
     AirfieldFileChanged = true;
 
     // assuming all is ok, we can...
-    Profile::Use();
+    Profile::Use(Profile::map);
   }
 }
 
@@ -371,23 +373,23 @@ InputEvents::eventOrientation(const TCHAR *misc)
   MapSettings &settings_map = CommonInterface::SetMapSettings();
 
   if (StringIsEqual(misc, _T("northup"))) {
-    settings_map.cruise_orientation = DisplayOrientation::NORTH_UP;
-    settings_map.circling_orientation = DisplayOrientation::NORTH_UP;
+    settings_map.cruise_orientation = MapOrientation::NORTH_UP;
+    settings_map.circling_orientation = MapOrientation::NORTH_UP;
   } else if (StringIsEqual(misc, _T("northcircle"))) {
-    settings_map.cruise_orientation = DisplayOrientation::TRACK_UP;
-    settings_map.circling_orientation = DisplayOrientation::NORTH_UP;
+    settings_map.cruise_orientation = MapOrientation::TRACK_UP;
+    settings_map.circling_orientation = MapOrientation::NORTH_UP;
   } else if (StringIsEqual(misc, _T("trackcircle"))) {
-    settings_map.cruise_orientation = DisplayOrientation::NORTH_UP;
-    settings_map.circling_orientation = DisplayOrientation::TRACK_UP;
+    settings_map.cruise_orientation = MapOrientation::NORTH_UP;
+    settings_map.circling_orientation = MapOrientation::TRACK_UP;
   } else if (StringIsEqual(misc, _T("trackup"))) {
-    settings_map.cruise_orientation = DisplayOrientation::TRACK_UP;
-    settings_map.circling_orientation = DisplayOrientation::TRACK_UP;
+    settings_map.cruise_orientation = MapOrientation::TRACK_UP;
+    settings_map.circling_orientation = MapOrientation::TRACK_UP;
   } else if (StringIsEqual(misc, _T("northtrack"))) {
-    settings_map.cruise_orientation = DisplayOrientation::TRACK_UP;
-    settings_map.circling_orientation = DisplayOrientation::TARGET_UP;
+    settings_map.cruise_orientation = MapOrientation::TRACK_UP;
+    settings_map.circling_orientation = MapOrientation::TARGET_UP;
   } else if (StringIsEqual(misc, _T("targetup"))) {
-    settings_map.cruise_orientation = DisplayOrientation::TARGET_UP;
-    settings_map.circling_orientation = DisplayOrientation::TARGET_UP;
+    settings_map.cruise_orientation = MapOrientation::TARGET_UP;
+    settings_map.circling_orientation = MapOrientation::TARGET_UP;
   }
 
   Profile::Set(ProfileKeys::OrientationCruise,

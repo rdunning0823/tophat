@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -46,8 +46,7 @@ WaypointRendererSettings::LoadFromProfile()
   //       due to pref migration dependencies!
   GetEnum(ProfileKeys::WaypointLabelSelection, label_selection);
   GetEnum(ProfileKeys::WaypointArrivalHeightDisplay, arrival_height_display);
-  /** always use defaults for landable_render_mode */
-//  GetEnum(ProfileKeys::WaypointLabelStyle, landable_render_mode);
+  GetEnum(ProfileKeys::WaypointLabelStyle, landable_render_mode);
 
   GetEnum(ProfileKeys::AppIndLandable, landable_style);
   Get(ProfileKeys::AppUseSWLandablesRendering, vector_landable_rendering);

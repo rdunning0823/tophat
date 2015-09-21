@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,8 +28,9 @@ package org.tophat;
  * as a proxy for another #AndroidPort instance.
  */
 abstract class ProxyAndroidPort implements AndroidPort {
-  private AndroidPort port;
-  private InputListener listener;
+  private volatile AndroidPort port;
+  private volatile PortListener portListener;
+  private volatile InputListener inputListener;
 
   protected void setPort(AndroidPort _port) {
     AndroidPort oldPort = this.port;
@@ -38,7 +39,9 @@ abstract class ProxyAndroidPort implements AndroidPort {
       oldPort.close();
 
     if (port != null)
-      port.setListener(listener);
+      port.setInputListener(inputListener);
+
+    stateChanged();
   }
 
   @Override public String toString() {
@@ -48,12 +51,20 @@ abstract class ProxyAndroidPort implements AndroidPort {
       : super.toString();
   }
 
-  @Override public void setListener(InputListener _listener) {
-    listener = _listener;
+  @Override public void setListener(PortListener _listener) {
+    portListener = _listener;
 
     AndroidPort port = this.port;
     if (port != null)
       port.setListener(_listener);
+  }
+
+  @Override public void setInputListener(InputListener _listener) {
+    inputListener = _listener;
+
+    AndroidPort port = this.port;
+    if (port != null)
+      port.setInputListener(_listener);
   }
 
   @Override public void close() {
@@ -61,6 +72,8 @@ abstract class ProxyAndroidPort implements AndroidPort {
     this.port = null;
     if (port != null)
       port.close();
+
+    stateChanged();
   }
 
   @Override public int getState() {
@@ -90,5 +103,11 @@ abstract class ProxyAndroidPort implements AndroidPort {
     return port != null
       ? port.write(data, length)
       : 0;
+  }
+
+  protected void stateChanged() {
+    PortListener portListener = this.portListener;
+    if (portListener != null)
+      portListener.portStateChanged();
   }
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,7 +33,6 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Dialogs/WidgetDialog.hpp"
 #include "Dialogs/TextEntry.hpp"
-#include "Form/Form.hpp"
 #include "Form/Button.hpp"
 #include "Widget/ListWidget.hpp"
 #include "Weather/NOAAGlue.hpp"
@@ -41,16 +40,19 @@ Copyright_License {
 #include "Weather/NOAAUpdater.hpp"
 #include "Weather/METAR.hpp"
 #include "Util/TrivialArray.hpp"
+#include "Util/StringAPI.hpp"
 #include "Compiler.h"
 #include "Renderer/NOAAListRenderer.hpp"
+#include "Renderer/TwoTextRowsRenderer.hpp"
 
 struct NOAAListItem
 {
   StaticString<5> code;
   NOAAStore::iterator iterator;
 
+  gcc_pure
   bool operator<(const NOAAListItem &i2) const {
-    return _tcscmp(code, i2.code) == -1;
+    return StringCollate(code, i2.code) < 0;
   }
 };
 
@@ -63,9 +65,11 @@ class NOAAListWidget final
     REMOVE,
   };
 
-  WndButton *details_button, *add_button, *update_button, *remove_button;
+  Button *details_button, *add_button, *update_button, *remove_button;
 
   TrivialArray<NOAAListItem, 20> stations;
+
+  TwoTextRowsRenderer row_renderer;
 
 public:
   void CreateButtons(WidgetDialog &dialog);
@@ -115,7 +119,9 @@ void
 NOAAListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
-  CreateList(parent, look, rc, NOAAListRenderer::GetHeight(look));
+  CreateList(parent, look, rc,
+             row_renderer.CalculateLayout(*look.list.font_bold,
+                                          look.small_font));
   UpdateList();
 }
 
@@ -156,7 +162,7 @@ NOAAListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned index)
   assert(index < stations.size());
 
   NOAAListRenderer::Draw(canvas, rc, *stations[index].iterator,
-                         UIGlobals::GetDialogLook());
+                         row_renderer);
 }
 
 inline void
@@ -270,6 +276,7 @@ dlgNOAAListShowModal()
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("METAR and TAF"), &widget);
   dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
+  dialog.EnableCursorSelection();
 
   dialog.ShowModal();
   dialog.StealWidget();

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ Copyright_License {
 #include "WindowWidget.hpp"
 #include "Form/Edit.hpp"
 #include "Form/DataField/Base.hpp"
+#include "Repository/FileType.hpp"
 #include "Util/StaticArray.hpp"
 #include "Util/EnumCast.hpp"
 #include "Units/Group.hpp"
@@ -41,7 +42,7 @@ class ActionListener;
 class Angle;
 class RoughTime;
 class RoughTimeDelta;
-class WndButton;
+class Button;
 
 /**
  * A #Widget that contains #WndProperty controls, one in a row.
@@ -78,7 +79,7 @@ class RowFormWidget : public WindowWidget {
       MULTI_LINE,
 
       /**
-       * A #WndButton.
+       * A #Button.
        */
       BUTTON,
 
@@ -137,7 +138,7 @@ class RowFormWidget : public WindowWidget {
       :type(_type), available(true), visible(true), expert(false),
        widget(nullptr), window(_window) {
       assert(_type != Type::DUMMY);
-      assert(_window != NULL);
+      assert(_window != nullptr);
     }
 
     Row(Widget *_widget)
@@ -145,7 +146,7 @@ class RowFormWidget : public WindowWidget {
        initialised(false), prepared(false), shown(false),
        available(true), visible(true), expert(false),
        widget(_widget), window(nullptr) {
-      assert(_widget != NULL);
+      assert(_widget != nullptr);
     }
 
     /**
@@ -213,14 +214,14 @@ class RowFormWidget : public WindowWidget {
 
     gcc_pure
     Window &GetWindow() {
-      assert(window != NULL);
+      assert(window != nullptr);
 
       return *window;
     }
 
     gcc_pure
     const Window &GetWindow() const {
-      assert(window != NULL);
+      assert(window != nullptr);
 
       return *window;
     }
@@ -228,7 +229,7 @@ class RowFormWidget : public WindowWidget {
     gcc_pure
     WndProperty &GetControl() {
       assert(type == Type::EDIT);
-      assert(window != NULL);
+      assert(window != nullptr);
 
       return *(WndProperty *)window;
     }
@@ -236,7 +237,7 @@ class RowFormWidget : public WindowWidget {
     gcc_pure
     const WndProperty &GetControl() const {
       assert(type == Type::EDIT);
-      assert(window != NULL);
+      assert(window != nullptr);
 
       return *(WndProperty *)window;
     }
@@ -292,7 +293,7 @@ protected:
 
   void Add(Row::Type type, Window *window);
 
-  WndProperty *CreateEdit(const TCHAR *label, const TCHAR *help=NULL,
+  WndProperty *CreateEdit(const TCHAR *label, const TCHAR *help=nullptr,
                           bool read_only=false);
 
 public:
@@ -324,15 +325,15 @@ public:
     Add(Row::Type::REMAINING, window);
   }
 
-  WndProperty *Add(const TCHAR *label, const TCHAR *help=NULL,
+  WndProperty *Add(const TCHAR *label, const TCHAR *help=nullptr,
                    bool read_only=false);
 
   /**
    * Add a read-only control.  You can use SetText() to update its
    * text.
    */
-  void AddReadOnly(const TCHAR *label, const TCHAR *help=NULL,
-                   const TCHAR *text=NULL);
+  void AddReadOnly(const TCHAR *label, const TCHAR *help=nullptr,
+                   const TCHAR *text=nullptr);
 
   /**
    * Add a read-only control displaying a floating-point value.  Use
@@ -419,9 +420,17 @@ public:
 
   void AddSpacer();
 
-  WndProperty *AddFileReader(const TCHAR *label, const TCHAR *help,
-                             const char *profile_key, const TCHAR *filters,
-                             bool nullable = true);
+  WndProperty *AddFile(const TCHAR *label, const TCHAR *help,
+                       const char *profile_key, const TCHAR *filters,
+                       FileType file_type,
+                       bool nullable = true);
+
+  WndProperty *AddFile(const TCHAR *label, const TCHAR *help,
+                       const char *profile_key, const TCHAR *filters,
+                       bool nullable = true) {
+    return AddFile(label, help, profile_key, filters, FileType::UNKNOWN,
+                   nullable);
+  }
 
   WndProperty *AddFileReader(const TCHAR *label, const TCHAR *help,
                              const char *registry_key, const TCHAR *filters,
@@ -439,8 +448,8 @@ public:
    */
   void AddMultiLine(const TCHAR *text=nullptr);
 
-  WndButton *AddButton(const TCHAR *label, ActionListener &listener, int id);
   WndButton *AddSymbolButton(const TCHAR *label, ActionListener &listener, int id);
+  Button *AddButton(const TCHAR *label, ActionListener &listener, int id);
 
   gcc_pure
   Widget &GetRowWidget(unsigned i) {
@@ -506,11 +515,15 @@ public:
    * Update the text of a multi line control.
    */
   void SetText(unsigned i, const TCHAR *text) {
-    assert(text != NULL);
+    assert(text != nullptr);
 
     WndProperty &control = GetControl(i);
-    assert(control.GetDataField() == NULL);
+    assert(control.GetDataField() == nullptr);
     control.SetText(text);
+  }
+
+  void ClearText(unsigned i) {
+    SetText(i, _T(""));
   }
 
   /**
@@ -521,14 +534,14 @@ public:
   gcc_pure
   DataField &GetDataField(unsigned i) {
     DataField *df = GetControl(i).GetDataField();
-    assert(df != NULL);
+    assert(df != nullptr);
     return *df;
   }
 
   gcc_pure
   const DataField &GetDataField(unsigned i) const {
     const DataField *df = GetControl(i).GetDataField();
-    assert(df != NULL);
+    assert(df != nullptr);
     return *df;
   }
 
@@ -603,7 +616,19 @@ public:
   bool SaveValue(unsigned i, Angle &value_r) const;
   bool SaveValue(unsigned i, RoughTime &value_r) const;
   bool SaveValue(unsigned i, TCHAR *string, size_t max_size) const;
+
+  template<size_t max>
+  bool SaveValue(unsigned i, StringBuffer<TCHAR, max> &value) const {
+    return SaveValue(i, value.data(), value.capacity());
+  }
+
   bool SaveValue(unsigned i, const char *profile_key, TCHAR *string, size_t max_size) const;
+
+  template<size_t max>
+  bool SaveValue(unsigned i, const char *profile_key,
+                 StringBuffer<TCHAR, max> &value) const {
+    return SaveValue(i, profile_key, value.data(), value.capacity());
+  }
 
   bool SaveValue(unsigned i, unsigned &value) const {
     return SaveValue(i, (int &)value);
@@ -667,14 +692,13 @@ protected:
 
 public:
   /* virtual methods from Widget */
-  virtual PixelSize GetMinimumSize() const override;
-  virtual PixelSize GetMaximumSize() const override;
-  virtual void Initialise(ContainerWindow &parent,
-                          const PixelRect &rc) override;
-  virtual void Unprepare() override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Move(const PixelRect &rc) override;
-  virtual bool SetFocus() override;
+  PixelSize GetMinimumSize() const override;
+  PixelSize GetMaximumSize() const override;
+  void Initialise(ContainerWindow &parent, const PixelRect &rc) override;
+  void Unprepare() override;
+  void Show(const PixelRect &rc) override;
+  void Move(const PixelRect &rc) override;
+  bool SetFocus() override;
 };
 
 #endif

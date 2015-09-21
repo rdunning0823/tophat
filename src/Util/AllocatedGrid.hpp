@@ -27,8 +27,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_ALLOCATED_GRID_HPP
-#define XCSOAR_ALLOCATED_GRID_HPP
+#ifndef ALLOCATED_GRID_HPP
+#define ALLOCATED_GRID_HPP
 
 #include "AllocatedArray.hpp"
 
@@ -152,25 +152,32 @@ public:
       width = _width;
     }
 
+    const unsigned h = std::min(height, _height);
+    const unsigned fill_start = h > 0
+      ? (h - 1) * _width + width
+      : 0;
+
     array.GrowPreserve(_width * _height, width * height);
 
     if (_width > width) {
-      const unsigned h = std::min(height, _height);
+      const unsigned delta_w = _width - width;
       const auto end = array.begin();
 
       for (auto in = array.begin() + (h - 1) * width,
              out = array.begin() + (h - 1) * _width + width;
-           in < end; in -= width, out -= _width) {
-        std::move_backward(in, in + width, out);
-        std::fill(out, out + _width - width, fill);
+           in > end; in -= width, out -= delta_w) {
+        out = std::move_backward(in, in + width, out);
+        std::fill(out - delta_w, out, fill);
       }
 
       width = _width;
     }
 
-    std::fill(array.begin() + width * height, array.end(), fill);
-
     height = _height;
+
+    unsigned new_size = GetSize();
+    if (fill_start < new_size)
+      std::fill(begin() + fill_start, begin() + new_size, fill);
   }
 };
 

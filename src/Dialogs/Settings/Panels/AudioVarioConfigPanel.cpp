@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@ Copyright_License {
 #include "Profile/ProfileKeys.hpp"
 #include "Language/Language.hpp"
 #include "Interface.hpp"
-#include "Form/Form.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Form/DataField/Float.hpp"
 #include "UIGlobals.hpp"
@@ -72,7 +71,7 @@ AudioVarioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _("Emulate the sound of an electronic vario."),
              settings.enabled);
 
-  AddInteger(_("Volume"), NULL, _T("%u %%"), _T("%u"),
+  AddInteger(_("Volume"), nullptr, _T("%u %%"), _T("%u"),
              0, 100, 1, settings.volume);
 
   AddBoolean(_("Enable Deadband"),
@@ -106,7 +105,7 @@ AudioVarioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddFloat(_("Deadband min. lift"),
            _("Below this lift threshold the vario will start to play sounds if the 'Deadband' feature is enabled."),
            _T("%.1f %s"), _T("%.1f"),
-           Units::ToUserVSpeed(fixed(-2)), fixed(0),
+           Units::ToUserVSpeed(fixed(-5)), fixed(0),
            GetUserVerticalSpeedStep(), false, UnitGroup::VERTICAL_SPEED,
            settings.min_dead);
   SetExpertRow(DEAD_BAND_MIN);

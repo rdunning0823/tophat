@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,32 +22,32 @@ Copyright_License {
 */
 
 #include "ComboList.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <algorithm>
 
 #include <stdlib.h>
-#include <string.h>
 
-ComboList::Item::Item(int _DataFieldIndex,
-                      const TCHAR *_StringValue,
-                      const TCHAR *_StringValueFormatted,
-                      const TCHAR *_StringHelp)
-  :DataFieldIndex(_DataFieldIndex),
-   StringValue(_tcsdup(_StringValue)),
-   StringValueFormatted(_tcsdup(_StringValueFormatted)),
-   StringHelp(_StringHelp ? _tcsdup(_StringHelp) : NULL)
+ComboList::Item::Item(int _int_value,
+                      const TCHAR *_string_value,
+                      const TCHAR *_display_string,
+                      const TCHAR *_help_text)
+  :int_value(_int_value),
+   string_value(_tcsdup(_string_value)),
+   display_string(_tcsdup(_display_string)),
+   help_text(_help_text ? _tcsdup(_help_text) : nullptr)
 {
 }
 
 ComboList::Item::~Item()
 {
-  free(StringValue);
-  free(StringValueFormatted);
-  free(StringHelp);
+  free(string_value);
+  free(display_string);
+  free(help_text);
 }
 
 ComboList::ComboList(ComboList &&other)
-  :ComboPopupItemSavedIndex(other.ComboPopupItemSavedIndex),
+  :current_index(other.current_index),
    items(other.items)
 {
   std::fill(other.items.begin(), other.items.end(), nullptr);
@@ -70,26 +70,19 @@ ComboList::Append(ComboList::Item *item)
   return i;
 }
 
-static int
-CompareByValue(const void *elem1, const void *elem2)
-{
-  const ComboList::Item *entry1 = *((const ComboList::Item *const*)elem1);
-  const ComboList::Item *entry2 = *((const ComboList::Item *const*)elem2);
-
-  return _tcscmp(entry1->StringValueFormatted, entry2->StringValueFormatted);
-}
-
 void
 ComboList::Sort()
 {
-  qsort(items.begin(), items.size(), sizeof(items[0]), CompareByValue);
+  std::sort(items.begin(), items.end(), [](const Item *a, const Item *b){
+      return StringCollate(a->display_string, b->display_string) < 0;
+    });
 }
 
 unsigned
-ComboList::LookUp(int DataFieldIndex)
+ComboList::LookUp(int int_value)
 {
   for (unsigned i = 0; i < items.size(); i++)
-    if (items[i]->DataFieldIndex == DataFieldIndex)
+    if (items[i]->int_value == int_value)
       return i;
 
   return 0;

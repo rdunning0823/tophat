@@ -1,6 +1,5 @@
 Top Hat - http://www.tophatsoaring.org
-
-Copyright (C) 2000-2012
+Copyright (C) 2000-2015
 
 The following people and organizations have contributed significantly to Top Hat:
  Rob Dunning <rob@raspberryridgesheepfarm.com>
@@ -63,6 +62,17 @@ Top Hat is based on XCSoar which was created by the following folks:
  Andreas K. Wasserbauer <akw@alpensegler.org>
  Frank Paynter <paynterf@gmail.com>
  Frank van der Hulst <drifter.frank@gmail.com>
+ Felix Hädicke <felixhaedicke@web.de>
+ Melissa Jenkins <melissa-xcsoar@littlebluecar.co.uk>
+ Alexander Lehmann <a.lehm@gmx.de>
+ Christian Körner <christian_koerner@web.de>
+ Mindaugas Milasauskas <mindmil@gmail.com>
+ Benjamin Tissoires <benjamin.tissoires@gmail.com>
+ Florian Mösch <florian@moesch.org>
+ Lloyd Bailey <3dairspace@lloydbailey.net>
+ Timo Bruderek <timo.bruderek@gmx.de>
+ Steffen Engel <steffen.engel@nutrimat.de>
+ Alex Graf <xcsoar@grafitation.ch>
 
 Documentation:
 
@@ -224,6 +234,9 @@ uk (Ukrainian):
 
 vi (Vietnamese):
 *Dang Quoc Tuan
+
+zh_CN (Simplified Chinese)
+ Li Zhuohuan <zixia@zixia.net>
 
 *Contributions attributed to the LK8000 project (http://www.lk8000.it/)
 

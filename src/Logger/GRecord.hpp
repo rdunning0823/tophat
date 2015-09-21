@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -34,10 +34,11 @@ class TextWriter;
 class GRecord
 {
 public:
-  static constexpr size_t DIGEST_LENGTH = 4 * MD5::DIGEST_LENGTH;
+  static constexpr unsigned N_MD5 = 4;
+  static constexpr size_t DIGEST_LENGTH = N_MD5 * MD5::DIGEST_LENGTH;
 
 private:
-  MD5 md5[4];
+  MD5 md5[N_MD5];
 
   /**
    * If true, then the comma is ignored in the MD5 calculation, even

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const LoggerSettings &logger = settings_computer.logger;
 
   RowFormWidget::Prepare(parent, rc);
-  AddText(_("Pilot name"), NULL, logger.pilot_name);
+  AddText(_("Pilot name"), nullptr, logger.pilot_name);
 
   AddTime(_("Time step cruise"),
           _("This is the time interval between logged points when not circling."),
@@ -79,7 +79,7 @@ LoggerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              logger.enable_flight_logger);
   SetExpertRow(EnableFlightLogger);
 
-  AddText(_("Logger ID"), NULL, logger.logger_id);
+  AddText(_("Logger ID"), nullptr, logger.logger_id);
   SetExpertRow(LoggerID);
 }
 
@@ -90,7 +90,7 @@ LoggerConfigPanel::Save(bool &changed)
   LoggerSettings &logger = settings_computer.logger;
 
   changed |= SaveValue(PilotName, ProfileKeys::PilotName,
-                       logger.pilot_name.buffer(), logger.pilot_name.MAX_SIZE);
+                       logger.pilot_name);
 
   changed |= SaveValue(LoggerTimeStepCruise, ProfileKeys::LoggerTimeStepCruise,
                        logger.time_step_cruise);
@@ -114,8 +114,7 @@ LoggerConfigPanel::Save(bool &changed)
     require_restart = true;
   }
 
-  changed |= SaveValue(LoggerID, ProfileKeys::LoggerID,
-                       logger.logger_id.buffer(), logger.logger_id.MAX_SIZE);
+  changed |= SaveValue(LoggerID, ProfileKeys::LoggerID, logger.logger_id);
 
   return true;
 }

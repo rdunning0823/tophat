@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,6 +36,22 @@ Copyright_License {
 gcc_pure  gcc_nonnull_all
 bool
 ValidateUTF8(const char *p);
+
+/**
+ * @return the number of the sequence beginning with the given
+ * character, or 0 if the character is not a valid start byte
+ */
+gcc_const
+size_t
+SequenceLengthUTF8(char ch);
+
+/**
+ * @return the number of the first sequence in the given string, or 0
+ * if the sequence is malformed
+ */
+gcc_pure
+size_t
+SequenceLengthUTF8(const char *p);
 
 /**
  * Convert the specified string from ISO-8859-1 to UTF-8.

@@ -1,5 +1,9 @@
 LINK = $(CXX)
 
+ifeq ($(ICF),y)
+LINK += -fuse-ld=gold -Wl,--icf=all
+endif
+
 ld-flags = $(ALL_LDFLAGS) $(TARGET_ARCH)
 ld-libs = $(ALL_LDLIBS)
 
@@ -134,14 +138,21 @@ endef
 #  _DEPENDS: a list of library names this executable depends on; it
 #  will use its CPPFLAGS, LDADD and LDFLAGS
 #
+#  _NO_LIB_PREFIX: if "y", then the output file will not be prefixed with "lib"
+#
 #  _STRIP: if "y", then the library will be stripped
 #
 define link-shared-library
 
-$(2)_BIN = $$(TARGET_BIN_DIR)/lib$(1).so
+$(2)_LIB_PREFIX = lib
+ifeq ($$($(2)_NO_LIB_PREFIX),y)
+$(2)_LIB_PREFIX =
+endif
+
+$(2)_BIN = $$(TARGET_BIN_DIR)/$$($(2)_LIB_PREFIX)$(1).so
 
 ifeq ($$($(2)_STRIP),y)
-$(2)_NOSTRIP = $$(TARGET_BIN_DIR)/lib$(1)-ns.so
+$(2)_NOSTRIP = $$(TARGET_BIN_DIR)/$$($(2)_LIB_PREFIX)$(1)-ns.so
 else
 $(2)_NOSTRIP = $$($(2)_BIN)
 endif
@@ -155,10 +166,14 @@ $$($(2)_OBJS): CPPFLAGS += $$($(2)_CPPFLAGS)
 $$($(2)_OBJS): CPPFLAGS += $(patsubst %,$$(%_CPPFLAGS),$($(2)_DEPENDS))
 
 # Link the unstripped binary
+ifneq ($(HOST_IS_DARWIN),y)
 $$($(2)_NOSTRIP): LDFLAGS += -Wl,-shared,-Bsymbolic
+endif
+
 ifeq ($$(TARGET),ANDROID)
 $$($(2)_NOSTRIP): LDFLAGS += -nostdlib
 endif
+
 $$($(2)_NOSTRIP): $$($(2)_OBJS) $$($(2)_LDADD) $$(TARGET_LDADD) | $$(TARGET_BIN_DIR)/dirstamp
 	@$$(NQ)echo "  LINK    $$@"
 	$$(Q)$$(LINK) $$(ld-flags) -o $$@ $$^ $$(ld-libs) $$($(2)_LDLIBS)

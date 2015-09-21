@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ ReadIGCDeclaration(const TCHAR *path, IGCDeclarationHeader &header,
   // Read IGC file
   char *line;
   bool header_found = false;
-  while ((line = reader.ReadLine()) != NULL) {
+  while ((line = reader.ReadLine()) != nullptr) {
     // Skip lines which are not declaration records
     if (*line != _T('C'))
       continue;
@@ -78,7 +78,7 @@ TaskFileIGC::GetTask(const TaskBehaviour &task_behaviour,
   std::list<IGCDeclarationTurnpoint> turnpoints;
 
   if (!ReadIGCDeclaration(path, header, turnpoints))
-    return NULL;
+    return nullptr;
 
   // Number of turnpoints including start and finish
   unsigned num_turnpoints = header.num_turnpoints + 2;
@@ -89,7 +89,7 @@ TaskFileIGC::GetTask(const TaskBehaviour &task_behaviour,
     turnpoints.pop_back();
   } else if (num_turnpoints != turnpoints.size())
     // Declared number of turnpoints is not matching parsed number of turnpoints
-    return NULL;
+    return nullptr;
 
   // Create a blank task
   OrderedTask *task = new OrderedTask(task_behaviour);
@@ -124,7 +124,7 @@ TaskFileIGC::GetTask(const TaskBehaviour &task_behaviour,
     else
       tp = fact.CreateIntermediate(wp);
 
-    if (tp != NULL) {
+    if (tp != nullptr) {
       fact.Append(*tp);
       delete tp;
     }
@@ -154,7 +154,7 @@ TaskFileIGC::Count()
 
   // Search for declaration
   char *line;
-  while ((line = reader.ReadLine()) != NULL) {
+  while ((line = reader.ReadLine()) != nullptr) {
     if (*line != 'C')
       continue;
 

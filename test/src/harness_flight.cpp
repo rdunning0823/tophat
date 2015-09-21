@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@
 }
 */
 
+#include "Printing.hpp"
 #include "harness_flight.hpp"
 #include "harness_airspace.hpp"
 #include "harness_wind.hpp"
@@ -31,6 +32,7 @@
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Engine/Airspace/AirspaceAircraftPerformance.hpp"
 #include "OS/FileUtil.hpp"
+#include "test_debug.hpp"
 
 #include <fstream>
 
@@ -264,7 +266,6 @@ test_flight(TestFlightComponents components, int test_num, int n_wind,
 
   TaskBehaviour task_behaviour;
   task_behaviour.SetDefaults();
-  task_behaviour.enable_trace = false;
   task_behaviour.auto_mc = auto_mc;
   task_behaviour.calc_glide_required = false;
   if ((test_num == 0) || (test_num == 2))

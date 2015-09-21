@@ -27,11 +27,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_CACHE_HPP
-#define XCSOAR_CACHE_HPP
+#ifndef CACHE_HPP
+#define CACHE_HPP
 
-#include "Util/ListHead.hpp"
+#include "Manual.hpp"
 #include "Compiler.h"
+
+#include <boost/intrusive/list.hpp>
+#include <boost/intrusive/unordered_set.hpp>
 
 #include <unordered_map>
 #include <limits>
@@ -40,123 +43,67 @@
 template<typename Key, typename Data,
          unsigned capacity,
          typename Hash=std::hash<Key>,
-         typename KeyEqual=std::equal_to<Key>>
+         typename Equal=std::equal_to<Key>>
 class Cache {
 
-  /**
-   * Wrapper that holds an uninitialised object, which be be
-   * initialised and deinitialised on demand.
-   */
-  template<typename T>
-  class Constructible {
-    char buffer[sizeof(T)];
+  class Item
+    : public boost::intrusive::unordered_set_base_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>,
+      public boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>> {
 
-#ifndef NDEBUG
-    bool constructed;
-#endif
+    Manual<Key> key;
+
+    Manual<Data> data;
 
   public:
-#ifndef NDEBUG
-    Constructible():constructed(false) {}
-
-    ~Constructible() {
-      assert(!constructed);
-    }
-#endif
-
-    const T &Get() const {
-      assert(constructed);
-
-      const void *p = static_cast<const void *>(buffer);
-      return *static_cast<const T *>(p);
-    }
-
-    T &Get() {
-      assert(constructed);
-
-      void *p = static_cast<void *>(buffer);
-      return *static_cast<T *>(p);
-    }
-
-    void Construct() {
-      assert(!constructed);
-
-      void *p = static_cast<void *>(buffer);
-      new (p) T();
-
-#ifndef NDEBUG
-      constructed = true;
-#endif
-    }
-
-    template<typename U>
-    void Construct(U &&value) {
-      assert(!constructed);
-
-      void *p = static_cast<void *>(buffer);
-      new (p) T(std::forward<U>(value));
-
-#ifndef NDEBUG
-      constructed = true;
-#endif
-    }
-
-    void Destruct() {
-      assert(constructed);
-
-      T &value = Get();
-      value.T::~T();
-
-#ifndef NDEBUG
-      constructed = false;
-#endif
-    }
-  };
-
-  class Item;
-
-  /* This is a multimap, even though we use at most one cache item for
-     a key.  A multimap means less overhead, because insert() does not
-     need to do a full lookup, and this class  */
-  typedef std::unordered_multimap<Key, class Item *, Hash, KeyEqual> KeyMap;
-
-  class Item : public ListHead {
-    /**
-     * This iterator is stored to allow quick removal of outdated
-     * cache items.  This is safe, because rehashing is disabled in
-     * #KeyMap.
-     */
-    typename KeyMap::iterator iterator;
-
-    Constructible<Data> data;
-
-  public:
-    typename KeyMap::iterator GetIterator() {
-      return iterator;
-    }
-
-    void SetIterator(typename KeyMap::iterator _iterator) {
-      iterator = _iterator;
+    const Key &GetKey() const {
+      return key.Get();
     }
 
     const Data &GetData() const {
       return data.Get();
     }
 
-    template<typename U>
-    void Construct(U &&value) {
+    template<typename K, typename U>
+    void Construct(K &&_key, U &&value) {
+      key.Construct(std::forward<K>(_key));
       data.Construct(std::forward<U>(value));
     }
 
     void Destruct() {
+      key.Destruct();
       data.Destruct();
     }
 
-    template<typename U>
-    void Replace(U &&value) {
+    template<typename K, typename U>
+    void Replace(K &&_key, U &&value) {
+      key.Get() = std::forward<K>(_key);
       data.Get() = std::forward<U>(value);
     }
   };
+
+  struct ItemHash : Hash {
+    using Hash::operator();
+
+    gcc_pure
+    std::size_t operator()(const Item &a) const {
+      return Hash::operator()(a.GetKey());
+    }
+  };
+
+  struct ItemEqual : Equal {
+    gcc_pure
+    bool operator()(const Item &a, const Item &b) const {
+      return Equal::operator()(a.GetKey(), b.GetKey());
+    }
+
+    gcc_pure
+    bool operator()(const Key &a, const Item &b) const {
+      return Equal::operator()(a, b.GetKey());
+    }
+  };
+
+  typedef boost::intrusive::list<Item,
+                                 boost::intrusive::constant_time_size<false>> ItemList;
 
   /**
    * The number of cached items.
@@ -166,18 +113,29 @@ class Cache {
   /**
    * The list of unallocated items.
    */
-  ListHead unallocated_list;
+  ItemList unallocated_list;
 
-  ListHead chronological_list;
+  ItemList chronological_list;
 
+  /* This is a multiset, even though we use at most one cache item for
+     a key.  A multiset means less overhead, because insert() does not
+     need to do a full lookup, and this class will only insert new
+     items when it knows an item does not already exists */
+  typedef boost::intrusive::unordered_multiset<Item,
+                                               boost::intrusive::hash<ItemHash>,
+                                               boost::intrusive::equal<ItemEqual>,
+                                               boost::intrusive::constant_time_size<false>> KeyMap;
   KeyMap map;
 
   Item buffer[capacity];
 
-  Item &GetOldest() {
-    assert(!chronological_list.IsEmpty());
+  static constexpr unsigned N_BUCKETS = capacity;
+  typename KeyMap::bucket_type buckets[N_BUCKETS];
 
-    return *(Item *)chronological_list.GetPrevious();
+  Item &GetOldest() {
+    assert(!chronological_list.empty());
+
+    return chronological_list.back();
   }
 
   /**
@@ -187,8 +145,8 @@ class Cache {
   Item &RemoveOldest() {
     Item &item = GetOldest();
 
-    map.erase(item.GetIterator());
-    item.Remove();
+    map.erase(map.iterator_to(item));
+    chronological_list.erase(chronological_list.iterator_to(item));
 
 #ifndef NDEBUG
     --size;
@@ -201,24 +159,24 @@ class Cache {
    * Allocate an item from #unallocated_list, but do not construct it.
    */
   Item &Allocate() {
-    assert(!unallocated_list.IsEmpty());
+    assert(!unallocated_list.empty());
 
-    Item &item = *(Item *)unallocated_list.GetNext();
-    item.Remove();
+    Item &item = unallocated_list.front();
+    unallocated_list.erase(unallocated_list.iterator_to(item));
     return item;
   }
 
-  template<typename U>
-  Item &Make(U &&data) {
-    if (unallocated_list.IsEmpty()) {
+  template<typename K, typename U>
+  Item &Make(K &&key, U &&data) {
+    if (unallocated_list.empty()) {
       /* cache is full: delete oldest */
       Item &item = RemoveOldest();
-      item.Replace(std::forward<U>(data));
+      item.Replace(std::forward<K>(key), std::forward<U>(data));
       return item;
     } else {
       /* cache is not full: allocate new item */
       Item &item = Allocate();
-      item.Construct(std::forward<U>(data));
+      item.Construct(std::forward<K>(key), std::forward<U>(data));
       return item;
     }
   }
@@ -226,18 +184,9 @@ class Cache {
 public:
   Cache()
     :size(0),
-     unallocated_list(ListHead::empty()),
-     chronological_list(ListHead::empty()) {
+     map(typename KeyMap::bucket_traits(buckets, N_BUCKETS)) {
     for (unsigned i = 0; i < capacity; ++i)
-      buffer[i].InsertAfter(unallocated_list);
-
-    /* allocate enough buckets for the whole lifetime of this
-       object */
-    map.rehash(capacity);
-
-    /* forcibly disable rehashing, as that would Invalidate existing
-       iterators */
-    map.max_load_factor(std::numeric_limits<decltype(map.max_load_factor())>::infinity());
+      unallocated_list.push_back(buffer[i]);
   }
 
   ~Cache() {
@@ -253,46 +202,41 @@ public:
   void Clear() {
     map.clear();
 
-    while (!chronological_list.IsEmpty()) {
+    chronological_list.clear_and_dispose([this](Item *item){
 #ifndef NDEBUG
-      assert(size > 0);
-      --size;
+        assert(size > 0);
+        --size;
 #endif
 
-      Item &item = *(Item *)chronological_list.GetNext();
-      item.Remove();
-
-      item.Destruct();
-      item.InsertAfter(unallocated_list);
-    }
+        item->Destruct();
+        unallocated_list.push_front(*item);
+      });
 
     assert(size == 0);
     size = 0;
   }
 
   const Data *Get(const Key &key) {
-    typename KeyMap::iterator i = map.find(key);
+    auto i = map.find(key, map.hash_function(), map.key_eq());
     if (i == map.end())
       return nullptr;
 
-    Item &item = *i->second;
-    assert(item.GetIterator() == i);
+    Item &item = *i;
 
     /* move to the front of the chronological list */
-    item.Remove();
-    item.InsertAfter(chronological_list);
+    chronological_list.erase(chronological_list.iterator_to(item));
+    chronological_list.push_front(item);
 
     return &item.GetData();
   }
 
   template<typename K, typename U>
   void Put(K &&key, U &&data) {
-    assert(map.find(key) == map.end());
+    assert(map.find(key, map.hash_function(), map.key_eq()) == map.end());
 
-    Item &item = Make(std::forward<U>(data));
-    item.InsertAfter(chronological_list);
-    auto iterator = map.insert(std::make_pair(std::forward<K>(key), &item));
-    item.SetIterator(iterator);
+    Item &item = Make(std::forward<K>(key), std::forward<U>(data));
+    chronological_list.push_front(item);
+    map.insert(item);
 
 #ifndef NDEBUG
     ++size;

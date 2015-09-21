@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,19 +21,24 @@ Copyright_License {
 }
 */
 
-#include "Android/BluetoothHelper.hpp"
+#include "BluetoothHelper.hpp"
+#include "Context.hpp"
+#include "Main.hpp"
+#include "NativeLeScanCallback.hpp"
 #include "PortBridge.hpp"
-#include "Java/String.hpp"
-#include "Java/Class.hpp"
+#include "Java/String.hxx"
+#include "Java/Class.hxx"
 
 #include <map>
 #include <string>
 
 namespace BluetoothHelper {
   static Java::TrivialClass cls;
+  static jfieldID hasLe_field;
   static jmethodID isEnabled_method;
   static jmethodID getNameFromAddress_method;
   static jmethodID list_method, connect_method, createServer_method;
+  static jmethodID startLeScan_method, stopLeScan_method;
 
   static std::map<std::string, std::string> address_to_name;
 }
@@ -42,20 +47,30 @@ bool
 BluetoothHelper::Initialise(JNIEnv *env)
 {
   assert(!cls.IsDefined());
-  assert(env != NULL);
+  assert(env != nullptr);
 
-  if (!cls.FindOptional(env, "org/tophat/BluetoothHelper"))
+  if (android_api_level < 5 ||
+      !cls.FindOptional(env, "org/tophat/BluetoothHelper"))
     /* Android < 2.0 doesn't have Bluetooth support */
     return false;
 
+  hasLe_field = env->GetStaticFieldID(cls, "hasLe", "Z");
   isEnabled_method = env->GetStaticMethodID(cls, "isEnabled", "()Z");
   getNameFromAddress_method = env->GetStaticMethodID(cls, "getNameFromAddress",
                                                      "(Ljava/lang/String;)Ljava/lang/String;");
   list_method = env->GetStaticMethodID(cls, "list", "()[Ljava/lang/String;");
   connect_method = env->GetStaticMethodID(cls, "connect",
-                                          "(Ljava/lang/String;)Lorg/tophat/AndroidPort;");
+                                          "(Landroid/content/Context;"
+                                          "Ljava/lang/String;)"
+                                          "Lorg/tophat/AndroidPort;");
   createServer_method = env->GetStaticMethodID(cls, "createServer",
                                                "()Lorg/tophat/AndroidPort;");
+
+  startLeScan_method = env->GetStaticMethodID(cls, "startLeScan",
+                                              "(Landroid/bluetooth/BluetoothAdapter$LeScanCallback;)Z");
+  stopLeScan_method = env->GetStaticMethodID(cls, "stopLeScan",
+                                             "(Landroid/bluetooth/BluetoothAdapter$LeScanCallback;)V");
+
   return true;
 }
 
@@ -105,26 +120,57 @@ jobjectArray
 BluetoothHelper::list(JNIEnv *env)
 {
   if (!cls.IsDefined())
-    return NULL;
+    return nullptr;
 
   /* call BluetoothHelper.connect() */
 
   return (jobjectArray)env->CallStaticObjectMethod(cls, list_method);
 }
 
+bool
+BluetoothHelper::HasLe(JNIEnv *env)
+{
+  return env->GetStaticBooleanField(cls, hasLe_field);
+}
+
+jobject
+BluetoothHelper::StartLeScan(JNIEnv *env, LeScanCallback &_cb)
+{
+  jobject cb = NativeLeScanCallback::Create(env, _cb);
+  if (cb == nullptr) {
+    env->ExceptionClear();
+    return nullptr;
+  }
+
+  if (!env->CallStaticBooleanMethod(cls, startLeScan_method, cb)) {
+    env->ExceptionClear();
+    env->DeleteLocalRef(cb);
+    return nullptr;
+  }
+
+  return cb;
+}
+
+void
+BluetoothHelper::StopLeScan(JNIEnv *env, jobject cb)
+{
+  env->CallStaticVoidMethod(cls, stopLeScan_method, cb);
+  env->DeleteLocalRef(cb);
+}
+
 PortBridge *
 BluetoothHelper::connect(JNIEnv *env, const char *address)
 {
   if (!cls.IsDefined())
-    return NULL;
+    return nullptr;
 
   /* call BluetoothHelper.connect() */
 
   const Java::String address2(env, address);
   jobject obj = env->CallStaticObjectMethod(cls, connect_method,
-                                            address2.Get());
-  if (obj == NULL)
-    return NULL;
+                                            context->Get(), address2.Get());
+  if (obj == nullptr)
+    return nullptr;
 
   PortBridge *helper = new PortBridge(env, obj);
   env->DeleteLocalRef(obj);
@@ -136,11 +182,11 @@ PortBridge *
 BluetoothHelper::createServer(JNIEnv *env)
 {
   if (!cls.IsDefined())
-    return NULL;
+    return nullptr;
 
   jobject obj = env->CallStaticObjectMethod(cls, createServer_method);
-  if (obj == NULL)
-    return NULL;
+  if (obj == nullptr)
+    return nullptr;
 
   PortBridge *helper = new PortBridge(env, obj);
   env->DeleteLocalRef(obj);

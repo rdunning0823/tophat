@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ AirspaceWarningManager::AirspaceWarningManager(const Airspaces &_airspaces)
   config.warning_time = -1;
 }
 
-const TaskProjection &
+const FlatProjection &
 AirspaceWarningManager::GetProjection() const
 {
   return airspaces.GetProjection();
@@ -103,7 +103,7 @@ AirspaceWarningManager::GetWarningPtr(const AbstractAirspace &airspace)
     if (&(w.GetAirspace()) == &airspace)
       return &w;
 
-  return NULL;
+  return nullptr;
 }
 
 AirspaceWarning*
@@ -218,7 +218,7 @@ public:
       return;
 
     AirspaceWarning *warning = warning_manager.GetWarningPtr(airspace);
-    if (warning == NULL || warning->IsStateAccepted(warning_state)) {
+    if (warning == nullptr || warning->IsStateAccepted(warning_state)) {
 
       AirspaceInterceptSolution solution;
 
@@ -232,7 +232,7 @@ public:
       if (solution.elapsed_time > max_time)
         return;
 
-      if (warning == NULL)
+      if (warning == nullptr)
         warning = warning_manager.GetNewWarningPtr(airspace);
 
       warning->UpdateSolution(warning_state, solution);
@@ -240,7 +240,7 @@ public:
     }
   }
 
-  virtual void Visit(const AbstractAirspace &as) override {
+  void Visit(const AbstractAirspace &as) override {
     Intersection(as);
   }
 
@@ -396,7 +396,7 @@ AirspaceWarningManager::UpdateInside(const AircraftState& state,
 
   Airspaces::AirspaceVector results = airspaces.FindInside(state, condition);
   for (const auto &i : results) {
-    const AbstractAirspace& airspace = *i.GetAirspace();
+    const AbstractAirspace &airspace = i.GetAirspace();
 
     if (!airspace.IsActive())
       continue; // ignore inactive airspaces
@@ -406,13 +406,14 @@ AirspaceWarningManager::UpdateInside(const AircraftState& state,
 
     AirspaceWarning *warning = GetWarningPtr(airspace);
 
-    if (warning == NULL || warning->IsStateAccepted(AirspaceWarning::WARNING_INSIDE)) {
+    if (warning == nullptr ||
+        warning->IsStateAccepted(AirspaceWarning::WARNING_INSIDE)) {
       GeoPoint c = airspace.ClosestPoint(state.location, GetProjection());
       const AirspaceAircraftPerformance perf_glide(glide_polar);
       AirspaceInterceptSolution solution;
       airspace.Intercept(state, c, GetProjection(), perf_glide, solution);
 
-      if (warning == NULL)
+      if (warning == nullptr)
         warning = GetNewWarningPtr(airspace);
 
       warning->UpdateSolution(AirspaceWarning::WARNING_INSIDE, solution);
@@ -421,6 +422,14 @@ AirspaceWarningManager::UpdateInside(const AircraftState& state,
   }
 
   return found;
+}
+
+void
+AirspaceWarningManager::Acknowledge(const AbstractAirspace &airspace)
+{
+  auto *w = GetWarningPtr(airspace);
+  if (w != nullptr)
+    w->Acknowledge();
 }
 
 void 
@@ -448,7 +457,7 @@ bool
 AirspaceWarningManager::GetAckDay(const AbstractAirspace &airspace) const
 {
   const AirspaceWarning *warning = GetWarningPtr(airspace);
-  return (warning != NULL ? warning->GetAckDay() : false);
+  return warning != nullptr && warning->GetAckDay();
 }
 
 bool

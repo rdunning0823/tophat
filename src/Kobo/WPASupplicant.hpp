@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,8 +24,14 @@ Copyright_License {
 #ifndef XCSOAR_KOBO_WIFI_HPP
 #define XCSOAR_KOBO_WIFI_HPP
 
-#include "Util/StaticString.hpp"
-#include "OS/SocketDescriptor.hpp"
+#include "Util/StaticString.hxx"
+#include "Net/SocketDescriptor.hpp"
+
+enum WifiSecurity {
+  WPA_SECURITY,
+  WEP_SECURITY,
+  OPEN_SECURITY,
+};
 
 struct WifiStatus {
   StaticString<32> bssid;
@@ -41,6 +47,7 @@ struct WifiVisibleNetwork {
   StaticString<32> bssid;
   StaticString<256> ssid;
   unsigned signal_level;
+  enum WifiSecurity security;
 };
 
 struct WifiConfiguredNetworkInfo {
@@ -55,6 +62,8 @@ class WPASupplicant {
   char local_path[32];
 
 public:
+  WPASupplicant():fd(SocketDescriptor::Undefined()) {}
+
   ~WPASupplicant() {
     Close();
   }
@@ -94,6 +103,8 @@ public:
   int AddNetwork();
 
   bool SetNetworkString(unsigned id, const char *name, const char *value);
+
+  bool SetNetworkID(unsigned id, const char *name, const char *value);
 
   bool SetNetworkSSID(unsigned id, const char *ssid) {
     return SetNetworkString(id, "ssid", ssid);

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,7 +30,6 @@ Copyright_License {
 #include "MainWindow.hpp"
 #include "LogFile.hpp"
 #include "Language/Language.hpp"
-#include "Dialogs/XML.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 #include "UtilsSettings.hpp"
@@ -46,7 +45,7 @@ Copyright_License {
 #endif
 
 enum ControlIndex {
-  DisplayOrientation,
+  MapOrientation,
   AppInfoBoxGeom,
   ScreensButtonLocation,
   AppInverseInfoBox,
@@ -56,15 +55,15 @@ enum ControlIndex {
 };
 
 static constexpr StaticEnumChoice display_orientation_list[] = {
-  { (unsigned)DisplaySettings::Orientation::DEFAULT,
+  { (unsigned)DisplayOrientation::DEFAULT,
     N_("Default") },
-  { (unsigned)DisplaySettings::Orientation::PORTRAIT,
+  { (unsigned)DisplayOrientation::PORTRAIT,
     N_("Portrait") },
-  { (unsigned)DisplaySettings::Orientation::LANDSCAPE,
+  { (unsigned)DisplayOrientation::LANDSCAPE,
     N_("Landscape") },
-  { (unsigned)DisplaySettings::Orientation::REVERSE_PORTRAIT,
+  { (unsigned)DisplayOrientation::REVERSE_PORTRAIT,
     N_("Reverse Portrait") },
-  { (unsigned)DisplaySettings::Orientation::REVERSE_LANDSCAPE,
+  { (unsigned)DisplayOrientation::REVERSE_LANDSCAPE,
     N_("Reverse Landscape") },
   { 0 }
 };
@@ -102,6 +101,8 @@ static constexpr StaticEnumChoice info_box_geometry_list[] = {
     N_("12 bottom or right") },
   { (unsigned)InfoBoxSettings::Geometry::TOP_LEFT_12,
     N_("12 top or left") },
+  { (unsigned)InfoBoxSettings::Geometry::RIGHT_16,
+    N_("16 Right (Landscape)") },
   { (unsigned)InfoBoxSettings::Geometry::RIGHT_24,
     N_("24 right (landscape)") },
   { (unsigned)InfoBoxSettings::Geometry::TOP_LEFT_4,
@@ -210,7 +211,7 @@ LayoutConfigPanel::Save(bool &_changed)
 
   if (Display::RotateSupported()) {
     orientation_changed =
-      SaveValueEnum(DisplayOrientation, ProfileKeys::DisplayOrientation,
+      SaveValueEnum(MapOrientation, ProfileKeys::MapOrientation,
                     ui_settings.display.orientation);
     changed |= orientation_changed;
   }
@@ -240,7 +241,7 @@ LayoutConfigPanel::Save(bool &_changed)
   if (orientation_changed) {
     assert(Display::RotateSupported());
 
-    if (ui_settings.display.orientation == DisplaySettings::Orientation::DEFAULT)
+    if (ui_settings.display.orientation == DisplayOrientation::DEFAULT)
       Display::RotateRestore();
     else {
       if (!Display::Rotate(ui_settings.display.orientation))

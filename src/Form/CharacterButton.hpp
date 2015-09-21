@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,16 +24,14 @@ Copyright_License {
 #ifndef XCSOAR_CHARACTER_BUTTON_HPP
 #define XCSOAR_CHARACTER_BUTTON_HPP
 
-#include "Screen/ButtonWindow.hpp"
+#include "Button.hpp"
 
 #include <tchar.h>
-
-struct ButtonLook;
 
 /**
  * A button that emits a character on press.
  */
-class CharacterButton : public ButtonWindow {
+class CharacterButton : public Button {
   typedef bool (*OnCharacterCallback)(unsigned key);
 
   OnCharacterCallback on_character;
@@ -43,11 +41,17 @@ public:
   void Create(ContainerWindow &parent, const ButtonLook &look,
               const TCHAR *text, PixelRect rc,
               OnCharacterCallback on_character, unsigned character,
-              const ButtonWindowStyle _style=ButtonWindowStyle());
+              const WindowStyle _style=WindowStyle());
 
   unsigned GetCharacter() const {
     return character;
   }
+
+  /**
+   * Convert GetCharacter() to upper case (ASCII only).
+   */
+  gcc_pure
+  unsigned GetUpperCharacter() const;
 
   void SetCharacter(unsigned character);
 

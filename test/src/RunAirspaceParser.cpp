@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
   const char *path = args.ExpectNext();
   args.ExpectEnd();
 
-  FileLineReader reader(path, ConvertLineReader::AUTO);
+  FileLineReader reader(path, Charset::AUTO);
   if (reader.error()) {
     fprintf(stderr, "Failed to open input file\n");
     return 1;

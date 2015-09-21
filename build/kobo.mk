@@ -1,8 +1,10 @@
 KOBO_MENU_SOURCES = \
 	$(SRC)/Version.cpp \
+	$(SRC)/Asset.cpp \
 	$(SRC)/Formatter/HexColor.cpp \
 	$(SRC)/Hardware/CPU.cpp \
 	$(SRC)/Hardware/DisplayDPI.cpp \
+	$(SRC)/Hardware/DisplaySize.cpp \
 	$(SRC)/Hardware/RotateDisplay.cpp \
 	$(SRC)/Screen/Layout.cpp \
 	$(SRC)/Screen/TerminalWindow.cpp \
@@ -10,6 +12,7 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Look/DialogLook.cpp \
 	$(SRC)/Look/IconLook.cpp \
 	$(SRC)/Look/ButtonLook.cpp \
+	$(SRC)/Look/CheckBoxLook.cpp \
 	$(SRC)/Gauge/LogoView.cpp \
 	$(SRC)/Dialogs/DialogSettings.cpp \
 	$(SRC)/Dialogs/WidgetDialog.cpp \
@@ -22,7 +25,9 @@ KOBO_MENU_SOURCES = \
 	$(TEST_SRC_DIR)/Fonts.cpp \
 	$(TEST_SRC_DIR)/FakeLanguage.cpp \
 	$(SRC)/Kobo/WPASupplicant.cpp \
+	$(SRC)/Kobo/Model.cpp \
 	$(SRC)/Kobo/System.cpp \
+	$(SRC)/Kobo/Kernel.cpp \
 	$(SRC)/Kobo/NetworkDialog.cpp \
 	$(SRC)/Kobo/SDCardSync.cpp \
 	$(SRC)/Kobo/WPASupplicant.cpp \
@@ -32,7 +37,7 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Kobo/FakeSymbols.cpp \
 	$(SRC)/Kobo/KoboMenu.cpp
 KOBO_MENU_LDADD = $(FAKE_LIBS)
-KOBO_MENU_DEPENDS = WIDGET FORM SCREEN EVENT RESOURCE ASYNC OS THREAD MATH UTIL
+KOBO_MENU_DEPENDS = WIDGET FORM SCREEN EVENT RESOURCE IO ASYNC LIBNET OS THREAD MATH UTIL
 KOBO_MENU_STRIP = y
 
 $(eval $(call link-program,KoboMenu,KOBO_MENU))
@@ -43,6 +48,10 @@ endif
 
 ifeq ($(TARGET_IS_KOBO),y)
 
+.PHONY: kobo-libs
+kobo-libs:
+	./kobo/build.py $(TARGET_OUTPUT_DIR) $(CC) $(CXX) $(AR) $(STRIP)
+
 KOBO_POWER_OFF_SOURCES = \
 	$(TEST_SRC_DIR)/Fonts.cpp \
 	$(SRC)/Hardware/RotateDisplay.cpp \
@@ -52,9 +61,10 @@ KOBO_POWER_OFF_SOURCES = \
 	$(SRC)/FlightInfo.cpp \
 	$(SRC)/Thread/Mutex.cpp \
 	$(SRC)/Version.cpp \
+	$(SRC)/Kobo/Model.cpp \
 	$(SRC)/Kobo/PowerOff.cpp
 KOBO_POWER_OFF_LDADD = $(FAKE_LIBS)
-KOBO_POWER_OFF_DEPENDS = SCREEN RESOURCE IO OS UTIL TIME
+KOBO_POWER_OFF_DEPENDS = SCREEN RESOURCE IO OS MATH UTIL TIME
 KOBO_POWER_OFF_STRIP = y
 $(eval $(call link-program,PowerOff,KOBO_POWER_OFF))
 OPTIONAL_OUTPUTS += $(KOBO_POWER_OFF_BIN)
@@ -68,7 +78,12 @@ fi)
 BITSTREAM_VERA_NAMES = Vera VeraBd VeraIt VeraBI VeraMono
 BITSTREAM_VERA_FILES = $(patsubst %,$(BITSTREAM_VERA_DIR)/%.ttf,$(BITSTREAM_VERA_NAMES))
 
-SYSROOT = $(shell $(CC) -print-sysroot)
+ifeq ($(USE_CROSSTOOL_NG),y)
+  SYSROOT = $(shell $(CC) -print-sysroot)
+else
+  # from Debian package libc6-armhf-cross
+  SYSROOT = /usr/arm-linux-gnueabihf
+endif
 
 # install our version of the system libraries in /opt/tophat/lib; this
 # is necessary because:
@@ -80,6 +95,10 @@ KOBO_SYS_LIB_NAMES = libc.so.6 libm.so.6 libpthread.so.0 librt.so.1 \
 	libdl.so.2 \
 	libresolv.so.2 libnss_dns.so.2 libnss_files.so.2 \
 	ld-linux-armhf.so.3
+
+# from Debian package libgcc1-armhf-cross
+KOBO_SYS_LIB_NAMES += libgcc_s.so.1
+
 KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 
 # Optionally, uImage files which supports USB HOST mode are created

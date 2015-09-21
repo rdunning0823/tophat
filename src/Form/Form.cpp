@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ Copyright_License {
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
+#include "Screen/OpenGL/VertexPointer.hpp"
 #endif
 
 #ifdef ANDROID
@@ -46,9 +47,9 @@ Copyright_License {
 #elif defined(ENABLE_SDL)
 #include "Event/SDL/Event.hpp"
 #include "Event/SDL/Loop.hpp"
-#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#elif defined(USE_POLL_EVENT)
 #include "Event/Shared/Event.hpp"
-#include "Event/Console/Loop.hpp"
+#include "Event/Poll/Loop.hpp"
 #elif defined(USE_GDI)
 #include "Event/GDI/Event.hpp"
 #include "Event/GDI/Loop.hpp"
@@ -95,8 +96,7 @@ WndForm::WndForm(const DialogLook &_look)
    modal_result(0), force(false),
    modeless(false),
    dragging(false),
-   client_area(_look),
-   default_focus(nullptr)
+   client_area(_look)
 {
 }
 
@@ -108,8 +108,7 @@ WndForm::WndForm(SingleWindow &main_window, const DialogLook &_look,
    modal_result(0), force(false),
    modeless(false),
    dragging(false),
-   client_area(_look),
-   default_focus(NULL)
+   client_area(_look)
 {
   Create(main_window, rc, Caption, AddBorder(style));
 }
@@ -143,7 +142,6 @@ WndForm::~WndForm()
      our own OnDestroy() method won't be called (during object
      destruction, this object loses its identity) */
   Destroy();
-  SubForm::Clear();
 }
 
 SingleWindow &
@@ -309,14 +307,6 @@ WndForm::OnCommand(unsigned id, unsigned code)
 
 #endif
 
-static bool
-IsSpecialKey(unsigned key_code)
-{
-  return key_code == KEY_LEFT || key_code == KEY_RIGHT ||
-    key_code == KEY_UP || key_code == KEY_DOWN ||
-    key_code == KEY_TAB || key_code == KEY_RETURN || key_code == KEY_ESCAPE;
-}
-
 /**
  * Is this key handled by the focused control? (bypassing the dialog
  * manager)
@@ -332,28 +322,11 @@ CheckKey(ContainerWindow *container, const Event &event)
   return (r & DLGC_WANTMESSAGE) != 0;
 #else
   Window *focused = container->GetFocusedWindow();
-  if (focused == NULL)
+  if (focused == nullptr)
     return false;
 
   return focused->OnKeyCheck(event.GetKeyCode());
 #endif
-}
-
-/**
- * Is this "special" key handled by the focused control? (bypassing
- * the dialog manager)
- */
-gcc_pure
-static bool
-CheckSpecialKey(ContainerWindow *container, const Event &event)
-{
-  return IsSpecialKey(event.GetKeyCode()) && CheckKey(container, event);
-}
-
-int WndForm::ShowModeless()
-{
-  modeless = true;
-  return ShowModal();
 }
 
 int
@@ -392,7 +365,7 @@ WndForm::ShowModal()
   main_window.Refresh();
 #endif
 
-#if defined(ANDROID) || defined(USE_CONSOLE) || defined(ENABLE_SDL) || defined(NON_INTERACTIVE)
+#if defined(ANDROID) || defined(USE_POLL_EVENT) || defined(ENABLE_SDL)
   EventLoop loop(*event_queue, main_window);
 #else
   DialogEventLoop loop(*event_queue, *this);
@@ -418,21 +391,23 @@ WndForm::ShowModal()
     }
 
     if (event.IsKeyDown()) {
-      if (
-#ifdef USE_GDI
-          IdentifyDescendant(event.msg.hwnd) &&
-#endif
-          !CheckSpecialKey(this, event) &&
-          OnAnyKeyDown(event.GetKeyCode()))
+      if (OnAnyKeyDown(event.GetKeyCode()))
         continue;
 
 #ifdef ENABLE_SDL
       if (event.GetKeyCode() == SDLK_TAB) {
         /* the Tab key moves the keyboard focus */
-        const Uint8 *keystate = ::SDL_GetKeyState(NULL);
+#if SDL_MAJOR_VERSION >= 2
+        const Uint8 *keystate = ::SDL_GetKeyboardState(nullptr);
+        event.event.key.keysym.sym =
+            keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]
+          ? SDLK_UP : SDLK_DOWN;
+#else
+        const Uint8 *keystate = ::SDL_GetKeyState(nullptr);
         event.event.key.keysym.sym =
           keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]
           ? SDLK_UP : SDLK_DOWN;
+#endif
       }
 #endif
 
@@ -482,9 +457,13 @@ WndForm::ShowModal()
 #endif
     }
 
-    if (event.IsCharacter() && character_function &&
-        character_function(event.GetCharacter()))
-      continue;
+    if (character_function && (event.GetCharacterCount() > 0)) {
+      bool handled = false;
+      for (size_t i = 0; i < event.GetCharacterCount(); ++i)
+        handled = character_function(event.GetCharacter(i)) || handled;
+      if (handled)
+        continue;
+    }
 
     loop.Dispatch(event);
   } // End Modal Loop
@@ -496,7 +475,7 @@ WndForm::ShowModal()
 #else
   if (old_focus_reference.Defined()) {
     Window *old_focus = old_focus_reference.Get(*root);
-    if (old_focus != NULL)
+    if (old_focus != nullptr)
       old_focus->SetFocus();
   }
 #endif /* !USE_GDI */
@@ -514,10 +493,9 @@ WndForm::OnPaint(Canvas &canvas)
   if (!IsDithered() && !IsMaximised() && is_active) {
     /* draw a shade around the current dialog to emphasise it */
     const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnableClientState(GL_COLOR_ARRAY);
 
     const PixelRect rc = GetClientRect();
-    const PixelScalar size = Layout::SmallScale(4);
+    const PixelScalar size = Layout::VptScale(4);
 
     const RasterPoint vertices[8] = {
       { rc.left, rc.top },
@@ -530,7 +508,7 @@ WndForm::OnPaint(Canvas &canvas)
       { rc.left - size, rc.bottom + size },
     };
 
-    glVertexPointer(2, GL_VALUE, 0, vertices);
+    const ScopeVertexPointer vp(vertices);
 
     static constexpr Color inner_color = COLOR_BLACK.WithAlpha(192);
     static constexpr Color outer_color = COLOR_BLACK.WithAlpha(16);
@@ -545,11 +523,7 @@ WndForm::OnPaint(Canvas &canvas)
       outer_color,
     };
 
-#ifdef HAVE_GLES
-    glColorPointer(4, GL_FIXED, 0, colors);
-#else
-    glColorPointer(4, GL_UNSIGNED_BYTE, 0, colors);
-#endif
+    const ScopeColorPointer cp(colors);
 
     static constexpr GLubyte indices[] = {
       0, 4, 1, 4, 5, 1,
@@ -560,8 +534,6 @@ WndForm::OnPaint(Canvas &canvas)
 
     glDrawElements(GL_TRIANGLES, ARRAY_SIZE(indices),
                    GL_UNSIGNED_BYTE, indices);
-
-    glDisableClientState(GL_COLOR_ARRAY);
   }
 #endif
 
@@ -600,14 +572,14 @@ WndForm::OnPaint(Canvas &canvas)
                      look.caption.background_bitmap);
 
       // Draw titlebar text
-      canvas.DrawText(title_rect.left + Layout::FastScale(2), title_rect.top,
-                      caption.c_str());
+      canvas.DrawText(title_rect.left + Layout::GetTextPadding(),
+                      title_rect.top, caption.c_str());
     } else {
 #endif
       canvas.SetBackgroundColor(is_active
                                 ? look.caption.background_color
                                 : look.caption.inactive_background_color);
-      canvas.DrawOpaqueText(title_rect.left + Layout::FastScale(2),
+      canvas.DrawOpaqueText(title_rect.left + Layout::GetTextPadding(),
                             title_rect.top, title_rect, caption.c_str());
 #ifdef EYE_CANDY
     }
@@ -630,7 +602,7 @@ WndForm::OnPaint(Canvas &canvas)
 void
 WndForm::SetCaption(const TCHAR *_caption)
 {
-  if (_caption == NULL)
+  if (_caption == nullptr)
     _caption = _T("");
 
   if (!caption.equals(_caption)) {
@@ -674,10 +646,7 @@ void
 WndForm::SetDefaultFocus()
 {
   SetFocus();
-  if (default_focus)
-    default_focus->SetFocus();
-  else
-    client_area.FocusFirstControl();
+  client_area.FocusFirstControl();
 }
 
 bool

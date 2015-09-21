@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,7 +30,14 @@ Copyright_License {
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Scope.hpp"
+#include "Screen/OpenGL/VertexPointer.hpp"
+
+#ifdef USE_GLSL
+#include "Screen/OpenGL/Globals.hpp"
+#include "Screen/OpenGL/Program.hpp"
+#else
 #include "Screen/OpenGL/Compatibility.hpp"
+#endif
 #endif
 
 #include <assert.h>
@@ -310,12 +317,11 @@ static_assert(ARRAY_SIZE(terrain_colors) == TerrainRendererSettings::NUM_RAMPS,
 //  mapscale/7.5 terrain units/pixel
 //
 // this is for TerrainInfo.StepSize = 0.0025;
-TerrainRenderer::TerrainRenderer(const RasterTerrain *_terrain)
+TerrainRenderer::TerrainRenderer(const RasterTerrain &_terrain)
   :terrain(_terrain),
    last_sun_azimuth(Angle::Zero()),
-   last_color_ramp(NULL)
+   last_color_ramp(nullptr)
 {
-  assert(terrain != NULL);
   settings.SetDefaults();
 }
 
@@ -355,7 +361,7 @@ TerrainRenderer::Generate(const WindowProjection &map_projection,
 
   if (old_bounds.IsValid() && old_bounds.IsInside(new_bounds) &&
       !IsLargeSizeDifference(old_bounds, new_bounds) &&
-      terrain_serial == terrain->GetSerial() &&
+      terrain_serial == terrain.GetSerial() &&
       sunazimuth.CompareRoughly(last_sun_azimuth) &&
       !raster_renderer.UpdateQuantisation())
     /* no change since previous frame */
@@ -363,7 +369,7 @@ TerrainRenderer::Generate(const WindowProjection &map_projection,
 
 #else
   if (compare_projection.Compare(map_projection) &&
-      terrain_serial == terrain->GetSerial() &&
+      terrain_serial == terrain.GetSerial() &&
       sunazimuth.CompareRoughly(last_sun_azimuth))
     /* no change since previous frame */
     return;
@@ -371,7 +377,7 @@ TerrainRenderer::Generate(const WindowProjection &map_projection,
   compare_projection = CompareProjection(map_projection);
 #endif
 
-  terrain_serial = terrain->GetSerial();
+  terrain_serial = terrain.GetSerial();
 
   last_sun_azimuth = sunazimuth;
 
@@ -386,20 +392,20 @@ TerrainRenderer::Generate(const WindowProjection &map_projection,
 
   const ColorRamp *const color_ramp = &terrain_colors[settings.ramp][0];
   if (color_ramp != last_color_ramp) {
-    raster_renderer.ColorTable(color_ramp, do_water,
-                               height_scale, interp_levels);
+    raster_renderer.PrepareColorTable(color_ramp, do_water,
+                                      height_scale, interp_levels);
     last_color_ramp = color_ramp;
   }
 
   {
-    RasterTerrain::Lease map(*terrain);
+    RasterTerrain::Lease map(terrain);
     raster_renderer.ScanMap(map, map_projection);
   }
 
   raster_renderer.GenerateImage(do_shading, height_scale,
                                 settings.contrast, settings.brightness,
                                 sunazimuth,
-				do_contour);
+                                do_contour);
 }
 
 /**
@@ -423,7 +429,7 @@ TerrainRenderer::Draw(Canvas &canvas,
     map_projection.GeoToScreen(bounds.GetSouthEast()),
   };
 
-  glVertexPointer(2, GL_VALUE, 0, vertices);
+  const ScopeVertexPointer vp(vertices);
 
   const GLTexture &texture = raster_renderer.BindAndGetTexture();
   const PixelSize allocated = texture.GetAllocatedSize();
@@ -443,13 +449,28 @@ TerrainRenderer::Draw(Canvas &canvas,
     x1, y1,
   };
 
+#ifdef USE_GLSL
+  OpenGL::texture_shader->Use();
+  glEnableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
+  glVertexAttribPointer(OpenGL::Attribute::TEXCOORD, 2, GL_FLOAT, GL_FALSE,
+                        0, coord);
+#else
+  const GLEnable<GL_TEXTURE_2D> scope;
   OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-  GLEnable scope(GL_TEXTURE_2D);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glTexCoordPointer(2, GL_FLOAT, 0, coord);
+#endif
+
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+#ifdef USE_GLSL
+  glDisableVertexAttribArray(OpenGL::Attribute::TEXCOORD);
+  OpenGL::solid_shader->Use();
+#else
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#endif
+
 #else
   CopyTo(canvas, map_projection.GetScreenWidth(),
          map_projection.GetScreenHeight());

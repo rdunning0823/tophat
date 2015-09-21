@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -111,11 +111,11 @@ TrailLook::Initialise(const TrailSettings &settings)
                                      Layout::ScalePenWidth(16) / NUMSNAILCOLORS));
 
     trail_widths[i] = iwidth;
-    trail_brushes[i].Set(color);
-    trail_pens[i].Set(minwidth, color);
-    scaled_trail_pens[i].Set(iwidth, color);
+    trail_brushes[i].Create(color);
+    trail_pens[i].Create(minwidth, color);
+    scaled_trail_pens[i].Create(iwidth, color);
   }
 
-  simple_pen.Set(simple_width, COLOR_BLACK);
-  trace_pen.Set(2, Color(50, 243, 45));
+  simple_pen.Create(simple_width, COLOR_BLACK);
+  trace_pen.Create(2, Color(50, 243, 45));
 }

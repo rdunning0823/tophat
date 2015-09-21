@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,9 +29,9 @@
 #ifdef ANDROID
 #include "Event/Android/Loop.hpp"
 #include "Event/Shared/Event.hpp"
-#elif defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#elif defined(USE_POLL_EVENT)
 #include "Event/Shared/Event.hpp"
-#include "Event/Console/Loop.hpp"
+#include "Event/Poll/Loop.hpp"
 #include "Screen/TopWindow.hpp"
 #elif defined(ENABLE_SDL)
 #include "Event/SDL/Event.hpp"
@@ -44,7 +44,7 @@
 #ifdef USE_FB
 #include "Hardware/RotateDisplay.hpp"
 bool
-Display::Rotate(DisplaySettings::Orientation orientation)
+Display::Rotate(DisplayOrientation orientation)
 {
   return false;
 }
@@ -52,13 +52,13 @@ Display::Rotate(DisplaySettings::Orientation orientation)
 
 #ifndef KOBO
 
-#ifdef USE_EGL
+#if defined(USE_EGL) || defined(USE_GLX)
 /* avoid TopWindow.cpp from being linked, as it brings some heavy
    dependencies */
 void TopWindow::Refresh() {}
 #endif
 
-#if defined(USE_CONSOLE) || defined(NON_INTERACTIVE)
+#ifdef USE_POLL_EVENT
 bool TopWindow::OnEvent(const Event &event) { return false; }
 #endif
 

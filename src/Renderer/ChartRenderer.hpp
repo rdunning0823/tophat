@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@ Copyright_License {
 #include "Math/fixed.hpp"
 #include "Screen/Point.hpp"
 #include "Look/ChartLook.hpp"
+#include "Language/Language.hpp"
 #include "Compiler.h"
 
 #include <tchar.h>
@@ -53,7 +54,7 @@ class ChartRenderer
 
     void Reset();
 
-    PixelScalar ToScreen(fixed value) const;
+    int ToScreen(fixed value) const;
   } x, y;
 
 public:
@@ -78,8 +79,8 @@ public:
                       const fixed xmax, const fixed ymax,
                       const Brush &brush);
   void DrawFilledY(const std::vector< std::pair<fixed, fixed> > &vals, const Brush &brush,
-                   const Pen* pen= NULL);
-  void DrawDot(const fixed x, const fixed y, const PixelScalar width);
+                   const Pen *pen=nullptr);
+  void DrawDot(const fixed x, const fixed y, const unsigned width);
 
   void ScaleYFromData(const LeastSquares &lsdata);
   void ScaleXFromData(const LeastSquares &lsdata);
@@ -105,7 +106,7 @@ public:
   void DrawYLabel(const TCHAR *text, const TCHAR *unit);
 
   void DrawLabel(const TCHAR *text, const fixed xv, const fixed yv);
-  void DrawNoData();
+  void DrawNoData(const TCHAR *text = _("No data"));
 
   fixed GetYMin() const { return y.min; }
   fixed GetYMax() const { return y.max; }
@@ -113,10 +114,10 @@ public:
   fixed GetXMax() const { return x.max; }
 
   gcc_pure
-  PixelScalar ScreenX(fixed x) const;
+  int ScreenX(fixed x) const;
 
   gcc_pure
-  PixelScalar ScreenY(fixed y) const;
+  int ScreenY(fixed y) const;
 
   gcc_pure
   RasterPoint ToScreen(fixed x, fixed y) const {

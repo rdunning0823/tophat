@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -30,9 +30,9 @@ Copyright_License {
 #include <windows.h>
 #endif
 
-ConvertLineReader::ConvertLineReader(LineReader<char> &_source, charset cs)
+ConvertLineReader::ConvertLineReader(LineReader<char> &_source, Charset cs)
   :source(_source),
-   m_charset(cs)
+   charset(cs)
 {
 }
 
@@ -53,39 +53,39 @@ ConvertLineReader::ReadLine()
 {
   char *narrow = source.ReadLine();
 
-  if (narrow == NULL)
-    return NULL;
+  if (narrow == nullptr)
+    return nullptr;
 
   // Check if there is byte order mark in front
   if (narrow[0] == (char)0xEF &&
       narrow[1] == (char)0xBB &&
       narrow[2] == (char)0xBF &&
-      (m_charset == AUTO || m_charset == UTF8)) {
+      (charset == Charset::AUTO || charset == Charset::UTF8)) {
     // -> if so, skip it
     narrow += 3;
 
     /* if it was "AUTO", then explicitly switch to UTF-8 now */
-    m_charset = UTF8;
+    charset = Charset::UTF8;
   }
 
-  if (m_charset == AUTO && !ValidateUTF8(narrow))
+  if (charset == Charset::AUTO && !ValidateUTF8(narrow))
     /* invalid UTF-8 sequence detected: switch to ISO-Latin-1 */
-    m_charset = ISO_LATIN_1;
+    charset = Charset::ISO_LATIN_1;
 
 #ifdef _UNICODE
   size_t narrow_length = strlen(narrow);
 
   TCHAR *t = tbuffer.get(narrow_length + 1);
-  if (t == NULL)
-    return NULL;
+  if (t == nullptr)
+    return nullptr;
 
   if (narrow_length == 0) {
     t[0] = _T('\0');
     return t;
   }
 
-  switch (m_charset) {
-  case ISO_LATIN_1:
+  switch (charset) {
+  case Charset::ISO_LATIN_1:
     iso_latin_1_to_tchar(t, narrow);
     break;
 
@@ -93,7 +93,7 @@ ConvertLineReader::ReadLine()
     int length = MultiByteToWideChar(CP_UTF8, 0, narrow, narrow_length,
                                      t, narrow_length);
     if (length == 0)
-      return NULL;
+      return nullptr;
 
     t[length] = _T('\0');
 
@@ -102,25 +102,25 @@ ConvertLineReader::ReadLine()
 
   return t;
 #else
-  switch (m_charset) {
+  switch (charset) {
     size_t buffer_size;
     const char *utf8;
 
-  case ISO_LATIN_1:
+  case Charset::ISO_LATIN_1:
     buffer_size = strlen(narrow) * 2 + 1;
     utf8 = Latin1ToUTF8(narrow, tbuffer.get(buffer_size), buffer_size);
-    if (utf8 == NULL)
+    if (utf8 == nullptr)
       return narrow;
     return const_cast<char *>(utf8);
 
-  case UTF8:
+  case Charset::UTF8:
     if (!ValidateUTF8(narrow))
       /* abort on invalid UTF-8 sequence */
-      return NULL;
+      return nullptr;
 
     /* fall through ... */
 
-  case AUTO:
+  case Charset::AUTO:
     return narrow;
   }
 

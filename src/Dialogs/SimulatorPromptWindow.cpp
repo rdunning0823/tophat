@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,17 +25,15 @@ Copyright_License {
 
 #ifdef SIMULATOR_AVAILABLE
 
-#include "Widget/WindowWidget.hpp"
 #include "Look/DialogLook.hpp"
-#include "Form/SymbolButton.hpp"
 #include "Language/Language.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/Canvas.hpp"
 #include "Gauge/LogoView.hpp"
 #include "Screen/Layout.hpp"
+#include "Renderer/BitmapButtonRenderer.hpp"
 #include "Simulator.hpp"
-
-class WndButton;
+#include "Resources.hpp"
 
 void
 SimulatorPromptWindow::OnCreate()
@@ -44,16 +42,23 @@ SimulatorPromptWindow::OnCreate()
 
   const PixelRect rc = GetClientRect();
 
-  ButtonWindowStyle style;
+  WindowStyle style;
   style.TabStop();
 
-  fly_button.Create(*this, _T("Fly"), rc, style,
+  fly_bitmap.Load(IDB_LAUNCHER1);
+  fly_bitmap.EnableInterpolation();
+  fly_button.Create(*this, rc, style,
+                    new BitmapButtonRenderer(fly_bitmap),
                     action_listener, FLY);
-  sim_button.Create(*this, _T("Simulator"), rc, style,
+
+  sim_bitmap.Load(IDB_LAUNCHER2);
+  sim_bitmap.EnableInterpolation();
+  sim_button.Create(*this, rc, style,
+                    new BitmapButtonRenderer(sim_bitmap),
                     action_listener, SIMULATOR);
 
   if (have_quit_button)
-    quit_button.Create(*this, _("Quit"), rc, style,
+    quit_button.Create(*this, look.button, _("Quit"), rc, style,
                        action_listener, QUIT);
 }
 
@@ -69,7 +74,7 @@ SimulatorPromptWindow::OnResize(PixelSize new_size)
   const unsigned button_width = Layout::Scale(112);
   const unsigned button_height = Layout::Scale(30);
   const unsigned label_height =
-    look.text_font->GetHeight() + Layout::GetTextPadding();
+    look.text_font.GetHeight() + Layout::GetTextPadding();
 
   PixelRect button_rc;
   button_rc.left = h_middle - button_width;
@@ -102,7 +107,7 @@ SimulatorPromptWindow::OnPaint(Canvas &canvas)
   canvas.ClearWhite();
   logo_view.draw(canvas, logo_rect);
 
-  canvas.Select(*look.text_font);
+  canvas.Select(look.text_font);
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
   canvas.DrawText(label_position.x, label_position.y,

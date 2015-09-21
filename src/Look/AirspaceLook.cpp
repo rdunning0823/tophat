@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -59,20 +59,26 @@ AirspaceClassLook::Initialise(const AirspaceClassRendererSettings &settings)
   if (AlphaBlendAvailable())
 #endif
 #if defined(HAVE_ALPHA_BLEND) || !defined(HAVE_HATCHED_BRUSH)
-    solid_brush.Set(fill_color);
+    solid_brush.Create(fill_color);
 #endif
 
   if (settings.border_width != 0)
-    border_pen.Set(Layout::ScalePenWidth(settings.border_width),
-                   Color(settings.border_color));
+    border_pen.Create(Layout::ScalePenWidth(settings.border_width),
+                      Color(settings.border_color));
+}
+
+void
+AirspaceLook::Reinitialise(const AirspaceRendererSettings &settings)
+{
+  for (unsigned i = 0; i < AIRSPACECLASSCOUNT; ++i)
+    classes[i].Initialise(settings.classes[i]);
 }
 
 void
 AirspaceLook::Initialise(const AirspaceRendererSettings &settings,
                          const Font &_name_font)
 {
-  for (unsigned i = 0; i < AIRSPACECLASSCOUNT; ++i)
-    classes[i].Initialise(settings.classes[i]);
+  Reinitialise(settings);
 
   // airspace brushes and colors
 #ifdef HAVE_HATCHED_BRUSH
@@ -86,12 +92,17 @@ AirspaceLook::Initialise(const AirspaceRendererSettings &settings,
   bitmaps[7].Load(IDB_AIRSPACE7);
 
   for (unsigned i = 0; i < ARRAY_SIZE(AirspaceLook::brushes); i++)
-    brushes[i].Set(bitmaps[i]);
+    brushes[i].Create(bitmaps[i]);
 #endif
 
-  thick_pen.Set(Layout::ScalePenWidth(10), COLOR_BLACK);
+  thick_pen.Create(Layout::ScalePenWidth(10), COLOR_BLACK);
 
-  intercept_icon.LoadResource(IDB_AIRSPACEI, IDB_AIRSPACEI_HD);
+  intercept_icon.LoadResource(IDB_AIRSPACEI, IDB_AIRSPACEI_HD, IDB_AIRSPACEI_HD2);
+
+  // labels
+  label_pen.Create(1, COLOR_BLUE);
+  label_brush.Create(COLOR_WHITE);
+  label_text_color = COLOR_BLUE;
 
   name_font = &_name_font;
 }

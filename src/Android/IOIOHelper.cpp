@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,9 +21,9 @@ Copyright_License {
 }
 */
 
-#include "Android/IOIOHelper.hpp"
+#include "IOIOHelper.hpp"
 #include "PortBridge.hpp"
-#include "Java/Class.hpp"
+#include "Java/Class.hxx"
 
 Java::TrivialClass IOIOHelper::cls;
 jmethodID IOIOHelper::ctor,
@@ -34,7 +34,7 @@ bool
 IOIOHelper::Initialise(JNIEnv *env)
 {
   assert(!cls.IsDefined());
-  assert(env != NULL);
+  assert(env != nullptr);
 
   if (!cls.FindOptional(env, "org/tophat/IOIOHelper"))
     return false;
@@ -57,8 +57,8 @@ PortBridge *
 IOIOHelper::openUart(JNIEnv *env, unsigned ID, unsigned baud)
 {
   jobject obj = env->CallObjectMethod(Get(), openUart_method, ID, (int)baud);
-  if (obj == NULL)
-    return NULL;
+  if (obj == nullptr)
+    return nullptr;
 
   PortBridge *bridge = new PortBridge(env, obj);
   env->DeleteLocalRef(obj);
@@ -68,7 +68,7 @@ IOIOHelper::openUart(JNIEnv *env, unsigned ID, unsigned baud)
 IOIOHelper::IOIOHelper(JNIEnv *env)
 {
   jobject obj = env->NewObject(cls, ctor);
-  assert(obj != NULL);
+  assert(obj != nullptr);
 
   Set(env, obj);
 

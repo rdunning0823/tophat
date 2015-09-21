@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 
 #include "Formatter/GeoPointFormatter.hpp"
 #include "Util/Macros.hpp"
-#include "Util/StringUtil.hpp"
+#include "Util/StringAPI.hpp"
 #include "TestUtil.hpp"
 
 static bool
@@ -101,7 +101,7 @@ main(int argc, char **argv)
                  CoordinateFormat::UTM);
   ok1(StringIsEqualWildcard(buffer, _T("19H 4051** 6386***")));
 
-  // Test seperator
+  // Test separator
   FormatGeoPoint(location1, buffer, ARRAY_SIZE(buffer),
                  CoordinateFormat::DDMMSS, _T('\n'));
   ok1(StringIsEqual(buffer, _T("49°29'14\" N\n008°27'59\" E")));

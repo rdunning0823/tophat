@@ -2,7 +2,7 @@
  Copyright_License {
 
  XCSoar Glide Computer - http://www.xcsoar.org/
- Copyright (C) 2000-2013 The XCSoar Project
+ Copyright (C) 2000-2015 The XCSoar Project
  A detailed list of copyright holders can be found in the file "AUTHORS".
 
  This program is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@
  */
 
 #include "Task/TaskFileSeeYou.hpp"
+#include "Util/ExtractParameters.hpp"
+#include "Util/StringAPI.hpp"
 #include "Util/Macros.hpp"
 #include "IO/FileLineReader.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
@@ -88,7 +90,7 @@ ParseTaskTime(const TCHAR* str)
   if (str != end && _tcslen(str) > 3 && str[2] == _T(':')) {
     mm = _tcstol(str + 3, &end, 10);
     if (str != end && _tcslen(str + 3) > 3 && str[5] == _T(':'))
-      ss = _tcstol(str + 6, NULL, 10);
+      ss = _tcstol(str + 6, nullptr, 10);
   }
   return fixed(ss + mm * 60 + hh * 3600);
 }
@@ -156,12 +158,12 @@ ParseOptions(SeeYouTaskInformation *task_info, const TCHAR *params[],
 {
   // Iterate through available task options
   for (unsigned i = 1; i < n_params; i++) {
-    if (_tcsncmp(params[i], _T("WpDis"), 5) == 0) {
+    if (StringIsEqual(params[i], _T("WpDis"), 5)) {
       // Parse WpDis option
       if (_tcslen(params[i]) > 6 &&
-          _tcsncmp(params[i] + 6, _T("False"), 5) == 0)
+          StringIsEqual(params[i] + 6, _T("False"), 5))
         task_info->wp_dis = false;
-    } else if (_tcsncmp(params[i], _T("TaskTime"), 8) == 0) {
+    } else if (StringIsEqual(params[i], _T("TaskTime"), 8)) {
       // Parse TaskTime option
       if (_tcslen(params[i]) > 9)
         task_info->task_time = ParseTaskTime(params[i] + 9);
@@ -192,31 +194,31 @@ ParseOZs(SeeYouTurnpointInformation turnpoint_infos[], const TCHAR *params[],
     const TCHAR *pair = params[i];
     SeeYouTurnpointInformation &tp_info = turnpoint_infos[oz_index];
 
-    if (_tcsncmp(pair, _T("Style"), 5) == 0) {
+    if (StringIsEqual(pair, _T("Style"), 5)) {
       if (_tcslen(pair) > 6)
         tp_info.style = ParseStyle(pair + 6);
-    } else if (_tcsncmp(pair, _T("R1="), 3) == 0) {
+    } else if (StringIsEqual(pair, _T("R1="), 3)) {
       if (_tcslen(pair) > 3)
         tp_info.radius1 = ParseRadius(pair + 3);
-    } else if (_tcsncmp(pair, _T("A1="), 3) == 0) {
+    } else if (StringIsEqual(pair, _T("A1="), 3)) {
       if (_tcslen(pair) > 3)
         tp_info.angle1 = ParseAngle(pair + 3);
-    } else if (_tcsncmp(pair, _T("R2="), 3) == 0) {
+    } else if (StringIsEqual(pair, _T("R2="), 3)) {
       if (_tcslen(pair) > 3)
         tp_info.radius2 = ParseRadius(pair + 3);
-    } else if (_tcsncmp(pair, _T("A2="), 3) == 0) {
+    } else if (StringIsEqual(pair, _T("A2="), 3)) {
       if (_tcslen(pair) > 3)
         tp_info.angle2 = ParseAngle(pair + 3);
-    } else if (_tcsncmp(pair, _T("A12="), 4) == 0) {
+    } else if (StringIsEqual(pair, _T("A12="), 4)) {
       if (_tcslen(pair) > 3)
         tp_info.angle12 = ParseAngle(pair + 4);
-    } else if (_tcsncmp(pair, _T("MaxAlt="), 7) == 0) {
+    } else if (StringIsEqual(pair, _T("MaxAlt="), 7)) {
       if (_tcslen(pair) > 7)
         tp_info.max_altitude = ParseMaxAlt(pair + 7);
-      } else if (_tcsncmp(pair, _T("Line"), 4) == 0) {
+      } else if (StringIsEqual(pair, _T("Line"), 4)) {
       if (_tcslen(pair) > 5 && pair[5] == _T('1'))
         tp_info.is_line = true;
-    } else if (_tcsncmp(pair, _T("Reduce"), 6) == 0) {
+    } else if (StringIsEqual(pair, _T("Reduce"), 6)) {
       if (_tcslen(pair) > 7 && pair[7] == _T('1'))
         tp_info.reduce = true;
     }
@@ -240,16 +242,16 @@ ParseCUTaskDetails(FileLineReader &reader, SeeYouTaskInformation *task_info,
   TCHAR *line;
   int TPIndex = 0;
   const unsigned int max_params = ARRAY_SIZE(params);
-  while ((line = reader.ReadLine()) != NULL &&
+  while ((line = reader.ReadLine()) != nullptr &&
          line[0] != _T('\"') && line[0] != _T(',')) {
-    const size_t n_params = WaypointReaderBase::
-        ExtractParameters(line, params_buffer, params, max_params, true);
+    const size_t n_params = ExtractParameters(line, params_buffer,
+                                              params, max_params, true);
 
-    if (_tcscmp(params[0], _T("Options")) == 0) {
+    if (StringIsEqual(params[0], _T("Options"))) {
       // Options line found
       ParseOptions(task_info, params, n_params);
 
-    } else if (_tcsncmp(params[0], _T("ObsZone"), 7) == 0) {
+    } else if (StringIsEqual(params[0], _T("ObsZone"), 7)) {
       // Observation zone line found
       if (_tcslen(params[0]) <= 8)
         continue;
@@ -335,12 +337,12 @@ CreateOZ(const SeeYouTurnpointInformation &turnpoint_infos,
          unsigned pos, unsigned size, const Waypoint *wps[],
          TaskFactoryType factType)
 {
-  ObservationZonePoint* oz = NULL;
+  ObservationZonePoint* oz = nullptr;
   const bool is_intermediate = (pos > 0) && (pos < (size - 1));
   const Waypoint *wp = wps[pos];
 
   if (!turnpoint_infos.valid)
-    return NULL;
+    return nullptr;
 
   if (factType == TaskFactoryType::RACING &&
       is_intermediate && isKeyhole(turnpoint_infos))
@@ -414,7 +416,7 @@ CreatePoint(unsigned pos, unsigned n_waypoints, const Waypoint *wp,
     AbstractTaskFactory& fact, ObservationZonePoint* oz,
     const TaskFactoryType factType)
 {
-  OrderedTaskPoint *pt = NULL;
+  OrderedTaskPoint *pt = nullptr;
 
   if (pos == 0)
     pt = (oz ? fact.CreateStart(oz, *wp) : fact.CreateStart(*wp));
@@ -438,7 +440,7 @@ AdvanceReaderToTask(FileLineReader &reader, const unsigned index)
   unsigned count = 0;
   bool in_task_section = false;
   TCHAR *line;
-  for (unsigned i = 0; (line = reader.ReadLine()) != NULL; i++) {
+  for (unsigned i = 0; (line = reader.ReadLine()) != nullptr; i++) {
     if (in_task_section) {
       if (line[0] == _T('\"') || line[0] == _T(',')) {
         if (count == index)
@@ -458,33 +460,34 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
                         const Waypoints *waypoints, unsigned index) const
 {
   // Create FileReader for reading the task
-  FileLineReader reader(path, ConvertLineReader::AUTO);
+  FileLineReader reader(path, Charset::AUTO);
   if (reader.error())
-    return NULL;
+    return nullptr;
 
   // Read waypoints from the CUP file
   Waypoints file_waypoints;
   {
-    WaypointReaderSeeYou waypoint_file(0);
+    const WaypointFactory factory(WaypointOrigin::NONE);
+    WaypointReaderSeeYou waypoint_file(factory);
     NullOperationEnvironment operation;
     waypoint_file.Parse(file_waypoints, reader, operation);
   }
   file_waypoints.Optimise();
 
   if (!reader.Rewind())
-    return NULL;
+    return nullptr;
 
   TCHAR *line = AdvanceReaderToTask(reader, index);
-  if (line == NULL)
-    return NULL;
+  if (line == nullptr)
+    return nullptr;
 
   // Read waypoint list
   // e.g. "Club day 4 Racing task","085PRI","083BOJ","170D_K","065SKY","0844YY", "0844YY"
   //       TASK NAME              , TAKEOFF, START  , TP1    , TP2    , FINISH ,  LANDING
   TCHAR waypoints_buffer[1024];
   const TCHAR *wps[30];
-  size_t n_waypoints = WaypointReaderBase::
-      ExtractParameters(line, waypoints_buffer, wps, 30, true, _T('"'));
+  size_t n_waypoints = ExtractParameters(line, waypoints_buffer, wps, 30,
+                                         true, _T('"'));
 
   // Some versions of StrePla append a trailing ',' without a following
   // WP name resulting an empty last entry. Remove it from the results
@@ -493,7 +496,7 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
 
   // At least taskname and takeoff, start, finish and landing points are needed
   if (n_waypoints < 5)
-    return NULL;
+    return nullptr;
 
   // Remove taskname, start point and landing point from count
   n_waypoints -= 3;
@@ -524,15 +527,15 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
   // mark task waypoints.  Skip takeoff and landing point
   for (unsigned i = 0; i < n_waypoints; i++) {
     const Waypoint* file_wp = file_waypoints.LookupName(wps[i + 2]);
-    if (file_wp == NULL)
-      return NULL;
+    if (file_wp == nullptr)
+      return nullptr;
 
     // Try to find waypoint by name
     const Waypoint* wp = waypoints->LookupName(file_wp->name);
 
     // If waypoint by name found and closer than 10m to the original
-    if (wp != NULL &&
-        wp->location.Distance(file_wp->location) <= fixed(10)) {
+    if (wp != nullptr &&
+        wp->location.DistanceS(file_wp->location) <= fixed(10)) {
       // Use this waypoint for the task
       waypoints_in_task[i] = wp;
       continue;
@@ -542,8 +545,8 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
     wp = waypoints->GetNearest(file_wp->location, fixed(10));
 
     // If closest waypoint found and closer than 10m to the original
-    if (wp != NULL &&
-        wp->location.Distance(file_wp->location) <= fixed(10)) {
+    if (wp != nullptr &&
+        wp->location.DistanceS(file_wp->location) <= fixed(10)) {
       // Use this waypoint for the task
       waypoints_in_task[i] = wp;
       continue;
@@ -562,7 +565,7 @@ TaskFileSeeYou::GetTask(const TaskBehaviour &task_behaviour,
     OrderedTaskPoint *pt = CreatePoint(i, n_waypoints, waypoints_in_task[i],
                                        fact, oz, factType);
 
-    if (pt != NULL)
+    if (pt != nullptr)
       fact.Append(*pt, false);
 
     delete pt;
@@ -584,14 +587,14 @@ TaskFileSeeYou::Count()
   namesuffixes.clear();
 
   // Open the CUP file
-  FileLineReader reader(path, ConvertLineReader::AUTO);
+  FileLineReader reader(path, Charset::AUTO);
   if (reader.error())
     return 0;
 
   unsigned count = 0;
   bool in_task_section = false;
   TCHAR *line;
-  while ((line = reader.ReadLine()) != NULL) {
+  while ((line = reader.ReadLine()) != nullptr) {
     if (in_task_section) {
       // If the line starts with a string or "nothing" followed
       // by a comma it is a new task definition line
@@ -600,7 +603,7 @@ TaskFileSeeYou::Count()
         if (count < namesuffixes.capacity()) {
           // If the task doesn't have a name inside the file
           if (line[0] == _T(','))
-            namesuffixes.append(NULL);
+            namesuffixes.append(nullptr);
           else {
             // Ignore starting quote (")
             line++;
@@ -618,7 +621,7 @@ TaskFileSeeYou::Count()
             if (_tcslen(name) > 0)
               namesuffixes.append(_tcsdup(name));
             else
-              namesuffixes.append(NULL);
+              namesuffixes.append(nullptr);
           }
         }
 

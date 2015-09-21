@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,9 +24,9 @@ Copyright_License {
 #ifndef XCSOAR_DISPLAY_SETTINGS_HPP
 #define XCSOAR_DISPLAY_SETTINGS_HPP
 
-#include <type_traits>
+#include "DisplayOrientation.hpp"
 
-#include <stdint.h>
+#include <type_traits>
 
 /**
  * Display settings.
@@ -34,13 +34,7 @@ Copyright_License {
 struct DisplaySettings {
   bool enable_auto_blank;
 
-  enum class Orientation : uint8_t {
-    DEFAULT,
-    PORTRAIT,
-    LANDSCAPE,
-    REVERSE_PORTRAIT,
-    REVERSE_LANDSCAPE,
-  } orientation;
+  DisplayOrientation orientation;
 
   void SetDefaults();
 };

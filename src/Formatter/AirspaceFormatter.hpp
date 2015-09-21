@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -54,7 +54,8 @@ const TCHAR *GetClassShort(const AbstractAirspace &airspace);
   void FormatAltitude(TCHAR *buffer, const AirspaceAltitude &altitude);
 
   /** Returns the airspace altitude limit as short text with unit. */
-  void FormatAltitudeShort(TCHAR *buffer, const AirspaceAltitude &altitude);
+  void FormatAltitudeShort(TCHAR *buffer, const AirspaceAltitude &altitude,
+                           bool include_unit = true);
 }
 
 #endif

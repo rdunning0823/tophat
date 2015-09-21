@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,12 +26,14 @@ Copyright_License {
 
 #include <assert.h>
 
-AndroidPort::AndroidPort(DataHandler &_handler, PortBridge *_bridge)
-  :BufferedPort(_handler), bridge(_bridge)
+AndroidPort::AndroidPort(PortListener *_listener, DataHandler &_handler,
+                         PortBridge *_bridge)
+  :BufferedPort(_listener, _handler), bridge(_bridge)
 {
   assert(bridge != nullptr);
 
-  bridge->setListener(Java::GetEnv(), this);
+  bridge->setListener(Java::GetEnv(), _listener);
+  bridge->setInputListener(Java::GetEnv(), this);
 }
 
 AndroidPort::~AndroidPort()

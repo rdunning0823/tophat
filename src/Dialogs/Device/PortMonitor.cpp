@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,18 +23,19 @@ Copyright_License {
 
 #include "PortMonitor.hpp"
 #include "Dialogs/Message.hpp"
-#include "Look/DialogLook.hpp"
+#include "Look/Look.hpp"
 #include "Screen/TerminalWindow.hpp"
-#include "Form/Form.hpp"
-#include "Form/ButtonPanel.hpp"
+#include "Widget/WindowWidget.hpp"
+#include "Dialogs/WidgetDialog.hpp"
 #include "Form/ActionListener.hpp"
 #include "Device/Descriptor.hpp"
 #include "Util/Macros.hpp"
-#include "Util/FifoBuffer.hpp"
+#include "Util/StaticFifoBuffer.hpp"
 #include "Language/Language.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Event/DelayedNotify.hpp"
 #include "Thread/Mutex.hpp"
+#include "UIGlobals.hpp"
 
 enum Buttons {
   CLEAR = 100,
@@ -49,7 +50,7 @@ enum Buttons {
 class PortTerminalBridge : public DataHandler, private DelayedNotify {
   TerminalWindow &terminal;
   Mutex mutex;
-  FifoBuffer<char, 1024> buffer;
+  StaticFifoBuffer<char, 1024> buffer;
 
 public:
   PortTerminalBridge(TerminalWindow &_terminal)
@@ -58,9 +59,10 @@ public:
 
   virtual void DataReceived(const void *data, size_t length) {
     mutex.Lock();
+    buffer.Shift();
     auto range = buffer.Write();
-    if (range.length < length)
-      length = range.length;
+    if (range.size < length)
+      length = range.size;
     memcpy(range.data, data, length);
     buffer.Append(length);
     mutex.Unlock();
@@ -79,7 +81,7 @@ private:
         if (range.IsEmpty())
           break;
 
-        length = std::min(ARRAY_SIZE(data), size_t(range.length));
+        length = std::min(ARRAY_SIZE(data), size_t(range.size));
         memcpy(data, range.data, length);
         buffer.Consume(length);
       }
@@ -89,28 +91,19 @@ private:
   }
 };
 
-class PortMonitorGlue : public ActionListener {
+class PortMonitorWidget final : public WindowWidget, public ActionListener {
   DeviceDescriptor &device;
   TerminalWindow terminal;
   PortTerminalBridge bridge;
 
-  WndButton *pause_button;
+  Button *pause_button;
   bool paused;
 
 public:
-  PortMonitorGlue(DeviceDescriptor &_device, const TerminalLook &look)
+  PortMonitorWidget(DeviceDescriptor &_device, const TerminalLook &look)
     :device(_device), terminal(look), bridge(terminal), paused(false) {}
 
-  ~PortMonitorGlue() {
-    device.SetMonitor(nullptr);
-  }
-
-  void CreateButtons(ButtonPanel &buttons);
-
-  void CreateTerminal(ContainerWindow &parent, const PixelRect &rc) {
-    terminal.Create(parent, rc);
-    device.SetMonitor(&bridge);
-  }
+  void CreateButtons(WidgetDialog &dialog);
 
   void Clear() {
     terminal.Clear();
@@ -119,6 +112,21 @@ public:
   void Reconnect();
   void TogglePause();
 
+  /* virtual methods from class Widget */
+
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override {
+    WindowStyle style;
+    style.Hide();
+    terminal.Create(parent, rc, style);
+    SetWindow(&terminal);
+    device.SetMonitor(&bridge);
+  }
+
+  void Unprepare() override {
+    device.SetMonitor(nullptr);
+  }
+
+  /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override {
     switch (id) {
     case CLEAR:
@@ -137,15 +145,15 @@ public:
 };
 
 void
-PortMonitorGlue::CreateButtons(ButtonPanel &buttons)
+PortMonitorWidget::CreateButtons(WidgetDialog &dialog)
 {
-  buttons.Add(_("Clear"), *this, CLEAR);
-  buttons.Add(_("Reconnect"), *this, RECONNECT);
-  pause_button = buttons.Add(_("Pause"), *this, PAUSE);
+  dialog.AddButton(_("Clear"), *this, CLEAR);
+  dialog.AddButton(_("Reconnect"), *this, RECONNECT);
+  pause_button = dialog.AddButton(_("Pause"), *this, PAUSE);
 }
 
 void
-PortMonitorGlue::Reconnect()
+PortMonitorWidget::Reconnect()
 {
   if (device.IsOccupied()) {
     ShowMessageBox(_("Device is occupied"), _("Manage"), MB_OK | MB_ICONERROR);
@@ -159,7 +167,7 @@ PortMonitorGlue::Reconnect()
 }
 
 void
-PortMonitorGlue::TogglePause()
+PortMonitorWidget::TogglePause()
 {
   paused = !paused;
 
@@ -173,34 +181,22 @@ PortMonitorGlue::TogglePause()
 }
 
 void
-ShowPortMonitor(SingleWindow &parent, const DialogLook &dialog_look,
-                const TerminalLook &terminal_look,
-                DeviceDescriptor &device)
+ShowPortMonitor(DeviceDescriptor &device)
 {
-  /* create the dialog */
-
-  WindowStyle dialog_style;
-  dialog_style.Hide();
-  dialog_style.ControlParent();
+  const Look &look = UIGlobals::GetLook();
 
   TCHAR buffer[64];
   StaticString<128> caption;
   caption.Format(_T("%s: %s"), _("Port monitor"),
                  device.GetConfig().GetPortName(buffer, ARRAY_SIZE(buffer)));
 
-  WndForm dialog(dialog_look);
-  dialog.Create(parent, caption, dialog_style);
+  PortMonitorWidget widget(device, look.terminal);
 
-  ContainerWindow &client_area = dialog.GetClientAreaWindow();
-
-  PortMonitorGlue glue(device, terminal_look);
-
-  ButtonPanel buttons(client_area, dialog_look.button);
-  buttons.AddSymbol(_T("_X"), dialog, mrOK);
-  glue.CreateButtons(buttons);
-  glue.CreateTerminal(client_area, buttons.UpdateLayout());
-
-  /* run it */
+  WidgetDialog dialog(look.dialog);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), caption, &widget);
+  dialog.AddButton(_T("_X"), mrOK);
+  widget.CreateButtons(dialog);
 
   dialog.ShowModal();
+  dialog.StealWidget();
 }

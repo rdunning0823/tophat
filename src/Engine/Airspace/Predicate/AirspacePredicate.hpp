@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@ public:
  */
 class AirspacePredicateTrue final : public AirspacePredicate {
 public:
-  virtual bool operator()(const AbstractAirspace& t) const override {
+  bool operator()(gcc_unused const AbstractAirspace& t) const override {
     return true;
   }
 };
@@ -66,7 +66,7 @@ public:
   template<typename... Args>
   WrapAirspacePredicate(Args&&... args):P(args...) {}
 
-  virtual bool operator()(const AbstractAirspace& t) const override {
+  bool operator()(const AbstractAirspace& t) const override {
     return static_cast<const P &>(*this)(t);
   }
 };
@@ -83,7 +83,7 @@ class AndAirspacePredicate final : public AirspacePredicate {
                        const AirspacePredicate &_b)
     :a(_a), b(_b) {}
 
-  virtual bool operator()(const AbstractAirspace &t) const override {
+  bool operator()(const AbstractAirspace &t) const override {
     return a(t) && b(t);
   }
 };

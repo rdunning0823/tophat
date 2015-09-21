@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -56,7 +56,7 @@ AircraftSim::Integrate(const Angle heading, const fixed timestep)
 {
   GeoPoint v = GetEndPoint(heading, timestep);
   state.track = state.location.Bearing(v);
-  state.ground_speed = v.Distance(state.location)/timestep;
+  state.ground_speed = v.DistanceS(state.location)/timestep;
   state.location = v;
   state.altitude += state.vario*timestep;
   state.time += timestep;

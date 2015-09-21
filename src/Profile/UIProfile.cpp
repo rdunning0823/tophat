@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,127 +21,138 @@ Copyright_License {
 }
 */
 
-#include "Profile/UIProfile.hpp"
-#include "Profile/MapProfile.hpp"
-#include "Profile/InfoBoxConfig.hpp"
-#include "Profile/PageProfile.hpp"
-#include "Profile/Profile.hpp"
-#include "Profile/UnitsConfig.hpp"
+#include "UIProfile.hpp"
+#include "ProfileKeys.hpp"
+#include "Map.hpp"
+#include "MapProfile.hpp"
+#include "InfoBoxConfig.hpp"
+#include "PageProfile.hpp"
+#include "UnitsConfig.hpp"
 #include "UISettings.hpp"
 
 namespace Profile {
-  static void Load(DisplaySettings &settings);
-  static void Load(VarioSettings &settings);
-  static void Load(TrafficSettings &settings);
-  static void Load(DialogSettings &settings);
-  static void Load(SoundSettings &settings);
-  static void Load(VarioSoundSettings &settings);
+  static void Load(const ProfileMap &map, DisplaySettings &settings);
+  static void Load(const ProfileMap &map, FormatSettings &settings);
+  static void Load(const ProfileMap &map, VarioSettings &settings);
+  static void Load(const ProfileMap &map, TrafficSettings &settings);
+  static void Load(const ProfileMap &map, DialogSettings &settings);
+  static void Load(const ProfileMap &map, SoundSettings &settings);
+  static void Load(const ProfileMap &map, VarioSoundSettings &settings);
 };
 
 void
-Profile::Load(DisplaySettings &settings)
+Profile::Load(const ProfileMap &map, DisplaySettings &settings)
 {
-  Get(ProfileKeys::AutoBlank, settings.enable_auto_blank);
-  GetEnum(ProfileKeys::DisplayOrientation, settings.orientation);
+  map.Get(ProfileKeys::AutoBlank, settings.enable_auto_blank);
+  map.GetEnum(ProfileKeys::MapOrientation, settings.orientation);
 }
 
 void
-Profile::Load(VarioSettings &settings)
+Profile::Load(const ProfileMap &map, FormatSettings &settings)
 {
-  Get(ProfileKeys::AppGaugeVarioSpeedToFly, settings.show_speed_to_fly);
-  Get(ProfileKeys::AppGaugeVarioAvgText, settings.show_average);
-  Get(ProfileKeys::AppGaugeVarioMc, settings.show_mc);
-  Get(ProfileKeys::AppGaugeVarioBugs, settings.show_bugs);
-  Get(ProfileKeys::AppGaugeVarioBallast, settings.show_ballast);
-  Get(ProfileKeys::AppGaugeVarioGross, settings.show_gross);
-  Get(ProfileKeys::AppAveNeedle, settings.show_average_needle);
+  map.GetEnum(ProfileKeys::LatLonUnits, settings.coordinate_format);
+  LoadUnits(map, settings.units);
 }
 
 void
-Profile::Load(TrafficSettings &settings)
+Profile::Load(const ProfileMap &map, VarioSettings &settings)
 {
-  Get(ProfileKeys::EnableFLARMGauge, settings.enable_gauge);
-  Get(ProfileKeys::AutoCloseFlarmDialog, settings.auto_close_dialog);
-  Get(ProfileKeys::FlarmAutoZoom, settings.auto_zoom);
-  Get(ProfileKeys::FlarmNorthUp, settings.north_up);
+  map.Get(ProfileKeys::AppGaugeVarioSpeedToFly, settings.show_speed_to_fly);
+  map.Get(ProfileKeys::AppGaugeVarioAvgText, settings.show_average);
+  map.Get(ProfileKeys::AppGaugeVarioMc, settings.show_mc);
+  map.Get(ProfileKeys::AppGaugeVarioBugs, settings.show_bugs);
+  map.Get(ProfileKeys::AppGaugeVarioBallast, settings.show_ballast);
+  map.Get(ProfileKeys::AppGaugeVarioGross, settings.show_gross);
+  map.Get(ProfileKeys::AppAveNeedle, settings.show_average_needle);
 }
 
 void
-Profile::Load(DialogSettings &settings)
+Profile::Load(const ProfileMap &map, TrafficSettings &settings)
 {
-//  use default tab style
-//  GetEnum(ProfileKeys::AppDialogTabStyle, settings.tab_style);
-  GetEnum(ProfileKeys::AppTextInputStyle, settings.text_input_style);
-  Get(ProfileKeys::UserLevel, settings.expert);
+  map.Get(ProfileKeys::EnableFLARMGauge, settings.enable_gauge);
+  map.Get(ProfileKeys::AutoCloseFlarmDialog, settings.auto_close_dialog);
+  map.Get(ProfileKeys::FlarmAutoZoom, settings.auto_zoom);
+  map.Get(ProfileKeys::FlarmNorthUp, settings.north_up);
+  map.GetEnum(ProfileKeys::FlarmLocation, settings.gauge_location);
 }
 
 void
-Profile::Load(VarioSoundSettings &settings)
+Profile::Load(const ProfileMap &map, DialogSettings &settings)
 {
-  Get(ProfileKeys::SoundAudioVario, settings.enabled);
-  Get(ProfileKeys::SoundVolume, settings.volume);
-  Get(ProfileKeys::VarioDeadBandEnabled, settings.dead_band_enabled);
-
-  Get(ProfileKeys::VarioMinFrequency, settings.min_frequency);
-  Get(ProfileKeys::VarioZeroFrequency, settings.zero_frequency);
-  Get(ProfileKeys::VarioMaxFrequency, settings.max_frequency);
-
-  Get(ProfileKeys::VarioMinPeriod, settings.min_period_ms);
-  Get(ProfileKeys::VarioMaxPeriod, settings.max_period_ms);
-
-  Get(ProfileKeys::VarioDeadBandMin, settings.min_dead);
-  Get(ProfileKeys::VarioDeadBandMax, settings.max_dead);
+  map.GetEnum(ProfileKeys::AppTextInputStyle, settings.text_input_style);
+  //  use default tab style
+  //map.GetEnum(ProfileKeys::AppDialogTabStyle, settings.tab_style);
+  map.Get(ProfileKeys::UserLevel, settings.expert);
 }
 
 void
-Profile::Load(SoundSettings &settings)
+Profile::Load(const ProfileMap &map, VarioSoundSettings &settings)
 {
-  Get(ProfileKeys::SoundTask, settings.sound_task_enabled);
-  Get(ProfileKeys::SoundModes, settings.sound_modes_enabled);
-  Get(ProfileKeys::SoundDeadband, settings.sound_deadband);
+  map.Get(ProfileKeys::SoundAudioVario, settings.enabled);
+  map.Get(ProfileKeys::SoundVolume, settings.volume);
+  map.Get(ProfileKeys::VarioDeadBandEnabled, settings.dead_band_enabled);
 
-  Load(settings.vario);
+  map.Get(ProfileKeys::VarioMinFrequency, settings.min_frequency);
+  map.Get(ProfileKeys::VarioZeroFrequency, settings.zero_frequency);
+  map.Get(ProfileKeys::VarioMaxFrequency, settings.max_frequency);
+
+  map.Get(ProfileKeys::VarioMinPeriod, settings.min_period_ms);
+  map.Get(ProfileKeys::VarioMaxPeriod, settings.max_period_ms);
+
+  map.Get(ProfileKeys::VarioDeadBandMin, settings.min_dead);
+  map.Get(ProfileKeys::VarioDeadBandMax, settings.max_dead);
 }
 
 void
-Profile::Load(UISettings &settings)
+Profile::Load(const ProfileMap &map, SoundSettings &settings)
 {
-  Load(settings.display);
+  map.Get(ProfileKeys::SoundTask, settings.sound_task_enabled);
+  map.Get(ProfileKeys::SoundModes, settings.sound_modes_enabled);
+  map.Get(ProfileKeys::SoundDeadband, settings.sound_deadband);
 
-// hard code to default
-//  Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
+  Load(map, settings.vario);
+}
 
-  Get(ProfileKeys::ShowWaypointListWarning,
+void
+Profile::Load(const ProfileMap &map, UISettings &settings)
+{
+  Load(map, settings.display);
+
+  map.Get(ProfileKeys::ShowWaypointListWarning,
       settings.show_waypoints_list_warning);
-  Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
+  map.Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
-  GetEnum(ProfileKeys::WaypointSortDirection, settings.waypoint_sort_direction);
+  map.GetEnum(ProfileKeys::WaypointSortDirection, settings.waypoint_sort_direction);
+  // hard code to default
+  //map.Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 
 #ifndef GNAV
-  Get(ProfileKeys::UseCustomFonts, settings.custom_fonts);
+  map.Get(ProfileKeys::UIScale, settings.scale);
+  if (settings.scale < 50 || settings.scale > 200)
+    settings.scale = 100;
 #endif
 
-  Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);
+  map.Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);
 
-//  hard code to default value
-//  GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
+  map.Get(ProfileKeys::AirspaceWarningDialog, settings.enable_airspace_warning_dialog);
 
-  GetEnum(ProfileKeys::HapticFeedback, settings.haptic_feedback);
+  //  hard code to default value
+  map.GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
 
-  GetEnum(ProfileKeys::LatLonUnits, settings.coordinate_format);
+  map.GetEnum(ProfileKeys::HapticFeedback, settings.haptic_feedback);
 
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   settings.screens_button_location = UISettings::ScreensButtonLocation::MENU;
 #else
-  GetEnum(ProfileKeys::ScreensButtonLocation, settings.screens_button_location);
+  map.GetEnum(ProfileKeys::ScreensButtonLocation, settings.screens_button_location);
 #endif
 
-  LoadUnits(settings.units);
-  Load(settings.map);
-  Load(settings.info_boxes);
-  Load(settings.vario);
-  Load(settings.traffic);
-  Load(settings.pages);
-  Load(settings.dialog);
-  Load(settings.sound);
+  Load(map, settings.format);
+  Load(map, settings.map);
+  Load(map, settings.info_boxes);
+  Load(map, settings.vario);
+  Load(map, settings.traffic);
+  Load(map, settings.pages);
+  Load(map, settings.dialog);
+  Load(map, settings.sound);
 }

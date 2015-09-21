@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,23 +39,21 @@ public:
 private:
   const RouteLink &link;
   fixed min_distance;
-  const TaskProjection &proj;
+  const FlatProjection &proj;
   const RoutePolars &rpolar;
-  const GeoPoint origin;
   AIVResult nearest;
 
 public:
   AIV(const RouteLink &_e,
-      const TaskProjection &_proj,
+      const FlatProjection &_proj,
       const RoutePolars &_rpolar)
    :link(_e),
     min_distance(-1),
     proj(_proj),
     rpolar(_rpolar),
-    origin(proj.Unproject(_e.first)),
     nearest((const AbstractAirspace *)nullptr, _e.first) {}
 
-  virtual void Visit(const AbstractAirspace &as) override {
+  void Visit(const AbstractAirspace &as) override {
     assert(!intersections.empty());
 
     GeoPoint point = intersections[0].first;
@@ -93,7 +91,7 @@ public:
   }
 
 protected:
-  virtual void Visit(const AbstractAirspace &as) override {
+  void Visit(const AbstractAirspace &as) override {
     m_found = &as;
   }
 };
@@ -101,9 +99,9 @@ protected:
 AirspaceRoute::RouteAirspaceIntersection
 AirspaceRoute::FirstIntersecting(const RouteLink &e) const
 {
-  const GeoPoint origin(task_projection.Unproject(e.first));
-  const GeoPoint dest(task_projection.Unproject(e.second));
-  AIV visitor(e, task_projection, rpolars_route);
+  const GeoPoint origin(projection.Unproject(e.first));
+  const GeoPoint dest(projection.Unproject(e.second));
+  AIV visitor(e, projection, rpolars_route);
   m_airspaces.VisitIntersecting(origin, dest, visitor);
   const AIV::AIVResult res(visitor.GetNearest());
   ++count_airspace;
@@ -148,7 +146,7 @@ AirspaceRoute::FindClearingPair(const SearchPointVector &spv,
         continue;
       }
     } else {
-      AGeoPoint gborder(task_projection.Unproject(pborder), dest.altitude); // @todo alt!
+      AGeoPoint gborder(projection.Unproject(pborder), dest.altitude); // @todo alt!
       if (!check_others || !InsideOthers(gborder)) {
         if (j == 0) {
           p.first = pborder;
@@ -311,10 +309,9 @@ void
 AirspaceRoute::OnSolve(const AGeoPoint &origin, const AGeoPoint &destination)
 {
   if (m_airspaces.IsEmpty()) {
-    task_projection.Reset(origin);
-    task_projection.Update();
+    projection.SetCenter(origin);
   } else {
-    task_projection = m_airspaces.GetProjection();
+    projection = m_airspaces.GetProjection();
   }
 }
 

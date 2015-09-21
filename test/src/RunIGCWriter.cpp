@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -51,9 +51,9 @@ int main(int argc, char **argv)
                      _T("Ventus"), _T("D-1234"),
                      _T("MM"), "FOO", driver_name, true);
 
-  GPSClock log_clock(fixed(1));
+  GPSClock log_clock;
   while (replay->Next())
-    if (log_clock.CheckAdvance(replay->Basic().time))
+    if (log_clock.CheckAdvance(replay->Basic().time, fixed(1)))
       writer.LogPoint(replay->Basic());
 
   writer.Flush();

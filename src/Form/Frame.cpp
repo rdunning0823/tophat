@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,12 +28,18 @@ Copyright_License {
 
 #include <winuser.h>
 
+WndFrame::WndFrame(const DialogLook &_look)
+  :look(_look),
+   caption_color(look.text_color)
+{
+  text.clear();
+}
+
 WndFrame::WndFrame(ContainerWindow &parent, const DialogLook &_look,
                    PixelRect rc,
                    const WindowStyle style)
   :look(_look),
-   caption_color(look.text_color),
-   mCaptionStyle(DT_LEFT | DT_NOCLIP | DT_WORDBREAK)
+   caption_color(look.text_color)
 {
   text.clear();
 
@@ -43,15 +49,14 @@ WndFrame::WndFrame(ContainerWindow &parent, const DialogLook &_look,
 void
 WndFrame::SetAlignCenter()
 {
-  mCaptionStyle &= ~(DT_LEFT|DT_RIGHT);
-  mCaptionStyle |= DT_CENTER;
+  text_renderer.SetCenter();
   Invalidate();
 }
 
 void
 WndFrame::SetVAlignCenter()
 {
-  mCaptionStyle |= DT_VCENTER;
+  text_renderer.SetVCenter();
   Invalidate();
 }
 
@@ -70,27 +75,25 @@ WndFrame::GetTextHeight() const
   rc.Grow(-padding);
 
   AnyCanvas canvas;
-  canvas.Select(*look.text_font);
-  canvas.DrawFormattedText(&rc, text.c_str(), mCaptionStyle | DT_CALCRECT);
+  canvas.Select(look.text_font);
 
-  return rc.bottom - rc.top;
+  return text_renderer.GetHeight(canvas, rc, text.c_str());
 }
 
 void
 WndFrame::OnPaint(Canvas &canvas)
 {
-#ifdef HAVE_CLIPPING
-  canvas.Clear(look.background_brush);
-#endif
+  if (HaveClipping())
+    canvas.Clear(look.background_brush);
 
   canvas.SetTextColor(caption_color);
   canvas.SetBackgroundTransparent();
 
-  canvas.Select(*look.text_font);
+  canvas.Select(look.text_font);
 
   PixelRect rc = GetClientRect();
   const int padding = Layout::GetTextPadding();
   rc.Grow(-padding);
 
-  canvas.DrawFormattedText(&rc, text.c_str(), mCaptionStyle);
+  text_renderer.Draw(canvas, rc, text.c_str());
 }

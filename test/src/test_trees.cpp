@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,11 +24,13 @@
 #include "harness_airspace.hpp"
 #include "test_debug.hpp"
 #include "OS/FileUtil.hpp"
-
-#define n_test 500
-
 #include "Waypoint/WaypointVisitor.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
+#include "test_debug.hpp"
+
+#include <fstream>
+
+#define n_test 500
 
 class WaypointVisitorPrint: public WaypointVisitor {
 public:

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,8 +36,16 @@ class WindowWidget : public NullWidget {
   Window *window;
 
 public:
+  /**
+   * Initialise an empty instance.  Call SetWindow() to finish it.
+   */
   WindowWidget():window(nullptr) {}
 
+  /**
+   * Initialise an instance with an existing #Window pointer.  It must
+   * be hidden or undefined (i.e. not yet created).  However, it must
+   * be created before the #Widget gets shown.
+   */
   WindowWidget(Window *_window);
 
 protected:
@@ -68,9 +76,10 @@ protected:
   }
 
 public:
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
-  virtual void Move(const PixelRect &rc) override;
+  /* virtual methods from class Widget */
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
+  void Move(const PixelRect &rc) override;
 };
 
 #endif

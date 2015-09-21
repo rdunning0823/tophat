@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
  */
 
 #include "AirspacePolygon.hpp"
-#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/Flat/FlatProjection.hpp"
 #include "Geo/Flat/FlatRay.hpp"
 #include "AirspaceIntersectSort.hpp"
 #include "AirspaceIntersectionVector.hpp"
@@ -30,41 +30,56 @@ AirspacePolygon::AirspacePolygon(const std::vector<GeoPoint> &pts,
                                  const bool prune)
   :AbstractAirspace(Shape::POLYGON)
 {
-  if (pts.size() < 2) {
-    m_is_convex = true;
+  assert(pts.size() >= 3);
+
+  m_border.reserve(pts.size() + 1);
+
+  for (const GeoPoint &pt : pts)
+    m_border.emplace_back(pt);
+
+  // ensure airspace is closed
+  const GeoPoint &p_start = pts.front();
+  const GeoPoint &p_end = pts.back();
+  if (p_start != p_end)
+    m_border.emplace_back(p_start);
+
+
+  if (prune) {
+    // only for testing
+    m_border.PruneInterior();
+    is_convex = TriState::TRUE;
   } else {
-    m_border.reserve(pts.size() + 1);
-
-    for (const GeoPoint &pt : pts)
-      m_border.emplace_back(pt);
-
-    // ensure airspace is closed
-    GeoPoint p_start = pts[0];
-    GeoPoint p_end = *(pts.end() - 1);
-    if (p_start != p_end)
-      m_border.emplace_back(p_start);
-
-
-    if (prune) {
-      // only for testing
-      m_border.PruneInterior();
-      m_is_convex = true;
-    } else {
-      m_is_convex = m_border.IsConvex();
-    }
+    is_convex = TriState::UNKNOWN;
   }
 }
 
-const GeoPoint 
-AirspacePolygon::GetCenter() const
+const GeoPoint
+AirspacePolygon::GetReferenceLocation() const
 {
-  if (m_border.empty())
-    return GeoPoint::Invalid();
+  assert(m_border.size() >= 3);
 
   return m_border[0].GetLocation();
 }
 
-bool 
+const GeoPoint
+AirspacePolygon::GetCenter() const
+{
+  assert(m_border.size() >= 3);
+
+  fixed lat(0), lon(0);
+
+  for (const auto &pt : m_border) {
+    lat += pt.GetLocation().latitude.Native();
+    lon += pt.GetLocation().longitude.Native();
+  }
+
+  lon = lon / m_border.size();
+  lat = lat / m_border.size();
+
+  return GeoPoint(Angle::Native(lon), Angle::Native(lat));
+}
+
+bool
 AirspacePolygon::Inside(const GeoPoint &loc) const
 {
   return m_border.IsInside(loc);
@@ -72,7 +87,7 @@ AirspacePolygon::Inside(const GeoPoint &loc) const
 
 AirspaceIntersectionVector
 AirspacePolygon::Intersects(const GeoPoint &start, const GeoPoint &end,
-                            const TaskProjection &projection) const
+                            const FlatProjection &projection) const
 {
   const FlatRay ray(projection.ProjectInteger(start),
                     projection.ProjectInteger(end));
@@ -90,9 +105,9 @@ AirspacePolygon::Intersects(const GeoPoint &start, const GeoPoint &end,
   return sorter.all();
 }
 
-GeoPoint 
+GeoPoint
 AirspacePolygon::ClosestPoint(const GeoPoint &loc,
-                              const TaskProjection &projection) const
+                              const FlatProjection &projection) const
 {
   const FlatGeoPoint p = projection.ProjectInteger(loc);
   const FlatGeoPoint pb = m_border.NearestPoint(p);

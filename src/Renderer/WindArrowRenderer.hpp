@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,11 +24,12 @@ Copyright_License {
 #ifndef XCSOAR_WIND_ARROW_RENDERER_HPP
 #define XCSOAR_WIND_ARROW_RENDERER_HPP
 
-#include "Screen/Point.hpp"
 #include "MapSettings.hpp"
 
 class Canvas;
 class Angle;
+struct RasterPoint;
+struct PixelRect;
 struct WindArrowLook;
 struct SpeedVector;
 struct DerivedInfo;
@@ -47,8 +48,8 @@ public:
             const MapSettings &settings);
 
   void DrawArrow(Canvas &canvas, RasterPoint pos, Angle angle,
-                 PixelScalar length, WindArrowStyle arrow_style,
-                 PixelScalar offset = 23);
+                 unsigned length, WindArrowStyle arrow_style,
+                 int offset = 23);
 };
 
 #endif

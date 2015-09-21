@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -58,7 +58,7 @@ main(int argc, char **argv)
   InitialiseIOThread();
 
   MyHandler handler;
-  Port *port = OpenPort(config, handler);
+  Port *port = OpenPort(config, nullptr, handler);
   if (port == NULL) {
     fprintf(stderr, "Failed to open COM port\n");
     return EXIT_FAILURE;
@@ -88,7 +88,7 @@ main(int argc, char **argv)
         (memcmp(line + 3, "GGA", 3) == 0 ||
          memcmp(line + 3, "RMC", 3) == 0) &&
         line[6] == ',' &&
-        strncmp(stamp, line + 7, sizeof(stamp)) != 0) {
+        !StringIsEqual(stamp, line + 7, sizeof(stamp))) {
       /* the time stamp has changed - sleep for one second */
       Sleep(1000);
       strncpy(stamp, line + 7, sizeof(stamp));

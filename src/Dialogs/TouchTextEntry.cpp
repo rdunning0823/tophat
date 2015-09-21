@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/SymbolButton.hpp"
 #include "Form/Edit.hpp"
+#include "Form/LambdaActionListener.hpp"
 #include "Widget/KeyboardWidget.hpp"
 #include "Widget/KeyboardNumericWidget.hpp"
 #include "Screen/Layout.hpp"
@@ -239,22 +240,25 @@ TouchTextEntry(TCHAR *text, size_t width,
   _editor.SetReadOnly();
   editor = &_editor;
 
-  ButtonWindowStyle button_style;
+  WindowStyle button_style;
   button_style.TabStop();
 
   WndSymbolButton ok_button(client_area, look.button, _T("_X"),
                             { ok_left, button_top, ok_right, button_bottom },
                             button_style, form, mrOK);
 
-  WndButton cancel_button(client_area, look.button, _("Cancel"),
-                          { cancel_left, button_top,
-                              cancel_right, button_bottom },
-                          button_style, form, mrCancel);
+  Button cancel_button(client_area, look.button, _("Cancel"),
+                       { cancel_left, button_top,
+                           cancel_right, button_bottom },
+                       button_style, form, mrCancel);
 
-  WndButton clear_button(client_area, look.button, _("Clear"),
-                         { clear_left, button_top,
-                             clear_right, button_bottom },
-                         button_style, ClearText);
+  auto clear_listener = MakeLambdaActionListener([](unsigned id){
+      ClearText();
+    });
+  Button clear_button(client_area, look.button, _("Clear"),
+                      { clear_left, button_top,
+                          clear_right, button_bottom },
+                      button_style, clear_listener, 0);
 
   KeyboardWidget keyboard(look.button, FormCharacter, !accb,
                           default_shift_state);
@@ -271,10 +275,13 @@ TouchTextEntry(TCHAR *text, size_t width,
   kb = &keyboard;
   knb = nullptr;
 
-  WndButton backspace_button(client_area, look.button, _T("<-"),
-                             { backspace_left, padding, rc.right - padding,
-                                 editor_bottom },
-                             button_style, OnBackspace);
+  auto backspace_listener = MakeLambdaActionListener([](unsigned id){
+      OnBackspace();
+    });
+  Button backspace_button(client_area, look.button, _T("<-"),
+                          { backspace_left, padding, rc.right - padding,
+                              editor_bottom },
+                          button_style, backspace_listener, 0);
 
   AllowedCharactersCallback = accb;
 

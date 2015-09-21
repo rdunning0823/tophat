@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,6 +21,7 @@ Copyright_License {
 }
 */
 
+#include "Screen/Features.hpp"
 #include "Screen/SingleWindow.hpp"
 #include "Event/SDL/Event.hpp"
 
@@ -31,7 +32,7 @@ Copyright_License {
 bool
 SingleWindow::FilterEvent(const Event &_event, Window *allowed) const
 {
-  assert(allowed != NULL);
+  assert(allowed != nullptr);
 
   const SDL_Event &event = _event.event;
 
@@ -39,8 +40,17 @@ SingleWindow::FilterEvent(const Event &_event, Window *allowed) const
   case SDL_MOUSEMOTION:
   case SDL_MOUSEBUTTONDOWN:
   case SDL_MOUSEBUTTONUP:
+#ifdef HAVE_HIGHDPI_SUPPORT
+    {
+      Sint32 x = event.button.x;
+      Sint32 y = event.button.y;
+      PointToReal(x, y);
+      return FilterMouseEvent(RasterPoint(x, y), allowed);
+    }
+#else
     return FilterMouseEvent(RasterPoint(event.button.x, event.button.y),
                             allowed);
+#endif
 
   default:
     return true;

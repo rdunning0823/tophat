@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,36 +24,55 @@ Copyright_License {
 #ifndef XCSOAR_TASK_CLOSE_PANEL_HPP
 #define XCSOAR_TASK_CLOSE_PANEL_HPP
 
-#include "Widget/XMLWidget.hpp"
+#include "Widget/Widget.hpp"
+#include "Form/Frame.hpp"
+#include "Form/Button.hpp"
+#include "Form/ActionListener.hpp"
 
 class TaskManagerDialog;
-class OrderedTask;
-class WndFrame;
-class WndButton;
 
-class TaskClosePanel final : public XMLWidget {
+class TaskClosePanel final : public NullWidget, ActionListener {
+  enum Buttons {
+    CLOSE,
+    REVERT,
+  };
+
+  struct Layout {
+    PixelRect close_button, message, revert_button;
+
+    Layout(PixelRect rc, const DialogLook &look);
+  };
+
 public:
   TaskManagerDialog &dialog;
 
 private:
   bool *task_modified;
 
-  WndFrame *wStatus;
-  WndButton *cmdRevert, *cmdClose;
+  const DialogLook &look;
+
+  Button close_button;
+  WndFrame message;
+  Button revert_button;
 
 public:
-  TaskClosePanel(TaskManagerDialog &_dialog, bool *_task_modified)
-    :dialog(_dialog), task_modified(_task_modified) {}
+  TaskClosePanel(TaskManagerDialog &_dialog, bool *_task_modified,
+                 const DialogLook &_look);
 
   void CommitAndClose();
   void RefreshStatus();
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual bool Click() override;
-  virtual void ReClick() override;
-  virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
-  virtual bool SetFocus() override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  bool Click() override;
+  void ReClick() override;
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
+  void Move(const PixelRect &rc) override;
+  bool SetFocus() override;
+
+private:
+  /* virtual methods from class ActionListener */
+  void OnAction(int id) override;
 };
 
 #endif

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_FORM_CHECK_BOX_HPP
 #define XCSOAR_FORM_CHECK_BOX_HPP
 
-#include "Screen/CheckBox.hpp"
+#include "Screen/PaintWindow.hpp"
+#include "Util/tstring.hpp"
 
 struct DialogLook;
 class ContainerWindow;
@@ -33,69 +34,52 @@ class ActionListener;
 /**
  * This class is used for creating buttons.
  */
-class CheckBoxControl : public CheckBox {
-public:
-  typedef void (*ClickNotifyCallback)(CheckBoxControl &button);
+class CheckBoxControl : public PaintWindow {
+  bool checked, dragging, pressed;
 
-private:
+  const DialogLook *look;
+  tstring caption;
+
   ActionListener *listener;
-#ifdef USE_GDI
   int id;
-#endif
-
-  /**
-   * The callback-function that should be called when the button is pressed
-   * @see SetOnClickNotify()
-   */
-  ClickNotifyCallback click_notify_callback;
 
 public:
-  /**
-   * @param parent Parent window/ContainerControl
-   * @param caption Text on the button
-   * @param click_notify_callback The function that should be called
-   * when the button is clicked
-   */
-  CheckBoxControl(ContainerWindow &parent, const DialogLook &look,
-                  tstring::const_pointer caption,
-                  const PixelRect &rc,
-                  const CheckBoxStyle style,
-                  ClickNotifyCallback click_notify_callback = NULL);
-
-  CheckBoxControl(ContainerWindow &parent, const DialogLook &look,
-                  tstring::const_pointer caption,
-                  const PixelRect &rc,
-                  const CheckBoxStyle style,
-                  ActionListener *listener, int id);
+  void Create(ContainerWindow &parent, const DialogLook &look,
+              tstring::const_pointer caption,
+              const PixelRect &rc,
+              const WindowStyle style,
+              ActionListener &listener, int id);
 
   /**
    * Set the object that will receive click events.
    */
-  void SetListener(ActionListener *_listener) {
+  void SetListener(ActionListener &_listener) {
     assert(listener == nullptr);
 
-    listener = _listener;
+    listener = &_listener;
   }
 
-  /**
-   * Sets the function that should be called when the button is pressed
-   * @param Function Pointer to the function to be called
-   */
-  void
-  SetOnClickNotify(ClickNotifyCallback _click_notify_callback)
-  {
-    assert(listener == nullptr);
-
-    click_notify_callback = _click_notify_callback;
+  bool GetState() const {
+    return checked;
   }
 
-  virtual bool OnClicked() override;
+  void SetState(bool value);
 
-#ifdef _WIN32_WCE
 protected:
-  virtual bool OnKeyCheck(unsigned key_code) const override;
-  virtual bool OnKeyDown(unsigned key_code) override;
-#endif
+  void SetPressed(bool value);
+
+  virtual bool OnClicked();
+
+  /* virtual methods from class Window */
+  bool OnKeyCheck(unsigned key_code) const override;
+  bool OnKeyDown(unsigned key_code) override;
+  bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
+  bool OnMouseDown(PixelScalar x, PixelScalar y) override;
+  bool OnMouseUp(PixelScalar x, PixelScalar y) override;
+  void OnSetFocus() override;
+  void OnKillFocus() override;
+  void OnCancelMode() override;
+  void OnPaint(Canvas &canvas) override;
 };
 
 #endif

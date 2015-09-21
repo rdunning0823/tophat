@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,14 +26,13 @@ Copyright_License {
 
 #include "Geo/GeoPoint.hpp"
 #include "Geo/GeoVector.hpp"
-#include "Markers/Marker.hpp"
 #include "FLARM/FlarmId.hpp"
 #include "FLARM/Color.hpp"
 #include "NMEA/ThermalLocator.hpp"
 #include "Weather/Features.hpp"
 #include "Engine/Route/ReachResult.hpp"
 #include "Tracking/SkyLines/Features.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 #ifdef HAVE_NOAA
 #include "Weather/NOAAStore.hpp"
@@ -58,7 +57,6 @@ struct MapItem
     WEATHER,
 #endif
     AIRSPACE,
-    MARKER,
     THERMAL,
     WAYPOINT,
     TRAFFIC,
@@ -141,15 +139,6 @@ struct WaypointMapItem: public MapItem
     :MapItem(WAYPOINT), waypoint(_waypoint) {}
 };
 
-struct MarkerMapItem: public MapItem
-{
-  unsigned id;
-  Marker marker;
-
-  MarkerMapItem(unsigned _id, const Marker &_marker)
-    :MapItem(MARKER), id(_id), marker(_marker) {}
-};
-
 #ifdef HAVE_NOAA
 struct WeatherStationMapItem: public MapItem
 {
@@ -175,11 +164,15 @@ struct SkyLinesTrafficMapItem : public MapItem
 {
   uint32_t id, time_of_day_ms;
 
+  int altitude;
+
   StaticString<40> name;
 
   SkyLinesTrafficMapItem(uint32_t _id, uint32_t _time_of_day_ms,
+                         int _altitude,
                          const TCHAR *_name)
     :MapItem(SKYLINES_TRAFFIC), id(_id), time_of_day_ms(_time_of_day_ms),
+     altitude(_altitude),
      name(_name) {}
 };
 

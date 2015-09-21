@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@ Copyright_License {
 #include "IO/LineReader.hpp"
 #include "Units/System.hpp"
 #include "Util/Macros.hpp"
+#include "Util/ExtractParameters.hpp"
 
 #include <stdlib.h>
 
@@ -66,15 +67,16 @@ ParseString(const TCHAR *src, tstring &dest)
 }
 
 bool
-WaypointReaderOzi::ParseLine(const TCHAR* line, const unsigned linenum,
-                              Waypoints &way_points)
+WaypointReaderOzi::ParseLine(const TCHAR *line, Waypoints &way_points)
 {
   if (line[0] == '\0')
     return true;
 
   // Ignore first four header lines
-  if (linenum < 4)
+  if (ignore_lines > 0) {
+    --ignore_lines;
     return true;
+  }
 
   TCHAR ctemp[255];
   const TCHAR *params[20];
@@ -103,8 +105,7 @@ WaypointReaderOzi::ParseLine(const TCHAR* line, const unsigned linenum,
 
   location.Normalize(); // ensure longitude is within -180:180
 
-  Waypoint new_waypoint(location);
-  new_waypoint.file_num = file_num;
+  Waypoint new_waypoint = factory.Create(location);
 
   long value;
   new_waypoint.original_id = (ParseNumber(params[0], value) ? value : 0);
@@ -114,7 +115,7 @@ WaypointReaderOzi::ParseLine(const TCHAR* line, const unsigned linenum,
 
   if (ParseNumber(params[14], value) && value != -777)
     new_waypoint.elevation = Units::ToSysUnit(fixed(value), Unit::FEET);
-  else if (!CheckAltitude(new_waypoint))
+  else if (!factory.FallbackElevation(new_waypoint))
     return false;
 
   // Description (Characters 35-44)
@@ -128,7 +129,7 @@ bool
 WaypointReaderOzi::VerifyFormat(TLineReader &reader)
 {
   const TCHAR *line = reader.ReadLine();
-  if (line == NULL)
+  if (line == nullptr)
     return false;
 
   return StringStartsWith(line, _T("OziExplorer Waypoint File"));

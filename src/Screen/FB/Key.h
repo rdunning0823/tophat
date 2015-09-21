@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,11 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_CONSOLE_KEY_H
 #define XCSOAR_SCREEN_CONSOLE_KEY_H
 
-#ifdef KOBO
-#define USE_LINUX_INPUT
-#endif
-
-#ifdef USE_LINUX_INPUT
+#if defined(USE_LINUX_INPUT) || defined(USE_LIBINPUT) || defined(USE_WAYLAND)
 #include <linux/input.h>
 
 /* these macros conflict with Event::Type */
@@ -40,7 +36,7 @@ Copyright_License {
 #endif
 
 enum {
-#ifdef USE_LINUX_INPUT
+#if defined(USE_LINUX_INPUT) || defined(USE_LIBINPUT) || defined(USE_WAYLAND)
   KEY_RETURN = KEY_ENTER,
   KEY_ESCAPE = KEY_ESC,
   KEY_PRIOR = KEY_PAGEUP,

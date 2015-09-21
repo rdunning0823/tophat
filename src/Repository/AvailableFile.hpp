@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,24 +24,15 @@ Copyright_License {
 #ifndef XCSOAR_AVAILABLE_FILE_HPP
 #define XCSOAR_AVAILABLE_FILE_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
+#include "FileType.hpp"
 
 #include <string>
-
-#include <stdint.h>
 
 /**
  * The description of a file that is available in a remote repository.
  */
 struct AvailableFile {
-  enum class Type : uint8_t {
-    UNKNOWN,
-    AIRSPACE,
-    WAYPOINT,
-    MAP,
-    FLARMNET,
-  };
-
   /**
    * Display name of the file.
    */
@@ -70,7 +61,7 @@ struct AvailableFile {
   NarrowString<25> subarea;
 
 
-  Type type;
+  FileType type;
 
   bool IsEmpty() const {
     return name.empty();
@@ -86,7 +77,7 @@ struct AvailableFile {
     uri.clear();
     area.clear();
     subarea.clear();
-    type = Type::UNKNOWN;
+    type = FileType::UNKNOWN;
   }
 
   const char *GetDisplayName() const {

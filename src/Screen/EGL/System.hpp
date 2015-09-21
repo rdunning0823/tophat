@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,14 +24,24 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_EGL_SYSTEM_HPP
 #define XCSOAR_SCREEN_EGL_SYSTEM_HPP
 
-/* kludges to work around namespace collisions with X11 headers */
+#ifdef USE_WAYLAND
+#include <wayland-egl.h>
+#endif
 
+#ifdef USE_X11
+/* kludges to work around namespace collisions with X11 headers */
 #define Font X11Font
 #define Window X11Window
 #define Display X11Display
+#endif
+
+#ifdef MESA_KMS
+#include <gbm.h>
+#endif
 
 #include <EGL/egl.h>
 
+#ifdef USE_X11
 #undef Font
 #undef Window
 #undef Display
@@ -46,6 +56,7 @@ Copyright_License {
 
 #ifdef None
 #undef None
+#endif
 #endif
 
 #endif

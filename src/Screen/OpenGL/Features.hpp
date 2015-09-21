@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -41,12 +41,29 @@ Copyright_License {
 /**
  * The OES_draw_texture extension is available.
  */
+#ifndef HAVE_GLES2
 #define HAVE_OES_DRAW_TEXTURE
+#endif
 
 #endif
 
-#if defined(USE_VIDEOCORE) || defined(HAVE_MALI)
+#ifdef HAVE_GLES
+#define HAVE_OES_MAPBUFFER
+#endif
+
+#if defined(HAVE_MALI) || defined(WIN32) || (defined(HAVE_GLES) && (defined(MESA_KMS) || defined(USE_X11)))
+#define HAVE_DYNAMIC_MAPBUFFER
+#endif
+
+#if defined(USE_VIDEOCORE) || defined(HAVE_MALI) || defined(MESA_KMS)
 #define DRAW_MOUSE_CURSOR
+#endif
+
+#ifdef USE_EGL
+/**
+ * Support display rotation via glRotatef()?
+ */
+#define SOFTWARE_ROTATE_DISPLAY
 #endif
 
 /**
@@ -57,6 +74,20 @@ static inline bool
 HaveGLES()
 {
 #ifdef HAVE_GLES
+  return true;
+#else
+  return false;
+#endif
+}
+
+/**
+ * Running on OpenGL/ES 2.0?
+ */
+constexpr
+static inline bool
+HaveGLES2()
+{
+#ifdef HAVE_GLES2
   return true;
 #else
   return false;

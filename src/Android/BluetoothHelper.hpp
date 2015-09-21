@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@ Copyright_License {
 
 #include <jni.h>
 
+class LeScanCallback;
 class PortBridge;
 
 namespace BluetoothHelper {
@@ -53,6 +54,26 @@ namespace BluetoothHelper {
    */
   gcc_malloc
   jobjectArray list(JNIEnv *env);
+
+  /**
+   * Does the device support Bluetooth LE?
+   */
+  gcc_const
+  bool HasLe(JNIEnv *env);
+
+  /**
+   * Start scanning for Bluetooth LE devices.  Call StopLeScan() with
+   * the returned value when you're done.  Returns nullptr on error.
+   */
+  jobject StartLeScan(JNIEnv *env, LeScanCallback &cb);
+
+  /**
+   * Stop scanning for Bluetooth LE devices.
+   *
+   * @param cb the return value of StartLeScan(); the local reference
+   * will be deleted by this function
+   */
+  void StopLeScan(JNIEnv *env, jobject cb);
 
   gcc_malloc
   PortBridge *connect(JNIEnv *env, const char *address);

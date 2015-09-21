@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -49,20 +49,6 @@ enum Controls {
   FINISH_HEIGHT_REF,
   FAI_FINISH_HEIGHT,
 };
-
-/**
- * returns true if task is an FAI type
- * @param ftype. task type being checked
- */
-constexpr
-static bool
-IsFai(TaskFactoryType ftype)
-{
-  return ftype == TaskFactoryType::FAI_GENERAL ||
-    ftype == TaskFactoryType::FAI_GOAL ||
-    ftype == TaskFactoryType::FAI_OR ||
-    ftype == TaskFactoryType::FAI_TRIANGLE;
-}
 
 TaskPropertiesPanel::TaskPropertiesPanel(TaskManagerDialog &_dialog,
                                          OrderedTask **_active_task,
@@ -299,22 +285,12 @@ TaskPropertiesPanel::ReClick()
 void
 TaskPropertiesPanel::Show(const PixelRect &rc)
 {
-  dialog.ShowTaskView();
-
   ordered_task = *ordered_task_pointer;
   orig_taskType = ordered_task->GetFactoryType();
 
   RefreshView();
 
   RowFormWidget::Show(rc);
-}
-
-void
-TaskPropertiesPanel::Hide()
-{
-  dialog.ResetTaskView();
-
-  RowFormWidget::Hide();
 }
 
 bool

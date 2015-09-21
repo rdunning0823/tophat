@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,17 +23,11 @@ Copyright_License {
 
 #include "Vector.hpp"
 #include "Point.hpp"
-#include "Geo/Flat/TaskProjection.hpp"
+#include "Geo/GeoBounds.hpp"
 
-TaskProjection
-TracePointVector::GetBounds(const GeoPoint &fallback_location) const
+void
+TracePointVector::ScanBounds(GeoBounds &bounds) const
 {
-  TaskProjection task_projection;
-
-  task_projection.Reset(fallback_location);
   for (const auto &i : *this)
-    task_projection.Scan(i.GetLocation());
-
-  task_projection.Update();
-  return task_projection;
+    bounds.Extend(i.GetLocation());
 }

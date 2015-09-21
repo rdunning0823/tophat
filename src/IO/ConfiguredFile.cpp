@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ Copyright_License {
 #include "Profile/Profile.hpp"
 
 #include <assert.h>
+#include <string.h>
 #include <windef.h> /* for MAX_PATH */
 
 NLineReader *
@@ -48,45 +49,45 @@ OpenConfiguredTextFileA(const char *profile_key)
 }
 
 TLineReader *
-OpenConfiguredTextFile(const char *profile_key, ConvertLineReader::charset cs)
+OpenConfiguredTextFile(const char *profile_key, Charset cs)
 {
-  assert(profile_key != NULL);
+  assert(profile_key != nullptr);
 
   TCHAR path[MAX_PATH];
   if (!Profile::GetPath(profile_key, path))
-    return NULL;
+    return nullptr;
 
   FileLineReader *reader = new FileLineReader(path, cs);
-  if (reader == NULL)
-    return NULL;
+  if (reader == nullptr)
+    return nullptr;
 
   if (reader->error()) {
     delete reader;
-    return NULL;
+    return nullptr;
   }
 
   return reader;
 }
 
 static TLineReader *
-OpenMapTextFile(const TCHAR *in_map_file, ConvertLineReader::charset cs)
+OpenMapTextFile(const TCHAR *in_map_file, Charset cs)
 {
-  assert(in_map_file != NULL);
+  assert(in_map_file != nullptr);
 
   TCHAR path[MAX_PATH];
   if (!Profile::GetPath(ProfileKeys::MapFile, path))
-    return NULL;
+    return nullptr;
 
   _tcscat(path, _T("/"));
   _tcscat(path, in_map_file);
 
   ZipLineReader *reader = new ZipLineReader(path, cs);
-  if (reader == NULL)
-    return NULL;
+  if (reader == nullptr)
+    return nullptr;
 
   if (reader->error()) {
     delete reader;
-    return NULL;
+    return nullptr;
   }
 
   return reader;
@@ -94,13 +95,13 @@ OpenMapTextFile(const TCHAR *in_map_file, ConvertLineReader::charset cs)
 
 TLineReader *
 OpenConfiguredTextFile(const char *profile_key, const TCHAR *in_map_file,
-                       ConvertLineReader::charset cs)
+                       Charset cs)
 {
-  assert(profile_key != NULL);
-  assert(in_map_file != NULL);
+  assert(profile_key != nullptr);
+  assert(in_map_file != nullptr);
 
   TLineReader *reader = OpenConfiguredTextFile(profile_key, cs);
-  if (reader == NULL)
+  if (reader == nullptr)
     reader = OpenMapTextFile(in_map_file, cs);
 
   return reader;

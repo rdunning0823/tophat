@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,8 +28,8 @@ Copyright_License {
 
 #include <assert.h>
 
-BufferedPort::BufferedPort(DataHandler &_handler)
-  :Port(_handler),
+BufferedPort::BufferedPort(PortListener *_listener, DataHandler &_handler)
+  :Port(_listener, _handler),
    running(false), closing(false)
 {
 }
@@ -109,11 +109,11 @@ BufferedPort::Read(void *dest, size_t length)
   ScopeLock protect(mutex);
 
   auto r = buffer.Read();
-  if (r.length == 0)
+  if (r.size == 0)
     return -1;
 
-  size_t nbytes = std::min(length, r.length);
-  std::copy(r.data, r.data + nbytes, (uint8_t *)dest);
+  size_t nbytes = std::min(length, r.size);
+  std::copy_n(r.data, nbytes, (uint8_t *)dest);
   buffer.Consume(nbytes);
   return nbytes;
 }
@@ -155,15 +155,16 @@ BufferedPort::DataReceived(const void *data, size_t length)
 
     ScopeLock protect(mutex);
 
+    buffer.Shift();
     auto r = buffer.Write();
-    if (r.length == 0)
+    if (r.size == 0)
       /* the buffer is already full, discard excess data */
       return;
 
     /* discard excess data */
-    size_t nbytes = std::min(length, r.length);
+    size_t nbytes = std::min(length, r.size);
 
-    std::copy(p, p + nbytes, r.data);
+    std::copy_n(p, nbytes, r.data);
     buffer.Append(nbytes);
 
 #ifdef HAVE_POSIX

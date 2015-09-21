@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -134,9 +134,6 @@ struct TaskBehaviour {
 
   /** Defaults for ordered task */
   OrderedTaskSettings ordered_defaults;
-
-  /** Whether to maintain a thinned trace of the flight.  This is overridden by enable_olc. */
-  bool enable_trace;
 
   /**
    * How should the Abort/Alternate task work like:

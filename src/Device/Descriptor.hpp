@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,9 +24,10 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_DESCRIPTOR_HPP
 #define XCSOAR_DEVICE_DESCRIPTOR_HPP
 
+#include "Features.hpp"
 #include "Config.hpp"
 #include "IO/DataHandler.hpp"
-#include "Port/LineSplitter.hpp"
+#include "Device/Util/LineSplitter.hpp"
 #include "Port/State.hpp"
 #include "Device/Parser.hpp"
 #include "RadioFrequency.hpp"
@@ -60,6 +61,7 @@ class RecordedFlightList;
 struct RecordedFlightInfo;
 class OperationEnvironment;
 class OpenDeviceJob;
+class PortListener;
 
 class DeviceDescriptor final : private Notify, private PortLineSplitter {
   /**
@@ -71,6 +73,8 @@ class DeviceDescriptor final : private Notify, private PortLineSplitter {
 
   /** the index of this device in the global list */
   const unsigned index;
+
+  PortListener *const port_listener;
 
   /**
    * This device's configuration.  It may differ from the instance in
@@ -86,14 +90,14 @@ class DeviceDescriptor final : private Notify, private PortLineSplitter {
   AsyncJobRunner async;
 
   /**
-   * The #Job that currently opens the device.  NULL if the device is
+   * The #Job that currently opens the device.  nullptr if the device is
    * not currently being opened.
    */
   OpenDeviceJob *open_job;
 
   /**
    * The #Port used by this device.  This is not applicable to some
-   * devices, and is NULL in that case.
+   * devices, and is nullptr in that case.
    */
   DumpPort *port;
 
@@ -125,13 +129,26 @@ class DeviceDescriptor final : private Notify, private PortLineSplitter {
    */
   Device *device;
 
-#ifdef ANDROID
+  /**
+   * The second device driver for a passed through device.
+   */
+  const DeviceRegister *second_driver;
+
+  /**
+   * An instance of the passed through driver, if available.
+   */
+  Device *second_device;
+
+
+#ifdef HAVE_INTERNAL_GPS
   /**
    * A pointer to the Java object managing all Android sensors (GPS,
    * baro sensor and others).
    */
   InternalSensors *internal_sensors;
+#endif
 
+#ifdef ANDROID
   BMP085Device *droidsoar_v2;
   I2CbaroDevice *i2cbaro[3]; // static, pitot, tek; in any order
   NunchuckDevice *nunchuck;
@@ -198,7 +215,7 @@ class DeviceDescriptor final : private Notify, private PortLineSplitter {
   bool borrowed;
 
 public:
-  DeviceDescriptor(unsigned index);
+  DeviceDescriptor(unsigned index, PortListener *port_listener);
   ~DeviceDescriptor() {
     assert(!IsOccupied());
   }
@@ -225,7 +242,7 @@ public:
    * Was there a failure on the #Port object?
    */
   bool HasPortFailed() const {
-    return config.IsAvailable() && config.UsesPort() && port == NULL;
+    return config.IsAvailable() && config.UsesPort() && port == nullptr;
   }
 
   /**
@@ -266,7 +283,7 @@ public:
   }
 
   /**
-   * Returns the Device object; may be NULL if the device is not open
+   * Returns the Device object; may be nullptr if the device is not open
    * or if the Device class is not applicable for this object.
    *
    * Should only be used by driver-specific code (such as the CAI 302
@@ -388,7 +405,8 @@ public:
   bool CanBorrow() const {
     assert(InMainThread());
 
-    return device != NULL && GetState() == PortState::READY && !IsOccupied();
+    return device != nullptr && GetState() == PortState::READY &&
+      !IsOccupied();
   }
 
   /**
@@ -487,13 +505,13 @@ private:
   bool ParseLine(const char *line);
 
   /* virtual methods from class Notify */
-  virtual void OnNotification() override;
+  void OnNotification() override;
 
   /* virtual methods from DataHandler  */
-  virtual void DataReceived(const void *data, size_t length) override;
+  void DataReceived(const void *data, size_t length) override;
 
   /* virtual methods from PortLineHandler */
-  virtual void LineReceived(const char *line) override;
+  void LineReceived(const char *line) override;
 };
 
 #endif

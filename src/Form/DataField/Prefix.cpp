@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "Prefix.hpp"
+#include "Util/StringAPI.hpp"
 
 const TCHAR *
 PrefixDataField::GetAsDisplayString() const
@@ -41,7 +42,7 @@ PrefixDataField::Inc()
 
   const TCHAR current = GetAsString()[0];
   const TCHAR *p = current != _T('\0')
-    ? _tcschr(chars, current)
+    ? StringFind(chars, current)
     : nullptr;
 
   TCHAR next;
@@ -68,7 +69,7 @@ PrefixDataField::Dec()
     next = chars[_tcslen(chars) - 1];
   else {
     const TCHAR *p = current != _T('\0')
-      ? _tcschr(chars, current)
+      ? StringFind(chars, current)
       : nullptr;
 
     if (p > chars)

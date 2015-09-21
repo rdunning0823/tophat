@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -47,10 +47,12 @@ PagerWidget::Add(Widget *w)
   if (initialised) {
     w->Initialise(*parent, position);
 
-    if (prepared && visible && was_empty) {
-      children.front().prepared = true;
+    if (prepared) {
+      children.back().prepared = true;
       w->Prepare(*parent, position);
-      w->Show(position);
+
+      if (visible && was_empty)
+        w->Show(position);
     }
   }
 }
@@ -113,7 +115,7 @@ PagerWidget::SetCurrent(unsigned i, bool click)
     }
   }
 
-  assert(old_child.prepared);
+  assert(!visible || old_child.prepared);
   if (visible && !old_child.widget->Leave())
     return false;
 
@@ -132,6 +134,8 @@ PagerWidget::SetCurrent(unsigned i, bool click)
 
   if (visible)
     new_child.widget->Show(position);
+
+  OnPageFlipped();
   return true;
 }
 
@@ -379,4 +383,11 @@ PagerWidget::KeyPress(unsigned key_code)
   assert(children[current].prepared);
 
   return children[current].widget->KeyPress(key_code);
+}
+
+void
+PagerWidget::OnPageFlipped()
+{
+  if (page_flipped_callback)
+    page_flipped_callback();
 }

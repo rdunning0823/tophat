@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,6 +32,18 @@ KoboReboot();
 
 bool
 KoboPowerOff();
+
+bool
+KoboUmountData();
+
+bool
+KoboMountData();
+
+bool
+KoboExportUSBStorage();
+
+void
+KoboUnexportUSBStorage();
 
 gcc_pure
 bool
@@ -114,4 +126,8 @@ bool IsUSBStorageKoboRootInRoot();
  * @return true if KoboRoot.tgz was found on the USB storage
  */
 bool InstallKoboRootTgz();
+
+void
+KoboRunFtpd();
+
 #endif

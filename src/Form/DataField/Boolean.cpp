@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ DataFieldBoolean::CreateComboList(const TCHAR *reference) const
   combo_list.Append(false, false_text);
   combo_list.Append(true, true_text);
 
-  combo_list.ComboPopupItemSavedIndex = GetAsInteger();
+  combo_list.current_index = GetAsInteger();
   return combo_list;
 }
 

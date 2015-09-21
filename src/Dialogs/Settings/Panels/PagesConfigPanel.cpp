@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,6 +32,7 @@ Copyright_License {
 #include "PageActions.hpp"
 #include "Language/Language.hpp"
 #include "Profile/PageProfile.hpp"
+#include "Profile/Current.hpp"
 #include "Interface.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Widget/ListWidget.hpp"
@@ -101,8 +102,8 @@ class PageListWidget
   PageSettings settings;
 
   ButtonPanelWidget *buttons;
-  WndButton *add_button, *delete_button;
-  WndButton *move_up_button, *move_down_button;
+  Button *add_button, *delete_button;
+  Button *move_up_button, *move_down_button;
 
 public:
   ~PageListWidget() {
@@ -344,7 +345,7 @@ PageListWidget::Save(bool &_changed)
     EnforceLayoutConstraints(settings.pages[i]);
     const PageLayout &src = settings.pages[i];
     if (src != dest) {
-      Profile::Save(src, i);
+      Profile::Save(Profile::map, src, i);
       changed = true;
     }
   }

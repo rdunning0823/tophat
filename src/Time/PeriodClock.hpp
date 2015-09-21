@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -40,8 +40,8 @@ private:
 public:
   /**
    * Initializes the object, setting the last time stamp to "0",
-   * i.e. a check() will always succeed.  If you do not want this
-   * default behaviour, call update() immediately after creating the
+   * i.e. a Check() will always succeed.  If you do not want this
+   * default behaviour, call Update() immediately after creating the
    * object.
    */
   constexpr
@@ -67,7 +67,7 @@ protected:
   }
 
 public:
-  bool IsDefined() const {
+  constexpr bool IsDefined() const {
     return last != 0;
   }
 

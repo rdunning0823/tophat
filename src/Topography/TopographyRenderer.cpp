@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,11 +24,12 @@ Copyright_License {
 #include "Topography/TopographyRenderer.hpp"
 #include "Topography/TopographyFileRenderer.hpp"
 
-TopographyRenderer::TopographyRenderer(const TopographyStore &_store)
+TopographyRenderer::TopographyRenderer(const TopographyStore &_store,
+                                       const TopographyLook &look)
   :store(_store)
 {
   for (unsigned i = 0; i < store.size(); ++i)
-    files.append(new TopographyFileRenderer(store[i]));
+    files.append(new TopographyFileRenderer(store[i], look));
 }
 
 TopographyRenderer::~TopographyRenderer()

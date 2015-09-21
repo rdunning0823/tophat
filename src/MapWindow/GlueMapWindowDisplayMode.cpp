@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "GlueMapWindow.hpp"
 #include "Terrain/RasterTerrain.hpp"
+#include "Topography/Thread.hpp"
 #include "Interface.hpp"
 #include "Profile/Profile.hpp"
 #include "Screen/Layout.hpp"
@@ -78,7 +79,22 @@ GlueMapWindow::SetPan(bool enable)
     break;
   }
 
-  UpdateProjection();
+  FullRedraw();
+}
+
+void
+GlueMapWindow::TogglePan()
+{
+  switch (follow_mode) {
+  case FOLLOW_SELF:
+    follow_mode = FOLLOW_PAN;
+    break;
+
+  case FOLLOW_PAN:
+    follow_mode = FOLLOW_SELF;
+    break;
+  }
+
   FullRedraw();
 }
 
@@ -86,16 +102,26 @@ void
 GlueMapWindow::PanTo(const GeoPoint &location)
 {
   follow_mode = FOLLOW_PAN;
-  visible_projection.SetGeoLocation(location);
+  SetLocation(location);
 
-  UpdateProjection();
   FullRedraw();
+}
+
+void
+GlueMapWindow::UpdateScreenBounds()
+{
+  visible_projection.UpdateScreenBounds();
+
+  if (topography_thread != nullptr &&
+      CommonInterface::GetMapSettings().topography_enabled)
+    topography_thread->Trigger(visible_projection);
 }
 
 void
 GlueMapWindow::SetMapScale(fixed scale)
 {
   MapWindow::SetMapScale(scale);
+  OnProjectionModified();
 
   const bool circling =
     CommonInterface::GetUIState().display_mode == DisplayMode::CIRCLING;
@@ -120,6 +146,7 @@ GlueMapWindow::RestoreMapScale()
   visible_projection.SetScale(settings.circle_zoom_enabled && circling
                               ? settings.circling_scale
                               : settings.cruise_scale);
+  OnProjectionModified();
 }
 
 inline void
@@ -169,21 +196,21 @@ GlueMapWindow::UpdateScreenAngle()
   const MapSettings &settings = CommonInterface::GetMapSettings();
   const UIState &ui_state = CommonInterface::GetUIState();
 
-  DisplayOrientation orientation =
+  MapOrientation orientation =
     ui_state.display_mode == DisplayMode::CIRCLING
     ? settings.circling_orientation
     : settings.cruise_orientation;
 
-  if (orientation == DisplayOrientation::TARGET_UP &&
+  if (orientation == MapOrientation::TARGET_UP &&
       calculated.task_stats.current_leg.vector_remaining.IsValid())
     visible_projection.SetScreenAngle(calculated.task_stats.current_leg.
                                       vector_remaining.bearing);
-  else if (orientation == DisplayOrientation::HEADING_UP)
+  else if (orientation == MapOrientation::HEADING_UP)
     visible_projection.SetScreenAngle(
       basic.attitude.IsHeadingUseable() ? basic.attitude.heading : Angle::Zero());
-  else if (orientation == DisplayOrientation::NORTH_UP)
+  else if (orientation == MapOrientation::NORTH_UP)
     visible_projection.SetScreenAngle(Angle::Zero());
-  else if (orientation == DisplayOrientation::WIND_UP &&
+  else if (orientation == MapOrientation::WIND_UP &&
            calculated.wind_available &&
            calculated.wind.norm >= fixed(0.5))
     visible_projection.SetScreenAngle(calculated.wind.bearing);
@@ -192,7 +219,9 @@ GlueMapWindow::UpdateScreenAngle()
     visible_projection.SetScreenAngle(
       basic.track_available ? basic.track : Angle::Zero());
 
-  compass_visible = orientation != DisplayOrientation::NORTH_UP;
+  OnProjectionModified();
+
+  compass_visible = orientation != MapOrientation::NORTH_UP;
 }
 
 void
@@ -201,7 +230,7 @@ GlueMapWindow::UpdateMapScale()
   /* not using MapWindowBlackboard here because these methods are
      called by the main thread */
   const DerivedInfo &calculated = CommonInterface::Calculated();
-  const MapSettings &settings = CommonInterface::GetMapSettings();
+  MapSettings &settings = CommonInterface::SetMapSettings();
   const bool circling =
     CommonInterface::GetUIState().display_mode == DisplayMode::CIRCLING;
 
@@ -231,7 +260,17 @@ GlueMapWindow::UpdateMapScale()
                      settings.max_auto_zoom_distance / 10);
 
     visible_projection.SetFreeMapScale(distance);
+    settings.cruise_scale = visible_projection.GetScale();
+
+    OnProjectionModified();
   }
+}
+
+void
+GlueMapWindow::SetLocation(const GeoPoint location)
+{
+  MapWindow::SetLocation(location);
+  OnProjectionModified();
 }
 
 void
@@ -243,7 +282,7 @@ GlueMapWindow::SetLocationLazy(const GeoPoint location)
   }
 
   const fixed distance_meters =
-    visible_projection.GetGeoLocation().Distance(location);
+    visible_projection.GetGeoLocation().DistanceS(location);
   const fixed distance_pixels =
     visible_projection.DistanceMetersToPixels(distance_meters);
   if (distance_pixels > fixed(0.5))
@@ -267,8 +306,8 @@ GlueMapWindow::UpdateProjection()
 
   if (circling || !IsNearSelf())
     visible_projection.SetScreenOrigin(center.x, center.y);
-  else if (settings_map.cruise_orientation == DisplayOrientation::NORTH_UP ||
-           settings_map.cruise_orientation == DisplayOrientation::WIND_UP) {
+  else if (settings_map.cruise_orientation == MapOrientation::NORTH_UP ||
+           settings_map.cruise_orientation == MapOrientation::WIND_UP) {
     RasterPoint offset{0, 0};
     if (settings_map.glider_screen_position != 50 &&
         settings_map.map_shift_bias != MapShiftBias::NONE) {
@@ -309,7 +348,7 @@ GlueMapWindow::UpdateProjection()
   if (!IsNearSelf()) {
     /* no-op - the Projection's location is updated manually */
   } else if (circling && calculated.thermal_locator.estimate_valid) {
-    const fixed d_t = calculated.thermal_locator.estimate_location.Distance(basic.location);
+    const fixed d_t = calculated.thermal_locator.estimate_location.DistanceS(basic.location);
     if (!positive(d_t)) {
       SetLocationLazy(basic.location);
     } else {
@@ -327,5 +366,5 @@ GlueMapWindow::UpdateProjection()
        users */
     SetLocation(terrain->GetTerrainCenter());
 
-  visible_projection.UpdateScreenBounds();
+  OnProjectionModified();
 }

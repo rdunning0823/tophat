@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ enum class AircraftSymbol : uint8_t {
   PARAGLIDER,
 };
 
-enum class DisplayOrientation : uint8_t {
+enum class MapOrientation : uint8_t {
   TRACK_UP,
   NORTH_UP,
   TARGET_UP,
@@ -159,8 +159,8 @@ struct MapSettings {
 
   int glider_screen_position;
   /** Orientation of the map (North up, Track up, etc.) */
-  DisplayOrientation cruise_orientation;
-  DisplayOrientation circling_orientation;
+  MapOrientation cruise_orientation;
+  MapOrientation circling_orientation;
 
   /** Map scale in cruise mode [px/m] */
   fixed cruise_scale;

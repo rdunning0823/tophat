@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -62,9 +62,9 @@ public:
 
 public:
   /* virtual methods from class NLineReader */
-  virtual char *ReadLine() override;
-  virtual long GetSize() const override;
-  virtual long Tell() const override;
+  char *ReadLine() override;
+  long GetSize() const override;
+  long Tell() const override;
 };
 
 /**
@@ -79,12 +79,12 @@ protected:
 
 public:
   FileLineReader(const char *path,
-                 ConvertLineReader::charset cs=ConvertLineReader::UTF8)
+                 Charset cs=Charset::UTF8)
     :file(path), splitter(file), convert(splitter, cs) {}
 
 #ifdef _UNICODE
   FileLineReader(const TCHAR *path,
-                 ConvertLineReader::charset cs=ConvertLineReader::UTF8)
+                 Charset cs=Charset::UTF8)
     :file(path), splitter(file), convert(splitter, cs) {}
 #endif
 
@@ -105,9 +105,9 @@ public:
 
 public:
   /* virtual methods from class TLineReader */
-  virtual TCHAR *ReadLine() override;
-  virtual long GetSize() const override;
-  virtual long Tell() const override;
+  TCHAR *ReadLine() override;
+  long GetSize() const override;
+  long Tell() const override;
 };
 
 #endif

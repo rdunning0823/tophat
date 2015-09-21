@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_CONFIG_HPP
 #define XCSOAR_DEVICE_CONFIG_HPP
 
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Math/fixed.hpp"
 
 #include <stdint.h>
@@ -182,6 +182,12 @@ struct DeviceConfig {
   StaticString<32> driver_name;
 
   /**
+   * useflag and Name of the second driver for passed through device.
+   */
+  bool use_second_device;
+  StaticString<32> driver2_name;
+
+  /**
    * The IP address of the peer to connect to, including the port
    * number.  Used for #TCP_CLIENT.
    */
@@ -223,11 +229,6 @@ struct DeviceConfig {
    * Should XCSoar use the MC value, bug, ballast, etc. received from the device
    */
   bool sync_from_device;
-
-  /**
-   * Should XCSoar ignore the received checksums and mark everything as valid
-   */
-  bool ignore_checksum;
 
   /**
    * Does this port type use a baud rate?

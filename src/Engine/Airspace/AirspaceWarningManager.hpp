@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
 #ifndef AIRSPACE_WARNING_MANAGER_HPP
 #define AIRSPACE_WARNING_MANAGER_HPP
 
-#include "Util/NonCopyable.hpp"
 #include "AirspaceWarning.hpp"
 #include "AirspaceWarningConfig.hpp"
 #include "Util/AircraftStateFilter.hpp"
@@ -33,7 +32,7 @@
 class TaskStats;
 class GlidePolar;
 class Airspaces;
-class TaskProjection;
+class FlatProjection;
 class AirspaceAircraftPerformance;
 
 /**
@@ -47,9 +46,7 @@ class AirspaceAircraftPerformance;
  * - Task (longer range predicted warning based on current leg of task)
  *
  */
-class AirspaceWarningManager: 
-  public NonCopyable
-{
+class AirspaceWarningManager {
   AirspaceWarningConfig config;
 
   const Airspaces &airspaces;
@@ -81,8 +78,10 @@ public:
    */
   AirspaceWarningManager(const Airspaces &_airspaces);
 
+  AirspaceWarningManager(const AirspaceWarningManager &) = delete;
+
   gcc_pure
-  const TaskProjection &GetProjection() const;
+  const FlatProjection &GetProjection() const;
 
   const AirspaceWarningConfig &GetConfig() const {
     return config;
@@ -149,7 +148,7 @@ public:
    *
    * @param airspace Airspace to find warning for
    *
-   * @return Pointer to airspace warning item (or NULL if not found)
+   * @return Pointer to airspace warning item (or nullptr if not found)
    */
   AirspaceWarning* GetWarningPtr(const AbstractAirspace& airspace);
 
@@ -158,7 +157,7 @@ public:
    *
    * @param airspace Airspace for which to create warning for
    *
-   * @return Pointer to airspace warning item (or NULL if not found)
+   * @return Pointer to airspace warning item (or nullptr if not found)
    */
   AirspaceWarning* GetNewWarningPtr(const AbstractAirspace& airspace);
 
@@ -207,6 +206,12 @@ public:
   const_iterator end() const {
     return warnings.end();
   }
+
+  /**
+   * Acknowledge an airspace warning or airspace inside (depending on
+   * the state).
+   */
+  void Acknowledge(const AbstractAirspace &airspace);
 
   /**
    * Acknowledge an airspace warning

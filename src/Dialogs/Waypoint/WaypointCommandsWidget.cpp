@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,10 +22,12 @@ Copyright_License {
 */
 
 #include "WaypointCommandsWidget.hpp"
+#include "WaypointDialogs.hpp"
 #include "Dialogs/Message.hpp"
 #include "Form/Form.hpp"
 #include "Language/Language.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
+#include "Engine/Waypoint/Waypoints.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/MapTaskManager.hpp"
 #include "MapWindow/GlueMapWindow.hpp"
@@ -34,6 +36,9 @@ Copyright_License {
 #include "Components.hpp"
 #include "Waypoint/WaypointGlue.hpp"
 #include "Pan.hpp"
+#include "Blackboard/DeviceBlackboard.hpp"
+#include "Operation/MessageOperationEnvironment.hpp"
+#include "Profile/Current.hpp"
 
 enum Commands {
   REPLACE_IN_TASK,
@@ -42,6 +47,9 @@ enum Commands {
   REMOVE_FROM_TASK,
   SET_HOME,
   PAN,
+  SET_ACTIVE_FREQUENCY,
+  SET_STANDBY_FREQUENCY,
+  EDIT,
 };
 
 static bool
@@ -187,7 +195,8 @@ SetHome(const Waypoint &waypoint)
     WaypointGlue::SetHome(way_points, terrain,
                           settings_computer.poi, settings_computer.team_code,
                           device_blackboard, false);
-    WaypointGlue::SaveHome(settings_computer.poi, settings_computer.team_code);
+    WaypointGlue::SaveHome(Profile::map,
+                           settings_computer.poi, settings_computer.team_code);
   }
 }
 
@@ -200,6 +209,8 @@ ActivatePan(const Waypoint &waypoint)
 void
 WaypointCommandsWidget::OnAction(int id)
 {
+  MessageOperationEnvironment env;
+
   switch (id) {
   case REPLACE_IN_TASK:
     if (ReplaceInTask(*task_manager, waypoint) && form != nullptr)
@@ -231,6 +242,35 @@ WaypointCommandsWidget::OnAction(int id)
     if (ActivatePan(waypoint) && form != nullptr)
       form->SetModalResult(mrOK);
     break;
+
+  case SET_ACTIVE_FREQUENCY:
+    device_blackboard->SetActiveFrequency(waypoint.radio_frequency,
+                                          waypoint.name.c_str(), env);
+    break;
+
+  case SET_STANDBY_FREQUENCY:
+    device_blackboard->SetStandbyFrequency(waypoint.radio_frequency,
+                                           waypoint.name.c_str(), env);
+    break;
+
+  case EDIT:
+    {
+      Waypoint wp_copy = waypoint;
+
+      /* move to user.cup */
+      wp_copy.origin = WaypointOrigin::USER;
+
+      if (dlgWaypointEditShowModal(wp_copy)) {
+        // TODO: refresh data instead of closing dialog?
+        // TODO: save user.cup?
+        form->SetModalResult(mrOK);
+
+        ScopeSuspendAllThreads suspend;
+        way_points.Replace(waypoint, wp_copy);
+        way_points.Optimise();
+      }
+    }
+    break;
   }
 }
 
@@ -240,14 +280,17 @@ WaypointCommandsWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
   if (task_manager != nullptr) {
-    AddButton(_("Replace In Task"), *this, REPLACE_IN_TASK);
-    AddButton(_("Insert In Task"), *this, INSERT_IN_TASK);
-    AddButton(_("Append To Task"), *this, APPEND_TO_TASK);
+    AddButton(_("Replace in Task"), *this, REPLACE_IN_TASK);
+    AddButton(_("Insert in Task"), *this, INSERT_IN_TASK);
+    AddButton(_("Append to Task"), *this, APPEND_TO_TASK);
 
     if (MapTaskManager::GetIndexInTask(waypoint) >= 0)
-      AddButton(_("Remove From Task"), *this, REMOVE_FROM_TASK);
+      AddButton(_("Remove from Task"), *this, REMOVE_FROM_TASK);
   }
 
-  AddButton(_("Set As New Home"), *this, SET_HOME);
-  AddButton(_("Pan To Waypoint"), *this, PAN);
+  AddButton(_("Set as New Home"), *this, SET_HOME);
+  AddButton(_("Pan to Waypoint"), *this, PAN);
+  AddButton(_("Set Active Frequency"), *this, SET_ACTIVE_FREQUENCY);
+  AddButton(_("Set Standby Frequency"), *this, SET_STANDBY_FREQUENCY);
+  AddButton(_("Edit"), *this, EDIT);
 }

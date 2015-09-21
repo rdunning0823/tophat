@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -40,6 +40,7 @@ Copyright_License {
 struct WaypointLook;
 struct TaskLook;
 struct AircraftLook;
+struct TopographyLook;
 class ContainerWindow;
 class TopographyStore;
 class TopographyRenderer;
@@ -51,6 +52,7 @@ class GlideComputer;
 class TargetMapWindow : public BufferWindow {
   const TaskLook &task_look;
   const AircraftLook &aircraft_look;
+  const TopographyLook &topography_look;
 
 #ifndef ENABLE_OPENGL
   // graphics vars
@@ -108,7 +110,8 @@ public:
                   const AirspaceLook &airspace_look,
                   const TrailLook &trail_look,
                   const TaskLook &task_look,
-                  const AircraftLook &aircraft_look);
+                  const AircraftLook &aircraft_look,
+                  const TopographyLook &topography_look);
   virtual ~TargetMapWindow();
 
   void Create(ContainerWindow &parent, PixelRect rc, WindowStyle style);

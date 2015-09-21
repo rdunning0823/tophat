@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -38,10 +38,10 @@ FastRotation::SetAngle(Angle _angle)
   sint = angle.fastsine();
 }
 
-FastRotation::Pair
+FastRotation::Point
 FastRotation::Rotate(fixed x, fixed y) const
 {
-  return Pair(x * cost - y * sint, y * cost + x * sint);
+  return Point(x * cost - y * sint, y * cost + x * sint);
 }
 
 void
@@ -56,9 +56,9 @@ FastIntegerRotation::SetAngle(Angle _angle)
   sint = angle.ifastsine();
 }
 
-FastIntegerRotation::Pair
+FastIntegerRotation::Point
 FastIntegerRotation::Rotate(int x, int y) const
 {
-  return Pair((x * cost - y * sint + 512) >> 10,
-              (y * cost + x * sint + 512) >> 10);
+  return Point((x * cost - y * sint + 512) >> 10,
+               (y * cost + x * sint + 512) >> 10);
 }

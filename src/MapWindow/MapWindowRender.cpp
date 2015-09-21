@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Topography/CachedTopographyRenderer.hpp"
 #include "Renderer/AircraftRenderer.hpp"
-#include "Renderer/MarkerRenderer.hpp"
+#include "Renderer/WaveRenderer.hpp"
 
 #ifdef HAVE_NOAA
 #include "Weather/NOAAStore.hpp"
@@ -49,21 +49,21 @@ MapWindow::RenderTerrain(Canvas &canvas)
 void
 MapWindow::RenderTopography(Canvas &canvas)
 {
-  if (topography_renderer != NULL && GetMapSettings().topography_enabled)
+  if (topography_renderer != nullptr && GetMapSettings().topography_enabled)
     topography_renderer->Draw(canvas, render_projection);
 }
 
 void
 MapWindow::RenderTopographyLabels(Canvas &canvas)
 {
-  if (topography_renderer != NULL && GetMapSettings().topography_enabled)
+  if (topography_renderer != nullptr && GetMapSettings().topography_enabled)
     topography_renderer->DrawLabels(canvas, render_projection, label_block);
 }
 
 void
 MapWindow::RenderFinalGlideShading(Canvas &canvas)
 {
-  if (terrain != NULL &&
+  if (terrain != nullptr &&
       Calculated().terrain_valid)
       DrawTerrainAbove(canvas);
 }
@@ -71,7 +71,7 @@ MapWindow::RenderFinalGlideShading(Canvas &canvas)
 void
 MapWindow::RenderAirspace(Canvas &canvas)
 {
-  if (GetMapSettings().airspace.enable)
+  if (GetMapSettings().airspace.enable) {
     airspace_renderer.Draw(canvas,
 #ifndef ENABLE_OPENGL
                            buffer_canvas,
@@ -80,21 +80,23 @@ MapWindow::RenderAirspace(Canvas &canvas)
                            Basic(), Calculated(),
                            GetComputerSettings().airspace,
                            GetMapSettings().airspace);
-}
 
-void
-MapWindow::RenderMarkers(Canvas &canvas)
-{
-  if (marks != NULL &&
-      render_projection.GetMapScale() <= fixed(30000))
-    ::RenderMarkers(canvas, render_projection, look.marker, *marks);
+    airspace_label_renderer.Draw(canvas,
+#ifndef ENABLE_OPENGL
+                                 buffer_canvas,
+#endif
+                                 render_projection,
+                                 Basic(), Calculated(),
+                                 GetComputerSettings().airspace,
+                                 GetMapSettings().airspace);
+  }
 }
 
 void
 MapWindow::RenderNOAAStations(Canvas &canvas)
 {
 #ifdef HAVE_NOAA
-  if (noaa_store == NULL)
+  if (noaa_store == nullptr)
     return;
 
   RasterPoint pt;
@@ -103,6 +105,13 @@ MapWindow::RenderNOAAStations(Canvas &canvas)
         render_projection.GeoToScreenIfVisible(it->parsed_metar.location, pt))
       look.noaa.icon.Draw(canvas, pt);
 #endif
+}
+
+inline void
+MapWindow::DrawWaves(Canvas &canvas)
+{
+  const WaveRenderer renderer(look.wave);
+  renderer.Draw(canvas, render_projection, Calculated().wave);
 }
 
 void
@@ -172,7 +181,7 @@ MapWindow::Render(Canvas &canvas, const PixelRect &rc)
   if (basic.location_available)
     RenderTrail(canvas, aircraft_pos);
 
-  RenderMarkers(canvas);
+  DrawWaves(canvas);
 
   // Render estimate of thermal location
   DrawThermalEstimate(canvas);

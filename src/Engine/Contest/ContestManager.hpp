@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -116,6 +116,18 @@ public:
 
   bool SolveExhaustive() {
     return UpdateIdle(true);
+  }
+
+  /**
+   * Solve exhaustive with custom computational limits for the triangle solver.
+   */
+  bool SolveExhaustive(unsigned max_iterations, unsigned max_tree_size) {
+    olc_fai.SetMaxIterations(max_iterations);
+    olc_fai.SetMaxTreeSize(max_tree_size);
+    dhv_xc_triangle.SetMaxIterations(max_iterations);
+    dhv_xc_triangle.SetMaxTreeSize(max_tree_size);
+
+    return SolveExhaustive();
   }
 
   /**

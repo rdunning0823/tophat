@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ void
 TextWindow::Create(ContainerWindow &parent, const TCHAR *_text,
                    PixelRect rc, const TextWindowStyle style)
 {
-  if (_text != NULL)
+  if (_text != nullptr)
     text = _text;
   else
     text.clear();
@@ -46,6 +46,10 @@ TextWindow::OnPaint(Canvas &canvas)
   if (!text.empty()) {
     canvas.SetTextColor(COLOR_BLACK);
     canvas.SetBackgroundTransparent();
+
+#ifndef USE_GDI
+    canvas.Select(GetFont());
+#endif
     canvas.DrawText(1, 1, text.c_str());
   }
 }

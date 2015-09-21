@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -54,8 +54,8 @@ AudioVarioGlue::HaveAudioVario()
 void
 AudioVarioGlue::Initialise()
 {
-  assert(player == NULL);
-  assert(synthesiser == NULL);
+  assert(player == nullptr);
+  assert(synthesiser == nullptr);
 
 #ifdef ANDROID
   have_sles = SLES::Initialise();
@@ -84,8 +84,8 @@ AudioVarioGlue::Configure(const VarioSoundSettings &settings)
     return;
 #endif
 
-  assert(player != NULL);
-  assert(synthesiser != NULL);
+  assert(player != nullptr);
+  assert(synthesiser != nullptr);
 
   if (settings.enabled) {
     synthesiser->SetVolume(settings.volume);
@@ -107,8 +107,8 @@ AudioVarioGlue::SetValue(fixed vario)
     return;
 #endif
 
-  assert(player != NULL);
-  assert(synthesiser != NULL);
+  assert(player != nullptr);
+  assert(synthesiser != nullptr);
 
   synthesiser->SetVario(sample_rate, vario);
 }
@@ -121,8 +121,8 @@ AudioVarioGlue::NoValue()
     return;
 #endif
 
-  assert(player != NULL);
-  assert(synthesiser != NULL);
+  assert(player != nullptr);
+  assert(synthesiser != nullptr);
 
   synthesiser->SetSilence();
 }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -32,8 +32,8 @@ GPSState::Reset()
   fix_quality_available.Clear();
   real = false;
   simulator = false;
-#ifdef ANDROID
-  android_internal_gps = false;
+#if defined(ANDROID) || defined(__APPLE__)
+  nonexpiring_internal_gps = false;
 #endif
   satellites_used_available.Clear();
   satellite_ids_available.Clear();
@@ -153,6 +153,10 @@ NMEAInfo::Reset()
   track = Angle::Zero();
   track_available.Clear();
 
+  heading_available.Clear();
+
+  variation_available.Clear();
+
   ground_speed_available.Clear();
   airspeed_available.Clear();
   ground_speed = true_airspeed = indicated_airspeed = fixed(0);
@@ -211,9 +215,9 @@ NMEAInfo::ExpireWallClock()
 
   UpdateClock();
 
-#ifdef ANDROID
-  if (gps.android_internal_gps)
-    /* the Android internal GPS does not expire */
+#if defined(ANDROID) || defined(__APPLE__)
+  if (gps.nonexpiring_internal_gps)
+    /* the internal GPS does not expire */
     return;
 #endif
 
@@ -339,6 +343,16 @@ NMEAInfo::Complement(const NMEAInfo &add)
   if (!temperature_available && add.temperature_available) {
     temperature = add.temperature;
     temperature_available = add.temperature_available;
+  }
+
+  if (!heading_available && add.heading_available) {
+    heading = add.heading;
+    heading_available = add.heading_available;
+  }
+
+   if (!variation_available && add.variation_available) {
+    variation = add.variation;
+    variation_available = add.variation_available;
   }
 
   if (!humidity_available && add.humidity_available) {

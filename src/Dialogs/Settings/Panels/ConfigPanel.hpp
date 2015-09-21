@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,10 +24,14 @@ Copyright_License {
 #ifndef CONFIGPANEL_HPP
 #define CONFIGPANEL_HPP
 
-class WndButton;
+#include <tchar.h>
+
+class ActionListener;
 
 namespace ConfigPanel {
-  WndButton *GetExtraButton(unsigned);
+  void BorrowExtraButton(unsigned i, const TCHAR *caption,
+                         ActionListener &listener, int id);
+  void ReturnExtraButton(unsigned i);
 };
 
 #endif

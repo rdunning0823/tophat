@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,6 +39,14 @@ struct ButtonLook {
 
     Color background_color;
     Pen light_border_pen, dark_border_pen;
+    Brush light_border_brush, dark_border_brush;
+
+    void CreateBorder(Color light, Color dark) {
+      light_border_pen.Create(1, light);
+      light_border_brush.Create(light);
+      dark_border_pen.Create(1, dark);
+      dark_border_brush.Create(dark);
+    }
   } standard, focused, dimmed;
   /* dimmed used for less visible / obtrusive overlay buttons */
 

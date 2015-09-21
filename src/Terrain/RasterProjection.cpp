@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "RasterProjection.hpp"
 #include "Geo/GeoBounds.hpp"
-#include "Geo/Constants.hpp"
+#include "Geo/FAISphere.hpp"
 
 #include <algorithm>
 
@@ -53,11 +53,11 @@ RasterProjection::FinePixelDistance(const GeoPoint &location,
 
   Angle distance = WidthToAngle(fixed_sqrt_two * FACTOR * pixels);
   GeoPoint p = GeoPoint(location.longitude + distance, location.latitude);
-  fixed x = location.Distance(p);
+  fixed x = location.DistanceS(p);
 
   distance = HeightToAngle(fixed_sqrt_two * FACTOR * pixels);
   p = GeoPoint(location.longitude, location.latitude + distance);
-  fixed y = location.Distance(p);
+  fixed y = location.DistanceS(p);
 
   return std::max(x, y) / FACTOR;
 }
@@ -65,6 +65,6 @@ RasterProjection::FinePixelDistance(const GeoPoint &location,
 unsigned
 RasterProjection::DistancePixelsFine(fixed distance) const
 {
-  Angle angle = Angle::Radians(distance / REARTH);
+  Angle angle = Angle::Radians(distance / FAISphere::REARTH);
   return AngleToHeight(angle);
 }

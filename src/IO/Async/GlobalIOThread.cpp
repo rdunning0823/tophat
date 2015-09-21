@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@ IOThread *io_thread;
 void
 InitialiseIOThread()
 {
-  assert(io_thread == NULL);
+  assert(io_thread == nullptr);
 
   io_thread = new IOThread();
   io_thread->Start();

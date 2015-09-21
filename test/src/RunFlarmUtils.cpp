@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ ChangePilot(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(pilot_name);
+    StripRight(pilot_name);
     fprintf(stdout, "Setting pilot name to \"%s\" ...\n", pilot_name);
 
     const UTF8ToWideConverter value(pilot_name);
@@ -84,7 +84,7 @@ ChangeCoPilot(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(copilot_name);
+    StripRight(copilot_name);
     fprintf(stdout, "Setting copilot name to \"%s\" ...\n", copilot_name);
 
     const UTF8ToWideConverter value(copilot_name);
@@ -114,7 +114,7 @@ ChangePlaneType(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(plane_type);
+    StripRight(plane_type);
     fprintf(stdout, "Setting plane type to \"%s\" ...\n", plane_type);
 
     const UTF8ToWideConverter value(plane_type);
@@ -144,7 +144,7 @@ ChangeRegistration(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(registration);
+    StripRight(registration);
     fprintf(stdout, "Setting plane registration to \"%s\" ...\n", registration);
 
     const UTF8ToWideConverter value(registration);
@@ -174,7 +174,7 @@ ChangeCompetitionId(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(id);
+    StripRight(id);
     fprintf(stdout, "Setting competition id to \"%s\" ...\n", id);
 
     const UTF8ToWideConverter value(id);
@@ -204,7 +204,7 @@ ChangeCompetitionClass(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(comp_class);
+    StripRight(comp_class);
     fprintf(stdout, "Setting competition class to \"%s\" ...\n", comp_class);
 
     const UTF8ToWideConverter value(comp_class);
@@ -235,7 +235,7 @@ ChangeRange(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(range);
+    StripRight(range);
 
     char *end_ptr;
     num_range = strtoul(range, &end_ptr, 10);
@@ -273,7 +273,7 @@ ChangeBaudRate(FlarmDevice &flarm, OperationEnvironment &env)
       continue;
     }
 
-    TrimRight(buffer);
+    StripRight(buffer);
 
     char *end_ptr;
     baud_id = strtoul(buffer, &end_ptr, 10);
@@ -401,7 +401,7 @@ main(int argc, char **argv)
 
   InitialiseIOThread();
 
-  Port *port = OpenPort(config, *(DataHandler *)NULL);
+  Port *port = OpenPort(config, nullptr, *(DataHandler *)nullptr);
   if (port == NULL) {
     fprintf(stderr, "Failed to open COM port\n");
     return EXIT_FAILURE;

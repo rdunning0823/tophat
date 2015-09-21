@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,14 +22,14 @@ Copyright_License {
 */
 
 #include "Context.hpp"
-#include "Java/Class.hpp"
-#include "Java/String.hpp"
+#include "Java/Class.hxx"
+#include "Java/String.hxx"
 
 jobject
 Context::GetSystemService(JNIEnv *env, jstring name)
 {
-  assert(env != NULL);
-  assert(name != NULL);
+  assert(env != nullptr);
+  assert(name != nullptr);
 
   Java::Class cls(env, env->GetObjectClass(Get()));
   jmethodID method = env->GetMethodID(cls, "getSystemService",
@@ -42,8 +42,8 @@ Context::GetSystemService(JNIEnv *env, jstring name)
 jobject
 Context::GetSystemService(JNIEnv *env, const char *name)
 {
-  assert(env != NULL);
-  assert(name != NULL);
+  assert(env != nullptr);
+  assert(name != nullptr);
 
   Java::String name2(env, name);
   return GetSystemService(env, name2);

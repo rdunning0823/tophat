@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_PROGRESS_BAR_HXX
 #define XCSOAR_SCREEN_PROGRESS_BAR_HXX
 
-#include "Window.hpp"
+#include "NativeWindow.hpp"
 
 class ProgressBarStyle : public WindowStyle {
 public:
@@ -35,7 +35,7 @@ public:
   void Smooth();
 };
 
-class ProgressBar : public Window {
+class ProgressBar : public NativeWindow {
 #ifndef USE_GDI
   unsigned min_value, max_value, value, step_size;
 
@@ -54,7 +54,7 @@ public:
 
 #ifndef USE_GDI
 protected:
-  virtual void OnPaint(Canvas &canvas) override;
+  void OnPaint(Canvas &canvas) override;
 #endif
 };
 

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -37,7 +37,6 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Form/Button.hpp"
-#include "Form/Form.hpp"
 #include "Language/Language.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Event/Timer.hpp"
@@ -59,7 +58,7 @@ class FlightSetupPanel final
   : public RowFormWidget, DataFieldListener,
     private Timer,
     public ActionListener {
-  WndButton *dump_button;
+  Button *dump_button;
 
   PolarSettings &polar_settings;
 
@@ -70,7 +69,7 @@ public:
      polar_settings(CommonInterface::SetComputerSettings().polar)
   {}
 
-  void SetDumpButton(WndButton *_dump_button) {
+  void SetDumpButton(Button *_dump_button) {
     dump_button = _dump_button;
   }
 
@@ -118,7 +117,6 @@ public:
 private:
   /* virtual methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
-  virtual void OnSpecial(DataField &df) override;
 
   /* virtual methods from Timer */
   virtual void OnTimer() override;
@@ -213,13 +211,6 @@ FlightSetupPanel::OnModified(DataField &df)
     const DataFieldFloat &dff = (const DataFieldFloat &)df;
     SetBugs(fixed(1) - (dff.GetAsFixed() / 100));
   }
-}
-
-void
-FlightSetupPanel::OnSpecial(DataField &df)
-{
-  if (IsDataField(Ballast, df))
-    FlipBallastTimer();
 }
 
 void

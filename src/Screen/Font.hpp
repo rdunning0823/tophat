@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,12 +33,11 @@ typedef struct FT_FaceRec_ *FT_Face;
 
 #ifdef WIN32
 #include <windows.h>
-#else
-#include <wingdi.h>
 #endif
 
 #include <tchar.h>
 
+class FontDescription;
 class TextUtil;
 
 /**
@@ -66,9 +65,9 @@ public:
 #ifdef USE_FREETYPE
   Font():face(nullptr) {}
 #elif defined(ANDROID)
-  Font():text_util_object(NULL) {}
+  Font():text_util_object(nullptr) {}
 #else
-  Font():font(NULL) {}
+  Font():font(nullptr) {}
 #endif
 
   ~Font() { Destroy(); }
@@ -76,10 +75,13 @@ public:
   Font(const Font &other) = delete;
   Font &operator=(const Font &other) = delete;
 
+#ifdef USE_FREETYPE
   /**
    * Perform global font initialisation.
    */
   static void Initialise();
+  static void Deinitialise();
+#endif
 
 public:
   bool
@@ -87,20 +89,18 @@ public:
 #ifdef USE_FREETYPE
     return face != nullptr;
 #elif defined(ANDROID)
-    return text_util_object != NULL;
+    return text_util_object != nullptr;
     #else
-    return font != NULL;
+    return font != nullptr;
     #endif
   }
 
 #ifdef USE_FREETYPE
-  bool LoadFile(const char *file, UPixelScalar ptsize, bool bold = false,
+  bool LoadFile(const char *file, unsigned ptsize, bool bold = false,
                 bool italic = false);
 #endif
 
-  bool Load(const TCHAR *facename, UPixelScalar height, bool bold = false,
-            bool italic = false);
-  bool Load(const LOGFONT &log_font);
+  bool Load(const FontDescription &d);
   void Destroy();
 
   gcc_pure
@@ -122,22 +122,22 @@ public:
   }
 #endif
 
-  UPixelScalar GetHeight() const {
+  unsigned GetHeight() const {
     return height;
   }
-  UPixelScalar GetAscentHeight() const {
+  unsigned GetAscentHeight() const {
     return ascent_height;
   }
-  UPixelScalar GetCapitalHeight() const {
+  unsigned GetCapitalHeight() const {
     return capital_height;
   }
 
 #ifdef USE_FREETYPE
-  UPixelScalar GetLineSpacing() const {
+  unsigned GetLineSpacing() const {
     return height;
   }
 #elif defined(ANDROID)
-  UPixelScalar GetLineSpacing() const {
+  unsigned GetLineSpacing() const {
     return line_spacing;
   }
 #endif

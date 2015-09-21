@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -25,14 +25,10 @@ Copyright_License {
 #define XCSOAR_SCREEN_SUB_CANVAS_HPP
 
 #include "Screen/Canvas.hpp"
-#include "Screen/Point.hpp"
 
 #ifdef ENABLE_OPENGL
-#include "Screen/OpenGL/Globals.hpp"
-#include "Screen/OpenGL/System.hpp"
+#include "Screen/Point.hpp"
 #endif
-
-#include <algorithm>
 
 /**
  * A #Canvas implementation which maps into a part of an existing
@@ -43,52 +39,12 @@ class SubCanvas : public Canvas {
   RasterPoint relative;
 #endif
 
-  static inline unsigned
-  ClipMax(unsigned limit, int offset, unsigned size) {
-    return std::min(unsigned(size),
-                    unsigned(std::max(int(limit - offset), 0)));
-  }
-
 public:
-  SubCanvas(Canvas &canvas, RasterPoint _offset, PixelSize _size)
+  SubCanvas(Canvas &canvas, RasterPoint _offset, PixelSize _size);
+
 #ifdef ENABLE_OPENGL
-    :relative(_offset)
+  ~SubCanvas();
 #endif
-  {
-#ifdef ENABLE_OPENGL
-    assert(canvas.offset == OpenGL::translate);
-    offset = canvas.offset + _offset;
-    size = _size;
-
-    if (relative.x != 0 || relative.y != 0) {
-      OpenGL::translate += _offset;
-
-      glPushMatrix();
-#ifdef HAVE_GLES
-      glTranslatex((GLfixed)relative.x << 16, (GLfixed)relative.y << 16, 0);
-#else
-      glTranslatef(relative.x, relative.y, 0);
-#endif
-    }
-#else
-    buffer = canvas.buffer;
-    buffer.data = buffer.At(_offset.x, _offset.y);
-    buffer.width = ClipMax(buffer.width, _offset.x, _size.cx);
-    buffer.height = ClipMax(buffer.height, _offset.y, _size.cy);
-#endif
-  }
-
-  ~SubCanvas() {
-#ifdef ENABLE_OPENGL
-    assert(offset == OpenGL::translate);
-
-    if (relative.x != 0 || relative.y != 0) {
-      OpenGL::translate -= relative;
-
-      glPopMatrix();
-    }
-#endif
-  }
 };
 
 #endif

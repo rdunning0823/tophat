@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_MEMORY_CANVAS_HPP
 #define XCSOAR_SCREEN_MEMORY_CANVAS_HPP
 
-#include "Math/fixed.hpp"
 #include "Screen/Brush.hpp"
 #include "Screen/Font.hpp"
 #include "Screen/Pen.hpp"
@@ -32,6 +31,7 @@ Copyright_License {
 #include "Point.hpp"
 #include "PixelTraits.hpp"
 #include "Buffer.hpp"
+#include "ActivePixelTraits.hpp"
 #include "Compiler.h"
 
 #include <tchar.h>
@@ -46,24 +46,17 @@ Copyright_License {
 class Angle;
 class Bitmap;
 
-#ifdef GREYSCALE
-using SDLPixelTraits = GreyscalePixelTraits;
-#else
-using SDLPixelTraits = BGRAPixelTraits;
-#endif
-
 /**
  * Base drawable canvas class
- * 
  */
 class Canvas {
   friend class WindowCanvas;
   friend class SubCanvas;
 
-  using ConstImageBuffer = ::ConstImageBuffer<SDLPixelTraits>;
+  using ConstImageBuffer = ::ConstImageBuffer<ActivePixelTraits>;
 
 protected:
-  WritableImageBuffer<SDLPixelTraits> buffer;
+  WritableImageBuffer<ActivePixelTraits> buffer;
 
   Pen pen;
   Brush brush;
@@ -75,14 +68,14 @@ protected:
 
 public:
   Canvas()
-    :buffer(WritableImageBuffer<SDLPixelTraits>::Empty()),
-     font(NULL), background_mode(OPAQUE) {}
+    :buffer(WritableImageBuffer<ActivePixelTraits>::Empty()),
+     font(nullptr), background_mode(OPAQUE) {}
 
-  explicit Canvas(WritableImageBuffer<SDLPixelTraits> _buffer)
+  explicit Canvas(WritableImageBuffer<ActivePixelTraits> _buffer)
     :buffer(_buffer),
-     font(NULL), background_mode(OPAQUE) {}
+     font(nullptr), background_mode(OPAQUE) {}
 
-  void Create(WritableImageBuffer<SDLPixelTraits> _buffer) {
+  void Create(WritableImageBuffer<ActivePixelTraits> _buffer) {
     buffer = _buffer;
   }
 
@@ -132,7 +125,7 @@ public:
   }
 
   void SelectHollowBrush() {
-    brush.Reset();
+    brush.Destroy();
   }
 
   void SelectWhiteBrush() {
@@ -312,8 +305,6 @@ public:
                          COLOR_DARK_GRAY);
   }
 
-  void DrawButton(PixelRect rc, bool down);
-
   gcc_pure
   const PixelSize CalcTextSize(const TCHAR *text, size_t length) const;
 
@@ -327,7 +318,7 @@ public:
 
   gcc_pure
   unsigned GetFontHeight() const {
-    return font != NULL ? font->GetHeight() : 0;
+    return font != nullptr ? font->GetHeight() : 0;
   }
 
   void DrawText(int x, int y, const TCHAR *text);

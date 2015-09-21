@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,14 +26,16 @@ Copyright_License {
 
 namespace ProfileKeys {
 
+extern const char UIScale[];
+extern const char Password[];
 extern const char SpeedUnitsValue[];
 extern const char DistanceUnitsValue[];
 extern const char AltitudeUnitsValue[];
 extern const char TemperatureUnitsValue[];
 extern const char LiftUnitsValue[];
 extern const char PressureUnitsValue[];
-extern const char WingLoadingUnitsValue[];
-extern const char MassUnitsValue[];
+extern const char WingLoadingUnitValue[];
+extern const char MassUnitValue[];
 extern const char TaskSpeedUnitsValue[];
 extern const char DisplayUpValue[];
 extern const char OrientationCruise[];
@@ -61,7 +63,6 @@ extern const char AdditionalAirspaceFile[];
 extern const char AirfieldFile[];
 extern const char PolarFile[];
 extern const char LanguageFile[];
-extern const char StatusFile[];
 extern const char InputFile[];
 extern const char AltMode[];
 extern const char ClipAlt[];
@@ -75,9 +76,11 @@ extern const char TerrainContours[];
 extern const char FinalGlideTerrain[];
 extern const char UserWindSource[];
 extern const char AirspaceWarning[];
+extern const char AirspaceWarningDialog[];
 extern const char AirspaceBlackOutline[];
 extern const char AirspaceTransparency[];
 extern const char AirspaceFillMode[];
+extern const char AirspaceLabelSelection[];
 extern const char WarningTime[];
 extern const char RepetitiveSound[];
 extern const char AcknowledgementTime[];
@@ -211,7 +214,6 @@ extern const char ShowWaypointListWarning[];
 extern const char StartupTipId[];
 extern const char StartupTipDeclineVersion[];
 extern const char AccelerometerZero[];
-extern const char UseCustomFonts[];
 extern const char DialogFont[];
 extern const char FontInfoWindowFont[];
 extern const char FontTitleWindowFont[];
@@ -236,7 +238,7 @@ extern const char FlarmAutoZoom[];
 extern const char FlarmNorthUp[];
 
 extern const char IgnoreNMEAChecksum[];
-extern const char DisplayOrientation[];
+extern const char MapOrientation[];
 
 extern const char ClimbMapScale[];
 extern const char CruiseMapScale[];
@@ -255,8 +257,10 @@ extern const char TrackingInterval[];
 extern const char TrackingVehicleType[];
 extern const char TrackingVehicleName[];
 extern const char SkyLinesTrackingEnabled[];
+extern const char SkyLinesRoaming[];
 extern const char SkyLinesTrackingInterval[];
 extern const char SkyLinesTrafficEnabled[];
+extern const char SkyLinesNearTrafficEnabled[];
 extern const char SkyLinesTrackingKey[];
 extern const char LiveTrack24Enabled[];
 extern const char LiveTrack24Server[];
@@ -281,6 +285,8 @@ extern const char FilePickAndDownloadAreaFilter[];
 extern const char FilePickAndDownloadSubAreaFilter[];
 extern const char ScreensButtonLocation[];
 extern const char WaypointSortDirection[];
+extern const char WaveAssistant[];
+
 }
 
 #endif

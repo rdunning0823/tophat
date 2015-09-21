@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -55,16 +55,20 @@ public:
   explicit Brush(const Color _color):color(_color)  {}
 #else
   /** Base Constructor of the Brush class */
-  Brush():brush(NULL) {}
+  Brush():brush(nullptr) {}
 
   /**
    * Constructor (creates a Brush object of the given Color
    * @param c Color of the Brush
    */
-  explicit Brush(const Color c) : brush(NULL) { Set(c); }
+  explicit Brush(const Color c):brush(nullptr) {
+    Create(c);
+  }
 
   /** Destructor */
-  ~Brush() { Reset(); }
+  ~Brush() {
+    Destroy();
+  }
 
   Brush(const Brush &other) = delete;
   Brush &operator=(const Brush &other) = delete;
@@ -75,7 +79,7 @@ public:
    * Sets the Color of the Brush
    * @param c The new Color
    */
-  void Set(const Color c);
+  void Create(const Color c);
 
 #ifdef HAVE_HATCHED_BRUSH
 
@@ -83,17 +87,17 @@ public:
    * Creates a bitmap-based Brush
    * @param bitmap The bitmap the new Brush will be based on
    */
-  void Set(const Bitmap &bitmap);
+  void Create(const Bitmap &bitmap);
 
 #endif
 
   /**
-   * Resets the Brush to NULL
+   * Resets the Brush to nullptr
    */
-  void Reset();
+  void Destroy();
 
   /**
-   * Returns whether the Brush is defined (!= NULL)
+   * Returns whether the Brush is defined (!= nullptr)
    * @return True if the Brush is defined, False otherwise
    */
   bool
@@ -102,7 +106,7 @@ public:
 #ifndef USE_GDI
     return !color.IsTransparent();
 #else
-    return brush != NULL;
+    return brush != nullptr;
 #endif
   }
 
@@ -126,16 +130,22 @@ public:
   /**
    * Configures this brush in the OpenGL context.
    */
-  void Set() const {
-    color.Set();
+  void Bind() const {
+    color.Bind();
   }
+
+#ifdef USE_GLSL
+  void BindUniform(GLint location) const {
+    color.Uniform(location);
+  }
+#endif
 #endif /* OPENGL */
 };
 
 #ifndef USE_GDI
 
 inline void
-Brush::Set(const Color c)
+Brush::Create(const Color c)
 {
   assert(IsScreenInitialized());
 
@@ -143,7 +153,7 @@ Brush::Set(const Color c)
 }
 
 inline void
-Brush::Reset()
+Brush::Destroy()
 {
   assert(!IsDefined() || IsScreenInitialized());
 

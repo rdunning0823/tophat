@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,17 +24,21 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_ANDROID_BLUETOOTH_PORT_HPP
 #define XCSOAR_DEVICE_ANDROID_BLUETOOTH_PORT_HPP
 
-#include "Port.hpp"
 #include "Compiler.h"
 
 #include <tchar.h>
 
-gcc_malloc
-Port *
-OpenAndroidBluetoothPort(const TCHAR *address, DataHandler &_handler);
+class Port;
+class PortListener;
+class DataHandler;
 
 gcc_malloc
 Port *
-OpenAndroidBluetoothServerPort(DataHandler &_handler);
+OpenAndroidBluetoothPort(const TCHAR *address, PortListener *_listener,
+                         DataHandler &_handler);
+
+gcc_malloc
+Port *
+OpenAndroidBluetoothServerPort(PortListener *_listener, DataHandler &_handler);
 
 #endif

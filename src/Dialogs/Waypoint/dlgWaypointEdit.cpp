@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -53,8 +53,8 @@ public:
 
 private:
   /* virtual methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual bool Save(bool &changed) override;
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  bool Save(bool &changed) override;
 };
 
 static constexpr StaticEnumChoice waypoint_types[] = {
@@ -65,13 +65,14 @@ static constexpr StaticEnumChoice waypoint_types[] = {
 };
 
 void
-WaypointEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
+WaypointEditWidget::Prepare(gcc_unused ContainerWindow &parent,
+                            gcc_unused const PixelRect &rc)
 {
   AddText(_("Name"), nullptr, value.name.c_str());
   AddText(_("Comment"), nullptr, value.comment.c_str());
-  Add(_("Location"), nullptr, new GeoPointDataField(value.location,
-                                                    CommonInterface::GetUISettings().coordinate_format));
-
+  Add(_("Location"), nullptr, new
+      GeoPointDataField(value.location,
+                        UIGlobals::GetFormatSettings().coordinate_format));
   AddFloat(_("Altitude"), nullptr,
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(30000), fixed(5), false,
@@ -112,7 +113,7 @@ WaypointEditWidget::Save(bool &_changed)
 bool
 dlgWaypointEditShowModal(Waypoint &way_point)
 {
-  if (CommonInterface::GetUISettings().coordinate_format ==
+  if (UIGlobals::GetFormatSettings().coordinate_format ==
       CoordinateFormat::UTM) {
     ShowMessageBox(
         _("Sorry, the waypoint editor is not yet available for the UTM coordinate format."),

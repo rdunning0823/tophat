@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "SocketPort.hpp"
+#include "Net/SocketError.hpp"
 #include "IO/DataHandler.hpp"
 
 #ifdef HAVE_POSIX
@@ -42,7 +43,7 @@ SocketPort::Close()
 
 #ifdef HAVE_POSIX
   if (socket.IsDefined()) {
-    io_thread->LockRemove(socket.Get());
+    io_thread->LockRemove(socket.ToFileDescriptor());
     socket.Close();
   }
 #else
@@ -58,6 +59,8 @@ SocketPort::Close()
 #endif
 
   BufferedPort::EndClose();
+
+  StateChanged();
 }
 
 void
@@ -73,10 +76,12 @@ SocketPort::Set(SocketDescriptor &&_socket)
 
   /* register the socket in then IOThread or the SocketThread */
 #ifdef HAVE_POSIX
-  io_thread->LockAdd(socket.Get(), Poll::READ, *this);
+  io_thread->LockAdd(socket.ToFileDescriptor(), Poll::READ, *this);
 #else
   thread.Start();
 #endif
+
+  StateChanged();
 }
 
 bool
@@ -112,6 +117,16 @@ SocketPort::Write(const void *data, size_t length)
     return 0;
 
   ssize_t nbytes = socket.Write((const char *)data, length);
+
+  if (nbytes < 0 && IsSocketBlockingError()) {
+    /* writing to the socket blocks; wait and retry */
+
+    if (socket.WaitWritable(1000) <= 0)
+      return 0;
+
+    nbytes = socket.Write(data, length);
+  }
+
   return nbytes < 0 ? 0 : nbytes;
 }
 
@@ -128,14 +143,15 @@ SocketPort::SetBaudrate(unsigned baud_rate)
 }
 
 bool
-SocketPort::OnFileEvent(int fd, unsigned mask)
+SocketPort::OnSocketEvent(SocketDescriptor _socket, unsigned mask)
 {
-  assert(fd == socket.Get());
+  assert(_socket == socket);
 
   char buffer[1024];
   ssize_t nbytes = socket.Read(buffer, sizeof(buffer));
   if (nbytes <= 0) {
     socket.Close();
+    StateChanged();
     return false;
   }
 

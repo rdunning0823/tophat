@@ -9,8 +9,7 @@ MSGMERGE = msgmerge
 GETTEXT_PACKAGE = tophat
 GETTEXT_SOURCES = $(XCSOAR_SOURCES) \
 	$(wildcard $(SRC)/Dialogs/Device/Vega/*Parameters.hpp) \
-	$(SRC)/Terrain/RasterWeather.cpp
-GETTEXT_DIALOGS = $(wildcard Data/Dialogs/*.xml)
+	$(SRC)/Terrain/RasterWeatherStore.cpp
 GETTEXT_EVENTS = Data/Input/default.xci
 
 $(OUT)/po/cpp.pot: $(GETTEXT_SOURCES) | $(OUT)/po/dirstamp
@@ -27,17 +26,12 @@ $(OUT)/po/cpp.pot: $(GETTEXT_SOURCES) | $(OUT)/po/dirstamp
 	  --force-po \
 	  $^
 
-$(OUT)/po/xml.pot: $(GETTEXT_DIALOGS) | $(OUT)/po/dirstamp
-	@$(NQ)echo "  GEN     $@"
-	$(Q)$(PERL) $(topdir)/tools/xml2po.pl $^ >$@.tmp
-	$(Q)mv $@.tmp $@
-
 $(OUT)/po/event.pot: $(GETTEXT_EVENTS) | $(OUT)/po/dirstamp
 	@$(NQ)echo "  GEN     $@"
 	$(Q)$(PERL) $(topdir)/tools/xci2po.pl $^ >$@.tmp
 	$(Q)mv $@.tmp $@
 
-po/$(GETTEXT_PACKAGE).pot: $(OUT)/po/cpp.pot $(OUT)/po/xml.pot $(OUT)/po/event.pot
+po/$(GETTEXT_PACKAGE).pot: $(OUT)/po/cpp.pot $(OUT)/po/event.pot
 	@$(NQ)echo "  GEN     $@"
 	$(Q)$(MSGCAT) -o $@ $^
 

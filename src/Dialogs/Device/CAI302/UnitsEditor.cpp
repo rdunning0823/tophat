@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -78,6 +78,14 @@ CAI302UnitsEditor::Prepare(ContainerWindow &parent, const PixelRect &rc)
   };
   AddEnum(_("Speed"), NULL, speed_list,
           data.GetSpeedUnit());
+
+  static constexpr StaticEnumChoice sink_tone_list[] = {
+    { 0, _T("off"), },
+    { 1, _T("on"), },
+    { 0 }
+  };
+  AddEnum(_("Sink tone"), NULL, sink_tone_list,
+          data.GetSinkTone());
 }
 
 bool
@@ -118,6 +126,12 @@ CAI302UnitsEditor::Save(bool &_changed)
   unsigned speed = data.GetSpeedUnit();
   if (SaveValue(SpeedUnit, speed)) {
     data.SetSpeedUnit(speed);
+    changed = true;
+  }
+
+  unsigned sink_tone = data.GetSinkTone();
+  if (SaveValue(SinkTone, sink_tone)) {
+    data.SetSinkTone(sink_tone);
     changed = true;
   }
 

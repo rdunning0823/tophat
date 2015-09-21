@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,13 +24,10 @@ Copyright_License {
 #include "SymbolsConfigPanel.hpp"
 #include "Profile/ProfileKeys.hpp"
 #include "Form/DataField/Enum.hpp"
-#include "Form/DataField/Base.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
-#include "Form/Form.hpp"
 #include "Widget/RowFormWidget.hpp"
-#include "Dialogs/CallBackTable.hpp"
 #include "UIGlobals.hpp"
 #include "MapSettings.hpp"
 
@@ -191,7 +188,7 @@ SymbolsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddEnum(_("Wind arrow location"), _("Determines where the wind arrow is shown."),
           wind_arrow_list, (unsigned)settings_map.wind_arrow_location);
 
-  AddEnum(_("Aircraft symbol"), NULL, aircraft_symbol_list,
+  AddEnum(_("Aircraft symbol"), nullptr, aircraft_symbol_list,
           (unsigned)settings_map.aircraft_symbol);
   SetExpertRow(AIRCRAFT_SYMBOL);
 }

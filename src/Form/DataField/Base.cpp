@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -35,15 +35,7 @@ enum {
 
 DataField::DataField(Type _type, bool _supports_combolist,
                      DataFieldListener *_listener)
-  :listener(_listener), data_access_callback(nullptr),
-   supports_combolist(_supports_combolist), type(_type),
-   item_help_enabled(false)
-{
-}
-
-DataField::DataField(Type _type, bool _supports_combolist,
-                     DataAccessCallback _data_access_callback)
-  :listener(NULL), data_access_callback(_data_access_callback),
+  :listener(_listener),
    supports_combolist(_supports_combolist), type(_type),
    item_help_enabled(false)
 {
@@ -52,17 +44,8 @@ DataField::DataField(Type _type, bool _supports_combolist,
 void
 DataField::Modified()
 {
-  if (listener != NULL)
+  if (listener != nullptr)
     listener->OnModified(*this);
-  else if (data_access_callback != NULL)
-    data_access_callback(this);
-}
-
-void
-DataField::Special()
-{
-  if (listener != NULL)
-    listener->OnSpecial(*this);
 }
 
 void
@@ -84,7 +67,7 @@ DataField::GetAsInteger() const
 const TCHAR *
 DataField::GetAsString() const
 {
-  return NULL;
+  return nullptr;
 }
 
 const TCHAR *

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -27,17 +27,17 @@ Copyright_License {
 #include "Widget/ListWidget.hpp"
 #include "Widget/TwoWidgets.hpp"
 #include "Widget/RowFormWidget.hpp"
-#include "Form/Form.hpp"
 #include "Form/List.hpp"
 #include "Form/Edit.hpp"
-#include "Form/DataField/String.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "Form/DataField/Prefix.hpp"
 #include "Engine/Airspace/Airspaces.hpp"
 #include "Engine/Airspace/AbstractAirspace.hpp"
 #include "Renderer/AirspaceListRenderer.hpp"
+#include "Renderer/TwoTextRowsRenderer.hpp"
 #include "Look/MapLook.hpp"
+#include "Look/DialogLook.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
@@ -61,14 +61,20 @@ enum Controls {
   TYPE,
 };
 
+enum Buttons {
+  DETAILS,
+};
+
 class AirspaceFilterWidget;
 
 class AirspaceListWidget final
   : public ListWidget, public DataFieldListener,
-    NullBlackboardListener {
+    public ActionListener, NullBlackboardListener {
   AirspaceFilterWidget &filter_widget;
 
   AirspaceSelectInfoVector items;
+
+  TwoTextRowsRenderer row_renderer;
 
 public:
   AirspaceListWidget(AirspaceFilterWidget &_filter_widget)
@@ -76,6 +82,7 @@ public:
 
   void UpdateList();
   void FilterMode(bool direction);
+  void OnAirspaceListEnter(unsigned index);
 
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent,
@@ -108,6 +115,9 @@ public:
 
   virtual void OnActivateItem(unsigned index) override;
 
+  /* virtual methods from ActionListener */
+  virtual void OnAction(int id) override;
+
   /* virtual methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
 
@@ -139,14 +149,20 @@ public:
 
 class AirspaceListButtons final : public RowFormWidget {
   ActionListener &dialog;
+  ActionListener *list;
 
 public:
   AirspaceListButtons(const DialogLook &look, ActionListener &_dialog)
     :RowFormWidget(look), dialog(_dialog) {}
 
+  void SetList(ActionListener *_list) {
+    list = _list;
+  }
+
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override {
     AddSymbolButton(_T("_X"), dialog, mrCancel);
+    AddButton(_("Details"), *list, DETAILS);
   }
 };
 
@@ -195,7 +211,7 @@ struct AirspaceListWidgetState
 static AirspaceListWidgetState dialog_state;
 
 void
-AirspaceListWidget::OnActivateItem(unsigned i)
+AirspaceListWidget::OnAirspaceListEnter(unsigned i)
 {
   if (items.empty()) {
     assert(i == 0);
@@ -205,6 +221,22 @@ AirspaceListWidget::OnActivateItem(unsigned i)
   assert(i < items.size());
 
   dlgAirspaceDetails(items[i].GetAirspace(), airspace_warnings);
+}
+
+void
+AirspaceListWidget::OnActivateItem(unsigned index)
+{
+  OnAirspaceListEnter(index);
+}
+
+void
+AirspaceListWidget::OnAction(int id)
+{
+  switch (Buttons(id)) {
+  case DETAILS:
+    OnAirspaceListEnter(GetList().GetCursorIndex());
+    break;
+  }
 }
 
 void
@@ -241,7 +273,9 @@ void
 AirspaceListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
-  CreateList(parent, look, rc, AirspaceListRenderer::GetHeight(look));
+  CreateList(parent, look, rc,
+             row_renderer.CalculateLayout(*look.list.font,
+                                          look.small_font));
   UpdateList();
 }
 
@@ -300,7 +334,7 @@ AirspaceListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   AirspaceListRenderer::Draw(
       canvas, rc, airspace,
       items[i].GetVector(location, airspaces->GetProjection()),
-      UIGlobals::GetDialogLook(), UIGlobals::GetMapLook().airspace,
+      row_renderer, UIGlobals::GetMapLook().airspace,
       CommonInterface::GetMapSettings().airspace);
 }
 
@@ -399,10 +433,8 @@ FillDirectionEnum(DataFieldEnum &df)
     360, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330
   };
 
-  for (unsigned i = 0; i < ARRAY_SIZE(directions); ++i) {
-    FormatBearing(buffer, ARRAY_SIZE(buffer), directions[i]);
-    df.AddChoice(directions[i], buffer);
-  }
+  for (unsigned i = 0; i < ARRAY_SIZE(directions); ++i)
+    df.AddChoice(directions[i], FormatBearing(directions[i]).c_str());
 
   df.Set(WILDCARD);
 }
@@ -462,6 +494,7 @@ ShowAirspaceListDialog(const Airspaces &_airspaces,
     new AirspaceListWidget(*filter_widget);
 
   filter_widget->SetListener(list_widget);
+  buttons_widget->SetList(list_widget);
 
   TwoWidgets *widget = new TwoWidgets(left_widget, list_widget, false);
 

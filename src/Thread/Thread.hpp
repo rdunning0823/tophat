@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,8 +24,10 @@ Copyright_License {
 #ifndef XCSOAR_THREAD_THREAD_HPP
 #define XCSOAR_THREAD_THREAD_HPP
 
+#include "Compiler.h"
+
 #ifndef NDEBUG
-#include "Util/ListHead.hpp"
+#include <boost/intrusive/list.hpp>
 #endif
 
 #ifdef HAVE_POSIX
@@ -40,9 +42,7 @@ Copyright_License {
  * This class provides an OS independent view on a thread.
  */
 class Thread {
-#ifndef NDEBUG
-  ListHead siblings;
-#endif
+  const char *const name;
 
 #ifdef HAVE_POSIX
   pthread_t handle;
@@ -63,14 +63,20 @@ class Thread {
 #endif
 
 public:
+
+#ifndef NDEBUG
+  typedef boost::intrusive::list_member_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>> SiblingsHook;
+  SiblingsHook siblings;
+#endif
+
 #ifdef HAVE_POSIX
-  Thread():defined(false) {
+  Thread(const char *_name=nullptr):name(_name), defined(false) {
 #ifndef NDEBUG
     creating = false;
 #endif
   }
 #else
-  Thread():handle(NULL) {}
+  Thread(const char *_name=nullptr):name(_name), handle(nullptr) {}
 #endif
 
 #ifndef NDEBUG
@@ -88,7 +94,7 @@ public:
 #ifdef HAVE_POSIX
     return defined;
 #else
-    return handle != NULL;
+    return handle != nullptr;
 #endif
   }
 
@@ -112,6 +118,8 @@ public:
     ::SetThreadPriority(handle, THREAD_PRIORITY_BELOW_NORMAL);
 #endif
   }
+
+  void SetIdlePriority();
 
   bool Start();
   void Join();

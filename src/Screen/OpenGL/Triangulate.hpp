@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,11 +24,11 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_OPENGL_TRIANGULATE_HPP
 #define XCSOAR_SCREEN_OPENGL_TRIANGULATE_HPP
 
-#include "Util/AllocatedArray.hpp"
 #include "System.hpp"
 
 struct RasterPoint;
-struct ShapePoint;
+struct FloatPoint;
+template<class T> class AllocatedArray;
 
 /**
  * cutting ears - simple algorithm, no support for holes
@@ -48,8 +48,8 @@ PolygonToTriangles(const RasterPoint *points, unsigned num_points,
                    AllocatedArray<GLushort> &triangles,
                    unsigned min_distance=1);
 unsigned
-PolygonToTriangles(const ShapePoint *points, unsigned num_points,
-                   GLushort *triangles, unsigned min_distance=1);
+PolygonToTriangles(const FloatPoint *points, unsigned num_points,
+                   GLushort *triangles, float min_distance=1);
 
 /**
  * Pack triangle indices into a triangle strip.

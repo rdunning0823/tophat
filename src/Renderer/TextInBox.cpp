@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -81,10 +81,11 @@ RenderShadowedText(Canvas &canvas, const TCHAR *text,
   canvas.SetBackgroundTransparent();
 
   canvas.SetTextColor(inverted ? COLOR_BLACK : COLOR_WHITE);
-  canvas.DrawText(x + Layout::SmallScale(1), y, text);
-  canvas.DrawText(x - Layout::SmallScale(1), y, text);
-  canvas.DrawText(x, y + 1, text);
-  canvas.DrawText(x, y - 1, text);
+  const int offset = canvas.GetFontHeight() / 12u;
+  canvas.DrawText(x + offset, y, text);
+  canvas.DrawText(x - offset, y, text);
+  canvas.DrawText(x, y + offset, text);
+  canvas.DrawText(x, y - offset, text);
 
   canvas.SetTextColor(inverted ? COLOR_WHITE : COLOR_BLACK);
   canvas.DrawText(x, y, text);
@@ -122,7 +123,7 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
     y += offset.y;
   }
 
-  if (label_block != NULL && !label_block->check(rc))
+  if (label_block != nullptr && !label_block->check(rc))
     return false;
 
   if (mode.shape == LabelShape::ROUNDED_BLACK ||
@@ -136,7 +137,7 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
       canvas.SelectWhiteBrush();
 
       canvas.DrawRoundRectangle(rc.left, rc.top, rc.right, rc.bottom,
-                                Layout::SmallScale(8), Layout::SmallScale(8));
+                                Layout::VptScale(8), Layout::VptScale(8));
     }
 
     canvas.SetBackgroundTransparent();

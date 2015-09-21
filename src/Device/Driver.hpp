@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,12 +24,11 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_DRIVER_HPP
 #define XCSOAR_DEVICE_DRIVER_HPP
 
-#include "Util/StaticArray.hpp"
 #include "Math/fixed.hpp"
 #include "FlightInfo.hpp"
 
+#include <stddef.h>
 #include <tchar.h>
-#include <stdint.h>
 
 struct NMEAInfo;
 struct MoreData;
@@ -41,52 +40,8 @@ class Port;
 class AtmosphericPressure;
 class RadioFrequency;
 class OperationEnvironment;
-
-struct RecordedFlightInfo : FlightInfo {
-  /**
-   * Optional driver specific data to address a flight.
-   */
-  union {
-    /**
-     * Flight number, used by the CAI302 driver.
-     */
-    uint8_t cai302;
-
-    /**
-     * Flight address, used by the IMI ERIXX driver.
-     */
-    uint32_t imi;
-
-    struct {
-      /**
-       * File name.  Only used by the LXNAV Nano sub-driver.  If this
-       * is empty, then the "classic" Colibri protocol is used.
-       */
-      char nano_filename[16];
-
-      uint8_t start_address[3];
-      uint8_t end_address[3];
-    } lx;
-
-    /**
-     * Flight number, used by the FLARM driver.
-     */
-    uint8_t flarm;
-
-    /**
-     * Flight number, used by Volkslogger driver
-     */
-    uint8_t volkslogger;
-
-    /**
-     * Flight number, used by the Flytec driver.
-     */
-    unsigned flytec;
-  } internal;
-};
-
-class RecordedFlightList : public StaticArray<RecordedFlightInfo, 128u> {
-};
+struct RecordedFlightInfo;
+class RecordedFlightList;
 
 /**
  * This is the interface for a device driver.
@@ -199,7 +154,7 @@ public:
    * Declare a task.
    *
    * @param declaration the task declaration
-   * @param home the home waypoint, or NULL if not known/configured;
+   * @param home the home waypoint, or nullptr if not known/configured;
    * this is not part of the task declaration, but some drivers might
    * want to send it to the logger during the declaration process
    * @return true on success
@@ -229,8 +184,6 @@ public:
 
   /**
    * Called periodically each second
-   *
-   * @param calculated the current set of calculation results
    */
   virtual void OnSysTicker() = 0;
 
@@ -281,46 +234,46 @@ public:
  */
 class AbstractDevice : public Device {
 public:
-  virtual void LinkTimeout() override;
-  virtual bool EnableNMEA(OperationEnvironment &env) override;
+  void LinkTimeout() override;
+  bool EnableNMEA(OperationEnvironment &env) override;
 
-  virtual bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
+  bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
 
-  virtual bool PutMacCready(fixed MacCready, OperationEnvironment &env) override;
-  virtual bool PutBugs(fixed bugs, OperationEnvironment &env) override;
-  virtual bool PutBallast(fixed fraction, fixed overload,
+  bool PutMacCready(fixed MacCready, OperationEnvironment &env) override;
+  bool PutBugs(fixed bugs, OperationEnvironment &env) override;
+  bool PutBallast(fixed fraction, fixed overload,
+                  OperationEnvironment &env) override;
+  bool PutQNH(const AtmosphericPressure &pres,
+              OperationEnvironment &env) override;
+  bool PutVolume(unsigned volume, OperationEnvironment &env) override;
+  bool PutActiveFrequency(RadioFrequency frequency,
+                          const TCHAR *name,
                           OperationEnvironment &env) override;
-  virtual bool PutQNH(const AtmosphericPressure &pres,
+  bool PutStandbyFrequency(RadioFrequency frequency,
+                           const TCHAR *name,
+                           OperationEnvironment &env) override;
+
+  bool EnablePassThrough(OperationEnvironment &env) override;
+
+  bool Declare(const Declaration &declaration, const Waypoint *home,
+               OperationEnvironment &env) override;
+
+  bool ReadFlightList(RecordedFlightList &flight_list,
                       OperationEnvironment &env) override;
-  virtual bool PutVolume(unsigned volume, OperationEnvironment &env) override;
-  virtual bool PutActiveFrequency(RadioFrequency frequency,
-                                  const TCHAR *name,
-                                  OperationEnvironment &env) override;
-  virtual bool PutStandbyFrequency(RadioFrequency frequency,
-                                   const TCHAR *name,
-                                   OperationEnvironment &env) override;
 
-  virtual bool EnablePassThrough(OperationEnvironment &env) override;
+  bool DownloadFlight(const RecordedFlightInfo &flight,
+                      const TCHAR *path,
+                      OperationEnvironment &env) override;
 
-  virtual bool Declare(const Declaration &declaration, const Waypoint *home,
-                       OperationEnvironment &env) override;
+  void OnSysTicker() override;
 
-  virtual bool ReadFlightList(RecordedFlightList &flight_list,
-                              OperationEnvironment &env) override;
+  bool DataReceived(const void *data, size_t length,
+                    struct NMEAInfo &info) override;
 
-  virtual bool DownloadFlight(const RecordedFlightInfo &flight,
-                              const TCHAR *path,
-                              OperationEnvironment &env) override;
+  void OnSensorUpdate(const MoreData &basic) override {}
 
-  virtual void OnSysTicker() override;
-
-  virtual bool DataReceived(const void *data, size_t length,
-                            struct NMEAInfo &info) override;
-
-  virtual void OnSensorUpdate(const MoreData &basic) override {}
-
-  virtual void OnCalculatedUpdate(const MoreData &basic,
-                                  const DerivedInfo &calculated) override {}
+  void OnCalculatedUpdate(const MoreData &basic,
+                          const DerivedInfo &calculated) override {}
 };
 
 /**

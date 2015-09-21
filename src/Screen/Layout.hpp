@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -33,11 +33,16 @@ namespace Layout
   extern bool landscape;
 
   /**
+   * Screen size in pixels, the smaller of width and height.
+   */
+  extern unsigned min_screen_pixels;
+
+  /**
    * Fixed-point scaling factor, fractional part is 10 bits (factor
    * 1024).
    */
   extern unsigned scale_1024;
-  extern int scale;
+  extern unsigned scale;
 
   /**
    * Fixed-point scaling factor for on-screen objects which don't grow
@@ -48,21 +53,42 @@ namespace Layout
   extern unsigned pen_width_scale;
 
   /**
+   * Fixed-point scaling factor to convert a point (1/72th inch) to
+   * pixels.
+   */
+  extern unsigned pt_scale;
+
+  /**
+   * Fixed-point scaling factor to convert a "virtual point" to
+   * pixels.
+   *
+   * @see VptScale()
+   */
+  extern unsigned vpt_scale;
+
+  /**
+   * Fixed-point scaling factor to convert a font size (in points =
+   * 1/72th inch) to pixels.
+   */
+  extern unsigned font_scale;
+
+  /**
    * Recommended padding from Window boundary to text.
    */
-  extern UPixelScalar text_padding;
+  extern unsigned text_padding;
 
-  extern UPixelScalar minimum_control_height, maximum_control_height;
+  extern unsigned minimum_control_height, maximum_control_height;
 
-  extern UPixelScalar hit_radius;
+  extern unsigned hit_radius;
 
   /**
    * Initializes the screen layout information provided by this
    * namespace.
    *
    * @param screen_size the size of the screen in pixels
+   * @param ui_scale the UI scale setting in percent
    */
-  void Initialize(PixelSize screen_size);
+  void Initialize(PixelSize screen_size, unsigned ui_scale=100);
 
   /**
    * dots per inch X
@@ -90,18 +116,54 @@ namespace Layout
   }
 
   gcc_const
-  static inline PixelScalar
-  Scale(PixelScalar x)
+  static inline int
+  Scale(int x)
   {
     if (!ScaleSupported())
       return x;
 
-    return ((int)x * (int)scale_1024) >> 10;
+    return (x * int(scale_1024)) >> 10;
   }
 
   gcc_const
-  static inline PixelScalar
-  FastScale(PixelScalar x)
+  static inline unsigned
+  Scale(unsigned x)
+  {
+    if (!ScaleSupported())
+      return x;
+
+    return (x * scale_1024) >> 10;
+  }
+
+#ifdef USE_GDI
+  gcc_const
+  static inline int
+  Scale(PixelScalar x)
+  {
+    return Scale(int(x));
+  }
+
+  gcc_const
+  static inline int
+  Scale(UPixelScalar x)
+  {
+    return Scale(unsigned(x));
+  }
+#endif
+
+  gcc_const
+  static inline int
+  FastScale(int x)
+  {
+    if (!ScaleSupported())
+      return x;
+
+    return x * int(scale);
+  }
+
+  gcc_const
+  static inline unsigned
+  FastScale(unsigned x)
   {
     if (!ScaleSupported())
       return x;
@@ -109,9 +171,25 @@ namespace Layout
     return x * scale;
   }
 
+#ifdef USE_GDI
   gcc_const
-  static inline PixelScalar
-  SmallScale(PixelScalar x)
+  static inline int
+  FastScale(PixelScalar x)
+  {
+    return FastScale(int(x));
+  }
+
+  gcc_const
+  static inline int
+  FastScale(UPixelScalar x)
+  {
+    return FastScale(unsigned(x));
+  }
+#endif
+
+  gcc_const
+  static inline int
+  SmallScale(int x)
   {
     if (!ScaleSupported())
       return x;
@@ -130,20 +208,58 @@ namespace Layout
   }
 
   /**
+   * Scale a physical size in points (1/72th inch) to pixels.
+   *
+   * Use this if you need exact physical dimensions.
+   */
+  gcc_const
+  static inline unsigned
+  PtScale(unsigned pt)
+  {
+    return (pt * pt_scale) >> 10;
+  }
+
+  /**
+   * Scale a physical size in "virtual points" (nominally 1/72th inch)
+   * to pixels.  An additional scaling factor may be applied to
+   * consider the reduced viewing distance on small screens.
+   *
+   * Use this for best readability of on-screen objects.
+   */
+  gcc_const
+  static inline unsigned
+  VptScale(unsigned pt)
+  {
+    return (pt * vpt_scale) >> 10;
+  }
+
+  /**
+   * Scale a font size in points (1/72th inch) to pixels.  Additional
+   * scaling factors may be applied to consider small screens
+   * (i.e. viewing distance) and user preference.
+   */
+  gcc_const
+  static inline unsigned
+  FontScale(unsigned spt)
+  {
+    return (spt * font_scale) >> 10;
+  }
+
+  /**
    * Scale a vertical dimension value according to the aspect ratio of
    * the display, to work around non-square pixels.  An ellipsis with
    * the pixel width "x" and the pixel height "ScaleY(x)" shall be a
    * circle.
    */
   gcc_const
-  static inline PixelScalar
-  ScaleY(PixelScalar y)
+  static inline int
+  ScaleY(int y)
   {
     return y;
   }
 
   gcc_const
-  static inline UPixelScalar
+  static inline unsigned
   GetTextPadding()
   {
     if (!ScaleSupported())
@@ -183,7 +299,7 @@ namespace Layout
    * items.
    */
   gcc_pure
-  static inline UPixelScalar
+  static inline unsigned
   GetHitRadius()
   {
     if (!HasPointer())

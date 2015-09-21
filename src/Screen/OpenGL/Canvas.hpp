@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -24,24 +24,37 @@ Copyright_License {
 #ifndef XCSOAR_SCREEN_OPENGL_CANVAS_HPP
 #define XCSOAR_SCREEN_OPENGL_CANVAS_HPP
 
-#include "Math/fixed.hpp"
-#include "Math/Angle.hpp"
+#include "Color.hpp"
+#include "Point.hpp"
+#include "Features.hpp"
+#include "System.hpp"
 #include "Screen/Brush.hpp"
 #include "Screen/Font.hpp"
 #include "Screen/Pen.hpp"
-#include "Screen/OpenGL/Color.hpp"
-#include "Screen/OpenGL/Point.hpp"
-#include "Screen/OpenGL/Triangulate.hpp"
-#include "Screen/OpenGL/Features.hpp"
-#include "Screen/OpenGL/System.hpp"
-#include "Util/AllocatedArray.hpp"
 #include "Compiler.h"
 
-#include <assert.h>
+#ifdef USE_GLSL
+#include <glm/glm.hpp>
+#endif
+
 #include <tchar.h>
 
+
+/* Workaround: Some Win32 headers define OPAQUE and TRANSPARENT as preprocessor
+ * defines. Undefine them to avoid name conflict. */
+#ifdef OPAQUE
+#undef OPAQUE
+#endif
+
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif
+
+
+class Angle;
 class Bitmap;
 class GLTexture;
+template<class T> class AllocatedArray;
 
 /**
  * Base drawable canvas class
@@ -71,10 +84,11 @@ protected:
 public:
   Canvas()
     :offset(0, 0), size(0, 0),
-     font(NULL), background_mode(OPAQUE) {}
+     font(nullptr), background_mode(OPAQUE) {}
+
   Canvas(PixelSize _size)
     :offset(0, 0), size(_size),
-     font(NULL), background_mode(OPAQUE) {}
+     font(nullptr), background_mode(OPAQUE) {}
 
   Canvas(const Canvas &other) = delete;
   Canvas &operator=(const Canvas &other) = delete;
@@ -129,7 +143,7 @@ public:
   }
 
   void SelectHollowBrush() {
-    brush.Reset();
+    brush.Destroy();
   }
 
   void SelectWhiteBrush() {
@@ -216,8 +230,8 @@ public:
 
   void DrawOutlineRectangle(int left, int top, int right, int bottom,
                             Color color) {
-    color.Set();
-#ifdef HAVE_GLES
+    color.Bind();
+#if defined(HAVE_GLES) && !defined(HAVE_GLES2)
     glLineWidthx(1 << 16);
 #else
     glLineWidth(1);
@@ -316,8 +330,6 @@ public:
 
   void DrawFocusRectangle(PixelRect rc);
 
-  void DrawButton(PixelRect rc, bool down);
-
   gcc_pure
   const PixelSize CalcTextSize(const TCHAR *text, size_t length) const;
 
@@ -331,7 +343,7 @@ public:
 
   gcc_pure
   unsigned GetFontHeight() const {
-    return font != NULL ? font->GetHeight() : 0;
+    return font != nullptr ? font->GetHeight() : 0;
   }
 
   void DrawText(int x, int y, const TCHAR *text);
@@ -419,18 +431,6 @@ public:
                    int src_x, int src_y,
                    unsigned src_width, unsigned src_height,
                    Color fg_color, Color bg_color);
-
-  void CopyNotOr(int dest_x, int dest_y,
-                 unsigned dest_width, unsigned dest_height,
-                 const Bitmap &src, int src_x, int src_y);
-
-  void CopyAnd(int dest_x, int dest_y,
-               unsigned dest_width, unsigned dest_height,
-               const Bitmap &src, int src_x, int src_y);
-
-  void CopyAnd(const Bitmap &src) {
-    CopyAnd(0, 0, GetWidth(), GetHeight(), src, 0, 0);
-  }
 
   void ScaleCopy(int dest_x, int dest_y,
                  const Bitmap &src,

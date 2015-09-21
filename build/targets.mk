@@ -2,14 +2,25 @@ TARGETS = PC WIN64 \
 	PPC2000 PPC2003 PPC2003X WM5 WM5X \
 	ALTAIR \
 	UNIX UNIX32 UNIX64 OPT \
-	PI KOBO NEON \
+	WAYLAND \
+	PI PI2 CUBIE KOBO NEON \
 	ANDROID ANDROID7 ANDROID7NEON ANDROID86 ANDROIDMIPS \
+	ANDROIDAARCH64 ANDROIDX64 ANDROIDMIPS64 \
 	ANDROIDFAT \
-	WINE CYGWIN
+	WINE CYGWIN \
+	OSX32 OSX64 IOS32 IOS64
 
 ifeq ($(TARGET),)
   ifeq ($(HOST_IS_UNIX),y)
-    TARGET = UNIX
+    ifeq ($(HOST_IS_DARWIN),y)
+      ifeq ($(HOST_IS_X86_32),y)
+        TARGET = OSX32
+      else
+        TARGET = OSX64
+      endif
+    else
+      TARGET = UNIX
+    endif
   else
     TARGET = PC
   endif
@@ -19,19 +30,26 @@ else
   endif
 endif
 
-TARGET_FLAVOR := $(TARGET)
+ifeq ($(MAKECMDGOALS),python)
+  TARGET_FLAVOR := $(TARGET)_PYTHON
+else
+  TARGET_FLAVOR := $(TARGET)
+endif
 
 HAVE_CE := n
 HAVE_FPU := y
 X64 := n
 TARGET_IS_ARM = n
+TARGET_IS_ARMHF = n
 XSCALE := n
 ARMV5 = n
 ARMV6 = n
 ARMV7 := n
 NEON := n
+AARCH64 := n
 X86 := n
 MIPS := n
+MIPS64 := n
 FAT_BINARY := n
 
 TARGET_IS_DARWIN := n
@@ -42,6 +60,8 @@ TARGET_IS_KOBO := n
 HAVE_POSIX := n
 HAVE_WIN32 := y
 HAVE_MSVCRT := y
+
+USE_CROSSTOOL_NG := n
 
 TARGET_ARCH :=
 
@@ -81,6 +101,7 @@ endif
 
 ifeq ($(TARGET),ANDROID7)
   TARGET_IS_ARM = y
+  TARGET_IS_ARMHF = y
   ARMV7 := y
   override TARGET = ANDROID
 endif
@@ -92,6 +113,21 @@ endif
 
 ifeq ($(TARGET),ANDROIDMIPS)
   MIPS := y
+  override TARGET = ANDROID
+endif
+
+ifeq ($(TARGET),ANDROIDAARCH64)
+  AARCH64 := y
+  override TARGET = ANDROID
+endif
+
+ifeq ($(TARGET),ANDROIDX64)
+  X64 := y
+  override TARGET = ANDROID
+endif
+
+ifeq ($(TARGET),ANDROIDMIPS64)
+  MIPS64 := y
   override TARGET = ANDROID
 endif
 
@@ -185,6 +221,12 @@ ifeq ($(TARGET),OPT)
   DEBUG = n
 endif
 
+ifeq ($(TARGET),WAYLAND)
+  # experimental target for the Wayland display server
+  override TARGET = UNIX
+  USE_WAYLAND = y
+endif
+
 ifeq ($(TARGET),UNIX)
   # LOCAL_TCPREFIX is set in local-config.mk if configure was run.
   TCPREFIX := $(LOCAL_TCPREFIX)
@@ -194,6 +236,7 @@ ifeq ($(TARGET),UNIX)
   ARMV6 = $(HOST_IS_ARMV6)
   ARMV7 = $(HOST_IS_ARMV7)
   NEON = $(HOST_HAS_NEON)
+  TARGET_IS_ARMHF := $(call bool_or,$(ARMV7),$(TARGET_IS_PI))
   TARGET_HAS_MALI = $(HOST_HAS_MALI)
 endif
 
@@ -209,31 +252,143 @@ endif
 
 ifeq ($(TARGET),PI)
   override TARGET = UNIX
-  TCPREFIX := arm-unknown-linux-gnueabi-
+  TCPREFIX := arm-linux-gnueabihf-
   PI ?= /opt/pi/root
-  TARGET_ARCH += -march=armv6j -mfpu=vfp -mfloat-abi=hard
   TARGET_IS_PI = y
   TARGET_IS_ARM = y
+  TARGET_IS_ARMHF = y
   ARMV6 = y
+endif
+
+ifeq ($(TARGET),PI2)
+  override TARGET = NEON
+  PI ?= /opt/pi/root
+  TARGET_IS_PI = y
+endif
+
+ifeq ($(TARGET),CUBIE)
+  # cross-crompiling for Cubieboard
+  override TARGET = NEON
+  CUBIE ?= /opt/cubie/root
+  TARGET_HAS_MALI = y
 endif
 
 ifeq ($(TARGET),KOBO)
   # Experimental target for Kobo Mini
   override TARGET = NEON
-  KOBO ?= /opt/kobo/arm-unknown-linux-gnueabi
+  KOBO = $(TARGET_OUTPUT_DIR)/lib/arm-linux-gnueabihf/root
   TARGET_IS_KOBO = y
 endif
 
 ifeq ($(TARGET),NEON)
   # Experimental target for generic ARMv7 with NEON
   override TARGET = UNIX
-  TCPREFIX = arm-unknown-linux-gnueabi-
+  ifeq ($(USE_CROSSTOOL_NG),y)
+    TCPREFIX = arm-unknown-linux-gnueabihf-
+  else
+    TCPREFIX = arm-linux-gnueabihf-
+  endif
   ifeq ($(CLANG),n)
-    TARGET_ARCH += -mcpu=cortex-a8 -mfloat-abi=hard
+    TARGET_ARCH += -mcpu=cortex-a8
   endif
   TARGET_IS_ARM = y
+  TARGET_IS_ARMHF = y
   ARMV7 := y
   NEON := y
+endif
+
+ifeq ($(TARGET),OSX32)
+  override TARGET = UNIX
+  TARGET_IS_DARWIN = y
+  TARGET_IS_OSX = y
+  DARWIN_SDK_VERSION = 10.10
+  OSX_MIN_SUPPORTED_VERSION = 10.7
+  ifeq ($(HOST_IS_DARWIN),y)
+    DARWIN_SDK ?= /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${DARWIN_SDK_VERSION}.sdk
+    LLVM_TARGET = i386-apple-darwin
+  else
+    DARWIN_TOOLCHAIN ?= $(HOME)/opt/darwin-toolchain
+    DARWIN_SDK ?= $(DARWIN_TOOLCHAIN)/lib/SDKs/MacOSX$(DARWIN_SDK_VERSION).sdk
+    DARWIN_LIBS ?= $(DARWIN_TOOLCHAIN)/lib/i386-MacOSX-$(OSX_MIN_SUPPORTED_VERSION)-SDK$(DARWIN_SDK_VERSION).sdk
+    TCPREFIX = $(DARWIN_TOOLCHAIN)/bin/i386-apple-darwin-
+    LLVM_PREFIX = $(TCPREFIX)
+  endif
+  LIBCXX = y
+  CLANG = y
+  TARGET_ARCH += -march=i686 -msse2 -mmacosx-version-min=$(OSX_MIN_SUPPORTED_VERSION)
+endif
+
+ifeq ($(TARGET),OSX64)
+  override TARGET = UNIX
+  TARGET_IS_DARWIN = y
+  TARGET_IS_OSX = y
+  DARWIN_SDK_VERSION = 10.10
+  OSX_MIN_SUPPORTED_VERSION = 10.7
+  ifeq ($(HOST_IS_DARWIN),y)
+    DARWIN_SDK ?= /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${DARWIN_SDK_VERSION}.sdk
+    LLVM_TARGET = x86_64-apple-darwin
+  else
+    DARWIN_TOOLCHAIN ?= $(HOME)/opt/darwin-toolchain
+    DARWIN_SDK ?= $(DARWIN_TOOLCHAIN)/lib/SDKs/MacOSX$(DARWIN_SDK_VERSION).sdk
+    DARWIN_LIBS ?= $(DARWIN_TOOLCHAIN)/lib/x86_64-MacOSX-$(OSX_MIN_SUPPORTED_VERSION)-SDK$(DARWIN_SDK_VERSION).sdk
+    TCPREFIX = $(DARWIN_TOOLCHAIN)/bin/x86_64-apple-darwin-
+    LLVM_PREFIX = $(TCPREFIX)
+  endif
+  LIBCXX = y
+  CLANG = y
+  TARGET_ARCH += -mmacosx-version-min=$(OSX_MIN_SUPPORTED_VERSION)
+endif
+
+ifeq ($(TARGET),IOS32)
+  override TARGET = UNIX
+  TARGET_IS_DARWIN = y
+  TARGET_IS_IOS = y
+  DARWIN_SDK_VERSION = 8.3
+  IOS_MIN_SUPPORTED_VERSION = 5.1
+  ifeq ($(HOST_IS_DARWIN),y)
+    DARWIN_SDK ?= /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${DARWIN_SDK_VERSION}.sdk
+    LLVM_TARGET = armv7-apple-darwin
+  else
+    DARWIN_TOOLCHAIN ?= $(HOME)/opt/darwin-toolchain
+    DARWIN_SDK ?= $(DARWIN_TOOLCHAIN)/lib/SDKs/iPhoneOS$(DARWIN_SDK_VERSION).sdk
+    DARWIN_LIBS ?= $(DARWIN_TOOLCHAIN)/lib/armv7-iOS-$(IOS_MIN_SUPPORTED_VERSION)-SDK$(DARWIN_SDK_VERSION).sdk
+    TCPREFIX = $(DARWIN_TOOLCHAIN)/bin/armv7-apple-darwin-
+    LLVM_PREFIX = $(TCPREFIX)
+  endif
+  LIBCXX = y
+  CLANG = y
+  TARGET_ARCH += -miphoneos-version-min=$(IOS_MIN_SUPPORTED_VERSION)
+endif
+
+ifeq ($(TARGET),IOS64)
+  override TARGET = UNIX
+  TARGET_IS_DARWIN = y
+  TARGET_IS_IOS = y
+  DARWIN_SDK_VERSION = 8.3
+  IOS_MIN_SUPPORTED_VERSION = 7.0
+  ifeq ($(HOST_IS_DARWIN),y)
+    DARWIN_SDK ?= /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS${DARWIN_SDK_VERSION}.sdk
+    LLVM_TARGET = aarch64-apple-darwin
+  else
+    DARWIN_TOOLCHAIN ?= $(HOME)/opt/darwin-toolchain
+    DARWIN_SDK ?= $(DARWIN_TOOLCHAIN)/lib/SDKs/iPhoneOS$(DARWIN_SDK_VERSION).sdk
+    DARWIN_LIBS ?= $(DARWIN_TOOLCHAIN)/lib/arm64-iOS-$(IOS_MIN_SUPPORTED_VERSION)-SDK$(DARWIN_SDK_VERSION).sdk
+    TCPREFIX = $(DARWIN_TOOLCHAIN)/bin/aarch64-apple-darwin-
+    LLVM_PREFIX = $(TCPREFIX)
+  endif
+  LIBCXX = y
+  CLANG = y
+  TARGET_ARCH += -miphoneos-version-min=$(IOS_MIN_SUPPORTED_VERSION) -arch arm64
+  ASFLAGS += -arch arm64
+endif
+
+ifeq ($(filter $(TARGET),UNIX WINE),$(TARGET))
+  ifeq ($(HOST_IS_LINUX)$(TARGET_IS_DARWIN),yn)
+    TARGET_IS_LINUX := y
+  endif
+  ifeq ($(HOST_IS_DARWIN),y)
+    TARGET_IS_DARWIN := y
+  endif
 endif
 
 ifeq ($(TARGET),UNIX)
@@ -244,47 +399,57 @@ ifeq ($(TARGET),UNIX)
 
   ifeq ($(ARMV6),y)
     TARGET_ARCH += -march=armv6
-  endif
 
-  ifeq ($(ARMV7),y)
-    ifeq ($(CLANG),y)
-      TARGET_ARCH += -target armv7-none-linux-gnueabihf -integrated-as
-    else
-      TARGET_ARCH += -march=armv7-a
+    ifneq ($(CLANG),y)
+      # Force-disable thumb just in case the gcc binary was built with
+      # thumb enabled by default.  This fixes the dreaded gcc error
+      # "sorry, unimplemented: Thumb-1 hard-float VFP ABI".
+      TARGET_ARCH += -marm
     endif
   endif
 
-  ifeq ($(NEON),y)
-    TARGET_ARCH += -mfpu=neon
+  ifeq ($(ARMV7),y)
+    TARGET_ARCH += -march=armv7-a
   endif
-endif
 
-ifeq ($(filter $(TARGET),UNIX WINE),$(TARGET))
-  ifeq ($(HOST_IS_LINUX),y)
-    TARGET_IS_LINUX := y
+  ifeq ($(TARGET_IS_ARMHF),y)
+    ifeq ($(ARMV6),y)
+      TARGET_ARCH += -mfpu=vfp
+    endif
+
+    ifeq ($(NEON),y)
+      TARGET_ARCH += -mfpu=neon
+    endif
+
+    TARGET_ARCH += -mfloat-abi=hard
   endif
-  ifeq ($(HOST_IS_DARWIN),y)
-    TARGET_IS_DARWIN := y
+
+  ifeq ($(TARGET_IS_ARM)$(TARGET_IS_LINUX),yy)
+    ifeq ($(TARGET_IS_ARMHF),y)
+      LLVM_TARGET = arm-linux-gnueabihf
+    else
+      LLVM_TARGET = arm-linux-gnueabi
+    endif
   endif
 endif
 
 ifeq ($(TARGET),ANDROID)
-  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r9
+  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r10e
 
-  ANDROID_PLATFORM = android-17
-  ANDROID_SDK_PLATFORM = $(ANDROID_PLATFORM)
-
-  # NDK r8b has only android-14
-  ANDROID_NDK_PLATFORM = android-14
+  ANDROID_SDK_PLATFORM = android-22
+  ANDROID_NDK_PLATFORM = android-19
+  ANDROID_NDK_PLATFORM_64 = android-21
 
   ANDROID_ARCH = arm
   ANDROID_ABI2 = arm-linux-androideabi
   ANDROID_ABI3 = armeabi
   ANDROID_ABI4 = $(ANDROID_ABI2)
-  ANDROID_GCC_VERSION = 4.8
+  ANDROID_ABI5 = $(ANDROID_ABI3)
+  ANDROID_GCC_VERSION = 4.9
 
   ifeq ($(ARMV7),y)
-    ANDROID_ABI3 = armeabi-v7a
+    ANDROID_ABI3 = armeabi-v7a-hard
+    ANDROID_ABI5 = armeabi-v7a
   endif
 
   ifeq ($(X86),y)
@@ -300,13 +465,55 @@ ifeq ($(TARGET),ANDROID)
     ANDROID_ABI3 = mips
   endif
 
+  ifeq ($(AARCH64),y)
+    ANDROID_ARCH = arm64
+    ANDROID_ABI2 = aarch64-linux-android
+    ANDROID_ABI3 = arm64-v8a
+    ANDROID_NDK_PLATFORM = $(ANDROID_NDK_PLATFORM_64)
+  endif
+
+  ifeq ($(X64),y)
+    ANDROID_ARCH = x86_64
+    ANDROID_ABI2 = x86_64
+    ANDROID_ABI3 = x86_64
+    ANDROID_ABI4 = x86_64-linux-android
+    ANDROID_NDK_PLATFORM = $(ANDROID_NDK_PLATFORM_64)
+  endif
+
+  ifeq ($(MIPS64),y)
+    ANDROID_ARCH = mips64
+    ANDROID_ABI2 = mips64el-linux-android
+    ANDROID_ABI3 = mips64
+    ANDROID_NDK_PLATFORM = $(ANDROID_NDK_PLATFORM_64)
+  endif
+
   ANDROID_NDK_PLATFORM_DIR = $(ANDROID_NDK)/platforms/$(ANDROID_NDK_PLATFORM)
   ANDROID_TARGET_ROOT = $(ANDROID_NDK_PLATFORM_DIR)/arch-$(ANDROID_ARCH)
 
   ANDROID_GCC_TOOLCHAIN_NAME = $(ANDROID_ABI2)-$(ANDROID_GCC_VERSION)
 
+  ifeq ($(ANDROID_ARCH),arm)
+    # on ARMv6, LLVM/clang generates the "movw" instruction which
+    # however requires ARMv7 and leads to a SIGILL crash
+    # (http://llvm.org/bugs/show_bug.cgi?id=18364 and
+    # http://bugs.xcsoar.org/ticket/3339); until this LLVM bug is
+    # fixed, we keep using gcc
+
+    # on ARM, LLVM/clang generates "str" opcodes with Rd=Rn and
+    # post-index (FlexOffset), which is illegal
+    # (http://llvm.org/bugs/show_bug.cgi?id=20323 and
+    # http://bugs.xcsoar.org/ticket/3356); until this LLVM bug is
+    # fixed, we keep using gcc
+
+    CLANG ?= n
+  endif
+
+  # clang is the default compiler on Android
+  CLANG ?= y
+
   ifeq ($(CLANG),y)
-    ANDROID_TOOLCHAIN_NAME = llvm-3.3
+    ANDROID_TOOLCHAIN_NAME = llvm-3.6
+    LIBCXX = y
   else
     ANDROID_TOOLCHAIN_NAME = $(ANDROID_GCC_TOOLCHAIN_NAME)
   endif
@@ -332,28 +539,30 @@ ifeq ($(TARGET),ANDROID)
   LLVM_PREFIX = $(ANDROID_TOOLCHAIN)/bin/
 
   ifeq ($(X86),y)
+    LLVM_TARGET = i686-none-linux-android
     HAVE_FPU := y
   endif
 
   ifeq ($(MIPS),y)
+    LLVM_TARGET = mipsel-none-linux-android
     HAVE_FPU := y
   endif
 
   ifeq ($(ARMV5),y)
-    LLVM_TRIPLE = armv5te-none-linux-androideabi
+    LLVM_TARGET = armv5te-none-linux-androideabi
     TARGET_ARCH += -march=armv5te -mtune=xscale -msoft-float -mthumb-interwork
     HAVE_FPU := n
   endif
 
   ifeq ($(ARMV6),y)
-    LLVM_TRIPLE = armv6-none-linux-androideabi
+    LLVM_TARGET = armv6-none-linux-androideabi
     TARGET_ARCH += -march=armv6 -mtune=xscale -msoft-float -mthumb-interwork
     HAVE_FPU := n
   endif
 
   ifeq ($(ARMV7),y)
-    LLVM_TRIPLE = armv7-none-linux-androideabi
-    TARGET_ARCH += -march=armv7-a -mfloat-abi=softfp -mthumb-interwork
+    LLVM_TARGET = armv7a-none-linux-androideabi
+    TARGET_ARCH += -march=armv7-a -mfloat-abi=hard -mhard-float -D_NDK_MATH_NO_SOFTFP=1
     HAVE_FPU := y
   endif
 
@@ -363,6 +572,21 @@ ifeq ($(TARGET),ANDROID)
 
   ifeq ($(ARMV7)$(NEON),yn)
     TARGET_ARCH += -mfpu=vfpv3-d16
+  endif
+
+  ifeq ($(AARCH64),y)
+    LLVM_TARGET = aarch64-linux-android
+    HAVE_FPU := y
+  endif
+
+  ifeq ($(X64),y)
+    LLVM_TARGET = x86_64-linux-android
+    HAVE_FPU := y
+  endif
+
+  ifeq ($(MIPS64),y)
+    LLVM_TARGET = mips64el-linux-android
+    HAVE_FPU := y
   endif
 
   TARGET_ARCH += -fpic -funwind-tables
@@ -410,10 +634,6 @@ ifeq ($(HAVE_WIN32),y)
   endif
 endif
 
-ifeq ($(TARGET),PPC2000)
-  TARGET_CPPFLAGS += -DNOLINETO -DNOCLEARTYPE
-endif
-
 ifeq ($(TARGET),WINE)
   TARGET_CPPFLAGS += -D__WINE__
   TARGET_CPPFLAGS += -DWINE_STRICT_PROTOTYPES
@@ -434,6 +654,7 @@ endif
 ifeq ($(HAVE_MSVCRT),y)
   TARGET_CPPFLAGS += -DHAVE_MSVCRT
   TARGET_CPPFLAGS += -DUNICODE -D_UNICODE
+  TARGET_CPPFLAGS += -DSTRICT
 endif
 
 ifeq ($(HAVE_WIN32),n)
@@ -445,7 +666,13 @@ ifeq ($(TARGET),WINE)
 endif
 
 ifeq ($(HOST_IS_PI)$(TARGET_IS_PI),ny)
-  TARGET_CPPFLAGS += --sysroot=$(PI) -isystem $(PI)/usr/include/arm-linux-gnueabihf
+  TARGET_CPPFLAGS += --sysroot=$(PI) -isystem $(PI)/usr/include/arm-linux-gnueabihf -isystem $(PI)/usr/include
+endif
+
+ifeq ($(HOST_IS_ARM)$(TARGET_HAS_MALI),ny)
+  # cross-crompiling for Cubieboard
+  TARGET_CPPFLAGS += --sysroot=$(CUBIE) -isystem $(CUBIE)/usr/include/arm-linux-gnueabihf
+  TARGET_CPPFLAGS += -isystem $(CUBIE)/usr/local/stow/sunxi-mali/include
 endif
 
 ifeq ($(TARGET_IS_KOBO),y)
@@ -528,6 +755,14 @@ ifeq ($(HOST_IS_PI)$(TARGET_IS_PI),ny)
   TARGET_LDFLAGS += --sysroot=$(PI) -L$(PI)/usr/lib/arm-linux-gnueabihf
 endif
 
+ifeq ($(HOST_IS_ARM)$(TARGET_HAS_MALI),ny)
+  # cross-crompiling for Cubieboard
+  TARGET_LDFLAGS += --sysroot=$(CUBIE)
+  TARGET_LDFLAGS += -L$(CUBIE)/lib/arm-linux-gnueabihf
+  TARGET_LDFLAGS += -L$(CUBIE)/usr/lib/arm-linux-gnueabihf
+  TARGET_LDFLAGS += -L$(CUBIE)/usr/local/stow/sunxi-mali/lib
+endif
+
 ifeq ($(TARGET_IS_KOBO),y)
   TARGET_LDFLAGS += -L$(KOBO)/lib
   TARGET_LDFLAGS += -static-libstdc++
@@ -541,7 +776,11 @@ endif
 ifeq ($(TARGET),ANDROID)
   TARGET_LDFLAGS += -Wl,--no-undefined
   TARGET_LDFLAGS += --sysroot=$(ANDROID_TARGET_ROOT)
-  TARGET_LDFLAGS += -L$(ANDROID_TARGET_ROOT)/usr/lib
+  ifeq ($(call bool_or,$(X64),$(MIPS64)),y)
+    TARGET_LDFLAGS += -L$(ANDROID_TARGET_ROOT)/usr/lib64
+  else
+    TARGET_LDFLAGS += -L$(ANDROID_TARGET_ROOT)/usr/lib
+  endif
 
   ifeq ($(ARMV7),y)
     TARGET_LDFLAGS += -Wl,--fix-cortex-a8
@@ -571,7 +810,15 @@ ifeq ($(TARGET),UNIX)
 endif
 
 ifeq ($(TARGET),ANDROID)
-  TARGET_LDLIBS += -lc -lm
+  TARGET_LDLIBS += -lc
+
+  ifeq ($(ARMV7),y)
+    TARGET_LDLIBS += -lm_hard
+    TARGET_LDLIBS += -Wl,--no-warn-mismatch
+  else
+    TARGET_LDLIBS += -lm
+  endif
+
   TARGET_LDLIBS += -llog
   TARGET_LDLIBS += -lgcc
 endif

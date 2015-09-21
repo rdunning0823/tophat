@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,20 +36,20 @@ Copyright_License {
 
 void
 WindArrowRenderer::DrawArrow(Canvas &canvas, RasterPoint pos, Angle angle,
-                             PixelScalar length, WindArrowStyle arrow_style,
-                             PixelScalar offset)
+                             unsigned length, WindArrowStyle arrow_style,
+                             int offset)
 {
   // Draw arrow
 
   RasterPoint arrow[] = {
-    { 0, (PixelScalar)(-offset + 3) },
-    { -6, (PixelScalar)(-offset - 3 - length) },
-    { 0, (PixelScalar)(-offset + 3 - length) },
-    { 6, (PixelScalar)(-offset - 3 - length) },
+    { 0, -offset + 3 },
+    { -6, -offset - 3 - int(length) },
+    { 0, -offset + 3 - int(length) },
+    { 6, -offset - 3 - int(length) },
   };
 
   // Rotate the arrow
-  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pos.x, pos.y, angle);
+  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pos, angle);
 
   canvas.Select(look.arrow_pen);
   canvas.Select(look.arrow_brush);
@@ -59,12 +59,12 @@ WindArrowRenderer::DrawArrow(Canvas &canvas, RasterPoint pos, Angle angle,
 
   if (arrow_style == WindArrowStyle::FULL_ARROW) {
     RasterPoint tail[] = {
-      { 0, (PixelScalar)(-offset + 3) },
-      { 0, -offset - 3 - std::min(PixelScalar(20), length) * 3 },
+      { 0, -offset + 3 },
+      { 0, -offset - 3 - int(std::min(20u, length) * 3u) },
     };
 
     PolygonRotateShift(tail, ARRAY_SIZE(tail),
-                       pos.x, pos.y, angle);
+                       pos, angle);
 
     canvas.Select(look.tail_pen);
     canvas.DrawLine(tail[0], tail[1]);
@@ -78,7 +78,7 @@ WindArrowRenderer::Draw(Canvas &canvas, const Angle screen_angle,
 {
   // Draw arrow (and tail)
 
-  PixelScalar length = iround(4 * wind.norm);
+  const unsigned length = uround(Quadruple(wind.norm));
   DrawArrow(canvas, pos, wind.bearing - screen_angle, length, arrow_style);
 
   // Draw wind speed label
@@ -89,12 +89,12 @@ WindArrowRenderer::Draw(Canvas &canvas, const Angle screen_angle,
   canvas.SetTextColor(COLOR_BLACK);
   canvas.Select(*look.font);
 
-  PixelScalar offset = iround(fixed_sqrt_two * wind.norm);
+  const unsigned offset = uround(fixed_sqrt_two * wind.norm);
   RasterPoint label[] = {
-      { 18, (PixelScalar)(-26 - offset) },
+    { 18, -26 - int(offset) },
   };
   PolygonRotateShift(label, ARRAY_SIZE(label),
-                     pos.x, pos.y, wind.bearing - screen_angle);
+                     pos, wind.bearing - screen_angle);
 
   TextInBoxMode style;
   style.align = TextInBoxMode::Alignment::CENTER;

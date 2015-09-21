@@ -2,7 +2,7 @@
   Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -104,7 +104,7 @@ public:
    * referenced from the previous target
    * used by dlgTarget
    */
-  void SetTarget(RangeAndRadial rar, const TaskProjection &projection);
+  void SetTarget(RangeAndRadial rar, const FlatProjection &projection);
 
   /**
    * returns position of the target in signed range & radial as
@@ -210,16 +210,16 @@ public:
   const GeoPoint& GetLocationRemaining() const override;
 
   /* virtual methods from class ObservationZoneClient */
-  virtual fixed ScoreAdjustment() const override {
+  fixed ScoreAdjustment() const override {
     return fixed(0);
   }
 
   /* virtual methods from class OrderedTaskPoint */
-  virtual bool Equals(const OrderedTaskPoint &other) const override;
-  virtual bool UpdateSampleNear(const AircraftState &state,
-                                const TaskProjection &projection) override;
-  virtual bool UpdateSampleFar(const AircraftState &state,
-                               const TaskProjection &projection) override;
+  bool Equals(const OrderedTaskPoint &other) const override;
+  bool UpdateSampleNear(const AircraftState &state,
+                        const FlatProjection &projection) override;
+  bool UpdateSampleFar(const AircraftState &state,
+                       const FlatProjection &projection) override;
 };
 
 #endif

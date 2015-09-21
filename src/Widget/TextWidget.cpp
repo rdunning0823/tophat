@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -45,12 +45,11 @@ TextWidget::SetColor(Color _color)
 PixelSize
 TextWidget::GetMinimumSize() const
 {
-  if (fixed_height > 0)
-    return { PixelScalar(0), fixed_height };
+    if (fixed_height > 0)
+      return { PixelScalar(0), fixed_height };
 
-  const Font &font = *UIGlobals::GetDialogLook().text_font;
-  const PixelScalar height = (2 * Layout::GetTextPadding() + font.GetHeight())
-      * num_rows_text;
+  const Font &font = UIGlobals::GetDialogLook().text_font;
+  const PixelScalar height = 2 * Layout::GetTextPadding() + font.GetHeight();
 
   return { PixelScalar(0), height };
 }

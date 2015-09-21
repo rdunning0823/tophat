@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 #include "TaskEventsPrint.hpp"
 #include "harness_flight.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
+#include "test_debug.hpp"
 
 static bool
 test_abort(int n_wind)
@@ -37,7 +38,6 @@ test_abort(int n_wind)
   TaskBehaviour task_behaviour;
   task_behaviour.SetDefaults();
   task_behaviour.DisableAll();
-  task_behaviour.enable_trace = false;
 
   TaskManager task_manager(task_behaviour, waypoints);
 
@@ -69,7 +69,6 @@ test_goto(int n_wind, unsigned id, bool auto_mc)
   task_behaviour.SetDefaults();
   task_behaviour.DisableAll();
   task_behaviour.auto_mc = auto_mc;
-  task_behaviour.enable_trace = false;
 
   TaskManager task_manager(task_behaviour, waypoints);
 
@@ -102,7 +101,6 @@ test_null()
   TaskBehaviour task_behaviour;
   task_behaviour.SetDefaults();
   task_behaviour.DisableAll();
-  task_behaviour.enable_trace = false;
 
   TaskManager task_manager(task_behaviour, waypoints);
 

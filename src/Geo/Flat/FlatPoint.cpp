@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,30 +23,10 @@
 #include <algorithm>
 #include <math.h>
 
-fixed
-FlatPoint::CrossProduct(const FlatPoint &p2) const
-{
-  return x * p2.y - p2.x * y;
-}
-
 void
 FlatPoint::MultiplyY(const fixed a)
 {
   y *= a;
-}
-
-void
-FlatPoint::Subtract(const FlatPoint &p2)
-{
-  x -= p2.x;
-  y -= p2.y;
-}
-
-void
-FlatPoint::Add(const FlatPoint &p2)
-{
-  x += p2.x;
-  y += p2.y;
 }
 
 void

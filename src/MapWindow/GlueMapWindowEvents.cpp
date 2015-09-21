@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -36,6 +36,12 @@ Copyright_License {
 #include "Event/Idle.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Menu/TophatMenu.hpp"
+#include "Topography/Thread.hpp"
+
+#ifdef USE_X11
+#include "Event/Globals.hpp"
+#include "Event/Queue.hpp"
+#endif
 
 #ifdef ENABLE_SDL
 #include <SDL_keyboard.h>
@@ -44,6 +50,9 @@ Copyright_License {
 void
 GlueMapWindow::OnDestroy()
 {
+  /* stop the TopographyThread */
+  SetTopography(nullptr);
+
 #ifdef ENABLE_OPENGL
   data_timer.Cancel();
 #endif
@@ -85,9 +94,9 @@ GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
   case DRAG_MULTI_TOUCH_PAN:
 #endif
   case DRAG_PAN:
-    visible_projection.SetGeoLocation(drag_projection.GetGeoLocation()
-                                      + drag_start_geopoint
-                                      - drag_projection.ScreenToGeo(x, y));
+    SetLocation(drag_projection.GetGeoLocation()
+                + drag_start_geopoint
+                - drag_projection.ScreenToGeo(x, y));
     QuickRedraw();
 
 #ifdef ENABLE_OPENGL
@@ -111,6 +120,8 @@ IsCtrlKeyPressed()
   return SDL_GetModState() & (KMOD_LCTRL|KMOD_RCTRL);
 #elif defined(USE_GDI)
   return GetKeyState(VK_CONTROL) & 0x8000;
+#elif defined(USE_X11)
+  return event_queue->WasCtrlClick();
 #else
   return false;
 #endif
@@ -135,7 +146,7 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
     return true;
 
   if (is_simulator() && IsCtrlKeyPressed() && visible_projection.IsValid()) {
-    /* clicking with Alt key held moves the simulator to the click
+    /* clicking with Ctrl key held moves the simulator to the click
        location instantly */
     const GeoPoint location = visible_projection.ScreenToGeo(x, y);
     device_blackboard->SetSimulatorLocation(location);
@@ -333,6 +344,9 @@ GlueMapWindow::OnMouseWheel(PixelScalar x, PixelScalar y, int delta)
 bool
 GlueMapWindow::OnMultiTouchDown()
 {
+  if (!visible_projection.IsValid())
+    return false;
+
   if (drag_mode == DRAG_GESTURE)
     gestures.Finish();
   else if (follow_mode != FOLLOW_SELF)
@@ -482,7 +496,7 @@ GlueMapWindow::OnTimer(WindowTimer &timer)
       location = drag_projection.GetGeoLocation() +
           drag_start_geopoint - location;
 
-      visible_projection.SetGeoLocation(location);
+      SetLocation(location);
       QuickRedraw();
     }
 

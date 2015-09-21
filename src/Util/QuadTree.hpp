@@ -28,10 +28,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XCSOAR_QUAD_TREE_HPP
-#define XCSOAR_QUAD_TREE_HPP
+#ifndef QUAD_TREE_HPP
+#define QUAD_TREE_HPP
 
-#include "Util/NonCopyable.hpp"
+#include "Compiler.h"
 
 #include <utility>
 #include <limits>
@@ -58,10 +58,10 @@
  */
 template<typename T, typename Accessor,
          typename Alloc = std::allocator<T> >
-class QuadTree : private NonCopyable {
+class QuadTree {
   struct AlwaysTrue {
     constexpr
-    bool operator()(const T &value) const {
+    bool operator()(const T &) const {
       return true;
     }
   };
@@ -133,7 +133,7 @@ public:
   };
 
   /**
-   * An rectangle on the plane that is parallel to the X and Y axes.
+   * A rectangle on the plane that is parallel to the X and Y axes.
    */
   struct Rectangle {
     position_type left, top, right, bottom;
@@ -932,6 +932,8 @@ public:
   QuadTree() {
     bounds.Clear();
   }
+
+  QuadTree(const QuadTree &) = delete;
 
   ~QuadTree() {
     /* this needs to be called manually, because we can't pass the

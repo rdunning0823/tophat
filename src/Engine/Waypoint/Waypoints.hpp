@@ -1,7 +1,7 @@
 /* Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
 #ifndef WAYPOINTS_HPP
 #define WAYPOINTS_HPP
 
-#include "Util/NonCopyable.hpp"
 #include "Util/SliceAllocator.hpp"
 #include "Util/RadixTree.hpp"
 #include "Util/QuadTree.hpp"
@@ -33,11 +32,10 @@
 class WaypointVisitor;
 
 /**
- * Container for waypoints using kd-tree representation internally for fast 
- * geospatial lookups.
+ * Container for waypoints using kd-tree representation internally for
+ * fast geospatial lookups.
  */
-class Waypoints: private NonCopyable 
-{
+class Waypoints {
   /**
    * Function object used to provide access to coordinate values by
    * QuadTree.
@@ -60,7 +58,7 @@ class Waypoints: private NonCopyable
   typedef QuadTree<Waypoint, WaypointAccessor,
                    SliceAllocator<Waypoint, 512u> > WaypointTree;
 
-  class WaypointNameTree : public RadixTree<const Waypoint*> {
+  class WaypointNameTree : public RadixTree<const Waypoint *> {
   public:
     const Waypoint *Get(const TCHAR *name) const;
     void VisitNormalisedPrefix(const TCHAR *prefix, WaypointVisitor &visitor) const;
@@ -87,7 +85,7 @@ public:
   typedef WaypointTree::const_iterator const_iterator;
 
   /**
-   * Constructor.  Task projection is updated after call to optimise().
+   * Constructor.  Task projection is updated after call to Optimise().
    * As waypoints are added they are stored temporarily before applying
    * projection so that the bounds of the projection may be obtained.
    *
@@ -96,13 +94,15 @@ public:
    */
   Waypoints();
 
+  Waypoints(const Waypoints &) = delete;
+
   const Serial &GetSerial() const {
     return serial;
   }
 
   /**
    * Add waypoint to internal store.  Internal copy is made.
-   * optimise() must be called after inserting waypoints prior to
+   * Optimise() must be called after inserting waypoints prior to
    * performing any queries, but can be done in batches.
    *
    * @param wp Waypoint to add to internal store
@@ -110,7 +110,7 @@ public:
   const Waypoint &Append(Waypoint &&wp);
 
   /**
-   * Erase waypoint from the internal store.  Requires optimise() to
+   * Erase waypoint from the internal store.  Requires Optimise() to
    * be called afterwards
    *
    * @param wp Waypoint to erase from internal store
@@ -118,7 +118,13 @@ public:
   void Erase(const Waypoint& wp);
 
   /**
-   * Replace waypoint from the internal store.  Requires optimise() to
+   * Erase all waypoints with origin==WaypointOrigin::USER &&
+   * type==Type::MARKER.
+   */
+  void EraseUserMarkers();
+
+  /**
+   * Replace waypoint from the internal store.  Requires Optimise() to
    * be called afterwards.
    *
    * @param orig Waypoint that will be replaced
@@ -142,10 +148,18 @@ public:
    * This updates the task_projection.
    *
    * Note: currently this code doesn't check for task projections
-   * being modified from multiple calls to optimise() so it should
+   * being modified from multiple calls to Optimise() so it should
    * only be called once (until this is fixed).
    */
   void Optimise();
+
+  /**
+   * Prepare and enable the next Optimise() call.
+   */
+  void ScheduleOptimise() {
+    waypoint_tree.Flatten();
+    waypoint_tree.ClearBounds();
+  }
 
   /**
    * Clear the waypoint store
@@ -154,7 +168,7 @@ public:
 
   /**
    * Size of waypoints (in tree, not in temporary store) ---
-   * must call optimise() before this for it to be accurate.
+   * must call Optimise() before this for it to be accurate.
    *
    * @return Number of waypoints in tree
    */
@@ -189,7 +203,7 @@ public:
                          const fixed terrain_alt);
 
   /**
-   * Return the current home waypoint.  May be NULL if none is
+   * Return the current home waypoint.  May be nullptr if none is
    * configured.
    */
   const Waypoint *GetHome() const {
@@ -199,7 +213,7 @@ public:
   /**
    * Find first home waypoint
    *
-   * @return Pointer to waypoint if found (or NULL if not)
+   * @return Pointer to waypoint if found (or nullptr if not)
    */
   gcc_pure
   const Waypoint *FindHome();
@@ -217,10 +231,10 @@ public:
    *
    * @param id Id of waypoint to find in internal tree
    *
-   * @return Pointer to waypoint if found (or NULL if not)
+   * @return Pointer to waypoint if found (or nullptr if not)
    */
   gcc_pure
-  const Waypoint* LookupId(const unsigned id) const;
+  const Waypoint *LookupId(const unsigned id) const;
 
   /**
    * Look up closest waypoint by location within range
@@ -228,10 +242,10 @@ public:
    * @param loc Location of waypoint to find in internal tree
    * @param range Threshold for range
    *
-   * @return Pointer to waypoint if found (or NULL if none found)
+   * @return Pointer to waypoint if found (or nullptr if none found)
    */
   gcc_pure
-  const Waypoint* LookupLocation(const GeoPoint &loc,
+  const Waypoint *LookupLocation(const GeoPoint &loc,
                                  const fixed range = fixed(0)) const;
 
   /**
@@ -239,24 +253,24 @@ public:
    *
    * @param name Name of waypoint to find in internal tree
    *
-   * @return Pointer to waypoint if found (or NULL if not)
+   * @return Pointer to waypoint if found (or nullptr if not)
    */
   gcc_pure
-  const Waypoint* LookupName(const TCHAR *name) const;
+  const Waypoint *LookupName(const TCHAR *name) const;
 
   gcc_pure
-  const Waypoint* LookupName(const tstring &name) const {
+  const Waypoint *LookupName(const tstring &name) const {
     return LookupName(name.c_str());
   }
 
- /** 
-  * Check if a waypoint with same name and approximate location
-  * is already in the database.  If not, is appended to the database.
-  * 
-  * @param waypoint Waypoint to check against (replaced)
-  * 
-  * @return reference to waypoint in tree (either existing or appended)
-  */
+  /**
+   * Check if a waypoint with same name and approximate location
+   * is already in the database.  If not, is appended to the database.
+   *
+   * @param waypoint Waypoint to check against (replaced)
+   *
+   * @return reference to waypoint in tree (either existing or appended)
+   */
   const Waypoint &CheckExistsOrAppend(const Waypoint &waypoint);
 
   /**

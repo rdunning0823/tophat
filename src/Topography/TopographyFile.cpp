@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ Copyright_License {
 
 #include "Topography/TopographyFile.hpp"
 #include "Topography/XShape.hpp"
+#include "Convert.hpp"
 #include "Projection/WindowProjection.hpp"
 
 #include <zzip/lib.h>
@@ -30,7 +31,7 @@ Copyright_License {
 #include <algorithm>
 #include <stdlib.h>
 
-TopographyFile::TopographyFile(struct zzip_dir *_dir, const char *filename,
+TopographyFile::TopographyFile(zzip_dir *_dir, const char *filename,
                                fixed _threshold,
                                fixed _label_threshold,
                                fixed _important_label_threshold,
@@ -38,7 +39,7 @@ TopographyFile::TopographyFile(struct zzip_dir *_dir, const char *filename,
                                int _label_field,
                                ResourceId _icon, ResourceId _big_icon,
                                unsigned _pen_width)
-  :dir(_dir), first(NULL),
+  :dir(_dir), first(nullptr),
    label_field(_label_field), icon(_icon), big_icon(_big_icon),
    pen_width(_pen_width),
    color(_color), scale_threshold(_threshold),
@@ -54,10 +55,12 @@ TopographyFile::TopographyFile(struct zzip_dir *_dir, const char *filename,
     return;
   }
 
-  shapes.ResizeDiscard(file.numshapes);
-  std::fill(shapes.begin(), shapes.end(), ShapeList(NULL));
+  center = ImportRect(file.bounds).GetCenter();
 
-  if (dir != NULL)
+  shapes.ResizeDiscard(file.numshapes);
+  std::fill(shapes.begin(), shapes.end(), ShapeList(nullptr));
+
+  if (dir != nullptr)
     ++dir->refcount;
 
   ++serial;
@@ -71,7 +74,7 @@ TopographyFile::~TopographyFile()
   ClearCache();
   msShapefileClose(&file);
 
-  if (dir != NULL) {
+  if (dir != nullptr) {
     --dir->refcount;
     zzip_dir_free(dir);
   }
@@ -82,22 +85,17 @@ TopographyFile::ClearCache()
 {
   for (auto i = shapes.begin(), end = shapes.end(); i != end; ++i) {
     delete i->shape;
-    i->shape = NULL;
+    i->shape = nullptr;
   }
 
-  first = NULL;
+  first = nullptr;
 }
 
-gcc_pure
-static rectObj
-ConvertRect(const GeoBounds &br)
+static XShape *
+LoadShape(shapefileObj *file, const GeoPoint &center, int i,
+          int label_field)
 {
-  rectObj dest;
-  dest.minx = (double)br.GetWest().Degrees();
-  dest.maxx = (double)br.GetEast().Degrees();
-  dest.miny = (double)br.GetSouth().Degrees();
-  dest.maxy = (double)br.GetNorth().Degrees();
-  return dest;
+  return new XShape(file, center, i, label_field);
 }
 
 bool
@@ -116,20 +114,26 @@ TopographyFile::Update(const WindowProjection &map_projection)
     /* the cache is still fresh */
     return false;
 
-  cache_bounds = map_projection.GetScreenBounds().Scale(fixed(2));
+  cache_bounds = screenRect.Scale(fixed(2));
 
   rectObj deg_bounds = ConvertRect(cache_bounds);
 
   // Test which shapes are inside the given bounds and save the
   // status to file.status
-  msShapefileWhichShapes(&file, dir, deg_bounds, 0);
-
-  // If not a single shape is inside the bounds
-  if (!file.status) {
-    // ... clear the whole buffer
+  switch (msShapefileWhichShapes(&file, dir, deg_bounds, 0)) {
+  case MS_FAILURE:
     ClearCache();
     return false;
+
+  case MS_DONE:
+    /* screen is outside of map bounds */
+    return false;
+
+  case MS_SUCCESS:
+    break;
   }
+
+  assert(file.status != nullptr);
 
   // Iterate through the shapefile entries
   const ShapeList **current = &first;
@@ -138,22 +142,44 @@ TopographyFile::Update(const WindowProjection &map_projection)
     if (!msGetBit(file.status, i)) {
       // If the shape is outside the bounds
       // delete the shape from the cache
-      delete it->shape;
-      it->shape = NULL;
+      if (it->shape != nullptr) {
+        assert(*current == it);
+
+        /* remove from linked list (protected) */
+        mutex.Lock();
+        *current = it->next;
+        mutex.Unlock();
+
+        /* now it's unreachable, and we can delete the XShape without
+           holding a lock */
+        delete it->shape;
+        it->shape = nullptr;
+      }
     } else {
       // is inside the bounds
-      if (it->shape == NULL)
+      if (it->shape == nullptr) {
+        assert(*current != it);
+
         // shape isn't cached yet -> cache the shape
-        it->shape = new XShape(&file, i, label_field);
-      // update list pointer
-      *current = it;
+        it->shape = LoadShape(&file, center, i, label_field);
+        it->next = *current;
+
+        /* insert into linked list (protected) */
+        mutex.Lock();
+        *current = it;
+        mutex.Unlock();
+      }
+
       current = &it->next;
     }
   }
   // end of list marker
-  *current = NULL;
+  assert(*current == nullptr);
 
+  mutex.Lock();
   ++serial;
+  mutex.Unlock();
+
   return true;
 }
 
@@ -164,15 +190,15 @@ TopographyFile::LoadAll()
   const ShapeList **current = &first;
   auto it = shapes.begin();
   for (int i = 0; i < file.numshapes; ++i, ++it) {
-    if (it->shape == NULL)
+    if (it->shape == nullptr)
       // shape isn't cached yet -> cache the shape
-      it->shape = new XShape(&file, i, label_field);
+      it->shape = LoadShape(&file, center, i, label_field);
     // update list pointer
     *current = it;
     current = &it->next;
   }
   // end of list marker
-  *current = NULL;
+  *current = nullptr;
 
   ++serial;
 }

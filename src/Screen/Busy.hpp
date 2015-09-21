@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ class ScopeBusyIndicator {
 
 public:
   ScopeBusyIndicator()
-    :old_cursor(::SetCursor(::LoadCursor(NULL, IDC_WAIT))) {
+    :old_cursor(::SetCursor(::LoadCursor(nullptr, IDC_WAIT))) {
     if (IsAltair() && IsEmbedded())
       SetCursorPos(160,120);
   }

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -76,16 +76,6 @@ return the maximum least squares error:
 
 */
 
-/**
- * Constructor of the LeastSquares class
- */
-LeastSquares::LeastSquares() {
-  Reset();
-}
-
-/**
- * Reset the LeastSquares calculator
- */
 void
 LeastSquares::Reset()
 {
@@ -103,13 +93,11 @@ LeastSquares::Reset()
   x_min = fixed(0);
   x_max = fixed(0);
   y_ave = fixed(0);
+  slots.clear();
 }
 
-/**
- * Calculate the least squares average
- */
 void
-LeastSquares::LeastSquaresUpdate()
+LeastSquares::Compute()
 {
   fixed denom = (sum_weights * sum_xi_2 - sum_xi * sum_xi);
 
@@ -120,58 +108,38 @@ LeastSquares::LeastSquaresUpdate()
   }
   b = (sum_yi - m * sum_xi) / sum_weights;
 
-  y_ave = m * (x_max + x_min) / 2 + b;
+  y_ave = GetYAt(GetMiddleX());
 }
 
-/**
- * Add a new data point to the values and calculate least squares average
- * (assumes x = sum_n + 1)
- * @param y y-Value of the new data point
- */
 void
-LeastSquares::LeastSquaresUpdate(fixed y)
+LeastSquares::Update(fixed y)
 {
-  LeastSquaresUpdate(fixed(sum_n + 1), y);
+  Update(fixed(sum_n + 1), y);
 }
 
-/**
- * Add a new data point to the values and calculate least squares average
- * @param x x-Value of the new data point
- * @param y y-Value of the new data point
- * @param weight Weight of the new data point (optional)
- */
 void
-LeastSquares::LeastSquaresUpdate(fixed x, fixed y, fixed weight)
+LeastSquares::Update(fixed x, fixed y, fixed weight)
 {
   // Add new point
-  LeastSquaresAdd(x, y, weight);
+  Add(x, y, weight);
   // Update calculation
-  LeastSquaresUpdate();
+  Compute();
 
   // Calculate error
-  fixed error = fabs(y - (m * x + b));
+  fixed error = fabs(y - GetYAt(x));
   sum_error += sqr(error) * weight;
   if (error > max_error)
     max_error = error;
 }
 
-/**
- * Calculates the LeastSquaresError
- */
 void
-LeastSquares::LeastSquaresErrorUpdate()
+LeastSquares::UpdateError()
 {
   rms_error = sqrt(sum_error / sum_weights);
 }
 
-/**
- * Add a new data point to the values
- * @param x x-Value of the new data point
- * @param y y-Value of the new data point
- * @param weight Weight of the new data point (optional)
- */
 void
-LeastSquares::LeastSquaresAdd(fixed x, fixed y, fixed weight)
+LeastSquares::Add(fixed x, fixed y, fixed weight)
 {
   // Update maximum/minimum values
   if (IsEmpty() || y > y_max)

@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -77,6 +77,22 @@ class FlyingComputer {
   fixed stationary_since;
   GeoPoint stationary_at;
 
+  /**
+   * If the aircraft is in powered flight, then this denotes
+   * the initial powered time stamp. If the aircraft is unpowered
+   * this is set to a negative value.
+   */
+  fixed powered_since;
+  GeoPoint powered_at;
+
+  /**
+   * If the aircraft is in unpowered flight, then this denotes
+   * the initial unpowered time stamp. If the aircraft is powered
+   * this is set to a negative value.
+   */
+  fixed unpowered_since;
+  GeoPoint unpowered_at;
+
   fixed climbing_altitude;
 
   /* we limit updates to the climbing_clock to reduce noise */
@@ -134,6 +150,11 @@ protected:
    * seconds
    */
   bool CheckClimbing(fixed dt, fixed altitude);
+
+  /**
+   * Check for powered flight.
+   */
+  void CheckPowered(fixed dt, const NMEAInfo &basic, FlyingState &flying);
 
   void Check(FlyingState &state, fixed time);
 

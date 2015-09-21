@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,37 +26,36 @@ Copyright_License {
 #include "Form/List.hpp"
 #include "Form/DataField/Base.hpp"
 #include "Form/DataField/ComboList.hpp"
-#include "Screen/Canvas.hpp"
-#include "Screen/Layout.hpp"
+#include "Renderer/TextRowRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 
 static const ComboList *ComboListPopup;
 
 class ComboPickerSupport : public ListItemRenderer {
   const ComboList &combo_list;
-  const UPixelScalar padding;
+  TextRowRenderer row_renderer;
 
 public:
-  ComboPickerSupport(const ComboList &_combo_list,
-                     const UPixelScalar _padding)
-    :combo_list(_combo_list), padding(_padding) {}
+  ComboPickerSupport(const ComboList &_combo_list)
+    :combo_list(_combo_list) {}
 
+  unsigned CalculateLayout(const DialogLook &look) {
+    return row_renderer.CalculateLayout(*look.list.font);
+  }
 
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
                            unsigned i) override {
-    canvas.DrawClippedText(rc.left + padding,
-                           rc.top + padding, rc,
-                           combo_list[i].StringValueFormatted);
+    row_renderer.DrawTextRow(canvas, rc, combo_list[i].display_string);
   }
 };
 
 static const TCHAR*
 OnItemHelp(unsigned i)
 {
-  if ((*ComboListPopup)[i].StringHelp)
-    return (*ComboListPopup)[i].StringHelp;
+  if ((*ComboListPopup)[i].help_text)
+    return (*ComboListPopup)[i].help_text;
 
   return _T("");
 }
@@ -65,29 +64,20 @@ int
 ComboPicker(const TCHAR *caption,
             const ComboList &combo_list,
             const TCHAR *help_text,
-            bool enable_item_help)
+            bool enable_item_help,
+            const TCHAR *extra_caption)
 {
   ComboListPopup = &combo_list;
 
-  const UPixelScalar font_height =
-    UIGlobals::GetDialogLook().text_font->GetHeight() + Layout::FastScale(2);
-  const UPixelScalar max_height = Layout::GetMaximumControlHeight();
-  const UPixelScalar row_height = font_height >= max_height
-    ? font_height
-    /* this formula is supposed to be a compromise between too small
-       and too large: */
-    : (font_height + max_height) / 2;
-
-  const UPixelScalar padding = (row_height - font_height) / 2;
-
-  ComboPickerSupport support(combo_list, padding);
+  ComboPickerSupport support(combo_list);
   return ListPicker(caption,
                     combo_list.size(),
-                    combo_list.ComboPopupItemSavedIndex,
-                    row_height,
+                    combo_list.current_index,
+                    support.CalculateLayout(UIGlobals::GetDialogLook()),
                     support, false,
                     help_text,
-                    enable_item_help ? OnItemHelp : NULL);
+                    enable_item_help ? OnItemHelp : nullptr,
+                    extra_caption);
 }
 
 bool
@@ -109,15 +99,15 @@ ComboPicker(const TCHAR *caption, DataField &df,
     const ComboList::Item &item = combo_list[idx];
 
     // OK/Select
-    if (item.DataFieldIndex == ComboList::Item::NEXT_PAGE) {
+    if (item.int_value == ComboList::Item::NEXT_PAGE) {
       // we're last in list and the want more past end of list so select last real list item and reopen
       // we'll reopen, so don't call xcsoar data changed routine yet
-      reference = buffer = combo_list[idx - 1].StringValue;
-    } else if (item.DataFieldIndex == ComboList::Item::PREVIOUS_PAGE) {
+      reference = buffer = combo_list[idx - 1].string_value;
+    } else if (item.int_value == ComboList::Item::PREVIOUS_PAGE) {
       // same as above but lower items needed
-      reference = buffer = combo_list[idx + 1].StringValue;
+      reference = buffer = combo_list[idx + 1].string_value;
     } else {
-      df.SetFromCombo(item.DataFieldIndex, item.StringValue);
+      df.SetFromCombo(item.int_value, item.string_value);
       return true;
     }
   } // loop reopen combo if <<More>>  or <<Less>> picked
