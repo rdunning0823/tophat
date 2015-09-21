@@ -30,7 +30,6 @@
  */
 
 #include "TrafficDialogs.hpp"
-#include "Look/TrafficLook.hpp"
 #include "Dialogs/TextEntry.hpp"
 #include "Dialogs/Message.hpp"
 #include "Dialogs/WidgetDialog.hpp"
@@ -122,23 +121,19 @@ private:
 inline void
 FlarmTrafficDetailsWidget::CreateButtons(WidgetDialog &buttons)
 {
-  const ButtonLook &button_look = buttons.GetButtonLook();
+  const ButtonLook &look = buttons.GetButtonLook();
 
-  buttons.AddButton(new ColorButtonRenderer(button_look,
-                                            TrafficLook::team_color_green),
-                    *this, GREEN);
+  constexpr Color green(0x74, 0xff, 0x00);
+  buttons.AddButton(new ColorButtonRenderer(look, green), *this, GREEN);
 
-  buttons.AddButton(new ColorButtonRenderer(button_look,
-                                            TrafficLook::team_color_blue),
-                    *this, BLUE);
+  constexpr Color blue(0x00, 0x90, 0xff);
+  buttons.AddButton(new ColorButtonRenderer(look, blue), *this, BLUE);
 
-  buttons.AddButton(new ColorButtonRenderer(button_look,
-                                            TrafficLook::team_color_yellow),
-                    *this, YELLOW);
+  constexpr Color yellow(0xff, 0xe8, 0x00);
+  buttons.AddButton(new ColorButtonRenderer(look, yellow), *this, YELLOW);
 
-  buttons.AddButton(new ColorButtonRenderer(button_look,
-                                            TrafficLook::team_color_magenta),
-                    *this, MAGENTA);
+  constexpr Color magenta(0xff, 0x00, 0xcb);
+  buttons.AddButton(new ColorButtonRenderer(look, magenta), *this, MAGENTA);
 
   buttons.AddButton(_("Clear"), *this, CLEAR);
   buttons.AddButton(_("Team"), *this, TEAM);
@@ -195,7 +190,7 @@ FlarmTrafficDetailsWidget::UpdateChanging(const MoreData &basic)
 
   // Fill distance/direction field
   if (target_ok) {
-    FormatUserDistanceSmart(target->distance, tmp);
+    FormatUserDistanceSmart(target->distance, tmp, 20, fixed(1000));
     TCHAR *p = tmp + _tcslen(tmp);
     *p++ = _T(' ');
     FormatAngleDelta(p, 20, target->Bearing() - basic.track);
