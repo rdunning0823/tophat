@@ -281,7 +281,7 @@ void
 SaveTask(WritableDataNode &node, const OrderedTask &task)
 {
   node.SetAttribute(_T("type"), GetTaskFactoryType(task.GetFactoryType()));
-  node.SetAttribute(_T("name"), task.GetTaskName());
+  node.SetAttribute(_T("name"), task.GetName());
   Serialise(node, task.GetOrderedTaskSettings());
 
   for (const auto &tp : task.GetPoints())

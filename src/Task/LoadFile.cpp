@@ -26,6 +26,7 @@
 #include "XML/Parser.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Util/StringUtil.hpp"
+#include "Engine/Task/Factory/AbstractTaskFactory.hpp"
 
 #include <memory>
 

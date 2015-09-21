@@ -276,7 +276,7 @@ Deserialise(OrderedTaskSettings &data, const ConstDataNode &node)
 }
 
 static const TCHAR *
-GetTaskName(const ConstDataNode &node) const
+GetName(const ConstDataNode &node)
 {
   const TCHAR *type = node.GetAttribute(_T("name"));
   if (type == nullptr)
@@ -320,7 +320,7 @@ LoadTask(OrderedTask &task, const ConstDataNode &node,
 {
   task.Clear();
   task.SetFactory(GetTaskFactoryType(node));
-  task.SetName(GetTaskName(node));
+  task.SetName(GetName(node));
   task.Reset();
 
   OrderedTaskSettings beh = task.GetOrderedTaskSettings();

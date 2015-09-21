@@ -132,14 +132,6 @@ public:
    */
   void SetFactory(const TaskFactoryType _factory);
 
-  const TCHAR * GetTaskName() const {
-    return task_name.c_str();
-  }
-
-  bool GetTaskNameIsBlank() const {
-    return task_name.empty();
-  }
-
   /** 
    * Return list of factory types
    *
@@ -726,8 +718,16 @@ public:
     return name;
   }
 
+  bool GetNameIsBlank() const {
+    return name.empty();
+  }
+
   /** name of task, no file extension */
   void SetName(const StaticString<64> &name_) {
+    name = name_;
+  }
+  /** name of task, no file extension */
+  void SetName(const TCHAR *name_) {
     name = name_;
   }
 

@@ -291,7 +291,7 @@ bool
 OrderedTaskSave(OrderedTask &task)
 {
   TCHAR fname[69] = _T("");
-  CopyString(fname, task.GetTaskName(), StringLength(task.GetTaskName()) + 1);
+  CopyString(fname, task.GetName(), StringLength(task.GetName()) + 1);
 
   if (!TextEntryDialog(fname, 64, _("Enter a task name")))
     return false;

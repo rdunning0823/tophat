@@ -270,7 +270,7 @@ TaskListPanel::LoadTask()
   OrderedTask* temptask = orig->Clone(CommonInterface::GetComputerSettings().task);
   delete *active_task;
   *active_task = temptask;
-  if ((*active_task)->GetTaskNameIsBlank()) {
+  if ((*active_task)->GetNameIsBlank()) {
     StaticString<64>name;
     name = get_cursor_name();
 
