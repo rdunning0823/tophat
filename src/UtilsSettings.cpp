@@ -158,7 +158,7 @@ SettingsLeave(const UISettings &old_ui_settings)
 
   if (WaypointFileChanged || TerrainFileChanged) {
     // re-set home
-    WaypointGlue::SetHome(way_points, terrain,
+    WaypointGlue::SetHome(Profile::map, way_points, terrain,
                           CommonInterface::SetComputerSettings().poi,
                           CommonInterface::SetComputerSettings().team_code,
                           device_blackboard, WaypointFileChanged);

@@ -97,13 +97,14 @@ WaypointGlue::FindFlaggedHome(Waypoints &waypoints,
  * in the profile, and we're flying, then create a new waypoint with this
  * information and append it to the waypoint database
  *
+ * @param ProfileMap
  * @param waypoints the database
  * @param poi_settings info about last home waypoint
  * @param flying.  true if state of aircraft is flying
  * @return pointer to waypoint in waypoint database or nullptr if not added
  */
 static const Waypoint*
-CreateHomeAndAppend(Waypoints &waypoints,
+CreateHomeAndAppend(ProfileMap &profile, Waypoints &waypoints,
                     PlacesOfInterestSettings &poi_settings,
                     bool flying)
 {
@@ -115,7 +116,7 @@ CreateHomeAndAppend(Waypoints &waypoints,
     return nullptr;
 //  TCHAR blank[] = _T("");
   tstring home_waypoint_name;
-  UTF8ToWideConverter text2(Profile::Get(ProfileKeys::HomeWaypointName, ""));
+  UTF8ToWideConverter text2(profile.Get(ProfileKeys::HomeWaypointName, ""));
   if (text2.IsValid())
     home_waypoint_name = text2;
 
@@ -136,7 +137,8 @@ CreateHomeAndAppend(Waypoints &waypoints,
 }
 
 void
-WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
+WaypointGlue::SetHome(ProfileMap &profile,
+                      Waypoints &way_points, const RasterTerrain *terrain,
                       PlacesOfInterestSettings &poi_settings,
                       TeamCodeSettings &team_code_settings,
                       DeviceBlackboard *device_blackboard,
@@ -153,7 +155,7 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
     wp = FindHomeLocation(way_points, poi_settings);
     // create a new waypoint if home exists but can't be found in the wp file
     if (wp == nullptr)
-      wp = CreateHomeAndAppend(way_points, poi_settings,
+      wp = CreateHomeAndAppend(profile, way_points, poi_settings,
                                device_blackboard->Calculated().flight.flying);
 
     if (wp == nullptr)
@@ -171,12 +173,12 @@ WaypointGlue::SetHome(Waypoints &way_points, const RasterTerrain *terrain,
     team_code_settings.team_code_reference_waypoint = poi_settings.home_waypoint;
 
   if (poi_settings.home_location_available) {
-    Profile::SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
+    profile.SetGeoPoint(ProfileKeys::HomeLocation, poi_settings.home_location);
     const Waypoint *wp = way_points.LookupId(poi_settings.home_waypoint);
     tstring name;
     if (wp != nullptr)
       name = wp->name.c_str();
-    Profile::Set(ProfileKeys::HomeWaypointName, name.c_str());
+    profile.Set(ProfileKeys::HomeWaypointName, name.c_str());
   }
 
   if (device_blackboard != nullptr) {
@@ -213,8 +215,9 @@ WaypointGlue::SaveHome(ProfileMap &profile,
 }
 
 void
-WaypointGlue::SaveATCReference(const PlacesOfInterestSettings &poi_settings)
+WaypointGlue::SaveATCReference(ProfileMap &profile,
+                               const PlacesOfInterestSettings &poi_settings)
 {
   if (poi_settings.atc_reference.IsValid())
-    Profile::SetGeoPoint(ProfileKeys::ATCReference, poi_settings.atc_reference);
+    profile.SetGeoPoint(ProfileKeys::ATCReference, poi_settings.atc_reference);
 }

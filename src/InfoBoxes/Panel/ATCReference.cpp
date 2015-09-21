@@ -136,7 +136,7 @@ ATCReferencePanel::OnAction(int id)
       CommonInterface::SetComputerSettings().poi.atc_reference = location;
       {
         ScopeSuspendAllThreads suspend;
-        WaypointGlue::SaveATCReference(
+        WaypointGlue::SaveATCReference(Profile::map,
             CommonInterface::SetComputerSettings().poi);
       }
       StaticString<255> message;

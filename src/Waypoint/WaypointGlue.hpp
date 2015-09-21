@@ -75,6 +75,7 @@ namespace WaypointGlue {
   /**
    * This functions checks if the home and teamcode waypoint
    * indices exist and if necessary tries to find new ones in the waypoint list
+   * @param profile Profile Map
    * @param way_points Waypoint list
    * @param terrain RasterTerrain (for placing the aircraft
    * in the middle of the terrain if no home was found)
@@ -83,7 +84,8 @@ namespace WaypointGlue {
    * @param reset This should be true if the waypoint file was changed,
    * it resets all special waypoints indices
    */
-  void SetHome(Waypoints &way_points, const RasterTerrain *terrain,
+  void SetHome(ProfileMap &profile,
+               Waypoints &way_points, const RasterTerrain *terrain,
                PlacesOfInterestSettings &poi_settings,
                TeamCodeSettings &team_code_settings,
                DeviceBlackboard *device_blackboard,
@@ -100,7 +102,8 @@ namespace WaypointGlue {
   /**
    * Save the ATC reference location to the profile
    */
-  void SaveATCReference(const PlacesOfInterestSettings &poi_settings);
+  void SaveATCReference(ProfileMap &profile,
+                        const PlacesOfInterestSettings &poi_settings);
 
   /**
    * Reads the waypoints out of the two waypoint files and appends them to the

@@ -363,7 +363,7 @@ Startup()
   WaypointDetails::ReadFileFromProfile(way_points, operation);
 
   // Set the home waypoint
-  WaypointGlue::SetHome(way_points, terrain,
+  WaypointGlue::SetHome(Profile::map, way_points, terrain,
                         CommonInterface::SetComputerSettings().poi,
                         CommonInterface::SetComputerSettings().team_code,
                         device_blackboard, true);
