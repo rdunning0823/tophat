@@ -137,8 +137,8 @@ unsigned
 ExternalLogger::LoggerAttachedCount()
 {
   unsigned count = 0;
-  for (unsigned i = 0; i < NUMDEV; ++i) {
-    DeviceDescriptor &device = *device_list[i];
+  for (DeviceDescriptor *i : *devices) {
+    DeviceDescriptor &device = *i;
 
     if (device.CanDeclare() && device.IsAlive())
       ++count;

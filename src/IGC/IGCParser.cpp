@@ -67,8 +67,8 @@ IGCParseHRecords(const char *line, GliderType &glider_type, LoggerSettings &logg
   char tmp[StringLength];
 
   CopyString(tmp, line, StringLength);
-  CopyASCIIUppper(upper_line, tmp);
-  TrimRight(upper_line);
+  CopyASCIIUpper(upper_line, tmp);
+  StripRight(upper_line);
 
   if (memcmp(upper_line, "HFPLTPILOT:", 11) == 0)
     IGCParsePilotRecord(upper_line, logger_settings);
@@ -87,7 +87,7 @@ IGCParsePilotRecord(const char *upper_line, LoggerSettings &logger_settings)
   assert (memcmp(upper_line, "HFPLTPILOT:", 11) == 0);
 
   upper_line += 11;
-  ACPToWideConverter trimmed_line(TrimLeft(upper_line));
+  ACPToWideConverter trimmed_line(StripLeft(upper_line));
 
   logger_settings.pilot_name = trimmed_line;
   return true;
@@ -99,7 +99,7 @@ IGCParseCompetitionIDRecord(const char *upper_line, LoggerSettings &logger_setti
   assert (memcmp(upper_line, "HFCIDCOMPETITIONID:", 19) == 0);
 
   upper_line += 19;
-  ACPToWideConverter trimmed_line(TrimLeft(upper_line));
+  ACPToWideConverter trimmed_line(StripLeft(upper_line));
 
   logger_settings.competition_id = trimmed_line;
   return true;
@@ -111,7 +111,7 @@ IGCParseGliderIDRecord(const char *upper_line, LoggerSettings &logger_settings)
   assert (memcmp(upper_line, "HFGIDGLIDERID:", 14) == 0);
 
   upper_line += 14;
-  ACPToWideConverter trimmed_line(TrimLeft(upper_line));
+  ACPToWideConverter trimmed_line(StripLeft(upper_line));
 
   logger_settings.glider_id = trimmed_line;
   return true;
@@ -123,8 +123,8 @@ IGCParseGliderType(const char *upper_line, GliderType &glider_type)
   assert (memcmp(upper_line, "HFGTYGLIDERTYPE:", 16) == 0);
 
   upper_line += 16;
-  ACPToWideConverter trimmed_line(TrimLeft(upper_line));
-  glider_type = TrimLeft(trimmed_line);
+  ACPToWideConverter trimmed_line(StripLeft(upper_line));
+  glider_type = StripLeft(trimmed_line);
 
   return true;
 }

@@ -192,7 +192,7 @@ FlarmTrafficControl::OnCreate()
 unsigned
 FlarmTrafficControl::GetZoomDistance(unsigned zoom)
 {
-  UnitSetting &config = CommonInterface::SetUISettings().units;
+  UnitSetting &config = CommonInterface::SetUISettings().format.units;
 
   if (config.distance_unit == Unit::NAUTICAL_MILES ||
       config.distance_unit == Unit::STATUTE_MILES)

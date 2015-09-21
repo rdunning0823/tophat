@@ -81,11 +81,10 @@ public:
 
   void OnComputerSettingsUpdate(const ComputerSettings &settings) override;
 
-  virtual void OnUISettingsUpdate(const UISettings &settings) override;
-
-  virtual void OnUIStateUpdate() override;
-
   void OnUISettingsUpdate(const UISettings &settings) override;
+
+  void OnUIStateUpdate() override;
+
 };
 
 #endif
