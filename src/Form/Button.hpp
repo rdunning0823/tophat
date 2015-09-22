@@ -25,8 +25,7 @@ Copyright_License {
 #define XCSOAR_FORM_BUTTON_HPP
 
 #include "Screen/PaintWindow.hpp"
-
-#include <tchar.h>
+#include "Util/StaticString.hxx"
 
 #include <tchar.h>
 
@@ -108,6 +107,8 @@ public:
    */
   void SetCaption(const TCHAR *caption);
 
+  StaticString<64>::const_pointer GetCaption();
+
   void SetSelected(bool _selected);
 
   gcc_pure
@@ -139,6 +140,9 @@ protected:
   void OnCancelMode() override;
 
   void OnPaint(Canvas &canvas) override;
+  bool IsDown() {
+    return down;
+  }
 
 private:
   void SetDown(bool _down);
@@ -153,6 +157,8 @@ public:
                   WindowStyle style,
                   ActionListener &_listener,
                   int _id);
+
+  void SetCaption(const TCHAR *caption);
 };
 
 #endif

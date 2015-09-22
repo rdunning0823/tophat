@@ -34,7 +34,7 @@ Copyright_License {
 class SymbolButtonRenderer : public ButtonRenderer {
   ButtonFrameRenderer frame_renderer;
 
-  const StaticString<16> caption;
+  StaticString<16> caption;
 
 public:
   SymbolButtonRenderer(const ButtonLook &_look,
@@ -47,6 +47,10 @@ public:
 
   StaticString<64>::const_pointer GetCaption() const {
     return caption;
+  }
+
+  void SetCaption(const TCHAR* _caption) {
+    caption = _caption;
   }
 
   void DrawButton(Canvas &canvas, const PixelRect &rc,

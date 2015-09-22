@@ -42,6 +42,17 @@ WndSymbolButton::WndSymbolButton(ContainerWindow &parent,
               _listener, _id);
 }
 
+void
+WndSymbolButton::SetCaption(const TCHAR *caption)
+{
+  assert(caption != nullptr);
+
+  SymbolButtonRenderer &r = *(SymbolButtonRenderer *)renderer;
+  r.SetCaption(caption);
+
+  Invalidate();
+}
+
 Button::~Button() {
   /* we must override ~Window(), because in ~Window(), our own
      OnDestroy() method won't be called (during object destruction,
@@ -99,6 +110,13 @@ Button::SetCaption(const TCHAR *caption)
   r.SetCaption(caption);
 
   Invalidate();
+}
+
+StaticString<64>::const_pointer
+Button::GetCaption(const TCHAR *caption)
+{
+  TextButtonRenderer &r = *(TextButtonRenderer *)renderer;
+  return r.GetCaption();
 }
 
 void
