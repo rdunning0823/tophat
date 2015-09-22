@@ -591,17 +591,17 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
                       _("Hide"), _("Show"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
-      DisplayOrientation::NORTH_UP, OutBuffer,
+      MapOrientation::NORTH_UP, OutBuffer,
                       _T("$(OrientationNorthUp)"),
                       _T("* "), _("North up"), _("North up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
-      DisplayOrientation::TARGET_UP, OutBuffer,
+      MapOrientation::TARGET_UP, OutBuffer,
                       _T("$(OrientationTargetUp)"),
                       _T("* "), _("Target up"), _("Target up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
-      DisplayOrientation::TRACK_UP, OutBuffer,
+      MapOrientation::TRACK_UP, OutBuffer,
                       _T("$(OrientationTrackUp)"),
                       _T("* "), _("Track up"), _("Track up"), Size);
 

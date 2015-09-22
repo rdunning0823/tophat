@@ -428,6 +428,7 @@ InfoBoxLayout::HasInfoBoxesOnBottom(InfoBoxSettings::Geometry geometry)
   case InfoBoxSettings::Geometry::TOP_LEFT_4:
   case InfoBoxSettings::Geometry::TOP_8_VARIO:
   case InfoBoxSettings::Geometry::RIGHT_5:
+  case InfoBoxSettings::Geometry::RIGHT_16:
   case InfoBoxSettings::Geometry::RIGHT_24:
   case InfoBoxSettings::Geometry::RIGHT_9_VARIO:
 
