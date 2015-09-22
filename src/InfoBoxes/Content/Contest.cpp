@@ -26,9 +26,11 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Components.hpp"
 #include "UIGlobals.hpp"
+#include "Dialogs/dlgAnalysis.hpp"
 #include "Language/Language.hpp"
 #include "InfoBoxes/Panel/OnlineContest.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
+#include "Widget/CallbackWidget.hpp"
 
 #include <tchar.h>
 
@@ -88,19 +90,16 @@ InfoBoxContentOLC::Update(InfoBoxData &data)
   data.UnsafeFormatComment(_T("%.1f pts"), (double)result_olc.score);
 }
 
+/*
 static constexpr InfoBoxPanel panels_olc[] = {
   { N_("OLC"), LoadOnlineContestPanel },
   { nullptr, nullptr }
 };
-
-const InfoBoxPanel *
-InfoBoxContentOLC::GetDialogContent() {
-  return panels_olc;
-}
+*/
 
 const InfoBoxPanel *
 InfoBoxContentOLCSpeed::GetDialogContent() {
-  return panels_olc;
+  return analysis8_infobox_panels;
 }
 
 void
