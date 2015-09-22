@@ -25,8 +25,7 @@ Copyright_License {
 #include "Gauge/BigThermalAssistantWindow.hpp"
 #include "Blackboard/LiveBlackboard.hpp"
 #include "Language/Language.hpp"
-#include "Form/Button.hpp"
-#include "Form/SymbolButton.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Screen/Layout.hpp"
 #include "Look/DialogLook.hpp"
 #include "UIGlobals.hpp"
@@ -49,7 +48,7 @@ BigThermalAssistantWidget::UpdateLayout()
   button_rc.top = button_rc.bottom - button_height;
   button_rc.left = rc.left + margin;
   button_rc.right = button_rc.left + Layout::Scale(50);
-  close_button->Move(button_rc);
+  close_button.Move(button_rc);
 #endif
 }
 
@@ -69,10 +68,11 @@ BigThermalAssistantWidget::Prepare(ContainerWindow &parent,
   const PixelRect rc = GetContainer().GetClientRect();
 
 #ifndef GNAV
-  close_button = new WndSymbolButton(GetContainer(),
-                                     UIGlobals::GetDialogLook().button,
-                                     _T("_X"), rc, WindowStyle(),
-                                     *this, CLOSE);
+  close_button.Create(parent, rc, WindowStyle(),
+                     new SymbolButtonRenderer(UIGlobals::GetDialogLook().button,
+                                              _T("_X")),
+                     *this, CLOSE);
+
 #endif
 
   view = new BigThermalAssistantWindow(look, Layout::FastScale(10));
@@ -84,9 +84,6 @@ void
 BigThermalAssistantWidget::Unprepare()
 {
   delete view;
-#ifndef GNAV
-  delete close_button;
-#endif
 
   ContainerWidget::Unprepare();
 }
@@ -104,11 +101,11 @@ BigThermalAssistantWidget::Show(const PixelRect &rc)
 
 #if defined(ENABLE_OPENGL) | defined(KOBO)
   /* hide close button on OPENGL where we have the screens button */
-  close_button->SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined() &&
+  close_button.SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined() &&
                            CommonInterface::GetUISettings().screens_button_location ==
                                      UISettings::ScreensButtonLocation::MENU);
 #else
-  close_button->SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined());
+  close_button.SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined());
 #endif
 #endif
 
