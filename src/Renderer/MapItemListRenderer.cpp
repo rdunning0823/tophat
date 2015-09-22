@@ -54,6 +54,7 @@ Copyright_License {
 #include "FLARM/List.hpp"
 #include "Time/RoughTime.hpp"
 #include "Task/Points/TaskPoint.hpp"
+#include "Renderer/TwoTextRowsRenderer.hpp"
 
 #ifdef HAVE_NOAA
 #include "Renderer/NOAAListRenderer.hpp"
@@ -63,6 +64,9 @@ Copyright_License {
 
 namespace MapItemListRenderer
 {
+  unsigned CalculateLayout(const DialogLook &dialog_look,
+                           TwoTextRowsRenderer &row_renderer);
+
   void Draw(Canvas &canvas, const PixelRect rc, const LocationMapItem &item,
             const DialogLook &dialog_look);
 
@@ -81,10 +85,6 @@ namespace MapItemListRenderer
   void Draw(Canvas &canvas, const PixelRect rc, const WaypointMapItem &item,
             const DialogLook &dialog_look, const WaypointLook &look,
             const WaypointRendererSettings &renderer_settings);
-
-  void Draw(Canvas &canvas, const PixelRect rc, const MarkerMapItem &item,
-            RoughTimeDelta utc_offset,
-            const DialogLook &dialog_look, const MarkerLook &look);
 
 #ifdef HAVE_NOAA
   void Draw(Canvas &canvas, const PixelRect rc, const WeatherStationMapItem &item,
@@ -105,13 +105,21 @@ namespace MapItemListRenderer
             const DialogLook &dialog_look, const MapLook &look);
 }
 
+unsigned
+MapItemListRenderer::CalculateLayout(const DialogLook &dialog_look,
+                                     TwoTextRowsRenderer &row_renderer)
+{
+  return row_renderer.CalculateLayout(*dialog_look.list.font_bold,
+                                      dialog_look.small_font);
+}
+
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const LocationMapItem &item,
                           const DialogLook &dialog_look)
 {
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   const unsigned text_padding = Layout::GetTextPadding();
   int left = rc.left + text_padding;
@@ -121,12 +129,12 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     FormatUserDistanceSmart(item.vector.distance, distance_buffer);
     FormatBearing(direction_buffer, ARRAY_SIZE(direction_buffer),
                   item.vector.bearing);
-    StringFormatUnsafe(info_buffer, _T("%s: %s, %s: %s"),
-                       _("Distance"), distance_buffer,
-                       _("Direction"), direction_buffer);
+    _stprintf(info_buffer, _T("%s: %s, %s: %s"),
+              _("Distance"), distance_buffer,
+              _("Direction"), direction_buffer);
   } else {
-    StringFormatUnsafe(info_buffer, _T("%s: %s, %s: %s"),
-                       _("Distance"), _T("???"), _("Direction"), _T("???"));
+    _stprintf(info_buffer, _T("%s: %s, %s: %s"),
+              _("Distance"), _T("???"), _("Direction"), _T("???"));
   }
 
   canvas.Select(name_font);
@@ -137,11 +145,9 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   TCHAR elevation_buffer[32];
   if (!RasterBuffer::IsSpecial(item.elevation)) {
     FormatUserAltitude(fixed(item.elevation), elevation_buffer, 32);
-    StringFormatUnsafe(info_buffer, _T("%s: %s"), _("Elevation"),
-                       elevation_buffer);
+    _stprintf(info_buffer, _T("%s: %s"), _("Elevation"), elevation_buffer);
   } else {
-    StringFormatUnsafe(info_buffer, _T("%s: %s"), _("Elevation"),
-                       _T("???"));
+    _stprintf(info_buffer, _T("%s: %s"), _("Elevation"), _T("???"));
   }
 
   canvas.Select(text_font);
@@ -187,7 +193,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   };
 
   Angle arrow_angle = reachable ? Angle::HalfCircle() : Angle::Zero();
-  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pt.x, pt.y, arrow_angle, 100);
+  PolygonRotateShift(arrow, ARRAY_SIZE(arrow), pt, arrow_angle, 100);
 
   if (reachable) {
     canvas.Select(look.brush_above);
@@ -200,7 +206,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   const unsigned text_padding = Layout::GetTextPadding();
   int left = rc.left + line_height + text_padding;
@@ -282,7 +288,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const unsigned text_padding = Layout::GetTextPadding();
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   int left = rc.left + line_height + text_padding;
   canvas.Select(name_font);
@@ -312,7 +318,10 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const AirspaceLook &look,
                           const AirspaceRendererSettings &renderer_settings)
 {
-  AirspaceListRenderer::Draw(canvas, rc, *item.airspace, dialog_look, look,
+  TwoTextRowsRenderer row_renderer;
+  MapItemListRenderer::CalculateLayout(dialog_look, row_renderer);
+
+  AirspaceListRenderer::Draw(canvas, rc, *item.airspace, row_renderer, look,
                              renderer_settings);
 }
 
@@ -330,46 +339,6 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                              dialog_look, look, renderer_settings);
 }
 
-/**
- * Dropped Marker
- */
-void
-MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
-                          const MarkerMapItem &item, RoughTimeDelta utc_offset,
-                          const DialogLook &dialog_look,
-                          const MarkerLook &look)
-{
-  const unsigned line_height = rc.bottom - rc.top;
-  const unsigned text_padding = Layout::GetTextPadding();
-
-  const Marker &marker = item.marker;
-
-  const RasterPoint pt(rc.left + line_height / 2,
-                       rc.top + line_height / 2);
-
-  look.icon.Draw(canvas, pt);
-
-  const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
-
-  int left = rc.left + line_height + text_padding;
-
-  StaticString<256> buffer;
-  buffer.Format(_T("%s #%d"), _("Marker"), item.id + 1);
-  canvas.Select(name_font);
-  canvas.DrawClippedText(left, rc.top + text_padding, rc, buffer);
-
-  TCHAR time_buffer[32], timespan_buffer[32];
-  FormatLocalTimeHHMM(time_buffer, marker.time.GetSecondOfDay(), utc_offset);
-  FormatTimespanSmart(timespan_buffer, BrokenDateTime::NowUTC() - marker.time);
-  buffer.Format(_("dropped %s ago"), timespan_buffer);
-  buffer.AppendFormat(_T(" (%s)"), time_buffer);
-  canvas.Select(text_font);
-  canvas.DrawClippedText(left,
-                         rc.top + name_font.GetHeight() + 2 * text_padding,
-                         rc, buffer);
-}
-
 #ifdef HAVE_NOAA
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
@@ -377,8 +346,11 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const DialogLook &dialog_look,
                           const NOAALook &look)
 {
+  TwoTextRowsRenderer row_renderer;
+  MapItemListRenderer::CalculateLayout(dialog_look, row_renderer);
+
   const NOAAStore::Item &station = *item.station;
-  NOAAListRenderer::Draw(canvas, rc, station, look, dialog_look);
+  NOAAListRenderer::Draw(canvas, rc, station, look, row_renderer);
 }
 #endif
 
@@ -403,7 +375,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   look.thermal_source_icon.Draw(canvas, pt);
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   int left = rc.left + line_height + text_padding;
 
@@ -449,7 +421,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const Waypoint &waypoint = item.waypoint;
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   TCHAR buffer[256];
 
@@ -478,7 +450,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   const RasterPoint pt(rc.left + line_height / 2,
                        rc.top + line_height / 2);
-  PixelScalar radius = std::min(PixelScalar(line_height / 2
+  PixelScalar radius = std::min(int(line_height / 2
                                             - 2 * padding),
                                 Layout::FastScale(10));
   OZPreviewRenderer::Draw(canvas, oz, pt, radius, look,
@@ -504,7 +476,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   // Now render the text information
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
   int left = rc.left + line_height + text_padding;
 
   const FlarmNetRecord *record = FlarmDetails::LookupRecord(item.id);
@@ -592,7 +564,7 @@ Draw(Canvas &canvas, const PixelRect rc,
      const DialogLook &dialog_look)
 {
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   const unsigned line_height = rc.bottom - rc.top;
   const unsigned text_padding = Layout::GetTextPadding();
@@ -653,10 +625,6 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     Draw(canvas, rc, (const TaskOZMapItem &)item,
          dialog_look, look.task, look.airspace,
          settings.airspace);
-    break;
-  case MapItem::MARKER:
-    Draw(canvas, rc, (const MarkerMapItem &)item, utc_offset,
-         dialog_look, look.marker);
     break;
 
 #ifdef HAVE_NOAA
