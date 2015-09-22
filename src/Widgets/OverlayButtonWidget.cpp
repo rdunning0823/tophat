@@ -45,9 +45,9 @@ void
 OverlayButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
+  const MapLook &map_look = UIGlobals::GetMapLook();
   assert(prepared == false);
-  white_look.Initialise(Fonts::map_bold);
-  white_look.font = &Fonts::map_overlay_button;
+  white_look.Initialise(*map_look.overlay_font);
 
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   CreateButton(parent, white_look, icon_look, rc);

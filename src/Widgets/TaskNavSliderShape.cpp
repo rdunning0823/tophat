@@ -51,13 +51,13 @@ Copyright_License {
 const Font &
 SliderShape::GetLargeFont()
 {
-  return *infobox_look.value.font;
+  return infobox_look.value_font;
 }
 
 const Font &
 SliderShape::GetSmallFont()
 {
-  return *dialog_look.text_font;
+  return dialog_look.text_font;
 }
 
 const Font &
@@ -433,7 +433,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 #ifdef ENABLE_OPENGL
     OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-    const GLEnable scope(GL_TEXTURE_2D);
+    const GLEnable<GL_TEXTURE_2D> scope;
     const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     GLTexture &texture = *bmp->GetNative();
@@ -511,7 +511,7 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
 #ifdef ENABLE_OPENGL
     OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-    const GLEnable scope(GL_TEXTURE_2D);
+    const GLEnable<GL_TEXTURE_2D> scope;
     const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     GLTexture &texture = *bmp_bearing->GetNative();

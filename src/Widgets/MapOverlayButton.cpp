@@ -37,6 +37,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Pan.hpp"
 #include "Renderer/TextInBox.hpp"
+#include "Renderer/ButtonRenderer.hpp"
 
 unsigned
 MapOverlayButton::GetScale()
@@ -85,10 +86,12 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     transparent = true;
 #endif
   //Todo fix the GDI rendering so it draws transparent correctly
-  renderer.DrawButton(canvas, rc, HasFocus(), pressed, transparent, dimmed);
-  rc = renderer.GetDrawingRect(rc, pressed);
+  GetRenderer().DrawButton(canvas, rc, HasFocus(), pressed, transparent);
+  if (pressed)
+    rc.Offset(1, 1); //hack -- should use ButtonFrameRenderer
 
   if (bmp != nullptr) {
+#ifdef _NOT_SUPPORTED
     canvas.SelectNullPen();
     if (!IsEnabled())
       canvas.Select(button_look.disabled.brush);
@@ -103,6 +106,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
                     bitmap_size.cy,
                     *bmp,
                     bitmap_size.cx / 2, 0);
+#endif
   } else {
     canvas.SetBackgroundTransparent();
     if (HasCursorKeys() ? (HasFocus() | pressed) : pressed)
@@ -114,7 +118,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     PixelSize sz;
     sz.cx = rc.right - rc.left;
     sz.cy = rc.bottom - rc.top;
-    PixelSize sz_main = GetLargeFont().TextSize(GetText().c_str());
+    PixelSize sz_main = GetLargeFont().TextSize(GetCaption());
     PixelSize sz_subscript = GetMediumFont().TextSize(subscript_text.c_str());
     PixelSize sz_line_two = GetMediumFont().TextSize(line_two_text.c_str());
     sz_main.cx *= 0.85;
@@ -136,7 +140,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     TextInBoxMode mode;
     mode.shape = LabelShape::OUTLINED;
     mode.align = TextInBoxMode::Alignment::LEFT;
-    TextInBox(canvas, GetText().c_str(), rc_main_text.left, rc_main_text.top, mode,
+    TextInBox(canvas, GetCaption(), rc_main_text.left, rc_main_text.top, mode,
               rc.GetSize().cx, rc.GetSize().cy);
 
     canvas.SetBackgroundOpaque();
