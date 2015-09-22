@@ -84,7 +84,7 @@ GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     return true;
   case DRAG_NON_GESTURE:
 
-    if ((abs(drag_start.x - x) + abs(drag_start.y - y)) < Layout::Scale(threshold)
+    if (unsigned((abs(drag_start.x - x) + abs(drag_start.y - y))) < Layout::Scale(threshold)
         && follow_mode != FOLLOW_PAN)
       break;
     drag_projection = visible_projection;

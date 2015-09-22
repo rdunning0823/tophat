@@ -455,7 +455,6 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
 
   // draw "Simulator/Replay
   StaticString<80> buffer;
-  const UIState &ui_state = GetUIState();
 
   canvas.SetBackgroundOpaque();
   canvas.SetBackgroundColor(COLOR_WHITE);
@@ -485,42 +484,6 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
     unsigned x = (rc.right - rc.left - text_size.cx) / 2;
     unsigned y = rc.top + nav_slider_bar_visible_height;
     TextInBox(canvas, buffer.c_str(), x, y, mode, rc, NULL);
-  }
-
-  return; // don't show rest of stuff
-
-  canvas.Select(Fonts::title);
-  if (weather != NULL && weather->GetParameter() > 0) {
-    const TCHAR *label = weather->ItemLabel(weather->GetParameter());
-    if (label != NULL) {
-      buffer += _T(" ");
-      buffer += label;
-    }
-  }
-
-  if (ui_state.auxiliary_enabled) {
-    if (!buffer.empty())
-      buffer += _T(", ");
-    buffer += ui_state.panel_name;
-  }
-
-  if (!buffer.empty()) {
-    offset += canvas.CalcTextWidth(buffer) + Layout::Scale(2);
-
-    canvas.DrawText(rc.right - offset, rc.bottom - canvas.CalcTextSize(buffer).cy, buffer);
-  }
-
-  const PolarSettings &polar_settings = GetComputerSettings().polar;
-  // calc "Ballast" and draw above sim/replay info
-  if (((int)polar_settings.glide_polar_task.GetBallastLitres() > 0 ||
-      !Calculated().flight.flying)
-      && polar_settings.glide_polar_task.IsBallastable()) {
-    buffer = _("Ballast");
-    buffer.AppendFormat(
-      _T(" %d L"),
-      (int)computer_settings.polar.glide_polar_task.GetBallastLitres());
-
-    canvas.DrawText(rc.right - offset, rc.bottom - 2 * canvas.CalcTextSize(buffer).cy, buffer);
   }
 }
 
