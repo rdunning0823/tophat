@@ -175,7 +175,7 @@ const BuiltinLanguage language_table[] = {
   { LANG_DANISH, da_mo, da_mo_size, _T("da.mo"), _T("Danish") },
   { LANG_GERMAN, de_mo, de_mo_size, _T("de.mo"), _T("German") },
   { LANG_GREEK, el_mo, el_mo_size, _T("el.mo"), _T("Greek") },
-  { LANG_ENGLISH, en_start, en_size, _T("en.mo"), N_("English") },
+  { LANG_ENGLISH, en_mo, en_mo_size, _T("en.mo"), N_("English") },
   { LANG_SPANISH, es_mo, es_mo_size, _T("es.mo"), _T("Spanish") },
   { LANG_FINNISH, fi_mo, fi_mo_size, _T("fi.mo"), _T("Finnish") },
   { LANG_FRENCH, fr_mo, fr_mo_size, _T("fr.mo"), _T("French") },
@@ -490,13 +490,12 @@ GetActiveLanguageName()
     ? buffer : _T("en.mo");
 
   if (StringIsEmpty(value) || StringIsEqual(value, _T("auto"))) {
-#ifdef HAVE_NATIVE_GETTEXT
-    const BuiltinLanguage *built_in_language = nullptr;
-#else
+#ifndef HAVE_NATIVE_GETTEXT
     const BuiltinLanguage *built_in_language = DetectLanguage();
-#endif
     if (built_in_language != nullptr)
       value = built_in_language->name;
+#endif
+
     return value;
   }
 #ifdef HAVE_BUILTIN_LANGUAGES
