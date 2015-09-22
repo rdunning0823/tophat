@@ -187,7 +187,6 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   header_text = new WndFrame(GetClientAreaWindow(), look,
                              frame_rc, style_frame);
   header_text->SetVAlignCenter();
-  header_text->SetFont(Fonts::infobox_small);
   SetCaption();
 
   managed_widget.Move(content_rc);
