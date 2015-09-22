@@ -74,7 +74,7 @@ Profile::Load(const ProfileMap &map, MapSettings &settings)
 // hard code to default
   // map.GetEnum(ProfileKeys::WindArrowStyle, settings.wind_arrow_style);
 
-  GetEnum(ProfileKeys::WindArrowLocation, settings.wind_arrow_location);
+  map.GetEnum(ProfileKeys::WindArrowLocation, settings.wind_arrow_location);
   settings.waypoint.LoadFromProfile();
 
   Load(map, settings.airspace);

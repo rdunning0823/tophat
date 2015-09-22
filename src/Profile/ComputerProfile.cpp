@@ -82,7 +82,7 @@ Profile::Load(const ProfileMap &map, TeamCodeSettings &settings)
 }
 
 void
-Profile::Load(FilePickAndDownloadSettings &settings)
+Profile::Load(const ProfileMap &map, FilePickAndDownloadSettings &settings)
 {
   map.Get(ProfileKeys::FilePickAndDownloadAreaFilter, settings.area_filter);
   map.Get(ProfileKeys::FilePickAndDownloadSubAreaFilter, settings.subarea_filter);

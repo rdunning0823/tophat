@@ -149,7 +149,8 @@ Profile::Load(const ProfileMap &map, InfoBoxSettings &settings)
     }
   }
 
-  Get(ProfileKeys::ShowAlternateAltitudeUnits, settings.show_alternative_altitude_units);
+  map.Get(ProfileKeys::ShowAlternateAltitudeUnits,
+          settings.show_alternative_altitude_units);
 }
 
 void
