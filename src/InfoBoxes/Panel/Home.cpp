@@ -67,7 +67,8 @@ public:
   HomePanel(unsigned _id)
     :BaseAccessPanel(_id) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Prepare(ContaineWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
 
   void Refresh();
 
@@ -164,12 +165,15 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            upper_rc,
                            style_frame);
   home_name->SetVAlignCenter();
-  AddDestruct(change);
-  AddDestruct(home_name);
 
   Refresh();
 }
 
+HomePanel::Unprepare()
+{
+  delete change;
+  delete home_name;
+}
 Widget *
 LoadHomePanel(unsigned id)
 {

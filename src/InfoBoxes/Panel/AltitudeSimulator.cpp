@@ -266,7 +266,6 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           (UPixelScalar)(fg_rc.right - fg_rc.left),
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
-  WndForm::AddDestruct(final_glide_chart);
 
   big_button_look.Initialise(Fonts::map_bold);
 
@@ -279,35 +278,29 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   big_plus = new Button(GetClientAreaWindow(), big_button_look, _T("+100"),
                            big_plus_rc,
                            button_style, *this, BigPlus);
-  WndForm::AddDestruct(big_plus);
 
   little_plus = new Button(GetClientAreaWindow(), big_button_look,
                               _T("+10"), little_plus_rc,
                               button_style, *this, LittlePlus);
-  WndForm::AddDestruct(little_plus);
 
   big_minus = new Button(GetClientAreaWindow(), big_button_look,
                             _T("-100"), big_minus_rc,
                             button_style, *this, BigMinus);
-  WndForm::AddDestruct(big_minus);
 
   little_minus = new Button(GetClientAreaWindow(), big_button_look,
                                _T("-10"), little_minus_rc,
                                button_style, *this, LittleMinus);
-  WndForm::AddDestruct(little_minus);
 
   WindowStyle style_frame;
 
   altitude_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
                                 value_rc, style_frame);
-  WndForm::AddDestruct(altitude_value);
 
   altitude_value->SetAlignCenter();
   altitude_value->SetVAlignCenter();
 
   altitude_type = new WndFrame(GetClientAreaWindow(), dialog_look,
                                 sub_number_rc, style_frame);
-  WndForm::AddDestruct(altitude_type);
   altitude_type->SetAlignCenter();
   altitude_type->SetVAlignCenter();
 
@@ -322,7 +315,6 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const InfoBoxSettings &settings_info_boxes =
       CommonInterface::GetUISettings().info_boxes;
   show_alternate_units->SetState(settings_info_boxes.show_alternative_altitude_units);
-  WndForm::AddDestruct(show_alternate_units);
 
   dialog_timer.Schedule(500);
   Refresh();
@@ -332,6 +324,15 @@ void
 AltitudeSimulatorPanel::Unprepare()
 {
   dialog_timer.Cancel();
+  delete(final_glide_chart);
+  delete(big_plus);
+  delete(little_plus);
+  delete(big_minus);
+  delete(little_minus);
+  delete(altitude_value);
+  delete(altitude_type);
+  delete(show_alternate_units);
+
 }
 
 AltitudeSimulatorPanel::FinalGlideChart::FinalGlideChart(

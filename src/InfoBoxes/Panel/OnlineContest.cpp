@@ -158,7 +158,6 @@ OnlineContestPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
                             info_rc, style_frame);
-  WndForm::AddDestruct(info_frame);
 
   const Look &look = UIGlobals::GetLook();
   online_contest_chart =
@@ -167,7 +166,6 @@ OnlineContestPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            (UPixelScalar)(graph_rc.right - graph_rc.left),
                            (UPixelScalar)(graph_rc.bottom - graph_rc.top),
                            style, look);
-  WndForm::AddDestruct(online_contest_chart);
 
   dialog_timer.Schedule(1000);
   Refresh();
@@ -177,6 +175,8 @@ void
 OnlineContestPanel::Unprepare()
 {
   dialog_timer.Cancel();
+  delete(info_frame);
+  delete(online_contest_chart);
 }
 
 Widget *

@@ -93,6 +93,7 @@ public:
    */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
 
+  virtual void Unprepare();
   /**
    * calculates the rectangles on the base class itself
    */

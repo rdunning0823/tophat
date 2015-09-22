@@ -276,7 +276,6 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
   digit_entry->CreateTime(GetClientAreaWindow(), rc, control_style);
   digit_entry->Resize(digit_entry->GetRecommendedSize());
   digit_entry->SetActionListener(*this, CLOSEBUTTON);
-  AddDestruct(digit_entry);
 
   const BrokenTime bt = BrokenDateTime::NowUTC();
   utc_time = utc_time.FromMinuteOfDayChecked(bt.hour * 60 + bt.minute);
@@ -308,27 +307,22 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
                         _("Update"),
                         rc_close,
                         button_style, *this, CLOSEBUTTON);
-  AddDestruct(close);
 
   cancel = new Button(GetClientAreaWindow(), button_look,
                          _("Cancel"),
                          rc_cancel,
                          button_style, *this, CANCELBUTTON);
-  AddDestruct(cancel);
 
   label_help = new WndFrame(GetClientAreaWindow(), dialog_look,
                             rc_label_help, style_frame);
-  AddDestruct(label_help);
   label_help->SetCaption(_("Adjust time you started the task"));
 
   label_current = new WndFrame(GetClientAreaWindow(), dialog_look,
                               rc_label_current, style_frame);
-  AddDestruct(label_current);
 
   label_start = new WndFrame(GetClientAreaWindow(), dialog_look,
                               rc_label_start, style_frame);
   label_start->SetCaption(start_label_text.c_str());
-  AddDestruct(label_start);
 
   UpdateCurrentTime();
 
@@ -339,6 +333,13 @@ void
 StartTimeEntry::Unprepare()
 {
   dialog_timer.Cancel();
+  delete(digit_entry);
+  delete(close);
+  delete(cancel);
+  delete(label_help);
+  delete(label_current);
+  delete(label_start);
+
 }
 
 static void

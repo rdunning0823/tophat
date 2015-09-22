@@ -225,17 +225,14 @@ TeamCodeFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   set_code_button = new Button(GetClientAreaWindow(), button_look, _T("Set code"),
                                   left_button_rc,
                               button_style, *this, SET_CODE);
-  WndForm::AddDestruct(set_code_button);
 
   set_waypoint_button = new Button(GetClientAreaWindow(), button_look, _T("Set WP"),
                                  middle_button_rc,
                                  button_style, *this, SET_WAYPOINT);
-  WndForm::AddDestruct(set_waypoint_button);
 
   flarm_lock_button = new Button(GetClientAreaWindow(), button_look, _T("Flarm lock"),
                                  right_button_rc,
                                  button_style, *this, SET_FLARM_LOCK);
-  WndForm::AddDestruct(flarm_lock_button);
 }
 
 void
@@ -244,6 +241,9 @@ TeamCodeFullScreen::Unprepare()
   assert (team_code_widget2 != nullptr);
   team_code_widget2->Unprepare();
   delete team_code_widget2;
+  delete(set_code_button);
+  delete(set_waypoint_button);
+  delete(flarm_lock_button);
 }
 
 void

@@ -535,50 +535,41 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                   add_del_button_text.c_str(),
                                   rc_delete,
                                   button_style, *this, DeletePointClick);
-    AddDestruct(delete_button);
   } else {
     add_button = new Button(GetClientAreaWindow(), button_look,
                                add_del_button_text.c_str(),
                                rc_add,
                                button_style, *this, AddPointClick);
-    AddDestruct(add_button);
 
     if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
       replace_button = new Button(GetClientAreaWindow(), button_look,
                                      replace_button_text.c_str(),
                                      rc_replace,
                                      button_style, *this, ReplacePointClick);
-      AddDestruct(replace_button);
 
       replace_info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
                                         rc_replace_info, style_frame);
-      AddDestruct(replace_info_frame);
       replace_info_frame->SetCaption(replace_text.c_str());
     }
   }
 
   header_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
                               rc_header, style_frame);
-  AddDestruct(header_frame);
 
   estimate_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
                                 rc_estimate, style_frame);
-  AddDestruct(estimate_frame);
 
   add_info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
                                 rc_add_info, style_frame);
-  AddDestruct(add_info_frame);
   add_info_frame->SetCaption(add_del_info_text.c_str());
 
   more = new Button(GetClientAreaWindow(), button_look, _T("More"),
                        rc_more,
                        button_style, *this, MoreClick);
-  AddDestruct(more);
 
   cancel = new Button(GetClientAreaWindow(), button_look, _T("Cancel"),
                          rc_cancel,
                          button_style, *this, CancelClick);
-  AddDestruct(cancel);
 
   if (modified_task.mat_mode != MAT_DELETE)
     RefreshFormForAdd();
@@ -590,6 +581,17 @@ void
 MatClickPanel::Unprepare()
 {
   dialog_timer.Cancel();
+  delete cancel;
+  delete more;
+  delete add_info_frame;
+  delete estimate_frame;
+  delete header_frame;
+  if (replace_button != nullptr)
+    delete replace_button;
+  if (replace_info_frame != nullptr)
+    delete replace_info_frame;
+  delete add_button;
+  delete dete_button;
 }
 
 /**
