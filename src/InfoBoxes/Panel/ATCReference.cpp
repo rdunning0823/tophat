@@ -38,6 +38,7 @@ Copyright_License {
 #include "Protection.hpp"
 #include "Message.hpp"
 #include "Screen/SingleWindow.hpp"
+#include "Profile/Current.hpp"
 
 enum Controls {
   WAYPOINT,

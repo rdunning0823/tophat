@@ -43,7 +43,7 @@ Copyright_License {
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Message.hpp"
 #include "Look/DialogLook.hpp"
-
+#include "Profile/Current.hpp"
 
 enum ControlIndex {
   HomeName = 100,
@@ -67,7 +67,7 @@ public:
   HomePanel(unsigned _id)
     :BaseAccessPanel(_id) {}
 
-  virtual void Prepare(ContaineWindow &parent, const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
 
   void Refresh();
@@ -168,11 +168,14 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   Refresh();
 }
 
+void
 HomePanel::Unprepare()
 {
   delete change;
   delete home_name;
+  BaseAccessPanel::Unprepare();
 }
+
 Widget *
 LoadHomePanel(unsigned id)
 {

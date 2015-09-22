@@ -116,7 +116,7 @@ TeamCodeWidget2::Update(const MoreData &basic, const DerivedInfo &calculated)
   StaticString<100> buffer;
 
   if (teamcode_info.teammate_available && basic.track_available) {
-    FormatAngleDelta(buffer.buffer(), buffer.MAX_SIZE,
+    FormatAngleDelta(buffer.buffer(), buffer.CAPACITY,
                      teamcode_info.teammate_vector.bearing - basic.track);
   } else {
     buffer = _T("---");
@@ -125,7 +125,7 @@ TeamCodeWidget2::Update(const MoreData &basic, const DerivedInfo &calculated)
   SetText(RELATIVE_BEARING, buffer);
 
   if (teamcode_info.teammate_available) {
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE,
+    FormatBearing(buffer.buffer(), buffer.CAPACITY,
                   teamcode_info.teammate_vector.bearing);
     SetText(BEARING, buffer);
 
@@ -295,7 +295,7 @@ TeamCodeFullScreen::OnFlarmLockClicked()
 {
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;
-  TCHAR newTeamFlarmCNTarget[settings.team_flarm_callsign.MAX_SIZE];
+  TCHAR newTeamFlarmCNTarget[settings.team_flarm_callsign.CAPACITY];
   _tcscpy(newTeamFlarmCNTarget, settings.team_flarm_callsign.c_str());
 
   if (!TextEntryDialog(newTeamFlarmCNTarget, 4))

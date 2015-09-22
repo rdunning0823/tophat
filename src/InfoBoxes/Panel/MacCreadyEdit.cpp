@@ -45,6 +45,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
 #include "Screen/SingleWindow.hpp"
+#include "Form/Button.hpp"
 
 enum ControlIndex {
   BigPlus,
@@ -86,7 +87,7 @@ protected:
    */
   WndSymbolButton *big_plus, *big_minus, *little_plus, *little_minus;
   WndFrame *mc_value, *speed_to_fly;
-  CheckBoxControl *auto_mc;
+  CheckBoxControl auto_mc;
   PixelRect checkbox_rc;
 
   /**
@@ -197,12 +198,12 @@ MacCreadyEditPanel::Refresh()
 {
   const ComputerSettings &settings_computer =
     CommonInterface::GetComputerSettings();
-  auto_mc->SetState(XCSoarInterface::GetComputerSettings().task.auto_mc);
+  auto_mc.SetState(XCSoarInterface::GetComputerSettings().task.auto_mc);
   fixed mc = settings_computer.polar.glide_polar_task.GetMC();
   StaticString<32> buffer;
   FormatUserVerticalSpeed(mc, buffer.buffer(), false);
   mc_value->SetCaption(buffer.c_str());
-  mc_value->SetEnabled(!auto_mc->GetState());
+  mc_value->SetEnabled(!auto_mc.GetState());
 
   buffer.clear();
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
@@ -228,7 +229,7 @@ MacCreadyEditPanel::Move(const PixelRect &rc_unused)
   mc_value->Move(value_rc);
 
   speed_to_fly->Move(sub_number_rc);
-  auto_mc->Move(checkbox_rc);
+  auto_mc.Move(checkbox_rc);
 }
 
 void
@@ -255,7 +256,7 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
 
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   sub_number_rc.left = sub_number_rc.right -
-      dialog_look.text_font->TextSize(_T("333 km/h")).cx + Layout::Scale(1);
+      dialog_look.text_font.TextSize(_T("333 km/h")).cx + Layout::Scale(1);
 
 
 
@@ -279,6 +280,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+
   WindowStyle button_style;
   button_style.TabStop();
   big_plus = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("^"),
@@ -298,10 +300,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                      button_style, *this, LittleMinus);
 
   WindowStyle style_frame;
-  big_dialog_look.Initialise(Fonts::map_bold, Fonts::infobox, Fonts::map_label,
-                             Fonts::infobox, Fonts::map_bold,
-                             Fonts::map_bold);
-  mc_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
+  mc_value = new WndFrame(GetClientAreaWindow(), dialog_look,
                           value_rc, style_frame);
 
   mc_value->SetAlignCenter();
@@ -316,9 +315,12 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WindowStyle checkbox_style;
   checkbox_style.TabStop();
 
-  auto_mc = new CheckBoxControl(GetClientAreaWindow(), dialog_look, _T("Auto MC"),
-                                checkbox_rc, checkbox_style,
-                                this, AutoMc);
+  auto_mc.Create(GetClientAreaWindow(),
+                 dialog_look,
+                 _T("Auto MC"),
+                 checkbox_rc,
+                 checkbox_style,
+                 *this, AutoMc);
 
   dialog_timer.Schedule(500);
   Refresh();
@@ -335,7 +337,6 @@ MacCreadyEditPanel::Unprepare()
   delete(big_minus);
   delete(mc_value);
   delete(speed_to_fly);
-  delete(auto_mc);
 }
 
 Widget *

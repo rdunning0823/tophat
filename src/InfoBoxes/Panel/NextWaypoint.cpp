@@ -53,7 +53,7 @@ NextWaypointPanel::SetCaption()
   assert(waypoint != nullptr);
   StaticString<255> caption;
   caption.Format(_T("%s: %s"), _("Next waypoint"), waypoint->name.c_str());
-  header_text->SetText(caption.get());
+  header_text->SetText(caption.c_str());
 }
 
 Widget *
