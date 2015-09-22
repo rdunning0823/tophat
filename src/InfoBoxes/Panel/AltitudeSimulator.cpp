@@ -91,7 +91,7 @@ protected:
   Button *big_plus, *big_minus, *little_plus, *little_minus;
   WndFrame *altitude_value;
   WndFrame *altitude_type;
-  CheckBoxControl *show_alternate_units;
+  CheckBoxControl show_alternate_units;
   /**
    * draws the Final Glide Bar on the MC widget so the pilot can
    * adjust his MC with respect to the arrival height
@@ -205,7 +205,7 @@ AltitudeSimulatorPanel::Refresh()
   StaticString<50> altitude_string;
   FormatUserAltitude(altitude, altitude_string.buffer(), true);
 
-  altitude_value->SetCaption(altitude_string.get());
+  altitude_value->SetCaption(altitude_string.c_str());
   final_glide_chart->Invalidate();
   altitude_type->SetCaption(is_agl ? _("AGL") : _("MSL"));
 }
@@ -224,7 +224,7 @@ AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
   little_minus->Move(little_minus_rc);
   altitude_value->Move(value_rc);
   altitude_type->Move(sub_number_rc);
-  show_alternate_units->Move(show_alternate_units_rc);
+  show_alternate_units.Move(show_alternate_units_rc);
 }
 
 void
@@ -259,6 +259,7 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WindowStyle style;
   const Look &look = UIGlobals::GetLook();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const MapLook &map_look = UIGlobals::GetLook().map;
 
   final_glide_chart =
       new FinalGlideChart(GetClientAreaWindow(),
@@ -267,14 +268,10 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
 
-  big_button_look.Initialise(Fonts::map_bold);
+  big_button_look.Initialise(*map_look.overlay_font);
 
-  big_dialog_look.Initialise(Fonts::map_bold, Fonts::infobox, Fonts::map_label,
-                             Fonts::infobox, Fonts::map_bold,
-                             Fonts::map_bold);
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   big_plus = new Button(GetClientAreaWindow(), big_button_look, _T("+100"),
                            big_plus_rc,
                            button_style, *this, BigPlus);
@@ -306,15 +303,16 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle checkbox_style;
   checkbox_style.TabStop();
-  show_alternate_units = new CheckBoxControl(GetClientAreaWindow(),
-                                             dialog_look,
-                                             _T("Show feet and meters"),
-                                             show_alternate_units_rc,
-                                             checkbox_style,
-                                             this, AlternateUnits);
+  show_alternate_units.Create(GetClientAreaWindow(),
+                              dialog_look,
+                              _T("Show feet and meters"),
+                              show_alternate_units_rc,
+                              checkbox_style,
+                              *this, AlternateUnits);
+
   const InfoBoxSettings &settings_info_boxes =
       CommonInterface::GetUISettings().info_boxes;
-  show_alternate_units->SetState(settings_info_boxes.show_alternative_altitude_units);
+  show_alternate_units.SetState(settings_info_boxes.show_alternative_altitude_units);
 
   dialog_timer.Schedule(500);
   Refresh();
@@ -331,8 +329,6 @@ AltitudeSimulatorPanel::Unprepare()
   delete(little_minus);
   delete(altitude_value);
   delete(altitude_type);
-  delete(show_alternate_units);
-
 }
 
 AltitudeSimulatorPanel::FinalGlideChart::FinalGlideChart(

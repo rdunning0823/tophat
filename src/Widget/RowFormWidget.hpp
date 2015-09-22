@@ -432,16 +432,6 @@ public:
                    nullable);
   }
 
-  WndProperty *AddFileReader(const TCHAR *label, const TCHAR *help,
-                             const char *registry_key, const TCHAR *filters,
-                             bool nullable,
-                             DataFieldListener *listener) {
-    WndProperty *control = AddFileReader(label, help, registry_key,
-                                         filters, nullable);
-    control->GetDataField()->SetListener(listener);
-    return control;
-  }
-
   /**
    * Add a read-only multi-line control.  You can use
    * SetMultiLineText() to update its text.
