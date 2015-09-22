@@ -244,6 +244,11 @@ protected:
     button1.Move(layout.button1);
   }
 
+private:
+  /* virtual methods from ActionListener */
+  virtual void OnAction(int id) override {
+  }
+
 };
 
 void
