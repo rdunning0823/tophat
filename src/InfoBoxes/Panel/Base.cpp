@@ -69,10 +69,10 @@ BaseAccessPanel::BaseAccessPanel(unsigned _id)
 gcc_pure PixelScalar
 BaseAccessPanel::GetHeaderHeight() {
   const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *bmp = &icons.hBmpTabSettings;
-  const PixelSize bitmap_size = bmp->GetSize();
+  const MaskedIcon &icon = icons.hBmpTabSettings;
+  const PixelSize icon_size = icon.GetSize();
   return (PixelScalar)std::max((unsigned)Layout::Scale(20),
-                               (unsigned)bitmap_size.cy + (unsigned)Layout::Scale(2));
+                               (unsigned)icon_size.cy + (unsigned)Layout::Scale(2));
 }
 
 static gcc_pure PixelScalar
@@ -113,7 +113,7 @@ BaseAccessPanel::Show(const PixelRect &rc)
 {
   if (managed_widget.IsDefined())
     managed_widget.Show();
-  WndForm::ShowModeless();
+  WndForm::ShowModal();
 }
 
 void
@@ -155,6 +155,13 @@ BaseAccessPanel::CalculateLayout(const PixelRect &rc)
   content_rc.bottom -= GetFooterHeight();
 }
 
+void BaseAccessPanel::Unprepare()
+{
+  delete(close_button);
+  delete(setup_button);
+  delete(header_text);
+}
+
 void
 BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
@@ -165,7 +172,6 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
 
   CalculateLayout(rc);
 
@@ -173,16 +179,13 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                      _T("_X"), close_button_rc,
                                      button_style,
                                      *this, CloseButton);
-  AddDestruct(close_button);
   setup_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
                                      _("Setup"), setup_button_rc,
                                      button_style,
                                      *this, SetUp);
-  AddDestruct(setup_button);
   WindowStyle style_frame;
   header_text = new WndFrame(GetClientAreaWindow(), look,
                              frame_rc, style_frame);
-  AddDestruct(header_text);
   header_text->SetVAlignCenter();
   header_text->SetFont(Fonts::infobox_small);
   SetCaption();
