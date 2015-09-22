@@ -143,6 +143,10 @@ class WaypointVisitorMap:
   const TaskBehaviour &task_behaviour;
   const TaskLook &task_look;
   const MoreData &basic;
+  /**
+   * is the ordered task a MAT
+   */
+  bool is_mat;
 
   TCHAR sAltUnit[4];
   bool task_valid;
@@ -169,10 +173,18 @@ public:
      settings(_settings), look(_look), task_behaviour(_task_behaviour),
      task_look(UIGlobals::GetMapLook().task),
      basic(_basic),
+     is_mat(false),
      task_valid(false),
      labels(projection.GetScreenWidth(), projection.GetScreenHeight())
   {
     _tcscpy(sAltUnit, Units::GetAltitudeName());
+  }
+
+  /**
+   * Indicate the ordered task is a MAT
+   */
+  void SetIsMat(bool v) {
+    is_mat = v;
   }
 
 protected:
@@ -382,7 +394,7 @@ protected:
 
 public:
   void Visit(const Waypoint& way_point) override {
-    AddWaypoint(way_point, false);
+    AddWaypoint(way_point, way_point.IsTurnpoint() && is_mat);
   }
 
   void Visit(const TaskPoint &tp) override {
@@ -488,6 +500,8 @@ WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
     ProtectedTaskManager::Lease task_manager(*task);
 
     const TaskStats &task_stats = task_manager->GetStats();
+
+    v.SetIsMat(task_stats.is_mat);
 
     // task items come first, this is the only way we know that an item is in task,
     // and we won't add it if it is already there
