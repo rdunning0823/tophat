@@ -58,7 +58,7 @@ private:
     RightTipAndBody,
 
     /* no part is visible */
-    None,
+    NotVisible,
   };
 
   PixelRect inner_rect;

@@ -92,7 +92,7 @@ SliderShape::GetVisibilityLevel(Canvas &canvas, RasterPoint poly[])
     else
       return RightTip;
   } else
-    return None;
+    return NotVisible;
 }
 
 void
@@ -165,7 +165,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
 
   const VisibilityLevel visibility = GetVisibilityLevel(canvas, poly_raw);
 
-  if (visibility == None)
+  if (visibility == NotVisible)
     return false;
 
 #ifdef _WIN32
@@ -195,7 +195,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
     break;
 
   /* no part is visible */
-  case None:
+  case NotVisible:
     gcc_unreachable();
     break;
   }

@@ -29,6 +29,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "Operation/PopupOperationEnvironment.hpp"
 #include "Simulator.hpp"
+#include "UIGlobals.hpp"
 
 #include <assert.h>
 
@@ -88,7 +89,7 @@ InputEvents::eventDownloadFlightLog(const TCHAR *misc)
   bool found_logger = false;
 
   for (unsigned i = 0; i < NUMDEV; ++i) {
-    DeviceDescriptor &device = *device_list[i];
+    DeviceDescriptor &device = (*devices)[i];
 
     if (device.IsLogger() && device.IsAlive()) {
       found_logger = true;
@@ -96,5 +97,5 @@ InputEvents::eventDownloadFlightLog(const TCHAR *misc)
     }
   }
   if (found_logger)
-    ShowDeviceList(UIGlobals::GetLook().terminal);
+    ShowDeviceList();
 }
