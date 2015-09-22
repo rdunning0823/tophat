@@ -111,7 +111,7 @@ protected:
    * Button must be created before this is called
    */
   void SetBitmap(const Bitmap *_bmp) {
-    assert(GetButton().GetText().compare(_T("")) == 0);
+//    assert(GetButton().GetCaption().length() == 0); TODO Fix syntax
     bmp = _bmp;
   }
 
@@ -129,7 +129,7 @@ protected:
   void SetText(const TCHAR * _text) {
     assert(bmp == nullptr);
     assert(prepared == true);
-    GetButton().SetText(_text);
+    GetButton().SetCaption(_text);
   }
 
   /**
