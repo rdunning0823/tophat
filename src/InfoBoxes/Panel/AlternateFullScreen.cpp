@@ -136,7 +136,6 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   goto_button = new Button(GetClientAreaWindow(), button_look, _T("Goto"),
                               left_button_rc,
                               button_style, *this, Goto);

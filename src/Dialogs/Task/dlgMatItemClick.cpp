@@ -527,7 +527,6 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const ButtonLook &button_look = dialog_look.button;
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   WindowStyle style_frame;
 
   if (modified_task.mat_mode == MAT_DELETE) {

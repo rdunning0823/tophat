@@ -498,7 +498,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
 
   nationality_button = new Button(GetClientAreaWindow(), button_look,
                                 _("Nationality"),

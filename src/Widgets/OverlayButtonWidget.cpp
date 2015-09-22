@@ -113,7 +113,6 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
                                    const PixelRect &rc_map)
 {
   WindowStyle button_style;
-  button_style.multiline();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
   MapOverlayButton *button =

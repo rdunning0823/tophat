@@ -151,7 +151,6 @@ HomePanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   change = new Button(GetClientAreaWindow(), dialog_look.button,
                          _("Select waypoint"),
                          lower_left_rc, button_style, *this, Change);

@@ -221,7 +221,6 @@ TeamCodeFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   set_code_button = new Button(GetClientAreaWindow(), button_look, _T("Set code"),
                                   left_button_rc,
                               button_style, *this, SET_CODE);

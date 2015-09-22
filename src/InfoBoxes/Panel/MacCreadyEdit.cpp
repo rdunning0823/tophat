@@ -281,7 +281,6 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   big_plus = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("^"),
                                  big_plus_rc,
                                  button_style, *this, BigPlus);

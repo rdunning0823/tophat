@@ -309,7 +309,6 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   close = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("_X"),
                               rc_close,
                               button_style, *this, CloseDialogClick);

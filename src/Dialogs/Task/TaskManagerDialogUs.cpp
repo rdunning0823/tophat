@@ -165,7 +165,6 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   fly_button = new WndSymbolButton(GetClientAreaWindow(), look.button, _T("_X"),
                                    rc_fly_button,
                                    button_style, *this, FLY);

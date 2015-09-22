@@ -79,7 +79,6 @@ TaskButtonWidget::CreateButton(ContainerWindow &parent,
                                const PixelRect &rc_map)
 {
   WindowStyle button_style;
-  button_style.multiline();
 
   WndSymbolButton *button = new WndSymbolButton(parent, button_look, caption,
                                                 rc_map, button_style, *this, 0);

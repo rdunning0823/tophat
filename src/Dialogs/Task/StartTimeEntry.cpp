@@ -300,7 +300,6 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
   WindowStyle style_frame;
 
   close = new Button(GetClientAreaWindow(), button_look,

@@ -299,7 +299,6 @@ RowFormWidget::AddSymbolButton(const TCHAR *label, ActionListener &listener, int
 
   WindowStyle button_style;
   button_style.TabStop();
-  button_style.multiline();
 
   ContainerWindow &panel = (ContainerWindow &)GetWindow();
 
