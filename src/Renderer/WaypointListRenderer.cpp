@@ -31,7 +31,7 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/AngleFormatter.hpp"
 #include "Language/Language.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Util/Macros.hpp"
 
 #include <cstdio>
@@ -71,7 +71,7 @@ UPixelScalar
 WaypointListRenderer::GetHeight(const DialogLook &look)
 {
   return look.list.font->GetHeight() + Layout::Scale(6)
-    + look.text_font->GetHeight();
+    + look.text_font.GetHeight();
 }
 
 /**
@@ -121,7 +121,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   const PixelScalar line_height = rc.bottom - rc.top;
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   PixelScalar middle = rc.GetSize().cy > (int)name_font.GetHeight() ?
       rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2 : rc.top;
@@ -175,7 +175,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   const PixelScalar line_height = rc.bottom - rc.top;
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   Buffer buffer;
 
@@ -200,7 +200,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                     buffer.c_str());
 
     // Draw leg bearing
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE, vector->bearing);
+    FormatBearing(buffer.buffer(), buffer.CAPACITY, vector->bearing);
     width = canvas.CalcTextWidth(buffer.c_str());
     canvas.DrawText(rc.right - padding - width, top2,
                     buffer.c_str());
@@ -254,7 +254,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   const PixelScalar line_height = rc.bottom - rc.top;
 
   const Font &name_font = *dialog_look.list.font_bold;
-  const Font &text_font = *dialog_look.text_font;
+  const Font &text_font = dialog_look.text_font;
 
   PixelScalar middle = rc.GetSize().cy > (int)name_font.GetHeight() ?
       rc.top + (rc.GetSize().cy - name_font.GetHeight()) / 2 : rc.top;
@@ -282,7 +282,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
                     buffer.c_str());
 
     // Draw leg bearing
-    FormatBearing(buffer.buffer(), buffer.MAX_SIZE, vector->bearing);
+    FormatBearing(buffer.buffer(), buffer.CAPACITY, vector->bearing);
     width = canvas.CalcTextWidth(buffer.c_str());
     canvas.DrawText(rc.right - padding - width, top2,
                     buffer.c_str());
