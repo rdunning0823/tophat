@@ -33,6 +33,7 @@ struct GeoVector;
 struct DialogLook;
 struct WaypointLook;
 struct WaypointRendererSettings;
+class TwoTextRowsRenderer;
 
 namespace WaypointListRenderer
 {
@@ -44,6 +45,15 @@ namespace WaypointListRenderer
    */
   void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
             const DialogLook &dialog_look, const WaypointLook &look,
+            const WaypointRendererSettings &renderer_settings);
+
+  /**
+   * dummy row_renderer support
+   * @param row_renderer_dummy: unused
+   */
+  void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
+            TwoTextRowsRenderer &row_renderer_dummy,
+            const WaypointLook &look,
             const WaypointRendererSettings &renderer_settings);
 
   /**
