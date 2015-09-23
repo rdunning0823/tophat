@@ -42,6 +42,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Profile/ProfileKeys.hpp"
 #include "Profile/Profile.hpp"
+#include "Repository/FileType.hpp"
 
 #ifdef ANDROID
 #include "Android/NativeView.hpp"
@@ -49,8 +50,20 @@ Copyright_License {
 #endif
 
 #ifdef HAVE_DOWNLOAD_MANAGER
+#include "Repository/Glue.hpp"
+#include "ListPicker.hpp"
+#include "Form/Button.hpp"
+#include "Net/HTTP/DownloadManager.hpp"
+#include "Event/Notify.hpp"
+#include "Thread/Mutex.hpp"
+#include "Event/Timer.hpp"
+
 #include <map>
+#include <set>
+#include <vector>
 #endif
+
+
 
 #include <assert.h>
 #include <windef.h> /* for MAX_PATH */
@@ -133,7 +146,6 @@ ManagedFilePickAndDownloadWidget::Prepare(ContainerWindow &parent, const PixelRe
                                 rc_status,
                                 style_frame);
   RowFormWidget::Add(status_message);
-  status_message->SetFont(*look.list.font);
   status_message->SetCaption(_("Downloading list of files"));
 
   wp_area_filter = AddEnum(_("Continent or Country"),
@@ -209,7 +221,7 @@ ManagedFilePickAndDownloadWidget::LoadRepositoryFile()
     return;
 
   ParseFileRepository(repository, reader);
-  if (file_filter.type == AvailableFile::Type::MAP)
+  if (file_filter.type == FileType::MAP)
     EnhanceAreaNames();
 }
 
@@ -234,48 +246,48 @@ ManagedFilePickAndDownloadWidget::EnhanceAreaNames()
 {
   std::map<std::string, AvailableFile > area_map;
 
-  area_map["alps"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Alps"), AvailableFile::Type::UNKNOWN};
-  area_map["ar"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Argentina"), AvailableFile::Type::UNKNOWN};
-  area_map["at"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Austria"), AvailableFile::Type::UNKNOWN};
-  area_map["au"] = AvailableFile {"", "", "", NarrowString<25ul>("Australia"), NarrowString<25ul>("Australia"), AvailableFile::Type::UNKNOWN};
-  area_map["be"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Belgium"), AvailableFile::Type::UNKNOWN};
-  area_map["bg"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Bulgaria"), AvailableFile::Type::UNKNOWN};
-  area_map["benelux"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Netherlands"), AvailableFile::Type::UNKNOWN};
-  area_map["br"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Brazil"), AvailableFile::Type::UNKNOWN};
-  area_map["ca"] = AvailableFile {"", "", "", NarrowString<25ul>("Canada"), NarrowString<25ul>("Canada"), AvailableFile::Type::UNKNOWN};
-  area_map["ch"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Switzerland"), AvailableFile::Type::UNKNOWN};
-  area_map["cl"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Chile"), AvailableFile::Type::UNKNOWN};
-  area_map["co"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Colombia"), AvailableFile::Type::UNKNOWN};
-  area_map["cz"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Czech Republic"), AvailableFile::Type::UNKNOWN};
-  area_map["cz_sk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Czech Republic"), AvailableFile::Type::UNKNOWN};
-  area_map["de"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Germany"), AvailableFile::Type::UNKNOWN};
-  area_map["dk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Denmark"), AvailableFile::Type::UNKNOWN};
-  area_map["es"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Spain"), AvailableFile::Type::UNKNOWN};
-  area_map["eu"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Europe"), AvailableFile::Type::UNKNOWN};
-  area_map["fi"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Finland"), AvailableFile::Type::UNKNOWN};
-  area_map["fr"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("France"), AvailableFile::Type::UNKNOWN};
-  area_map["hr"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Croatia"), AvailableFile::Type::UNKNOWN};
-  area_map["hu"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Hungary"), AvailableFile::Type::UNKNOWN};
-  area_map["ie"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Ireland"), AvailableFile::Type::UNKNOWN};
-  area_map["il"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Israel"), AvailableFile::Type::UNKNOWN};
-  area_map["it"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Italy"), AvailableFile::Type::UNKNOWN};
-  area_map["jp"] = AvailableFile {"", "", "", NarrowString<25ul>("Japan"), NarrowString<25ul>("Japan"), AvailableFile::Type::UNKNOWN};
-  area_map["lt"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Lithuania"), AvailableFile::Type::UNKNOWN};
-  area_map["lv"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Latvia"), AvailableFile::Type::UNKNOWN};
-  area_map["mx"] = AvailableFile {"", "", "", NarrowString<25ul>("Mexico"), NarrowString<25ul>("Central America"), AvailableFile::Type::UNKNOWN};
-  area_map["na"] = AvailableFile {"", "", "", NarrowString<25ul>("Africa"), NarrowString<25ul>("Namibia"), AvailableFile::Type::UNKNOWN};
-  area_map["nl"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Netherlands"), AvailableFile::Type::UNKNOWN};
-  area_map["no"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Norway"), AvailableFile::Type::UNKNOWN};
-  area_map["nz"] = AvailableFile {"", "", "", NarrowString<25ul>("New Zealand"), NarrowString<25ul>("New Zealand"), AvailableFile::Type::UNKNOWN};
-  area_map["pl"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Poland"), AvailableFile::Type::UNKNOWN};
-  area_map["po"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Poland"), AvailableFile::Type::UNKNOWN};
-  area_map["pt"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Portugal"), AvailableFile::Type::UNKNOWN};
-  area_map["se"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Sweden"), AvailableFile::Type::UNKNOWN};
-  area_map["si"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Slovenia"), AvailableFile::Type::UNKNOWN};
-  area_map["sk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Slovakia"), AvailableFile::Type::UNKNOWN};
-  area_map["uk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("United Kingdom"), AvailableFile::Type::UNKNOWN};
-  area_map["us"] = AvailableFile {"", "", "", NarrowString<25ul>("United States"), NarrowString<25ul>("United States"), AvailableFile::Type::UNKNOWN};
-  area_map["za"] = AvailableFile {"", "", "", NarrowString<25ul>("Africa"), NarrowString<25ul>("South Africa"), AvailableFile::Type::UNKNOWN};
+  area_map["alps"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Alps"), FileType::UNKNOWN};
+  area_map["ar"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Argentina"), FileType::UNKNOWN};
+  area_map["at"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Austria"), FileType::UNKNOWN};
+  area_map["au"] = AvailableFile {"", "", "", NarrowString<25ul>("Australia"), NarrowString<25ul>("Australia"), FileType::UNKNOWN};
+  area_map["be"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Belgium"), FileType::UNKNOWN};
+  area_map["bg"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Bulgaria"), FileType::UNKNOWN};
+  area_map["benelux"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Netherlands"), FileType::UNKNOWN};
+  area_map["br"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Brazil"), FileType::UNKNOWN};
+  area_map["ca"] = AvailableFile {"", "", "", NarrowString<25ul>("Canada"), NarrowString<25ul>("Canada"), FileType::UNKNOWN};
+  area_map["ch"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Switzerland"), FileType::UNKNOWN};
+  area_map["cl"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Chile"), FileType::UNKNOWN};
+  area_map["co"] = AvailableFile {"", "", "", NarrowString<25ul>("South America"), NarrowString<25ul>("Colombia"), FileType::UNKNOWN};
+  area_map["cz"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Czech Republic"), FileType::UNKNOWN};
+  area_map["cz_sk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Czech Republic"), FileType::UNKNOWN};
+  area_map["de"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Germany"), FileType::UNKNOWN};
+  area_map["dk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Denmark"), FileType::UNKNOWN};
+  area_map["es"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Spain"), FileType::UNKNOWN};
+  area_map["eu"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Europe"), FileType::UNKNOWN};
+  area_map["fi"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Finland"), FileType::UNKNOWN};
+  area_map["fr"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("France"), FileType::UNKNOWN};
+  area_map["hr"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Croatia"), FileType::UNKNOWN};
+  area_map["hu"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Hungary"), FileType::UNKNOWN};
+  area_map["ie"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Ireland"), FileType::UNKNOWN};
+  area_map["il"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Israel"), FileType::UNKNOWN};
+  area_map["it"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Italy"), FileType::UNKNOWN};
+  area_map["jp"] = AvailableFile {"", "", "", NarrowString<25ul>("Japan"), NarrowString<25ul>("Japan"), FileType::UNKNOWN};
+  area_map["lt"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Lithuania"), FileType::UNKNOWN};
+  area_map["lv"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Latvia"), FileType::UNKNOWN};
+  area_map["mx"] = AvailableFile {"", "", "", NarrowString<25ul>("Mexico"), NarrowString<25ul>("Central America"), FileType::UNKNOWN};
+  area_map["na"] = AvailableFile {"", "", "", NarrowString<25ul>("Africa"), NarrowString<25ul>("Namibia"), FileType::UNKNOWN};
+  area_map["nl"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Netherlands"), FileType::UNKNOWN};
+  area_map["no"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Norway"), FileType::UNKNOWN};
+  area_map["nz"] = AvailableFile {"", "", "", NarrowString<25ul>("New Zealand"), NarrowString<25ul>("New Zealand"), FileType::UNKNOWN};
+  area_map["pl"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Poland"), FileType::UNKNOWN};
+  area_map["po"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Poland"), FileType::UNKNOWN};
+  area_map["pt"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Portugal"), FileType::UNKNOWN};
+  area_map["se"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Sweden"), FileType::UNKNOWN};
+  area_map["si"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Slovenia"), FileType::UNKNOWN};
+  area_map["sk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("Slovakia"), FileType::UNKNOWN};
+  area_map["uk"] = AvailableFile {"", "", "", NarrowString<25ul>("Europe"), NarrowString<25ul>("United Kingdom"), FileType::UNKNOWN};
+  area_map["us"] = AvailableFile {"", "", "", NarrowString<25ul>("United States"), NarrowString<25ul>("United States"), FileType::UNKNOWN};
+  area_map["za"] = AvailableFile {"", "", "", NarrowString<25ul>("Africa"), NarrowString<25ul>("South Africa"), FileType::UNKNOWN};
 
   for (auto i = repository.begin1(), end = repository.end1(); i != end; ++i) {
     AvailableFile &repo_file = *i;
@@ -290,7 +302,7 @@ ManagedFilePickAndDownloadWidget::EnhanceAreaNames()
 }
 
 const char*
-ManagedFilePickAndDownloadWidget::GetRepositoryUri(AvailableFile::Type type)
+ManagedFilePickAndDownloadWidget::GetRepositoryUri(FileType type)
 {
 #define REPOSITORY_MAP_URI "http://download.xcsoar.org/repository"
 //#define REPOSITORY_URI          "http://downloads.tophatsoaring.org/repository/repository_waypoint_tophat.txt"
@@ -299,15 +311,15 @@ ManagedFilePickAndDownloadWidget::GetRepositoryUri(AvailableFile::Type type)
 
 
   switch (type) {
-  case AvailableFile::Type::MAP:
-  case AvailableFile::Type::FLARMNET:
-  case AvailableFile::Type::UNKNOWN:
+  case FileType::MAP:
+  case FileType::FLARMNET:
+  case FileType::UNKNOWN:
     return REPOSITORY_MAP_URI;
 
-  case AvailableFile::Type::AIRSPACE:
+  case FileType::AIRSPACE:
     return REPOSITORY_AIRSPACE_URI;
 
-  case AvailableFile::Type::WAYPOINT:
+  case FileType::WAYPOINT:
     return REPOSITORY_WAYPOINT_URI;
 
   }
@@ -547,7 +559,7 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
     if ((file_filter.area.empty() || (remote_file.area == file_filter.area)) &&
         (file_filter.subarea.empty() || (remote_file.subarea
             == file_filter.subarea)) &&
-        (file_filter.type == AvailableFile::Type::UNKNOWN ||
+        (file_filter.type == FileType::UNKNOWN ||
             (file_filter.type == remote_file.type)))
       list.push_back(remote_file);
   }
@@ -773,15 +785,15 @@ const TCHAR *
 ManagedFilePickAndDownloadWidget::GetTypeFilterName() const
 {
   switch (file_filter.type) {
-  case AvailableFile::Type::UNKNOWN:
+  case FileType::UNKNOWN:
     return _("all");
-  case AvailableFile::Type::AIRSPACE:
+  case FileType::AIRSPACE:
     return _("airspace");
-  case AvailableFile::Type::WAYPOINT:
+  case FileType::WAYPOINT:
     return _("waypoint");
-  case AvailableFile::Type::MAP:
+  case FileType::MAP:
     return _("map");
-  case AvailableFile::Type::FLARMNET:
+  case FileType::FLARMNET:
     return _("FlarmNet ");
   }
   return _("");
@@ -821,7 +833,7 @@ ShowFilePickAndDownload(AvailableFile &file_filter)
   const TCHAR *message =
       _("Internet download is not available on this device.  Go to tophatsoaring.org/data%20files");
 #ifdef ANDROID
-  if (native_view->GetAPILevel() < 9)
+  if (android_api_level < 9)
     message =
       _("Internet download is not available on this device.  Go to tophatsoaring.org/data%20files");
 #endif

@@ -36,13 +36,13 @@ Copyright_License {
 #include "Repository/FileRepository.hpp"
 #include "UIGlobals.hpp"
 #include "OS/FileUtil.hpp"
-#include "Net/Features.hpp"
+#include "Net/HTTP/Features.hpp"
 #include "Form/List.hpp"
 
 #include <windef.h> /* for MAX_PATH */
-
 #ifdef HAVE_DOWNLOAD_MANAGER
-#include "Net/DownloadManager.hpp"
+
+#include "Net/HTTP/DownloadManager.hpp"
 #include "Event/Notify.hpp"
 #include "Event/Timer.hpp"
 #include "Thread/Mutex.hpp"
@@ -113,7 +113,7 @@ public:
       LocalPath(path, name);
 
       if (File::Exists(path)) {
-        FormatByteSize(size.buffer(), size.MAX_SIZE,
+        FormatByteSize(size.buffer(), size.CAPACITY,
                        File::GetSize(path));
 #ifdef HAVE_POSIX
         FormatISO8601(last_modified.buffer(),
@@ -287,7 +287,7 @@ public:
    * @param type.  type of file
    * @return. URI of repository for specified type of file
    */
-  const char* GetRepositoryUri(AvailableFile::Type type);
+  const char* GetRepositoryUri(FileType type);
 
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);

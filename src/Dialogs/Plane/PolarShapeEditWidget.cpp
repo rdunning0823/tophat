@@ -128,8 +128,8 @@ PolarShapeEditWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
 
   const unsigned row_height = height / 2;
   const unsigned label_width = Layout::Scale(8) +
-    std::max(look.text_font->TextSize(v_text).cx,
-             look.text_font->TextSize(v_text).cx);
+    std::max(look.text_font.TextSize(v_text).cx,
+             look.text_font.TextSize(v_text).cx);
   const UPixelScalar edit_width = (width - label_width) / ARRAY_SIZE(points);
 
   WindowStyle style;

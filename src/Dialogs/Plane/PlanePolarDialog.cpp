@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -127,7 +127,6 @@ PlanePolarWidget::Update()
 
   LoadValue(REFERENCE_MASS, plane.reference_mass, UnitGroup::MASS);
   LoadValue(DRY_MASS, plane.dry_mass, UnitGroup::MASS);
-  UpdatePolarLabel();
 }
 
 void
@@ -193,7 +192,7 @@ PlanePolarWidget::ListClicked()
 
   assert((unsigned)result < len);
 
-  const PolarStore::Item &item = PolarStore::GetItem(list[result].DataFieldIndex);
+  const PolarStore::Item &item = PolarStore::GetItem(list[result].int_value);
 
   plane.reference_mass = fixed(item.reference_mass);
   plane.dry_mass = fixed(item.reference_mass);
@@ -207,7 +206,7 @@ PlanePolarWidget::ListClicked()
 
   plane.polar_shape = item.ToPolarShape();
 
-  plane.polar_name = list[result].StringValue;
+  plane.polar_name = list[result].string_value;
 
   if (item.contest_handicap > 0)
     plane.handicap = item.contest_handicap;
@@ -247,7 +246,7 @@ PlanePolarWidget::ImportClicked()
   assert((unsigned)result < list.size());
 
   PolarInfo polar;
-  const TCHAR* path = list[result].StringValue;
+  const TCHAR* path = list[result].string_value;
   PolarGlue::LoadFromFile(polar, path);
 
   plane.reference_mass = polar.reference_mass;
@@ -262,7 +261,7 @@ PlanePolarWidget::ImportClicked()
 
   plane.polar_shape = polar.shape;
 
-  plane.polar_name = list[result].StringValueFormatted;
+  plane.polar_name = list[result].display_string;
 
   Update();
 }
@@ -299,8 +298,8 @@ dlgPlanePolarShowModal(Plane &_plane)
   WidgetDialog dialog(look);
   PlanePolarWidget widget(_plane, look);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), caption, &widget);
-  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
+  dialog.AddButton(_("OK"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   const int result = dialog.ShowModal();
   dialog.StealWidget();

@@ -135,7 +135,7 @@ static UPixelScalar
 GetRowHeight(const DialogLook &look)
 {
   return look.list.font_bold->GetHeight() + Layout::Scale(6)
-    + look.small_font->GetHeight();
+    + look.small_font.GetHeight();
 }
 
 /**
@@ -219,7 +219,7 @@ PlaneListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned i)
 
   const DialogLook &look = UIGlobals::GetDialogLook();
   const Font &name_font = *look.list.font_bold;
-  const Font &details_font = *look.small_font;
+  const Font &details_font = look.small_font;
 
   canvas.Select(name_font);
 
@@ -227,7 +227,7 @@ PlaneListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned i)
   if (PlaneGlue::ReadFile(plane, list[i].path)) {
     canvas.DrawClippedText(rc.left + Layout::FastScale(2),
                            rc.top + Layout::FastScale(2), rc,
-                           plane.registration.get());
+                           plane.registration.c_str());
 
     if (Profile::GetPathIsEqual("PlanePath", list[i].path)) {
       StaticString<256> buffer;
@@ -243,11 +243,11 @@ PlaneListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned i)
     StaticString<5> slash(_T(" / "));
     if (plane.type.empty() || plane.competition_id.empty())
       slash.clear();
-    plane_desc.Format(_T("%s%s%s"), plane.type.get(), slash.get(),
-                      plane.competition_id.get());
+    plane_desc.Format(_T("%s%s%s"), plane.type.c_str(), slash.c_str(),
+                      plane.competition_id.c_str());
     canvas.DrawClippedText(rc.left + Layout::FastScale(2),
                            rc.top + name_font.GetHeight() + Layout::FastScale(4),
-                           rc, plane_desc.get());
+                           rc, plane_desc.c_str());
   }
 }
 
