@@ -24,11 +24,8 @@ Copyright_License {
 #include "Dialogs/Task/TaskEditorDialog.hpp"
 #include "Dialogs/Task/TaskDialogs.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
-#include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/XML.hpp"
 #include "Dialogs/Message.hpp"
 #include "Form/Form.hpp"
-#include "Form/Util.hpp"
 #include "Form/Edit.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Draw.hpp"
@@ -39,6 +36,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Screen/Font.hpp"
 #include "Screen/Canvas.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "Components.hpp"
 #include "Dialogs/Task/dlgTaskHelpers.hpp"
 #include "Units/Units.hpp"
@@ -79,28 +77,98 @@ Copyright_License {
 #include <assert.h>
 #include <stdio.h>
 
-static WndForm *wf = nullptr;
-static DockWindow *dock;
-static ObservationZoneEditWidget *properties_widget;
-static ObservationZoneSummaryWidget *properties_summary_widget;
-ListControl *wTaskPoints;
-static OrderedTask* ordered_task = nullptr;
-static OrderedTask** ordered_task_pointer = nullptr;
-static bool task_modified = false;
-static unsigned active_index = 0;
-/**
- * tells calling program if modified, not modified or should be reverted
- */
-TaskEditorReturn task_editor_return;
+gcc_const
+static WindowStyle
+GetDialogStyle()
+{
+  WindowStyle style;
+  style.Hide();
+  style.ControlParent();
+  return style;
+}
 
-// setting to True during refresh so control values don't trigger form save
-static bool Refreshing = false;
+enum Actions {
+  TaskPropertiesClick = 100,
+  BrowseClick,
+  AddClick,
+  RelocateClick,
+  RemoveClick,
+  ZoneTypeClick,
+  CloseClick,
+};
 
-class TaskPointUsDialog : public ListItemRenderer, public ListCursorHandler {
+class TaskPointUsDialog : public NullWidget, public WndForm,
+  public ListItemRenderer, public ListCursorHandler,
+  public ObservationZoneEditWidget::Listener {
 public:
+
+  // setting to True during refresh so control values don't trigger form save
+  bool refreshing;
+  DockWindow dock;
+
+  OrderedTask* ordered_task;
+  OrderedTask** ordered_task_pointer;
+  bool task_modified;
+  unsigned active_index;
+  /**
+   * tells calling program if modified, not modified or should be reverted
+   */
+  TaskEditorReturn task_editor_return;
+
+
+  /**
+   *  one of these two widgets is displayed in the dock
+   */
+  ObservationZoneEditWidget *properties_widget;
+  ObservationZoneSummaryWidget *properties_summary_widget;
+
+  ListControl waypoint_list;
+  WndSymbolButton close_button;
+  Button zone_type_button;
+  Button add_button;
+  Button task_properties_button;
+  Button browse_button;
+  Button relocate_button;
+  Button remove_button;
+  Button type_button;
+  Button properties_button;
+
+  PixelRect rc_task_properties_button;
+  PixelRect rc_close_button;
+  PixelRect rc_zone_type_button;
+  PixelRect rc_add_button;
+  PixelRect rc_browse_button;
+  PixelRect rc_relocate_button;
+  PixelRect rc_remove_button;
+  PixelRect rc_type_button;
+  PixelRect rc_properties_button;
+  PixelRect rc_dock;
+  PixelRect rc_waypoint_list;
+
+  TaskPointUsDialog(OrderedTask** _task_pointer,
+                    const unsigned _index)
+  :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
+           UIGlobals::GetMainWindow().GetClientRect(),
+           _T(""), GetDialogStyle()), refreshing(false),
+           ordered_task(nullptr), ordered_task_pointer(_task_pointer),
+           task_modified(false), active_index(_index),
+           task_editor_return(TaskEditorReturn::TASK_NOT_MODIFIED),
+           waypoint_list(UIGlobals::GetDialogLook()) {}
+
+  /* virtual methods from Widget */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
+  virtual bool Save(bool &changed);
+  virtual void Show(const PixelRect &rc);
+  virtual void Hide() {};
+  virtual void Move(const PixelRect &rc);
+
   /* virtual methods from ListItemRenderer */
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
                            unsigned idx) override;
+
+  /* virtual method from ObservationZoneEditWidget */
+  void OnModified(ObservationZoneEditWidget &widget);
 
   /* virtual methods from ListCursorHandler */
   virtual void OnCursorMoved(unsigned index) override;
@@ -110,18 +178,78 @@ public:
   }
 
   virtual void OnActivateItem(unsigned index) override;
+
+  /**
+   * from ActionListener
+   */
+  virtual void OnAction(int id);
+
+  /**
+   * converts last point to finish if it is not already.
+   * @return true if task is valid
+   */
+  bool CheckAndFixTask();
+  void OnCloseClicked();
+  /* shows fields if task exists, else hides them */
+  void ShowDetails(bool visible);
+  void RefreshTaskProperties();
+  void RefreshView();
+  void ReadValues();
+  void OnRemoveClicked();
+  void OnTaskPropertiesClicked();
+  /**
+   * shows the task browse dialog, and updates the task as needed
+   */
+  void OnBrowseClicked();
+
+  void SetRectangles(const PixelRect rc_outer);
+
+  /* creates a new oz edit widget of appropriate type. */
+  ObservationZoneEditWidget *
+  CreateObservationZoneEditWidget(ObservationZonePoint &oz,
+                                  bool is_fai_general);
+  /**
+   * inserts or appends to task
+   * @param insert_index the index of the new point
+   * @param reference_location the reference point to pass to the waypoint list
+   */
+  void AddInsertTurnpoint(const unsigned insert_index,
+                          const GeoPoint &reference_location);
+
+  /**
+   * appends tp to end of task
+   */
+  void AppendTurnpoint();
+
+  /**
+   * inserts turnpoint prior to index of selected item
+   * active_index can be 0 to TaskSize() (i.e. append)
+   */
+  void InsertTurnpoint(const unsigned active_index);
+
+  /**
+   * appends or inserts a task point after the current item
+   */
+  void OnAddClicked();
+  void OnRelocateClicked();
+  void OnTypeClicked();
+
+  OrderedTask* GetOrderedTask() {
+    return ordered_task;
+  }
+  bool IsModified() {
+    return task_modified;
+  }
+
+  /* returns the revert, not modified or save state of the task */
+  TaskEditorReturn GetReturnMode() {
+    return task_editor_return;
+  }
 };
 
-class TPOZListenerUs : public ObservationZoneEditWidget::Listener {
-public:
-  /* virtual methods from class ObservationZoneEditWidget::Listener */
-  virtual void OnModified(ObservationZoneEditWidget &widget) override;
-};
-
-static TPOZListenerUs listener;
-
-static ObservationZoneEditWidget *
-CreateObservationZoneEditWidget(ObservationZonePoint &oz, bool is_fai_general)
+ObservationZoneEditWidget *
+TaskPointUsDialog::CreateObservationZoneEditWidget(ObservationZonePoint &oz,
+                                                   bool is_fai_general)
 {
   switch (oz.GetShape()) {
   case ObservationZone::Shape::SECTOR:
@@ -157,7 +285,7 @@ CreateObservationZoneEditWidget(ObservationZonePoint &oz, bool is_fai_general)
  * @param ftype. task type being checked
  */
 static bool
-IsFai(TaskFactoryType ftype)
+IsFaiFactory(TaskFactoryType ftype)
 {
   return (ftype == TaskFactoryType::FAI_GENERAL) ||
       (ftype == TaskFactoryType::FAI_GOAL) ||
@@ -169,8 +297,8 @@ IsFai(TaskFactoryType ftype)
  * converts last point to finish if it is not already.
  * @return true if task is valid
  */
-static bool
-CheckAndFixTask()
+bool
+TaskPointUsDialog::CheckAndFixTask()
 {
   if (!task_modified)
     return true;
@@ -182,11 +310,33 @@ CheckAndFixTask()
   return (ordered_task->TaskSize() == 0) || ordered_task->CheckTask();
 }
 
-static void
-OnCloseClicked(gcc_unused Button &Sender)
+void
+TaskPointUsDialog::OnAction(int id)
+{
+  switch (id) {
+  case TaskPropertiesClick:
+    break;
+  case BrowseClick:
+    break;
+  case AddClick:
+    break;
+  case RelocateClick:
+    break;
+  case RemoveClick:
+    break;
+  case ZoneTypeClick:
+    break;
+  case CloseClick:
+    OnCloseClicked();
+    break;
+  }
+}
+
+void
+TaskPointUsDialog::OnCloseClicked()
 {
   if (CheckAndFixTask())
-    wf->SetModalResult(mrOK);
+    SetModalResult(mrOK);
   else {
 
     ShowMessageBox(getTaskValidationErrors(
@@ -196,32 +346,43 @@ OnCloseClicked(gcc_unused Button &Sender)
     if (ShowMessageBox(_("Task not valid. Changes will be lost. Continue?"),
                         _("Task Manager"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK) {
       task_editor_return = TaskEditorReturn::TASK_REVERT;
-      wf->SetModalResult(mrOK);
+      SetModalResult(mrOK);
     }
   }
 }
 
-static void
-ShowDetails(bool visible)
+void
+TaskPointUsDialog::ShowDetails(bool visible)
 {
-  PanelControl *p = (PanelControl*)wf->FindByName(_T("frmDetails"));
-  assert(p != nullptr);
-  p->SetVisible(visible);
+/*
+  List Name="List" X="0" Y="113" Width="150" Height="-37"/>
 
-  Button *button_add = (Button*) wf->FindByName(_T("butAdd"));
-  assert (button_add != nullptr);
-  button_add->SetVisible(!ordered_task->IsFull());
+      <Panel Name="frmButtons" X="157" Y="109" Width="75" Height="105" Border="0">
+        <Button Name="butRelocate" Caption="Replace" X="0" Y="35" Width="73" Height="35" OnClick="OnRelocateClicked"/>
+        <Button Name="butRemove" Caption="Delete" X="0" Y="70" Width="73" Height="35" OnClick="OnRemoveClicked"/>
+      </Panel>
+
+      <Panel Name="frmType" X="0" Y="38" Width="150" Height="73" Border="1">
+        <Button Name="butType" Caption="Change Type" X="2" Y="3" Width="145" Height="35" OnClick="OnTypeClicked"/>
+
+        <Widget Name="properties" X="2" Y="40" Width="145" Height="35"/>
+*/
+
+  relocate_button.SetVisible(visible);
+  remove_button.SetVisible(visible);
+  relocate_button.SetVisible(visible);
+  zone_type_button.SetVisible(visible);
+
+  add_button.SetVisible(!ordered_task->IsFull());
   if (visible)
-    button_add->SetCaption(_("Insert before"));
+    add_button.SetCaption(_("Insert before"));
   else
-    button_add->SetCaption(_("Insert"));
+    add_button.SetCaption(_("Insert"));
 }
 
-static void
-RefreshTaskProperties()
+void
+TaskPointUsDialog::RefreshTaskProperties()
 {
-  Button *button_properties = (Button*) wf->FindByName(_T("butTaskProperties"));
-  assert (button_properties != nullptr);
   StaticString<255> line_1;
   StaticString<255> line_2;
   StaticString<255> both_lines;
@@ -231,12 +392,12 @@ RefreshTaskProperties()
   line_1 = OrderedTaskFactoryName(ftype);
 
   if (ordered_task->GetNameIsBlank())
-    wf->SetCaption(line_1.c_str());
+    SetCaption(line_1.c_str());
   else
-    wf->SetCaption(ordered_task->GetName());
+    SetCaption(ordered_task->GetName());
 
-  if (IsFai(ordered_task->GetFactoryType())) {
-    button_properties->SetCaption(line_1.c_str());
+  if (IsFaiFactory(ordered_task->GetFactoryType())) {
+    task_properties_button.SetCaption(line_1.c_str());
     return;
   }
 
@@ -269,52 +430,42 @@ RefreshTaskProperties()
 
   line_2.Format(_T("%s, %s"), text_start.c_str(), text_finish.c_str());
   both_lines.Format(_T("%s\n%s"), line_1.c_str(), line_2.c_str());
-  button_properties->SetCaption(both_lines.c_str());
+  task_properties_button.SetCaption(both_lines.c_str());
 }
 
-static void
-RefreshView()
+void
+TaskPointUsDialog::RefreshView()
 {
-  wTaskPoints->SetLength(ordered_task->TaskSize() + 1);
+  waypoint_list.SetLength(ordered_task->TaskSize() + 1);
 
-  wTaskPoints->SetCursorIndex(active_index);
+  waypoint_list.SetCursorIndex(active_index);
 
   RefreshTaskProperties();
 
   ShowDetails(ordered_task->TaskSize() != 0);
 
-  Button *button_type = (Button*) wf->FindByName(_T("butType"));
-  assert (button_type != nullptr);
 
-  Button *button_relocate = (Button*) wf->FindByName(_T("butRelocate"));
-  assert (button_relocate != nullptr);
-  button_relocate->SetVisible(active_index != ordered_task->TaskSize());
-
-  Button *button_remove = (Button*) wf->FindByName(_T("butRemove"));
-  assert (button_remove != nullptr);
-  button_remove->SetVisible(active_index != ordered_task->TaskSize());
-
-  Button *button_add = (Button*) wf->FindByName(_T("butAdd"));
-  assert (button_add != nullptr);
-  button_add->SetVisible(active_index != ordered_task->TaskSize() ||
+  relocate_button.SetVisible(active_index != ordered_task->TaskSize());
+  remove_button.SetVisible(active_index != ordered_task->TaskSize());
+  add_button.SetVisible(active_index != ordered_task->TaskSize() ||
                          ordered_task->TaskSize() == 0);
 
   if (ordered_task->TaskSize() == 0 ||
       active_index == ordered_task->TaskSize()) {
-    dock->SetWidget(nullptr);
-    button_type->SetVisible(false);
+    dock.SetWidget(nullptr);
+    zone_type_button.SetVisible(false);
     return;
   }
-  button_type->SetVisible(true);
+  zone_type_button.SetVisible(true);
 
   if (active_index == ordered_task->TaskSize())
     return;
 
   OrderedTaskPoint &tp = ordered_task->GetPoint(active_index);
 
-  Refreshing = true; // tell onChange routines not to save form!
+  refreshing = true; // tell onChange routines not to save form!
 
-  dock->SetWidget(new PanelWidget());
+  dock.SetWidget(new PanelWidget());
 
   ObservationZonePoint &oz = tp.GetObservationZone();
   const bool is_fai_general =
@@ -324,30 +475,32 @@ RefreshView()
   if (properties_widget != nullptr) {
 
     properties_widget->SetWaypointName(tp.GetWaypoint().name.c_str());
-    properties_widget->SetListener(&listener);
+    properties_widget->SetListener(this);
 
     if (properties_widget->IsSummarized()) {
       properties_summary_widget = new
           ObservationZoneSummaryWidget(*properties_widget);
-      dock->SetWidget(properties_summary_widget);
+      dock.SetWidget(properties_summary_widget);
     } else {
-      dock->SetWidget(properties_widget);
+      dock.SetWidget(properties_widget);
     }
   }
+
+  //TODO: memory leak here.  Need to delete these; dock.DeleteWidget()
 
   TrivialArray<TaskPointFactoryType, LegalPointSet::N> point_types;
   point_types.clear();
   ordered_task->GetFactory().GetValidTypes(active_index)
     .CopyTo(std::back_inserter(point_types));
-  button_type->SetVisible(point_types.size() > 1u);
+  zone_type_button.SetVisible(point_types.size() > 1u);
 
-  button_type->SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
+  zone_type_button.SetCaption(OrderedTaskPointName(ordered_task->GetFactory().GetType(tp)));
 
-  Refreshing = false; // reactivate onChange routines
+  refreshing = false; // reactivate onChange routines
 }
 
-static void
-ReadValues()
+void
+TaskPointUsDialog::ReadValues()
 {
   if (properties_widget != nullptr)
     properties_widget->Save(task_modified);
@@ -355,8 +508,8 @@ ReadValues()
     properties_summary_widget->Save(task_modified);
 }
 
-static void 
-OnRemoveClicked(gcc_unused Button &Sender)
+void
+TaskPointUsDialog::OnRemoveClicked()
 {
   assert(active_index < ordered_task->TaskSize());
 
@@ -390,31 +543,24 @@ OnRemoveClicked(gcc_unused Button &Sender)
   RefreshView();
 }
 
-static void
-OnTaskPropertiesClicked(gcc_unused Button &Sender)
+void
+TaskPointUsDialog::OnTaskPropertiesClicked()
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
   dlgTaskPropertiesUsShowModal(look, &ordered_task, task_modified);
   RefreshView();
 }
-/**
- * shows the task browse dialog, and updates the task as needed
- */
-static void
-OnBrowseClicked(gcc_unused Button &Sender)
+
+void
+TaskPointUsDialog::OnBrowseClicked()
 {
   dlgTaskListUsShowModal(ordered_task_pointer, task_modified);
   ordered_task = *ordered_task_pointer;
   RefreshView();
 }
 
-/**
- * inserts or appends to task
- * @param insert_index the index of the new point
- * @param reference_location the reference point to pass to the waypoint list
- */
-static void
-AddInsertTurnpoint(const unsigned insert_index,
+void
+TaskPointUsDialog::AddInsertTurnpoint(const unsigned insert_index,
                    const GeoPoint &reference_location)
 {
   assert(insert_index <= ordered_task->TaskSize());
@@ -452,11 +598,8 @@ AddInsertTurnpoint(const unsigned insert_index,
   RefreshView();
 }
 
-/**
- * appends tp to end of task
- */
-static void
-AppendTurnpoint()
+void
+TaskPointUsDialog::AppendTurnpoint()
 {
   unsigned task_size = ordered_task->TaskSize();
   assert(task_size > 0);
@@ -465,12 +608,8 @@ AppendTurnpoint()
                      ordered_task->GetPoint(task_size - 1).GetLocation());
 }
 
-/**
- * inserts turnpoint prior to index of selected item
- * active_index can be 0 to TaskSize() (i.e. append)
- */
-static void
-InsertTurnpoint(const unsigned active_index)
+void
+TaskPointUsDialog::InsertTurnpoint(const unsigned active_index)
 {
   if (active_index == ordered_task->TaskSize() &&
       active_index > 0) {
@@ -489,11 +628,8 @@ InsertTurnpoint(const unsigned active_index)
   AddInsertTurnpoint(active_index, *point);
 }
 
-/**
- * appends or inserts a task point after the current item
- */
-static void
-OnAddClicked(gcc_unused Button &Sender)
+void
+TaskPointUsDialog::OnAddClicked()
 {
   assert(!ordered_task->IsFull());
   if (active_index == ordered_task->TaskSize() &&
@@ -503,8 +639,8 @@ OnAddClicked(gcc_unused Button &Sender)
     InsertTurnpoint(active_index);
 }
 
-static void
-OnRelocateClicked(gcc_unused Button &Sender)
+void
+TaskPointUsDialog::OnRelocateClicked()
 {
   assert (active_index < ordered_task->TaskSize());
 
@@ -523,30 +659,18 @@ OnRelocateClicked(gcc_unused Button &Sender)
   RefreshView();
 }
 
-static void
-OnTypeClicked(gcc_unused Button &Sender)
+void
+TaskPointUsDialog::OnTypeClicked()
 {
-  if (dlgTaskPointType(&ordered_task, active_index)) {
+  if (dlgTaskPointType(*ordered_task, active_index)) {
     task_modified = true;
     RefreshView();
     ordered_task->ScanStartFinish();
   }
 }
 
-static constexpr CallBackTableEntry CallBackTable[] = {
-
-  DeclareCallBackEntry(OnTaskPropertiesClicked),
-  DeclareCallBackEntry(OnCloseClicked),
-  DeclareCallBackEntry(OnRemoveClicked),
-  DeclareCallBackEntry(OnBrowseClicked),
-  DeclareCallBackEntry(OnAddClicked),
-  DeclareCallBackEntry(OnRelocateClicked),
-  DeclareCallBackEntry(OnTypeClicked),
-  DeclareCallBackEntry(nullptr)
-};
-
 void
-TPOZListenerUs::OnModified(ObservationZoneEditWidget &widget)
+TaskPointUsDialog::OnModified(ObservationZoneEditWidget &widget)
 {
   ReadValues();
 }
@@ -583,7 +707,7 @@ TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned Draw
   const DialogLook &look = UIGlobals::GetDialogLook();
 
   const Font &name_font = *look.button.font;
-  const Font &text_font = *look.text_font;
+  const Font &text_font = look.text_font;
   const unsigned padding = Layout::GetTextPadding();
   const PixelScalar line_height = rc.bottom - rc.top;
 
@@ -619,43 +743,117 @@ TaskPointUsDialog::OnPaintItem(Canvas &canvas, const PixelRect rc, unsigned Draw
                       rc.right - left, buffer);
 }
 
+void
+TaskPointUsDialog::SetRectangles(const PixelRect rc_outer)
+{
+  unsigned button_height = Layout::Scale(35);
+  unsigned button_width = Layout::Scale(73);
+
+  rc_dock.left = 0;
+  rc_dock.right = Layout::Scale(150);
+  rc_dock.top = Layout::Scale(40);
+  rc_dock.bottom = rc_outer.top + button_height;
+
+  rc_waypoint_list.left = 0;
+  rc_waypoint_list.right = Layout::Scale(150);
+  rc_waypoint_list.bottom = rc_outer.bottom - button_height;
+  rc_waypoint_list.top = Layout::Scale(113);
+
+  rc_task_properties_button.left = Layout::Scale(2);
+  rc_task_properties_button.right = rc_task_properties_button.left + Layout::Scale(236);
+  rc_task_properties_button.top = Layout::Scale(2);
+  rc_task_properties_button.bottom = rc_task_properties_button.top + button_height;
+
+  rc_close_button.left = 0;
+  rc_close_button.right = Layout::Scale(150);
+  rc_close_button.bottom = rc_outer.bottom;
+  rc_close_button.top = rc_outer.bottom - button_height;
+
+  rc_browse_button.left = Layout::Scale(157);
+  rc_browse_button.right = rc_browse_button.left + button_width;
+  rc_browse_button.top = Layout::Scale(38);
+  rc_browse_button.bottom = rc_browse_button.top + button_height;
+
+  rc_add_button.left = Layout::Scale(157);
+  rc_add_button.right = rc_add_button.left + button_width;
+  rc_add_button.top = Layout::Scale(109);
+  rc_add_button.bottom = rc_add_button.top + button_height;
+
+  rc_relocate_button.left = Layout::Scale(157);
+  rc_relocate_button.right = rc_relocate_button.left + button_width;
+  rc_relocate_button.top = Layout::Scale(147);
+  rc_relocate_button.bottom = rc_relocate_button.top + button_height;
+
+  rc_remove_button.left = Layout::Scale(157);
+  rc_remove_button.right = rc_remove_button.left + button_width;
+  rc_remove_button.top = Layout::Scale(185);
+  rc_remove_button.bottom = rc_remove_button.top + button_height;
+
+  rc_zone_type_button.left = Layout::Scale(2);
+  rc_zone_type_button.right = Layout::Scale(146);
+  rc_zone_type_button.top = Layout::Scale(38);
+  rc_zone_type_button.bottom = rc_zone_type_button.top + button_height;;
+
+}
+
+
+void
+TaskPointUsDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  const PixelRect rc_form = rc;
+  NullWidget::Prepare(parent, rc_form);
+  WndForm::Move(rc_form);
+
+  SetRectangles(rc_form);
+  WindowStyle style_frame;
+  const DialogLook &look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
+
+  unsigned line_height = look.list.font->GetHeight()
+        + Layout::Scale(6) + look.text_font.GetHeight();
+  waypoint_list.Create(GetClientAreaWindow(), rc_waypoint_list, style_frame,
+                       line_height);
+
+  task_properties_button.Create(GetClientAreaWindow(), button_look, _T("*"),
+                                rc_task_properties_button,
+                                style_frame, *this, TaskPropertiesClick);
+  close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
+                      rc_close_button,
+                      style_frame, *this, CloseClick);
+  zone_type_button.Create(GetClientAreaWindow(), button_look, _T("*"),
+                      rc_zone_type_button,
+                      style_frame, *this, ZoneTypeClick);
+
+  browse_button.Create(GetClientAreaWindow(), button_look, _("Browse"),
+                       rc_browse_button,
+                       style_frame, *this, BrowseClick);
+  add_button.Create(GetClientAreaWindow(), button_look, _("Insert before"),
+                    rc_add_button,
+                    style_frame, *this, AddClick);
+  relocate_button.Create(GetClientAreaWindow(), button_look, _T("Replace"),
+                         rc_relocate_button,
+                         style_frame, *this, RelocateClick);
+  remove_button.Create(GetClientAreaWindow(), button_look, _T("Delete"),
+                       rc_remove_button,
+                       style_frame, *this, RemoveClick);
+  RefreshView();
+}
+
+
 TaskEditorReturn
 dlgTaskEditorShowModal(OrderedTask** task_pointer,
                       const unsigned index)
 {
-  ordered_task = *task_pointer;
-  ordered_task_pointer = task_pointer;
-  task_modified = false;
-  task_editor_return = TaskEditorReturn::TASK_NOT_MODIFIED;
-  active_index = index;
 
-  wf = LoadDialog(CallBackTable, UIGlobals::GetMainWindow(),
-                  Layout::landscape ? _T("IDR_XML_TASKEDITOR_L") :
-                                      _T("IDR_XML_TASKEDITOR"));
-  assert(wf != nullptr);
+  ContainerWindow &w = UIGlobals::GetMainWindow();
+  TaskPointUsDialog *instance = new TaskPointUsDialog(task_pointer, index);
+  ManagedWidget managed_widget(w, instance);
+  managed_widget.Move(w.GetClientRect());
+  managed_widget.Show();
+  instance->ShowModal();
 
-  dock = (DockWindow *)wf->FindByName(_T("properties"));
-  assert(dock != nullptr);
-
-  const DialogLook &look = UIGlobals::GetDialogLook();
-
-  TaskPointUsDialog dialog2;
-
-  wTaskPoints = (ListControl*)wf->FindByName(_T("List"));
-  assert(wTaskPoints != nullptr);
-
-  wTaskPoints->SetItemRenderer(&dialog2);
-  wTaskPoints->SetCursorHandler(&dialog2);
-  UPixelScalar line_height = look.list.font->GetHeight()
-    + Layout::Scale(6) + look.text_font->GetHeight();
-  wTaskPoints->SetItemHeight(line_height);
-
-  RefreshView();
-
-  wf->ShowModal();
-
-  delete wf;
-
+  bool task_modified = instance->IsModified();
+  OrderedTask* ordered_task = instance->GetOrderedTask();
   if (*task_pointer != ordered_task) {
     *task_pointer = ordered_task;
     task_modified = true;
@@ -664,10 +862,11 @@ dlgTaskEditorShowModal(OrderedTask** task_pointer,
     ordered_task->UpdateGeometry();
   }
 
-  if (task_editor_return == TaskEditorReturn::TASK_REVERT)
-    return task_editor_return;
+  if (instance->GetReturnMode() == TaskEditorReturn::TASK_REVERT)
+    return instance->GetReturnMode();
   else if (task_modified)
     return TaskEditorReturn::TASK_MODIFIED;
 
   return TaskEditorReturn::TASK_NOT_MODIFIED;
 }
+

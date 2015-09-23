@@ -170,7 +170,7 @@ StartTimeEntry::SetRectangles(const PixelRect &rc_outer)
   PixelRect rc;
   UPixelScalar side_margin = Layout::landscape ? Layout::Scale(10) : Layout::Scale(4);
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  unsigned line_height = dialog_look.text_font->TextSize(_T("A")).cy * 1.5;
+  unsigned line_height = dialog_look.text_font.TextSize(_T("A")).cy * 1.5;
 
   rc.left = rc_outer.left + side_margin;
   rc.top = rc_outer.left + Layout::Scale(2);
@@ -267,7 +267,7 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   SetCaption(_("Task start"));
   start_label_text.Format(_T("%s:  "), _("Start time"));
-  start_label_width = dialog_look.text_font->TextSize(start_label_text.c_str()).cx;
+  start_label_width = dialog_look.text_font.TextSize(start_label_text.c_str()).cx;
 
   /* create the input control widget*/
   WindowStyle control_style;

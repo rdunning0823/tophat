@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2015 The XCSoar Project
+  Copyright (C) 2000-2013 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@ Copyright_License {
 #include "Dialogs/WidgetDialog.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Screen/Layout.hpp"
-#include "Widget/ListWidget.hpp"
 #include "Screen/Font.hpp"
 #include "Look/DialogLook.hpp"
 #include "Components.hpp"
@@ -35,72 +34,16 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/MapLook.hpp"
 #include "Renderer/WaypointListRenderer.hpp"
-#include "Renderer/TwoTextRowsRenderer.hpp"
 #include "Language/Language.hpp"
 #include "Form/Form.hpp"
 #include "Widget/TwoWidgets.hpp"
 
-class AlternatesListWidget final
-  : public ListWidget, private ActionListener {
-  enum Buttons {
-    SETTINGS,
-    GOTO,
-  };
-
-  const DialogLook &dialog_look;
-
-  TwoTextRowsRenderer row_renderer;
-
-  Button *details_button, *cancel_button, *goto_button;
-
-public:
-  AlternateList alternates;
 
 const TCHAR *distance_label_text = N_("Distance");
 const TCHAR *arrival_alt_label_text = N_("Arrival alt");
 
 /* used by item Draw() to match column headers with row data */
 static unsigned distance_label_width;
-public:
-  AlternatesListWidget(const DialogLook &_dialog_look)
-    :dialog_look(_dialog_look) {}
-
-  unsigned GetCursorIndex() const {
-    return GetList().GetCursorIndex();
-  }
-
-  bool Update() {
-    ProtectedTaskManager::Lease lease(*protected_task_manager);
-    alternates = lease->GetAlternates();
-    return !alternates.empty();
-  }
-
-public:
-  /* virtual methods from class Widget */
-  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  void Unprepare() override {
-    DeleteWindow();
-  }
-
-  /* virtual methods from class List::Handler */
-  void OnPaintItem(Canvas &canvas, const PixelRect rc,
-                   unsigned index) override {
-    assert(index < alternates.size());
-
-    const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-    const Waypoint &waypoint = alternates[index].waypoint;
-    const GlideResult& solution = alternates[index].solution;
-
-    WaypointListRenderer::Draw(canvas, rc, waypoint, solution.vector.distance,
-                               solution.SelectAltitudeDifference(settings.task.glide),
-                               row_renderer,
-                               UIGlobals::GetMapLook().waypoint,
-                               CommonInterface::GetMapSettings().waypoint);
-  }
-
-  bool CanActivateItem(unsigned index) const  override{
-    return true;
-  }
 
 void
 AlternatesListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
@@ -138,9 +81,11 @@ AlternatesListWidget::CreateButtons(WidgetDialog &dialog)
 void
 AlternatesListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  CreateList(parent, dialog_look, rc,
-             row_renderer.CalculateLayout(*dialog_look.list.font_bold,
-                                          dialog_look.small_font));
+  UPixelScalar item_height = dialog_look.list.font_bold->GetHeight()
+    + Layout::Scale(6) + dialog_look.small_font.GetHeight();
+  assert(item_height > 0);
+
+  CreateList(parent, dialog_look, rc, item_height);
 
   GetList().SetLength(alternates.size());
 }
@@ -226,9 +171,9 @@ void
 AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  PixelSize sz_space = dialog_look.text_font->TextSize(_T(" "));
+  PixelSize sz_space = dialog_look.text_font.TextSize(_T(" "));
   distance_label_width =
-      dialog_look.text_font->TextSize(distance_label_text).cx + 5 * sz_space.cx;
+      dialog_look.text_font.TextSize(distance_label_text).cx + 5 * sz_space.cx;
 
   unsigned spaces_needed = rc.GetSize().cx / 2 / sz_space.cx;
   StaticString<100> spaces (_T("                                                                                                    "));
@@ -278,7 +223,6 @@ dlgAlternatesListShowModal()
   widget->SetForm(&dialog);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Alternates"), two_widgets);
   widget->CreateButtons(dialog);
-  dialog.EnableCursorSelection();
 
   int i = dialog.ShowModal() == mrOK
     ? (int)widget->GetCursorIndex()

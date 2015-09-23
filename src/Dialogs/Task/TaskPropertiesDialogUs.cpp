@@ -59,7 +59,7 @@ enum Controls {
  * @param ftype. task type being checked
  */
 static bool
-IsFai(TaskFactoryType ftype)
+IsFaiTask(TaskFactoryType ftype)
 {
   return (ftype == TaskFactoryType::FAI_GENERAL) ||
       (ftype == TaskFactoryType::FAI_GOAL) ||
@@ -190,7 +190,7 @@ TaskPropertiesPanelUs::ReadValues()
                              p.finish_constraints.min_height_ref);
   }
 
-  p.finish_constraints.fai_finish = IsFai(newtype);
+  p.finish_constraints.fai_finish = IsFaiTask(newtype);
 
   ordered_task->SetOrderedTaskSettings(p);
 }

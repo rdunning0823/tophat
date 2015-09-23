@@ -313,7 +313,7 @@ MatClickPanel::RemovePoint()
 UPixelScalar
 MatClickPanel::GetNavSliderHeight()
 {
-  UPixelScalar large_font_height = UIGlobals::GetLook().info_box.value.font->GetHeight();
+  UPixelScalar large_font_height = UIGlobals::GetLook().info_box.value_font.GetHeight();
   UPixelScalar small_font_height = UIGlobals::GetDialogLook().list.font->GetHeight();
 
   return large_font_height + 2 * small_font_height - Layout::Scale(3);
@@ -354,7 +354,7 @@ MatClickPanel::SetRectangles(const PixelRect &rc_outer)
   PixelRect rc;
   UPixelScalar side_margin = Layout::landscape ? Layout::Scale(10) : Layout::Scale(4);
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  unsigned line_height = dialog_look.text_font->TextSize(_T("A")).cy * 1.5;
+  unsigned line_height = dialog_look.text_font.TextSize(_T("A")).cy * 1.5;
 
   rc.left = side_margin;
   rc.top = Layout::Scale(2);
@@ -590,7 +590,7 @@ MatClickPanel::Unprepare()
   if (replace_info_frame != nullptr)
     delete replace_info_frame;
   delete add_button;
-  delete dete_button;
+  delete delete_button;
 }
 
 /**

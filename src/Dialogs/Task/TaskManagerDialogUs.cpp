@@ -158,7 +158,6 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   task_summary = new WndFrame(GetClientAreaWindow(), look,
                               rc_task_summary,
                               style_frame);
-  task_summary->SetFont(Fonts::infobox_small);
   StaticString<300> text;
   OrderedTaskSummary(active_task, text.buffer(), false);
   task_summary->SetCaption(text.c_str());
@@ -271,10 +270,10 @@ TaskManagerDialogUs::TaskView::OnPaint(Canvas &canvas)
   const NMEAInfo &basic = CommonInterface::Basic();
 
   PaintTask(canvas, GetClientRect(), **ordered_task_pointer,
-            basic.location_available, basic.location,
+            basic.location,
             CommonInterface::GetMapSettings(),
             map_look.task, map_look.airspace,
-            terrain, &airspace_database);
+            terrain, &airspace_database, false, false);
 }
 
 /**
