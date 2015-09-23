@@ -31,7 +31,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/SingleWindow.hpp"
-#include "Event/KeyCode.hpp"
+#include "Screen/Key.h"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/String.hpp"
 #include "Form/DataField/Listener.hpp"
@@ -40,7 +40,7 @@ Copyright_License {
 #include "InfoBoxes/Content/Factory.hpp"
 #include "Look/InfoBoxLook.hpp"
 #include "Language/Language.hpp"
-#include "Util/StringAPI.hxx"
+#include "Util/StringAPI.hpp"
 #include "Util/StaticArray.hpp"
 #include "Compiler.h"
 
@@ -195,6 +195,10 @@ public:
     GetGeneric(INFOBOX).SetFocus();
     return true;
   }
+
+#ifdef GNAV
+  bool KeyPress(unsigned key_code) override;
+#endif
 
 private:
   /* virtual methods from class DataFieldListener */
@@ -432,6 +436,56 @@ InfoBoxPreview::OnPaint(Canvas &canvas)
   canvas.SetTextColor(is_current ? COLOR_WHITE : COLOR_BLACK);
   canvas.DrawText(2, 2, caption);
 }
+
+#ifdef GNAV
+
+bool
+InfoBoxesConfigWidget::KeyPress(unsigned key_code)
+{
+  /* map the Altair hardware buttons */
+  switch (key_code){
+  case KEY_UP:
+    ((DataFieldEnum &)GetDataField(INFOBOX)).Dec();
+    GetControl(INFOBOX).RefreshDisplay();
+    return true;
+
+  case KEY_DOWN:
+    ((DataFieldEnum &)GetDataField(INFOBOX)).Inc();
+    GetControl(INFOBOX).RefreshDisplay();
+    return true;
+
+  case KEY_LEFT:
+    ((DataFieldEnum &)GetDataField(CONTENT)).Dec();
+    GetControl(CONTENT).RefreshDisplay();
+    return true;
+
+  case KEY_RIGHT:
+    ((DataFieldEnum &)GetDataField(CONTENT)).Inc();
+    GetControl(CONTENT).RefreshDisplay();
+    return true;
+
+  case KEY_APP1:
+    GetControl(NAME).BeginEditing();
+    return true;
+
+  case '6':
+    dialog.OnAction(mrOK);
+    return true;
+
+  case '7':
+    OnCopy();
+    return true;
+
+  case '8':
+    OnPaste();
+    return true;
+
+  default:
+    return false;
+  }
+}
+
+#endif
 
 bool
 dlgConfigInfoboxesShowModal(SingleWindow &parent,

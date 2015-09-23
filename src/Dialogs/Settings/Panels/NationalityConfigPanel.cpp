@@ -174,7 +174,7 @@ NationalityConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   DataFieldEnum &df = *(DataFieldEnum *)wp->GetDataField();
 
   unsigned len = Units::Store::Count();
-  UnitSetting current_dlg_set = CommonInterface::SetUISettings().units;
+  UnitSetting current_dlg_set = CommonInterface::SetUISettings().format.units;
 
   for (unsigned i = 0; i < len; i++)
     df.addEnumText(Units::Store::GetName(i), i);
@@ -271,7 +271,7 @@ NationalityConfigPanel::Save(bool &_changed)
     if (units_changed) {
 
       UnitSetting preset_units = Units::Store::Read(the_unit);
-      UnitSetting &config = CommonInterface::SetUISettings().units;
+      UnitSetting &config = CommonInterface::SetUISettings().format.units;
       config = preset_units;
 
       config.wind_speed_unit = config.speed_unit; // Mapping the wind speed to the speed unit
@@ -296,10 +296,10 @@ NationalityConfigPanel::Save(bool &_changed)
       Profile::Set(ProfileKeys::PressureUnitsValue,
                    (int)config.pressure_unit);
 
-      Profile::Set(ProfileKeys::WingLoadingUnitsValue,
+      Profile::Set(ProfileKeys::WingLoadingUnitValue,
                    (int)config.wing_loading_unit);
 
-      Profile::Set(ProfileKeys::MassUnitsValue,
+      Profile::Set(ProfileKeys::MassUnitValue,
                    (int)config.mass_unit);
 
     }

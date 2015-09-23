@@ -110,7 +110,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     FormatUserDistanceSmart(vector.distance, buffer.buffer());
 
     StaticString<64> bearing_buffer;
-    FormatBearing(bearing_buffer.buffer(), bearing_buffer.MAX_SIZE,
+    FormatBearing(bearing_buffer.buffer(), bearing_buffer.CAPACITY,
                   vector.bearing);
     buffer.AppendFormat(_T(" / %s"), bearing_buffer.c_str());
     AddReadOnly(_("Distance / bearing"), nullptr, buffer);
@@ -126,8 +126,8 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     fixed mc = settings.polar.glide_polar_task.GetMC();
     StaticString<10>mc_value;
     FormatUserVerticalSpeed(mc, mc_value.buffer(), true);
-    buffer.Format(_T("%s %s %s"), _("Arrival altitude"), _("MC"), mc_value.get());
-    AddGlideResult(buffer.get(),
+    buffer.Format(_T("%s %s %s"), _("Arrival altitude"), _("MC"), mc_value.c_str());
+    AddGlideResult(buffer.c_str(),
                    MacCready::Solve(settings.task.glide,
                                     settings.polar.glide_polar_task,
                                     glide_state));
@@ -145,7 +145,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       const fixed distance = basic.location.Distance(waypoint.location);
       const fixed gr = distance / delta_h;
       if (GradientValid(gr)) {
-        ::FormatGlideRatio(gr_text.buffer(), gr_text.MAX_SIZE, gr);
+        ::FormatGlideRatio(gr_text.buffer(), gr_text.CAPACITY, gr);
       }
     }
     AddReadOnly(_("Glide ratio"), nullptr, gr_text.c_str());
@@ -154,16 +154,16 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddSpacer();
 
   FormatUserAltitude(waypoint.elevation,
-                     buffer.buffer(), buffer.MAX_SIZE);
+                     buffer.buffer(), buffer.CAPACITY);
   AddReadOnly(_("Elevation"), nullptr, buffer);
 
   if (FormatGeoPoint(waypoint.location,
-                     buffer.buffer(), buffer.MAX_SIZE) != nullptr)
+                     buffer.buffer(), buffer.CAPACITY) != nullptr)
     AddReadOnly(_("Location"), nullptr, buffer);
 
   if (waypoint.radio_frequency.IsDefined() &&
       waypoint.radio_frequency.Format(buffer.buffer(),
-                                      buffer.MAX_SIZE) != nullptr) {
+                                      buffer.CAPACITY) != nullptr) {
     buffer += _T(" MHz");
     AddReadOnly(_("Radio frequency"), nullptr, buffer);
   }

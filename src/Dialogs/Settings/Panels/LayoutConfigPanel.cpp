@@ -146,7 +146,7 @@ LayoutConfigPanel::OnAction(int id)
     break;
   }
   assert(widget != nullptr);
-  SystemConfiguration(*widget, title.get());
+  SystemConfiguration(*widget, title.c_str());
 }
 
 void

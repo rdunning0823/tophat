@@ -126,7 +126,7 @@ public:
         ? caption_height : 0u;
 
     PixelScalar item_height = dialog_look.list.font->GetHeight()
-      + Layout::Scale(6) + dialog_look.text_font->GetHeight();
+      + Layout::Scale(6) + dialog_look.text_font.GetHeight();
     assert(item_height > 0);
 
     const PixelRect rc_footer = GetFooterRect();
@@ -190,8 +190,6 @@ class MapItemListWidget final : public ListWidget, private ActionListener {
 
   Button *details_button, *cancel_button, *goto_button;
   Button *ack_button;
-  MapItemListRenderer renderer;
-
 
 public:
   void CreateButtons(WidgetDialog &dialog);
@@ -204,9 +202,7 @@ public:
                     const MapSettings &_settings)
     :list(_list),
      dialog_look(_dialog_look),
-     settings(_settings),
-     renderer(_look, _traffic_look, _final_glide_look,
-              _settings, CommonInterface::GetComputerSettings().utc_offset) {}
+     settings(_settings) {}
 
   unsigned GetCursorIndex() const {
     return GetList().GetCursorIndex();
@@ -298,13 +294,13 @@ MapItemListWidget::CreateButtons(WidgetDialog &dialog)
 void
 MapItemListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-/*  UPixelScalar item_height = dialog_look.list.font_bold->GetHeight()
-    + Layout::Scale(6) + dialog_look.text_font->GetHeight();
+  UPixelScalar item_height = dialog_look.list.font_bold->GetHeight()
+    + Layout::Scale(6) + dialog_look.text_font.GetHeight();
   assert(item_height > 0);
 
-  CreateList(parent, dialog_look, rc, item_height);*/
-  CreateList(parent, dialog_look, rc,
-             renderer.CalculateLayout(dialog_look));
+  CreateList(parent, dialog_look, rc, item_height);
+/*  CreateList(parent, dialog_look, rc,
+             MapItemListRenderer::CalculateLayout(dialog_look));*/
 
   GetList().SetLength(list.size());
   UpdateButtons();
@@ -322,9 +318,15 @@ void
 MapItemListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
                                unsigned idx)
 {
+  const MapLook &map_look = UIGlobals::GetMapLook();
+  const TrafficLook &traffic_look = UIGlobals::GetLook().traffic;
+  const FinalGlideBarLook &final_glide_look = UIGlobals::GetLook().final_glide_bar;
   const MapItem &item = *list[idx];
-  renderer.Draw(canvas, rc, item,
-                &CommonInterface::Basic().flarm.traffic);
+  MapItemListRenderer::Draw(canvas, rc, item,
+                            dialog_look, map_look, traffic_look,
+                            final_glide_look, settings,
+                            CommonInterface::GetComputerSettings().utc_offset,
+                            &CommonInterface::Basic().flarm.traffic);
 
   if ((settings.item_list.add_arrival_altitude &&
        item.type == MapItem::Type::ARRIVAL_ALTITUDE) ||
@@ -412,7 +414,7 @@ ShowMapItemListDialog(const MapItemList &list,
                       const MapSettings &settings)
 {
   UPixelScalar item_height = dialog_look.list.font->GetHeight()
-    + Layout::Scale(6) + dialog_look.text_font->GetHeight();
+    + Layout::Scale(6) + dialog_look.text_font.GetHeight();
   assert(item_height > 0);
   UPixelScalar caption_height = dialog_look.caption.font->GetHeight();
   UPixelScalar portrait_spacer_height = !Layout::landscape
