@@ -77,7 +77,7 @@ KeyboardNumericWidget::SetAllowedCharacters(const TCHAR *allowed)
 {
   for (unsigned i = 0; i < num_buttons; ++i)
     buttons[i].SetVisible(allowed == nullptr ||
-                          _tcschr(allowed, buttons[i].GetCharacter())
+                          StringFind(allowed, buttons[i].GetCharacter())
                           != nullptr);
 }
 

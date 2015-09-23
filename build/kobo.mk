@@ -20,6 +20,7 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Dialogs/Message.cpp \
 	$(SRC)/Dialogs/TextEntry.cpp \
 	$(SRC)/Dialogs/KnobTextEntry.cpp \
+	$(SRC)/Dialogs/TouchNumericEntry.cpp \
 	$(SRC)/Dialogs/TouchTextEntry.cpp \
 	$(SRC)/Dialogs/SimulatorPromptWindow.cpp \
 	$(TEST_SRC_DIR)/Fonts.cpp \

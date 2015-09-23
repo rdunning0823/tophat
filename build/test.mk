@@ -1895,6 +1895,7 @@ RUN_TEXT_ENTRY_SOURCES = \
 	$(SRC)/Dialogs/TextEntry.cpp \
 	$(SRC)/Dialogs/KnobTextEntry.cpp \
 	$(SRC)/Dialogs/TouchTextEntry.cpp \
+	$(SRC)/Dialogs/TouchNumericEntry.cpp \
 	$(SRC)/Dialogs/DialogSettings.cpp \
 	$(SRC)/Dialogs/WidgetDialog.cpp \
 	$(MORE_SCREEN_SOURCES) \
@@ -2354,6 +2355,7 @@ RUN_PROFILE_LIST_DIALOG_SOURCES = \
 	$(SRC)/Dialogs/WidgetDialog.cpp \
 	$(SRC)/Dialogs/TextEntry.cpp \
 	$(SRC)/Dialogs/KnobTextEntry.cpp \
+	$(SRC)/Dialogs/TouchNumericEntry.cpp \
 	$(SRC)/Dialogs/TouchTextEntry.cpp \
 	$(SRC)/Dialogs/Message.cpp \
 	$(SRC)/Dialogs/HelpDialog.cpp \

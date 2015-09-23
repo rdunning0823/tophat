@@ -28,6 +28,7 @@ Copyright_License {
 #include "Form/Edit.hpp"
 #include "Form/LambdaActionListener.hpp"
 #include "Widget/KeyboardWidget.hpp"
+#include "Widget/KeyboardNumericWidget.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
 #include "Util/StringUtil.hpp"
@@ -40,7 +41,7 @@ Copyright_License {
 #include <assert.h>
 
 static WndProperty *editor;
-static KeyboardWidget *kb = nullptr;
+static KeyboardNumericWidget *knb = nullptr;
 
 static AllowedCharacters AllowedCharactersCallback;
 
@@ -48,6 +49,8 @@ static constexpr size_t MAX_TEXTENTRY = 40;
 static unsigned int cursor = 0;
 static size_t max_width;
 static TCHAR edittext[MAX_TEXTENTRY];
+static const TCHAR* caption;
+static const TCHAR* help_text;
 
 /**
  * has the value been edited by the user
@@ -69,8 +72,8 @@ ClearTextFirstTime()
 static void
 UpdateAllowedCharacters()
 {
-  if (AllowedCharactersCallback)
-    kb->SetAllowedCharacters(AllowedCharactersCallback(edittext));
+  if (AllowedCharactersCallback && knb != nullptr)
+    knb->SetAllowedCharacters(AllowedCharactersCallback(edittext));
 }
 
 static void
@@ -157,19 +160,42 @@ ClearText()
   edittext[0] = 0;
   UpdateTextboxProp();
 }
+static void ShowHelp();
+static void
+ShowHelp()
+{
+  HelpDialog(caption, help_text);
+}
 
 bool
-TouchTextEntry(TCHAR *text, size_t width,
-               const TCHAR *caption,
-               AllowedCharacters accb,
-               bool default_shift_state)
+TouchNumericEntry(fixed &value,
+                  const TCHAR *_caption,
+                  const TCHAR *_help_text,
+                  bool show_minus,
+                  AllowedCharacters accb)
 {
-  if (width == 0)
-    width = MAX_TEXTENTRY;
+  caption = _caption;
+  help_text = _help_text;
+  has_been_edited = false;
 
-  has_been_edited = true; // disable clearing of value on first key for alpha
+  StaticString<12> buffer;
+  buffer.Format(_T("%.1f"), (double)value);
 
-  max_width = std::min(MAX_TEXTENTRY, width);
+  const TCHAR zero = '0';
+  const TCHAR point = '.';
+
+  // remove trailing zeros
+  unsigned decimal_location = 0;
+  for (unsigned i = 0; i < buffer.length(); ++i)
+    if (buffer[i] == point) {
+      decimal_location = i;
+      break;
+    }
+  for (unsigned i = buffer.length(); i > decimal_location; --i)
+    if (buffer[i] == zero)
+      buffer.Truncate(i - 1);
+
+  max_width = MAX_TEXTENTRY;
 
   const DialogLook &look = UIGlobals::GetDialogLook();
   WndForm form(look);
@@ -183,46 +209,17 @@ TouchTextEntry(TCHAR *text, size_t width,
   const PixelScalar client_height = rc.bottom - rc.top;
 
   const PixelScalar padding = Layout::Scale(2);
-  const PixelScalar backspace_width = Layout::Scale(36);
+  const PixelScalar backspace_width = (rc.right - rc.left) / 4;
   const PixelScalar backspace_left = rc.right - padding - backspace_width;
-  const PixelScalar editor_height = Layout::Scale(22);
-  const PixelScalar editor_bottom = padding + editor_height;
-  const PixelScalar button_height = Layout::Scale(40);
-  constexpr unsigned keyboard_rows = 5;
-  const PixelScalar keyboard_top = editor_bottom + padding;
-  const PixelScalar keyboard_height = keyboard_rows * button_height;
-  const PixelScalar keyboard_bottom = keyboard_top + keyboard_height;
 
-  const bool vertical = client_height >= keyboard_bottom + button_height;
+  const PixelScalar button_height = (client_height - padding * 2) / 6;
 
-  const PixelScalar button_top = vertical
-    ? rc.bottom - button_height
-    : keyboard_bottom - button_height;
-  const PixelScalar button_bottom = vertical
-    ? rc.bottom
-    : keyboard_bottom;
+  const PixelScalar keyboard_top = rc.top + padding + button_height;
+  const PixelScalar keyboard_bottom = rc.bottom - button_height - padding;
 
-  const PixelScalar ok_left = vertical ? 0 : padding;
-  const PixelScalar ok_right = vertical
-    ? rc.right / 3
-    : ok_left + Layout::Scale(80);
-
-  const PixelScalar cancel_left = vertical
-    ? ok_right
-    : Layout::Scale(175);
-  const PixelScalar cancel_right = vertical
-    ? rc.right * 2 / 3
-    : cancel_left + Layout::Scale(60);
-
-  const PixelScalar clear_left = vertical
-    ? cancel_right
-    : Layout::Scale(235);
-  const PixelScalar clear_right = vertical
-    ? rc.right
-    : clear_left + Layout::Scale(50);
 
   WndProperty _editor(client_area, look, _T(""),
-                      { 0, padding, backspace_left - padding, editor_bottom },
+                      { 0, padding, backspace_left - padding, rc.top + button_height },
                       0, WindowStyle());
   _editor.SetReadOnly();
   editor = &_editor;
@@ -230,26 +227,54 @@ TouchTextEntry(TCHAR *text, size_t width,
   WindowStyle button_style;
   button_style.TabStop();
 
+  PixelScalar button_width = (rc.right - rc.left) / 3;
   WndSymbolButton ok_button(client_area, look.button, _T("_X"),
-                            { ok_left, button_top, ok_right, button_bottom },
+                            { 0, rc.top + 5 * button_height, button_width,
+                              rc.top + 6 * button_height},
                             button_style, form, mrOK);
 
-  Button cancel_button(client_area, look.button, _("Cancel"),
-                          { cancel_left, button_top,
-                              cancel_right, button_bottom },
-                          button_style, form, mrCancel);
+  Button cancel_button;
+  PixelRect rc_cancel( { button_width,
+                         rc.top + 5 * button_height, 2 * button_width,
+                         rc.top + 6 * button_height} );
+  cancel_button.Create(client_area,
+                       look.button,
+                       _("Cancel"),
+                       rc_cancel,
+                       button_style,
+                       form,
+                       mrCancel);
+/*  Button::Create(ContainerWindow &parent,
+                 const ButtonLook &look,
+                 const TCHAR *caption,
+                 const PixelRect &rc,
+                 WindowStyle style,
+                 ActionListener &_listener,
+                 int _id) {*/
+
+  Button help_button;
+  auto help_listener = MakeLambdaActionListener([](unsigned id){
+      ShowHelp();
+    });
+  help_button.Create(client_area, look.button, _("Help"),
+                     { button_width * 2,
+                       rc.top + 5 * button_height, 3 * button_width,
+                       rc.top + 6 * button_height },
+                      button_style, help_listener, 0);
 
   auto clear_listener = MakeLambdaActionListener([](unsigned id){
       ClearText();
     });
   Button clear_button(client_area, look.button, _("Clear"),
-                      { clear_left, button_top,
-                          clear_right, button_bottom },
-                      button_style, clear_listener, 0);
+                      { button_width * 2,
+                        rc.top + 5 * button_height, 3 * button_width,
+                        rc.top + 6 * button_height},
+                       button_style, clear_listener, 0);
 
+  help_button.SetVisible(help_text != nullptr);
+  clear_button.SetVisible(help_text == nullptr);
 
-  KeyboardWidget keyboard(look.button, FormCharacter, !accb,
-                          default_shift_state);
+  KeyboardNumericWidget keyboard(look.button, FormCharacter, show_minus);
 
   const PixelRect keyboard_rc = {
     padding, keyboard_top,
@@ -260,34 +285,33 @@ TouchTextEntry(TCHAR *text, size_t width,
   keyboard.Prepare(client_area, keyboard_rc);
   keyboard.Show(keyboard_rc);
 
-  kb = &keyboard;
+  knb = &keyboard;
 
   auto backspace_listener = MakeLambdaActionListener([](unsigned id){
-      OnBackspace();
+    OnBackspace();
     });
   Button backspace_button(client_area, look.button, _T("<-"),
-                          { backspace_left, padding, rc.right - padding,
-                              editor_bottom },
-                          button_style, backspace_listener, 0);
+                             { backspace_left, padding, rc.right - padding,
+                               rc.top + button_height },
+                             button_style, backspace_listener, 0);
 
   AllowedCharactersCallback = accb;
 
-  cursor = 0;
   ClearText();
 
-  if (!StringIsEmpty(text)) {
-    CopyString(edittext, text, width);
-    cursor = _tcslen(text);
+  if (buffer.length() == 1 && buffer[0u] == zero)
+    buffer.clear();
+
+  if (!buffer.empty()) {
+    CopyString(edittext, buffer.c_str(), max_width);
+    cursor = buffer.length();
   }
 
   UpdateTextboxProp();
   bool result = form.ShowModal() == mrOK;
 
-  keyboard.Hide();
-  keyboard.Unprepare();
-
   if (result) {
-    CopyString(text, edittext, width);
+    value = fixed(ParseDouble(edittext));
   }
 
   return result;
