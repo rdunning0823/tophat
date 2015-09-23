@@ -23,8 +23,6 @@ Copyright_License {
 
 #include "WaypointDialogs.hpp"
 #include "Dialogs/TextEntry.hpp"
-#include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/XML.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Canvas.hpp"
 #include "Form/Form.hpp"
@@ -56,6 +54,9 @@ Copyright_License {
 #include "GlideSolvers/MacCready.hpp"
 #include "Math/SunEphemeris.hpp"
 #include "Dialogs/Message.hpp"
+#include "Widget/Widget.hpp"
+#include "Widget/ManagedWidget.hpp"
+#include "Screen/SingleWindow.hpp"
 
 #include <algorithm>
 #include <list>
@@ -64,61 +65,117 @@ Copyright_License {
 #include <stdlib.h>
 #include <stdio.h>
 
-static GeoPoint location;
-static WndForm *dialog = nullptr;
-static ListControl *waypoint_list_control = nullptr;
-static WndSymbolButton *search_button;
-static WndSymbolButton *name_header;
-static WndSymbolButton *elevation_header;
-static WndSymbolButton *distance_header;
-static PixelRect rc_name_header;
-static PixelRect rc_elevation_header;
-static PixelRect rc_distance_header;
-static OrderedTask *ordered_task;
-static unsigned ordered_task_index;
-
-static constexpr unsigned distance_filter_items[] = {
-  0, 25, 50, 75, 100, 150, 250, 500, 1000
+enum ControlIndex {
+  Search,
+  NameHeader,
+  ElevationHeader,
+  DistanceHeader,
+  List,
+  Select,
+  Close,
 };
 
-static constexpr int direction_filter_items[] = {
-  -1, -1, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330
+enum Actions {
+  SearchClick,
+  NameHeaderClick,
+  ElevationHeaderClick,
+  DistanceHeaderClick,
+  SelectClick,
+  CloseClick,
 };
 
-static Angle last_heading = Angle::Zero();
-
-static UISettings::WaypointSortDirection sort_direction;
-
-struct WaypointListDialogState
+gcc_const
+static WindowStyle
+GetDialogStyle()
 {
-  StaticString<WaypointFilter::NAME_LENGTH + 1> name;
+  WindowStyle style;
+  style.Hide();
+  style.ControlParent();
+  return style;
+}
 
-  int distance_index;
-  int direction_index;
-  TypeFilter type_index;
+class WaypointListSimpleDialog : public NullWidget, public WndForm,
+  public ListItemRenderer, public ListCursorHandler
+{
 
-  bool IsDefined() const {
-    return !name.empty() || distance_index > 0 ||
-      direction_index > 0 || type_index != TypeFilter::ALL;
-  }
+protected:
+  static constexpr unsigned distance_filter_items[] = {
+    0, 25, 50, 75, 100, 150, 250, 500, 1000
+  };
 
-  void ToFilter(WaypointFilter &filter, Angle heading) const {
-    filter.name = name;
-    filter.distance =
-      Units::ToSysDistance(fixed(distance_filter_items[distance_index]));
-    filter.type_index = type_index;
+  static constexpr int direction_filter_items[] = {
+    -1, -1, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330
+  };
 
-    if (direction_index != 1)
-      filter.direction = Angle::Degrees(
-          fixed(direction_filter_items[direction_index]));
-    else
-      filter.direction = heading;
-  }
-};
+  struct WaypointListDialogState
+  {
+    StaticString<WaypointFilter::NAME_LENGTH + 1> name;
 
-class WaypointListSimpleDialog : public ListItemRenderer,
-                                 public ListCursorHandler {
+    int distance_index;
+    int direction_index;
+    TypeFilter type_index;
+
+    WaypointListDialogState(): distance_index(0), direction_index(0) {}
+
+    bool IsDefined() const {
+      return !name.empty() || distance_index > 0 ||
+        direction_index > 0 || type_index != TypeFilter::ALL;
+    }
+
+    void ToFilter(WaypointFilter &filter, Angle heading) const {
+      filter.name = name;
+      filter.distance =
+        Units::ToSysDistance(fixed(distance_filter_items[distance_index]));
+      filter.type_index = type_index;
+
+      if (direction_index != 1)
+        filter.direction = Angle::Degrees(
+            fixed(direction_filter_items[direction_index]));
+      else
+        filter.direction = heading;
+    }
+  };
+
+  /* display Goto on Select button */
+  bool goto_mode;
+  GeoPoint location;
+  OrderedTask *ordered_task;
+  unsigned ordered_task_index;
+  Angle last_heading;
+
+  WaypointListDialogState dialog_state;
+  WaypointList waypoint_list;
+  UISettings::WaypointSortDirection sort_direction;
+
+  ListControl waypoint_list_control;
+  WndSymbolButton search_button;
+  WndSymbolButton name_header;
+  WndSymbolButton elevation_header;
+  WndSymbolButton distance_header;
+  WndSymbolButton select_button;
+  WndSymbolButton close_button;
+
+  PixelRect rc_list;
+  PixelRect rc_search_button;
+  PixelRect rc_name_header;
+  PixelRect rc_elevation_header;
+  PixelRect rc_distance_header;
+  PixelRect rc_select_button;
+  PixelRect rc_close_button;
+
 public:
+  WaypointListSimpleDialog(const GeoPoint &_location,
+                           OrderedTask *_ordered_task, unsigned _ordered_task_index,
+                           bool _goto_mode)
+  :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
+           UIGlobals::GetMainWindow().GetClientRect(),
+           _T("Select Waypoint"), GetDialogStyle()),
+   goto_mode(_goto_mode), location(_location),
+   ordered_task(_ordered_task),
+   ordered_task_index(_ordered_task_index),
+   last_heading(CommonInterface::Basic().attitude.heading),
+   waypoint_list_control(UIGlobals::GetDialogLook()) {};
+
   /* virtual methods from ListItemRenderer */
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
                            unsigned idx) override;
@@ -128,18 +185,216 @@ public:
     return true;
   }
 
+  /* virtual methods from Widget */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual bool Save(bool &changed);
+  virtual void Show(const PixelRect &rc);
+  virtual void Hide() {};
+  virtual void Move(const PixelRect &rc);
+
+  /* virtual methods from ActionListener */
+  virtual void OnAction(int id);
+
+  /* overrides from WndForm */
+  virtual void OnResize(PixelSize new_size) override;
+  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
+
+  /* virtual methods from ListCursorHandler */
   virtual void OnActivateItem(unsigned index) override;
+
+  void OnSearchClicked();
+  fixed CalcAltitudeDifferential(const Waypoint &waypoint);
+  const Waypoint* GetSelectedWaypoint();
+  void ItemSelected(unsigned index);
+  void SaveSortDirection();
+  void FillList(WaypointList &list, const Waypoints &src,
+                GeoPoint location, Angle heading,
+                const WaypointListDialogState &state);
+
+  void SetRectangles(const PixelRect &rc_outer);
+  void UpdateButtons();
+  void UpdateList();
+  void UpdateHeaders();
+
 };
 
-static WaypointListDialogState dialog_state;
-static WaypointList waypoint_list;
+void
+WaypointListSimpleDialog::OnAction(int id)
+{
+  switch(id) {
+  case SearchClick:
+    OnSearchClicked();
+    break;
+  case NameHeaderClick:
+    sort_direction = UISettings::WaypointSortDirection::NAME;
+    UpdateList();
+    break;
+  case ElevationHeaderClick:
+    sort_direction = UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE;
+    UpdateList();
+    break;
+  case DistanceHeaderClick:
+    sort_direction = UISettings::WaypointSortDirection::DISTANCE;
+    UpdateList();
+    break;
+  case SelectClick:
+    ItemSelected(waypoint_list_control.GetCursorIndex());
+    break;
+  case CloseClick:
+   SetModalResult(mrCancel);
+    break;
+  }
+}
 
-static void
-FillList(WaypointList &list, const Waypoints &src,
+void
+WaypointListSimpleDialog::SetRectangles(const PixelRect &rc_outer)
+{
+  PixelRect rc = WndForm::GetClientRect();
+  rc.bottom -= WndForm::GetTitleHeight();
+
+  unsigned control_height = Layout::Scale(35);
+  if (Layout::landscape) {
+
+    const unsigned left_col_width = Layout::Scale(65);
+
+    rc_list.left = left_col_width;
+    rc_list.right = rc.right;
+    rc_list.top = control_height;
+    rc_list.bottom = rc.bottom;
+
+    rc_search_button.left = 0;
+    rc_search_button.right = left_col_width;
+    rc_search_button.top = 0;
+    rc_search_button.bottom = control_height;
+
+    rc_name_header.top = 0;
+    rc_name_header.bottom = control_height;
+
+    rc_elevation_header.top = 0;
+    rc_elevation_header.bottom = control_height;
+
+    rc_distance_header.top = 0;
+    rc_distance_header.bottom = control_height;
+
+    rc_close_button.left = 0;
+    rc_close_button.right = left_col_width;
+    rc_close_button.bottom = rc.bottom - control_height;
+    rc_close_button.top = rc_close_button.bottom - control_height;
+
+    rc_select_button.left = 0;
+    rc_select_button.right = left_col_width;
+    rc_select_button.bottom = rc.bottom;
+    rc_select_button.top = rc_select_button.bottom - control_height;
+  } else {
+
+    rc_list.left = 0;
+    rc_list.right = rc.right;
+    rc_list.top = Layout::Scale(70);
+    rc_list.bottom = rc.bottom - control_height;
+
+    rc_search_button.left = Layout::Scale(160);
+    rc_search_button.right = rc_search_button.left + Layout::Scale(80);
+    rc_search_button.top = 0;
+    rc_search_button.bottom = control_height;
+
+    rc_name_header.top = Layout::Scale(35);
+    rc_name_header.bottom = rc_name_header.top + control_height;
+
+    rc_elevation_header.top = Layout::Scale(35);
+    rc_elevation_header.bottom = rc_elevation_header.top + control_height;
+
+    rc_distance_header.top = Layout::Scale(35);
+    rc_distance_header.bottom = rc_distance_header.top + control_height;
+
+    rc_close_button.left = 0;
+    rc_close_button.right = rc.right / 2;
+    rc_close_button.bottom = rc.bottom;
+    rc_close_button.top = rc_close_button.bottom - control_height;
+
+    rc_select_button.left = rc.right / 2;
+    rc_select_button.right = rc.right;
+    rc_select_button.bottom = rc.bottom;
+    rc_select_button.top = rc_select_button.bottom - control_height;
+  }
+
+  const unsigned padding = Layout::GetTextPadding();
+
+  rc_name_header.left = rc_list.left;
+  rc_name_header.right = rc_list.left
+      + (rc_list.GetSize().cx - waypoint_list_control.GetScrollBarWidth()) / 2
+      - padding;
+
+  rc_distance_header.right = rc_list.right;
+  rc_distance_header.left = (rc_name_header.right + rc_distance_header.right) / 2;
+
+  rc_elevation_header.left = rc_name_header.right;
+  rc_elevation_header.right = rc_distance_header.left;
+}
+
+void
+WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
+{
+  const PixelRect rc_form = rc;
+  NullWidget::Prepare(parent, rc_form);
+  WndForm::Move(rc_form);
+
+  SetCaption(_("Select Waypoint"));
+  SetRectangles(rc_form);
+
+  WindowStyle style_frame;
+
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = dialog_look.button;
+  WindowStyle button_style;
+  button_style.TabStop();
+
+  close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
+                       rc_close_button,
+                       button_style, *this, CloseClick);
+
+  search_button.Create(GetClientAreaWindow(), button_look, _T("Search"),
+                        rc_search_button,
+                        button_style, *this, SearchClick);
+
+  select_button.Create(GetClientAreaWindow(), button_look,
+                       (goto_mode ? _("Goto") : _("Select")),
+                        rc_select_button,
+                        button_style, *this, SelectClick);
+
+  name_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                      rc_name_header,
+                      button_style, *this, NameHeaderClick);
+
+  elevation_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                           rc_elevation_header,
+                           button_style, *this, ElevationHeaderClick);
+
+  distance_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                         rc_distance_header,
+                         button_style, *this, DistanceHeaderClick);
+
+  waypoint_list_control.Create(GetClientAreaWindow(), rc_list,
+                               button_style,
+                               WaypointListRenderer::GetHeight(dialog_look));
+
+  waypoint_list_control.SetItemRenderer(this);
+  waypoint_list_control.SetCursorHandler(this);
+  waypoint_list_control.SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
+
+  dialog_state.name = _T("");
+  sort_direction = CommonInterface::SetUISettings().waypoint_sort_direction;
+
+  UpdateList();
+  UpdateHeaders();
+}
+
+void
+WaypointListSimpleDialog::FillList(WaypointList &list, const Waypoints &src,
          GeoPoint location, Angle heading, const WaypointListDialogState &state)
 {
   WaypointFilter filter;
   state.ToFilter(filter, heading);
+
   WaypointListBuilder builder(filter, location, list,
                               ordered_task, ordered_task_index);
   builder.Visit(src);
@@ -184,13 +439,13 @@ FillList(WaypointList &list, const Waypoints &src,
   }
 }
 
-static void
-UpdateButtons()
+void
+WaypointListSimpleDialog::UpdateButtons()
 {
   if (dialog_state.name.empty())
-    search_button->SetCaption(_T("Search"));
+    search_button.SetCaption(_T("Search"));
   else
-    search_button->SetCaption(_T("SearchChecked"));
+    search_button.SetCaption(_T("SearchChecked"));
 }
 
 /**
@@ -199,59 +454,41 @@ UpdateButtons()
  * - Elevation
  * - Dist / Bearing
  */
-static void
-UpdateHeaders()
+void
+WaypointListSimpleDialog::UpdateHeaders()
 {
-  PixelRect rc_list = waypoint_list_control->GetPosition();
-  const unsigned padding = Layout::GetTextPadding();
+  SetRectangles(GetClientRect());
+  name_header.Move(rc_name_header);
+  elevation_header.Move(rc_elevation_header);
+  distance_header.Move(rc_distance_header);
 
-  const TCHAR *elevation_header_text = _("Arriv.");
-  const TCHAR *distance_header_text = _("Dist.");
-
-  rc_name_header = name_header->GetPosition();
-  rc_elevation_header = elevation_header->GetPosition();
-  rc_distance_header = distance_header->GetPosition();
-
-  rc_name_header.left = rc_list.left;
-  rc_name_header.right = rc_list.left
-      + (rc_list.GetSize().cx - waypoint_list_control->GetScrollBarWidth()) / 2
-      - padding;
-
-  rc_distance_header.right = rc_list.right;
-  rc_distance_header.left = (rc_name_header.right + rc_distance_header.right) / 2;
-
-  rc_elevation_header.left = rc_name_header.right;
-  rc_elevation_header.right = rc_distance_header.left;
-
-  name_header->Move(rc_name_header);
-  elevation_header->Move(rc_elevation_header);
-  distance_header->Move(rc_distance_header);
-
-  name_header->SetCaption(sort_direction ==
+  name_header.SetCaption(sort_direction ==
       UISettings::WaypointSortDirection::NAME ?
       _("_chkmark_Name") : _("Name"));
-  elevation_header->SetCaption(sort_direction ==
+  elevation_header.SetCaption(sort_direction ==
       UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE ?
-      _("_chkmark_Arr.") : elevation_header_text);
-  distance_header->SetCaption(sort_direction ==
+      _("_chkmark_Arr.") : _("Arriv."));
+  distance_header.SetCaption(sort_direction ==
       UISettings::WaypointSortDirection::DISTANCE ?
-      _("_chkmark_Dist.") : distance_header_text);
+      _("_chkmark_Dist.") : _("Dist."));
 }
 
-static void
-UpdateList()
+void
+WaypointListSimpleDialog::UpdateList()
 {
   waypoint_list.clear();
 
   FillList(waypoint_list, way_points, location, last_heading,
            dialog_state);
 
-  waypoint_list_control->SetLength(std::max(1, (int)waypoint_list.size()));
-  waypoint_list_control->SetOrigin(0);
-  waypoint_list_control->SetCursorIndex(1);
-  waypoint_list_control->SetCursorIndex(0);
+  waypoint_list_control.SetLength(std::max(1, (int)waypoint_list.size()));
+  waypoint_list_control.SetOrigin(0);
+  waypoint_list_control.SetCursorIndex(1);
+  waypoint_list_control.SetCursorIndex(0);
+
   UpdateButtons();
-  waypoint_list_control->Invalidate();
+
+  waypoint_list_control.Invalidate();
   UpdateHeaders();
 }
 
@@ -262,8 +499,8 @@ WaypointNameAllowedCharacters(const TCHAR *prefix)
   return way_points.SuggestNamePrefix(prefix, buffer, ARRAY_SIZE(buffer));
 }
 
-static void
-OnSearchClicked(gcc_unused Button &button)
+void
+WaypointListSimpleDialog::OnSearchClicked()
 {
   TCHAR new_name_filter[WaypointFilter::NAME_LENGTH + 1];
   CopyString(new_name_filter, dialog_state.name.c_str(),
@@ -288,17 +525,8 @@ OnSearchClicked(gcc_unused Button &button)
   UpdateList();
 }
 
-static void
-OnWaypointListEnter()
-{
-  if (waypoint_list.size() > 0)
-    dialog->SetModalResult(mrOK);
-  else
-    OnSearchClicked(*search_button);
-}
-
-static fixed
-CalcAltitudeDifferential(const Waypoint &waypoint)
+fixed
+WaypointListSimpleDialog::CalcAltitudeDifferential(const Waypoint &waypoint)
 {
   const MoreData &more_data = CommonInterface::Basic();
   const DerivedInfo &calculated = CommonInterface::Calculated();
@@ -322,7 +550,6 @@ CalcAltitudeDifferential(const Waypoint &waypoint)
                      glide_state);
   return result.SelectAltitudeDifference(settings.task.glide);
 }
-
 
 void
 WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
@@ -359,64 +586,21 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
 }
 
 void
+WaypointListSimpleDialog::ItemSelected(unsigned index)
+{
+  if (waypoint_list.size() > 0)
+    SetModalResult(mrOK);
+  else
+    OnSearchClicked();
+}
+void
 WaypointListSimpleDialog::OnActivateItem(unsigned index)
 {
-  OnWaypointListEnter();
+  ItemSelected(index);
 }
 
-static void
-OnByDistanceClicked(gcc_unused Button &button)
-{
-  sort_direction = UISettings::WaypointSortDirection::DISTANCE;
-  UpdateList();
-}
-
-static void
-OnByBearingClicked(gcc_unused Button &button)
-{
-  sort_direction = UISettings::WaypointSortDirection::BEARING;
-  UpdateList();
-}
-
-static void
-OnByElevationClicked(gcc_unused Button &button)
-{
-  sort_direction = UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE;
-  UpdateList();
-}
-
-static void
-OnByNameClicked(gcc_unused Button &button)
-{
-  sort_direction = UISettings::WaypointSortDirection::NAME;
-  UpdateList();
-}
-
-static void
-OnSelectClicked(gcc_unused Button &button)
-{
-  OnWaypointListEnter();
-}
-
-static void
-OnCloseClicked(gcc_unused Button &button)
-{
-  dialog->SetModalResult(mrCancel);
-}
-
-static constexpr CallBackTableEntry callback_table[] = {
-  DeclareCallBackEntry(OnCloseClicked),
-  DeclareCallBackEntry(OnSelectClicked),
-  DeclareCallBackEntry(OnByDistanceClicked),
-  DeclareCallBackEntry(OnByNameClicked),
-  DeclareCallBackEntry(OnByElevationClicked),
-  DeclareCallBackEntry(OnByBearingClicked),
-  DeclareCallBackEntry(OnSearchClicked),
-  DeclareCallBackEntry(nullptr)
-};
-
-static void
-SaveSortDirection()
+void
+WaypointListSimpleDialog::SaveSortDirection()
 {
   if (sort_direction != CommonInterface::GetUISettings().waypoint_sort_direction) {
     CommonInterface::SetUISettings().waypoint_sort_direction = sort_direction;
@@ -425,71 +609,62 @@ SaveSortDirection()
   }
 }
 
-const Waypoint*
-ShowWaypointListDialog(const GeoPoint &_location,
-                       OrderedTask *_ordered_task, unsigned _ordered_task_index,
-                       bool goto_button)
+void
+WaypointListSimpleDialog::ReinitialiseLayout(const PixelRect &parent_rc)
 {
-  dialog = LoadDialog(callback_table, UIGlobals::GetMainWindow(),
-                      Layout::landscape ?
-      _T("IDR_XML_WAYPOINTSELECTSIMPLE_L") : _T("IDR_XML_WAYPOINTSELECTSIMPLE"));
-  assert(dialog != nullptr);
+  WndForm::Move(parent_rc);
+}
 
-#ifdef GNAV
-  dialog->SetKeyDownNotify(FormKeyDown);
-#endif
+void
+WaypointListSimpleDialog::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+  SetRectangles(GetClientRect());
+  waypoint_list_control.Move(rc_list);
+  search_button.Move(rc_search_button);
+  name_header.Move(rc_name_header);
+  elevation_header.Move(rc_elevation_header);
+  distance_header.Move(rc_distance_header);
+  select_button.Move(rc_select_button);
+  close_button.Move(rc_close_button);
+}
 
-  sort_direction = CommonInterface::SetUISettings().waypoint_sort_direction;
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+void
+WaypointListSimpleDialog::Move(const PixelRect &rc)
+{
+}
 
-  WaypointListSimpleDialog dialog2;
+void
+WaypointListSimpleDialog::Show(const PixelRect &rc)
+{
+}
 
-  waypoint_list_control = (ListControl*)dialog->FindByName(_T("frmWaypointList"));
-  assert(waypoint_list_control != nullptr);
-  waypoint_list_control->SetItemRenderer(&dialog2);
-  waypoint_list_control->SetCursorHandler(&dialog2);
-  waypoint_list_control->SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
-  if (goto_button) {
-    Button *button_select = (Button*)dialog->FindByName(_T("cmdSelect"));
-    assert (button_select != nullptr);
-    button_select->SetCaption(_T("Goto"));
-  }
-
-  name_header = (WndSymbolButton *)dialog->FindByName(_T("btnNameHeader"));
-  elevation_header = (WndSymbolButton *)dialog->FindByName(_T("btnElevationHeader"));
-  distance_header = (WndSymbolButton *)dialog->FindByName(_T("btnDistanceHeader"));
-  assert(name_header != nullptr);
-  assert(elevation_header != nullptr);
-  assert(distance_header != nullptr);
-
-  search_button = (WndSymbolButton*)dialog->FindByName(_T("cmdSearch"));
-  assert(search_button != nullptr);
-
-  dialog_state.name = _T("");
-
-  location = _location;
-  ordered_task = _ordered_task;
-  ordered_task_index = _ordered_task_index;
-  last_heading = CommonInterface::Basic().attitude.heading;
-
-  UpdateList();
-
-  if (dialog->ShowModal() != mrOK) {
-    delete dialog;
-    SaveSortDirection();
-    return nullptr;
-  }
-
-  SaveSortDirection();
-
-  unsigned index = waypoint_list_control->GetCursorIndex();
-
-  delete dialog;
-
-  const Waypoint* retval = nullptr;
+const Waypoint*
+WaypointListSimpleDialog::GetSelectedWaypoint()
+{
+  unsigned index = waypoint_list_control.GetCursorIndex();
 
   if (index < waypoint_list.size())
-    retval = waypoint_list[index].waypoint;
+    return waypoint_list[index].waypoint;
 
-  return retval;
+  return nullptr;
+}
+
+const Waypoint*
+ShowWaypointListDialog(const GeoPoint &location,
+                       OrderedTask *ordered_task, unsigned ordered_task_index,
+                       bool goto_mode)
+{
+  ContainerWindow &w = UIGlobals::GetMainWindow();
+  WaypointListSimpleDialog *instance =
+      new WaypointListSimpleDialog(location,
+                                   ordered_task, ordered_task_index,
+                                   goto_mode);
+
+  ManagedWidget managed_widget(w, instance);
+  managed_widget.Move(w.GetClientRect());
+  managed_widget.Show();
+  int result = instance->ShowModal();
+  instance->SaveSortDirection();
+  return (result == ModalResult::mrCancel) ? nullptr : instance->GetSelectedWaypoint();
 }
