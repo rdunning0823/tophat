@@ -157,6 +157,17 @@ public:
                   WindowStyle style,
                   ActionListener &_listener,
                   int _id);
+  WndSymbolButton();
+
+  void
+  Create(ContainerWindow &parent,
+         const ButtonLook &look,
+         const TCHAR *caption,
+         const PixelRect &rc,
+         WindowStyle style,
+         ActionListener &_listener,
+         int _id);
+
 
   void SetCaption(const TCHAR *caption);
 };

@@ -42,6 +42,18 @@ WndSymbolButton::WndSymbolButton(ContainerWindow &parent,
               _listener, _id);
 }
 
+WndSymbolButton::Create(ContainerWindow &parent,
+                        const ButtonLook &_look,
+                        const TCHAR *_caption,
+                        const PixelRect &rc,
+                        WindowStyle style,
+                        ActionListener &_listener,
+                        int _id)
+{
+  void Create(parent, rc, style, new SymbolButtonRenderer(_look,_caption),
+              _listener, _id);
+}
+
 void
 WndSymbolButton::SetCaption(const TCHAR *caption)
 {
