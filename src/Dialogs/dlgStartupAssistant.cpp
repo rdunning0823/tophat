@@ -118,7 +118,7 @@ public:
 
   Button *prev_tip, *next_tip, *close;
   WndFrame *tip_text;
-  CheckBoxControl *chkb_decline;
+  CheckBoxControl chkb_decline;
 
   StartupAssistant()
     :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
@@ -181,7 +181,7 @@ StartupAssistant::OnResize(PixelSize new_size)
   close->Move(rc_close);
   next_tip->Move(rc_next_tip);
   prev_tip->Move(rc_prev_tip);
-  chkb_decline->Move(rc_chkb_decline);
+  chkb_decline.Move(rc_chkb_decline);
 }
 #endif
 
@@ -198,7 +198,7 @@ StartupAssistant::Show(const PixelRect &rc)
 UPixelScalar
 StartupAssistant::GetNavSliderHeight()
 {
-  UPixelScalar large_font_height = UIGlobals::GetLook().info_box.value.font->GetHeight();
+  UPixelScalar large_font_height = UIGlobals::GetLook().info_box.value_font.GetHeight();
   UPixelScalar small_font_height = UIGlobals::GetDialogLook().list.font->GetHeight();
 
   return large_font_height + 2 * small_font_height - Layout::Scale(9);
@@ -304,7 +304,6 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
   tip_text = new WndFrame(GetClientAreaWindow(), look,
                           rc_tip_text,
                           style_frame);
-  tip_text->SetFont(Fonts::infobox_small);
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   WindowStyle button_style;
@@ -323,11 +322,13 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle checkbox_style;
   checkbox_style.TabStop();
-  chkb_decline = new CheckBoxControl(GetClientAreaWindow(),
-                                     UIGlobals::GetDialogLook(),
-                                     _("Don't show tips at startup"),
-                                     rc_chkb_decline, checkbox_style,
-                                     this, DeclineCheckboxClick);
+  chkb_decline.Create(GetClientAreaWindow(),
+                      UIGlobals::GetDialogLook(),
+                      _("Don't show tips at startup"),
+                      rc_chkb_decline, checkbox_style,
+                      *this, DeclineCheckboxClick);
+
+
   SetTip(true);
 }
 
@@ -336,7 +337,7 @@ StartupAssistant::Save(bool &changed)
 {
   UISettings &ui_settings = CommonInterface::SetUISettings();
   Profile::Set(ProfileKeys::StartupTipId, ui_settings.last_startup_tip);
-  bool declined = chkb_decline->GetState();
+  bool declined = chkb_decline.GetState();
   Profile::Set(ProfileKeys::StartupTipDeclineVersion,
                declined ? TopHat_ProductToken : _T(""));
 

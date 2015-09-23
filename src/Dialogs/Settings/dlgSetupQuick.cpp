@@ -53,6 +53,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Profile/Profile.hpp"
 #include "Device/Register.hpp"
+#include "Device/MultipleDevices.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Task/TaskBehaviour.hpp"
 #include "Units/UnitsStore.hpp"
@@ -260,7 +261,7 @@ ShowPanel(unsigned page)
   }
 
   assert(widget != nullptr);
-  SystemConfiguration(*widget, title.get());
+  SystemConfiguration(*widget, title.c_str());
 }
 
 void
@@ -280,7 +281,7 @@ SetupQuick::OnAction(int id)
     break;
 
   case DEVICE:
-    ShowDeviceList(UIGlobals::GetLook().terminal);
+    ShowDeviceList();
     break;
 
   case ADVANCED:
@@ -304,7 +305,7 @@ SetupQuick::CreateDeviceList(TCHAR *buffer_out, size_t buffer_size)
   for (unsigned idx = 0; idx < NUMDEV; idx++) {
     Item item;
     item.Set(CommonInterface::GetSystemSettings().devices[idx],
-             *device_list[idx], device_blackboard->RealState(idx));
+             (*devices)[idx], device_blackboard->RealState(idx));
 
     const DeviceConfig &config =
       CommonInterface::SetSystemSettings().devices[idx];
@@ -374,7 +375,7 @@ SetupQuick::RefreshDeviceStatus()
   const TCHAR unconfigured[] = N_("*** Not configured ***");
   StaticString<255> text;
   text.clear();
-  CreateDeviceList(text.buffer(), text.MAX_SIZE);
+  CreateDeviceList(text.buffer(), text.CAPACITY);
 
   if (text.empty())
     text = gettext(unconfigured);

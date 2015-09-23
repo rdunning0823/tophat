@@ -26,7 +26,6 @@ Copyright_License {
 
 #include "Device/Descriptor.hpp"
 #include "Device/Port/State.hpp"
-#include "Device/List.hpp"
 #include "NMEA/Info.hpp"
 
 struct Flags {
