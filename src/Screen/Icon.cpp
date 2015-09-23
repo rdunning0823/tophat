@@ -71,7 +71,7 @@ MaskedIcon::LoadResource(ResourceId id, ResourceId big_id,
 
   if (Layout::ScaleEnabled()) {
     unsigned source_dpi = 96;
-    if (Layout::scale >= 4)
+    if (Layout::scale >= 4) {
       if (bigger_id.IsDefined()) {
         id = bigger_id;
         source_dpi = 384;
@@ -79,7 +79,7 @@ MaskedIcon::LoadResource(ResourceId id, ResourceId big_id,
         id = big_id;
         source_dpi = 192;
       }
-    else if (Layout::scale >= 2)
+    } else if (Layout::scale >= 2)
       if (big_id.IsDefined()) {
         id = big_id;
         source_dpi = 192;

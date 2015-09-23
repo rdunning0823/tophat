@@ -100,7 +100,6 @@ OrderedTask::OrderedTask(const TaskBehaviour &tb)
   ClearName();
   active_factory = CreateTaskFactory(factory_mode, *this, task_behaviour);
   active_factory->UpdateOrderedTaskSettings(ordered_settings);
-  task_name.clear();
 }
 
 OrderedTask::~OrderedTask()

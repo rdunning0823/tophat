@@ -27,6 +27,7 @@ Copyright_License {
 #include "Optimised.hpp"
 #include "RasterCanvas.hpp"
 #include "Screen/Custom/Cache.hpp"
+#include "Util/StringAPI.hpp"
 #include "Util/StringUtil.hpp"
 
 #ifdef __ARM_NEON__
@@ -275,27 +276,7 @@ Canvas::DrawClippedText(int x, int y, unsigned max_width, const TCHAR *text)
     CopyString(text_buffer, text, std::min(new_size, 256u));
     clipped_text = text_buffer;
   }
-
-  auto s = RenderText(font, clipped_text);
-  if (s.data == nullptr)
-    return;
-
-  SDLRasterCanvas canvas(buffer);
-  if (background_mode == OPAQUE) {
-    OpaqueAlphaPixelOperations<SDLPixelTraits, GreyscalePixelTraits>
-      opaque(canvas.Import(background_color), canvas.Import(text_color));
-    canvas.CopyRectangle<decltype(opaque), GreyscalePixelTraits>
-      (x, y, s.width, s.height,
-       GreyscalePixelTraits::const_pointer_type(s.data),
-       s.pitch, opaque);
-  } else {
-    ColoredAlphaPixelOperations<SDLPixelTraits, GreyscalePixelTraits>
-      transparent(canvas.Import(text_color));
-    canvas.CopyRectangle<decltype(transparent), GreyscalePixelTraits>
-      (x, y, s.width, s.height,
-       GreyscalePixelTraits::const_pointer_type(s.data),
-       s.pitch, transparent);
-  }
+  DrawText(x, y, clipped_text);
 }
 
 void

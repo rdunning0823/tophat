@@ -24,7 +24,7 @@ Copyright_License {
 #include "Device/Driver/FlymasterB1.hpp"
 #include "Device/Driver.hpp"
 #include "Device/Parser.hpp"
-#include "Device/Internal.hpp"
+#include "Device/Util/NMEAWriter.hpp"
 #include "NMEA/Checksum.hpp"
 #include "NMEA/Info.hpp"
 #include "NMEA/InputLine.hpp"
@@ -39,8 +39,8 @@ class FlymasterB1Device : public AbstractDevice {
 public:
   FlymasterB1Device(Port &_port):port(_port) {}
 
-  virtual bool EnableNMEA(OperationEnvironment &env) override;
-  virtual bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
+  bool EnableNMEA(OperationEnvironment &env) override;
+  bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
 };
 
 bool

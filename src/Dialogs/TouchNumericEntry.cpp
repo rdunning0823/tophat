@@ -55,7 +55,7 @@ static const TCHAR* help_text;
 /**
  * has the value been edited by the user
  */
-bool has_been_edited;
+static bool has_been_edited;
 
 static void ClearText();
 

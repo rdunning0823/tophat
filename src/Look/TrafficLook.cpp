@@ -33,7 +33,7 @@ TrafficLook::Initialise(const Font &_font)
     warning_color = Color(0xfe,0x84,0x38);
     alarm_color = COLOR_BLACK;
 
-    safe_brush.Set(Create);
+    safe_brush.Create(safe_color);
     warning_brush.Create(warning_color);
     alarm_brush.Create(alarm_color);
   } else {

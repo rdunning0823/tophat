@@ -78,7 +78,6 @@ static const struct DeviceRegister *const driver_list[] = {
   &ew_microrecorder_driver,
   &lx_driver,
   &zander_driver,
-  &flymaster_b1_driver,
   &flymaster_f1_driver,
   &xcom760_driver,
   &condor_driver,
