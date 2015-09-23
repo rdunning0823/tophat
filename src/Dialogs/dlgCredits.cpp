@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2013 The XCSoar Project
+  Copyright (C) 2000-2015 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -22,14 +22,13 @@ Copyright_License {
 */
 
 #include "Dialogs/Dialogs.h"
-#include "Dialogs/CallBackTable.hpp"
-#include "Dialogs/XML.hpp"
-#include "Form/Form.hpp"
-#include "Form/Button.hpp"
-#include "Form/Tabbed.hpp"
-#include "Look/StandardFonts.hpp"
+#include "Dialogs/WidgetDialog.hpp"
+#include "Widget/CreateWindowWidget.hpp"
+#include "Widget/ArrowPagerWidget.hpp"
+#include "Widget/LargeTextWidget.hpp"
+#include "Look/FontDescription.hpp"
+#include "Look/DialogLook.hpp"
 #include "Screen/Canvas.hpp"
-#include "Screen/LargeTextWindow.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Font.hpp"
@@ -38,92 +37,23 @@ Copyright_License {
 #include "Inflate.hpp"
 #include "Util/ConvertString.hpp"
 #include "Resources.hpp"
+#include "UIGlobals.hpp"
+#include "Language/Language.hpp"
 
-#include <assert.h>
 #if defined(KOBO)
 #include <sys/utsname.h>
 #endif
 
-static WndForm *wf = NULL;
-static TabbedControl *tab = NULL;
+class LogoPageWindow final : public PaintWindow {
+protected:
+  /** from class PaintWindow */
+  virtual void OnPaint(Canvas &canvas) override;
+};
 
-static void
-OnNext()
+void
+LogoPageWindow::OnPaint(Canvas &canvas)
 {
-  tab->NextPage();
-}
-
-static void
-OnPrev()
-{
-  tab->PreviousPage();
-}
-
-gcc_pure
-static LargeTextWindow *
-FindLargeTextWindow()
-{
-  const TCHAR *name;
-  switch (tab->GetCurrentPage()) {
-  case 1:
-    name = _T("prpAuthors");
-    break;
-
-  case 2:
-    name = _T("prpLicense");
-    break;
-
-  default:
-    return NULL;
-  }
-
-  return (LargeTextWindow *)wf->FindByName(name);
-}
-
-static bool
-FormKeyDown(unsigned key_code)
-{
-  switch (key_code) {
-    LargeTextWindow *edit;
-
-  case KEY_UP:
-    edit = FindLargeTextWindow();
-    if (edit != NULL) {
-      edit->ScrollVertically(-3);
-      return true;
-    } else
-      return false;
-
-  case KEY_DOWN:
-    edit = FindLargeTextWindow();
-    if (edit != NULL) {
-      edit->ScrollVertically(3);
-      return true;
-    } else
-      return false;
-
-  case KEY_LEFT:
-#ifdef GNAV
-  case '6':
-#endif
-    tab->PreviousPage();
-    return true;
-
-  case KEY_RIGHT:
-#ifdef GNAV
-  case '7':
-#endif
-    tab->NextPage();
-    return true;
-
-  default:
-    return false;
-  }
-}
-
-static void
-OnLogoPaint(Canvas &canvas, const PixelRect &rc)
-{
+  const PixelRect rc = GetClientRect();
   const unsigned width = rc.right - rc.left;
   const unsigned height = rc.bottom - rc.top;
   int x = rc.left + Layout::FastScale(10);
@@ -148,7 +78,7 @@ OnLogoPaint(Canvas &canvas, const PixelRect &rc)
   y += title_size.cy + Layout::FastScale(20);
 
   Font font;
-  font.Load(GetStandardFontFace(), Layout::FastScale(16));
+  font.Load(FontDescription(Layout::FontScale(16)));
   canvas.Select(font);
   canvas.SetTextColor(COLOR_BLACK);
   canvas.SetBackgroundTransparent();
@@ -181,58 +111,46 @@ OnLogoPaint(Canvas &canvas, const PixelRect &rc)
   canvas.DrawText(x, y, _T("http://www.tophatsoaring.org"));
 }
 
-static void
-LoadTextFromResource(const void *data, size_t size, const TCHAR *control)
+static Window *
+CreateLogoPage(ContainerWindow &parent, const PixelRect &rc,
+               WindowStyle style)
 {
-  char *buffer = InflateToString(data, size);
-
-  UTF8ToWideConverter text(buffer);
-  if (text.IsValid())
-    ((LargeTextWindow *)wf->FindByName(control))->SetText(text);
-
-  delete[] buffer;
+  LogoPageWindow *window = new LogoPageWindow();
+  window->Create(parent, rc, style);
+  return window;
 }
 
-static void
-LoadTextFromResource(const uint8_t *start, const uint8_t *end,
-                     const TCHAR *control)
+extern "C"
 {
-  LoadTextFromResource(start, end - start, control);
+  extern const uint8_t COPYING_gz[];
+  extern const size_t COPYING_gz_size;
+
+  extern const uint8_t AUTHORS_gz[];
+  extern const size_t AUTHORS_gz_size;
 }
-
-static constexpr CallBackTableEntry CallBackTable[] = {
-  DeclareCallBackEntry(OnNext),
-  DeclareCallBackEntry(OnPrev),
-  DeclareCallBackEntry(OnLogoPaint),
-  DeclareCallBackEntry(NULL)
-};
-
-/* workaround note: we would prefer to use the "_size" symbol here,
-   but it turns out that Android 4 relocates these symbols for some
-   reason, therefore we use "end-start" instead */
-
-extern const uint8_t license_start[] asm("_binary_COPYING_gz_start");
-extern const uint8_t license_end[] asm("_binary_COPYING_gz_end");
-
-extern const uint8_t authors_start[] asm("_binary_AUTHORS_gz_start");
-extern const uint8_t authors_end[] asm("_binary_AUTHORS_gz_end");
 
 void
 dlgCreditsShowModal(SingleWindow &parent)
 {
-  wf = LoadDialog(CallBackTable, parent, Layout::landscape ?
-                  _T("IDR_XML_CREDITS_L") : _T("IDR_XML_CREDITS"));
-  assert(wf != NULL);
+  const DialogLook &look = UIGlobals::GetDialogLook();
 
-  tab = ((TabbedControl *)wf->FindByName(_T("tab")));
-  assert(tab != NULL);
+  char *authors = InflateToString(AUTHORS_gz, AUTHORS_gz_size);
+  const UTF8ToWideConverter authors2(authors);
 
-  wf->SetKeyDownFunction(FormKeyDown);
+  char *license = InflateToString(COPYING_gz, COPYING_gz_size);
+  const UTF8ToWideConverter license2(license);
 
-  LoadTextFromResource(license_start, license_end, _T("prpLicense"));
-  LoadTextFromResource(authors_start, authors_end, _T("prpAuthors"));
+  WidgetDialog dialog(look);
 
-  wf->ShowModal();
+  ArrowPagerWidget pager(dialog, look.button);
+  pager.Add(new CreateWindowWidget(CreateLogoPage));
+  pager.Add(new LargeTextWidget(look, authors2));
+  pager.Add(new LargeTextWidget(look, license2));
 
-  delete wf;
+  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Credits"), &pager);
+  dialog.ShowModal();
+  dialog.StealWidget();
+
+  delete[] authors;
+  delete[] license;
 }
