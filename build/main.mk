@@ -70,7 +70,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/ReplayDialog.cpp \
 	$(SRC)/Dialogs/dlgSimulatorPrompt.cpp \
 	$(SRC)/Dialogs/SimulatorPromptWindow.cpp \
-	$(SRC)/Dialogs/dlgStartup.cpp \
 	$(SRC)/Dialogs/dlgStartupAssistant.cpp \
 	$(SRC)/Dialogs/StartupDialog.cpp \
 	$(SRC)/Dialogs/ProfilePasswordDialog.cpp \
@@ -123,7 +122,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/Widgets/SectorZoneEditWidget.cpp \
 	$(SRC)/Dialogs/Task/Widgets/KeyholeZoneEditWidget.cpp \
 	$(SRC)/Dialogs/Task/Widgets/ObservationZoneSummaryWidget.cpp \
-	$(SRC)/Dialogs/Task/Manager/TaskMapWindow.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskMapButtonRenderer.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskManagerDialog.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskClosePanel.cpp \

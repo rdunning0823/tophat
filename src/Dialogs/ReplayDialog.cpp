@@ -31,7 +31,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Components.hpp"
 #include "Replay/Replay.hpp"
-#include "Form/DataField/FileReader.hpp"
+#include "Form/DataField/File.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Language/Language.hpp"
 #include "Event/Timer.hpp"
@@ -182,10 +182,9 @@ ReplayControlWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
             _("Name of file to replay.  Can be an IGC file (.igc), a raw NMEA log file (.nmea), or if blank, runs the demo."),
             nullptr,
             _T("*.nmea\0*.igc\0"),
-            true,
-            this);
-  ((DataFieldFileReader *)file->GetDataField())->SetReverseSort();
-  ((DataFieldFileReader *)file->GetDataField())->Lookup(replay->GetFilename());
+            true);
+  ((FileDataField *)file->GetDataField())->SetReverseSort();
+  ((FileDataField *)file->GetDataField())->Lookup(replay->GetFilename());
   file->RefreshDisplay();
 
   user_speed = replay->GetTimeScale();
@@ -231,7 +230,7 @@ ReplayControlWidget::SetReplayRate(fixed rate)
 bool
 ReplayControlWidget::StartReplay()
 {
-  const DataFieldFileReader &df = (const DataFieldFileReader &)
+  const FileDataField &df = (const FileDataField &)
     GetDataField(FILE);
   const TCHAR *path = df.GetPathFile();
   if (replay->Start(path)) {

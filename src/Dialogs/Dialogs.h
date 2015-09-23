@@ -60,13 +60,6 @@ void dlgConfigFontsShowModal();
 void dlgConfigurationSingle(Widget &widget, const TCHAR *caption);
 
 /**
- * @return true on success, false if the user has pressed the "Quit"
- * button
- */
-bool
-dlgStartupShowModal();
-
-/**
  * show the help screen.
  * @param conditional: if true, does not display if user has opted to not show
  * on startup

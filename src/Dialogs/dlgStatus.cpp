@@ -84,7 +84,6 @@ dlgStatusShowModal(int start_page)
   const IconLook &icons = UIGlobals::GetIconLook();
   const auto *FlightIcon = enable_icons ? &icons.hBmpTabFlight : nullptr;
   const auto *SystemIcon = enable_icons ? &icons.hBmpTabSystem : nullptr;
-  const auto *TaskIcon = enable_icons ? &icons.hBmpTabTask : nullptr;
   const auto *RulesIcon = enable_icons ? &icons.hBmpTabRules : nullptr;
   const auto *TimesIcon = enable_icons ? &icons.hBmpTabTimes : nullptr;
 

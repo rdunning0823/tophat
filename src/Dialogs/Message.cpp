@@ -67,7 +67,7 @@ ShowMessageBox(const TCHAR *text, const TCHAR *caption, unsigned flags)
   ContainerWindow &client_area = wf.GetClientAreaWindow();
 
   // add this margin at top and bottom of the window and above buttons
-  UPixelScalar top_bottom_margin = dialog_look.text_font->TextSize(_T("A")).cy;
+  UPixelScalar top_bottom_margin = dialog_look.text_font.TextSize(_T("A")).cy;
 
   // Create text element
   PixelRect text_rc = form_rc;
