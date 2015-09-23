@@ -762,6 +762,11 @@ public:
   bool TaskStarted(bool soft=false) const override;
   bool CheckTask() const override;
 
+  /**
+   * is this type of task optimizable?
+   */
+  virtual bool IsOptimizable() const;
+
 protected:
   /* virtual methods from class AbstractTask */
   bool UpdateSample(const AircraftState &state_now,
@@ -814,10 +819,6 @@ protected:
                             DistanceStat &leg_remaining_effective,
                             const GlideResult &solution_remaining_total,
                             const GlideResult &solution_remaining_leg) override;
-  /**
-   * is this type of task optimizable?
-   */
-  virtual bool IsOptimizable() const;
 
   void UpdateNavBarStatistics(const AircraftState &aircraft,
                               const GlidePolar &polar);
