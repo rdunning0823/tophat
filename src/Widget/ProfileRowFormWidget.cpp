@@ -36,10 +36,11 @@ WndProperty *
 RowFormWidget::AddFile(const TCHAR *label, const TCHAR *help,
                        const char *registry_key, const TCHAR *filters,
                        FileType file_type,
+                       DataFieldListener *listener,
                        bool nullable)
 {
   WndProperty *edit = Add(label, help);
-  auto *df = new FileDataField();
+  auto *df = new FileDataField(listener);
   df->SetFileType(file_type);
   edit->SetDataField(df);
 

@@ -423,12 +423,20 @@ public:
   WndProperty *AddFile(const TCHAR *label, const TCHAR *help,
                        const char *profile_key, const TCHAR *filters,
                        FileType file_type,
+                       DataFieldListener *listener,
                        bool nullable = true);
 
   WndProperty *AddFile(const TCHAR *label, const TCHAR *help,
                        const char *profile_key, const TCHAR *filters,
                        bool nullable = true) {
-    return AddFile(label, help, profile_key, filters, FileType::UNKNOWN,
+    return AddFile(label, help, profile_key, filters, FileType::UNKNOWN, nullptr,
+                   nullable);
+  }
+  WndProperty *AddFile(const TCHAR *label, const TCHAR *help,
+                       const char *profile_key, const TCHAR *filters,
+                       DataFieldListener *listener,
+                       bool nullable = true) {
+    return AddFile(label, help, profile_key, filters, FileType::UNKNOWN, listener,
                    nullable);
   }
 
