@@ -91,12 +91,6 @@ public:
   virtual void OnPaint(Canvas &canvas);
 
   /**
-   * handles on mouse move, and if dragged off button face, cancels drag
-   * This allows background object to accept capture at this time
-   */
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
-
-  /**
    * updates subscript text of button
    */
   void SetSubscripText(const TCHAR * _text) {

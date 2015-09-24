@@ -57,16 +57,6 @@ MapOverlayButton::GetStandardButtonHeight()
   return Fonts::map_bold.GetHeight();
 }
 
-bool
-MapOverlayButton::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
-{
-  if (IsInside(x, y))
-    return Button::OnMouseMove(x, y, keys);
-  else
-    OnCancelMode();
-  return true;
-}
-
 void
 MapOverlayButton::OnPaint(Canvas &canvas)
 {
