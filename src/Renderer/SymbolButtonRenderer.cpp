@@ -33,63 +33,23 @@ Copyright_License {
 #include "Asset.hpp"
 #include "Screen/Layout.hpp"
 #include "UIGlobals.hpp"
-
+#include "Formatter/HexColor.hpp"
+#include "Util/tstring.hpp"
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Scope.hpp"
 #include "Screen/OpenGL/Compatibility.hpp"
 #endif
+#ifndef USE_GDI
+
+#include <algorithm>
+#include <winuser.h>
+#endif
 
 static void
-DrawIcon1(Canvas &canvas, PixelRect rc, const Bitmap &bmp, bool pressed)
+DrawIconOrBitmap(Canvas &canvas, PixelRect rc, const MaskedIcon &icon, bool pressed)
 {
-  const PixelSize bitmap_size = bmp.GetSize();
-  const int offsety = (rc.bottom - rc.top - bitmap_size.cy) / 2;
-
-#ifdef ENABLE_OPENGL
-    const int offsetx = (rc.right - rc.left - bitmap_size.cx) / 2;
-
-    if (pressed) {
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-
-      /* invert the texture color */
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
-
-      /* copy the texture alpha */
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_TEXTURE);
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
-    } else
-      /* simple copy */
-      OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    const GLEnable scope(GL_TEXTURE_2D);
-    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    GLTexture &texture = *bmp.GetNative();
-    texture.Bind();
-    texture.Draw(rc.left + offsetx, rc.top + offsety);
-
-#else
-    const int offsetx = (rc.right - rc.left - bitmap_size.cx / 2) / 2;
-    if (pressed) // black background
-      canvas.CopyNotOr(rc.left + offsetx,
-                       rc.top + offsety,
-                       bitmap_size.cx / 2,
-                       bitmap_size.cy,
-                       bmp,
-                       bitmap_size.cx / 2, 0);
-
-    else
-      canvas.CopyAnd(rc.left + offsetx,
-                      rc.top + offsety,
-                      bitmap_size.cx / 2,
-                      bitmap_size.cy,
-                      bmp,
-                      bitmap_size.cx / 2, 0);
-#endif
+  icon.Draw(canvas, rc, pressed);
 }
 
 inline void
@@ -99,7 +59,6 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
   const ButtonLook &look = GetLook();
 
   // If button has text on it
-  const tstring caption = GetText();
   if (caption.empty())
     return;
 
@@ -112,6 +71,7 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     canvas.Select(look.standard.foreground_brush);
 
   const char ch = (char)caption[0u];
+  RGB8Color color;
 
   // Draw arrow symbol instead of <
   if (caption == _T("<"))
@@ -172,32 +132,35 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     //draw search icon
   } else if (caption == _("Search") || caption == _("SearchChecked")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const Bitmap *bmp;
-    bmp = caption == _("Search") ? &icon_look.hBmpSearch :
+    const MaskedIcon *icon;
+    icon = caption == _("Search") ? &icon_look.hBmpSearch :
         &icon_look.hBmpSearchChecked;
 
-    DrawIcon1(canvas, rc, *bmp, focused);
+    DrawIconOrBitmap(canvas, rc, *icon, focused);
   }
 
   //draw gear for set up icon
   else if (caption == _("Setup")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const Bitmap &bmp = icon_look.hBmpTabSettings;
-    DrawIcon1(canvas, rc, bmp, focused);
+    const MaskedIcon &icon = icon_look.hBmpTabSettings;
+    DrawIconOrBitmap(canvas, rc, icon, focused);
   }
   else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const Bitmap &bmp = icon_look.hBmpClose;
-    DrawIcon1(canvas, rc, bmp, focused);
+    const MaskedIcon &bmp = icon_look.hBmpClose;
+    DrawIconOrBitmap(canvas, rc, bmp, focused);
 
-  } else if (caption.compare(0, 9, _T("_chkmark_")) == 0) {
+  } else if (caption.StartsWith(_T("_chkmark_"))) {
+    const ButtonLook &look = GetLook();
     const Font &font = *look.font;
-    tstring text = caption.substr(9, 99).c_str();
-    PixelSize sz_text = font.TextSize(text.c_str());
+    tstring temp_string = caption.c_str();
+    tstring sub_string = temp_string.substr(9, temp_string.length() - 9);
+
+    PixelSize sz_text = font.TextSize(sub_string.c_str());
     UPixelScalar padding = Layout::GetTextPadding();
 
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const Bitmap &bmp = icon_look.hBmpCheckMark;
+    const MaskedIcon &bmp = icon_look.hBmpCheckMark;
     PixelSize sz_icon = bmp.GetSize();
     PixelRect rc_icon = rc;
     rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
@@ -207,40 +170,9 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     rc_caption.left = rc_icon.right + padding;
     rc_caption.right = rc_caption.left + sz_text.cx + padding;
 
-    DrawIcon1(canvas, rc_icon, bmp, focused);
+    DrawIconOrBitmap(canvas, rc_icon, bmp, focused);
 
-    canvas.SetBackgroundTransparent();
-    if (enabled)
-      canvas.SetTextColor(look.disabled.color);
-    else if (focused)
-      canvas.SetTextColor(look.focused.foreground_color);
-    else
-      canvas.SetTextColor(look.standard.foreground_color);
-
-    canvas.Select(*look.font);
-
-#ifndef USE_GDI
-  unsigned style = GetTextStyle();
-
-  canvas.DrawFormattedText(&rc_caption, text.c_str(), style);
-#else
-  unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
-
-  PixelRect text_rc = rc_caption;
-  canvas.DrawFormattedText(&text_rc, text.c_str(), style | DT_CALCRECT);
-  text_rc.right = rc.right;
-
-  PixelScalar offset = rc.bottom - text_rc.bottom;
-  if (offset > 0) {
-    offset /= 2;
-    text_rc.top += offset;
-    text_rc.bottom += offset;
-  }
-
-  canvas.DrawFormattedText(&text_rc, text.c_str(), style);
-#endif
-
-
+    DrawCaption(canvas, sub_string.c_str(), rc_caption, enabled, focused, pressed);
 
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
@@ -276,9 +208,8 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     canvas.Select(Pen(Layout::Scale(1), COLOR_BLACK));
     canvas.SelectHollowBrush();
     canvas.DrawCircle(left, (rc.top + rc.bottom) / 2, (UPixelScalar)(size * 1.5));
-  } else {
-    Button::OnPaint(canvas);
-  }
+  } else
+    DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed);
 }
 
 void

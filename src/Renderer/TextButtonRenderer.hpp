@@ -33,6 +33,7 @@ Copyright_License {
  * some text.
  */
 class TextButtonRenderer : public ButtonRenderer {
+protected:
   ButtonFrameRenderer frame_renderer;
 
   TextRenderer text_renderer;
@@ -74,9 +75,14 @@ public:
   void DrawButton(Canvas &canvas, const PixelRect &rc,
                   bool enabled, bool focused, bool pressed) const override;
 
-private:
+protected:
   void DrawCaption(Canvas &canvas, const PixelRect &rc,
                    bool enabled, bool focused, bool pressed) const;
+
+  void DrawCaption(Canvas &canvas, StaticString<64>::const_pointer _caption,
+                   const PixelRect &rc,
+                   bool enabled, bool focused, bool pressed) const;
+
 };
 
 #endif

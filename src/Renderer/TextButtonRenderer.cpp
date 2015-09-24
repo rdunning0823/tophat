@@ -35,6 +35,15 @@ inline void
 TextButtonRenderer::DrawCaption(Canvas &canvas, const PixelRect &rc,
                                 bool enabled, bool focused, bool pressed) const
 {
+  DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed);
+}
+
+inline void
+TextButtonRenderer::DrawCaption(Canvas &canvas,
+                                StaticString<64>::const_pointer _caption,
+                                const PixelRect &rc, bool enabled,
+                                bool focused, bool pressed) const
+{
   const ButtonLook &look = GetLook();
 
   canvas.SetBackgroundTransparent();
@@ -47,7 +56,7 @@ TextButtonRenderer::DrawCaption(Canvas &canvas, const PixelRect &rc,
 
   canvas.Select(*look.font);
 
-  text_renderer.Draw(canvas, rc, GetCaption());
+  text_renderer.Draw(canvas, rc, _caption);
 }
 
 unsigned

@@ -24,39 +24,27 @@ Copyright_License {
 #ifndef XCSOAR_SYMBOL_BUTTON_RENDERER_HPP
 #define XCSOAR_SYMBOL_BUTTON_RENDERER_HPP
 
-#include "ButtonRenderer.hpp"
+#include "TextButtonRenderer.hpp"
 #include "Util/StaticString.hxx"
+
+#include <tchar.h>
 
 /**
  * A #ButtonRenderer instance that renders a regular button frame and
  * a symbol.
  */
-class SymbolButtonRenderer : public ButtonRenderer {
-  ButtonFrameRenderer frame_renderer;
-
-  StaticString<16> caption;
+class SymbolButtonRenderer : public TextButtonRenderer {
 
 public:
   SymbolButtonRenderer(const ButtonLook &_look,
                        StaticString<64>::const_pointer _caption)
-    :frame_renderer(_look), caption(_caption) {}
+    :TextButtonRenderer(_look, _caption) {}
 
-  const ButtonLook &GetLook() const {
-    return frame_renderer.GetLook();
-  }
-
-  StaticString<64>::const_pointer GetCaption() const {
-    return caption;
-  }
-
-  void SetCaption(const TCHAR* _caption) {
-    caption = _caption;
-  }
-
-  void DrawButton(Canvas &canvas, const PixelRect &rc,
-                  bool enabled, bool focused, bool pressed) const override;
 
 private:
+  virtual void DrawButton(Canvas &canvas, const PixelRect &rc,
+                          bool enabled, bool focused, bool pressed) const;
+
   void DrawSymbol(Canvas &canvas, PixelRect rc,
                   bool enabled, bool focused, bool pressed) const;
 };

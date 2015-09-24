@@ -38,10 +38,11 @@ WndSymbolButton::WndSymbolButton(ContainerWindow &parent,
                                  ActionListener &_listener,
                                  int _id)
 {
-  void Create(parent, rc, style, new SymbolButtonRenderer(_look,_caption),
-              _listener, _id);
+  Button::Create(parent, rc, style, new SymbolButtonRenderer(_look,_caption),
+                 _listener, _id);
 }
 
+void
 WndSymbolButton::Create(ContainerWindow &parent,
                         const ButtonLook &_look,
                         const TCHAR *_caption,
@@ -50,8 +51,8 @@ WndSymbolButton::Create(ContainerWindow &parent,
                         ActionListener &_listener,
                         int _id)
 {
-  void Create(parent, rc, style, new SymbolButtonRenderer(_look,_caption),
-              _listener, _id);
+  Button::Create(parent, rc, style, new SymbolButtonRenderer(_look,_caption),
+                 _listener, _id);
 }
 
 void
@@ -59,7 +60,7 @@ WndSymbolButton::SetCaption(const TCHAR *caption)
 {
   assert(caption != nullptr);
 
-  SymbolButtonRenderer &r = *(SymbolButtonRenderer *)renderer;
+  SymbolButtonRenderer &r = (SymbolButtonRenderer&)GetRenderer();
   r.SetCaption(caption);
 
   Invalidate();
@@ -125,7 +126,7 @@ Button::SetCaption(const TCHAR *caption)
 }
 
 StaticString<64>::const_pointer
-Button::GetCaption(const TCHAR *caption)
+Button::GetCaption()
 {
   TextButtonRenderer &r = *(TextButtonRenderer *)renderer;
   return r.GetCaption();
