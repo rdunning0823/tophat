@@ -389,20 +389,20 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   // Draw tp name, truncated to leave space before rt. bearing if drawn
   canvas.Select(name_font);
-  PixelSize bitmap_size {0, 0};
-  UPixelScalar left_bitmap;
-  const Bitmap *bmp = &icon_look.hBmpCheckMark;
+  PixelSize icon_size {0, 0};
+  UPixelScalar left_icon;
+  const MaskedIcon *icon = &icon_look.hBmpCheckMark;
   if (draw_checkmark) {
-    bitmap_size = bmp->GetSize();
+    icon_size = icon->GetSize();
 #ifdef ENABLE_OPENGL
     /* this seams to be a is this a bug? */
-    bitmap_size.cx *= 2;
+    icon_size.cx *= 2;
 #endif
   }
   PixelRect rc_name(rc_outer.left + GetHintWidth(), rc_outer.top,
                     rc_outer.right - GetHintWidth(), rc_outer.bottom);
 
-  width = canvas.CalcTextWidth(tp_name) + bitmap_size.cx / 2;
+  width = canvas.CalcTextWidth(tp_name) + icon_size.cx / 2;
 
   if ((PixelScalar)width > (rc_name.right - rc_name.left)) {
     if (is_current_tp && bearing_direction != 1)
@@ -410,43 +410,28 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if (is_current_tp && bearing_direction == 1)
         rc_name.right -= Layout::Scale(5);
 
-    left_bitmap = rc_name.left;
+    left_icon = rc_name.left;
 
   } else
-    left_bitmap = rc_name.left + (rc_name.right - rc_name.left - width) / 2;
+    left_icon = rc_name.left + (rc_name.right - rc_name.left - width) / 2;
 
-  // TODO make clip to show bearing bitmap and also clip for canvas
-  canvas.DrawClippedText(left_bitmap + bitmap_size.cx / 2,
+  // TODO make clip to show bearing icon and also clip for canvas
+  canvas.DrawClippedText(left_icon + icon_size.cx / 2,
                   line_two_y_offset,
-                  rc_name.right - rc_name.left - bitmap_size.cx / 2, tp_name);
+                  rc_name.right - rc_name.left - icon_size.cx / 2, tp_name);
 
   // draw checkmark next to name if oz entered
   if (draw_checkmark) {
 
-    const int offsety = ((PixelScalar)line_two_y_offset + bitmap_size.cy <= rc.bottom) ?
-        (line_two_y_offset + (rc.bottom - line_two_y_offset - bitmap_size.cy)
-            / 2 - Layout::Scale(1)) : rc.bottom - bitmap_size.cy - Layout::Scale(1);
-    RasterPoint upper_left(left_bitmap, rc.top + offsety);
-    RasterPoint lower_right(upper_left.x + bitmap_size.cx / 2,
-                            upper_left.y + bitmap_size.cy);
+    const int offsety = icon_size.cy / 2 + ((PixelScalar)line_two_y_offset + icon_size.cy <= rc.bottom) ?
+        (line_two_y_offset + (rc.bottom - line_two_y_offset - icon_size.cy)
+            / 2 - Layout::Scale(1)) : rc.bottom - icon_size.cy - Layout::Scale(1);
+
+    RasterPoint upper_left(left_icon, rc.top + offsety);
+    RasterPoint lower_right(upper_left.x,
+                            upper_left.y);
     if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right)) {
-#ifdef ENABLE_OPENGL
-    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    const GLEnable<GL_TEXTURE_2D> scope;
-    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    GLTexture &texture = *bmp->GetNative();
-    texture.Bind();
-    texture.Draw(upper_left.x, upper_left.y);
-#else
-    canvas.CopyAnd(upper_left.x,
-                   upper_left.y,
-                   bitmap_size.cx / 2,
-                   bitmap_size.cy,
-                   *bmp,
-                   bitmap_size.cx / 2, 0);
-#endif
+      icon->DrawUpperLeft(canvas, upper_left); // draws from center of icon
     }
 
   }
@@ -462,67 +447,50 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
     fourth = 30,
   };
   const IconLook &icon_look = UIGlobals::GetIconLook();
-  const Bitmap *bmp_bearing = nullptr;
+  const MaskedIcon *icon_bearing = nullptr;
   int direction = 0;
   if (bearing.AsDelta().Degrees() > fixed(first)) {
     if (bearing.AsDelta().Degrees() > fixed(fourth))
-      bmp_bearing = &icon_look.hBmpBearingRightFour;
+      icon_bearing = &icon_look.hBmpBearingRightFour;
     else if (bearing.AsDelta().Degrees() > fixed(third))
-      bmp_bearing = &icon_look.hBmpBearingRightThree;
+      icon_bearing = &icon_look.hBmpBearingRightThree;
     else if (bearing.AsDelta().Degrees() > fixed(second))
-      bmp_bearing = &icon_look.hBmpBearingRightTwo;
+      icon_bearing = &icon_look.hBmpBearingRightTwo;
     else
-      bmp_bearing = &icon_look.hBmpBearingRightOne;
+      icon_bearing = &icon_look.hBmpBearingRightOne;
     direction = 1;
   }
 
   if (bearing.AsDelta().Degrees() < fixed(-first)) {
     if (bearing.AsDelta().Degrees() < fixed(-fourth))
-      bmp_bearing = &icon_look.hBmpBearingLeftFour;
+      icon_bearing = &icon_look.hBmpBearingLeftFour;
     else if (bearing.AsDelta().Degrees() < fixed(-third))
-      bmp_bearing = &icon_look.hBmpBearingLeftThree;
+      icon_bearing = &icon_look.hBmpBearingLeftThree;
     else if (bearing.AsDelta().Degrees() < fixed(-second))
-      bmp_bearing = &icon_look.hBmpBearingLeftTwo;
+      icon_bearing = &icon_look.hBmpBearingLeftTwo;
     else
-      bmp_bearing = &icon_look.hBmpBearingLeftOne;
+      icon_bearing = &icon_look.hBmpBearingLeftOne;
     direction = -1;
   }
 
   if (direction == 0)
     return 0;
 
-  PixelSize bmp_bearing_size = bmp_bearing->GetSize();
-  const PixelScalar vert_margin = points[2].y - bmp_bearing_size.cy / 2;
+  PixelSize icon_bearing_size = icon_bearing->GetSize();
+  const PixelScalar vert_margin = points[2].y - icon_bearing_size.cy / 2;
 
-  UPixelScalar x_offset = (direction == -1) ? bearing_icon_hor_margin + 1 :
-      GetWidth() - bearing_icon_hor_margin -
-#ifdef ENABLE_OPENGL
-      bmp_bearing_size.cx; // not sure why this bug exists 672 introduced
-#else
-  bmp_bearing_size.cx / 2;
-#endif
+  UPixelScalar x_offset = (direction == -1) ? 1 :
+      GetWidth() - icon_bearing_size.cx;
 
   RasterPoint upper_left(rc_outer.left + x_offset, vert_margin);
-  RasterPoint lower_right(upper_left.x + bmp_bearing_size.cx / 2,
-                          upper_left.y + bmp_bearing_size.cy);
-
+  RasterPoint lower_right(upper_left.x + icon_bearing_size.cx,
+                          upper_left.y + icon_bearing_size.cy);
   if (canvas.GetRect().IsInside(upper_left) &&
       canvas.GetRect().IsInside(lower_right)) {
 #ifdef ENABLE_OPENGL
-    OpenGL::glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    const GLEnable<GL_TEXTURE_2D> scope;
-    const GLBlend blend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    GLTexture &texture = *bmp_bearing->GetNative();
-    texture.Bind();
-    texture.Draw(upper_left.x, upper_left.y);
+    icon_bearing->DrawUpperLeft(canvas, upper_left);
 #else
-    canvas.CopyAnd(upper_left.x,
-                   upper_left.y,
-                   bmp_bearing_size.cx / 2, bmp_bearing_size.cy,
-                   *bmp_bearing,
-                   bmp_bearing_size.cx / 2, 0);
+    icon_bearing->DrawUpperLeft(canvas, upper_left);
 #endif
   }
   return direction;
@@ -540,13 +508,13 @@ SliderShape::Resize(UPixelScalar map_width)
       + medium_font_height - Layout::Scale(2);
 
   total_height = std::max(total_height, UPixelScalar(
-      bearing_icon_size.cy + bearing_icon_hor_margin));
+      bearing_icon_size.cy));
 
   UPixelScalar raw_hint_width =
       (total_height - arrow_point_bluntness) / 2;  // make 45 degree angle
 
   raw_hint_width = std::max(raw_hint_width, UPixelScalar(
-      bearing_icon_size.cx / 2 + bearing_icon_hor_margin));
+      bearing_icon_size.cx / 2));
 
   total_height = std::max(total_height, UPixelScalar(
       raw_hint_width * 2 + arrow_point_bluntness));

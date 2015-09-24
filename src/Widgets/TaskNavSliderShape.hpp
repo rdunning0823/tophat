@@ -89,7 +89,7 @@ public:
    infobox_look(UIGlobals::GetLook().info_box),
    bearing_icon_hor_margin(0) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const Bitmap *bmp_bearing;
+    const MaskedIcon *bmp_bearing;
     bmp_bearing = &icon_look.hBmpBearingRightOne;
     bearing_icon_size = bmp_bearing->GetSize();
   };

@@ -42,22 +42,22 @@ struct IconLook {
   MaskedIcon hBmpTabRules;
   MaskedIcon hBmpTabTimes;
 
-  Bitmap hBmpMenuButton;
-  Bitmap hBmpScreensButton;
-  Bitmap hBmpCheckMark;
-  Bitmap hBmpSearch;
-  Bitmap hBmpSearchChecked;
-  Bitmap hBmpZoomOutButton;
-  Bitmap hBmpZoomInButton;
-  Bitmap hBmpBearingLeftOne;
-  Bitmap hBmpBearingLeftTwo;
-  Bitmap hBmpBearingLeftThree;
-  Bitmap hBmpBearingLeftFour;
-  Bitmap hBmpBearingRightOne;
-  Bitmap hBmpBearingRightTwo;
-  Bitmap hBmpBearingRightThree;
-  Bitmap hBmpBearingRightFour;
-  Bitmap hBmpClose;
+  MaskedIcon hBmpMenuButton;
+  MaskedIcon hBmpScreensButton;
+  MaskedIcon hBmpCheckMark;
+  MaskedIcon hBmpSearch;
+  MaskedIcon hBmpSearchChecked;
+  MaskedIcon hBmpZoomOutButton;
+  MaskedIcon hBmpZoomInButton;
+  MaskedIcon hBmpBearingLeftOne;
+  MaskedIcon hBmpBearingLeftTwo;
+  MaskedIcon hBmpBearingLeftThree;
+  MaskedIcon hBmpBearingLeftFour;
+  MaskedIcon hBmpBearingRightOne;
+  MaskedIcon hBmpBearingRightTwo;
+  MaskedIcon hBmpBearingRightThree;
+  MaskedIcon hBmpBearingRightFour;
+  MaskedIcon hBmpClose;
 
   void Initialise();
 };

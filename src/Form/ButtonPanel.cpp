@@ -30,7 +30,8 @@ Copyright_License {
 #include "Screen/Font.hpp"
 #include "Screen/Key.h"
 
-ButtonPanel::ButtonPanel(ContainerWindow &_parent, const ButtonLook &_look)
+ButtonPanel::ButtonPanel(ContainerWindow &_parent, const ButtonLook &_look,
+                         ButtonPanelPosition position)
   :parent(_parent), look(_look), selected_index(-1) {
   style.TabStop();
 }
