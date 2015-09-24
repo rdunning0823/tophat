@@ -129,7 +129,6 @@ event=Pan off
 label=Pan\nOff
 location=28
 
-
 ###### main entry buttons
 
 mode=default
@@ -683,28 +682,27 @@ event=Mode Config2
 label=Config\n1/3
 location=3
 
+
 mode=Config1
 type=key
 data=6
-event=Setup System
-event=Mode default
-label=System
+event=MacCready up
+label=MacCready\n+
 location=5
 
 mode=Config1
 type=key
 data=7
-event=Setup Plane
-event=Mode default
-label=Plane
+event=MacCready down
+label=MacCready\n-
 location=6
 
 mode=Config1
 type=key
 data=8
-event=Device list
-event=Mode default
-label=Devices
+event=MacCready auto show
+event=MacCready auto toggle
+label=$(CheckAutoMc)MacCready\n$(MacCreadyToggleActionName)
 location=7
 
 mode=Config1
@@ -736,17 +734,25 @@ location=3
 mode=Config2
 type=key
 data=6
-event=Setup Profile
+event=Setup System
 event=Mode default
-label=Profiles
+label=System
 location=5
 
 mode=Config2
 type=key
-data=8
-event=WaypointEditor
+data=7
+event=Setup Plane
 event=Mode default
-label=Waypoints Editor
+label=Plane
+location=6
+
+mode=Config2
+type=key
+data=8
+event=Device list
+event=Mode default
+label=Devices
 location=7
 
 mode=Config2
@@ -792,7 +798,15 @@ location=6
 
 mode=Config3
 type=key
-data=9
+data=8
+event=Setup Airspace
+event=Mode default
+label=Airspace$(CheckAirspace)
+location=7
+
+mode=Config3
+type=key
+data=0
 event=Mode Vario1
 label=Vega$(CheckVega)
 location=8
@@ -921,7 +935,7 @@ location=6
 mode=Info1
 type=key
 data=8
-event=NearestMapItems
+event=NearestMapItems aircraft
 event=Mode default
 label=What's\nhere?
 location=7
@@ -965,7 +979,7 @@ type=key
 data=7
 event=Setup Weather
 event=Mode default
-label=Weather$(CheckWeather)
+label=Weather
 location=6
 
 mode=Info2
