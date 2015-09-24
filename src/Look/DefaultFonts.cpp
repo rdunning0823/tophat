@@ -40,10 +40,10 @@ static void
 InitialiseLogFonts(FontSettings &settings)
 {
   // new font for map labels
-  settings.map = FontDescription(Layout::FontScale(10));
+  settings.map = FontDescription(Layout::FontScale(17));
 
   // Font for map bold text
-  settings.map_bold = FontDescription(Layout::FontScale(10), true);
+  settings.map_bold = FontDescription(Layout::FontScale(17), true);
 }
 
 FontSettings
