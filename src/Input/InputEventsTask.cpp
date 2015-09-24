@@ -36,6 +36,7 @@ Copyright_License {
 #include "Profile/ProfileKeys.hpp"
 #include "LocalPath.hpp"
 #include "Dialogs/Task/TaskDialogs.hpp"
+#include "Dialogs/Task/TaskManagerDialogUs.hpp"
 #include "Dialogs/Waypoint/WaypointDialogs.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/TaskFile.hpp"
@@ -107,7 +108,7 @@ InputEvents::eventArmAdvance(const TCHAR *misc)
 void
 InputEvents::eventCalculator(gcc_unused const TCHAR *misc)
 {
-  dlgTaskManagerShowModal();
+  TaskManagerDialogUsShowModal();
 
   trigger_redraw();
 }
