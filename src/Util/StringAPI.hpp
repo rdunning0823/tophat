@@ -160,9 +160,9 @@ StringCollate(const char *a, const char *b)
 {
 #ifdef _WIN32_WCE
   /* WinCE doesn't have strcoll() */
-  return strcmp(a, b);
+  return strcasecmp(a, b);
 #else
-  return strcoll(a, b);
+  return strcasecmp(a, b);
 #endif
 }
 

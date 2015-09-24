@@ -306,24 +306,6 @@ FileDataField::Dec()
   }
 }
 
-static int _cdecl
-DataFieldFileReaderCompareReverse(const void *elem1, const void *elem2)
-{
-  // Compare by filename
-  return StringCompareIgnoreCase(
-      ((const DataFieldFileReader::Item *)elem2)->filename,
-      ((const DataFieldFileReader::Item *)elem1)->filename);
-}
-
-static int _cdecl
-DataFieldFileReaderCompare(const void *elem1, const void *elem2)
-{
-  // Compare by filename
-  return StringCompareIgnoreCase(
-      ((const DataFieldFileReader::Item *)elem1)->filename,
-      ((const DataFieldFileReader::Item *)elem2)->filename);
-}
-
 void
 FileDataField::Sort()
 {
@@ -333,11 +315,15 @@ FileDataField::Sort()
   }
 
   if (sort_reverse)
-    qsort(files.begin(), files.size(), sizeof(Item),
-          DataFieldFileReaderCompareReverse);
+    // Sort the filelist (except for the first (empty) element)
+    std::sort(files.begin(), files.end(), [](const Item &a,
+                                             const Item &b) {
+                // Compare by filename
+                return StringCollate(a.filename, b.filename) > 0;
+              });
   else
   // Sort the filelist (except for the first (empty) element)
-  std::sort(files.begin(), files.end(), [](const Item &a,
+    std::sort(files.begin(), files.end(), [](const Item &a,
                                            const Item &b) {
               // Compare by filename
               return StringCollate(a.filename, b.filename) < 0;
@@ -427,13 +413,13 @@ FileDataField::EnsureLoaded()
 }
 
 const TCHAR*
-DataFieldFileReader::GetScanInternetLabel() const
+FileDataField::GetScanInternetLabel() const
 {
   return _("--Click to scan internet--");
 }
 
 void
-DataFieldFileReader::EnableInternetDownload()
+FileDataField::EnableInternetDownload()
 {
   enable_file_download = true;
 }
