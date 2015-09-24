@@ -33,70 +33,37 @@ Copyright_License {
 ArrowPagerWidget::Layout::Layout(PixelRect rc, const Widget *extra_widget)
   :main(rc)
 {
-  const unsigned width = rc.right - rc.left;
-  const unsigned height = rc.bottom - rc.top;
   const unsigned button_height = ::Layout::GetMaximumControlHeight();
+  const unsigned button_width = rc.GetSize().cx / 4; // close is 2x as wide
 
   main = rc;
 
-  if (width > height) {
-    /* landscape */
+  /* portrait */
 
-    main.left += ::Layout::Scale(70);
+  main.bottom -= button_height;
 
-    /* close button on the bottom left */
+  /* buttons distributed on the bottom line */
 
-    close_button.left = rc.left;
-    close_button.right = main.left;
+  previous_button.top = next_button.top =
+    close_button.top = main.bottom;
+  previous_button.bottom = next_button.bottom =
     close_button.bottom = rc.bottom;
-    close_button.top = close_button.bottom - button_height;
 
-    /* previous/next buttons above the close button */
+  close_button.left = rc.left;
+  close_button.right = close_button.left + 2 * button_width;
+  previous_button.left = close_button.right;
+  previous_button.right = previous_button.left + button_width;
 
-    previous_button = close_button;
-    previous_button.bottom = previous_button.top;
-    previous_button.top = previous_button.bottom - button_height;
-    previous_button.right = (previous_button.left + previous_button.right) / 2;
+  next_button.right = rc.right;
+  next_button.left = previous_button.right;
 
-    next_button = previous_button;
-    next_button.left = next_button.right;
-    next_button.right = close_button.right;
+  /* "extra" gets another row */
 
-    /* the remaining area is "extra" */
-
-    extra.left = close_button.left;
-    extra.right = close_button.right;
-    extra.top = rc.top;
-    extra.bottom = previous_button.top;
-  } else {
-    /* portrait */
-
-    main.bottom -= button_height;
-
-    /* buttons distributed on the bottom line */
-
-    previous_button.top = next_button.top =
-      close_button.top = main.bottom;
-    previous_button.bottom = next_button.bottom =
-      close_button.bottom = rc.bottom;
-
-    previous_button.left = rc.left;
-    close_button.right = rc.right;
-    close_button.left = (rc.left + rc.right) / 2;
-
-    next_button.right = close_button.left;
-    previous_button.right = next_button.left =
-      (rc.left * 3 + rc.right) / 4;
-    previous_button.left = rc.left;
-
-    /* "extra" gets another row */
-
-    if (extra_widget != nullptr) {
-      extra.left = main.left;
-      extra.right = main.right;
-      extra.bottom = main.bottom;
-      extra.top = main.bottom -= button_height;
-    }
+  if (extra_widget != nullptr) {
+    extra.left = main.left;
+    extra.right = main.right;
+    extra.bottom = main.bottom;
+    extra.top = main.bottom -= button_height;
   }
 }
 
