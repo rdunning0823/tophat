@@ -81,8 +81,6 @@ public:
     }
 
     virtual void OnPaint(Canvas &canvas) {
-      PaintWindow::OnPaint(canvas);
-
       if (listener != nullptr)
         listener->OnPaintFooter(canvas);
     }

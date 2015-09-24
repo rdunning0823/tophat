@@ -34,11 +34,12 @@
 #include "Screen/Layout.hpp"
 #include "Language/Language.hpp"
 #include "Renderer/TextInBox.hpp"
+#include "Hardware/DisplayDPI.hpp"
 
 #include <algorithm>
 
 GestureZone::GestureZone()
-  :x_zone_width(Layout::GetXDPI() / 2), draw_initialized(false),
+  :x_zone_width(Display::GetXDPI() / 2), draw_initialized(false),
    help_duration(15000), gesture_look(UIGlobals::GetLook().gesture),
    available(false){}
 
@@ -49,8 +50,8 @@ GestureZone::SetZoneWidth(PixelRect rc_map)
   /**
    * use 1/2 inch min up to 1 inch, but not more than 1/4 the width of the screen
    */
-  x_zone_width = std::max(Layout::GetXDPI() / 2,
-                          std::min(Layout::GetXDPI(), screen_width / 4));
+  x_zone_width = std::max(Display::GetXDPI() / 2,
+                          std::min(Display::GetXDPI(), screen_width / 4));
 }
 
 bool

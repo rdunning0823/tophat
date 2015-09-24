@@ -364,7 +364,6 @@ MacCreadyEditPanel::FinalGlideChart::FinalGlideChart(ContainerWindow &parent,
 void
 MacCreadyEditPanel::FinalGlideChart::OnPaint(Canvas &canvas)
 {
-  PaintWindow::OnPaint(canvas);
   canvas.SelectNullPen();
   canvas.Clear(look.dialog.background_color);
   StaticString<64> description;

@@ -94,19 +94,19 @@ GetDialogStyle()
   return style;
 }
 
+static constexpr unsigned distance_filter_items[] = {
+  0, 25, 50, 75, 100, 150, 250, 500, 1000
+};
+
+static constexpr int direction_filter_items[] = {
+  -1, -1, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330
+};
+
 class WaypointListSimpleDialog : public NullWidget, public WndForm,
   public ListItemRenderer, public ListCursorHandler
 {
 
 protected:
-  static constexpr unsigned distance_filter_items[] = {
-    0, 25, 50, 75, 100, 150, 250, 500, 1000
-  };
-
-  static constexpr int direction_filter_items[] = {
-    -1, -1, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330
-  };
-
   struct WaypointListDialogState
   {
     StaticString<WaypointFilter::NAME_LENGTH + 1> name;
@@ -187,7 +187,6 @@ public:
 
   /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual bool Save(bool &changed);
   virtual void Show(const PixelRect &rc);
   virtual void Hide() {};
   virtual void Move(const PixelRect &rc);

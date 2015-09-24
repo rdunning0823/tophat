@@ -259,8 +259,6 @@ TaskManagerDialogUs::TaskView::SetPartialScreenRect(PixelRect _rc_partial_screen
 void
 TaskManagerDialogUs::TaskView::OnPaint(Canvas &canvas)
 {
-  PaintWindow::OnPaint(canvas);
-
 #ifdef ENABLE_OPENGL
   /* enable clipping */
   GLCanvasScissor scissor(canvas);

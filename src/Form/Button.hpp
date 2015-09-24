@@ -157,7 +157,7 @@ public:
                   WindowStyle style,
                   ActionListener &_listener,
                   int _id);
-  WndSymbolButton();
+  WndSymbolButton() {};
 
   void Create(ContainerWindow &parent,
               const ButtonLook &look,

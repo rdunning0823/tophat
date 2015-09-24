@@ -157,11 +157,12 @@ public:
 
   /* virtual methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual bool Save(bool &changed);
-  virtual void Show(const PixelRect &rc);
+  virtual void Move(const PixelRect &rc) {};
+  virtual void Show(const PixelRect &rc) {};
   virtual void Hide() {};
-  virtual void Move(const PixelRect &rc);
+
+  /* overrides from WndForm */
+  virtual void OnResize(PixelSize new_size) override;
 
   /* virtual methods from ListItemRenderer */
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
@@ -246,6 +247,25 @@ public:
     return task_editor_return;
   }
 };
+
+void
+TaskPointUsDialog::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+  SetRectangles(GetClientRect());
+
+  task_properties_button.Move(rc_task_properties_button);
+  close_button.Move(rc_close_button);
+  zone_type_button.Move(rc_zone_type_button);
+  add_button.Move(rc_add_button);
+  browse_button.Move(rc_browse_button);
+  relocate_button.Move(rc_relocate_button);
+  remove_button.Move(rc_remove_button);
+  type_button.Move(rc_type_button);
+  properties_button.Move(rc_properties_button);
+  dock.Move(rc_dock);
+  waypoint_list.Move(rc_waypoint_list);
+}
 
 ObservationZoneEditWidget *
 TaskPointUsDialog::CreateObservationZoneEditWidget(ObservationZonePoint &oz,
@@ -795,7 +815,6 @@ TaskPointUsDialog::SetRectangles(const PixelRect rc_outer)
   rc_zone_type_button.bottom = rc_zone_type_button.top + button_height;;
 
 }
-
 
 void
 TaskPointUsDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
