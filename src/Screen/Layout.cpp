@@ -116,8 +116,8 @@ Layout::Initialize(PixelSize new_size, unsigned ui_scale)
 
   text_padding = VptScale(2);
 
-  minimum_control_height = std::min(FontScale(23),
-                                    min_screen_pixels / 12);
+  minimum_control_height = std::min(FontScale(23) * 3,
+                                    min_screen_pixels / 5);
 
   if (HasTouchScreen()) {
     /* larger rows for touch screens */
