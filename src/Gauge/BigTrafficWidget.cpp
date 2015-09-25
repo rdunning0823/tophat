@@ -47,7 +47,6 @@
 #include "Interface.hpp"
 #include "UISettings.hpp"
 #include "Asset.hpp"
-#include "Widgets/OverlayButtonWidget.hpp"
 #include "Renderer/SymbolRenderer.hpp"
 
 /**
