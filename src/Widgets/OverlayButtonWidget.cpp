@@ -48,6 +48,7 @@ OverlayButtonWidget::Prepare(ContainerWindow &parent,
   const MapLook &map_look = UIGlobals::GetMapLook();
   assert(prepared == false);
   white_look.Initialise(*map_look.overlay_font);
+  white_look.background_transparent = true;
 
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   CreateButton(parent, white_look, icon_look, rc);

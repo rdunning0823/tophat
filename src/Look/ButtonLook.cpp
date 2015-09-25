@@ -28,6 +28,7 @@ void
 ButtonLook::Initialise(const Font &_font)
 {
   font = &_font;
+  background_transparent = false;
 
   standard.foreground_color = COLOR_BLACK;
   standard.foreground_brush.Create(standard.foreground_color);

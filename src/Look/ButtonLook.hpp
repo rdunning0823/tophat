@@ -32,6 +32,7 @@ class Font;
 
 struct ButtonLook {
   const Font *font;
+  bool background_transparent;
 
   struct StateLook {
     Color foreground_color;
