@@ -182,26 +182,3 @@ RoundRect(Canvas &canvas, int left, int top,
   if (npoly)
     canvas.DrawPolygon(pt, npoly);
 }
-#if defined(ENABLE_OPENGL) | defined(KOBO)
-void
-DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
-                const Pen &light_border_pen, Color background_color,
-                bool focused, bool pressed, bool transparent)
-{
-  Pen pen_thick(2, pressed ? light_border_pen.GetColor() :
-      dark_border_pen.GetColor());
-  canvas.Select(pen_thick);
-  rc.right -= 1;
-  rc.top += 1;
-
-  if (transparent && !pressed)
-    canvas.SelectHollowBrush();
-  else
-    canvas.Select(Brush(background_color));
-
-  canvas.DrawRoundRectangle(rc.left, rc.top,
-                            rc.right, rc.bottom - 1,
-                            20,
-                            20);
-}
-#endif /* defined(ENABLE_OPENGL) | defined(KOBO) */

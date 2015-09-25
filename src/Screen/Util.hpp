@@ -48,14 +48,6 @@ bool
 KeyHole(Canvas &canvas, int x, int y, unsigned radius,
         Angle start, Angle end, unsigned inner_radius);
 
-#if defined(ENABLE_OPENGL) | defined(KOBO)
-/**
- * draws fancy button
- */
-void DrawButtonFancy(Canvas &canvas, PixelRect rc, const Pen &dark_border_pen,
-                     const Pen &light_border_pen, Color background_color,
-                     bool focused, bool pressed, bool transparent);
-#endif
 void
 RoundRect(Canvas &canvas, int left, int top,
           int right, int bottom, unsigned radius);
