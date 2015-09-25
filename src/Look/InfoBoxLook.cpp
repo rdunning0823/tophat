@@ -64,7 +64,7 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 #else
   ReinitialiseLayout(width);
 
-  title_font.Load(FontDescription(Layout::FontScale(8)));
+  title_font.Load(FontDescription(Layout::FontScale(15)));
 
   unit_fraction_pen.Create(1, value.fg_color);
 #endif
