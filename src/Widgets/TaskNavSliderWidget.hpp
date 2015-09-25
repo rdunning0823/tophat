@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_TASK_NAV_SLIDER_WIDGET_HPP
 #define XCSOAR_TASK_NAV_SLIDER_WIDGET_HPP
 
-#include "Widgets/MapOverlayWidget.hpp"
+#include "Widgets/MapOverlayBaseWidget.hpp"
 #include "Widgets/TaskNavSliderShape.hpp"
 #include "Form/HorizontalList.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
@@ -45,7 +45,7 @@ struct InfoBoxLook;
 class TaskStats;
 class ContainerWindow;
 
-class TaskNavSliderWidget : public MapOverlayWidget, ListItemRenderer,
+class TaskNavSliderWidget : public MapOverlayBaseWidget, ListItemRenderer,
   ListCursorHandler  {
 protected:
 

@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef XCSOAR_TASK_BUTTON_WIDGET_HPP
 #define XCSOAR_TASK_BUTTON_WIDGET_HPP
 
-#include "Widgets/MapOverlayWidget.hpp"
+#include "Widgets/MapOverlayBaseWidget.hpp"
 #include "Form/ActionListener.hpp"
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
@@ -42,7 +42,7 @@ class WndSymbolButton;
  * that is used for bad touch screens that can't swipe
  * the Nav Slider
  */
-class TaskButtonWidget : public MapOverlayWidget, protected ActionListener {
+class TaskButtonWidget : public MapOverlayBaseWidget, protected ActionListener {
 protected:
 
   /**

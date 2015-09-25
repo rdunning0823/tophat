@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_OVERLAY_BUTTON_WIDGET_HPP
 
 #include "Widgets/MapOverlayButton.hpp"
-#include "Widgets/MapOverlayWidget.hpp"
+#include "Widgets/MapOverlayBaseWidget.hpp"
 #include "Form/ActionListener.hpp"
 
 struct IconLook;
@@ -33,7 +33,7 @@ class ContainerWindow;
 class Bitmap;
 struct PixelRect;
 
-class OverlayButtonWidget : public MapOverlayWidget, protected ActionListener {
+class OverlayButtonWidget : public MapOverlayBaseWidget, protected ActionListener {
 protected:
   bool prepared;
 

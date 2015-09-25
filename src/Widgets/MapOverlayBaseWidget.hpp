@@ -33,11 +33,11 @@ struct PixelRect;
 /**
  * an abstract class for Map overlay widgets
  */
-class MapOverlayWidget : public OverlappedWidget {
+class MapOverlayBaseWidget : public OverlappedWidget {
 private:
 
 public:
-  MapOverlayWidget() {};
+  MapOverlayBaseWidget() {};
 
   virtual bool IsDefined() {
     return GetWindow().IsDefined();

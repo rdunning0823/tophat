@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "MapWidgetOverlays.hpp"
-#include "Widgets/MapOverlayWidget.hpp"
+#include "Widgets/MapOverlayBaseWidget.hpp"
 #include "Widget/Widget.hpp"
 #include "InfoBoxes/InfoBoxLayout.hpp"
 #include "Interface.hpp"
@@ -35,7 +35,7 @@ Copyright_License {
 MapWidgetOverlays::~MapWidgetOverlays()
 {
    for (const auto i : widget_list) {
-     MapOverlayWidget *map_overlay_widget = (MapOverlayWidget*)i;
+     MapOverlayBaseWidget *map_overlay_widget = (MapOverlayBaseWidget*)i;
      map_overlay_widget->Leave();
      if (map_overlay_widget->IsVisible())
        map_overlay_widget->Hide();
@@ -56,7 +56,7 @@ void
 MapWidgetOverlays::Move(PixelRect rc_map)
 {
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     if (widget->IsVisible())
       widget->Move(rc_map);
   }
@@ -68,7 +68,7 @@ MapWidgetOverlays::HeightFromTop()
   UPixelScalar max_y = 0u;
 
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     max_y = std::max(widget->HeightFromTop(), max_y);
   }
   return max_y;
@@ -80,7 +80,7 @@ MapWidgetOverlays::HeightFromBottomRight()
   UPixelScalar max_y = 0u;
 
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     max_y = std::max(widget->HeightFromBottomRight(), max_y);
   }
   return max_y;
@@ -92,7 +92,7 @@ MapWidgetOverlays::HeightFromBottomLeft()
   UPixelScalar max_y = 0u;
 
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     max_y = std::max(widget->HeightFromBottomLeft(), max_y);
   }
   return max_y;
@@ -144,7 +144,7 @@ MapWidgetOverlays::UpdateVisibility(const PixelRect &rc_full_screen,
     ib_layout.remaining;
 
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     widget->UpdateVisibility(rc_current, is_panning, is_main_window_widget,
                              is_map, is_top_widget);
     if (widget->IsVisible())
@@ -155,7 +155,7 @@ MapWidgetOverlays::UpdateVisibility(const PixelRect &rc_full_screen,
 void MapWidgetOverlays::Show(const PixelRect &rc)
 {
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     if (!widget->IsVisible())
       widget->Show(rc);
   }
@@ -174,7 +174,7 @@ bool MapWidgetOverlays::Leave()
 void MapWidgetOverlays::Hide()
 {
   for (const auto i : widget_list) {
-    MapOverlayWidget *widget = (MapOverlayWidget*)i;
+    MapOverlayBaseWidget *widget = (MapOverlayBaseWidget*)i;
     if (widget->IsVisible())
       widget->Hide();
   }
