@@ -26,7 +26,7 @@ Copyright_License {
 
 #include "Form/Button.hpp"
 #include "Look/ButtonLook.hpp"
-#include "Look/DialogLook.hpp"
+#include "Look/InfoBoxLook.hpp"
 #include "Util/tstring.hpp"
 #include "Renderer/ButtonRenderer.hpp"
 
@@ -49,7 +49,7 @@ protected:
 
   const IconLook &icon_look;
   const ButtonLook &button_look;
-  const DialogLook &dialog_look;
+  const InfoBoxLook &infobox_look;
   /**
    * the bitmap displayed in the button
    */
@@ -77,14 +77,15 @@ public:
 
   MapOverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
                    const IconLook &_icon_look,
-                   const DialogLook &_dialog_look,
+                   const InfoBoxLook &_infobox_look,
                     const Bitmap *_bmp,
                     const PixelRect &rc,
                     WindowStyle style,
                     ActionListener& listener, int id)
   :Button(parent, _button_look, _T(""), rc, style, listener, id),
    icon_look(_icon_look), button_look(_button_look),
-   dialog_look(_dialog_look), bmp(_bmp),
+   infobox_look(_infobox_look),
+   bmp(_bmp),
    frame_renderer(_button_look) {}
 
   /**
@@ -109,12 +110,12 @@ public:
 
   const Font &GetLargeFont()
   {
-    return *button_look.font;
+    return infobox_look.value_font;
   }
 
   const Font &GetMediumFont()
   {
-    return *dialog_look.caption.font;
+    return infobox_look.title_font;
   }
 };
 

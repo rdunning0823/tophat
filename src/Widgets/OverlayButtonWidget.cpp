@@ -24,14 +24,13 @@ Copyright_License {
 #include "OverlayButtonWidget.hpp"
 #include "MapOverlayButton.hpp"
 #include "UIGlobals.hpp"
-#include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Screen/Layout.hpp"
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
-#include "Look/GlobalFonts.hpp"
+#include "Look/InfoBoxLook.hpp"
 #include "Interface.hpp"
 
 
@@ -114,10 +113,10 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
                                    const PixelRect &rc_map)
 {
   WindowStyle button_style;
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const InfoBoxLook &infobox_look = UIGlobals::GetLook().info_box;
 
   MapOverlayButton *button =
-    new MapOverlayButton(parent, button_look, icon_look, dialog_look, bmp,
+    new MapOverlayButton(parent, button_look, icon_look, infobox_look, bmp,
                          rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;
