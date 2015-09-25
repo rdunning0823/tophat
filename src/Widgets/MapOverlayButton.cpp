@@ -68,13 +68,6 @@ MapOverlayButton::OnPaint(Canvas &canvas)
   bool dimmed = CommonInterface::Calculated().flight.flying && !IsPanning();
 
   bool pressed = IsDown();
-#ifdef ENABLE_OPENGL
-  bool transparent = true;
-#else
-  bool transparent = false;
-  if (IsKobo())
-    transparent = true;
-#endif
 
   const PixelRect rc = frame_renderer.GetDrawingRect(rc_outer, pressed);
   frame_renderer.DrawButton(canvas, rc, pressed, pressed);
