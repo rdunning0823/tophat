@@ -123,6 +123,12 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     mode.align = TextInBoxMode::Alignment::LEFT;
     TextInBox(canvas, GetCaption(), rc_main_text.left, rc_main_text.top, mode,
               rc.GetSize().cx, rc.GetSize().cy);
+// set again after TextInBox
+    if (HasCursorKeys() ? (HasFocus() | pressed) : pressed)
+      canvas.SetTextColor(button_look.focused.foreground_color);
+    else
+      canvas.SetTextColor(dimmed ? button_look.dimmed.foreground_color :
+          button_look.standard.foreground_color);
 
     canvas.SetBackgroundOpaque();
     const ButtonLook::StateLook &_look =
