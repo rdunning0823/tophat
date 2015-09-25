@@ -35,11 +35,6 @@ Copyright_License {
 #include <stdint.h>
 #include <assert.h>
 
-#ifdef KOBO
-#define HAVE_SHOW_MENU_BUTTON
-#include "Menu/ShowMenuButton.hpp"
-#endif
-
 struct ComputerSettings;
 struct MapSettings;
 struct UIState;
