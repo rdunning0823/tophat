@@ -28,6 +28,7 @@ Copyright_License {
 #include "Look/ButtonLook.hpp"
 #include "Look/DialogLook.hpp"
 #include "Util/tstring.hpp"
+#include "Renderer/ButtonRenderer.hpp"
 
 #include <tchar.h>
 
@@ -46,6 +47,16 @@ protected:
   /** optional text displayed under main text */
   tstring line_two_text;
 
+  const IconLook &icon_look;
+  const ButtonLook &button_look;
+  const DialogLook &dialog_look;
+  /**
+   * the bitmap displayed in the button
+   */
+  const Bitmap *bmp;
+
+  ButtonFrameRenderer frame_renderer;
+
 public:
   /**
    * size from 2 (tiny) to 6 (huge) of map overlay buttons
@@ -62,15 +73,6 @@ public:
    */
   static unsigned GetStandardButtonHeight();
 
-protected:
-  const IconLook &icon_look;
-  const ButtonLook &button_look;
-  const DialogLook &dialog_look;
-  /**
-   * the bitmap displayed in the button
-   */
-  const Bitmap *bmp;
-
 public:
 
   MapOverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
@@ -82,7 +84,8 @@ public:
                     ActionListener& listener, int id)
   :Button(parent, _button_look, _T(""), rc, style, listener, id),
    icon_look(_icon_look), button_look(_button_look),
-   dialog_look(_dialog_look), bmp(_bmp) {}
+   dialog_look(_dialog_look), bmp(_bmp),
+   frame_renderer(_button_look) {}
 
   /**
    * The OnPaint event is called when the button needs to be drawn

@@ -60,7 +60,7 @@ MapOverlayButton::GetStandardButtonHeight()
 void
 MapOverlayButton::OnPaint(Canvas &canvas)
 {
-  PixelRect rc = {
+  PixelRect rc_outer = {
     PixelScalar(0), PixelScalar(0), PixelScalar(canvas.GetWidth()),
     PixelScalar(canvas.GetHeight())
   };
@@ -75,10 +75,9 @@ MapOverlayButton::OnPaint(Canvas &canvas)
   if (IsKobo())
     transparent = true;
 #endif
-  //Todo fix the GDI rendering so it draws transparent correctly
-  GetRenderer().DrawButton(canvas, rc, HasFocus(), pressed, transparent);
-  if (pressed)
-    rc.Offset(1, 1); //hack -- should use ButtonFrameRenderer
+
+  const PixelRect rc = frame_renderer.GetDrawingRect(rc_outer, pressed);
+  frame_renderer.DrawButton(canvas, rc, pressed, pressed);
 
   if (bmp != nullptr) {
 #ifdef _NOT_SUPPORTED
@@ -98,6 +97,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
                     bitmap_size.cx / 2, 0);
 #endif
   } else {
+    /* custom rendering of this button -- don't call button OnPaint() */
     canvas.SetBackgroundTransparent();
     if (HasCursorKeys() ? (HasFocus() | pressed) : pressed)
       canvas.SetTextColor(button_look.focused.foreground_color);
@@ -149,6 +149,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
 
     if (sz_line_two.cx > 0) {
       PixelRect rc_line_two = rc;
+      rc_line_two.Grow(Layout::Scale(-1));
       rc_line_two.left = rc.left + (sz.cx - sz_line_two.cx) / 2;
       rc_line_two.top = rc_line_two.bottom - sz_line_two.cy;
       rc_line_two.right = rc_line_two.left + sz_line_two.cx;
@@ -159,6 +160,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     }
 
   #else
+    /* WIN */
     unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
 
     PixelRect text_rc = rc;
