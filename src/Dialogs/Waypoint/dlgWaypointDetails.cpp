@@ -113,13 +113,13 @@ class WaypointDetailsWidget final
   enum Buttons {
     GOTO,
     MAGNIFY, SHRINK,
-    PREVIOUS, NEXT,
+    NEXT,
   };
 
   struct Layout {
     PixelRect goto_button;
     PixelRect magnify_button, shrink_button;
-    PixelRect previous_button, next_button;
+    PixelRect next_button;
     PixelRect close_button;
     PixelRect main;
 
@@ -141,7 +141,7 @@ class WaypointDetailsWidget final
 
   Button goto_button;
   Button magnify_button, shrink_button;
-  Button previous_button, next_button;
+  Button next_button;
   Button close_button;
 
   int page, last_page;
@@ -214,7 +214,6 @@ public:
     }
 
     if (allow_navigation) {
-      previous_button.MoveAndShow(layout.previous_button);
       next_button.MoveAndShow(layout.next_button);
     }
 
@@ -246,7 +245,6 @@ public:
     }
 
     if (allow_navigation) {
-      previous_button.Hide();
       next_button.Hide();
     }
 
@@ -272,7 +270,6 @@ public:
     }
 
     if (allow_navigation) {
-      previous_button.Move(layout.previous_button);
       next_button.Move(layout.next_button);
     }
 
@@ -315,10 +312,6 @@ private:
       OnShrinkClicked();
       break;
 
-    case PREVIOUS:
-      NextPage(-1);
-      break;
-
     case NEXT:
       NextPage(1);
       break;
@@ -352,13 +345,11 @@ WaypointDetailsWidget::Layout::Layout(const PixelRect &rc,
       (buttons.left + buttons.right) / 2;
 
     close_button = buttons;
-    close_button.top = buttons.bottom -= button_height;
+    close_button.top = buttons.bottom - button_height;
 
-    previous_button = buttons;
-    previous_button.top = buttons.bottom -= button_height;
-    next_button = previous_button;
-    previous_button.right = next_button.left =
-      (buttons.left + buttons.right) / 2;
+    next_button = buttons;
+    next_button.bottom = close_button.top;
+    next_button.top = next_button.bottom - button_height;
   } else {
     main.bottom -= button_height;
 
@@ -369,16 +360,14 @@ WaypointDetailsWidget::Layout::Layout(const PixelRect &rc,
     const unsigned two_thirds = (buttons.left + 2 * buttons.right) / 3;
 
     goto_button = buttons;
-    goto_button.right = one_third;
+    goto_button.right = two_thirds;
+    goto_button.left = one_third;
 
     close_button = buttons;
-    close_button.left = two_thirds;
+    close_button.right = one_third;
 
-    previous_button = buttons;
-    previous_button.left = one_third;
     next_button = buttons;
-    next_button.right = two_thirds;
-    previous_button.right = next_button.left = (one_third + two_thirds) / 2;
+    next_button.left = two_thirds;
 
     const unsigned padding = ::Layout::GetTextPadding();
     shrink_button.left = main.left + padding;
@@ -447,16 +436,13 @@ WaypointDetailsWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
 
   if (allow_navigation) {
-    previous_button.Create(parent, layout.previous_button, button_style,
-                           new SymbolButtonRenderer(look.button, _T("<")),
-                           *this, PREVIOUS);
     next_button.Create(parent, layout.next_button, button_style,
                        new SymbolButtonRenderer(look.button, _T(">")),
                        *this, NEXT);
   }
-
-  close_button.Create(parent, look.button, _T("_X"), layout.close_button,
-                      button_style, dialog, mrOK);
+  close_button.Create(parent, layout.close_button, button_style,
+                     new SymbolButtonRenderer(look.button, _T("_X")),
+                     dialog, mrOK);
 
   info_dock.Create(parent, layout.main, dock_style);
   info_dock.SetWidget(&info_widget);
@@ -575,7 +561,6 @@ WaypointDetailsWidget::KeyPress(unsigned key_code)
 #ifdef GNAV
   case '6':
 #endif
-    previous_button.SetFocus();
     NextPage(-1);
     return true;
 
