@@ -190,10 +190,10 @@ private:
   PixelRect rc_add, rc_delete, rc_replace, rc_cancel, rc_more;
   PixelRect rc_add_info, rc_estimate, rc_header, rc_replace_info;
 
-  Button *add_button, *delete_button, *replace_button, *cancel, *more;
+  Button add_button, delete_button, replace_button, cancel, more;
 
-  WndFrame *add_info_frame, *estimate_frame, *replace_info_frame,
-      *header_frame;
+  WndFrame add_info_frame, estimate_frame, replace_info_frame,
+      header_frame;
 
 public:
   MatClickPanel(const Waypoint &_wp_clicked, const ModifiedTask _modified_task)
@@ -206,7 +206,11 @@ public:
    current_wp_name(_modified_task.IsValid() ?
        _modified_task.index_wp_name : wp_clicked.name.c_str()),
        return_state(OK), delay_counter(0),
-   modified_task(_modified_task)
+   modified_task(_modified_task),
+   add_info_frame(UIGlobals::GetDialogLook()),
+   estimate_frame(UIGlobals::GetDialogLook()),
+   replace_info_frame(UIGlobals::GetDialogLook()),
+   header_frame(UIGlobals::GetDialogLook())
   {
     assert(wp_clicked.IsTurnpoint());
   }
@@ -332,20 +336,20 @@ MatClickPanel::OnResize(PixelSize new_size)
   SetRectangles(GetClientRect());
 
   if (modified_task.mat_mode == MAT_DELETE)
-    delete_button->Move(rc_delete);
+    delete_button.Move(rc_delete);
   else {
-    add_button->Move(rc_add);
+    add_button.Move(rc_add);
     if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
-      replace_button->Move(rc_replace);
-      replace_info_frame->Move(rc_replace_info);
+      replace_button.Move(rc_replace);
+      replace_info_frame.Move(rc_replace_info);
     }
   }
 
-  header_frame->Move(rc_header);
-  estimate_frame->Move(rc_estimate);
-  add_info_frame->Move(rc_add_info);
-  more->Move(rc_more);
-  cancel->Move(rc_cancel);
+  header_frame.Move(rc_header);
+  estimate_frame.Move(rc_estimate);
+  add_info_frame.Move(rc_add_info);
+  more.Move(rc_more);
+  cancel.Move(rc_cancel);
 }
 
 void
@@ -441,13 +445,13 @@ MatClickPanel::RefreshFormForAdd()
   prompt.Format(_T("%s: %s"),
                 _("Time remaining"),
                 time_remaining.c_str());
-  header_frame->SetCaption(prompt.c_str());
+  header_frame.SetCaption(prompt.c_str());
 
   if (++delay_counter < DELAY_COUNTER_WAIT) {
     prompt = _T("");
     for (unsigned i = 0; i <= delay_counter; i++)
       prompt.append(_T(".."));
-    estimate_frame->SetCaption(prompt.c_str());
+    estimate_frame.SetCaption(prompt.c_str());
     return;
   }
 
@@ -465,7 +469,7 @@ MatClickPanel::RefreshFormForAdd()
                 _("Est. Finish"), time.c_str(),
                 _("Final glide"),
                 altitude_text.c_str());
-  estimate_frame->SetCaption(prompt.c_str());
+  estimate_frame.SetCaption(prompt.c_str());
 }
 
 bool
@@ -530,45 +534,44 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WindowStyle style_frame;
 
   if (modified_task.mat_mode == MAT_DELETE) {
-    delete_button = new Button(GetClientAreaWindow(), button_look,
-                                  add_del_button_text.c_str(),
-                                  rc_delete,
-                                  button_style, *this, DeletePointClick);
+    delete_button.Create(GetClientAreaWindow(), button_look,
+                         add_del_button_text.c_str(),
+                         rc_delete,
+                         button_style, *this, DeletePointClick);
   } else {
-    add_button = new Button(GetClientAreaWindow(), button_look,
-                               add_del_button_text.c_str(),
-                               rc_add,
-                               button_style, *this, AddPointClick);
+    add_button.Create(GetClientAreaWindow(), button_look,
+                      add_del_button_text.c_str(),
+                      rc_add,
+                      button_style, *this, AddPointClick);
 
     if (modified_task.mat_mode != MAT_INSERT_BEFORE_FINISH) {
-      replace_button = new Button(GetClientAreaWindow(), button_look,
-                                     replace_button_text.c_str(),
-                                     rc_replace,
-                                     button_style, *this, ReplacePointClick);
+      replace_button.Create(GetClientAreaWindow(), button_look,
+                            replace_button_text.c_str(),
+                            rc_replace,
+                            button_style, *this, ReplacePointClick);
 
-      replace_info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
-                                        rc_replace_info, style_frame);
-      replace_info_frame->SetCaption(replace_text.c_str());
+      replace_info_frame.Create(GetClientAreaWindow(),
+                                rc_replace_info, style_frame);
+      replace_info_frame.SetCaption(replace_text.c_str());
     }
   }
 
-  header_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
-                              rc_header, style_frame);
+  header_frame.Create(GetClientAreaWindow(),
+                      rc_header, style_frame);
 
-  estimate_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
-                                rc_estimate, style_frame);
+  estimate_frame.Create(GetClientAreaWindow(),
+                        rc_estimate, style_frame);
 
-  add_info_frame = new WndFrame(GetClientAreaWindow(), dialog_look,
-                                rc_add_info, style_frame);
-  add_info_frame->SetCaption(add_del_info_text.c_str());
+  add_info_frame.Create(GetClientAreaWindow(),
+                        rc_add_info, style_frame);
+  add_info_frame.SetCaption(add_del_info_text.c_str());
 
-  more = new Button(GetClientAreaWindow(), button_look, _T("More"),
-                       rc_more,
-                       button_style, *this, MoreClick);
+  more.Create(GetClientAreaWindow(), button_look, _T("More"),
+              rc_more, button_style, *this, MoreClick);
 
-  cancel = new Button(GetClientAreaWindow(), button_look, _T("Cancel"),
-                         rc_cancel,
-                         button_style, *this, CancelClick);
+  cancel.Create(GetClientAreaWindow(), button_look, _T("Cancel"),
+                rc_cancel,
+                button_style, *this, CancelClick);
 
   if (modified_task.mat_mode != MAT_DELETE)
     RefreshFormForAdd();
@@ -580,17 +583,6 @@ void
 MatClickPanel::Unprepare()
 {
   dialog_timer.Cancel();
-  delete cancel;
-  delete more;
-  delete add_info_frame;
-  delete estimate_frame;
-  delete header_frame;
-  if (replace_button != nullptr)
-    delete replace_button;
-  if (replace_info_frame != nullptr)
-    delete replace_info_frame;
-  delete add_button;
-  delete delete_button;
 }
 
 /**
