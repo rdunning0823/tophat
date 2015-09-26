@@ -113,13 +113,13 @@ AirspaceWarningWidget::OnAction(int id)
     else
       manager.AcknowledgeWarning(airspace);
     monitor.Schedule();
-    PageActions::RestoreBottom();
+    PageActions::RestoreTop();
     break;
 
   case ACK_DAY:
     manager.AcknowledgeDay(airspace);
     monitor.Schedule();
-    PageActions::RestoreBottom();
+    PageActions::RestoreTop();
     break;
 
   case MORE:
@@ -140,7 +140,7 @@ void
 AirspaceWarningMonitor::HideWidget()
 {
   if (widget != nullptr)
-    PageActions::RestoreBottom();
+    PageActions::RestoreTop();
   assert(widget == nullptr);
 }
 
@@ -155,7 +155,6 @@ AirspaceWarningMonitor::Check()
   /* there's a new airspace warning */
 
   last = calculated.airspace_warnings.latest;
-
   auto *airspace_warnings = GetAirspaceWarnings();
   if (airspace_warnings == nullptr) {
     HideWidget();
@@ -209,7 +208,7 @@ AirspaceWarningMonitor::Check()
 
     widget = new AirspaceWarningWidget(*this, *airspace_warnings,
                                        *airspace, state, solution);
-    PageActions::SetCustomBottom(widget);
+    PageActions::SetCustomTop(widget);
   }
 
   // un-blank the display, play a sound
