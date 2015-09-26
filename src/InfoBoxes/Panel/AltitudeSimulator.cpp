@@ -30,7 +30,6 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/Frame.hpp"
 #include "Form/CheckBox.hpp"
-#include "Look/GlobalFonts.hpp"
 #include "Screen/Timer.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Units/Units.hpp"
@@ -260,6 +259,8 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const Look &look = UIGlobals::GetLook();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const MapLook &map_look = UIGlobals::GetLook().map;
+  big_dialog_look.Initialise(370);
+  big_button_look.Initialise(*map_look.overlay_font);
 
   final_glide_chart =
       new FinalGlideChart(GetClientAreaWindow(),
@@ -267,8 +268,6 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           (UPixelScalar)(fg_rc.right - fg_rc.left),
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
-
-  big_button_look.Initialise(*map_look.overlay_font);
 
   WindowStyle button_style;
   button_style.TabStop();

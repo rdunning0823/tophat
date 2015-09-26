@@ -113,7 +113,7 @@ struct DialogLook {
   ButtonLook button;
   CheckBoxLook check_box;
 
-  void Initialise();
+  void Initialise(unsigned font_size_percent = 100);
 
   void SetBackgroundColor(Color color);
 };

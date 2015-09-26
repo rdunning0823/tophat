@@ -280,6 +280,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  big_dialog_look.Initialise(370);
 
   WindowStyle button_style;
   button_style.TabStop();
@@ -300,7 +301,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                      button_style, *this, LittleMinus);
 
   WindowStyle style_frame;
-  mc_value = new WndFrame(GetClientAreaWindow(), dialog_look,
+  mc_value = new WndFrame(GetClientAreaWindow(), big_dialog_look,
                           value_rc, style_frame);
 
   mc_value->SetAlignCenter();
