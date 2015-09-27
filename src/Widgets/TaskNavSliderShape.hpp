@@ -187,6 +187,7 @@ public:
 
   /**
    * resizes the slider to fit horizontally in the width of the rc
+   * point[0] is left top line of slider
    * @return height to set ItemHeight() of ListControl
    */
   void Resize(UPixelScalar map_width);
