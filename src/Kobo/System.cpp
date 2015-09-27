@@ -253,7 +253,7 @@ bool IsKoboUsbHostKernel()
   const char *local_path = "/tmp/usb_host.txt";
   TCHAR command[256];
   _stprintf(command, _T("%s %s > %s"), cmd_find_ip, search_string, local_path);
-  system(command);
+  Run(command);
   StaticString <256> buffer;
   File::ReadString(local_path, buffer.buffer(), 256);
   return buffer.Contains(search_string);
@@ -272,9 +272,9 @@ WriteSystemInfo()
   const char *local_path = "/TophatSystemInfo.txt";
   TCHAR command[256];
   _stprintf(command, _T("%s > %s"), cmd_kobo_kernel_info, local_path);
-  system(command);
+  Run(command);
   _stprintf(command, _T(" %s >> %s"), cmd_uname_all, local_path);
-  system(command);
+  Run(command);
 #endif
 }
 
@@ -336,7 +336,7 @@ UploadTasksToDevice()
 {
 #ifdef KOBO
   Directory::Create(_T("/mnt/onboard/XCSoarData/tasks"));
-  system(_T("cp -r /media/usb_storage/XCSoarData/tasks/*.* /mnt/onboard/XCSoarData/tasks"));
+  Run(_T("cp -r /media/usb_storage/XCSoarData/tasks/*.* /mnt/onboard/XCSoarData/tasks"));
 #endif
 }
 
@@ -346,8 +346,8 @@ CopyFlightsToSDCard()
 #ifdef KOBO
   Directory::Create(_T("/media/usb_storage/XCSoarData"));
   Directory::Create(_T("/media/usb_storage/XCSoarData/logs"));
-  system(_T("cp -r -p /mnt/onboard/XCSoarData/logs/*.igc /media/usb_storage/XCSoarData/logs"));
-  system(_T("cp -r -p /mnt/onboard/XCSoarData/logs/*.nmea /media/usb_storage/XCSoarData/logs"));
+  Run(_T("cp -r -p /mnt/onboard/XCSoarData/logs/*.igc /media/usb_storage/XCSoarData/logs"));
+  Run(_T("cp -r -p /mnt/onboard/XCSoarData/logs/*.nmea /media/usb_storage/XCSoarData/logs"));
 #endif
 }
 
@@ -355,7 +355,7 @@ void
 UploadSDCardToDevice()
 {
 #ifdef KOBO
-  system(_T("cp -r -p /media/usb_storage/XCSoarData /mnt/onboard"));
+  Run(_T("cp -r -p /media/usb_storage/XCSoarData /mnt/onboard"));
 #endif
 }
 
@@ -363,8 +363,8 @@ void
 CopyTopHatDataToSDCard()
 {
 #ifdef KOBO
-  system(_T("cp -r -p /mnt/onboard/XCSoarData /media/usb_storage"));
-  system(_T("sync"));
+  Run(_T("cp -r -p /mnt/onboard/XCSoarData /media/usb_storage"));
+  Run(_T("sync"));
 #endif
 }
 
@@ -374,9 +374,9 @@ UnmountKoboUSBStorage()
 #ifdef KOBO
   if (!IsUSBStorageConnected())
     return;
-  system(_T("umount /media/usb_storage"));
-  system(_T("rm -rf /media/usb_storage"));
-  system(_T("sync"));
+  Run(_T("umount /media/usb_storage"));
+  Run(_T("rm -rf /media/usb_storage"));
+  Run(_T("sync"));
 #endif
 }
 
@@ -398,9 +398,9 @@ InstallKoboRootTgz()
   if (!IsUSBStorageKoboRootInRoot())
     return false;
 
-  system(_T("cp /media/usb_storage/KoboRoot.tgz /mnt/onboard/.kobo"));
-  system(_T("rm -f /media/usb_storage/KoboRoot.tgz"));
-  system(_T("sync"));
+  Run(_T("cp /media/usb_storage/KoboRoot.tgz /mnt/onboard/.kobo"));
+  Run(_T("rm -f /media/usb_storage/KoboRoot.tgz"));
+  Run(_T("sync"));
   return true;
 #else
   return false;
