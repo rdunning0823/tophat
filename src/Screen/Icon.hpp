@@ -58,6 +58,16 @@ public:
     bitmap.Reset();
   }
 
+  /**
+   * Draws with reference to upper left of icon
+   */
+  void DrawUpperLeft(Canvas &canvas, PixelScalar x, PixelScalar y) const {
+    Draw(canvas, x + size.cx / 2, y + size.cy / 2);
+  }
+  void DrawUpperLeft(Canvas &canvas, RasterPoint pt) const {
+    Draw(canvas, pt.x + size.cx / 2, pt.y + size.cy / 2);
+  }
+
   void Draw(Canvas &canvas, PixelScalar x, PixelScalar y) const;
   void Draw(Canvas &canvas, RasterPoint pt) const {
     Draw(canvas, pt.x, pt.y);
