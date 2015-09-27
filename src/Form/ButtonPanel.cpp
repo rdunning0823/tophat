@@ -31,8 +31,8 @@ Copyright_License {
 #include "Screen/Key.h"
 
 ButtonPanel::ButtonPanel(ContainerWindow &_parent, const ButtonLook &_look,
-                         ButtonPanelPosition position)
-  :parent(_parent), look(_look), selected_index(-1) {
+                         ButtonPanelPosition _position)
+  :parent(_parent), look(_look), position(_position), selected_index(-1) {
   style.TabStop();
 }
 
@@ -48,7 +48,7 @@ ButtonPanel::UpdateLayout(const PixelRect rc)
   if (buttons.empty())
     return rc;
 
-  const bool landscape = rc.right - rc.left > rc.bottom - rc.top;
+  const bool landscape = false;
   return landscape
     ? LeftLayout(rc)
     : BottomLayout(rc);
