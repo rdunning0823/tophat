@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 /**
  * A listener for #AndroidPort objects.

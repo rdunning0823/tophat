@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.view.View;
 

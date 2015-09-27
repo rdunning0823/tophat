@@ -46,7 +46,7 @@ ifeq ($(GREYSCALE),y)
 TARGET_CPPFLAGS += -DGREYSCALE
 endif
 
-# When enabled, the Androidpackage org.xcsoar.testing is created, with
+# When enabled, the Androidpackage org.tophat.testing is created, with
 # a red Activity icon, to allow simultaneous installation of "stable"
 # and "testing".
 # In the stable branch, this should default to "n".

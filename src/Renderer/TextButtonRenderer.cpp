@@ -31,14 +31,14 @@ Copyright_License {
 
 #include <winuser.h>
 
-inline void
+void
 TextButtonRenderer::DrawCaption(Canvas &canvas, const PixelRect &rc,
                                 bool enabled, bool focused, bool pressed) const
 {
   DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed);
 }
 
-inline void
+void
 TextButtonRenderer::DrawCaption(Canvas &canvas,
                                 StaticString<64>::const_pointer _caption,
                                 const PixelRect &rc, bool enabled,

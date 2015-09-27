@@ -101,7 +101,7 @@ extern "C" {
 
 gcc_visibility_default
 JNIEXPORT jint JNICALL
-Java_org_xcsoar_NativeView_getEglContextClientVersion(JNIEnv *env, jobject obj)
+Java_org_tophat_NativeView_getEglContextClientVersion(JNIEnv *env, jobject obj)
 {
 #ifdef HAVE_GLES2
   return 2;

@@ -805,7 +805,7 @@ OrderedTask::GetAATTaskPoint(unsigned TPindex) const
    return (AATPoint *)nullptr;
 }
 
-inline bool
+bool
 OrderedTask::ScanStartFinish()
 {
   /// @todo also check there are not more than one start/finish point

@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import java.util.Arrays;
 import java.util.List;

@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-package org.xcsoar;
+package org.tophat;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
