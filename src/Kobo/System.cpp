@@ -294,26 +294,26 @@ WriteKoboScreenOrientation(const char * rotate)
     File::Delete(kobo_orientation_file_old);
 }
 
-DisplaySettings::Orientation
+DisplayOrientation
 ReadKoboLastScreenOrientation()
 {
-  DisplaySettings::Orientation orientation =
-      DisplaySettings::Orientation::DEFAULT;
+  DisplayOrientation orientation =
+      DisplayOrientation::DEFAULT;
   char line[4];
 
   if (File::ReadString(kobo_orientation_file, line, sizeof(line))) {
     switch(line[0]) {
     case '3':
-      orientation = DisplaySettings::Orientation::PORTRAIT;
+      orientation = DisplayOrientation::PORTRAIT;
       break;
     case '1':
-      orientation = DisplaySettings::Orientation::REVERSE_PORTRAIT;
+      orientation = DisplayOrientation::REVERSE_PORTRAIT;
       break;
     case '0':
-      orientation = DisplaySettings::Orientation::LANDSCAPE;
+      orientation = DisplayOrientation::LANDSCAPE;
       break;
     case '2':
-      orientation = DisplaySettings::Orientation::REVERSE_LANDSCAPE;
+      orientation = DisplayOrientation::REVERSE_LANDSCAPE;
       break;
     }
   }

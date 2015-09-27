@@ -25,7 +25,7 @@ Copyright_License {
 #define XCSOAR_KOBO_SYSTEM_HPP
 
 #include "Compiler.h"
-#include "DisplaySettings.hpp"
+#include "DisplayOrientation.hpp"
 
 bool
 KoboReboot();
@@ -87,7 +87,7 @@ void WriteKoboScreenOrientation(const char * rotate);
  * Reads rotation byte from file saved on disk
  * @return Orientation based on hardware settings
  */
-DisplaySettings::Orientation ReadKoboLastScreenOrientation();
+DisplayOrientation ReadKoboLastScreenOrientation();
 #endif
 /**
  * returns true if a USB Storage device is currently mounted
