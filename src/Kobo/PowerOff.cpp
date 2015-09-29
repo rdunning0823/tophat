@@ -40,15 +40,6 @@ Copyright_License {
 #include <algorithm>
 #include <stdio.h>
 
-/**
- * Fake symbols to avoid linking the Screen/Layout library.
- */
-namespace Layout {
-  unsigned small_scale = 1500;
-  unsigned scale_1024 = 2048;
-  unsigned text_padding = 3;
-};
-
 /*
  * Draws logo and footer
  * @return remaining rectangle unused
@@ -90,10 +81,10 @@ DrawBanner(Canvas &canvas, PixelRect &rc)
   /* some more text */
   x = rc.left + left_margin;
   const TCHAR *const website = _T("www.tophatsoaring.org");
-  canvas.Select(large_font);
+  canvas.Select(bold_font);
   unsigned website_top = rc.top + banner_height + padding + top_logo_margin;
   canvas.DrawText(x, website_top, website);
-  rc_remaining.top = website_top + large_bold_font.GetHeight();
+  rc_remaining.top = website_top + bold_font.GetHeight();
 
   /* Version at bottom right */
   const unsigned line_height = canvas.CalcTextSize(TopHat_Version).cy;
@@ -125,7 +116,7 @@ DrawFlights(Canvas &canvas, const PixelRect &rc)
   if (file.error())
     return;
 
-  FlightListRenderer renderer(large_font, large_bold_font);
+  FlightListRenderer renderer(normal_font, bold_font);
 
   FlightParser parser(file);
   FlightInfo flight;
@@ -173,7 +164,7 @@ int main(int argc, char **argv)
 
       /* draw the pictuer */
       canvas.ClearWhite();
-      InitialiseFonts({canvas.GetWidth(), canvas.GetHeight()});
+      InitialiseFonts();
       Draw(canvas);
 
       /* finish */

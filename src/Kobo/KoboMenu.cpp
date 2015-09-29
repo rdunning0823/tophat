@@ -265,11 +265,10 @@ Main()
   ScreenGlobalInit screen_init;
   PixelSize screen_size = GetScreenSize();
   Layout::Initialize(screen_size);
-  InitialiseFonts(screen_size);
+  InitialiseFonts(/*screen_size*/);
 
   DialogLook dialog_look;
-  dialog_look.Initialise(bold_font, normal_font, small_font,
-                         bold_font, bold_font, bold_font);
+  dialog_look.Initialise(100);
 
   IconLook icon_look;
   icon_look.Initialise();

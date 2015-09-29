@@ -29,7 +29,6 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
-#include "Renderer/TextRowRenderer.hpp"
 #include "Language/Language.hpp"
 #include "Form/ActionListener.hpp"
 #include "Widget/ListWidget.hpp"
@@ -59,8 +58,6 @@ class WifiListWidget final
   WifiStatus status;
   TrivialArray<NetworkInfo, 64> networks;
 
-  TextRowRenderer row_renderer;
-
   WPASupplicant wpa_supplicant;
 
 public:
@@ -75,9 +72,13 @@ public:
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override {
     const DialogLook &look = UIGlobals::GetDialogLook();
+    const unsigned row_height =
+      std::max(Layout::GetMaximumControlHeight(),
+               unsigned(Layout::GetTextPadding()) * 3
+               + look.list.font->GetHeight()
+               + look.list.font->GetHeight());
 
-    CreateList(parent, look, rc,
-               row_renderer.CalculateLayout(look.text_font));
+    CreateList(parent, look, rc, row_height);
     UpdateList();
     Timer::Schedule(1000);
   }
@@ -158,16 +159,16 @@ void
 WifiListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
                             unsigned idx)
 {
+  const DialogLook &look = UIGlobals::GetDialogLook();
   const auto &info = networks[idx];
+  const unsigned padding = Layout::GetTextPadding();
 
-  static char wifi_security[][20] = {
-    "WPA",
-    "WEP",
-    "Open",
-  };
+  const Font &font(*look.list.font);
+  const unsigned x1 = rc.left + padding;
+  const unsigned y1 = rc.top + (rc.bottom - rc.top -  font.GetHeight()) / 2;
 
-  row_renderer.DrawFirstRow(canvas, rc, info.ssid);
-  row_renderer.DrawSecondRow(canvas, rc, info.bssid);
+  canvas.Select(font);
+  canvas.DrawText(x1, y1, info.ssid);
 
   const TCHAR *state = nullptr;
   StaticString<40> state_buffer;
@@ -193,8 +194,10 @@ WifiListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   else if (info.signal_level >= 0)
     state = _("In range");
 
-  if (state != nullptr)
-    row_renderer.DrawRightFirstRow(canvas, rc, state);
+  if (state != nullptr) {
+    unsigned width = canvas.CalcTextWidth(state);
+    canvas.DrawText(rc.right - padding - width, y1, state);
+  }
 }
 
 static bool
@@ -491,8 +494,8 @@ ShowWifiDialog()
   WifiListWidget widget;
   WidgetDialog dialog(look);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Wifi"), &widget);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
-  dialog.AddButton(_T("_X"), mrOK);
   dialog.ShowModal();
   dialog.StealWidget();
 }
