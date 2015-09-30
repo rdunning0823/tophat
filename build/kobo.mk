@@ -10,8 +10,8 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Screen/TerminalWindow.cpp \
 	$(SRC)/Look/TerminalLook.cpp \
 	$(SRC)/Look/DialogLook.cpp \
-	$(SRC)/Look/IconLook.cpp \
 	$(SRC)/Look/ButtonLook.cpp \
+	$(SRC)/Look/IconLook.cpp \
 	$(SRC)/Look/CheckBoxLook.cpp \
 	$(SRC)/Gauge/LogoView.cpp \
 	$(SRC)/Dialogs/DialogSettings.cpp \
@@ -20,7 +20,6 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Dialogs/Message.cpp \
 	$(SRC)/Dialogs/TextEntry.cpp \
 	$(SRC)/Dialogs/KnobTextEntry.cpp \
-	$(SRC)/Dialogs/TouchNumericEntry.cpp \
 	$(SRC)/Dialogs/TouchTextEntry.cpp \
 	$(SRC)/Dialogs/SimulatorPromptWindow.cpp \
 	$(TEST_SRC_DIR)/Fonts.cpp \
@@ -30,12 +29,12 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Kobo/System.cpp \
 	$(SRC)/Kobo/Kernel.cpp \
 	$(SRC)/Kobo/NetworkDialog.cpp \
-	$(SRC)/Kobo/SDCardSync.cpp \
+	$(SRC)/Kobo/SystemDialog.cpp \
+	$(SRC)/Kobo/ToolsDialog.cpp \
 	$(SRC)/Kobo/WPASupplicant.cpp \
 	$(SRC)/Kobo/WifiDialog.cpp \
-	$(SRC)/Event/Shared/Timer.cpp \
-	$(SRC)/Net/IpAddress.cpp \
 	$(SRC)/Kobo/FakeSymbols.cpp \
+	$(SRC)/Kobo/SDCardSync.cpp \
 	$(SRC)/Kobo/KoboMenu.cpp
 KOBO_MENU_LDADD = $(FAKE_LIBS)
 KOBO_MENU_DEPENDS = WIDGET FORM SCREEN EVENT RESOURCE IO ASYNC LIBNET OS THREAD MATH UTIL
@@ -54,15 +53,19 @@ kobo-libs:
 	./kobo/build.py $(TARGET_OUTPUT_DIR) $(CC) $(CXX) $(AR) $(STRIP)
 
 KOBO_POWER_OFF_SOURCES = \
+	$(SRC)/Version.cpp \
+	$(SRC)/Screen/Layout.cpp \
+	$(SRC)/Screen/Debug.cpp \
 	$(TEST_SRC_DIR)/Fonts.cpp \
 	$(SRC)/Hardware/RotateDisplay.cpp \
+	$(SRC)/Hardware/DisplayDPI.cpp \
+	$(SRC)/Hardware/DisplaySize.cpp \
 	$(SRC)/Logger/FlightParser.cpp \
 	$(SRC)/Renderer/FlightListRenderer.cpp \
 	$(SRC)/Thread/Mutex.cpp \
 	$(SRC)/FlightInfo.cpp \
-	$(SRC)/Thread/Mutex.cpp \
-	$(SRC)/Version.cpp \
 	$(SRC)/Kobo/Model.cpp \
+	$(SRC)/Kobo/System.cpp \
 	$(SRC)/Kobo/PowerOff.cpp
 KOBO_POWER_OFF_LDADD = $(FAKE_LIBS)
 KOBO_POWER_OFF_DEPENDS = SCREEN RESOURCE IO OS MATH UTIL TIME
@@ -97,17 +100,12 @@ KOBO_SYS_LIB_NAMES = libc.so.6 libm.so.6 libpthread.so.0 librt.so.1 \
 	libresolv.so.2 libnss_dns.so.2 libnss_files.so.2 \
 	ld-linux-armhf.so.3
 
-# from Debian package libgcc1-armhf-cross
-KOBO_SYS_LIB_NAMES += libgcc_s.so.1
-
-KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
-
 # Optionally, uImage files which supports USB HOST mode are created
 # The installation is managed by the KoboMenu and rcS.tophat
 UIMAGE_BASE_DIR=$(topdir)/kobo/uimage/hw/imx507/linux-2.6.35.3-USBHOST
 UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage
 ifeq ($(KOBO_UIMAGE),y)
-	UIMAGE_PREREQUISITES=UIMAGE FORCE_UIMAGE
+	UIMAGE_PREREQUISITES=UIMAGE
 	UIMAGE_CMD=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
 endif
 
@@ -120,10 +118,16 @@ UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
 FORCE_UIMAGE:
 	touch $(TARGET_OUTPUT_DIR)/force_uimage
 
+# from Debian package libgcc1-armhf-cross
+KOBO_SYS_LIB_NAMES += libgcc_s.so.1
+
+KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
+
 # /mnt/onboard/.kobo/KoboRoot.tgz is a file that is picked up by
 # /etc/init.d/rcS, extracted to / on each boot; we can use it to
-# install XCSoar/TopHat
+# install TopHat
 $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
+	FORCE_UIMAGE \
 	$(UIMAGE_PREREQUISITES) \
 	$(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) \
 	$(BITSTREAM_VERA_FILES) \
