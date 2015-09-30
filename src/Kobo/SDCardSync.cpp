@@ -33,6 +33,8 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Event/Timer.hpp"
 #include "System.hpp"
+#include "OS/Process.hpp"
+
 #include <stdlib.h>
 
 
@@ -131,7 +133,8 @@ SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddButton(_T("Help"), *this, HelpButton);
   UpdateButtons();
 
-  Timer::Schedule(1000);  system(_T("sync"));
+  Timer::Schedule(1000);
+  Run("sync");
 }
 
 void
