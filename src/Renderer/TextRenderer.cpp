@@ -76,10 +76,6 @@ TextRenderer::Draw(Canvas &canvas, const PixelRect &_rc,
 #else
   if (vcenter)
     format |= DT_VCENTER;
-
-  if (control && IsDithered())
-    /* button texts are underlined on the Kobo */
-    format |= DT_UNDERLINE;
 #endif
 
   canvas.DrawFormattedText(&rc, text, format);
