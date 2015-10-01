@@ -111,8 +111,8 @@ void
 GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
 {
   const IconLook &icons = UIGlobals::GetIconLook();
-  const Bitmap *bmp = &icons.hBmpMenuButton;
-  const PixelSize bitmap_size = bmp->GetSize();
+  const MaskedIcon *icon = &icons.hBmpMenuButton;
+  const PixelSize icon_size = icon->GetSize();
 
   UPixelScalar pen_width = !HasColors() ? 2 : 1;
   canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
@@ -123,14 +123,19 @@ GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
   const UPixelScalar menu_button_width = rc_main_menu_button.right -
       rc_main_menu_button.left;
 
-  const int offsetx = (menu_button_width - bitmap_size.cx / 2) / 2;
-  const int offsety = (menu_button_height - bitmap_size.cy) / 2;
+  const int offsetx = (menu_button_width - icon_size.cx) / 2;
+  const int offsety = (menu_button_height - icon_size.cy) / 2;
+  icon->DrawUpperLeft(canvas, rc_main_menu_button.left + offsetx,
+                      rc_main_menu_button.top + offsety);
+
+/*
   canvas.CopyAnd(rc_main_menu_button.left + offsetx,
                  rc_main_menu_button.top + offsety,
-                  bitmap_size.cx / 2,
-                  bitmap_size.cy,
-                  *bmp,
-                  bitmap_size.cx / 2, 0);
+                  icon_size.cx / 2,
+                  icon_size.cy,
+                  *icon,
+                  icon_size.cx / 2, 0);
+*/
 }
 
 void
@@ -143,25 +148,32 @@ GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
   DrawRect(canvas, rc_zoom_in_button);
 
   const IconLook &icon_look = UIGlobals::GetIconLook();
-  const Bitmap *bmp_zoom_in = &icon_look.hBmpZoomInButton;
-  const PixelSize bitmap_in_size = bmp_zoom_in->GetSize();
-  const int offsetx = (rc_zoom_in_button.right - rc_zoom_in_button.left - bitmap_in_size.cx / 2) / 2;
-  const int offsety = (rc_zoom_in_button.bottom - rc_zoom_in_button.top - bitmap_in_size.cy) / 2;
+  const MaskedIcon *icon_zoom_in = &icon_look.hBmpZoomInButton;
+  const PixelSize icon_in_size = icon_zoom_in->GetSize();
+  const int offsetx = (rc_zoom_in_button.right - rc_zoom_in_button.left - icon_in_size.cx) / 2;
+  const int offsety = (rc_zoom_in_button.bottom - rc_zoom_in_button.top - icon_in_size.cy) / 2;
+  icon_zoom_in->DrawUpperLeft(canvas, rc_zoom_in_button.left + offsetx,
+                              rc_zoom_in_button.top + offsety);
+/*
   canvas.CopyAnd(rc_zoom_in_button.left + offsetx,
                   rc_zoom_in_button.top + offsety,
-                  bitmap_in_size.cx / 2,
-                  bitmap_in_size.cy,
-                  *bmp_zoom_in,
-                  bitmap_in_size.cx / 2, 0);
+                  icon_in_size.cx / 2,
+                  icon_in_size.cy,
+                  *icon_zoom_in,
+                  icon_in_size.cx / 2, 0);
+*/
 
-  const Bitmap *bmp_zoom_out = &icon_look.hBmpZoomOutButton;
-  const PixelSize bitmap_out_size = bmp_zoom_out->GetSize();
+  const MaskedIcon *icon_zoom_out = &icon_look.hBmpZoomOutButton;
+  icon_zoom_out->DrawUpperLeft(canvas, rc_zoom_out_button.left + offsetx,
+                               rc_zoom_out_button.top + offsety);
+/*
   canvas.CopyAnd(rc_zoom_out_button.left + offsetx,
                   rc_zoom_out_button.top + offsety,
-                  bitmap_out_size.cx / 2,
-                  bitmap_out_size.cy,
-                  *bmp_zoom_out,
-                  bitmap_out_size.cx / 2, 0);
+                  icon_out_size.cx / 2,
+                  icon_out_size.cy,
+                  *icon_zoom_out,
+                  icon_out_size.cx / 2, 0);
+*/
 
 }
 
@@ -403,8 +415,8 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
   FormatUserMapScale(map_width, buffer.buffer(), true);
   PixelSize text_size = canvas.CalcTextSize(buffer);
   const PixelScalar text_padding_x = Layout::Scale(2);
-  PixelSize bmp_size = look.map_scale_left_icon.GetSize();
-  const PixelScalar bmp_y = (text_size.cy + bmp_size.cy) / 2;
+  PixelSize icon_size = look.map_scale_left_icon.GetSize();
+  const PixelScalar icon_y = (text_size.cy + icon_size.cy) / 2;
 
   UPixelScalar zoom_button_width = MapOverlayButton::GetStandardButtonHeight()
       * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
@@ -412,11 +424,11 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
   PixelScalar x = rc.left + (Layout::landscape ? 0 : 1) * zoom_button_width;
 
   canvas.DrawFilledRectangle(x, rc.bottom - text_size.cy - Layout::Scale(1),
-                             x + 2 * bmp_size.cx + text_size.cx + Layout::Scale(2),
+                             x + 2 * icon_size.cx + text_size.cx + Layout::Scale(2),
                              rc.bottom, COLOR_WHITE);
 
-  look.map_scale_left_icon.Draw(canvas, x, rc.bottom - bmp_y);
-  x += bmp_size.cx;
+  look.map_scale_left_icon.Draw(canvas, x, rc.bottom - icon_y);
+  x += icon_size.cx;
 
   canvas.SetBackgroundColor(COLOR_WHITE);
   canvas.SetBackgroundOpaque();
@@ -425,7 +437,7 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
               buffer);
 
   x += text_padding_x + text_size.cx;
-  look.map_scale_right_icon.Draw(canvas, x, rc.bottom - bmp_y);
+  look.map_scale_right_icon.Draw(canvas, x, rc.bottom - icon_y);
 }
 
 void
@@ -438,20 +450,20 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
   button_size.cy = button_size.cx;
 
   // draw flight mode
-  const MaskedIcon *bmp;
+  const MaskedIcon *icon;
 
   if (Calculated().common_stats.task_type == TaskType::ABORT)
-    bmp = &look.abort_mode_icon;
+    icon = &look.abort_mode_icon;
   else if (GetDisplayMode() == DisplayMode::CIRCLING)
-    bmp = &look.climb_mode_icon;
+    icon = &look.climb_mode_icon;
   else if (GetDisplayMode() == DisplayMode::FINAL_GLIDE)
-    bmp = &look.final_glide_mode_icon;
+    icon = &look.final_glide_mode_icon;
   else
-    bmp = &look.cruise_mode_icon;
+    icon = &look.cruise_mode_icon;
 
-  unsigned offset = button_size.cx + Layout::Scale(2) + bmp->GetSize().cx;
-  bmp->Draw(canvas, rc.right - offset,
-            rc.bottom - bmp->GetSize().cy - Layout::Scale(1));
+  unsigned offset = button_size.cx + Layout::Scale(2) + icon->GetSize().cx;
+  icon->Draw(canvas, rc.right - offset,
+             rc.bottom - icon->GetSize().cy - Layout::Scale(1));
 
   // draw "Simulator/Replay
   StaticString<80> buffer;

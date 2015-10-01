@@ -234,9 +234,10 @@ TouchNumericEntry(fixed &value,
                             button_style, form, mrOK);
 
   Button cancel_button;
-  PixelRect rc_cancel( { button_width,
-                         rc.top + 5 * button_height, 2 * button_width,
-                         rc.top + 6 * button_height} );
+  PixelRect rc_cancel(button_width,
+                         PixelScalar(rc.top + 5 * button_height),
+                         PixelScalar(2 * button_width),
+                         PixelScalar(rc.top + 6 * button_height));
   cancel_button.Create(client_area,
                        look.button,
                        _("Cancel"),

@@ -39,9 +39,8 @@ ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
 {
   const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
 
-  Pen pen_thick(2, pressed ? _look.light_border_pen.GetColor() :
-      _look.dark_border_pen.GetColor());
-  canvas.Select(pen_thick);
+  canvas.Select(pressed ? _look.light_border_pen :
+      _look.dark_border_pen);
   rc.right -= 1;
   rc.top += 1;
 

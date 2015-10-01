@@ -161,7 +161,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
     unsigned style = DT_CENTER | DT_NOCLIP | DT_WORDBREAK;
 
     PixelRect text_rc = rc;
-    canvas.DrawFormattedText(&text_rc,  GetText().c_str(), style | DT_CALCRECT);
+    canvas.DrawFormattedText(&text_rc,  GetCaption(), style | DT_CALCRECT);
     text_rc.right = rc.right;
 
     PixelScalar offset = rc.bottom - text_rc.bottom;
@@ -171,7 +171,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
       text_rc.bottom += offset;
     }
 
-    canvas.DrawFormattedText(&text_rc,  GetText().c_str(), style);
+    canvas.DrawFormattedText(&text_rc,  GetCaption(), style);
   #endif
   }
 }

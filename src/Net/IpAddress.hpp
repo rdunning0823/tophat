@@ -31,7 +31,9 @@ namespace IpAddress {
  * @param buffer. contains string of formatted ip address e.g. 192.168.0.1
  * @return. false if fails
  */
+#ifdef KOBO
   bool GetFormattedIpAddress(char *buffer);
+#endif
 }
 
 #endif
