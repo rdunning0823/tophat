@@ -28,7 +28,7 @@ Copyright_License {
 
 QuestionWidget::QuestionWidget(const TCHAR *_message,
                                ActionListener &_listener)
-  :SolidWidget(new ButtonPanelWidget(new TextWidget(),
+  :SolidWidget(new ButtonPanelWidget(new TextWidget(2),
                                      ButtonPanelWidget::Alignment::BOTTOM)),
    message(_message), listener(_listener) {}
 
