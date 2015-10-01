@@ -275,15 +275,15 @@ WaypointListSimpleDialog::SetRectangles(const PixelRect &rc_outer)
     rc_distance_header.top = 0;
     rc_distance_header.bottom = control_height;
 
-    rc_close_button.left = 0;
-    rc_close_button.right = left_col_width;
-    rc_close_button.bottom = rc.bottom - control_height;
-    rc_close_button.top = rc_close_button.bottom - control_height;
-
     rc_select_button.left = 0;
     rc_select_button.right = left_col_width;
-    rc_select_button.bottom = rc.bottom;
+    rc_select_button.bottom = rc.bottom - control_height;
     rc_select_button.top = rc_select_button.bottom - control_height;
+
+    rc_close_button.left = 0;
+    rc_close_button.right = left_col_width;
+    rc_close_button.bottom = rc.bottom;
+    rc_close_button.top = rc_close_button.bottom - control_height;
   } else {
 
     rc_list.left = 0;
