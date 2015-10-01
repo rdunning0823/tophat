@@ -121,7 +121,7 @@ WaypointManagerWidget::CreateButtons(WidgetDialog &dialog)
   new_button = dialog.AddButton(_("New"), *this, NEW);
   edit_button = dialog.AddButton(_("Import"), *this, IMPORT);
   edit_button = dialog.AddButton(_("Edit"), *this, EDIT);
-  save_button = dialog.AddButton(_("Save"), *this, SAVE);
+  //save_button = dialog.AddButton(_("Save"), *this, SAVE);
   delete_button = dialog.AddButton(_("Delete"), *this, DELETE);
 }
 
@@ -303,6 +303,7 @@ WaypointManagerWidget::OnAction(int id)
     OnWaypointDeleteClicked(GetList().GetCursorIndex());
     break;
   }
+  UpdateButtons();
 }
 
 void
@@ -313,15 +314,13 @@ dlgConfigWaypointsShowModal()
   WidgetDialog dialog(look);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), _("Waypoints Editor"),
                     &widget);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   widget.CreateButtons(dialog);
-  dialog.AddButton(_T("_X"), mrCancel);
   dialog.EnableCursorSelection();
 
   dialog.ShowModal();
   dialog.StealWidget();
 
-  if (widget.IsModified() &&
-      ShowMessageBox(_("Save changes to waypoint file?"), _("Waypoints edited"),
-                  MB_YESNO | MB_ICONQUESTION) == IDYES)
+  if (widget.IsModified())
       widget.SaveWaypoints();
 }
