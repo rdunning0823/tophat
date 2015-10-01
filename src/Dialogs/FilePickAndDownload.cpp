@@ -419,11 +419,11 @@ ManagedFilePickAndDownloadWidget::RefreshForm()
     }
     PixelSize name_size = font.TextSize(message.c_str());
     PixelSize status_size = font.TextSize(status.c_str());
-    PixelSize space_size = font.TextSize(_T(" "));
-    UPixelScalar text_width = name_size.cx + status_size.cx + space_size.cx;
+    PixelSize space_size = font.TextSize(_T("     "));
+    UPixelScalar text_width = name_size.cx + status_size.cx + space_size.cx / 5;
 
     if (frame_width >= text_width) {
-      unsigned spaces_needed = (frame_width - text_width) / space_size.cx - 1;
+      unsigned spaces_needed = (frame_width - text_width) / space_size.cx / 5 - 1;
       StaticString<100> spaces (_T("                                                                                                    "));
       if (spaces_needed < spaces.length())
         spaces.Truncate(spaces_needed);
