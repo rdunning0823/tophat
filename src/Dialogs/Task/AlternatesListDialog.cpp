@@ -171,24 +171,28 @@ void
 AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  PixelSize sz_space = dialog_look.text_font.TextSize(_T(" "));
+  PixelSize sz_space = dialog_look.text_font.TextSize(_T("     "));
   distance_label_width =
-      dialog_look.text_font.TextSize(distance_label_text).cx + 5 * sz_space.cx;
+      dialog_look.text_font.TextSize(distance_label_text).cx + sz_space.cx;
 
-  unsigned spaces_needed = rc.GetSize().cx / 2 / sz_space.cx;
-  StaticString<100> spaces (_T("                                                                                                    "));
-  if (spaces_needed < spaces.length())
-    spaces.Truncate(spaces_needed);
   StaticString<1000> caption;
-  caption.Format(_T("%s%s     %s"),spaces.c_str(), distance_label_text,
+  caption.Format(_T("%s     %s"),distance_label_text,
                        arrival_alt_label_text);
   TextWidget::SetText(caption.c_str());
+}
+
+static const PixelRect
+GetRightHalf(const PixelRect &rc)
+{
+  PixelRect rc_right = rc;
+  rc_right.left += rc.GetSize().cx / 2;
+  return rc_right;
 }
 
 void
 AlternatesListHeaderWidget::Move(const PixelRect &rc)
 {
-  TextWidget::Move(rc);
+  TextWidget::Move(GetRightHalf(rc));
   CalculateLayout(rc);
 }
 
@@ -196,8 +200,14 @@ void
 AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
                                     const PixelRect &rc)
 {
-  TextWidget::Prepare(parent, rc);
+  TextWidget::Prepare(parent, GetRightHalf(rc));
   CalculateLayout(rc);
+}
+
+void
+AlternatesListHeaderWidget::Show(const PixelRect &rc)
+{
+  TextWidget::Show(GetRightHalf(rc));
 }
 
 void

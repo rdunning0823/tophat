@@ -131,6 +131,7 @@ class AlternatesListHeaderWidget : public TextWidget
 public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
+  void Show(const PixelRect &rc) override;
   virtual void Move(const PixelRect &rc) override;
 
   virtual PixelSize GetMinimumSize() const {
