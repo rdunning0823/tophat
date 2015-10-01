@@ -49,7 +49,8 @@ TextWidget::GetMinimumSize() const
       return { PixelScalar(0), fixed_height };
 
   const Font &font = UIGlobals::GetDialogLook().text_font;
-  const PixelScalar height = 2 * Layout::GetTextPadding() + font.GetHeight();
+  const PixelScalar height = Layout::GetTextPadding() + num_rows_text *
+      (Layout::GetTextPadding() + font.GetHeight());
 
   return { PixelScalar(0), height };
 }
