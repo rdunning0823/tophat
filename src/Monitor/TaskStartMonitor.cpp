@@ -151,9 +151,9 @@ TaskStartMonitor::Check()
 
   // what happens if we showed the dialog, and then user swiped screens to show bottom widget, killing dialog?
   message_string message;
-  unsigned rows_text = GetMessage1(stats.start, message);
+  GetMessage1(stats.start, message);
   if (widget == nullptr) {
-    widget = new TaskStartWidget(*this, message.c_str(), rows_text);
+    widget = new TaskStartWidget(*this, message.c_str(), 2);
     PageActions::SetCustomTop(widget);
   } else
     widget->UpdateMessage(message.c_str());
