@@ -35,6 +35,7 @@ Copyright_License {
 #include "Util/StaticString.hxx"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Time/LocalTime.hpp"
 
 class TaskStartWidget final
   : public QuestionWidget, private ActionListener {
@@ -96,12 +97,24 @@ TaskStartMonitor::GetMessage1(const StartStats &start, message_string &message)
   const auto &calculated = CommonInterface::Calculated();
   const CommonStats &common_stats = calculated.common_stats;
 
+
   const TCHAR task_start[] = N_("Start");
   unsigned rows_text = 2;
   TCHAR time_start[32];
   TCHAR altitude_start[32];
   FormatUserAltitude(start.altitude, altitude_start, true);
-  FormatSignedTimeHHMM(time_start, (int)start.time);
+  FormatSignedTimeHHMM(time_start, TimeLocal((int)start.time,
+                                             settings_computer.utc_offset));
+
+
+
+/*  StaticString<50> now_string1;
+  StaticString<50> now_string2;
+  FormatSignedTimeHHMM(now_string1.buffer(), TimeLocal((int)basic.time, settings.utc_offset));
+  now_string2.Format(_T("%s  %s"), _("Current time"), now_string1.c_str());
+  label_current->SetText(now_string2.c_str());
+
+  */
 
   message.Format(_T("%s:   %s    %s"), task_start, altitude_start , time_start);
   if (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) {
