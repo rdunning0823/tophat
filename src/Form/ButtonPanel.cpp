@@ -48,10 +48,18 @@ ButtonPanel::UpdateLayout(const PixelRect rc)
   if (buttons.empty())
     return rc;
 
-  const bool landscape = false;
-  return landscape
-    ? LeftLayout(rc)
-    : BottomLayout(rc);
+  switch (position) {
+  case ButtonPanelPosition::Auto:
+  case ButtonPanelPosition::Bottom:
+    return BottomLayout(rc);
+    break;
+  case ButtonPanelPosition::Side:
+    return LeftLayout(rc);
+    break;
+  case ButtonPanelPosition::Manual:
+    break;
+  }
+  return rc;
 }
 
 PixelRect

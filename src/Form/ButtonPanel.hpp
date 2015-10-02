@@ -36,6 +36,8 @@ public:
     Auto,
     Side,
     Bottom,
+    /* rely on caller to position buttons */
+    Manual,
   };
 
   ContainerWindow &parent;
@@ -120,7 +122,7 @@ public:
    * Call this after all buttons have been added or after the parent
    * window has been resized.
    *
-   * @return the remaining rectangle
+   * @return the remaining rectangle or full rc if Manual
    */
   PixelRect UpdateLayout(PixelRect rc);
   PixelRect UpdateLayout();
