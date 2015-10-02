@@ -378,7 +378,6 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   waypoint_list_control.SetItemRenderer(this);
   waypoint_list_control.SetCursorHandler(this);
-  waypoint_list_control.SetItemHeight(WaypointListRenderer::GetHeight(dialog_look));
 
   dialog_state.name = _T("");
   sort_direction = CommonInterface::SetUISettings().waypoint_sort_direction;
