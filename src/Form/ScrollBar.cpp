@@ -35,6 +35,7 @@ ScrollBar::ScrollBar(const ButtonLook &_button_look)
 {
   // Reset the ScrollBar on creation
   Reset();
+  button_renderer.SetRounded(false);
 }
 
 void

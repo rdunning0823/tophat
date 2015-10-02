@@ -32,12 +32,19 @@ class Canvas;
 
 class ButtonFrameRenderer {
   const ButtonLook &look;
+  /* draw rounded corners */
+  bool rounded;
 
 public:
-  explicit ButtonFrameRenderer(const ButtonLook &_look):look(_look) {}
+  explicit ButtonFrameRenderer(const ButtonLook &_look):look(_look),
+  rounded(true) {}
 
   const ButtonLook &GetLook() const {
     return look;
+  }
+
+  void SetRounded(bool _rounded) {
+    rounded = _rounded;
   }
 
   gcc_const
