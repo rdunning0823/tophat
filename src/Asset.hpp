@@ -305,11 +305,7 @@ constexpr
 static inline bool
 UseTouchScreenLayout()
 {
-#ifdef NDEBUG
-  return true;
-#else
   return HasTouchScreen();
-#endif
 }
 
 /**
