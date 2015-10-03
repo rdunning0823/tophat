@@ -32,7 +32,6 @@ Copyright_License {
 #include "Screen/Init.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Key.h"
-#include "../test/src/Fonts.hpp"
 #include "Language/Language.hpp"
 #include "Form/ActionListener.hpp"
 #include "Screen/Custom/TopCanvas.hpp"
@@ -265,7 +264,6 @@ Main()
   ScreenGlobalInit screen_init;
   PixelSize screen_size = GetScreenSize();
   Layout::Initialize(screen_size);
-  InitialiseFonts(/*screen_size*/);
 
   DialogLook dialog_look;
   dialog_look.Initialise(100);
@@ -287,8 +285,6 @@ Main()
   int action = Main(main_window, dialog_look);
 
   main_window.Destroy();
-
-  DeinitialiseFonts();
 
   return action;
 }
