@@ -31,8 +31,8 @@ Font normal_font, bold_font;
 void
 InitialiseFonts()
 {
-  normal_font.Load(FontDescription(Layout::FontScale(12)));
-  bold_font.Load(FontDescription(Layout::FontScale(12), true));
+  normal_font.Load(FontDescription(Layout::FontScale(18)));
+  bold_font.Load(FontDescription(Layout::FontScale(18), true));
 }
 
 void
