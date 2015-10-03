@@ -26,7 +26,6 @@ Copyright_License {
 #include "Base.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "Components.hpp"
-#include "Task/ProtectedTaskManager.hpp"
 #include "Form/Button.hpp"
 #include "Form/Frame.hpp"
 #include "Form/CheckBox.hpp"
@@ -37,13 +36,11 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Screen/Layout.hpp"
 #include "Util/StaticString.hxx"
-#include "Renderer/FinalGlideBarRenderer.hpp"
 #include "Look/Look.hpp"
 #include "Screen/Canvas.hpp"
 #include "Profile/Profile.hpp"
 #include "ActionInterface.hpp"
 #include "Language/Language.hpp"
-#include "Task/Points/TaskWaypoint.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Screen/SingleWindow.hpp"
@@ -58,29 +55,6 @@ enum ControlIndex {
 
 
 class AltitudeSimulatorPanel : public BaseAccessPanel, NumberButtonSubNumberLayout {
-  class FinalGlideChart: public PaintWindow
-  {
-  public:
-    FinalGlideChart(ContainerWindow &parent,
-                    PixelScalar x, PixelScalar y,
-                    UPixelScalar Width, UPixelScalar Height,
-                    WindowStyle style,
-                    const Look&);
-  protected:
-    const Look& look;
-
-    /**
-     * draws the Final Glide Bar on the MC widget so the pilot can
-     * adjust his MC with respect to the arrival height
-     */
-    FinalGlideBarRenderer *final_glide_bar_renderer;
-
-    /**
-     * draws the the Final Glide bar
-     */
-    virtual void OnPaint(Canvas &canvas);
-  };
-
 
 protected:
   /**
@@ -91,19 +65,9 @@ protected:
   WndFrame *altitude_value;
   WndFrame *altitude_type;
   CheckBoxControl show_alternate_units;
-  /**
-   * draws the Final Glide Bar on the MC widget so the pilot can
-   * adjust his MC with respect to the arrival height
-   */
-  FinalGlideChart *final_glide_chart;
 
   /**
-   * Area where canvas will draw the final glide bar
-   */
-  PixelRect fg_rc;
-
-  /**
-   * This timer updates the data for the final glide
+   * This timer syncs the altitude data
    */
   WindowTimer dialog_timer;
 
@@ -135,10 +99,7 @@ public:
 
 protected:
   /**
-   * render the final glide periodically because
-   * latency in the blackboards causes the final glide
-   * renderer to not always use value updated with the
-   * buttons
+   * sync blackboards
    */
   virtual bool OnTimer(WindowTimer &timer);
 
@@ -170,7 +131,7 @@ AltitudeSimulatorPanel::OnAction(int action_id)
   case BigPlus:
     altitude += step * fixed(10);
     break;
-  case LittlePlus:    Profile::SetModified(true);
+  case LittlePlus:
     altitude += step;
     break;
   case LittleMinus:
@@ -184,6 +145,7 @@ AltitudeSimulatorPanel::OnAction(int action_id)
         !settings_info_boxes.show_alternative_altitude_units;
     Profile::Set(ProfileKeys::ShowAlternateAltitudeUnits,
                  settings_info_boxes.show_alternative_altitude_units);
+    Profile::SetModified(true);
   default:
     BaseAccessPanel::OnAction(action_id);
     return;
@@ -205,7 +167,6 @@ AltitudeSimulatorPanel::Refresh()
   FormatUserAltitude(altitude, altitude_string.buffer(), true);
 
   altitude_value->SetCaption(altitude_string.c_str());
-  final_glide_chart->Invalidate();
   altitude_type->SetCaption(is_agl ? _("AGL") : _("MSL"));
 }
 
@@ -216,7 +177,6 @@ AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
 
   BaseAccessPanel::Move(rc);
   CalculateLayout(rc);
-  final_glide_chart->Move(fg_rc);
   big_plus->Move(big_plus_rc);
   little_plus->Move(little_plus_rc);
   big_minus->Move(big_minus_rc);
@@ -231,15 +191,9 @@ AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc)
 {
   NumberButtonSubNumberLayout::CalculateLayout(content_rc);
 
-  PixelRect content_right_rc = content_rc;
-  PixelRect content_left_rc = content_rc;
 
-  // split content area into two columns, buttons on the right, fg on left
-  content_right_rc.left += Layout::Scale(50);
-
-  NumberButtonSubNumberLayout::CalculateLayout(content_right_rc);
-  content_left_rc.right = big_plus_rc.left - 1;
-  fg_rc = content_left_rc;
+  NumberButtonSubNumberLayout::CalculateLayout(content_rc);
+  content_rc.right = big_plus_rc.left - 1;
 
   show_alternate_units_rc.bottom = content_rc.bottom -
     (content_rc.bottom - big_minus_rc.bottom) / 4;
@@ -256,18 +210,10 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   CalculateLayout(rc);
 
   WindowStyle style;
-  const Look &look = UIGlobals::GetLook();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const MapLook &map_look = UIGlobals::GetLook().map;
   big_dialog_look.Initialise(370);
   big_button_look.Initialise(*map_look.overlay_font);
-
-  final_glide_chart =
-      new FinalGlideChart(GetClientAreaWindow(),
-                          fg_rc.left, fg_rc.top,
-                          (UPixelScalar)(fg_rc.right - fg_rc.left),
-                          (UPixelScalar)(fg_rc.bottom - fg_rc.top),
-                          style, look);
 
   WindowStyle button_style;
   button_style.TabStop();
@@ -321,54 +267,12 @@ void
 AltitudeSimulatorPanel::Unprepare()
 {
   dialog_timer.Cancel();
-  delete(final_glide_chart);
   delete(big_plus);
   delete(little_plus);
   delete(big_minus);
   delete(little_minus);
   delete(altitude_value);
   delete(altitude_type);
-}
-
-AltitudeSimulatorPanel::FinalGlideChart::FinalGlideChart(
-    ContainerWindow &parent,
-    PixelScalar X,
-    PixelScalar Y,
-    UPixelScalar width,
-    UPixelScalar height,
-    WindowStyle style,
-    const Look& _look)
-:look(_look)
-{
-  PixelRect rc (X, Y, X + width, Y + height);
-  Create(parent, rc, style);
-  final_glide_bar_renderer = new FinalGlideBarRenderer(look.final_glide_bar,
-                                                       look.map.task);
-}
-
-void
-AltitudeSimulatorPanel::FinalGlideChart::OnPaint(Canvas &canvas)
-{
-  canvas.SelectNullPen();
-  canvas.Clear(look.dialog.background_color);
-  StaticString<64> description;
-
-  ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-  if (task_manager->GetMode() == TaskType::ORDERED)
-    description = _("Task");
-  else {
-    const TaskWaypoint* wp = task_manager->GetActiveTaskPoint();
-    if (wp != nullptr)
-      description = wp->GetWaypoint().name.c_str();
-    else
-      description.clear();
-  }
-
-  final_glide_bar_renderer->Draw(canvas, GetClientRect(),
-                                 CommonInterface::Calculated(),
-                                 CommonInterface::GetComputerSettings().task.glide,
-  CommonInterface::GetUISettings().map.final_glide_bar_mc0_enabled,
-  description.c_str());
 }
 
 static Widget*
