@@ -203,11 +203,11 @@ TaskManagerDialogUs::SetRectangles(const PixelRect &rc_outer)
   rc_fly_button.top = rc_back_button.top = rc_save_as_button.top =
       rc.bottom - button_height;
 
-  rc_save_as_button.left = button_width;
-  rc_back_button.left = button_width * 2;
-
   rc_fly_button.right = rc_fly_button.left + button_width;
-  rc_save_as_button.right = rc_save_as_button.left + button_width;
+  rc_save_as_button.left = rc_fly_button.right;
+  rc_save_as_button.right = rc_back_button.left =
+      rc_save_as_button.left + button_width;
+
   rc_back_button.right = rc_back_button.left + button_width;
 
   rc_task_summary.bottom = rc_fly_button.top - 1;
