@@ -280,6 +280,7 @@ protected:
   bool OnKeyCheck(unsigned key_code) const override;
   bool OnKeyDown(unsigned key_code) override;
   void OnPaint(Canvas &canvas) override;
+  void OnResize(PixelSize new_size) override;
 };
 
 #endif

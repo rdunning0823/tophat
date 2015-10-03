@@ -68,8 +68,6 @@ DigitEntry::Create(ContainerWindow &parent, const PixelRect &rc,
     digit.value = 0;
   }
 
-  max_width = rc.right - rc.left;
-
   CalculateLayout(rc);
 
   PaintWindow::Create(parent, rc, style);
@@ -241,6 +239,8 @@ DigitEntry::CreateTime(ContainerWindow &parent, const PixelRect &rc,
 void
 DigitEntry::CalculateLayout(const PixelRect rc)
 {
+  max_width = rc.right - rc.left;
+
   control_height = Layout::GetMaximumControlHeight();
   const UPixelScalar padding = Layout::GetTextPadding();
 
@@ -839,6 +839,13 @@ Angle
 DigitEntry::GetAngleValue() const
 {
   return Angle::Degrees(GetFixedValue());
+}
+
+void
+DigitEntry::OnResize(PixelSize new_size) {
+  PixelRect rc ((PixelScalar)0, (PixelScalar)0, new_size.cx, new_size.cy);
+  CalculateLayout(rc);
+  Window::OnResize(new_size);
 }
 
 bool
