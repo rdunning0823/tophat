@@ -97,6 +97,7 @@ extern const char HomeElevation[];
 extern const char HomeElevationAvailable[];
 extern const char TeamcodeRefWaypoint[];
 extern const char PilotName[];
+extern const char TophatArguments[];
 extern const char AircraftType[];
 extern const char AircraftReg[];
 extern const char CompetitionId[];

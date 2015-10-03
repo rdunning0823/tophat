@@ -43,6 +43,7 @@ Copyright_License {
 #include "Panels/UnitsConfigPanel.hpp"
 #include "Panels/TimeConfigPanel.hpp"
 #include "Panels/LoggerConfigPanel.hpp"
+#include "Panels/StartupConfigPanel.hpp"
 #include "Panels/AirspaceConfigPanel.hpp"
 #include "Panels/SiteConfigPanel.hpp"
 #include "Panels/MapDisplayConfigPanel.hpp"
@@ -141,6 +142,7 @@ static constexpr TabMenuPage setup_pages[] = {
   // Important: all pages after Units in this list must not have data fields that are
   // unit-dependent because they will be saved after their units may have changed.
   // ToDo: implement API that controls order in which pages are saved
+  { N_("Startup"), CreateStartupConfigPanel },
   { N_("Time"), CreateTimeConfigPanel },
 #ifdef HAVE_TRACKING
   { N_("Tracking"), CreateTrackingConfigPanel },

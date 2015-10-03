@@ -32,6 +32,7 @@ Copyright_License {
 #include "Tracking/TrackingSettings.hpp"
 #include "NMEA/Validity.hpp"
 #include "Logger/Settings.hpp"
+#include "Startup/Settings.hpp"
 #include "Airspace/AirspaceComputerSettings.hpp"
 #include "TeamCode/Settings.hpp"
 #include "FilePickAndDownloadSettings.hpp"

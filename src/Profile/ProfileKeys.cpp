@@ -99,6 +99,7 @@ const char WatchedWaypointFile[] = "WatchedWPFile"; // pL
 const char LanguageFile[] = "LanguageFile"; // pL
 const char InputFile[] = "InputFile"; // pL
 const char PilotName[] = "PilotName";
+const char TophatArguments[] = "TophatArguments";
 const char AircraftType[] = "AircraftType";
 const char AircraftReg[] = "AircraftReg";
 const char CompetitionId[] = "AircraftRego";
