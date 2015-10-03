@@ -70,7 +70,7 @@ DigitEntry::Create(ContainerWindow &parent, const PixelRect &rc,
 
   max_width = rc.right - rc.left;
 
-  CalculateLayout();
+  CalculateLayout(rc);
 
   PaintWindow::Create(parent, rc, style);
 }
@@ -117,7 +117,7 @@ DigitEntry::CreateAngle(ContainerWindow &parent, const PixelRect &rc,
   columns[2].type = Column::Type::DEGREES;
   cursor = 0;
 
-  CalculateLayout();
+  CalculateLayout(rc);
 }
 
 void
@@ -167,7 +167,7 @@ DigitEntry::CreateLatitude(ContainerWindow &parent, const PixelRect &rc,
 
   cursor = 0;
 
-  CalculateLayout();
+  CalculateLayout(rc);
 }
 
 void
@@ -221,7 +221,7 @@ DigitEntry::CreateLongitude(ContainerWindow &parent, const PixelRect &rc,
 
   cursor = 0;
 
-  CalculateLayout();
+  CalculateLayout(rc);
 }
 
 void
@@ -235,13 +235,13 @@ DigitEntry::CreateTime(ContainerWindow &parent, const PixelRect &rc,
   columns[2].type = Column::Type::DIGIT6;
   cursor = 0;
 
-  CalculateLayout();
+  CalculateLayout(rc);
 }
 
 void
-DigitEntry::CalculateLayout()
+DigitEntry::CalculateLayout(const PixelRect rc)
 {
-  const UPixelScalar control_height = Layout::GetMaximumControlHeight();
+  control_height = Layout::GetMaximumControlHeight();
   const UPixelScalar padding = Layout::GetTextPadding();
 
   const UPixelScalar min_value_height = control_height * 3 / 2;
@@ -251,6 +251,9 @@ DigitEntry::CalculateLayout()
   if (digit_size.cy < (PixelScalar)min_value_height)
     digit_size.cy = min_value_height;
 
+  fixed stretch_ratio = fixed(rc.GetSize().cy) / fixed(2 * control_height + digit_size.cy);
+  control_height = UPixelScalar((fixed)control_height * stretch_ratio);
+  digit_size.cy = PixelScalar(fixed(digit_size.cy) * stretch_ratio);
   top = control_height;
   bottom = top + digit_size.cy;
 
@@ -1042,8 +1045,6 @@ DigitEntry::OnPaint(Canvas &canvas)
 
   canvas.SetBackgroundTransparent();
   canvas.SetTextColor(look.text_color);
-
-  unsigned control_height = Layout::GetMaximumControlHeight();
 
   PixelRect plus_rc(0, top - control_height, 0, top);
   PixelRect minus_rc(0, bottom, 0, bottom + control_height);

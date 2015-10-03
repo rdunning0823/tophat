@@ -30,6 +30,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "UIGlobals.hpp"
 #include "Geo/GeoPoint.hpp"
+#include "Screen/Layout.hpp"
 
 bool
 GeoPointEntryDialog(const TCHAR *caption, GeoPoint &value,
@@ -51,14 +52,21 @@ GeoPointEntryDialog(const TCHAR *caption, GeoPoint &value,
   control_style.Hide();
   control_style.TabStop();
 
+  PixelRect rc_top, rc_bottom, rc_content;
+  rc_content = client_area.GetClientRect();
+  rc_content.bottom -= Layout::GetMaximumControlHeight(); // button
+  rc_top = rc_bottom = rc_content;
+  rc_top.bottom = rc_bottom.top = rc_content.GetSize().cy / 2;
+
+
   DigitEntry latitude_entry(look);
-  latitude_entry.CreateLatitude(client_area, client_area.GetClientRect(),
+  latitude_entry.CreateLatitude(client_area, rc_top,
                                 control_style, format);
   latitude_entry.Resize(latitude_entry.GetRecommendedSize());
   latitude_entry.SetActionListener(dialog, mrOK);
 
   DigitEntry longitude_entry(look);
-  longitude_entry.CreateLongitude(client_area, client_area.GetClientRect(),
+  longitude_entry.CreateLongitude(client_area, rc_bottom,
                                   control_style, format);
   longitude_entry.Resize(longitude_entry.GetRecommendedSize());
   longitude_entry.SetActionListener(dialog, mrOK);

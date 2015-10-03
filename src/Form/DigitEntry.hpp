@@ -130,8 +130,11 @@ class DigitEntry : public PaintWindow {
 
   bool valid;
 
+  /* top and bottom of the center row w/ data (excludes button height) */
   unsigned top, bottom, max_width;
 
+  /* value so controls fit in rc */
+  UPixelScalar control_height;
   /**
    * The current digit.
    */
@@ -167,7 +170,7 @@ public:
   void CreateLongitude(ContainerWindow &parent, const PixelRect &rc,
                        const WindowStyle style, CoordinateFormat format);
 
-  void CalculateLayout();
+  void CalculateLayout(const PixelRect rc);
 
   gcc_pure
   PixelSize GetRecommendedSize() const {
