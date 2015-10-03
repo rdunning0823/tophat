@@ -553,8 +553,8 @@ dlgAirspaceWarningsShowModal(ProtectedAirspaceWarningManager &_warnings,
 
   WidgetDialog dialog2(UIGlobals::GetDialogLook());
   dialog2.CreateFull(UIGlobals::GetMainWindow(), _("Airspace Warnings"), list);
-  list->CreateButtons(dialog2);
   dialog2.AddSymbolButton(_T("_X"), mrOK);
+  list->CreateButtons(dialog2);
   dialog2.EnableCursorSelection();
 
   dialog = &dialog2;
