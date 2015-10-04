@@ -25,6 +25,7 @@ Copyright_License {
 #include "Dialogs/WidgetDialog.hpp"
 #include "Widget/TabWidget.hpp"
 #include "Widget/ButtonWidget.hpp"
+#include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/IconLook.hpp"
 #include "Look/DialogLook.hpp"
@@ -53,14 +54,15 @@ void
 dlgStatusShowModal(int start_page)
 {
   const DialogLook &look = UIGlobals::GetDialogLook();
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   WidgetDialog dialog(look);
 
   WindowStyle button_style;
   button_style.Hide();
   button_style.TabStop();
 
-  auto *close_button = new ButtonWidget(look.button, _("Close"),
-                                        dialog, mrOK);
+  auto *close_button = new ButtonWidget(
+      new SymbolButtonRenderer(button_look, _T("_X")), dialog, mrOK);
 
   TabWidget widget(TabWidget::Orientation::AUTO, close_button);
   widget.SetPageFlippedCallback([&dialog, &widget]() {
