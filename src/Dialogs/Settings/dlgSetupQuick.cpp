@@ -159,7 +159,9 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 {
   PixelRect rc = WndForm::GetClientRect();
   rc.bottom -= WndForm::GetTitleHeight();
-  unsigned max_control_height = rc.GetSize().cy / 8;
+  const PixelScalar bottom_row_height = Layout::GetMinimumControlHeight();
+  unsigned max_control_height =
+      (rc.GetSize().cy - bottom_row_height) / 7;
 
   PixelScalar height = std::min(max_control_height, Layout::GetMaximumControlHeight());
 
@@ -203,9 +205,9 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_pilot_button.bottom = rc_pilot_text.bottom = rc_pilot_text.top + height;
 
   rc_ok = rc;
-  rc_ok.top = rc_ok.bottom - height;
+  rc_ok.top = rc_ok.bottom - bottom_row_height;
   if (Layout::landscape) {
-    rc_ok.top = rc_advanced.top = rc.bottom - height;
+    rc_advanced.top = rc_ok.top;
     rc_advanced.bottom = rc.bottom;
 
     rc_advanced.right = rc_right.right;
