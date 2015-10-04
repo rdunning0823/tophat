@@ -62,7 +62,7 @@ MapOverlayButton::OnPaint(Canvas &canvas)
   bool pressed = IsDown();
 
   const PixelRect rc = frame_renderer.GetDrawingRect(rc_outer, pressed);
-  frame_renderer.DrawButton(canvas, rc, pressed, pressed);
+  frame_renderer.DrawButton(canvas, rc_outer, pressed, pressed);
 
   if (bmp != nullptr) {
 #ifdef _NOT_SUPPORTED
