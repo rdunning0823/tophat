@@ -175,13 +175,17 @@ public:
   void OnTypeClicked();
 
   void CreateButtons() {
+    /* tab order works for portrait. */
+    /* landscape is problem b/c widget and list are created elsewhere */
     close_button = dialog.AddSymbolButton(_T("_X"), *this, CloseClick);
     task_properties_button = dialog.AddButton(_T("*"), *this, TaskPropertiesClick);
-    zone_type_button = dialog.AddButton(_T("*"), *this, ZoneTypeClick);
     browse_button = dialog.AddButton(_("Browse"), *this, BrowseClick);
     add_button = dialog.AddButton(_("Insert before"), *this, AddClick);
     relocate_button = dialog.AddButton(_("Replace"), *this, RelocateClick);
     remove_button = dialog.AddButton(_("Delete"), *this, RemoveClick);
+    zone_type_button = dialog.AddButton(_T("*"), *this, ZoneTypeClick);
+
+    close_button->SetFocus();
   }
 
   /** returns true if prior widget existed and had to be deleted */
