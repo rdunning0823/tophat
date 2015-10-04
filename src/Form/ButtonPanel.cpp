@@ -274,7 +274,7 @@ ButtonPanel::BottomLayout(PixelRect rc)
 
   /* now do the actual layout based on row metadata */
 
-  for (int i = rows.size() - 1; i >= 0; --i) {
+  for (int i = 0; i <= ((int)rows.size() - 1); ++i) {
     const auto &row = rows[i];
 
     rc = HorizontalRange(rc, row.start, row.end);
