@@ -119,6 +119,8 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
 
   button_position = GetButtonPosition(ui_settings.info_boxes.geometry,
                                       Layout::landscape);
+  // stretch to right and bottom if adjacent to another button
+  const unsigned pen_width = Layout::Scale(1);
 
   switch (button_position) {
   case ButtonPosition::Left:
@@ -136,7 +138,7 @@ ScreensButtonWidget::Move(const PixelRect &rc_map)
   break;
 
   case ButtonPosition::Bottom:
-    rc.left = rc_main.GetCenter().x - GetWidth() / 2;
+    rc.left = rc_main.GetCenter().x - GetWidth() / 2 - pen_width;
     rc.right = rc.left + GetWidth();
     rc.bottom = rc_main.bottom;
     rc.top = rc.bottom - GetHeight();

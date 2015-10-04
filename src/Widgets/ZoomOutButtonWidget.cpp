@@ -50,6 +50,8 @@ void
 ZoomOutButtonWidget::Move(const PixelRect &rc_map)
 {
   PixelRect rc;
+  // stretch to right and bottom if adjacent to another button
+  const unsigned pen_width = Layout::Scale(1);
   if (Layout::landscape) {
     rc.left = zoom_in->GetPosition().right;
     rc.right = rc.left + GetWidth();
@@ -59,7 +61,7 @@ ZoomOutButtonWidget::Move(const PixelRect &rc_map)
     rc.left = rc_map.left;
     rc.right = rc.left + GetWidth();
     rc.bottom = rc_map.bottom;
-    rc.top = rc.bottom - GetHeight();
+    rc.top = rc.bottom - GetHeight() - pen_width;
   }
 
   OverlayButtonWidget::Move(rc);

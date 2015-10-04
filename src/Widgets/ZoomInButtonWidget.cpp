@@ -52,21 +52,20 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
   PixelRect rc;
 
   // calc s_but position in case s_but not visible (e.g. on menu)
-  ScreensButtonWidget::ButtonPosition button_position;
+  ScreensButtonWidget::ButtonPosition s_button_position;
   const UISettings &ui_settings = CommonInterface::GetUISettings();
-  button_position = s_but->GetButtonPosition(ui_settings.info_boxes.geometry,
-                                             Layout::landscape);
+  s_button_position = s_but->GetButtonPosition(ui_settings.info_boxes.geometry,
+                                               Layout::landscape);
 
-  switch (button_position) {
+  switch (s_button_position) {
   case ScreensButtonWidget::ButtonPosition::Bottom:
-    // must be landscape mode
     rc.bottom = rc_map.bottom;
     rc.top = rc.bottom - GetHeight();
 
     if (s_but->GetPosition().left - rc_map.left - (3 * (PixelScalar)GetWidth()) < 0) {
 
       // draw adjacent to "S" button's left (with room for Zoom In button)
-      rc.right = s_but->GetPosition().left - GetWidth();
+      rc.right = s_but->GetPosition().left - GetWidth() ;
       rc.left = rc.right - GetWidth();
     } else {
       rc.left = rc_map.left;
@@ -78,9 +77,9 @@ ZoomInButtonWidget::Move(const PixelRect &rc_map)
   case ScreensButtonWidget::ButtonPosition::Right:
     if (Layout::landscape) {
       rc.left = rc_map.left;
-      rc.right = rc.left + GetWidth() + 2;
+      rc.right = rc.left + GetWidth();
       rc.bottom = rc_map.bottom;
-      rc.top = rc.bottom - GetHeight() - 2;
+      rc.top = rc.bottom - GetHeight();
     } else {
       rc.left = rc_map.left;
       rc.right = rc.left + GetWidth();
