@@ -55,7 +55,8 @@ ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
                               20,
                               20);
   } else {
-    canvas.DrawFilledRectangle(rc, _look.background_color);
+    if (!look.background_transparent || pressed)
+      canvas.DrawFilledRectangle(rc, _look.background_color);
 
     const unsigned margin = GetMargin();
 

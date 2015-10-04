@@ -37,7 +37,11 @@ class ButtonFrameRenderer {
 
 public:
   explicit ButtonFrameRenderer(const ButtonLook &_look):look(_look),
+#if defined(USE_GDI)
+  rounded(false) {}
+#else
   rounded(true) {}
+#endif
 
   const ButtonLook &GetLook() const {
     return look;
