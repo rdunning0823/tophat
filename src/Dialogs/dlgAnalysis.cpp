@@ -145,7 +145,7 @@ class AnalysisWidget final : public NullWidget, ActionListener, Timer {
   WndForm &dialog;
 
   WndFrame info;
-  Button details_button, previous_button, next_button, close_button;
+  WndSymbolButton details_button, previous_button, next_button, close_button;
   ChartControl chart;
 
 public:
@@ -247,49 +247,30 @@ private:
 
 AnalysisWidget::Layout::Layout(const PixelRect rc)
 {
-  const unsigned width = rc.right - rc.left;
-  const unsigned height = rc.bottom - rc.top;
   const unsigned button_height = ::Layout::GetMaximumControlHeight();
+  const unsigned button_width = rc.GetSize().cx / 4;
 
   main = rc;
 
   /* close button on the bottom left */
 
   close_button.left = rc.left;
-  close_button.right = rc.left + ::Layout::Scale(70);
+  close_button.right = rc.left + button_width;
   close_button.bottom = rc.bottom;
   close_button.top = close_button.bottom - button_height;
 
-  /* previous/next buttons above the close button */
+  /* previous/next buttons to right of the close button */
+  previous_button = next_button = details_button = close_button;
+  previous_button.Offset(button_width, 0);
+  next_button.Offset(2 * button_width, 0);
+  details_button.Offset(3 * button_width, 0);
 
-  previous_button = close_button;
-  previous_button.bottom = previous_button.top;
-  previous_button.top = previous_button.bottom - button_height;
-  previous_button.right = (previous_button.left + previous_button.right) / 2;
+  info = close_button;
+  info.top -= button_height;
+  info.right = rc.right;
+  info.Offset(0, -1 * button_height);
 
-  next_button = previous_button;
-  next_button.left = next_button.right;
-  next_button.right = close_button.right;
-
-  /* "details" button above "previous/next" */
-
-  details_button = close_button;
-  details_button.bottom = previous_button.top;
-  details_button.top = details_button.bottom - button_height;
-
-  if (width > height) {
-    info = close_button;
-    info.top = rc.top;
-    info.bottom = details_button.top;
-
-    main.left = close_button.right;
-  } else {
-    main.bottom = details_button.top;
-    info.left = close_button.right;
-    info.right = rc.right;
-    info.top = main.bottom;
-    info.bottom = rc.bottom;
-  }
+  main.bottom = info.top;
 }
 
 void
