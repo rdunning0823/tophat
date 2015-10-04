@@ -25,6 +25,7 @@ Copyright_License {
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/Airspace/AirspaceWarningDialog.hpp"
 #include "Dialogs/WidgetDialog.hpp"
+#include "Dialogs/StatusPanels/TaskStatusPanel.hpp"
 #include "Widget/Widget.hpp"
 #include "Form/Form.hpp"
 #include "Form/Frame.hpp"
@@ -636,7 +637,7 @@ AnalysisWidget::OnCalcClicked()
 
   case AnalysisPage::TASK:
   case AnalysisPage::TASK_SPEED:
-    dlgStatusShowModal(2);
+    ShowTaskStatusDialog();
     break;
 
   case AnalysisPage::WIND:

@@ -23,7 +23,7 @@ Copyright_License {
 
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/WidgetDialog.hpp"
-#include "Dialogs/Task/Manager/TaskCalculatorPanel.hpp"
+#include "Dialogs/StatusPanels/TaskStatusPanel.hpp"
 #include "Look/DialogLook.hpp"
 #include "Language/Language.hpp"
 
@@ -34,7 +34,7 @@ ShowTaskStatusDialog()
   WidgetDialog dialog(look);
   dialog.CreateFull(UIGlobals::GetMainWindow(),
                     _("Task Status"),
-                    new TaskCalculatorPanel(look));
+                    new TaskStatusPanel(look));
   dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
 }

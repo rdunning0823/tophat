@@ -126,7 +126,6 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Task/Manager/TaskMapButtonRenderer.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskManagerDialog.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskClosePanel.cpp \
-	$(SRC)/Dialogs/Task/Manager/TaskCalculatorPanel.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskEditPanel.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskPropertiesPanel.cpp \
 	$(SRC)/Dialogs/Task/Manager/TaskMiscPanel.cpp \
