@@ -94,7 +94,7 @@ dlgStatusShowModal(int start_page)
   widget.AddTab(system_panel, _("System"), SystemIcon);
 
   Widget *rules_panel = new RulesStatusPanel(look);
-  widget.AddTab(rules_panel, _("Rules"), RulesIcon);
+  widget.AddTab(rules_panel, _("Task start"), RulesIcon);
 
   Widget *times_panel = new TimesStatusPanel(look);
   widget.AddTab(times_panel, _("Times"), TimesIcon);
