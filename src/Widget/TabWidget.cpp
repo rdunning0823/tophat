@@ -47,7 +47,7 @@ TabWidget::Layout::Layout(Orientation orientation, PixelRect rc,
       tab_display.top = extra.bottom = extra.top + extra_height;
     }
   } else {
-    tab_display.bottom = pager.top = rc.top + td.GetRecommendedRowHeight();
+    tab_display.top = pager.bottom = rc.bottom - td.GetRecommendedRowHeight();
 
     if (e != nullptr) {
       auto max_size = e->GetMaximumSize();

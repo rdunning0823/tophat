@@ -53,18 +53,7 @@ private:
            const TabDisplay &td, const Widget *e);
 
     static bool IsVertical(Orientation orientation, PixelRect rc) {
-      switch (orientation) {
-      case Orientation::AUTO:
-        break;
-
-      case Orientation::VERTICAL:
-        return true;
-
-      case Orientation::HORIZONTAL:
-        return false;
-      }
-
-      return rc.right - rc.left > rc.bottom - rc.top;
+      return false;
     }
   };
 
@@ -85,7 +74,7 @@ private:
 public:
   explicit TabWidget(Orientation _orientation=Orientation::AUTO,
                      Widget *_extra=nullptr)
-    :orientation(_orientation), tab_display(nullptr),
+    :orientation(Orientation::HORIZONTAL), tab_display(nullptr),
      extra(_extra), large_extra(false) {}
 
   ~TabWidget() override;
