@@ -347,34 +347,66 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
   WindowStyle button_style;
   button_style.TabStop();
 
-  close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
-                       rc_close_button,
-                       button_style, *this, CloseClick);
+  if (Layout::landscape) {
+    close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
+                         rc_close_button,
+                         button_style, *this, CloseClick);
 
-  search_button.Create(GetClientAreaWindow(), button_look, _T("Search"),
-                        rc_search_button,
-                        button_style, *this, SearchClick);
+    waypoint_list_control.Create(GetClientAreaWindow(), rc_list,
+                                 button_style,
+                                 WaypointListRenderer::GetHeight(dialog_look));
 
-  select_button.Create(GetClientAreaWindow(), button_look,
-                       (goto_mode ? _("Goto") : _("Select")),
-                        rc_select_button,
-                        button_style, *this, SelectClick);
+    search_button.Create(GetClientAreaWindow(), button_look, _T("Search"),
+                          rc_search_button,
+                          button_style, *this, SearchClick);
 
-  name_header.Create(GetClientAreaWindow(), button_look, _T(""),
-                      rc_name_header,
-                      button_style, *this, NameHeaderClick);
+    name_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                        rc_name_header,
+                        button_style, *this, NameHeaderClick);
 
-  elevation_header.Create(GetClientAreaWindow(), button_look, _T(""),
-                           rc_elevation_header,
-                           button_style, *this, ElevationHeaderClick);
+    elevation_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                             rc_elevation_header,
+                             button_style, *this, ElevationHeaderClick);
 
-  distance_header.Create(GetClientAreaWindow(), button_look, _T(""),
-                         rc_distance_header,
-                         button_style, *this, DistanceHeaderClick);
+    distance_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                           rc_distance_header,
+                           button_style, *this, DistanceHeaderClick);
 
-  waypoint_list_control.Create(GetClientAreaWindow(), rc_list,
-                               button_style,
-                               WaypointListRenderer::GetHeight(dialog_look));
+    select_button.Create(GetClientAreaWindow(), button_look,
+                         (goto_mode ? _("Goto") : _("Select")),
+                          rc_select_button,
+                          button_style, *this, SelectClick);
+
+  } else {
+    close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
+                         rc_close_button,
+                         button_style, *this, CloseClick);
+
+    select_button.Create(GetClientAreaWindow(), button_look,
+                         (goto_mode ? _("Goto") : _("Select")),
+                          rc_select_button,
+                          button_style, *this, SelectClick);
+
+    search_button.Create(GetClientAreaWindow(), button_look, _T("Search"),
+                          rc_search_button,
+                          button_style, *this, SearchClick);
+
+    name_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                        rc_name_header,
+                        button_style, *this, NameHeaderClick);
+
+    elevation_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                             rc_elevation_header,
+                             button_style, *this, ElevationHeaderClick);
+
+    distance_header.Create(GetClientAreaWindow(), button_look, _T(""),
+                           rc_distance_header,
+                           button_style, *this, DistanceHeaderClick);
+
+    waypoint_list_control.Create(GetClientAreaWindow(), rc_list,
+                                 button_style,
+                                 WaypointListRenderer::GetHeight(dialog_look));
+  }
 
   waypoint_list_control.SetItemRenderer(this);
   waypoint_list_control.SetCursorHandler(this);
