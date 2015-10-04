@@ -142,7 +142,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   PixelScalar top_line_offset = 2;
 #else
   PixelScalar width_offset = 0;
-  PixelScalar top_line_offset = 0;
+  PixelScalar top_line_offset = 1;
 #endif
 
   for (unsigned i=0; i < 8; i++) {
