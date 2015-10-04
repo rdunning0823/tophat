@@ -64,11 +64,6 @@ public:
   static unsigned GetScale();
 
   /**
-   * additional padding around button size
-   */
-  static unsigned GetClearBorderWidth();
-
-  /**
    * returns standard button height.  Not scaled by GetScale()
    */
   static unsigned GetStandardButtonHeight();

@@ -419,7 +419,7 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
   const PixelScalar icon_y = (text_size.cy + icon_size.cy) / 2;
 
   UPixelScalar zoom_button_width = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
+      * MapOverlayButton::GetScale();
 
   PixelScalar x = rc.left + (Layout::landscape ? 0 : 1) * zoom_button_width;
 
@@ -446,7 +446,7 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
 {
   PixelSize button_size;
   button_size.cx = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
+      * MapOverlayButton::GetScale();
   button_size.cy = button_size.cx;
 
   // draw flight mode
@@ -644,7 +644,7 @@ GlueMapWindow::SetMainMenuButtonRect()
   PixelSize menu_button_size;
 
   menu_button_size.cx = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale() + MapOverlayButton::GetClearBorderWidth();
+      * MapOverlayButton::GetScale();
   menu_button_size.cy = menu_button_size.cx;
 
   UPixelScalar pen_width = Layout::Scale(2);
