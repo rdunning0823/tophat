@@ -40,15 +40,18 @@ ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
 {
   const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
   if (rounded) {
-    canvas.Select(pressed ? _look.light_border_pen :
-        _look.dark_border_pen);
     rc.right -= 1;
     rc.top += 1;
 
-    if (look.background_transparent && !pressed)
+    if (look.background_transparent && !pressed) {
+      canvas.Select(pressed ? _look.light_transparent_border_pen :
+          _look.dark_transparent_border_pen);
       canvas.SelectHollowBrush();
-    else
+    } else {
+      canvas.Select(pressed ? _look.light_border_pen :
+          _look.dark_border_pen);
       canvas.Select(Brush(_look.background_color));
+    }
 
     canvas.DrawRoundRectangle(rc.left, rc.top,
                               rc.right, rc.bottom - 1,
