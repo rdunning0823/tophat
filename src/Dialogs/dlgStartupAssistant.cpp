@@ -255,8 +255,7 @@ StartupAssistant::SetRectangles(const PixelRect &rc_outer)
   rc.right = rc_outer.right - rc_outer.left - Layout::Scale(2);
   rc.bottom = rc_outer.bottom - rc_outer.top - Layout::Scale(2) - WndForm::GetTitleHeight();
 
-  UPixelScalar button_height = std::min(GetNavSliderHeight(),
-                                        UPixelScalar(rc.bottom / 5));
+  UPixelScalar button_height = Layout::GetMinimumControlHeight();
 
   rc_close = rc_tip_text = rc_chkb_decline =
       rc_prev_tip = rc_next_tip = rc;
