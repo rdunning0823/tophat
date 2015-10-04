@@ -77,7 +77,7 @@ BaseAccessPanel::GetHeaderHeight() {
 
 static gcc_pure PixelScalar
 GetFooterHeight() {
-  return Layout::Scale(40);
+  return Layout::GetMinimumControlHeight();
 }
 
 void
