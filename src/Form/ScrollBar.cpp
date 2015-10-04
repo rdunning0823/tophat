@@ -44,12 +44,9 @@ ScrollBar::SetSize(const PixelSize size)
   unsigned width;
 
   // if the device has a pointer (mouse/touchscreen/etc.)
-  if (UseTouchScreenLayout())
+  if (UseTouchScreenLayout() || HasPointer())
     /* wide scroll bar for touch screen */
     width = Layout::Scale(24);
-  else if (HasPointer())
-    /* with a mouse, the scroll bar can be smaller */
-    width = Layout::GetMinimumControlHeight();
   else
     // thin for ALTAIR b/c no touch screen
     width = Layout::SmallScale(12);
