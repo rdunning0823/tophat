@@ -58,6 +58,7 @@ struct IconLook {
   MaskedIcon hBmpBearingRightThree;
   MaskedIcon hBmpBearingRightFour;
   MaskedIcon hBmpClose;
+  MaskedIcon icon_home;
 
   void Initialise();
 };

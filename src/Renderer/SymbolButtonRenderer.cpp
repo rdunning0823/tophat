@@ -186,6 +186,12 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     DrawIconAndText(canvas, rc, icon, caption.c_str(), _T("_chkmark_"),
                     enabled, focused, pressed);
 
+  } else if (caption.StartsWith(_T("_home_"))) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon &icon = icon_look.icon_home;
+    DrawIconAndText(canvas, rc, icon, caption.c_str(), _T("_home_"),
+                    enabled, focused, pressed);
+
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
     // Draw arrow symbols instead of v and ^
