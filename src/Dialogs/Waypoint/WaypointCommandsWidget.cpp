@@ -288,7 +288,7 @@ WaypointCommandsWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       AddButton(_("Remove from Task"), *this, REMOVE_FROM_TASK);
   }
 
-  AddButton(_("Set as New Home"), *this, SET_HOME);
+  AddSymbolButton(_("_home_Set as New Home"), *this, SET_HOME);
   AddButton(_("Pan to Waypoint"), *this, PAN);
 //  AddButton(_("Set Active Frequency"), *this, SET_ACTIVE_FREQUENCY);
 //  AddButton(_("Set Standby Frequency"), *this, SET_STANDBY_FREQUENCY);
