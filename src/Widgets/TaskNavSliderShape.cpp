@@ -63,7 +63,7 @@ SliderShape::GetSmallFont()
 const Font &
 SliderShape::GetMediumFont()
 {
-  return *dialog_look.caption.font;
+  return infobox_look.title_font;
 }
 
 SliderShape::VisibilityLevel
@@ -249,7 +249,6 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   StaticString<120> buffer;
   const Font &name_font = GetLargeFont();
-  const Font &small_font = GetSmallFont();
   const Font &medium_font = GetMediumFont();
   UPixelScalar width;
   PixelScalar left;
@@ -262,14 +261,14 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
       selected, true, false)));
     DrawOutline(canvas, rc_outer, border_width);
-    canvas.Select(small_font);
+    canvas.Select(medium_font);
     buffer = _("Click to navigate");
     width = canvas.CalcTextWidth(buffer.c_str());
     left = rc.left + (rc.right - rc.left - width) / 2;
     if (left > 0)
       canvas.TextAutoClipped(left,
                              rc.top + (rc.bottom - rc.top -
-                                 small_font.GetHeight()) / 2,
+                                 medium_font.GetHeight()) / 2,
                              buffer.c_str());
 #ifdef _WIN32
     if (HasDraggableScreen()) // PC or WM
@@ -326,13 +325,13 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
     break;
   }
-  canvas.Select(small_font);
+  canvas.Select(medium_font);
   label_width = canvas.CalcTextWidth(buffer.c_str());
 
   // Draw arrival altitude right upper corner
   if (altitude_difference_valid) {
 
-    canvas.Select(small_font);
+    canvas.Select(medium_font);
     FormatRelativeUserAltitude(tp_altitude_difference, height_buffer.buffer(),
                                true);
     height_width = canvas.CalcTextWidth(height_buffer.c_str());
@@ -367,7 +366,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if ((PixelScalar)(distance_width + height_width) <
         (PixelScalar)(rc.right - rc.left - label_width -
             Layout::FastScale(15))) {
-      canvas.Select(small_font);
+      canvas.Select(medium_font);
       left = rc.left;
       if (left > 0)
         canvas.TextAutoClipped(left, line_one_y_offset, buffer.c_str());
