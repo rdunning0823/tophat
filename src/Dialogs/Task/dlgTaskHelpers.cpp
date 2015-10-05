@@ -42,6 +42,8 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Util/StringUtil.hpp"
+#include "Util/StaticString.hxx"
+#include "Interface.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -164,15 +166,23 @@ OrderedTaskSummary(const OrderedTask *task, TCHAR *text, bool linebreaks)
                          (double)Units::ToUserDistance(stats.distance_min),
                          Units::GetDistanceName(),
                          gate_info.c_str());
-    else
-      StringFormatUnsafe(text, _T("%s. %s%s%s %.0f %s %s"),
+    else {
+      UnitSetting &config = CommonInterface::SetUISettings().format.units;
+      StaticString<15>km_display (_T(""));
+      if (config.distance_unit != Unit::KILOMETER) {
+        fixed km = Units::ToUserUnit(stats.distance_nominal, Unit::KILOMETER);
+        km_display.Format(_T(" (%.1f km)"), (double)km);
+      }
+      StringFormatUnsafe(text, _T("%s. %s%s%s %.0f %s %s%s"),
                          OrderedTaskFactoryName(task->GetFactoryType()),
                          summary_shape,
                          linebreak,
                          _("dist."),
                          (double)Units::ToUserDistance(stats.distance_nominal),
                          Units::GetDistanceName(),
-                         gate_info.c_str());
+                         gate_info.c_str(),
+                         km_display.c_str());
+    }
   }
 }
 
