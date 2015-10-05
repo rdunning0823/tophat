@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "TextButtonRenderer.hpp"
 #include "Util/StaticString.hxx"
+#include "Screen/Icon.hpp"
 
 #include <tchar.h>
 
@@ -47,6 +48,18 @@ private:
 
   void DrawSymbol(Canvas &canvas, PixelRect rc,
                   bool enabled, bool focused, bool pressed) const;
+
+  /**
+   * Displays icon plus remainder of text after matched_text
+   * @param full_text.  starts with matched text followed by optional caption
+   * @param matched_text.  The text to be discarded
+   * @icon.  The icon to display before the optional text
+   */
+  void DrawIconAndText(Canvas &canvas, PixelRect rc,
+                       const MaskedIcon &icon,
+                       const TCHAR *full_text,
+                       const TCHAR *matched_text,
+                       bool enabled, bool focused, bool pressed) const;
 };
 
 #endif

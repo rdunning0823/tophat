@@ -52,6 +52,36 @@ DrawIconOrBitmap(Canvas &canvas, PixelRect rc, const MaskedIcon &icon, bool pres
   icon.Draw(canvas, rc, pressed);
 }
 
+void
+SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
+                                      const MaskedIcon &icon,
+                                      const TCHAR *full_text,
+                                      const TCHAR *matched_text,
+                                      bool enabled, bool focused, bool pressed) const
+{
+  const ButtonLook &look = GetLook();
+  const Font &font = *look.font;
+  tstring temp_string = full_text;
+  unsigned matched_len = StringLength(matched_text);
+  tstring sub_string = temp_string.substr(matched_len,
+                                          StringLength(full_text) - matched_len);
+  PixelSize sz_text = font.TextSize(sub_string.c_str());
+  UPixelScalar padding = Layout::GetTextPadding();
+
+  PixelSize sz_icon = icon.GetSize();
+  PixelRect rc_icon = rc;
+  rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
+  rc_icon.right = rc_icon.left + sz_icon.cx;
+
+  PixelRect rc_caption = rc;
+  rc_caption.left = rc_icon.right + padding;
+  rc_caption.right = rc_caption.left + sz_text.cx + padding;
+
+  DrawIconOrBitmap(canvas, rc_icon, icon, focused);
+
+  DrawCaption(canvas, sub_string.c_str(), rc_caption, enabled, focused, pressed);
+}
+
 inline void
 SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
                                  bool focused, bool pressed) const
@@ -151,28 +181,10 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     DrawIconOrBitmap(canvas, rc, bmp, focused);
 
   } else if (caption.StartsWith(_T("_chkmark_"))) {
-    const ButtonLook &look = GetLook();
-    const Font &font = *look.font;
-    tstring temp_string = caption.c_str();
-    tstring sub_string = temp_string.substr(9, temp_string.length() - 9);
-
-    PixelSize sz_text = font.TextSize(sub_string.c_str());
-    UPixelScalar padding = Layout::GetTextPadding();
-
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &bmp = icon_look.hBmpCheckMark;
-    PixelSize sz_icon = bmp.GetSize();
-    PixelRect rc_icon = rc;
-    rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
-    rc_icon.right = rc_icon.left + sz_icon.cx;
-
-    PixelRect rc_caption = rc;
-    rc_caption.left = rc_icon.right + padding;
-    rc_caption.right = rc_caption.left + sz_text.cx + padding;
-
-    DrawIconOrBitmap(canvas, rc_icon, bmp, focused);
-
-    DrawCaption(canvas, sub_string.c_str(), rc_caption, enabled, focused, pressed);
+    const MaskedIcon &icon = icon_look.hBmpCheckMark;
+    DrawIconAndText(canvas, rc, icon, caption.c_str(), _T("_chkmark_"),
+                    enabled, focused, pressed);
 
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
