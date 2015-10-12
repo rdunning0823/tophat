@@ -153,7 +153,7 @@ protected:
   WndSymbolButton elevation_header;
   WndSymbolButton distance_header;
   WndSymbolButton select_button;
-  WndSymbolButton close_button;
+  WndSymbolButton cancel_button;
 
   PixelRect rc_list;
   PixelRect rc_search_button;
@@ -161,7 +161,7 @@ protected:
   PixelRect rc_elevation_header;
   PixelRect rc_distance_header;
   PixelRect rc_select_button;
-  PixelRect rc_close_button;
+  PixelRect rc_cancel_button;
 
 public:
   WaypointListSimpleDialog(const GeoPoint &_location,
@@ -280,10 +280,10 @@ WaypointListSimpleDialog::SetRectangles(const PixelRect &rc_outer)
     rc_select_button.bottom = rc.bottom - control_height;
     rc_select_button.top = rc_select_button.bottom - control_height;
 
-    rc_close_button.left = 0;
-    rc_close_button.right = left_col_width;
-    rc_close_button.bottom = rc.bottom;
-    rc_close_button.top = rc_close_button.bottom - control_height;
+    rc_cancel_button.left = 0;
+    rc_cancel_button.right = left_col_width;
+    rc_cancel_button.bottom = rc.bottom;
+    rc_cancel_button.top = rc_cancel_button.bottom - control_height;
   } else {
 
     rc_list.left = 0;
@@ -305,15 +305,15 @@ WaypointListSimpleDialog::SetRectangles(const PixelRect &rc_outer)
     rc_distance_header.top = Layout::Scale(35);
     rc_distance_header.bottom = rc_distance_header.top + control_height;
 
-    rc_close_button.left = 0;
-    rc_close_button.right = rc.right / 2;
-    rc_close_button.bottom = rc.bottom;
-    rc_close_button.top = rc_close_button.bottom - control_height;
-
-    rc_select_button.left = rc.right / 2;
-    rc_select_button.right = rc.right;
+    rc_select_button.left = 0;
+    rc_select_button.right = rc.right / 2;
     rc_select_button.bottom = rc.bottom;
     rc_select_button.top = rc_select_button.bottom - control_height;
+
+    rc_cancel_button.left = rc.right / 2;
+    rc_cancel_button.right = rc.right;
+    rc_cancel_button.bottom = rc.bottom;
+    rc_cancel_button.top = rc_cancel_button.bottom - control_height;
   }
 
   const unsigned padding = Layout::GetTextPadding();
@@ -348,8 +348,8 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
   button_style.TabStop();
 
   if (Layout::landscape) {
-    close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
-                         rc_close_button,
+    cancel_button.Create(GetClientAreaWindow(), button_look, _T("Cancel"),
+                         rc_cancel_button,
                          button_style, *this, CloseClick);
 
     waypoint_list_control.Create(GetClientAreaWindow(), rc_list,
@@ -378,8 +378,8 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           button_style, *this, SelectClick);
 
   } else {
-    close_button.Create(GetClientAreaWindow(), button_look, _T("_X"),
-                         rc_close_button,
+    cancel_button.Create(GetClientAreaWindow(), button_look, _T("Cancel"),
+                         rc_cancel_button,
                          button_style, *this, CloseClick);
 
     select_button.Create(GetClientAreaWindow(), button_look,
@@ -656,7 +656,7 @@ WaypointListSimpleDialog::OnResize(PixelSize new_size)
   elevation_header.Move(rc_elevation_header);
   distance_header.Move(rc_distance_header);
   select_button.Move(rc_select_button);
-  close_button.Move(rc_close_button);
+  cancel_button.Move(rc_cancel_button);
 }
 
 void
