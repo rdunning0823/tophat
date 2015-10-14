@@ -160,42 +160,54 @@ SDCardSyncWidget::OnAction(int id)
   if (!IsUSBStorageConnected())
     ShowMessageBox(_T("USB card not connected"),
                    _T("Error"), MB_OK | MB_ICONERROR);
-  else
+  else {
     switch (id) {
 
     case DownloadFlights:
-      CopyFlightsToSDCard();
-      ShowMessageBox(_T("Flights copied to SD card"),
-                     _T("Success"), MB_OK);
+      if (CopyFlightsToSDCard()) {
+        ShowMessageBox(_T("Flights copied to SD card"),
+                       _T("Success"), MB_OK);
+        return;
+      }
       break;
 
     case UploadTasks:
-      UploadTasksToDevice();
-      ShowMessageBox(_T("Task folder copied to Kobo"),
-                     _T("Success"), MB_OK);
+      if (UploadTasksToDevice()) {
+        ShowMessageBox(_T("Task folder copied to Kobo"),
+                       _T("Success"), MB_OK);
+        return;
+      }
       break;
 
-
     case UploadEverything:
-      UploadSDCardToDevice();
-      ShowMessageBox(_T("USB card successfully copied to Kobo"),
-                     _T("Success"), MB_OK);
+      if (UploadSDCardToDevice()) {
+        ShowMessageBox(_T("USB card successfully copied to Kobo"),
+                       _T("Success"), MB_OK);
+        return;
+      }
       break;
 
     case DownloadEverything:
-      CopyTopHatDataToSDCard();
-      ShowMessageBox(_T("All Top Hat data copied to USB card"),
-                     _T("Success"), MB_OK);
+      if (CopyTopHatDataToSDCard()) {
+        ShowMessageBox(_T("All Top Hat data copied to USB card"),
+                       _T("Success"), MB_OK);
+        return;
+      }
       break;
     case InstallKoboRoot:
       InstallUpgrade();
       listener->OnAction(mrOK);
+      return;
       break;
 
     case HelpButton:
       HelpDialog(_T("Kobo Sync"), _T("Copy data files to / from the XCSoarData folder on the USB card.  This includes igc log files, tasks, maps, airspace, waypoint files and all configuration files.  Copying may take a few minutes."));
+      return;
       break;
     }
+    ShowMessageBox(_T("Failed to copy files"),
+                   _T("Fail"), MB_OK);
+  }
 }
 
 void

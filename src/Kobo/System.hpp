@@ -72,9 +72,10 @@ IsKoboUsbHostKernel();
 
 /**
  * Writes uname -a info and dd if=/dev/mmcblk0 bs=8 count=1 skip=64
- * results to /tmp/TophatSystemInfo.txt
+ * results to /TophatSystemInfo.txt
+ * @return true if success
  */
-void WriteSystemInfo();
+bool WriteSystemInfo();
 
 #ifdef KOBO
 /**
@@ -98,22 +99,22 @@ bool IsUSBStorageConnected();
 /**
  * copy sdcard/XCSoarData/tasks folder to device task folder
  */
-void UploadTasksToDevice();
+bool UploadTasksToDevice();
 
 /**
  * copy device XCSoarData/logs folder to sdcard/XCSoarData
  */
-void CopyFlightsToSDCard();
+bool CopyFlightsToSDCard();
 
 /**
  * Copies the XCSoarData folder on the SDCard to the device
  */
-void UploadSDCardToDevice();
+bool UploadSDCardToDevice();
 
 /**
  * copies the XCSoarData folder on the device to the SD Card
  */
-void CopyTopHatDataToSDCard();
+bool CopyTopHatDataToSDCard();
 
 /**
  * does KoboRoot.tgz exist in the root of the USB Storage device
