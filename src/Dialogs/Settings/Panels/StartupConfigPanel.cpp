@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-#include <windef.h> // for MAX_PATH
+#include <windef.h>
 #include "StartupConfigPanel.hpp"
 #include "Profile/Profile.hpp"
 #include "Language/Language.hpp"
@@ -59,10 +59,10 @@ ReadQuickStart()
   InitialiseDataPath();
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
-  if (file == NULL)
+  if (file == nullptr)
     return _T("");
   line = file->ReadLine();
-  if (line == NULL)
+  if (line == nullptr)
     return _T("");
   CopyASCII(path, line);
   delete file;
@@ -75,7 +75,7 @@ WriteQuickStart(TCHAR *string)
   static TCHAR path[MAX_PATH];
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   TextWriter *writer = new TextWriter(path);
-  if (writer == NULL)
+  if (writer == nullptr)
     return;
   if (!writer->IsOpen()) {
     delete writer;
@@ -100,7 +100,7 @@ StartupConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   startup->SetDefaults(ReadQuickStart());
   RowFormWidget::Prepare(parent, rc);
-  AddText(_("tophat arguments"), NULL, startup->tophat_arguments);
+  AddText(_("tophat arguments"), nullptr, startup->tophat_arguments);
 }
 
 bool

@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-#include <windef.h> // for MAX_PATH
+#include <windef.h>
 #include "Dialogs/DialogSettings.hpp"
 #include "Dialogs/SimulatorPromptWindow.hpp"
 #include "Dialogs/WidgetDialog.hpp"
@@ -46,7 +46,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "LocalPath.hpp"
 #include "IO/FileLineReader.hpp"
-#include "Dialogs/Settings/Panels/StartupConfigPanel.hpp" /* for TOPHAT_ARGUMENTS */
+#include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
 
 enum Buttons {
   LAUNCH_NICKEL = 100,
@@ -303,10 +303,10 @@ int main(int argc, char **argv)
 
   while (true) {
     FileLineReader *file = new FileLineReader(path);
-    if (file != NULL) {
+    if (file != nullptr) {
       line = file->ReadLine();
-      if (line != NULL)
-	KoboRunXCSoar(line);
+      if (line != nullptr)
+        KoboRunXCSoar(line);
       delete file;
     }
     switch (Main()) {

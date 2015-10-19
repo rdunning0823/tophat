@@ -96,9 +96,9 @@ Copyright_License {
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "Thread/Debug.hpp"
 #include "Android/Nook.hpp"
-#include <windef.h> // for MAX_PATH
+#include <windef.h>
 #include "IO/FileLineReader.hpp"
-#include "Dialogs/Settings/Panels/StartupConfigPanel.hpp" /* for TOPHAT_ARGUMETS */
+#include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
@@ -260,9 +260,9 @@ Startup()
   InitialiseDataPath();
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
-  if (file != NULL) {
+  if (file != nullptr) {
     TCHAR *line = file->ReadLine();
-    if (line != NULL && strcasecmp(line, "-quick") == 0)
+    if (line != nullptr && strcasecmp(line, "-quick") == 0)
       CommandLine::show_dialog_setup_quick = false;
     delete file;
   }
