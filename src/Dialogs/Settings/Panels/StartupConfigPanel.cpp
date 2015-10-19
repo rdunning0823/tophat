@@ -57,7 +57,7 @@ ReadQuickStart()
   TCHAR *line;
 
   InitialiseDataPath();
-  LocalPath(path, _T(QUICK_START));
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
   if (file == NULL)
     return _T("");
@@ -73,7 +73,7 @@ static void
 WriteQuickStart(TCHAR *string)
 {
   static TCHAR path[MAX_PATH];
-  LocalPath(path, _T(QUICK_START));
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
   TextWriter *writer = new TextWriter(path);
   if (writer == NULL)
     return;
@@ -89,7 +89,7 @@ static void
 DeleteQuickStart()
 {
   static TCHAR path[MAX_PATH];
-  LocalPath(path, _T(QUICK_START));
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
   File::Delete(path);
 }
 

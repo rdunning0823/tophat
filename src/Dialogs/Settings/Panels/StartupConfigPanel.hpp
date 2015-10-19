@@ -24,7 +24,7 @@ Copyright_License {
 #ifndef STARTUPCONFIGPANEL_HPP
 #define STARTUPCONFIGPANEL_HPP
 
-#define QUICK_START "quick_start"
+#define TOPHAT_ARGUMENTS "tophat_arguments"
 
 class Widget;
 

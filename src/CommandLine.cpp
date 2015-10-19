@@ -51,6 +51,8 @@ namespace CommandLine {
 #ifdef HAVE_CMDLINE_REPLAY
   const char *replay_path;
 #endif
+
+  bool show_dialog_setup_quick = true;
 }
 
 void
@@ -92,6 +94,10 @@ CommandLine::Parse(Args &args)
       sim_set_in_cmd_line_flag=true;
 #endif
 #if !defined(_WIN32_WCE)
+    } else if (StringIsEqualIgnoreCase(s, "-quick")) {
+      global_simulator_flag = false;
+      sim_set_in_cmd_line_flag = true;
+      show_dialog_setup_quick = false;
     } else if (isdigit(s[1])) {
       char *p;
       width = ParseUnsigned(s + 1, &p);

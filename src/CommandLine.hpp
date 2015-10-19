@@ -40,6 +40,8 @@ namespace CommandLine {
   static constexpr bool full_screen = false;
 #endif
 
+extern bool show_dialog_setup_quick;
+
 #if defined(__linux__) && !defined(ANDROID)
 #define HAVE_CMDLINE_REPLAY
   extern const char *replay_path;

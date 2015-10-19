@@ -357,7 +357,7 @@ dlgStartupAssistantShowModal(bool conditional)
   if (text2.IsValid())
     decline_ver = text2;
 
-  if ((decline_ver == TopHat_ProductToken) && conditional)
+  if (decline_ver == TopHat_ProductToken)
     return;
 
   ContainerWindow &w = UIGlobals::GetMainWindow();

@@ -21,6 +21,7 @@ Copyright_License {
 }
 */
 
+#include <windef.h> // for MAX_PATH
 #include "Dialogs/DialogSettings.hpp"
 #include "Dialogs/SimulatorPromptWindow.hpp"
 #include "Dialogs/WidgetDialog.hpp"
@@ -43,6 +44,9 @@ Copyright_License {
 #include "Event/Timer.hpp"
 #include "OS/FileUtil.hpp"
 #include "Form/Button.hpp"
+#include "LocalPath.hpp"
+#include "IO/FileLineReader.hpp"
+#include "Dialogs/Settings/Panels/StartupConfigPanel.hpp" /* for TOPHAT_ARGUMENTS */
 
 enum Buttons {
   LAUNCH_NICKEL = 100,
@@ -291,10 +295,21 @@ Main()
 
 int main(int argc, char **argv)
 {
-  while (true) {
-    int action = Main();
+  static TCHAR path[MAX_PATH];
+  TCHAR *line;
 
-    switch (action) {
+  InitialiseDataPath();
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
+
+  while (true) {
+    FileLineReader *file = new FileLineReader(path);
+    if (file != NULL) {
+      line = file->ReadLine();
+      if (line != NULL)
+	KoboRunXCSoar(line);
+      delete file;
+    }
+    switch (Main()) {
     case LAUNCH_NICKEL:
       KoboExecNickel();
       return EXIT_FAILURE;
