@@ -262,7 +262,7 @@ Startup()
   FileLineReader *file = new FileLineReader(path);
   if (file != nullptr) {
     TCHAR *line = file->ReadLine();
-    if (line != nullptr && strcasecmp(line, "-quick") == 0)
+    if (line != nullptr && StringIsEqualIgnoreCase(line, _T("-quick")))
       CommandLine::show_dialog_setup_quick = false;
     delete file;
   }
