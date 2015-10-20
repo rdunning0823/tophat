@@ -391,17 +391,13 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   PixelSize icon_size {0, 0};
   UPixelScalar left_icon;
   const MaskedIcon *icon = &icon_look.hBmpCheckMark;
-  if (draw_checkmark) {
+  if (draw_checkmark)
     icon_size = icon->GetSize();
-#ifdef ENABLE_OPENGL
-    /* this seams to be a is this a bug? */
-    icon_size.cx *= 2;
-#endif
-  }
+
   PixelRect rc_name(rc_outer.left + GetHintWidth(), rc_outer.top,
                     rc_outer.right - GetHintWidth(), rc_outer.bottom);
 
-  width = canvas.CalcTextWidth(tp_name) + icon_size.cx / 2;
+  width = canvas.CalcTextWidth(tp_name) + icon_size.cx;
 
   if ((PixelScalar)width > (rc_name.right - rc_name.left)) {
     if (is_current_tp && bearing_direction != 1)
@@ -415,7 +411,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     left_icon = rc_name.left + (rc_name.right - rc_name.left - width) / 2;
 
   // TODO make clip to show bearing icon and also clip for canvas
-  canvas.DrawClippedText(left_icon + icon_size.cx / 2,
+  canvas.DrawClippedText(left_icon + icon_size.cx,
                   line_two_y_offset,
                   rc_name.right - rc_name.left - icon_size.cx / 2, tp_name);
 
