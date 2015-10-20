@@ -301,14 +301,15 @@ int main(int argc, char **argv)
   InitialiseDataPath();
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
 
+  FileLineReader *file = new FileLineReader(path);
+  if (file != nullptr) {
+    line = file->ReadLine();
+    if (line != nullptr)
+      KoboRunXCSoar(line);
+    delete file;
+  }
+
   while (true) {
-    FileLineReader *file = new FileLineReader(path);
-    if (file != nullptr) {
-      line = file->ReadLine();
-      if (line != nullptr)
-        KoboRunXCSoar(line);
-      delete file;
-    }
     switch (Main()) {
     case LAUNCH_NICKEL:
       KoboExecNickel();
