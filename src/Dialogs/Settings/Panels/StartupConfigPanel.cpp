@@ -96,23 +96,16 @@ DeleteQuickStart()
 void
 StartupConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  StartupSettings *startup = new StartupSettings();
-
-  startup->SetDefaults(ReadQuickStart());
   RowFormWidget::Prepare(parent, rc);
-  AddText(_("tophat arguments"), nullptr, startup->tophat_arguments);
+  AddText(_("tophat arguments"), nullptr, ReadQuickStart());
 }
 
 bool
 StartupConfigPanel::Save(bool &changed)
 {
-  StartupSettings *startup = new StartupSettings();
-
-  changed |= SaveValue(TophatArguments, ProfileKeys::TophatArguments,
-                       startup->tophat_arguments.buffer(),
-		       startup->tophat_arguments.CAPACITY);
-  if (startup->tophat_arguments.length() != 0)
-    WriteQuickStart(startup->tophat_arguments.buffer());
+  StaticString<64>startup(RowFormWidget::GetValueString(TophatArguments));
+  if (startup.length() != 0)
+    WriteQuickStart(startup.buffer());
   else
     DeleteQuickStart();
 
