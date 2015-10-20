@@ -39,6 +39,8 @@ Copyright_License {
 #include "Net/HTTP/Features.hpp"
 #include "Form/List.hpp"
 
+#include <boost/intrusive/list.hpp>
+#include <boost/intrusive/set.hpp>
 #include <windef.h> /* for MAX_PATH */
 #ifdef HAVE_DOWNLOAD_MANAGER
 

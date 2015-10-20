@@ -252,7 +252,7 @@ DigitEntry::CalculateLayout(const PixelRect rc)
     digit_size.cy = min_value_height;
 
   fixed stretch_ratio = fixed(rc.GetSize().cy) / fixed(2 * control_height + digit_size.cy);
-  control_height = UPixelScalar((fixed)control_height * stretch_ratio);
+  control_height = unsigned((fixed)control_height * stretch_ratio);
   digit_size.cy = PixelScalar(fixed(digit_size.cy) * stretch_ratio);
   top = control_height;
   bottom = top + digit_size.cy;
