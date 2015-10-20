@@ -164,11 +164,10 @@ AfterStartup()
 
   InfoBoxManager::SetDirty();
 
-  bool show_setup = true;
 #ifndef ANDROID
-  show_setup = CommandLine::show_dialog_setup_quick;
+  if (CommandLine::show_dialog_setup_quick)
 #endif
-  dlgStartupAssistantShowModal(show_setup);
+    dlgStartupAssistantShowModal(true);
 
   ForceCalculation();
 }
