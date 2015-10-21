@@ -96,6 +96,9 @@ Copyright_License {
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "Thread/Debug.hpp"
 #include "Android/Nook.hpp"
+#include <windef.h>
+#include "IO/FileLineReader.hpp"
+#include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
@@ -161,7 +164,10 @@ AfterStartup()
 
   InfoBoxManager::SetDirty();
 
-  dlgStartupAssistantShowModal(true);
+#ifndef ANDROID
+  if (CommandLine::show_dialog_setup_quick)
+#endif
+    dlgStartupAssistantShowModal(true);
 
   ForceCalculation();
 }
@@ -253,6 +259,20 @@ Startup()
   }
 #endif
 
+  static TCHAR path[MAX_PATH];
+
+#ifndef ANDROID
+  InitialiseDataPath();
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
+  FileLineReader *file = new FileLineReader(path);
+  if (file != nullptr) {
+    TCHAR *line = file->ReadLine();
+    if (line != nullptr && StringIsEqualIgnoreCase(line, _T("-quick")))
+      CommandLine::show_dialog_setup_quick = false;
+    delete file;
+  }
+#endif
+
   CommonInterface::SetSystemSettings().SetDefaults();
   CommonInterface::SetComputerSettings().SetDefaults();
   CommonInterface::SetUIState().Clear();
@@ -274,7 +294,6 @@ Startup()
 
   main_window->InitialiseConfigured();
 
-  TCHAR path[MAX_PATH];
   LocalPath(path, _T("cache"));
   file_cache = new FileCache(path);
 
