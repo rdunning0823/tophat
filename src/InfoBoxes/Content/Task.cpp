@@ -609,6 +609,12 @@ InfoBoxContentHomeDistance::Update(InfoBoxData &data)
   const NMEAInfo &basic = CommonInterface::Basic();
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
 
+  if (!basic.location_available.IsValid()) {
+    data.SetInvalid();
+    data.SetCommentInvalid();
+    return;
+  }
+
   if (!common_stats.vector_home.IsValid()) {
     data.SetClickToConfigure();
     return;
@@ -631,16 +637,16 @@ InfoBoxContentHomeGR::Update(InfoBoxData &data)
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
 
+  if (!basic.location_available || !more_data.NavAltitudeAvailable()) {
+    data.SetInvalid();
+    data.SetCommentInvalid();
+    return;
+  }
+
   if (!common_stats.vector_home.IsValid() ||
       !settings.poi.home_location_available ||
       !settings.poi.home_elevation_available) {
     data.SetClickToConfigure();
-    return;
-  }
-
-  if (!basic.location_available || !more_data.NavAltitudeAvailable()) {
-    data.SetInvalid();
-    data.SetCommentInvalid();
     return;
   }
 
@@ -681,6 +687,13 @@ InfoBoxContentHomeAltitudeDiff::Update(InfoBoxData &data)
   const MoreData &more_data = CommonInterface::Basic();
   const DerivedInfo &calculated = CommonInterface::Calculated();
 
+  if (!basic.location_available || !more_data.NavAltitudeAvailable() ||
+      !settings.polar.glide_polar_task.IsValid()) {
+    data.SetInvalid();
+    data.SetCommentInvalid();
+    return;
+  }
+
   if (!common_stats.vector_home.IsValid() ||
       !settings.poi.home_location_available ||
       !settings.poi.home_elevation_available) {
@@ -689,23 +702,18 @@ InfoBoxContentHomeAltitudeDiff::Update(InfoBoxData &data)
   }
 
   // altitude differential
+  const GlideState glide_state(
+    basic.location.DistanceBearing(settings.poi.home_location),
+    settings.poi.home_elevation + settings.task.safety_height_arrival,
+    more_data.nav_altitude,
+    calculated.GetWindOrZero());
 
-  if (basic.location_available && more_data.NavAltitudeAvailable() &&
-      settings.polar.glide_polar_task.IsValid()) {
-    const GlideState glide_state(
-      basic.location.DistanceBearing(settings.poi.home_location),
-      settings.poi.home_elevation + settings.task.safety_height_arrival,
-      more_data.nav_altitude,
-      calculated.GetWindOrZero());
+  const GlideResult &result =
+    MacCready::Solve(settings.task.glide,
+                     settings.polar.glide_polar_task,
+                     glide_state);
+  data.SetValueFromArrival(result.SelectAltitudeDifference(settings.task.glide));
 
-    const GlideResult &result =
-      MacCready::Solve(settings.task.glide,
-                       settings.polar.glide_polar_task,
-                       glide_state);
-    data.SetValueFromArrival(result.SelectAltitudeDifference(settings.task.glide));
-  }
-  else
-    data.SetInvalid();
 
   if (common_stats.vector_home.IsValid())
     data.SetCommentFromDistance(common_stats.vector_home.distance);
