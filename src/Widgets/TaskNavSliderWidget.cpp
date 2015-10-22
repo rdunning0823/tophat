@@ -199,12 +199,12 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     task_size,
                     tp_valid,
                     result.vector.distance,
-                    result.vector.IsValid(),
+                    basic.location_available && result.vector.IsValid(),
                     result.SelectAltitudeDifference(settings.task.glide) -
                         settings.task.safety_height_arrival,
-                    result.IsOk() || result.vector.distance < fixed(0.01) ,
+                    basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
                     result.vector.bearing - basic.track,
-                    result.vector.IsValid(),
+                    basic.location_available && result.vector.IsValid(),
                     border_width);
 }
 
