@@ -76,6 +76,9 @@ CalculateSplit(int top, int bottom, unsigned min_a, unsigned max_a,
 PixelScalar
 TwoWidgets::CalculateSplit(const PixelRect &rc) const
 {
+  if (equal)
+    return vertical ? rc.GetSize().cy / 2 : rc.GetSize().cx / 2;
+
   const PixelSize min_a = first->GetMinimumSize();
   const PixelSize max_a = first->GetMaximumSize();
   const PixelSize min_b = second->GetMinimumSize();

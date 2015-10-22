@@ -40,16 +40,18 @@ Copyright_License {
  */
 class TwoWidgets : public NullWidget {
   const bool vertical;
+  /* split equally */
+  const bool equal;
 
   Widget *first, *second;
 
   PixelRect rc;
 
 public:
-  TwoWidgets(bool _vertical=true):vertical(_vertical) {}
+  TwoWidgets(bool _vertical = true, bool _equal = false):vertical(_vertical), equal(_equal) {}
 
-  TwoWidgets(Widget *_first, Widget *_second, bool _vertical=true)
-    :vertical(_vertical), first(_first), second(_second) {
+  TwoWidgets(Widget *_first, Widget *_second, bool _vertical=true, bool _equal = false)
+    :vertical(_vertical), equal(_equal), first(_first), second(_second) {
     assert(first != nullptr);
     assert(second != nullptr);
   }
