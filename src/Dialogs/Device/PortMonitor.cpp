@@ -194,7 +194,7 @@ ShowPortMonitor(DeviceDescriptor &device)
 
   WidgetDialog dialog(look.dialog);
   dialog.CreateFull(UIGlobals::GetMainWindow(), caption, &widget);
-  dialog.AddButton(_T("_X"), mrOK);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
 
   dialog.ShowModal();
