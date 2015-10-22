@@ -384,7 +384,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if (do_bearing)
       bearing_direction = DrawBearing(canvas, rc_outer,bearing);
 
-  }
+  } else // just type type label
+    canvas.TextAutoClipped(rc.left, line_one_y_offset, buffer.c_str());
 
   // Draw tp name, truncated to leave space before rt. bearing if drawn
   canvas.Select(name_font);
