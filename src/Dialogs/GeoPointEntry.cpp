@@ -96,7 +96,7 @@ GeoPointEntryDialog(const TCHAR *caption, GeoPoint &value,
 
   TwoWidgets widget(new FixedWindowWidget(&latitude_entry),
                     new FixedWindowWidget(&longitude_entry),
-                    true);
+                    true, true);
   dialog.FinishPreliminary(&widget);
 
   bool result = dialog.ShowModal() == mrOK;
