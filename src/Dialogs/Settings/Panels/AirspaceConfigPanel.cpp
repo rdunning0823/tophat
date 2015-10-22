@@ -42,8 +42,8 @@ Copyright_License {
 #endif
 
 enum ControlIndex {
-  AirspaceDisplay,
   AirspaceLabelSelection,
+  AirspaceDisplay,
   ClipAltitude,
   AltWarningMargin,
   AirspaceWarnings,
@@ -189,14 +189,14 @@ AirspaceConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   RowFormWidget::Prepare(parent, rc);
 
-  AddEnum(_("Airspace display"),
-          _("Controls filtering of airspace for display and warnings.  The airspace filter button also allows filtering of display and warnings independently for each airspace class."),
-          as_display_list, (unsigned)renderer.altitude_mode, this);
-
   AddEnum(_("Label visibility"),
           _("Determines what labels are displayed."),
           as_label_selection_list, (unsigned)renderer.label_selection);
   SetExpertRow(AirspaceLabelSelection);
+
+  AddEnum(_("Airspace display"),
+          _("Controls filtering of airspace for display and warnings.  The airspace filter button also allows filtering of display and warnings independently for each airspace class."),
+          as_display_list, (unsigned)renderer.altitude_mode, this);
 
   AddFloat(_("Clip altitude"),
            _("For clip airspace mode, this is the altitude below which airspace is displayed."),
@@ -263,9 +263,9 @@ AirspaceConfigPanel::Save(bool &_changed)
     CommonInterface::SetMapSettings().airspace;
   UISettings &ui_settings = CommonInterface::SetUISettings();
 
-  changed |= SaveValueEnum(AirspaceDisplay, ProfileKeys::AltMode, renderer.altitude_mode);
-
   changed |= SaveValueEnum(AirspaceLabelSelection, ProfileKeys::AirspaceLabelSelection, renderer.label_selection);
+
+  changed |= SaveValueEnum(AirspaceDisplay, ProfileKeys::AltMode, renderer.altitude_mode);
 
   changed |= SaveValue(ClipAltitude, UnitGroup::ALTITUDE, ProfileKeys::ClipAlt, renderer.clip_altitude);
 
