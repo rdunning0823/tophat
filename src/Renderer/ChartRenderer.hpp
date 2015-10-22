@@ -103,6 +103,7 @@ public:
   void DrawXLabel(const TCHAR *text, const TCHAR *unit);
 
   void DrawYLabel(const TCHAR *text);
+  void DrawYLabelLine2(const TCHAR *text);
   void DrawYLabel(const TCHAR *text, const TCHAR *unit);
 
   void DrawLabel(const TCHAR *text, const fixed xv, const fixed yv);

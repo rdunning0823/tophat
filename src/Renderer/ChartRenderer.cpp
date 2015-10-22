@@ -193,7 +193,7 @@ ChartRenderer::DrawXLabel(const TCHAR *text, const TCHAR *unit)
   assert(unit != nullptr);
 
   StaticString<64> buffer;
-  buffer.UnsafeFormat(_T("%s [%s]"), text, unit);
+  buffer.UnsafeFormat(_T("%s %s"), text, unit);
   DrawXLabel(buffer);
 }
 
@@ -210,14 +210,26 @@ ChartRenderer::DrawYLabel(const TCHAR *text)
 }
 
 void
+ChartRenderer::DrawYLabelLine2(const TCHAR *text)
+{
+  canvas.Select(look.axis_label_font);
+  canvas.SetBackgroundTransparent();
+  PixelSize tsize = canvas.CalcTextSize(text);
+
+  int x = rc.left + Layout::GetTextPadding();
+  int y = rc.top + Layout::GetTextPadding() + tsize.cy;
+
+  canvas.DrawText(x, y, text);
+}
+
+void
 ChartRenderer::DrawYLabel(const TCHAR *text, const TCHAR *unit)
 {
   assert(text != nullptr);
   assert(unit != nullptr);
 
-  StaticString<64> buffer;
-  buffer.UnsafeFormat(_T("%s [%s]"), text, unit);
-  DrawYLabel(buffer);
+  DrawYLabel(text);
+  DrawYLabelLine2(unit);
 }
 
 void
