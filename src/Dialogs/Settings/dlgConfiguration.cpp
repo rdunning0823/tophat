@@ -61,6 +61,7 @@ Copyright_License {
 #include "Panels/TaskRulesConfigPanel.hpp"
 #include "Panels/ScoringConfigPanel.hpp"
 #include "Panels/InfoBoxesConfigPanel.hpp"
+#include "Dialogs/Airspace/Airspace.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Audio/Features.hpp"
@@ -100,6 +101,8 @@ static constexpr TabMenuPage map_pages[] = {
   { N_("Waypoints"), CreateWaypointDisplayConfigPanel },
   { N_("Terrain"), CreateTerrainDisplayConfigPanel },
   { N_("Airspace"), CreateAirspaceConfigPanel },
+  { N_("Airspace colors"), CreateAirspaceSettingsListColorPanel },
+  { N_("Airspace filters"), CreateAirspaceSettingsListFilterPanel },
   { nullptr, nullptr }
 };
 
@@ -170,6 +173,7 @@ class ConfigurationExtraButtons final
     PixelRect button2, button1;
 
     Layout(const PixelRect &rc):button2(rc), button1(rc) {
+      return; // don't use in TopHat
       const unsigned height = rc.bottom - rc.top;
       const unsigned max_control_height = ::Layout::GetMaximumControlHeight();
 
@@ -257,6 +261,7 @@ void
 ConfigPanel::BorrowExtraButton(unsigned i, const TCHAR *caption,
                                ActionListener &listener, int id)
 {
+  return; // don't use these in TopHat
   ConfigurationExtraButtons &extra =
     (ConfigurationExtraButtons &)pager->GetExtra();
   Button &button = extra.GetButton(i);
@@ -268,6 +273,7 @@ ConfigPanel::BorrowExtraButton(unsigned i, const TCHAR *caption,
 void
 ConfigPanel::ReturnExtraButton(unsigned i)
 {
+  return; // don't use these in TopHat
   ConfigurationExtraButtons &extra =
     (ConfigurationExtraButtons &)pager->GetExtra();
   Button &button = extra.GetButton(i);
@@ -309,7 +315,7 @@ void dlgConfigurationShowModal()
     });
 
   pager = new ArrowPagerWidget(on_close, look.button,
-                               new ConfigurationExtraButtons(look));
+                               nullptr);
 
   CommonInterface::SetUISettings().dialog.expert = true;
 

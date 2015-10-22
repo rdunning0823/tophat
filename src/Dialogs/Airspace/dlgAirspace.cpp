@@ -172,6 +172,18 @@ AirspaceSettingsListWidget::OnActivateItem(unsigned index)
   GetList().Invalidate();
 }
 
+Widget*
+CreateAirspaceSettingsListColorPanel()
+{
+  return new AirspaceSettingsListWidget(true);
+}
+
+Widget*
+CreateAirspaceSettingsListFilterPanel()
+{
+  return new AirspaceSettingsListWidget(false);
+}
+
 void
 dlgAirspaceShowModal(bool color_mode)
 {

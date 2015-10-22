@@ -29,6 +29,7 @@ Copyright_License {
 class AbstractAirspace;
 class Airspaces;
 class ProtectedAirspaceWarningManager;
+class Widget;
 struct AirspaceLook;
 
 void
@@ -37,6 +38,16 @@ dlgAirspaceDetails(const AbstractAirspace& the_airspace,
 
 int dlgAirspacePatternsShowModal(const AirspaceLook &look);
 void dlgAirspaceShowModal(bool colored);
+
+/**
+ * Creates a new instance of the widget to configure airspace colors
+ */
+Widget *CreateAirspaceSettingsListColorPanel();
+
+/**
+ * Creates a new instance of the widget to configure airspace filters
+ */
+Widget *CreateAirspaceSettingsListFilterPanel();
 
 void
 ShowAirspaceListDialog(const Airspaces &airspace_database,
