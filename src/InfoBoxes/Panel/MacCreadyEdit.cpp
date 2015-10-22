@@ -280,7 +280,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  big_dialog_look.Initialise(370);
+  big_dialog_look.Initialise(320);
 
   WindowStyle button_style;
   button_style.TabStop();
