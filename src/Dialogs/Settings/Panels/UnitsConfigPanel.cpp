@@ -47,7 +47,6 @@ enum ControlIndex {
   UnitsPressure,
   UnitsMass,
   UnitsWingLoading,
-  spacer_2,
   UnitsLatLon
 };
 
@@ -241,9 +240,6 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           wing_loading_labels_list,
           (unsigned)config.wing_loading_unit, this);
   SetExpertRow(UnitsWingLoading);
-
-  AddSpacer();
-  SetExpertRow(spacer_2);
 
   static constexpr StaticEnumChoice units_lat_lon_list[] = {
     { (unsigned)CoordinateFormat::DDMMSS, _T("DDMMSS") },
