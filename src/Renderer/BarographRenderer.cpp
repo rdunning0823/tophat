@@ -187,8 +187,8 @@ RenderBarograph(Canvas &canvas, const PixelRect rc,
   chart.DrawTrend(fs.altitude_base, ChartLook::STYLE_BLUETHIN);
   chart.DrawTrend(fs.altitude_ceiling, ChartLook::STYLE_BLUETHIN);
 
-  chart.DrawXLabel(_T("t"), _T("hr"));
-  chart.DrawYLabel(_T("h"), Units::GetAltitudeName());
+  chart.DrawXLabel(_T("hr"));
+  chart.DrawYLabel(Units::GetAltitudeName());
 }
 
 void

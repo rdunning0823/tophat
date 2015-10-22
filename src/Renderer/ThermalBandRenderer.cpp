@@ -186,8 +186,8 @@ ThermalBandRenderer::DrawThermalBand(const MoreData &basic,
     chart.DrawYGrid(Units::ToSysAltitude(fixed(1000)),
                     ChartLook::STYLE_THINDASHPAPER,
                     fixed(1000), true);
-    chart.DrawXLabel(_T("w"), Units::GetVerticalSpeedName());
-    chart.DrawYLabel(_T("h AGL"), Units::GetAltitudeName());
+    chart.DrawXLabel(Units::GetVerticalSpeedName());
+    chart.DrawYLabel(_T("AGL"), Units::GetAltitudeName());
   }
 }
 
