@@ -113,6 +113,8 @@ TabMenuDisplay::UpdateLayout()
   const unsigned border_width = GetTabLineHeight();
   const unsigned menu_button_height =
     std::min(Layout::GetMaximumControlHeight(), (window_height - 8 * border_width) / 7u);
+  const unsigned sub_menu_button_height = (menu_button_height * 8u) / 10u;
+
   const unsigned menu_button_width = (window_width - 2 * border_width) / 2;
 
   const unsigned offset = Layout::Scale(2);
@@ -144,7 +146,7 @@ TabMenuDisplay::UpdateLayout()
       page.rc.right = page.rc.left + menu_button_width;
 
       page.rc.top = page_y;
-      page.rc.bottom = page.rc.top + menu_button_height;
+      page.rc.bottom = page.rc.top + sub_menu_button_height;
       page_y = page.rc.bottom + border_width;
 
       page.renderer.InvalidateLayout();
