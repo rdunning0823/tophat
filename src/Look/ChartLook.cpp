@@ -40,8 +40,8 @@ ChartLook::Initialise()
 
   bar_brush.Create(COLOR_GREEN);
 
-  PixelScalar axis_label_size = std::max(8u, Layout::FontScale(6u));
-  PixelScalar axis_value_size = std::max(8u, Layout::FontScale(7u));
+  PixelScalar axis_label_size = std::max(16u, Layout::FontScale(12u));
+  PixelScalar axis_value_size = std::max(16u, Layout::FontScale(14u));
 
   label_font.Load(FontDescription(Layout::FontScale(12)));
   axis_label_font.Load(FontDescription(axis_label_size, true));
