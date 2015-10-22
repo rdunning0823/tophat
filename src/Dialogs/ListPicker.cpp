@@ -31,6 +31,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Event/LambdaTimer.hpp"
 #include "Event/Timer.hpp"
+#include "Screen/Layout.hpp"
 
 #include <assert.h>
 
@@ -175,8 +176,8 @@ ListPicker(const TCHAR *caption,
   Widget *widget = list_widget;
 
   if (_itemhelp_callback != nullptr) {
-    text_widget = new TextWidget();
-    text_widget->SetFixedHeight(item_height * 2);
+    // does not update if screen rotated while displaying
+    text_widget = new TextWidget(Layout::landscape ? 3 : 4);
     widget = two_widgets = new TwoWidgets(list_widget, text_widget);
 
     list_widget->EnableItemHelp(_itemhelp_callback, text_widget, two_widgets);
