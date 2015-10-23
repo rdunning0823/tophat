@@ -51,8 +51,7 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed);
-  /* Move() uses the passed rc for the RowFormWidget, but most move the form to
-   * the fullscreen using GetMainWindow()'s rect */
+  void Show(const PixelRect &rc);
   virtual void Move(const PixelRect &rc) override;
   void SetForm(WndForm *_form) {
     assert(_form != nullptr);
@@ -63,6 +62,13 @@ protected:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
 };
+
+void
+GrAverageConfigPanel::Show(const PixelRect &rc)
+{
+    RowFormWidget::Show(rc);
+    RowFormWidget::GetControl(Spacer).SetVisible(false);
+}
 
 void
 GrAverageConfigPanel::Move(const PixelRect &rc)
@@ -80,15 +86,7 @@ GrAverageConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   assert(IsDefined());
 
-#ifdef ENABLE_OPENGL
-  Window *window = new Window();
-  ContainerWindow& panel = (ContainerWindow &)GetWindow();
-  const PixelRect rc_blank = InitialControlRect(Layout::Scale(40));
-  window->Create(&panel, rc_blank);
-  Add(window);
-#else
-  AddDummy();
-#endif
+  Add(_T("Spacer"));
 
   static constexpr StaticEnumChoice aver_eff_list[] = {
     { ae7seconds, _T("7 s"), N_("For paragliders going to the speed-bar or brakes.") },

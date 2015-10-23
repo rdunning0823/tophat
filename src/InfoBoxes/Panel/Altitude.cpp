@@ -51,8 +51,7 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual bool Save(bool &changed);
-  /* Move() uses the passed rc for the RowFormWidget, but most move the form to
-   * the fullscreen using GetMainWindow()'s rect */
+  void Show(const PixelRect &rc);
   virtual void Move(const PixelRect &rc) override;
   void SetForm(WndForm *_form) {
     assert(_form != nullptr);
@@ -63,6 +62,13 @@ protected:
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
 };
+
+void
+AltitudeConfigPanel::Show(const PixelRect &rc)
+{
+    RowFormWidget::Show(rc);
+    RowFormWidget::GetControl(Spacer).SetVisible(false);
+}
 
 void
 AltitudeConfigPanel::Move(const PixelRect &rc)
@@ -80,15 +86,7 @@ AltitudeConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   assert(IsDefined());
 
-#ifdef ENABLE_OPENGL
-  Window *window = new Window();
-  ContainerWindow& panel = (ContainerWindow &)GetWindow();
-  const PixelRect rc_blank = InitialControlRect(Layout::Scale(40));
-  window->Create(&panel, rc_blank);
-  Add(window);
-#else
-  AddDummy();
-#endif
+  Add(_T("Spacer"));
 
   AddBoolean(_("Show feet and meters"),
              _("Display second set of units in the bottom of the Infobox"),
