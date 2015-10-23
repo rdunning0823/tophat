@@ -251,7 +251,7 @@ DigitEntry::CalculateLayout(const PixelRect rc)
   if (digit_size.cy < (PixelScalar)min_value_height)
     digit_size.cy = min_value_height;
 
-  fixed stretch_ratio = fixed(rc.GetSize().cy) / fixed(2 * control_height + digit_size.cy);
+  fixed stretch_ratio = std::min(fixed(1), fixed(rc.GetSize().cy) / fixed(2 * control_height + digit_size.cy));
   control_height = unsigned((fixed)control_height * stretch_ratio);
   digit_size.cy = PixelScalar(fixed(digit_size.cy) * stretch_ratio);
   top = control_height;
