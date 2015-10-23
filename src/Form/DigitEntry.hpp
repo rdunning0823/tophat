@@ -172,6 +172,9 @@ public:
 
   void CalculateLayout(const PixelRect rc);
 
+  /**
+   * returns the last calculated size
+   */
   gcc_pure
   PixelSize GetRecommendedSize() const {
     return PixelSize(columns[length - 1].right, bottom + top);
