@@ -91,16 +91,18 @@ protected:
   /* the time being edited stored as utc */
   RoughTime &utc_time;
 
-  PixelRect rc_digit_entry, rc_label_start, rc_label_current, rc_label_help;
+  PixelRect rc_digit_entry, rc_label_start, rc_label_current;
   PixelRect rc_cancel, rc_close;
 
+  /* save the initial size of digit_entry as a starting point when resizing */
+  PixelSize digit_entry_initial_size;
+
   Button *cancel, *close;
-  WndFrame *label_start, *label_current, *label_help;
+  WndFrame *label_start, *label_current;
   DigitEntry *digit_entry;
 
   StaticString<50> start_label_text;
   unsigned start_label_width;
-
 
 public:
   StartTimeEntry(RoughTime &_utc_time)
@@ -110,7 +112,7 @@ public:
      basic(CommonInterface::Basic()),
      settings(CommonInterface::GetComputerSettings()),
      dialog_timer(*this),
-     utc_time(_utc_time)
+     utc_time(_utc_time), start_label_width(0)
   {}
 
   /* override from Timer */
@@ -157,7 +159,6 @@ StartTimeEntry::OnResize(PixelSize new_size)
   SetRectangles(GetClientRect());
 
   label_current->Move(rc_label_current);
-  label_help->Move(rc_label_help);
   label_start->Move(rc_label_start);
   close->Move(rc_close);
   cancel->Move(rc_cancel);
@@ -169,11 +170,12 @@ StartTimeEntry::SetRectangles(const PixelRect &rc_outer)
 {
   PixelRect rc;
   UPixelScalar side_margin = Layout::landscape ? Layout::Scale(10) : Layout::Scale(4);
+  unsigned padding = Layout::GetTextPadding();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   unsigned line_height = dialog_look.text_font.TextSize(_T("A")).cy * 1.5;
 
   rc.left = rc_outer.left + side_margin;
-  rc.top = rc_outer.left + Layout::Scale(2);
+  rc.top = rc_outer.top + Layout::Scale(2);
   rc.right = rc_outer.right - side_margin;
   rc.bottom = rc_outer.bottom - rc_outer.top -
       Layout::Scale(2) - GetTitleHeight();
@@ -182,14 +184,20 @@ StartTimeEntry::SetRectangles(const PixelRect &rc_outer)
     (unsigned)Layout::Scale(40) };
 
   rc_cancel = rc_close = rc_digit_entry = rc_label_start = rc_label_current
-      = rc_label_help = rc;
+      = rc;
 
   rc_cancel.top = rc_close.top = rc.bottom - sz_button.cy;
   rc_cancel.left = rc_cancel.right - sz_button.cx;
   rc_close.right = rc_cancel.left;
 
-  PixelSize sz_entry = digit_entry->GetRecommendedSize();
-  rc_label_start.right = rc_label_start.left + start_label_width;
+  rc_label_current.top = rc.top;
+  rc_label_current.bottom = rc_label_current.top + line_height;
+
+  PixelSize sz_entry = digit_entry_initial_size;
+  sz_entry.cy = std::min(sz_entry.cy, PixelScalar(rc.GetSize().cy - sz_button.cy - 3 * line_height));
+  sz_entry.cx = std::min(sz_entry.cx, PixelScalar(rc.GetSize().cx - start_label_width - padding));
+
+  rc_label_start.right = rc_label_start.left + start_label_width + padding * 2;
   rc_label_start.top =
       rc.top + (rc.GetSize().cy - sz_button.cy - line_height) / 2;
   rc_label_start.bottom = rc_label_start.top + line_height;
@@ -199,12 +207,6 @@ StartTimeEntry::SetRectangles(const PixelRect &rc_outer)
   rc_digit_entry.top =
         rc.top + (rc.GetSize().cy - sz_button.cy - sz_entry.cy) / 2;
   rc_digit_entry.bottom = rc_digit_entry.top + sz_entry.cy;
-
-  rc_label_current.bottom = rc_digit_entry.top - line_height;
-  rc_label_current.top = rc_label_current.bottom - line_height;
-
-  rc_label_help.top += line_height;
-  rc_label_help.bottom = rc_label_help.top + line_height;
 }
 
 void
@@ -265,7 +267,8 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
   NullWidget::Prepare(parent, rc_form);
   WndForm::Move(rc_form);
 
-  SetCaption(_("Task start"));
+  SetCaption(_("Adjust time you started the task"));
+
   start_label_text.Format(_T("%s:  "), _("Start time"));
   start_label_width = dialog_look.text_font.TextSize(start_label_text.c_str()).cx;
 
@@ -274,7 +277,8 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
   control_style.TabStop();
   digit_entry = new DigitEntry(look);
   digit_entry->CreateTime(GetClientAreaWindow(), rc, control_style);
-  digit_entry->Resize(digit_entry->GetRecommendedSize());
+  digit_entry_initial_size = digit_entry->GetRecommendedSize();
+  digit_entry->Resize(digit_entry_initial_size);
   digit_entry->SetActionListener(*this, CLOSEBUTTON);
 
   const BrokenTime bt = BrokenDateTime::NowUTC();
@@ -312,10 +316,6 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
                          rc_cancel,
                          button_style, *this, CANCELBUTTON);
 
-  label_help = new WndFrame(GetClientAreaWindow(), dialog_look,
-                            rc_label_help, style_frame);
-  label_help->SetCaption(_("Adjust time you started the task"));
-
   label_current = new WndFrame(GetClientAreaWindow(), dialog_look,
                               rc_label_current, style_frame);
 
@@ -335,7 +335,7 @@ StartTimeEntry::Unprepare()
   delete(digit_entry);
   delete(close);
   delete(cancel);
-  delete(label_help);
+
   delete(label_current);
   delete(label_start);
 
