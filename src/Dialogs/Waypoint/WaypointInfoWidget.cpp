@@ -113,7 +113,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     FormatBearing(bearing_buffer.buffer(), bearing_buffer.CAPACITY,
                   vector.bearing);
     buffer.AppendFormat(_T(" / %s"), bearing_buffer.c_str());
-    AddReadOnly(_("Distance / bearing"), nullptr, buffer);
+    AddReadOnly(_("Distance"), nullptr, buffer);
   }
 
   if (basic.location_available && basic.NavAltitudeAvailable() &&
