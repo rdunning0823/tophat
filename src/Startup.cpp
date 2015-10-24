@@ -254,6 +254,7 @@ Startup()
     line.Format(_T("%s"), file->ReadLine());
 #endif
     Args args(line.c_str(), "");
+    args.SetStopOnError(false);
     CommandLine::Parse(args);
     delete file;
   }

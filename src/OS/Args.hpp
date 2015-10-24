@@ -48,10 +48,11 @@ class Args {
   const char *name, *usage;
 
   char *cmdline;
+  bool stop_on_error;
 
 public:
   Args(int argc, char **argv, const char *_usage)
-    :name(argv[0]), usage(_usage) {
+    :name(argv[0]), usage(_usage), stop_on_error(true) {
     assert(name != nullptr);
     assert(usage != nullptr);
 
@@ -74,6 +75,10 @@ public:
 
   ~Args() {
     delete[] cmdline;
+  }
+
+  void SetStopOnError(bool _stop_on_error) {
+    stop_on_error = _stop_on_error;
   }
 
   void ParseCommandLine(const char *_cmdline) {
@@ -123,13 +128,13 @@ public:
 
   Args &operator=(const Args &other) = delete;
 
-  gcc_noreturn
   void UsageError() {
     fprintf(stderr, "Usage: %s %s\n", name, usage);
 #ifdef MORE_USAGE
     PrintMoreUsage();
 #endif
-    exit(EXIT_FAILURE);
+    if (stop_on_error)
+      exit(EXIT_FAILURE);
   }
 
   bool IsEmpty() const {
