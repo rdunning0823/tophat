@@ -112,7 +112,7 @@ class TargetWidget
 
   CheckBoxControl optimized;
 
-  Button close_button;
+  WndSymbolButton close_button;
 
   unsigned initial_active_task_point;
   unsigned task_size;
@@ -402,8 +402,8 @@ TargetWidget::Layout::Layout(PixelRect rc)
     speed_remaining = rl.NextRow(control_height);
     speed_achieved = SplitRow(speed_remaining);
 
-    optimized = rl.BottomRow(control_height);
-    close_button = SplitRow(optimized);
+    close_button = rl.BottomRow(control_height);
+    optimized = SplitRow(close_button);
 
     map = rl.GetRemaining();
   }
