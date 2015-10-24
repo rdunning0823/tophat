@@ -62,7 +62,7 @@ CommandLine::Parse(Args &args)
     const char *s = args.GetNext();
 
     if (*s != '-') {
-#ifdef _WIN32
+#ifndef HAVE_CMDLINE_FULLSCREEN
       continue;
 #else
       args.UsageError();
@@ -93,11 +93,11 @@ CommandLine::Parse(Args &args)
       global_simulator_flag=false;
       sim_set_in_cmd_line_flag=true;
 #endif
-#if !defined(_WIN32_WCE)
     } else if (StringIsEqualIgnoreCase(s, "-quick")) {
       global_simulator_flag = false;
       sim_set_in_cmd_line_flag = true;
       show_dialog_setup_quick = false;
+#if defined(HAVE_CMDLINE_FULLSCREEN)
     } else if (isdigit(s[1])) {
       char *p;
       width = ParseUnsigned(s + 1, &p);
@@ -116,8 +116,6 @@ CommandLine::Parse(Args &args)
     } else if (StringIsEqual(s, "-small")) {
       width = 320;
       height = 240;
-#endif
-#ifdef HAVE_CMDLINE_FULLSCREEN
     } else if (StringIsEqual(s, "-fullscreen")) {
       full_screen = true;
 #endif
@@ -126,7 +124,7 @@ CommandLine::Parse(Args &args)
       AllocConsole();
       freopen("CONOUT$", "wb", stdout);
 #endif
-#if !defined(ANDROID) && !defined(_WIN32_WCE)
+#if defined(HAVE_CMDLINE_FULLSCREEN)
     } else if (StringIsEqual(s, "-dpi=", 5)) {
       unsigned x_dpi, y_dpi;
       char *p;
@@ -151,7 +149,7 @@ CommandLine::Parse(Args &args)
       */
 #endif
     } else {
-#ifndef _WIN32
+#ifdef HAVE_CMDLINE_FULLSCREEN
       args.UsageError();
 #endif
     }

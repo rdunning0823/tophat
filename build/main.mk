@@ -771,9 +771,11 @@ endif
 
 else
 XCSOAR_SOURCES += \
-	$(SRC)/CommandLine.cpp \
 	$(SRC)/XCSoar.cpp
 endif
+
+XCSOAR_SOURCES += \
+	$(SRC)/CommandLine.cpp \
 
 ifeq ($(TARGET_IS_KOBO),y)
 XCSOAR_SOURCES += \

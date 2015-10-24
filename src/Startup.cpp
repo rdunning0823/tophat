@@ -99,6 +99,8 @@ Copyright_License {
 #include <windef.h>
 #include "IO/FileLineReader.hpp"
 #include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
+#include "OS/Args.hpp"
+#include "Util/StaticString.hxx"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
@@ -164,9 +166,7 @@ AfterStartup()
 
   InfoBoxManager::SetDirty();
 
-#ifndef ANDROID
   if (CommandLine::show_dialog_setup_quick)
-#endif
     dlgStartupAssistantShowModal(true);
 
   ForceCalculation();
@@ -242,17 +242,21 @@ Startup()
 
   static TCHAR path[MAX_PATH];
 
-#ifndef ANDROID
   InitialiseDataPath();
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
   if (file != nullptr) {
-    TCHAR *line = file->ReadLine();
-    if (line != nullptr && StringIsEqualIgnoreCase(line, _T("-quick")))
-      CommandLine::show_dialog_setup_quick = false;
+    StaticString<64> line;
+#ifndef _WIN32_WCE
+          // program name is not included in command line on CE
+    line.Format(_T("%s %s"), _T("Top Hat Soaring"), file->ReadLine());
+#else
+    line.Format(_T("%s"), file->ReadLine());
+#endif
+    Args args(line.c_str(), "");
+    CommandLine::Parse(args);
     delete file;
   }
-#endif
 
 #ifdef SIMULATOR_AVAILABLE
   // prompt for simulator if not set by command line argument "-simulator" or "-fly"
