@@ -101,6 +101,8 @@ StartupConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   startup->SetDefaults(ReadQuickStart());
   RowFormWidget::Prepare(parent, rc);
   AddText(_("tophat arguments"), nullptr, startup->tophat_arguments);
+
+  AddMultiLine(_("Valid arguments are: -fly -simulator -quick.  [-quick] causes Top Hat to proceed to map screen."));
 }
 
 bool
