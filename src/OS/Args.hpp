@@ -27,6 +27,7 @@ Copyright_License {
 #include "Compiler.h"
 #include "Util/tstring.hpp"
 #include "Util/NumberParser.hpp"
+#include "Util/StringAPI.hpp"
 
 #ifdef _UNICODE
 #include "OS/ConvertPathName.hpp"
@@ -46,9 +47,7 @@ class Args {
   std::list<char *> args;
   const char *name, *usage;
 
-#ifdef WIN32
   char *cmdline;
-#endif
 
 public:
   Args(int argc, char **argv, const char *_usage)
@@ -58,21 +57,16 @@ public:
 
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
 
-#ifdef WIN32
     cmdline = nullptr;
-#endif
   }
 
   Args(const Args &other) = delete;
 
   Args(Args &&other):name(other.name), usage(other.usage) {
     std::swap(args, other.args);
-#ifdef WIN32
     std::swap(cmdline, other.cmdline);
-#endif
   }
 
-#ifdef WIN32
   Args(const TCHAR *_cmdline, const char *_usage)
     :usage(_usage) {
     ParseCommandLine(_cmdline);
@@ -84,7 +78,7 @@ public:
 
   void ParseCommandLine(const char *_cmdline) {
     const char *s = _cmdline;
-    cmdline = new char[strlen(s) + 1];
+    cmdline = new char[StringLength(s) + 1];
     char *d = cmdline;                 // current position in destination buffer
     char *option = cmdline;
 
@@ -125,7 +119,6 @@ public:
     NarrowPathName convert(_cmdline);
     ParseCommandLine(convert);
   }
-#endif
 #endif
 
   Args &operator=(const Args &other) = delete;
