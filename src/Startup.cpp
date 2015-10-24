@@ -240,6 +240,20 @@ Startup()
   CommonInterface::SetUISettings().SetDefaults();
   main_window->Initialise();
 
+  static TCHAR path[MAX_PATH];
+
+#ifndef ANDROID
+  InitialiseDataPath();
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
+  FileLineReader *file = new FileLineReader(path);
+  if (file != nullptr) {
+    TCHAR *line = file->ReadLine();
+    if (line != nullptr && StringIsEqualIgnoreCase(line, _T("-quick")))
+      CommandLine::show_dialog_setup_quick = false;
+    delete file;
+  }
+#endif
+
 #ifdef SIMULATOR_AVAILABLE
   // prompt for simulator if not set by command line argument "-simulator" or "-fly"
   if (!sim_set_in_cmd_line_flag) {
@@ -256,20 +270,6 @@ Startup()
       global_simulator_flag = true;
       break;
     }
-  }
-#endif
-
-  static TCHAR path[MAX_PATH];
-
-#ifndef ANDROID
-  InitialiseDataPath();
-  LocalPath(path, _T(TOPHAT_ARGUMENTS));
-  FileLineReader *file = new FileLineReader(path);
-  if (file != nullptr) {
-    TCHAR *line = file->ReadLine();
-    if (line != nullptr && StringIsEqualIgnoreCase(line, _T("-quick")))
-      CommandLine::show_dialog_setup_quick = false;
-    delete file;
   }
 #endif
 
