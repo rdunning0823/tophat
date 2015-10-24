@@ -94,8 +94,6 @@ CommandLine::Parse(Args &args)
       sim_set_in_cmd_line_flag=true;
 #endif
     } else if (StringIsEqualIgnoreCase(s, "-quick")) {
-      global_simulator_flag = false;
-      sim_set_in_cmd_line_flag = true;
       show_dialog_setup_quick = false;
 #if defined(HAVE_CMDLINE_FULLSCREEN)
     } else if (isdigit(s[1])) {
