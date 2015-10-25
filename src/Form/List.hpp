@@ -86,10 +86,6 @@ public:
     return false;
   }
 
-  /**
-   * called when the list scrolls a pixel
-   */
-  virtual void OnPixelMove() {}
   virtual void OnActivateItem(gcc_unused unsigned index) {}
 };
 
@@ -104,11 +100,6 @@ protected:
   /** The ScrollBar object */
   ScrollBar scroll_bar;
 
-  /**
-   * Show the scrollbar?
-   */
-  bool has_scroll_bar;
-
   /** The height of one item on the screen, in pixels. */
   UPixelScalar item_height;
   /** The number of items in the list. */
@@ -119,9 +110,8 @@ protected:
   /**
    * Which pixel row of the "origin" item is being displayed at the
    * top of the Window?
-   * May be negative if used by HorizontalList with over_scroll_max
    */
-  PixelScalar pixel_pan;
+  UPixelScalar pixel_pan;
 
   /** The number of items visible at a time. */
   unsigned items_visible;
@@ -180,7 +170,7 @@ public:
    */
   ListControl(ContainerWindow &parent, const DialogLook &look,
               PixelRect rc, const WindowStyle style,
-              UPixelScalar _item_height, int stopping_time = 1000);
+              UPixelScalar _item_height);
 
   virtual ~ListControl();
 
@@ -200,13 +190,6 @@ public:
     assert(cursor_handler == nullptr);
 
     cursor_handler = _cursor_handler;
-  }
-
-  /**
-   * Sets whether scroll bar should be used
-   */
-  void SetHasScrollBar(bool value) {
-    has_scroll_bar = value;
   }
 
   /**
@@ -235,10 +218,6 @@ public:
   void SetLength(unsigned n);
 
   /**
-   * returns width of scrollbar or 0 if none exists
-   */
-  int GetScrollBarWidth() const;
-  /**
    * Check whether the length of the list is below a certain
    * threshold.  Small lists may have different behaviour on some
    * platforms (e.g. Altair).
@@ -258,11 +237,10 @@ public:
   /**
    * Moves the cursor to the specified position.
    *
-   * @param ensure_visible.  If false, does not scroll to item
    * @return true if the cursor was moved to the specified position,
    * false if the position was invalid
    */
-  bool SetCursorIndex(unsigned i, bool ensure_visible = true);
+  bool SetCursorIndex(unsigned i);
 
   /**
    * Move the cursor this many items up (negative delta) or down
@@ -273,22 +251,14 @@ public:
   /**
    * Pan the "origin item" to the specified pixel position.
    */
-  void SetPixelPan(PixelScalar _pixel_pan);
-
-
-  /**
-   * returns max of 0 or pixel_pan
-   */
-  UPixelScalar GetPixelPanUnsigned() const {
-    return (UPixelScalar)std::max((PixelScalar)0, pixel_pan);
-  }
+  void SetPixelPan(UPixelScalar _pixel_pan);
 
   /**
    * Scrolls to the specified index.
    */
   void SetOrigin(int i);
 
-  PixelScalar GetPixelOrigin() const {
+  unsigned GetPixelOrigin() const {
     return origin * item_height + pixel_pan;
   }
 
@@ -300,16 +270,7 @@ public:
    */
   void MoveOrigin(int delta);
 
-  /**
-   * allow these to be overrided
-   */
-  virtual UPixelScalar GetHeight() {
-    return PaintWindow::GetHeight();
-  }
-  virtual UPixelScalar GetWidth() {
-    return PaintWindow::GetWidth();
-  }
-
+  int GetScrollBarWidth() const;
 protected:
   gcc_pure
   bool CanActivateItem() const;
@@ -322,7 +283,7 @@ protected:
    * Scroll to the ListItem defined by i
    * @param i The ListItem array id
    */
-  virtual void EnsureVisible(unsigned i);
+  void EnsureVisible(unsigned i);
 
   /**
    * Determine which list item resides at the specified pixel row.
@@ -330,11 +291,11 @@ protected:
    */
   gcc_pure
   int ItemIndexAt(int y) const {
-    int i = (y + GetPixelPanUnsigned()) / item_height + origin;
+    int i = (y + pixel_pan) / item_height + origin;
     return i >= 0 && (unsigned)i < length ? i : -1;
   }
 
-  virtual gcc_pure
+  gcc_pure
   PixelRect item_rect(unsigned i) const {
     PixelRect rc;
     rc.left = 0;
@@ -350,7 +311,7 @@ protected:
 
   void drag_end();
 
-  virtual void DrawItems(Canvas &canvas, unsigned start, unsigned end) const;
+  void DrawItems(Canvas &canvas, unsigned start, unsigned end) const;
 
   /** Draws the ScrollBar */
   void DrawScrollBar(Canvas &canvas);

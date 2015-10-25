@@ -46,7 +46,7 @@ class TaskStats;
 class ContainerWindow;
 
 class TaskNavSliderWidget : public MapOverlayBaseWidget, ListItemRenderer,
-  ListCursorHandler  {
+  HorizontalListCursorHandler  {
 protected:
 
   SliderShape slider_shape;

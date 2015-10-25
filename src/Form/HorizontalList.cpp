@@ -25,29 +25,137 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Canvas.hpp"
-
+#include "Screen/ContainerWindow.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
+#include "Screen/Key.h"
+#include "Screen/Point.hpp"
 #include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scissor.hpp"
+#include "Screen/OpenGL/Globals.hpp"
 #elif defined(USE_GDI)
 #include "Screen/WindowCanvas.hpp"
 #endif
 
+#include <assert.h>
+#include <algorithm>
+
+/**
+ * Can the user scroll with pixel precision?  This is used on fast
+ * displays to give more instant feedback, which feels more slick.  On
+ * slow e-paper screens, this is not a good idea.
+ */
+gcc_const
+static bool
+UsePixelPan()
+{
+  return HasDraggableScreen();
+}
 
 HorizontalListControl::HorizontalListControl(ContainerWindow &parent,
                                              const DialogLook &_look,
                                              PixelRect _rc,
                                              const WindowStyle _style,
                                              UPixelScalar _item_height)
-  :ListControl(parent, _look, _rc, _style, _item_height, 1000),
+  :look(_look),
+   scroll_bar(look.button),
+   has_scroll_bar(true),
+   item_height(_item_height),
+   length(0),
+   origin(0), pixel_pan(0),
+   cursor(0),
+   drag_mode(DragMode::NONE),
+   item_renderer(nullptr), cursor_handler(nullptr),
+ #ifndef _WIN32_WCE
+   kinetic(1000),
+   kinetic_timer(*this),
+ #endif
    over_scroll_max(0),
    cursor_down_index(-1),
    click_duration(0)
 {
+  Create(parent, _rc, _style, _item_height);
   SetHasScrollBar(false);
+}
+
+HorizontalListControl::~HorizontalListControl() {
+  /* we must override ~Window(), because in ~Window(), our own
+     OnDestroy() method won't be called (during object destruction,
+     this object loses its identity) */
+  Destroy();
+}
+
+void
+HorizontalListControl::Create(ContainerWindow &parent,
+                              PixelRect rc, const WindowStyle style,
+                              unsigned _item_height)
+{
+  item_height = _item_height;
+  PaintWindow::Create(parent, rc, style);
+}
+
+bool
+HorizontalListControl::CanActivateItem() const
+{
+  if (IsEmpty())
+    return false;
+
+  return cursor_handler != nullptr &&
+    cursor_handler->CanActivateItem(GetCursorIndex());
+}
+
+void
+HorizontalListControl::ActivateItem()
+{
+  assert(CanActivateItem());
+
+  unsigned index = GetCursorIndex();
+  assert(index < GetLength());
+  if (cursor_handler != nullptr)
+    cursor_handler->OnActivateItem(index);
+}
+
+void
+HorizontalListControl::show_or_hide_scroll_bar()
+{
+  const PixelSize size = GetSize();
+
+  if (length > items_visible && has_scroll_bar)
+    // enable the scroll bar
+    scroll_bar.SetSize(size);
+  else
+    // all items are visible
+    // -> hide the scroll bar
+    scroll_bar.Reset();
+}
+
+void
+HorizontalListControl::OnResize(PixelSize new_size)
+{
+  PaintWindow::OnResize(new_size);
+
+  items_visible = new_size.cy / item_height;
+
+  if (unsigned(new_size.cy) >= length * item_height) {
+    /* after the resize, there is enough room for all list items -
+       scroll back to the top */
+    origin = pixel_pan = 0;
+  }
+
+  if (length > 0)
+    /* make sure the cursor is still visible */
+    EnsureVisible(GetCursorIndex());
+
+  show_or_hide_scroll_bar();
+}
+
+void
+HorizontalListControl::OnSetFocus()
+{
+  PaintWindow::OnSetFocus();
+  Invalidate_item(cursor);
 }
 
 void
@@ -92,9 +200,83 @@ HorizontalListControl::SetOverScrollMax(UPixelScalar pixels)
 void
 HorizontalListControl::SetLength(unsigned n)
 {
-  ListControl::SetLength(n);
+  if (n == length)
+    return;
+
+  unsigned cursor = GetCursorIndex();
+
+  length = n;
+
+  if (n == 0)
+    cursor = 0;
+  else if (cursor >= n)
+    cursor = n - 1;
+
+  items_visible = GetHeight() / item_height;
+
+  if (n <= items_visible)
+    origin = 0;
+  else if (origin + items_visible > n)
+    origin = n - items_visible;
+  else if (cursor < origin)
+    origin = cursor;
+
+  show_or_hide_scroll_bar();
+  Invalidate();
+
+  SetCursorIndex(cursor);
+
   if (n > 0)
     EnsureVisible(origin);
+}
+
+void
+HorizontalListControl::MoveOrigin(int delta)
+{
+  if (UsePixelPan()) {
+    int pixel_origin = (int)GetPixelOrigin();
+    SetPixelOrigin(pixel_origin + delta * (int)item_height);
+  } else {
+    SetOrigin(origin + delta);
+  }
+}
+
+void
+HorizontalListControl::SetOrigin(int i)
+{
+  if (length <= items_visible)
+    return;
+
+  if (i < 0)
+    i = 0;
+  else if ((unsigned)i + items_visible > length)
+    i = length - items_visible;
+
+  if ((unsigned)i == origin)
+    return;
+
+#ifdef USE_GDI
+  int delta = origin - i;
+#endif
+
+  origin = i;
+
+#ifdef USE_GDI
+  if ((unsigned)abs(delta) < items_visible) {
+    PixelRect rc = GetClientRect();
+    rc.right = scroll_bar.GetLeft(GetSize());
+    Scroll(0, delta * item_height, rc);
+
+    /* repaint the scrollbar synchronously; we could Invalidate its
+       area and repaint asynchronously via WM_PAINT, but then the clip
+       rect passed to OnPaint() would be the whole client area */
+    WindowCanvas canvas(*this);
+    DrawScrollBar(canvas);
+    return;
+  }
+#endif
+
+  Invalidate();
 }
 
 void
@@ -128,6 +310,16 @@ HorizontalListControl::SetPixelOriginAndCenter(int pixel_origin)
 }
 
 void
+HorizontalListControl::SetPixelPan(PixelScalar _pixel_pan)
+{
+  if (pixel_pan == _pixel_pan)
+    return;
+
+  pixel_pan = _pixel_pan;
+  Invalidate();
+}
+
+void
 HorizontalListControl::OnPaint(Canvas &canvas)
 {
   if (item_renderer != nullptr) {
@@ -151,6 +343,74 @@ HorizontalListControl::OnPaint(Canvas &canvas, const PixelRect &dirty)
          first--;
     DrawItems(canvas, first, last);
   }
+}
+
+void
+HorizontalListControl::DrawScrollBar(Canvas &canvas) {
+  if (!scroll_bar.IsDefined())
+    return;
+
+//  scroll_bar.SetSlider(length * item_height, GetHeight(), (GetPixelOrigin() < 0) ? 0 : GetPixelOrigin());
+  if (UsePixelPan())
+    scroll_bar.SetSlider(length * item_height, GetHeight(), GetPixelOrigin());
+  else
+    scroll_bar.SetSlider(length, items_visible, origin);
+
+  scroll_bar.Paint(canvas);
+}
+
+void
+HorizontalListControl::SetItemHeight(UPixelScalar _item_height)
+{
+  item_height = _item_height;
+  items_visible = GetHeight() / item_height;
+
+  show_or_hide_scroll_bar();
+  Invalidate();
+}
+
+int
+HorizontalListControl::GetScrollBarWidth() const {
+  if (has_scroll_bar == false)
+    return 0;
+
+  return scroll_bar.GetWidth();
+}
+
+bool
+HorizontalListControl::SetCursorIndex(unsigned i, bool ensure_visible)
+{
+  if (i >= length)
+    return false;
+
+  if (i == GetCursorIndex())
+    return true;
+
+  if (ensure_visible)
+    EnsureVisible(i);
+
+  Invalidate_item(cursor);
+  cursor = i;
+  Invalidate_item(cursor);
+
+  if (cursor_handler != nullptr)
+    cursor_handler->OnCursorMoved(i);
+  return true;
+}
+
+void
+HorizontalListControl::MoveCursor(int delta)
+{
+  if (length == 0)
+    return;
+
+  int new_cursor = cursor + delta;
+  if (new_cursor < 0)
+    new_cursor = 0;
+  else if ((unsigned)new_cursor >= length)
+    new_cursor = length - 1;
+
+  SetCursorIndex(new_cursor);
 }
 
 void
@@ -316,6 +576,18 @@ HorizontalListControl::OnMouseDown(PixelScalar x, PixelScalar y)
   return true;
 }
 
+void
+HorizontalListControl::drag_end()
+{
+  if (drag_mode != DragMode::NONE) {
+    if (drag_mode == DragMode::CURSOR)
+      Invalidate_item(cursor);
+
+    drag_mode = DragMode::NONE;
+    ReleaseCapture();
+  }
+}
+
 bool
 HorizontalListControl::ScrollAdvance(bool forward)
 {
@@ -376,3 +648,132 @@ HorizontalListControl::OnTimer(WindowTimer &timer)
 
   return PaintWindow::OnTimer(timer);
 }
+
+bool
+HorizontalListControl::OnKeyCheck(unsigned key_code) const
+{
+  switch (key_code) {
+  case KEY_RETURN:
+    return CanActivateItem();
+
+  case KEY_UP:
+    return GetCursorIndex() > 0;
+
+  case KEY_DOWN:
+    return GetCursorIndex() + 1 < length;
+
+  default:
+    return false;
+  }
+}
+
+bool
+HorizontalListControl::OnKeyDown(unsigned key_code)
+{
+  scroll_bar.DragEnd(this);
+
+#ifndef _WIN32_WCE
+  kinetic_timer.Cancel();
+#endif
+
+  switch (key_code) {
+#ifdef GNAV
+  // JMW added this to make data entry easier
+  case KEY_APP4:
+#endif
+  case KEY_RETURN:
+    if (CanActivateItem())
+      ActivateItem();
+    return true;
+
+  case KEY_UP:
+    // previous item
+    if (GetCursorIndex() <= 0)
+      break;
+
+    MoveCursor(-1);
+    return true;
+
+  case KEY_DOWN:
+    // next item
+    if (GetCursorIndex() +1 >= length)
+      break;
+
+    MoveCursor(1);
+    return true;
+
+  case KEY_LEFT:
+    // page up
+    MoveCursor(-(int)items_visible);
+    return true;
+
+  case KEY_RIGHT:
+    // page down
+    MoveCursor(items_visible);
+    return true;
+
+  case KEY_HOME:
+    SetCursorIndex(0);
+    return true;
+
+  case KEY_END:
+    if (length > 0) {
+      SetCursorIndex(length - 1);
+    }
+    return true;
+
+  case KEY_PRIOR:
+    MoveCursor(-(int)items_visible);
+    return true;
+
+  case KEY_NEXT:
+    MoveCursor(items_visible);
+    return true;
+  }
+  return PaintWindow::OnKeyDown(key_code);
+}
+
+bool
+HorizontalListControl::OnMouseWheel(PixelScalar x, PixelScalar y, int delta)
+{
+  scroll_bar.DragEnd(this);
+  drag_end();
+
+#ifndef _WIN32_WCE
+  kinetic_timer.Cancel();
+#endif
+
+  if (delta > 0) {
+    // scroll up
+    MoveOrigin(-1);
+  } else if (delta < 0) {
+    // scroll down
+    MoveOrigin(1);
+  }
+
+  return true;
+}
+
+void
+HorizontalListControl::OnCancelMode()
+{
+  PaintWindow::OnCancelMode();
+
+  scroll_bar.DragEnd(this);
+  drag_end();
+
+#ifndef _WIN32_WCE
+  kinetic_timer.Cancel();
+#endif
+}
+
+#ifndef _WIN32_WCE
+void
+HorizontalListControl::OnDestroy()
+{
+  kinetic_timer.Cancel();
+
+  PaintWindow::OnDestroy();
+}
+#endif
+

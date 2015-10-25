@@ -49,13 +49,12 @@ gcc_const
 static bool
 UsePixelPan()
 {
-  return HasDraggableScreen();
+  return !HasEPaper();
 }
 
 ListControl::ListControl(const DialogLook &_look)
   :look(_look),
    scroll_bar(look.button),
-   has_scroll_bar(true),
    length(0),
    origin(0), pixel_pan(0),
    cursor(0),
@@ -69,19 +68,16 @@ ListControl::ListControl(const DialogLook &_look)
 
 ListControl::ListControl(ContainerWindow &parent, const DialogLook &_look,
                          PixelRect rc, const WindowStyle style,
-                         UPixelScalar _item_height, int stopping_time)
+                         UPixelScalar _item_height)
   :look(_look),
    scroll_bar(look.button),
-   has_scroll_bar(true),
-   item_height(_item_height),
    length(0),
    origin(0), pixel_pan(0),
    cursor(0),
    drag_mode(DragMode::NONE),
    item_renderer(nullptr), cursor_handler(nullptr)
 #ifndef _WIN32_WCE
-  , kinetic(stopping_time),
-   kinetic_timer(*this)
+   , kinetic_timer(*this)
 #endif
 {
   Create(parent, rc, style, _item_height);
@@ -129,7 +125,7 @@ ListControl::show_or_hide_scroll_bar()
 {
   const PixelSize size = GetSize();
 
-  if (length > items_visible && has_scroll_bar)
+  if (length > items_visible)
     // enable the scroll bar
     scroll_bar.SetSize(size);
   else
@@ -231,8 +227,8 @@ void
 ListControl::OnPaint(Canvas &canvas, const PixelRect &dirty)
 {
   if (item_renderer != nullptr)
-    DrawItems(canvas, origin + (dirty.top + GetPixelPanUnsigned()) / item_height,
-              origin + (dirty.bottom + GetPixelPanUnsigned() + item_height - 1) / item_height);
+    DrawItems(canvas, origin + (dirty.top + pixel_pan) / item_height,
+              origin + (dirty.bottom + pixel_pan + item_height - 1) / item_height);
 
   DrawScrollBar(canvas);
 }
@@ -242,7 +238,6 @@ ListControl::DrawScrollBar(Canvas &canvas) {
   if (!scroll_bar.IsDefined())
     return;
 
-//  scroll_bar.SetSlider(length * item_height, GetHeight(), (GetPixelOrigin() < 0) ? 0 : GetPixelOrigin());
   if (UsePixelPan())
     scroll_bar.SetSlider(length * item_height, GetHeight(), GetPixelOrigin());
   else
@@ -293,11 +288,7 @@ ListControl::SetLength(unsigned n)
 
 int
 ListControl::GetScrollBarWidth() const {
-  if (has_scroll_bar == false)
-    return 0;
-
   return scroll_bar.GetWidth();
-
 }
 
 void
@@ -322,7 +313,7 @@ ListControl::EnsureVisible(unsigned i)
 }
 
 bool
-ListControl::SetCursorIndex(unsigned i, bool ensure_visible)
+ListControl::SetCursorIndex(unsigned i)
 {
   if (i >= length)
     return false;
@@ -330,8 +321,7 @@ ListControl::SetCursorIndex(unsigned i, bool ensure_visible)
   if (i == GetCursorIndex())
     return true;
 
-  if (ensure_visible)
-    EnsureVisible(i);
+  EnsureVisible(i);
 
   Invalidate_item(cursor);
   cursor = i;
@@ -358,7 +348,7 @@ ListControl::MoveCursor(int delta)
 }
 
 void
-ListControl::SetPixelPan(PixelScalar _pixel_pan)
+ListControl::SetPixelPan(UPixelScalar _pixel_pan)
 {
   if (pixel_pan == _pixel_pan)
     return;
@@ -589,8 +579,6 @@ ListControl::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     if (UsePixelPan())
       kinetic.MouseMove(GetPixelOrigin());
 #endif
-    if (cursor_handler != nullptr)
-      cursor_handler->OnPixelMove();
     return true;
   }
 
@@ -654,7 +642,7 @@ ListControl::OnMouseDown(PixelScalar x, PixelScalar y)
     } else {
       // If item was not selected before
       // -> select it
-      SetCursorIndex(index, false);
+      SetCursorIndex(index);
       drag_mode = DragMode::SCROLL;
     }
 #ifndef _WIN32_WCE
