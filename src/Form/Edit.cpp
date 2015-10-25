@@ -116,7 +116,9 @@ WndProperty::WndProperty(const DialogLook &_look)
    data_field(nullptr),
    edit_callback(EditDataFieldDialog),
    read_only(false),
-   dragging(false), pressed(false)
+   dragging(false), pressed(false),
+   editing_caption(caption),
+   highlighted(false)
 {
 }
 
