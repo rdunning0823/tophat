@@ -340,13 +340,14 @@ TargetWidget::Layout::Layout(PixelRect rc)
   const unsigned height = rc.bottom - rc.top;
   const unsigned min_control_height = ::Layout::GetMinimumControlHeight();
   const unsigned max_control_height = ::Layout::GetMaximumControlHeight();
+  const unsigned close_button_height = ::Layout::GetMinimumControlHeight();
 
   map = rc;
 
   if (width > height) {
     /* landscape: form on the right */
 
-    map.right -= ::Layout::Scale(120);
+    map.left += ::Layout::Scale(120);
 
     constexpr unsigned n_static = 4;
 #ifndef GNAV
@@ -357,11 +358,11 @@ TargetWidget::Layout::Layout(PixelRect rc)
     constexpr unsigned n_rows = n_static + n_elastic;
 
     const unsigned control_height = n_rows * min_control_height >= height
-      ? min_control_height
+      ? (height - close_button_height) / (n_rows - 1)
       : std::min(max_control_height,
                  (height - n_static * min_control_height) / n_elastic);
 
-    RowLayout rl(PixelRect(map.right, rc.top, rc.right, rc.bottom));
+    RowLayout rl(PixelRect(rc.left, rc.top, map.left, rc.bottom));
     name_button = rl.NextRow(control_height);
 
 #ifndef GNAV
@@ -372,12 +373,12 @@ TargetWidget::Layout::Layout(PixelRect rc)
 
     range = rl.NextRow(control_height);
     radial = rl.NextRow(control_height);
-    ete = rl.NextRow(min_control_height);
-    delta_t = rl.NextRow(min_control_height);
-    speed_remaining = rl.NextRow(min_control_height);
-    speed_achieved = rl.NextRow(min_control_height);
+    ete = rl.NextRow(std::min(control_height, min_control_height));
+    delta_t = rl.NextRow(std::min(control_height, min_control_height));
+    speed_remaining = rl.NextRow(std::min(control_height, min_control_height));
+    speed_achieved = rl.NextRow(std::min(control_height, min_control_height));
     optimized = rl.NextRow(control_height);
-    close_button = rl.BottomRow(control_height);
+    close_button = rl.BottomRow(close_button_height);
   } else {
     /* portrait: form on the top */
 
@@ -402,7 +403,7 @@ TargetWidget::Layout::Layout(PixelRect rc)
     speed_remaining = rl.NextRow(control_height);
     speed_achieved = SplitRow(speed_remaining);
 
-    close_button = rl.BottomRow(control_height);
+    close_button = rl.BottomRow(close_button_height);
     optimized = SplitRow(close_button);
 
     map = rl.GetRemaining();
