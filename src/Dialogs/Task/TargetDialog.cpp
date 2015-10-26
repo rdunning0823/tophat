@@ -29,6 +29,7 @@ Copyright_License {
 #include "Form/CheckBox.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "Form/Form.hpp"
 #include "Renderer/SymbolButtonRenderer.hpp"
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
@@ -85,7 +86,6 @@ class TargetWidget
   struct Layout {
     PixelRect map;
 
-    PixelRect name_button;
 #ifndef GNAV
     PixelRect previous_button, next_button;
 #endif
@@ -97,12 +97,12 @@ class TargetWidget
   };
 
   ActionListener &dialog;
+  WndForm &form;
 
   RateLimitedBlackboardListener rate_limited_bl;
 
   TargetDialogMapWindow map;
 
-  Button name_button;
 #ifndef GNAV
   Button previous_button;
   Button next_button;
@@ -122,9 +122,10 @@ class TargetWidget
   bool is_locked;
 
 public:
-  TargetWidget(ActionListener &_dialog,
+  TargetWidget(WndForm & _form, ActionListener &_dialog,
                const DialogLook &dialog_look, const MapLook &map_look)
     :dialog(_dialog),
+     form(_form),
      rate_limited_bl(*this, 1800, 300),
      map(*this,
          map_look.waypoint, map_look.airspace,
@@ -181,7 +182,7 @@ public:
    */
   void RefreshCalculator();
 
-  void UpdateNameButton();
+  void UpdateName();
 
   void OnPrevClicked();
   void OnNextClicked();
@@ -198,7 +199,6 @@ public:
     const Layout layout(rc);
 
     map.MoveAndShow(layout.map);
-    name_button.MoveAndShow(layout.name_button);
 #ifndef GNAV
     previous_button.MoveAndShow(layout.previous_button);
     next_button.MoveAndShow(layout.next_button);
@@ -213,7 +213,7 @@ public:
     close_button.MoveAndShow(layout.close_button);
 
     SetTarget();
-    UpdateNameButton();
+    UpdateName();
 
     CommonInterface::GetLiveBlackboard().AddListener(rate_limited_bl);
   }
@@ -222,7 +222,6 @@ public:
     CommonInterface::GetLiveBlackboard().RemoveListener(rate_limited_bl);
 
     map.Hide();
-    name_button.Hide();
 #ifndef GNAV
     previous_button.Hide();
     next_button.Hide();
@@ -241,7 +240,6 @@ public:
     const Layout layout(rc);
 
     map.Move(layout.map);
-    name_button.Move(layout.name_button);
 #ifndef GNAV
     previous_button.Move(layout.previous_button);
     next_button.Move(layout.next_button);
@@ -257,7 +255,7 @@ public:
   }
 
   bool SetFocus() override {
-    name_button.SetFocus();
+    close_button.SetFocus();
     return true;
   }
 
@@ -351,7 +349,7 @@ TargetWidget::Layout::Layout(PixelRect rc)
 
     constexpr unsigned n_static = 4;
 #ifndef GNAV
-    constexpr unsigned n_elastic = 6;
+    constexpr unsigned n_elastic = 5;
 #else
     constexpr unsigned n_elastic = 5;
 #endif
@@ -363,7 +361,6 @@ TargetWidget::Layout::Layout(PixelRect rc)
                  (height - n_static * min_control_height) / n_elastic);
 
     RowLayout rl(PixelRect(rc.left, rc.top, map.left, rc.bottom));
-    name_button = rl.NextRow(control_height);
 
 #ifndef GNAV
     previous_button = next_button = rl.NextRow(control_height);
@@ -386,12 +383,10 @@ TargetWidget::Layout::Layout(PixelRect rc)
 
     const unsigned control_height = min_control_height;
 
-#ifdef GNAV
-    name_button = rl.NextRow(control_height);
-#else
-    previous_button = name_button = next_button = rl.NextRow(control_height);
-    previous_button.right = name_button.left = previous_button.left + control_height;
-    next_button.left = name_button.right = next_button.right - control_height;
+#ifndef GNAV
+    previous_button = next_button = rl.NextRow(control_height);
+    previous_button.right = next_button.left = previous_button.left +
+        previous_button.GetSize().cx / 2;
 #endif
 
     range = rl.NextRow(control_height);
@@ -439,9 +434,6 @@ TargetWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   map.Create(parent, layout.map, style);
 
   const auto &button_look = UIGlobals::GetDialogLook().button;
-
-  name_button.Create(parent, button_look, _T(""), layout.name_button,
-                     button_style, *this, NAME);
 
 #ifndef GNAV
   previous_button.Create(parent, layout.previous_button, button_style,
@@ -579,7 +571,7 @@ TargetWidget::RefreshCalculator()
 }
 
 void
-TargetWidget::UpdateNameButton()
+TargetWidget::UpdateName()
 {
   StaticString<80u> buffer;
 
@@ -587,14 +579,21 @@ TargetWidget::UpdateNameButton()
     ProtectedTaskManager::Lease lease(*protected_task_manager);
     const OrderedTask &task = lease->GetOrderedTask();
     if (target_point < task.TaskSize()) {
+      StaticString<16>prefix;
+      if (target_point == 0)
+        prefix = _T("Start");
+      else if (target_point + 1 == task.TaskSize())
+        prefix = _T("Finish");
+      else prefix.Format(_T("%s %u"), _("Target"), target_point);
+
       const OrderedTaskPoint &tp = task.GetTaskPoint(target_point);
-      buffer.Format(_T("%u: %s"), target_point,
+      buffer.Format(_T("%s: %s"), prefix.c_str(),
                     tp.GetWaypoint().name.c_str());
     } else
       buffer.clear();
   }
 
-  name_button.SetCaption(buffer);
+  form.SetCaption(buffer);
 }
 
 void
@@ -620,7 +619,7 @@ TargetWidget::OnNextClicked()
   else
     target_point = 0;
 
-  UpdateNameButton();
+  UpdateName();
   RefreshTargetPoint();
 }
 
@@ -632,7 +631,7 @@ TargetWidget::OnPrevClicked()
   else
     target_point = task_size - 1;
 
-  UpdateNameButton();
+  UpdateName();
   RefreshTargetPoint();
 }
 
@@ -815,7 +814,7 @@ dlgTargetShowModal(int _target_point)
 
   const Look &look = UIGlobals::GetLook();
   WidgetDialog dialog(look.dialog);
-  TargetWidget widget(dialog, look.dialog, look.map);
+  TargetWidget widget(dialog, dialog, look.dialog, look.map);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Target"), &widget);
 
   if (widget.InitTargetPoints(_target_point))
