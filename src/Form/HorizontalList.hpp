@@ -27,7 +27,6 @@ Copyright_License {
 #include "Screen/PaintWindow.hpp"
 #include "List.hpp" // for listeners & handlers
 #include "Time/PeriodClock.hpp"
-#include "Form/ScrollBar.hpp"
 #include "Compiler.h"
 
 #ifndef _WIN32_WCE
@@ -64,14 +63,6 @@ class HorizontalListControl : public PaintWindow {
 
 protected:
   const DialogLook &look;
-
-  /** The ScrollBar object */
-  ScrollBar scroll_bar;
-
-  /**
-   * Show the scrollbar?
-   */
-  bool has_scroll_bar;
 
   /** The height of one item on the screen, in pixels. */
   UPixelScalar item_height;
@@ -191,13 +182,6 @@ public:
   }
 
   /**
-   * Sets whether scroll bar should be used
-   */
-  void SetHasScrollBar(bool value) {
-    has_scroll_bar = value;
-  }
-
-  /**
    * Returns the height of list items
    * @return height of list items in pixel
    */
@@ -219,10 +203,6 @@ public:
     return length;
   }
 
-  /**
-   * returns width of scrollbar or 0 if none exists
-   */
-  int GetScrollBarWidth() const;
   /**
    * Check whether the length of the list is below a certain
    * threshold.  Small lists may have different behaviour on some
@@ -324,9 +304,6 @@ public:
 
   virtual void DrawItems(Canvas &canvas, unsigned start, unsigned end) const;
 
-  /** Draws the ScrollBar */
-  void DrawScrollBar(Canvas &canvas);
-
   virtual void OnPaint(Canvas &canvas);
   virtual void OnPaint(Canvas &canvas, const PixelRect &dirty);
   /**
@@ -360,9 +337,6 @@ protected:
   gcc_pure
   bool CanActivateItem() const;
   void ActivateItem();
-
-  /** Checks whether a ScrollBar is needed and shows/hides it */
-  void show_or_hide_scroll_bar();
 
   /**
    * Scroll to the ListItem defined by i

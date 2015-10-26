@@ -60,8 +60,6 @@ HorizontalListControl::HorizontalListControl(ContainerWindow &parent,
                                              const WindowStyle _style,
                                              UPixelScalar _item_height)
   :look(_look),
-   scroll_bar(look.button),
-   has_scroll_bar(true),
    item_height(_item_height),
    length(0),
    origin(0), pixel_pan(0),
@@ -77,7 +75,6 @@ HorizontalListControl::HorizontalListControl(ContainerWindow &parent,
    click_duration(0)
 {
   Create(parent, _rc, _style, _item_height);
-  SetHasScrollBar(false);
 }
 
 HorizontalListControl::~HorizontalListControl() {
@@ -118,20 +115,6 @@ HorizontalListControl::ActivateItem()
 }
 
 void
-HorizontalListControl::show_or_hide_scroll_bar()
-{
-  const PixelSize size = GetSize();
-
-  if (length > items_visible && has_scroll_bar)
-    // enable the scroll bar
-    scroll_bar.SetSize(size);
-  else
-    // all items are visible
-    // -> hide the scroll bar
-    scroll_bar.Reset();
-}
-
-void
 HorizontalListControl::OnResize(PixelSize new_size)
 {
   PaintWindow::OnResize(new_size);
@@ -147,8 +130,6 @@ HorizontalListControl::OnResize(PixelSize new_size)
   if (length > 0)
     /* make sure the cursor is still visible */
     EnsureVisible(GetCursorIndex());
-
-  show_or_hide_scroll_bar();
 }
 
 void
@@ -221,7 +202,6 @@ HorizontalListControl::SetLength(unsigned n)
   else if (cursor < origin)
     origin = cursor;
 
-  show_or_hide_scroll_bar();
   Invalidate();
 
   SetCursorIndex(cursor);
@@ -264,14 +244,7 @@ HorizontalListControl::SetOrigin(int i)
 #ifdef USE_GDI
   if ((unsigned)abs(delta) < items_visible) {
     PixelRect rc = GetClientRect();
-    rc.right = scroll_bar.GetLeft(GetSize());
     Scroll(0, delta * item_height, rc);
-
-    /* repaint the scrollbar synchronously; we could Invalidate its
-       area and repaint asynchronously via WM_PAINT, but then the clip
-       rect passed to OnPaint() would be the whole client area */
-    WindowCanvas canvas(*this);
-    DrawScrollBar(canvas);
     return;
   }
 #endif
@@ -346,35 +319,12 @@ HorizontalListControl::OnPaint(Canvas &canvas, const PixelRect &dirty)
 }
 
 void
-HorizontalListControl::DrawScrollBar(Canvas &canvas) {
-  if (!scroll_bar.IsDefined())
-    return;
-
-//  scroll_bar.SetSlider(length * item_height, GetHeight(), (GetPixelOrigin() < 0) ? 0 : GetPixelOrigin());
-  if (UsePixelPan())
-    scroll_bar.SetSlider(length * item_height, GetHeight(), GetPixelOrigin());
-  else
-    scroll_bar.SetSlider(length, items_visible, origin);
-
-  scroll_bar.Paint(canvas);
-}
-
-void
 HorizontalListControl::SetItemHeight(UPixelScalar _item_height)
 {
   item_height = _item_height;
   items_visible = GetHeight() / item_height;
 
-  show_or_hide_scroll_bar();
   Invalidate();
-}
-
-int
-HorizontalListControl::GetScrollBarWidth() const {
-  if (has_scroll_bar == false)
-    return 0;
-
-  return scroll_bar.GetWidth();
 }
 
 bool
@@ -670,8 +620,6 @@ HorizontalListControl::OnKeyCheck(unsigned key_code) const
 bool
 HorizontalListControl::OnKeyDown(unsigned key_code)
 {
-  scroll_bar.DragEnd(this);
-
 #ifndef _WIN32_WCE
   kinetic_timer.Cancel();
 #endif
@@ -736,7 +684,6 @@ HorizontalListControl::OnKeyDown(unsigned key_code)
 bool
 HorizontalListControl::OnMouseWheel(PixelScalar x, PixelScalar y, int delta)
 {
-  scroll_bar.DragEnd(this);
   drag_end();
 
 #ifndef _WIN32_WCE
@@ -759,7 +706,6 @@ HorizontalListControl::OnCancelMode()
 {
   PaintWindow::OnCancelMode();
 
-  scroll_bar.DragEnd(this);
   drag_end();
 
 #ifndef _WIN32_WCE

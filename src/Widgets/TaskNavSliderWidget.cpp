@@ -252,7 +252,6 @@ TaskNavSliderWidget::CreateListEmpty(ContainerWindow &parent,
 
   HorizontalListControl *list = new HorizontalListControl(parent, look, rc,
                                                           list_style, 20);
-  list->SetHasScrollBar(false);
   list->SetLength(0);
   list->SetItemRenderer(this);
   list->SetCursorHandler(this);
