@@ -89,7 +89,7 @@ class TargetWidget
 #ifndef GNAV
     PixelRect previous_button, next_button;
 #endif
-    PixelRect range, radial, ete, delta_t, speed_remaining, speed_achieved;
+    PixelRect range, radial, ete, speed_remaining;
     PixelRect optimized;
     PixelRect close_button;
 
@@ -108,7 +108,7 @@ class TargetWidget
   Button next_button;
 #endif
 
-  WndProperty range, radial, ete, delta_t, speed_remaining, speed_achieved;
+  WndProperty range, radial, ete, speed_remaining;
 
   CheckBoxControl optimized;
 
@@ -134,9 +134,7 @@ public:
      range(dialog_look),
      radial(dialog_look),
      ete(dialog_look),
-     delta_t(dialog_look),
-     speed_remaining(dialog_look),
-     speed_achieved(dialog_look) {
+     speed_remaining(dialog_look) {
     map.SetTerrain(terrain);
     map.SetTopograpgy(topography);
     map.SetAirspaces(&airspace_database);
@@ -206,9 +204,7 @@ public:
     range.MoveAndShow(layout.range);
     radial.MoveAndShow(layout.radial);
     ete.MoveAndShow(layout.ete);
-    delta_t.MoveAndShow(layout.delta_t);
     speed_remaining.MoveAndShow(layout.speed_remaining);
-    speed_achieved.MoveAndShow(layout.speed_achieved);
     optimized.MoveAndShow(layout.optimized);
     close_button.MoveAndShow(layout.close_button);
 
@@ -229,9 +225,7 @@ public:
     range.Hide();
     radial.Hide();
     ete.Hide();
-    delta_t.Hide();
     speed_remaining.Hide();
-    speed_achieved.Hide();
     optimized.Hide();
     close_button.Hide();
   }
@@ -247,9 +241,7 @@ public:
     range.Move(layout.range);
     radial.Move(layout.radial);
     ete.Move(layout.ete);
-    delta_t.Move(layout.delta_t);
     speed_remaining.Move(layout.speed_remaining);
-    speed_achieved.Move(layout.speed_achieved);
     optimized.Move(layout.optimized);
     close_button.Move(layout.close_button);
   }
@@ -349,9 +341,9 @@ TargetWidget::Layout::Layout(PixelRect rc)
 
     constexpr unsigned n_static = 4;
 #ifndef GNAV
-    constexpr unsigned n_elastic = 5;
+    constexpr unsigned n_elastic = 3;
 #else
-    constexpr unsigned n_elastic = 5;
+    constexpr unsigned n_elastic = 3;
 #endif
     constexpr unsigned n_rows = n_static + n_elastic;
 
@@ -371,9 +363,7 @@ TargetWidget::Layout::Layout(PixelRect rc)
     range = rl.NextRow(control_height);
     radial = rl.NextRow(control_height);
     ete = rl.NextRow(std::min(control_height, min_control_height));
-    delta_t = rl.NextRow(std::min(control_height, min_control_height));
     speed_remaining = rl.NextRow(std::min(control_height, min_control_height));
-    speed_achieved = rl.NextRow(std::min(control_height, min_control_height));
     optimized = rl.NextRow(control_height);
     close_button = rl.BottomRow(close_button_height);
   } else {
@@ -393,10 +383,7 @@ TargetWidget::Layout::Layout(PixelRect rc)
     radial = SplitRow(range);
 
     ete = rl.NextRow(control_height);
-    delta_t = SplitRow(ete);
-
-    speed_remaining = rl.NextRow(control_height);
-    speed_achieved = SplitRow(speed_remaining);
+    speed_remaining = SplitRow(ete);
 
     close_button = rl.BottomRow(close_button_height);
     optimized = SplitRow(close_button);
@@ -463,20 +450,12 @@ TargetWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ete.SetReadOnly();
   ete.SetHelpText(_("Estimated time en-route to the next AAT target."));
 
-  delta_t.Create(parent, layout.delta_t, _("Delta T"), caption_width, style);
-  delta_t.SetReadOnly();
-  delta_t.SetHelpText(_("AAT Delta Time - Difference between estimated task time and AAT minimum time. Colored red if negative (expected arrival too early), or blue if in sector and can turn now with estimated arrival time greater than AAT time plus 5 minutes."));
-
   speed_remaining.Create(parent, layout.speed_remaining, _("V rem."), caption_width, style);
   speed_remaining.SetReadOnly();
   speed_remaining.SetHelpText(_("Speed remaining"));
 
-  speed_achieved.Create(parent, layout.speed_achieved, _("V ach"), caption_width, style);
-  speed_achieved.SetReadOnly();
-  speed_achieved.SetHelpText(_("AA Speed - Assigned Area Task average speed achievable around target points remaining in minimum AAT time."));
-
-  UseRecommendedCaptionWidths(range, radial, ete, delta_t,
-                              speed_remaining, speed_achieved);
+  UseRecommendedCaptionWidths(range, radial, ete,
+                              speed_remaining);
 
   optimized.Create(parent, UIGlobals::GetDialogLook(), _("Optimized"),
                    layout.optimized, button_style, *this, OPTIMIZED);
@@ -516,7 +495,6 @@ TargetWidget::RefreshCalculator()
 {
   bool nodisplay = false;
   bool is_aat;
-  fixed aat_time;
 
   {
     ProtectedTaskManager::Lease lease(*protected_task_manager);
@@ -533,8 +511,6 @@ TargetWidget::RefreshCalculator()
       range_and_radial = ap->GetTargetRangeRadial(range_and_radial.range);
       is_locked = ap->IsTargetLocked();
     }
-
-    aat_time = task.GetOrderedTaskSettings().aat_min_time;
   }
 
   optimized.SetVisible(is_aat);
@@ -555,19 +531,13 @@ TargetWidget::RefreshCalculator()
 
   ete.SetVisible(!nodisplay);
 
-  delta_t.SetVisible(!nodisplay);
-
   if (!nodisplay) {
     ete.SetText(FormatTimespanSmart((int)aat_time_estimated, 2));
-    delta_t.SetText(FormatTimespanSmart((int)(aat_time_estimated - aat_time), 2));
   }
 
   const ElementStat &total = task_stats.total;
   if (total.remaining_effective.IsDefined())
     speed_remaining.SetText(FormatUserTaskSpeed(total.remaining_effective.GetSpeed()));
-
-  if (total.travelled.IsDefined())
-    speed_achieved.SetText(FormatUserTaskSpeed(total.travelled.GetSpeed()));
 }
 
 void
