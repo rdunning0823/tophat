@@ -242,6 +242,11 @@ Startup()
 
   static TCHAR path[MAX_PATH];
 
+  // save command line simulator setting so not overridden by tophat_arguments
+  bool prior_global_simulator_flag = global_simulator_flag;
+  bool prior_sim_set_in_cmd_line_flag = sim_set_in_cmd_line_flag;
+
+  // Read arguments from tophat_arguments file
   InitialiseDataPath();
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
@@ -259,6 +264,8 @@ Startup()
     delete file;
   }
 
+  if (prior_sim_set_in_cmd_line_flag)
+    global_simulator_flag = prior_global_simulator_flag;
 #ifdef SIMULATOR_AVAILABLE
   // prompt for simulator if not set by command line argument "-simulator" or "-fly"
   if (!sim_set_in_cmd_line_flag) {
