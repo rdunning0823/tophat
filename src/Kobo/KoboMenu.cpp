@@ -47,6 +47,9 @@ Copyright_License {
 #include "LocalPath.hpp"
 #include "IO/FileLineReader.hpp"
 #include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
+#include "CommandLine.hpp"
+#include "OS/Args.hpp"
+#include "Simulator.hpp"
 
 enum Buttons {
   LAUNCH_NICKEL = 100,
@@ -296,17 +299,21 @@ Main()
 int main(int argc, char **argv)
 {
   static TCHAR path[MAX_PATH];
-  TCHAR *line;
+  StaticString<64> line;
 
   InitialiseDataPath();
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
 
   FileLineReader *file = new FileLineReader(path);
   if (file != nullptr) {
-    line = file->ReadLine();
-    if (line != nullptr)
-      KoboRunXCSoar(line);
+          // program name is not included in command line on CE
+    line.Format(_T("%s %s"), _T("Top_Hat_Soaring"), file->ReadLine());
+    Args args(line.c_str(), "");
+    args.SetStopOnError(false);
+    CommandLine::Parse(args);
     delete file;
+    if (!CommandLine::show_dialog_setup_quick)
+      KoboRunXCSoar("");
   }
 
   while (true) {

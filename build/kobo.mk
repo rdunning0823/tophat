@@ -35,6 +35,12 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Kobo/FakeSymbols.cpp \
 	$(SRC)/Kobo/SDCardSync.cpp \
 	$(SRC)/LocalPath.cpp \
+	$(SRC)/CommandLine.cpp \
+	$(SRC)/Simulator.cpp \
+	$(SRC)/Profile/Profile.cpp \
+	$(SRC)/Profile/ProfileMap.cpp \
+	$(SRC)/Profile/Map.cpp \
+	$(SRC)/Profile/Current.cpp \
 	$(SRC)/Kobo/KoboMenu.cpp
 KOBO_MENU_LDADD = $(FAKE_LIBS)
 KOBO_MENU_DEPENDS = WIDGET FORM SCREEN EVENT RESOURCE IO ASYNC LIBNET OS THREAD MATH UTIL
