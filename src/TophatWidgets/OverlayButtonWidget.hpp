@@ -24,8 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_OVERLAY_BUTTON_WIDGET_HPP
 #define XCSOAR_OVERLAY_BUTTON_WIDGET_HPP
 
-#include "Widgets/MapOverlayButton.hpp"
-#include "Widgets/MapOverlayBaseWidget.hpp"
+#include "TophatWidgets/MapOverlayButton.hpp"
+#include "TophatWidgets/MapOverlayBaseWidget.hpp"
 #include "Form/ActionListener.hpp"
 
 struct IconLook;

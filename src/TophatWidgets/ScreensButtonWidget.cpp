@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "ScreensButtonWidget.hpp"
-#include "Widgets/MapOverlayButton.hpp"
+#include "TophatWidgets/MapOverlayButton.hpp"
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/IconLook.hpp"

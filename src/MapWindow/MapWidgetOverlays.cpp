@@ -22,7 +22,7 @@ Copyright_License {
 */
 
 #include "MapWidgetOverlays.hpp"
-#include "Widgets/MapOverlayBaseWidget.hpp"
+#include "TophatWidgets/MapOverlayBaseWidget.hpp"
 #include "Widget/Widget.hpp"
 #include "InfoBoxes/InfoBoxLayout.hpp"
 #include "Interface.hpp"

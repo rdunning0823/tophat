@@ -674,17 +674,17 @@ XCSOAR_SOURCES := \
 	$(SRC)/Startup.cpp \
 	$(SRC)/Components.cpp \
 	\
-	$(SRC)/Widgets/OverlayButtonWidget.cpp \
-	$(SRC)/Widgets/MainMenuButtonWidget.cpp \
-	$(SRC)/Widgets/ScreensButtonWidget.cpp \
-	$(SRC)/Widgets/MapOverlayButton.cpp \
-	$(SRC)/Widgets/TaskNavSliderWidget.cpp \
-	$(SRC)/Widgets/TaskNavSliderShape.cpp \
-	$(SRC)/Widgets/ZoomOutButtonWidget.cpp \
-	$(SRC)/Widgets/ZoomInButtonWidget.cpp \
-	$(SRC)/Widgets/TaskButtonWidget.cpp \
-	$(SRC)/Widgets/TaskPreviousButtonWidget.cpp \
-	$(SRC)/Widgets/TaskNextButtonWidget.cpp \
+	$(SRC)/TophatWidgets/OverlayButtonWidget.cpp \
+	$(SRC)/TophatWidgets/MainMenuButtonWidget.cpp \
+	$(SRC)/TophatWidgets/ScreensButtonWidget.cpp \
+	$(SRC)/TophatWidgets/MapOverlayButton.cpp \
+	$(SRC)/TophatWidgets/TaskNavSliderWidget.cpp \
+	$(SRC)/TophatWidgets/TaskNavSliderShape.cpp \
+	$(SRC)/TophatWidgets/ZoomOutButtonWidget.cpp \
+	$(SRC)/TophatWidgets/ZoomInButtonWidget.cpp \
+	$(SRC)/TophatWidgets/TaskButtonWidget.cpp \
+	$(SRC)/TophatWidgets/TaskPreviousButtonWidget.cpp \
+	$(SRC)/TophatWidgets/TaskNextButtonWidget.cpp \
 	\
 	$(SRC)/Device/Driver.cpp \
 	$(SRC)/Device/Declaration.cpp \

@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-#include "Widgets/TaskNavSliderShape.hpp"
+#include "TophatWidgets/TaskNavSliderShape.hpp"
 
 #include "Look/DialogLook.hpp"
 #include "Look/InfoBoxLook.hpp"

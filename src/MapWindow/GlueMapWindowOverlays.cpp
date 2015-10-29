@@ -51,7 +51,7 @@ Copyright_License {
 #include "Look/GestureLook.hpp"
 #include "Input/InputEvents.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
-#include "Widgets/MapOverlayButton.hpp"
+#include "TophatWidgets/MapOverlayButton.hpp"
 #include "Util/StaticString.hxx"
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"

@@ -21,17 +21,10 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_TASK_BUTTON_WIDGET_HPP
-#define XCSOAR_TASK_BUTTON_WIDGET_HPP
+#ifndef XCSOAR_TASK_PREVIOUS_BUTTON_WIDGET_HPP
+#define XCSOAR_TASK_PREVIOUS_BUTTON_WIDGET_HPP
 
-#include "Widgets/MapOverlayBaseWidget.hpp"
-#include "Form/ActionListener.hpp"
-#include "UIGlobals.hpp"
-#include "Look/Look.hpp"
-#include "Look/ButtonLook.hpp"
-#include "Widgets/TaskNavSliderShape.hpp"
-
-#include <tchar.h>
+#include "TophatWidgets/TaskButtonWidget.hpp"
 
 class ContainerWindow;
 struct PixelRect;
@@ -42,40 +35,12 @@ class WndSymbolButton;
  * that is used for bad touch screens that can't swipe
  * the Nav Slider
  */
-class TaskButtonWidget : public MapOverlayBaseWidget, protected ActionListener {
-protected:
-
-  /**
-   * the button
-   */
-  WndSymbolButton * button;
-
-  /**
-   * a customized copy of button_look
-   */
-  ButtonLook white_look;
-
-  /**
-   * height and width of button
-   */
-  UPixelScalar height;
-  UPixelScalar width;
-
-  /**
-   * the caption of the widget e.g. < or >
-   */
-  const TCHAR *caption;
-
-  SliderShape slider_shape;
+class TaskPreviousButtonWidget : public TaskButtonWidget {
 
 public:
-  TaskButtonWidget(const TCHAR *_caption)
-    :caption(_caption) {};
+  TaskPreviousButtonWidget()
+    :TaskButtonWidget(_T("<")) {};
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide();
   virtual void Move(const PixelRect &rc);
 
   WndSymbolButton& CreateButton(ContainerWindow &parent,
@@ -92,7 +57,7 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget) = 0;
+                                bool is_top_widget);
 
   /**
    * How much height does this widget use at the top of the map screen
@@ -105,7 +70,7 @@ public:
    * The OnAction is derived from ActionListener
    * Sets the previous task point if available
    */
-  virtual void OnAction(int id) { }
+  virtual void OnAction(int id);
 private:
 
 };

@@ -21,45 +21,27 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_ZOOM_IN_BUTTON_WIDGET_HPP
-#define XCSOAR_ZOOM_IN_BUTTON_WIDGET_HPP
+#ifndef XCSOAR_TASK_NEXT_BUTTON_WIDGET_HPP
+#define XCSOAR_TASK_NEXT_BUTTON_WIDGET_HPP
 
-#include "Widgets/OverlayButtonWidget.hpp"
-#include "Widgets/ScreensButtonWidget.hpp"
-#include "Form/ActionListener.hpp"
-#include "Projection/MapWindowProjection.hpp"
-#include "Look/ButtonLook.hpp"
-
-struct IconLook;
-class ContainerWindow;
-struct PixelRect;
+#include "TophatWidgets/TaskButtonWidget.hpp"
 
 /**
- * a class that is a widget that draws the a zoom in button
+ * a class that is a widget that draws the task previous button
+ * that is used for bad touch screens that can't swipe
+ * the Nav Slider
  */
-class ZoomInButtonWidget : public OverlayButtonWidget {
-protected:
-  /**
-   * pointer to the screen button widget so we can adjust
-   * our position
-   */
-  ScreensButtonWidget *s_but;
+class TaskNextButtonWidget : public TaskButtonWidget {
 
 public:
-  ZoomInButtonWidget(ScreensButtonWidget *_s_but)
-    :OverlayButtonWidget(), s_but(_s_but) {
-    assert(s_but != nullptr);
-  }
+  TaskNextButtonWidget()
+    :TaskButtonWidget(_T(">")) {};
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
-  virtual void Move(const PixelRect &rc) final;
+  virtual void Move(const PixelRect &rc);
 
-  /**
-   * How much height does this widget use at the bottom of the map screen
-   */
-  virtual UPixelScalar HeightFromBottomLeft() final;
   /**
    * Shows or hides the widgets based on these parameters
+   * It also checks that TaskManager for additional info
    * @rc. the rc of the map
    * @is_panning.  is the map in panning mode
    * @is_main_window_widget. is the mainWindow's widget non-NULL
@@ -67,14 +49,13 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget) final;
+                                bool is_top_widget);
 
   /**
    * The OnAction is derived from ActionListener
-   * Toggles between the more/less menus (MapDisplay1, MapDisplay2)
-   * and hiding the menu
+   * Sets the previous task point if available
    */
-  virtual void OnAction(int id) final;
+  virtual void OnAction(int id);
 private:
 
 };

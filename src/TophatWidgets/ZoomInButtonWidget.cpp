@@ -34,7 +34,7 @@ Copyright_License {
 #include "Look/Look.hpp"
 #include "UIState.hpp"
 #include "Input/InputEvents.hpp"
-#include "Widgets/MapOverlayButton.hpp"
+#include "TophatWidgets/MapOverlayButton.hpp"
 #include "Screen/Canvas.hpp"
 #include "Interface.hpp"
 

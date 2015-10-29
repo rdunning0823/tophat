@@ -21,20 +21,19 @@ Copyright_License {
 }
 */
 
-#include "TaskPreviousButtonWidget.hpp"
+#include "TaskNextButtonWidget.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Look/Look.hpp"
 #include "Look/GlobalFonts.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Engine/Task/TaskManager.hpp"
-#include "Engine/Task/TaskType.hpp"
 #include "Task/ProtectedTaskManager.hpp"
+#include "Engine/Task/TaskType.hpp"
 #include "Components.hpp"
-#include "Widgets/MapOverlayButton.hpp"
+#include "TophatWidgets/MapOverlayButton.hpp"
 
 void
-TaskPreviousButtonWidget::Move(const PixelRect &rc_map)
+TaskNextButtonWidget::Move(const PixelRect &rc_map)
 {
   slider_shape.Resize(rc_map.right - rc_map.left);
 
@@ -43,18 +42,18 @@ TaskPreviousButtonWidget::Move(const PixelRect &rc_map)
 
   PixelRect rc = rc_map;
   rc.bottom = rc.top + height;
-  rc.right = rc.left + width;
+  rc.left = rc.right - width;
 
   WindowWidget::Move(rc);
 }
 
 void
-TaskPreviousButtonWidget::OnAction(int id)
+TaskNextButtonWidget::OnAction(int id)
 {
   ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
-  if (task_manager->GetActiveTaskPointIndex() > 0)
-    task_manager->SetActiveTaskPoint(task_manager->GetActiveTaskPointIndex()
-                                     - 1);
+  if ((task_manager->GetActiveTaskPointIndex() + 1) < task_manager->TaskSize())
+    task_manager->SetActiveTaskPoint(task_manager-> GetActiveTaskPointIndex()
+                                     + 1);
 }
 
 static bool
@@ -62,15 +61,16 @@ DoesTaskNeedButton()
 {
   ProtectedTaskManager::Lease task_manager(*protected_task_manager);
   return (task_manager->GetMode() == TaskType::ORDERED &&
-      task_manager->GetActiveTaskPointIndex() > 0);
+      (task_manager->GetActiveTaskPointIndex() + 1) <
+      task_manager->TaskSize());
 }
 
 void
-TaskPreviousButtonWidget::UpdateVisibility(const PixelRect &rc,
-                                           bool is_panning,
-                                           bool is_main_window_widget,
-                                           bool is_map,
-                                           bool is_top_widget)
+TaskNextButtonWidget::UpdateVisibility(const PixelRect &rc,
+                                       bool is_panning,
+                                       bool is_main_window_widget,
+                                       bool is_map,
+                                       bool is_top_widget)
 {
   if (is_map && !is_main_window_widget && !is_panning && DoesTaskNeedButton()) {
     Show(rc);

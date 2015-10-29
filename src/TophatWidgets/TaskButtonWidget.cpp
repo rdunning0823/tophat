@@ -30,7 +30,7 @@ Copyright_License {
 #include "Engine/Task/TaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Components.hpp"
-#include "Widgets/MapOverlayButton.hpp"
+#include "TophatWidgets/MapOverlayButton.hpp"
 
 void
 TaskButtonWidget::Prepare(ContainerWindow &parent,

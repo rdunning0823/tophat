@@ -24,8 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_TASK_NAV_SLIDER_WIDGET_HPP
 #define XCSOAR_TASK_NAV_SLIDER_WIDGET_HPP
 
-#include "Widgets/MapOverlayBaseWidget.hpp"
-#include "Widgets/TaskNavSliderShape.hpp"
+#include "TophatWidgets/MapOverlayBaseWidget.hpp"
+#include "TophatWidgets/TaskNavSliderShape.hpp"
 #include "Form/HorizontalList.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
 #include "Time/PeriodClock.hpp"

@@ -33,7 +33,7 @@ Copyright_License {
 #include "Renderer/VarioBarRenderer.hpp"
 #include "Screen/Timer.hpp"
 #include "Screen/Features.hpp"
-#include "Widgets/TaskNavSliderShape.hpp"
+#include "TophatWidgets/TaskNavSliderShape.hpp"
 #include "UIUtil/GestureZone.hpp"
 
 #include <array>

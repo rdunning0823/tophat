@@ -21,40 +21,25 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_ZOOM_OUT_BUTTON_WIDGET_HPP
-#define XCSOAR_ZOOM_OUT_BUTTON_WIDGET_HPP
+#ifndef XCSOAR_MAIN_MENU_BUTTON_WIDGET_HPP
+#define XCSOAR_MAIN_MENU_BUTTON_WIDGET_HPP
 
-#include "Widgets/OverlayButtonWidget.hpp"
+#include "TophatWidgets/OverlayButtonWidget.hpp"
+#include "Form/Button.hpp"
 #include "Form/ActionListener.hpp"
-#include "Projection/MapWindowProjection.hpp"
 #include "Look/ButtonLook.hpp"
-#include "ZoomInButtonWidget.hpp"
+#include "Blackboard/BlackboardListener.hpp"
+
+#include <tchar.h>
 
 struct IconLook;
 class ContainerWindow;
 struct PixelRect;
 
-/**
- * a class that is a widget that draws the a zoom in button
- */
-class ZoomOutButtonWidget : public OverlayButtonWidget {
-protected:
-  /**
-   * pointer to the zoom in button
-   */
-  ZoomInButtonWidget *zoom_in;
+class MainMenuButtonWidget : public OverlayButtonWidget, NullBlackboardListener {
 public:
-  ZoomOutButtonWidget(ZoomInButtonWidget *_zoom_in)
-    :OverlayButtonWidget(), zoom_in(_zoom_in) {}
-
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
-  virtual void Move(const PixelRect &rc) final;
-
-  /**
-   * How much height does this widget use at the bottom of the map screen
-   */
-  virtual UPixelScalar HeightFromBottomLeft();
-
+  MainMenuButtonWidget()
+    :OverlayButtonWidget() {};
   /**
    * Shows or hides the widgets based on these parameters
    * @rc. the rc of the map
@@ -66,12 +51,23 @@ public:
                                 bool is_main_window_widget, bool is_map,
                                 bool is_top_widget);
 
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Unprepare();
+  virtual void Move(const PixelRect &rc);
+
+  /**
+   * updates the text on the button
+   * @page menu index 1-4 or 0 if no menu
+   */
+  void UpdateText(unsigned page);
+
   /**
    * The OnAction is derived from ActionListener
-   * Toggles between the more/less menus (MapDisplay1, MapDisplay2)
-   * and hiding the menu
    */
   virtual void OnAction(int id);
+
+  /* virtual methods from class BlackboardListener */
+  virtual void OnUIStateUpdate() override;
 private:
 
 };
