@@ -134,6 +134,38 @@ LoadProfile()
   return true;
 }
 
+/**
+ * reads additional commandline arguments stored in the tophat_arguments file
+ */
+static void
+LoadTophatArguments()
+{
+  static TCHAR path[MAX_PATH];
+  // save command line simulator setting so not overridden by tophat_arguments
+  bool prior_global_simulator_flag = global_simulator_flag;
+  bool prior_sim_set_in_cmd_line_flag = sim_set_in_cmd_line_flag;
+
+  // Read arguments from tophat_arguments file
+  InitialiseDataPath();
+  LocalPath(path, _T(TOPHAT_ARGUMENTS));
+  FileLineReader *file = new FileLineReader(path);
+  if (file != nullptr) {
+    StaticString<64> line;
+#ifndef _WIN32_WCE
+          // program name is not included in command line on CE
+    line.Format(_T("%s %s"), _T("Top Hat Soaring"), file->ReadLine());
+#else
+    line.Format(_T("%s"), file->ReadLine());
+#endif
+    Args args(line.c_str(), "");
+    args.SetStopOnError(false);
+    CommandLine::Parse(args);
+    delete file;
+  }
+  if (prior_sim_set_in_cmd_line_flag)
+    global_simulator_flag = prior_global_simulator_flag;
+}
+
 static void
 AfterStartup()
 {
@@ -240,32 +272,8 @@ Startup()
   CommonInterface::SetUISettings().SetDefaults();
   main_window->Initialise();
 
-  static TCHAR path[MAX_PATH];
+  LoadTophatArguments();
 
-  // save command line simulator setting so not overridden by tophat_arguments
-  bool prior_global_simulator_flag = global_simulator_flag;
-  bool prior_sim_set_in_cmd_line_flag = sim_set_in_cmd_line_flag;
-
-  // Read arguments from tophat_arguments file
-  InitialiseDataPath();
-  LocalPath(path, _T(TOPHAT_ARGUMENTS));
-  FileLineReader *file = new FileLineReader(path);
-  if (file != nullptr) {
-    StaticString<64> line;
-#ifndef _WIN32_WCE
-          // program name is not included in command line on CE
-    line.Format(_T("%s %s"), _T("Top Hat Soaring"), file->ReadLine());
-#else
-    line.Format(_T("%s"), file->ReadLine());
-#endif
-    Args args(line.c_str(), "");
-    args.SetStopOnError(false);
-    CommandLine::Parse(args);
-    delete file;
-  }
-
-  if (prior_sim_set_in_cmd_line_flag)
-    global_simulator_flag = prior_global_simulator_flag;
 #ifdef SIMULATOR_AVAILABLE
   // prompt for simulator if not set by command line argument "-simulator" or "-fly"
   if (!sim_set_in_cmd_line_flag) {
@@ -306,6 +314,7 @@ Startup()
 
   main_window->InitialiseConfigured();
 
+  static TCHAR path[MAX_PATH];
   LocalPath(path, _T("cache"));
   file_cache = new FileCache(path);
 
