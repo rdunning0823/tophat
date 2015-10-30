@@ -30,7 +30,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
-#include "Look/InfoBoxLook.hpp"
+#include "Look/NavSliderLook.hpp"
 #include "Interface.hpp"
 
 
@@ -113,10 +113,10 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
                                    const PixelRect &rc_map)
 {
   WindowStyle button_style;
-  const InfoBoxLook &infobox_look = UIGlobals::GetLook().info_box;
+  const NavSliderLook &nav_slider_look = UIGlobals::GetLook().nav_slider;
 
   MapOverlayButton *button =
-    new MapOverlayButton(parent, button_look, icon_look, infobox_look, bmp,
+    new MapOverlayButton(parent, button_look, icon_look, nav_slider_look, bmp,
                          rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;
