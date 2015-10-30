@@ -64,8 +64,6 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 #else
   ReinitialiseLayout(width);
 
-  title_font.Load(FontDescription(Layout::FontScale(14)));
-
   unit_fraction_pen.Create(1, value.fg_color);
 #endif
 
@@ -83,6 +81,10 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 void
 InfoBoxLook::ReinitialiseLayout(unsigned width)
 {
+  FontDescription title_font_d(Layout::FontScale(14));
+  AutoSizeFont(title_font_d, width, _T("MC MANUALXX"));
+  title_font.Load(title_font_d);
+
 #ifndef GNAV
   FontDescription value_font_d(10, true);
   AutoSizeFont(value_font_d, width, _T("1234m"));
