@@ -175,9 +175,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   const MoreData &basic = CommonInterface::Basic();
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
   const TerrainRendererSettings &terrain = settings_map.terrain;
-  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
-  if (IsKobo())
-    border_width /= 2;
+  bool use_wide_pen = !terrain.enable;
 
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
@@ -205,7 +203,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
                     result.vector.bearing - basic.track,
                     basic.location_available && result.vector.IsValid(),
-                    border_width);
+                    use_wide_pen);
 }
 
 void

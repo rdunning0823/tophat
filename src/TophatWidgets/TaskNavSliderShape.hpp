@@ -35,7 +35,7 @@ Copyright_License {
 #include <stdint.h>
 
 struct DialogLook;
-struct InfoBoxLook;
+struct NavSliderLook;
 class Font;
 class Canvas;
 enum class TaskType : uint8_t;
@@ -68,7 +68,7 @@ protected:
   RasterPoint points[8];
 
   const DialogLook &dialog_look;
-  const InfoBoxLook &infobox_look;
+  const NavSliderLook &nav_slider_look;
 
   /**
    * height of the bearing icon
@@ -86,7 +86,7 @@ protected:
 public:
   SliderShape()
   :dialog_look(UIGlobals::GetDialogLook()),
-   infobox_look(UIGlobals::GetLook().info_box),
+   nav_slider_look(UIGlobals::GetLook().nav_slider),
    bearing_icon_hor_margin(0) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *bmp_bearing;
@@ -130,14 +130,14 @@ public:
   const Font &GetLargeFont();
 
   /**
-   * the font used to display the info about the turnpoint
-   */
-  const Font &GetSmallFont();
-
-  /**
    * the font used to display the Distance about the turnpoint
    */
   const Font &GetMediumFont();
+
+  /**
+   * the font used to display the turnpoint name
+   */
+  const Font &GetSmallFont();
 
   /**
    * the y position of line one text for painting
@@ -208,19 +208,18 @@ public:
   /**
    * draws the full outline but draws the top with narrow line
    * @param poly.  the finalized point set
-   * @param width. the width of all points except the top line
-   * @param color
+   * @use_wide_pen. use the wide pen for the border width
    */
   void DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
-                      unsigned width, const Color color);
+                      bool use_wide_pen);
   /**
    * draws the outline of the slider shape
    * @param rc.  rect of the slider shape.  Note that this may overextend
    * the canvas size
-   * @border_width. the pen border width
+   * @use_wide_pen. use the wide pen for the border width
    * @return true if the outline is visible, false if it's off the canvas
    */
-  bool DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned border_width);
+  bool DrawOutline(Canvas &canvas, const PixelRect &rc, bool use_wide_pen);
 
   /**
    * Draws the text and the outline of the shape
@@ -237,7 +236,7 @@ public:
             bool altitude_difference_valid,
             Angle delta_bearing,
             bool bearing_valid,
-            unsigned border_width);
+            bool use_wide_pen);
 
 #ifdef _WIN32
   /**

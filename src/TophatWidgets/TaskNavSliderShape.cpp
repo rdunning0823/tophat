@@ -51,19 +51,19 @@ Copyright_License {
 const Font &
 SliderShape::GetLargeFont()
 {
-  return infobox_look.value_font;
-}
-
-const Font &
-SliderShape::GetSmallFont()
-{
-  return dialog_look.text_font;
+  return nav_slider_look.large_font;
 }
 
 const Font &
 SliderShape::GetMediumFont()
 {
-  return infobox_look.title_font;
+  return nav_slider_look.medium_font;
+}
+
+const Font &
+SliderShape::GetSmallFont()
+{
+  return nav_slider_look.small_font;
 }
 
 SliderShape::VisibilityLevel
@@ -102,8 +102,8 @@ SliderShape::DrawBackgroundAll(Canvas &canvas, const RasterPoint poly[])
   canvas.SelectWhitePen();
   canvas.DrawPolygon(poly, 8);
   if (IsKobo()) {
-    const unsigned y = 2;
-    canvas.Select(Pen(2, COLOR_WHITE));
+    const unsigned y = nav_slider_look.background_pen_width;
+    canvas.Select(nav_slider_look.background_pen);
     assert(canvas.GetRect().IsInside({poly[0].x, y}));
     assert(canvas.GetRect().IsInside({poly[1].x, y}));
     canvas.DrawLine(poly[0].x, y, poly[1].x, y);
@@ -112,10 +112,10 @@ SliderShape::DrawBackgroundAll(Canvas &canvas, const RasterPoint poly[])
 
 void
 SliderShape::DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
-                            unsigned width, const Color color)
+                            bool use_wide_pen)
 {
   /* draw with normal width but don't draw top line */
-  canvas.Select(Pen(width, color));
+  canvas.Select(nav_slider_look.GetBorderPen(use_wide_pen));
   canvas.DrawTwoLines(poly[1], poly[2], poly[3]);
   canvas.DrawTwoLines(poly[3], poly[4], poly[5]);
   canvas.DrawTwoLines(poly[5], poly[6], poly[7]);
@@ -123,7 +123,7 @@ SliderShape::DrawOutlineAll(Canvas &canvas, const RasterPoint poly[],
 }
 
 bool
-SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
+SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, bool use_wide_pen)
 {
   PixelRect canvas_rect = canvas.GetRect();
 
@@ -132,7 +132,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   RasterPoint poly[8];
   RasterPoint poly_raw[8];
 
-  assert (width > 0);
+  unsigned width = nav_slider_look.GetBorderPenWidth(use_wide_pen);
   /* KOBO dithering centers odd shaped widths within 1/2 pixel,
    * and we need to stay within the canvas or memory gets corrupted
    * The lines have square ends so the diagonal ones actually go
@@ -169,7 +169,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
     return false;
 
 #ifdef _WIN32
-  canvas.Select(Pen(width, COLOR_BLACK));
+  canvas.Select(nav_slider_look.GetBorderPen(use_wide_pen));
   canvas.DrawPolygon(poly, 8);
   return true;
 #endif
@@ -179,7 +179,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   case LeftTipAndBody:
   case RightTipAndBody:
     DrawBackgroundAll(canvas, poly);
-    DrawOutlineAll(canvas, poly, width, COLOR_BLACK);
+    DrawOutlineAll(canvas, poly, use_wide_pen);
     break;
 
   /** some or all of the left tip, but no body */
@@ -187,7 +187,7 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, unsigned width)
   case RightTip:
     canvas.SelectWhitePen();
     canvas.DrawPolygon(poly, 8); // could this be the problem? repeated poly points?
-    canvas.Select(Pen(width, COLOR_BLACK));
+    canvas.Select(nav_slider_look.GetBorderPen(use_wide_pen));
     if (visibility == LeftTip)
       canvas.DrawTwoLines(poly[0], poly[6], poly[5]);
     else
@@ -215,14 +215,14 @@ SliderShape::PaintBackground(Canvas &canvas, unsigned idx,
   if (idx == 0) {
     RasterPoint left_mid = GetPoint(7);
     canvas.DrawFilledRectangle(0, 0, x_offset + left_mid.x, rc_outer.bottom,
-        Brush(COLOR_WHITE));
+                               nav_slider_look.background_brush);
   }
   if (idx == (list_length - 1)) {
     RasterPoint right_mid = GetPoint(3);
     canvas.DrawFilledRectangle(x_offset + right_mid.x, 0,
         x_offset + right_mid.x + GetHintWidth() + 1,
         rc_outer.bottom,
-        Brush(COLOR_WHITE));
+        nav_slider_look.background_brush);
   }
 }
 #endif
@@ -238,7 +238,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   bool altitude_difference_valid,
                   Angle delta_bearing,
                   bool bearing_valid,
-                  unsigned border_width)
+                  bool use_wide_pen)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
@@ -247,9 +247,11 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       && (task_size > 1)
       && ((idx > 0 && has_entered) || (idx == 0 && has_exited));
 
-  StaticString<120> buffer;
+  StaticString<120> type_buffer;
   const Font &name_font = GetLargeFont();
-  const Font &medium_font = GetMediumFont();
+  const Font &distance_font = GetMediumFont();
+  const Font &type_font = GetSmallFont();
+  const Font &altitude_font = GetSmallFont();
   UPixelScalar width;
   PixelScalar left;
   PixelRect rc = rc_outer;
@@ -257,19 +259,20 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   rc.right -= 3 * GetHintWidth() / 2;
 
   if (!tp_valid) {
+    StaticString<120> nav_buffer;
+    const Font &nav_font = GetMediumFont();
     canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
-    canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
-      selected, true, false)));
-    DrawOutline(canvas, rc_outer, border_width);
-    canvas.Select(medium_font);
-    buffer = _("Click to navigate");
-    width = canvas.CalcTextWidth(buffer.c_str());
+    canvas.Select(nav_slider_look.GetBackgroundBrush(selected));
+    DrawOutline(canvas, rc_outer, use_wide_pen);
+    canvas.Select(nav_font);
+    nav_buffer = _("Click to navigate");
+    width = canvas.CalcTextWidth(nav_buffer.c_str());
     left = rc.left + (rc.right - rc.left - width) / 2;
     if (left > 0)
       canvas.TextAutoClipped(left,
                              rc.top + (rc.bottom - rc.top -
-                                 medium_font.GetHeight()) / 2,
-                             buffer.c_str());
+                                 nav_font.GetHeight()) / 2,
+                                 nav_buffer.c_str());
 #ifdef _WIN32
     if (HasDraggableScreen()) // PC or WM
       PaintBackground(canvas, idx, 1, dialog_look, rc_outer);
@@ -278,9 +281,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   }
 
   canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
-  canvas.Select(Brush(dialog_look.list.GetBackgroundColor(
-    selected, true, false)));
-  if (!DrawOutline(canvas, rc_outer, border_width))
+  canvas.Select(nav_slider_look.GetBackgroundBrush(selected));
+  if (!DrawOutline(canvas, rc_outer, use_wide_pen))
     return;
 
 #ifdef _WIN32
@@ -303,35 +305,35 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   switch (task_mode) {
   case TaskType::ORDERED:
     if (task_size == 0)
-      buffer = _("Go'n home:");
+      type_buffer = _("Go'n home:");
 
     else if (idx == 0)
-      buffer = _("Start");
+      type_buffer = _("Start");
     else if (idx + 1 == task_size)
-        buffer = _("Finish");
+      type_buffer = _("Finish");
     else if (task_factory_type ==  TaskFactoryType::AAT)
-      _stprintf(buffer.buffer(), _T("%s %u"), _("Center"), idx);
+      _stprintf(type_buffer.buffer(), _T("%s %u"), _("Center"), idx);
     else
-      _stprintf(buffer.buffer(), _T("%s %u"), _("TP"), idx);
+      _stprintf(type_buffer.buffer(), _T("%s %u"), _("TP"), idx);
 
     break;
   case TaskType::GOTO:
   case TaskType::ABORT:
-    buffer = _("Goto:");
+    type_buffer = _("Goto:");
     break;
 
   case TaskType::NONE:
-    buffer = _("Go'n home:");
+    type_buffer = _("Go'n home:");
 
     break;
   }
-  canvas.Select(medium_font);
-  label_width = canvas.CalcTextWidth(buffer.c_str());
+  canvas.Select(type_font);
+  label_width = canvas.CalcTextWidth(type_buffer.c_str());
 
   // Draw arrival altitude right upper corner
   if (altitude_difference_valid) {
 
-    canvas.Select(medium_font);
+    canvas.Select(altitude_font);
     FormatRelativeUserAltitude(tp_altitude_difference, height_buffer.buffer(),
                                true);
     height_width = canvas.CalcTextWidth(height_buffer.c_str());
@@ -359,24 +361,24 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   // draw label if room
   if (distance_valid) {
     FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
-    canvas.Select(medium_font);
+    canvas.Select(distance_font);
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
     UPixelScalar offset = rc.left;
     if ((PixelScalar)(distance_width + height_width) <
         (PixelScalar)(rc.right - rc.left - label_width -
             Layout::FastScale(15))) {
-      canvas.Select(medium_font);
+      canvas.Select(type_font);
       left = rc.left;
       if (left > 0)
-        canvas.TextAutoClipped(left, line_one_y_offset, buffer.c_str());
+        canvas.TextAutoClipped(left, line_one_y_offset, type_buffer.c_str());
       offset = rc.left + label_width +
           (rc.right - rc.left - distance_width - height_width
               - label_width) / 2;
 
     }
 
-    canvas.Select(medium_font);
+    canvas.Select(distance_font);
     left = offset;
     if (left > 0)
       canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
@@ -385,7 +387,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       bearing_direction = DrawBearing(canvas, rc_outer,bearing);
 
   } else // just type type label
-    canvas.TextAutoClipped(rc.left, line_one_y_offset, buffer.c_str());
+    canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
 
   // Draw tp name, truncated to leave space before rt. bearing if drawn
   canvas.Select(name_font);

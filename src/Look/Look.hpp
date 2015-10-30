@@ -42,6 +42,7 @@ Copyright_License {
 #include "VarioBarLook.hpp"
 #include "IconLook.hpp"
 #include "ThermalAssistantLook.hpp"
+#include "NavSliderLook.hpp"
 
 struct UISettings;
 class Font;
@@ -68,6 +69,7 @@ struct Look {
   IconLook icon;
   ThermalAssistantLook thermal_assistant_gauge;
   ThermalAssistantLook thermal_assistant_dialog;
+  NavSliderLook nav_slider;
 
   void Initialise(const Font &map_font);
   void InitialiseConfigured(const UISettings &settings,
