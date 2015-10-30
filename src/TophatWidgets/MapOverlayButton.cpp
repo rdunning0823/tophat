@@ -46,7 +46,7 @@ MapOverlayButton::GetScale()
 unsigned
 MapOverlayButton::GetStandardButtonHeight()
 {
-  return Fonts::map_bold.GetHeight();
+  return Layout::FontScale(16);
 }
 
 void
