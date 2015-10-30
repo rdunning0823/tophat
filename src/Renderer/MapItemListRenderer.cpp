@@ -65,9 +65,6 @@ Copyright_License {
 
 namespace MapItemListRenderer
 {
-  unsigned CalculateLayout(const DialogLook &dialog_look,
-                           TwoTextRowsRenderer &row_renderer);
-
   void Draw(Canvas &canvas, const PixelRect rc, const LocationMapItem &item,
             const DialogLook &dialog_look);
 
@@ -111,7 +108,7 @@ MapItemListRenderer::CalculateLayout(const DialogLook &dialog_look,
                                      TwoTextRowsRenderer &row_renderer)
 {
   return row_renderer.CalculateLayout(*dialog_look.list.font_bold,
-                                      dialog_look.small_font);
+                                      dialog_look.text_font);
 }
 
 void

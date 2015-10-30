@@ -34,9 +34,13 @@ struct FinalGlideBarLook;
 struct MapSettings;
 struct TrafficList;
 class RoughTimeDelta;
+class TwoTextRowsRenderer;
 
 namespace MapItemListRenderer
 {
+  unsigned CalculateLayout(const DialogLook &dialog_look,
+                           TwoTextRowsRenderer &row_renderer);
+
   void Draw(Canvas &canvas, const PixelRect rc, const MapItem &item,
             const DialogLook &dialog_look,
             const MapLook &look,

@@ -49,6 +49,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Dialogs/Dialogs.h"
 #include "Terrain/TerrainSettings.hpp"
+#include "Renderer/TwoTextRowsRenderer.hpp"
 
 #ifdef HAVE_NOAA
 #include "Dialogs/Weather/WeatherDialogs.hpp"
@@ -294,13 +295,8 @@ MapItemListWidget::CreateButtons(WidgetDialog &dialog)
 void
 MapItemListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  UPixelScalar item_height = dialog_look.list.font_bold->GetHeight()
-    + Layout::Scale(6) + dialog_look.text_font.GetHeight();
-  assert(item_height > 0);
-
-  CreateList(parent, dialog_look, rc, item_height);
-/*  CreateList(parent, dialog_look, rc,
-             MapItemListRenderer::CalculateLayout(dialog_look));*/
+  TwoTextRowsRenderer renderer;
+  CreateList(parent, dialog_look, rc, MapItemListRenderer::CalculateLayout(dialog_look, renderer));
 
   GetList().SetLength(list.size());
   UpdateButtons();
