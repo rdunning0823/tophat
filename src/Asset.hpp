@@ -298,6 +298,10 @@ HasTouchScreen()
 
 
 /**
+ *
+ *
+ *
+ *
  * Does this device have a touch screen?  This is useful to know for
  * sizing controls, as a touch screen may require bigger areas.
  */
@@ -305,7 +309,9 @@ constexpr
 static inline bool
 UseTouchScreenLayout()
 {
-  return HasTouchScreen();
+  return true;
+  // always look the same.  Otherwise too hard to debug!
+  // HasTouchScreen();
 }
 
 /**
