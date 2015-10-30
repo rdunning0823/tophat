@@ -296,7 +296,11 @@ Main()
   return action;
 }
 
-int main(int argc, char **argv)
+/**
+ * reads additional commandline arguments stored in the tophat_arguments file
+ */
+static void
+LoadTophatArguments()
 {
   static TCHAR path[MAX_PATH];
   StaticString<64> line;
@@ -312,9 +316,14 @@ int main(int argc, char **argv)
     args.SetStopOnError(false);
     CommandLine::Parse(args);
     delete file;
-    if (!CommandLine::show_dialog_setup_quick)
-      KoboRunXCSoar("");
   }
+}
+
+int main(int argc, char **argv)
+{
+  LoadTophatArguments();
+  if (!CommandLine::show_dialog_setup_quick)
+    KoboRunXCSoar("");
 
   while (true) {
     switch (Main()) {
