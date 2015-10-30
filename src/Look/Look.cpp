@@ -61,10 +61,12 @@ Look::InitialiseConfigured(const UISettings &settings,
   vario_bar.Initialise(map_font);
   map.Initialise(settings.map, map_font, map_bold_font);
   icon.Initialise();
+  nav_slider.Initialise();
 }
 
 void
 Look::ReinitialiseLayout(unsigned infobox_width)
 {
   info_box.ReinitialiseLayout(infobox_width);
+  nav_slider.ReinitialiseLayout();
 }
