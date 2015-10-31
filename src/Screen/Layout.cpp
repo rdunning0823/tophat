@@ -117,11 +117,11 @@ Layout::Initialize(PixelSize new_size, unsigned ui_scale)
   text_padding = VptScale(2);
 
   minimum_control_height = std::min(FontScale(23) * 3,
-                                    min_screen_pixels / 5);
+                                    min_screen_pixels / 7);
 
   if (HasTouchScreen()) {
     /* larger rows for touch screens */
-    maximum_control_height = PtScale(30);
+    maximum_control_height = std::min(PtScale(30), height / 7u);
     if (maximum_control_height < minimum_control_height)
       maximum_control_height = minimum_control_height;
   } else {
