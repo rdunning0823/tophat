@@ -103,12 +103,12 @@ public:
     line_two_text = _text;
   }
 
-  const Font &GetLargeFont()
+  const Font &GetLargeFont() const
   {
     return infobox_look.value_font;
   }
 
-  const Font &GetMediumFont()
+  const Font &GetMediumFont() const
   {
     return infobox_look.title_font;
   }
