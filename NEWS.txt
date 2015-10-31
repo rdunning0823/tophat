@@ -2,6 +2,17 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.1.2 Beta TBD
+* merge XCSoar 6.8.1
+* fix freeze bug when starting without GPS fix
+* fix crash with empty xcsoar-checklist.txt file
+* devices
+  - fix TCP port on Windows (#3428)
+* Windows
+  - fix the airspace file parser (#3633)
+* Kobo
+  - fix overlapping text (#3634)
+* Android
+  - fix USB-RS232-OTG permissions on Android
 * merge XCSoar 6.8
 	* data files
 	  - optimise the topography loader
@@ -88,7 +99,6 @@ Top Hat Soaring 2.1.2 Beta TBD
 	  - support USB-OTG
 	  - export data partition via USB storage
 	  - support the Kobo Aura screen (#3490)
-	
 	* user interface
 	  - fix crash in task editor
 	  - fix crash while panning the map
@@ -102,7 +112,6 @@ Top Hat Soaring 2.1.2 Beta TBD
 	  - timeout for the HTTP client (e.g. LiveTrack24)
 	* Kobo
 	  - enable crash dumps in XCSoarData/crash/
-	
 * merge XCSoar 6.7.8
 	* user interface
 	  - draw gray title bar on inactive dialogs
@@ -116,7 +125,6 @@ Top Hat Soaring 2.1.2 Beta TBD
 	* Linux
 	  - support Raspberry Pi 2
 	  - show ports renamed by udev
-
 * Merge XCSoar 6.7.7
 	* airspace
 	  - accept airspaces of class RMZ in OpenAir format files (#3437)
