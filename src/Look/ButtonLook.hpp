@@ -44,14 +44,8 @@ struct ButtonLook {
       light_transparent_border_pen, dark_transparent_border_pen;
     Brush light_border_brush, dark_border_brush;
 
-    void CreateBorder(Color light, Color dark) {
-      light_border_pen.Create(1, light);
-      light_transparent_border_pen.Create(Layout::Scale(1), light);
-      light_border_brush.Create(light);
-      dark_border_pen.Create(1, dark);
-      dark_transparent_border_pen.Create(Layout::Scale(1), dark);
-      dark_border_brush.Create(dark);
-    }
+    void CreateBorder(Color light, Color dark);
+
   } standard, focused, dimmed;
   /* dimmed used for less visible / obtrusive overlay buttons */
 

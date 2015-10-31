@@ -24,6 +24,20 @@ Copyright_License {
 #include "ButtonLook.hpp"
 #include "Asset.hpp"
 
+
+void
+ButtonLook::StateLook::CreateBorder(Color light, Color dark)
+{
+  /* pen width 3 appears uneven on screens with low dpi */
+  unsigned transparent_border_pen_width = (Layout::Scale(1) == 3) ? 2 : Layout::Scale(1);
+
+  light_border_pen.Create(1, light);
+  light_transparent_border_pen.Create(transparent_border_pen_width, light);
+  light_border_brush.Create(light);
+  dark_border_pen.Create(1, dark);
+  dark_transparent_border_pen.Create(transparent_border_pen_width, dark);
+  dark_border_brush.Create(dark);
+}
 void
 ButtonLook::Initialise(const Font &_font)
 {
