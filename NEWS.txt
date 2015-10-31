@@ -2,42 +2,29 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.1.2 Beta TBD
+* Task Restart prompt
+* Configure default startup settings via Advanced Configuration (fly, sim, quick)
+* Auto switch portait / landscape in all dialogs
+* Charts - clean up axis display
+* FAI task.  Show km if not default distance unit
+* Add "Home" icon in waypoint details
 * merge XCSoar 6.8.2
+	* fix freeze bug when starting without GPS fix
+	* fix crash with empty xcsoar-checklist.txt file
 	* Rubik R-26S polar
-	* user interface
-	  - save settings after copy&pasting an InfoBox set (#3649)
 	* map
 	  - fix crash in the topography renderer
 	* calculations
 	  - fix task progress display after finish achieved (#3657)
-	* devices
-	  - fix wrong baud rate after task declaration (#3654)
-	* Android
-	  - support the "escape" key (#3647)
-	  - fix all RS232 permissions on Android (#3648)
-	* Kobo
-	  - fix wrong IP address display (#3650)
-	* Raspberry Pi / Cubieboard
-	  - support digit and letter keys (#3611)
-* merge XCSoar 6.8.1
-	* fix freeze bug when starting without GPS fix
-	* fix crash with empty xcsoar-checklist.txt file
-	* devices
-	  - fix TCP port on Windows (#3428)
-	* Windows
-	  - fix the airspace file parser (#3633)
-	* Kobo
-	  - fix overlapping text (#3634)
-	* Android
-	  - fix USB-RS232-OTG permissions on Android
-* merge XCSoar 6.8
-	* data files
-	  - optimise the topography loader
-	  - faster RASP map change
-	  - show all RASP maps
-	  - fix comments in TNP files
-	  - ignore trailing whitespace in airspace files (#3546)
-	  - store user-edited waypoints and markers in "user.cup"
+	  - wave assistant
+	  - use maximum speed configured in plane setup as limit for calculations
+	  - use WGS84 earth ellipsoid for distance calculations (#2809)
+	  - remove setting "Prefer external wind"
+	  - reduce EKF wind latency
+	  - fix bogus value in "Nearest Airspace H" InfoBox (#3589)
+	  - obey the maximum start speed (#2841)
+	  - faster triangle score calculation
+	  - fix crash in triangle score calculation (#3576)
 	* devices
 	  - remove option "Ignore checksum"
 	  - CAI302: add sink tone configuration
@@ -48,49 +35,50 @@ Top Hat Soaring 2.1.2 Beta TBD
 	  - Westerboer VW921: remove buggy driver (#3215)
 	  - added TCP port 2000 to portlist (part of #3326)
 	  - support LXNAV V7 pass-through mode (#1913, #2808, #2919)
-	* calculations
-	  - wave assistant
-	  - use maximum speed configured in plane setup as limit for calculations
-	  - use WGS84 earth ellipsoid for distance calculations (#2809)
-	  - remove setting "Prefer external wind"
-	  - reduce EKF wind latency
-	  - fix bogus value in "Nearest Airspace H" InfoBox (#3589)
-	  - obey the maximum start speed (#2841)
-	* airspace cross-section
-	  - sync map & cross-section view zoom setting (#2913)
+	  - fix wrong baud rate after task declaration (#3654)
+	* Android
+	  - fix IOIO connection on Android 4.x (#2959, #3260)
+	  - support IOIO-OTG with the Android device in USB host mode
+	  - support IOIO over Bluetooth
+	  - support Bluetooth LE
+	  - timeout for the HTTP client (e.g. LiveTrack24)
+	  - support the "escape" key (#3647)
+	  - fix all RS232 permissions on Android (#3648)
+	  - fix USB-RS232-OTG permissions on Android
+	  - timeout for the HTTP client (e.g. LiveTrack24)
+	* Kobo
+	  - support Wifi with WEP (#3138)
+	  - support open Wifi networks (#3391)
+	  - support USB-OTG
+	  - support the Kobo Aura screen (#3490)
+	  - fix wrong IP address display (#3650)
+	  - enable crash dumps in XCSoarData/crash/
+	* Raspberry Pi / Cubieboard
+	  - support digit and letter keys (#3611)
+	* Windows
+	  - fix the airspace file parser (#3633)
+	  - Allow site files download from Internet
+	* data files
+	  - store user-edited waypoints and markers in "user.cup"
 	* infoboxes
 	  - add "Fin MC0 AltD" infobox (#2824)
 	  - add "Next arrow" infobox (#3128)
-	* task editor
-	  - added one-click task reversal (#1730)
-	  - show name of loaded/saved tasks in dialog title (#1924)
-	  - support large legs in the FAI triangle renderer (#3413)
-	  - task calculator moved to "Status" dialog
-	  - markers can be used in tasks and for "goto"
+	  - fix data for OLC infoboxes if "OLC League" is used (#3461)
 	* map
 	  - allow "Mark Drop" while panning
 	  - airspace labels
+	  - sync zoom with cross-section & map
 	* user interface
-	  - allow horizontal speeds in m/s
-	  - allow mass in lb, wing loading in lb/ft^2
-	  - download data files from site configuration
-	  - remove support for custom status files
-	  - merge airspace warning buttons "ACK Warn" and "ACK Space" (#1086)
-	  - show airspace warning at bottom (#1378, #2628, #3275)
-	  - profile manager
-	  - password-protected profiles (#851)
-	  - checklist remembers last opened list (#3110)
-	  - use configured coordinate format in waypoint editor
-	  - remove custom font support, replaced with global "text size" setting
-	  - improved font sizes
+	  - fix crash while panning the map
 	  - improved font renderer
-	  - display rotation for Raspberry Pi and Cubieboard (#3238)
-	  - use /dev/input/event* on Raspberry Pi and Cubieboard (#3179)
-	  - support mouse wheel on Raspberry Pi and Cubieboard
-	  - scale touchscreen coordinates to screen size
+	  - allow horizontal speeds in m/s
+	  - show airspace warning at top
+	  - use configured coordinate format in waypoint editor
+	  - replace custom font support with global "text size" setting
 	  - bigger icons on high-dpi screens (#2795, #3267, #3397, #3540)
 	  - improved keypad support (#3281)
 	  - new translation: Simplified Chinese
+	  - save settings after copy&pasting an InfoBox set (#3649)
 	* tracking
 	  - new option disables tracking while roaming on the cell network
 	  - queue SkyLines tracking fixes while data connection is unavailable
@@ -100,66 +88,13 @@ Top Hat Soaring 2.1.2 Beta TBD
 	  - show altitude in list (#3606)
 	  - show all nearby traffic (#2814)
 	  - pass vehicle name to LiveTrack24
-	* Linux
-	  - Wayland support
-	* Android
-	  - fix IOIO connection on Android 4.x (#2959, #3260)
-	  - support IOIO-OTG with the Android device in USB host mode
-	  - support IOIO over Bluetooth
-	  - support Bluetooth LE
-	  - timeout for the HTTP client (e.g. LiveTrack24)
-	* Kobo
-	  - menu button
-	  - add UI allowing the start of external scripts to KoboMenu (#3194)
-	  - support Wifi with WEP (#3138)
-	  - support open Wifi networks (#3391)
-	  - support USB-OTG
-	  - export data partition via USB storage
-	  - support the Kobo Aura screen (#3490)
-	* user interface
-	  - fix crash in task editor
-	  - fix crash while panning the map
-	  - improved font renderer
-	* data files
-	  - fix comments in TNP files
-	* calculations
-	  - faster triangle score calculation
-	  - fix crash in triangle score calculation (#3576)
-	* Android
-	  - timeout for the HTTP client (e.g. LiveTrack24)
-	* Kobo
-	  - enable crash dumps in XCSoarData/crash/
-* merge XCSoar 6.7.8
-	* user interface
-	  - draw gray title bar on inactive dialogs
-	  - improved dialog button placement
-	  - fix missing buttons in terrain configuration (#3421)
-	* task
-	  - support large legs in the FAI triangle renderer (#3413)
-	  - make "Cruise efficiency" read-only
-	* devices
-	  - fix crash when downloading flight without "logs" folder
-	* Linux
-	  - support Raspberry Pi 2
-	  - show ports renamed by udev
-* Merge XCSoar 6.7.7
 	* airspace
 	  - accept airspaces of class RMZ in OpenAir format files (#3437)
 	  - fix wrong AGL height due to longitude east/west wraparound (#3468)
-	* infoboxes
-	  - fix data for OLC infoboxes if "OLC League" is used (#3461)
-	* calculations
-	  - fix handicap factor for "OLC League" scores
-	  - fix reach calculation problems at border of map (#3239)
-	  - simplified EKF wind algorithm (#3062)
-	* input events
-	  - allow '_' character in event identifiers (#3464)
-	* replay
-	  - fix replay progress while replay is paused (#3446)
 
 Top Hat Soaring 2.1.1b Beta September 15, 2015
 * Smooth the circle diameter infobox
-* Fix but in "Ignore task start"
+* Fix bug in "Ignore task start"
 
 Top Hat Soaring 2.1.1 Beta September 11, 2015
 * Option to ignore task start
