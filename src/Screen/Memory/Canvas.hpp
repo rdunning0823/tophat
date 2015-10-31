@@ -329,14 +329,8 @@ public:
 
   void DrawOpaqueText(int x, int y, const PixelRect &rc, const TCHAR *text);
 
-  /**
-   * Clip text based on rough estimate of characters in string
-   */
+  void DrawClippedText(int x, int y, const PixelRect &rc, const TCHAR *text);
   void DrawClippedText(int x, int y, unsigned width, const TCHAR *text);
-
-  void DrawClippedText(int x, int y, const PixelRect &rc, const TCHAR *text) {
-    DrawClippedText(x, y, rc.right - rc.left, text);
-  }
 
   /**
    * Render text, clip it within the bounds of this Canvas.
