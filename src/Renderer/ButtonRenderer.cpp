@@ -54,8 +54,8 @@ ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
 
     canvas.DrawRoundRectangle(rc.left, rc.top,
                               rc.right, rc.bottom - 1,
-                              Layout::Scale(10),
-                              Layout::Scale(10));
+                              Layout::FontScale(12),
+                              Layout::FontScale(12));
   } else {
     if (!look.background_transparent || pressed)
       canvas.DrawFilledRectangle(rc, _look.background_color);
