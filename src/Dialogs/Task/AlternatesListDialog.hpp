@@ -25,6 +25,7 @@ Copyright_License {
 #define DIALOG_ALTERNATES_LIST_HPP
 
 #include "Widget/ListWidget.hpp"
+#include "Widget/TwoWidgets.hpp"
 #include "Widget/TextWidget.hpp"
 #include "Engine/Task/Unordered/AlternateList.hpp"
 #include "Form/ActionListener.hpp"
@@ -126,9 +127,12 @@ public:
  * A widget class that displays header rows above the List Widget
  * when used with TwoWidgets
  */
-class AlternatesListHeaderWidget : public TextWidget
+class AlternatesListHeaderWidget : public TwoWidgets
 {
 public:
+  AlternatesListHeaderWidget()
+    :TwoWidgets(new TextWidget(), new TextWidget(), false, true) {}
+
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
   virtual void Unprepare();
   void Show(const PixelRect &rc) override;

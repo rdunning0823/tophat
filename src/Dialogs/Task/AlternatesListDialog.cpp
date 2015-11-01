@@ -37,7 +37,7 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Form/Form.hpp"
 #include "Widget/TwoWidgets.hpp"
-
+#include "Widget/TextWidget.hpp"
 
 const TCHAR *distance_label_text = N_("Distance");
 const TCHAR *arrival_alt_label_text = N_("Arrival alt");
@@ -178,21 +178,14 @@ AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
   StaticString<1000> caption;
   caption.Format(_T("%s     %s"),distance_label_text,
                        arrival_alt_label_text);
-  TextWidget::SetText(caption.c_str());
-}
 
-static const PixelRect
-GetRightHalf(const PixelRect &rc)
-{
-  PixelRect rc_right = rc;
-  rc_right.left += rc.GetSize().cx / 2;
-  return rc_right;
+  ((TextWidget&)GetSecond()).SetText(caption.c_str());
 }
 
 void
 AlternatesListHeaderWidget::Move(const PixelRect &rc)
 {
-  TextWidget::Move(GetRightHalf(rc));
+  TwoWidgets::Move(rc);
   CalculateLayout(rc);
 }
 
@@ -200,20 +193,20 @@ void
 AlternatesListHeaderWidget::Prepare(ContainerWindow &parent,
                                     const PixelRect &rc)
 {
-  TextWidget::Prepare(parent, GetRightHalf(rc));
+  TwoWidgets::Prepare(parent, rc);
   CalculateLayout(rc);
 }
 
 void
 AlternatesListHeaderWidget::Show(const PixelRect &rc)
 {
-  TextWidget::Show(GetRightHalf(rc));
+  TwoWidgets::Show(rc);
 }
 
 void
 AlternatesListHeaderWidget::Unprepare()
 {
-  TextWidget::Unprepare();
+  TwoWidgets::Unprepare();
 }
 
 void
