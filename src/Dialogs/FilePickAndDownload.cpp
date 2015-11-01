@@ -576,7 +576,7 @@ ManagedFilePickAndDownloadWidget::PromptAndAdd()
 
   add_list = &list;
   int i = ListPicker(_("Select a file"),
-                     list.size(), 0, Layout::FastScale(18),
+                     list.size(), 0, Layout::GetMinimumControlHeight(),
                      *this);
 
   add_list = NULL;
