@@ -65,6 +65,7 @@ protected:
   WndFrame *altitude_value;
   WndFrame *altitude_type;
   CheckBoxControl show_alternate_units;
+  unsigned value_font_height;
 
   /**
    * This timer syncs the altitude data
@@ -94,7 +95,7 @@ public:
   virtual void Unprepare();
   /* Move must discard rc and use GetMainWindow()'s ClientRect */
   virtual void Move(const PixelRect &rc) override;
-  void CalculateLayout(const PixelRect &rc);
+  void CalculateLayout(const PixelRect &rc, unsigned value_height);
   void Refresh();
 
 protected:
@@ -176,7 +177,7 @@ AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
   PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
 
   BaseAccessPanel::Move(rc);
-  CalculateLayout(rc);
+  CalculateLayout(rc, value_font_height);
   big_plus->Move(big_plus_rc);
   little_plus->Move(little_plus_rc);
   big_minus->Move(big_minus_rc);
@@ -187,12 +188,12 @@ AltitudeSimulatorPanel::Move(const PixelRect &rc_unused)
 }
 
 void
-AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc)
+AltitudeSimulatorPanel::CalculateLayout(const PixelRect &rc, unsigned value_height)
 {
-  NumberButtonSubNumberLayout::CalculateLayout(content_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_rc, value_height);
 
 
-  NumberButtonSubNumberLayout::CalculateLayout(content_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_rc, value_height);
   content_rc.right = big_plus_rc.left - 1;
 
   show_alternate_units_rc.bottom = content_rc.bottom -
@@ -207,13 +208,15 @@ void
 AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  CalculateLayout(rc);
 
-  WindowStyle style;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const MapLook &map_look = UIGlobals::GetLook().map;
   big_dialog_look.Initialise(320);
   big_button_look.Initialise(*map_look.overlay_font);
+  value_font_height = big_dialog_look.text_font.GetHeight();
+  CalculateLayout(rc, value_font_height);
+
+  WindowStyle style;
 
   WindowStyle button_style;
   button_style.TabStop();

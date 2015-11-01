@@ -207,9 +207,9 @@ BaseAccessPanel::SetCaption()
 
 
 void
-NumberButtonSubNumberLayout::CalculateLayout(const PixelRect &parent_rc)
+NumberButtonSubNumberLayout::CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height)
 {
-  NumberButtonLayout::CalculateLayout(parent_rc);
+  NumberButtonLayout::CalculateLayout(parent_rc, min_value_height);
 
   sub_number_rc = value_rc;
   sub_number_rc.right = parent_rc.right;
@@ -217,7 +217,7 @@ NumberButtonSubNumberLayout::CalculateLayout(const PixelRect &parent_rc)
 }
 
 void
-NumberButtonLayout::CalculateLayout(const PixelRect &parent_rc)
+NumberButtonLayout::CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height)
 {
   fixed ratio = Layout::landscape ? fixed(0.65) : fixed(0.6);
   PixelRect rc_bound = parent_rc;
@@ -252,15 +252,26 @@ NumberButtonLayout::CalculateLayout(const PixelRect &parent_rc)
   little_minus_rc.top = little_minus_rc.bottom - sz_parent.cy / 3;
   little_minus_rc.left = little_minus_rc.right - sz_parent.cx / 2;
 
-  value_rc.left = big_plus_rc.left;
-  value_rc.right = little_plus_rc.right;
-  value_rc.top = big_plus_rc.bottom;
-  value_rc.bottom = big_minus_rc.top;
-
   double_size_plus_rc = big_plus_rc;
   double_size_plus_rc.right = little_plus_rc.right;
   double_size_minus_rc = big_minus_rc;
   double_size_minus_rc.right = little_minus_rc.right;
+
+  value_rc.left = big_plus_rc.left;
+  value_rc.right = little_plus_rc.right;
+  value_rc.top = big_plus_rc.bottom;
+  value_rc.bottom = big_minus_rc.top;
+  if (value_rc.GetSize().cy < (int)min_value_height) {
+    unsigned nudge_y = (min_value_height - value_rc.GetSize().cy) / 2;
+    unsigned new_value_top = std::max((int)(big_plus_rc.top + 10),
+                                      (int)(big_plus_rc.bottom - nudge_y));
+    unsigned new_value_bottom = std::min((int)(big_minus_rc.bottom - 10),
+                                         (int)(big_minus_rc.top + nudge_y));
+    value_rc.top = big_plus_rc.bottom = little_plus_rc.bottom =
+        double_size_plus_rc.bottom = new_value_top;
+    value_rc.bottom = big_minus_rc.top = little_minus_rc.top =
+        double_size_plus_rc.top = new_value_bottom;
+  }
 }
 
 void

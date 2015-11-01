@@ -89,6 +89,7 @@ protected:
   WndFrame *mc_value, *speed_to_fly;
   CheckBoxControl auto_mc;
   PixelRect checkbox_rc;
+  unsigned value_font_height;
 
   /**
    * draws the Final Glide Bar on the MC widget so the pilot can
@@ -119,7 +120,7 @@ public:
   virtual void Unprepare();
   /* Move must discard rc and use GetMainWindow()'s ClientRect */
   virtual void Move(const PixelRect &rc) override;
-  void CalculateLayout(const PixelRect &rc);
+  void CalculateLayout(const PixelRect &rc, unsigned value_height);
 
   void Refresh();
 
@@ -219,7 +220,7 @@ MacCreadyEditPanel::Move(const PixelRect &rc_unused)
   PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
 
   BaseAccessPanel::Move(rc);
-  CalculateLayout(rc);
+  CalculateLayout(rc, value_font_height);
   final_glide_chart->Move(fg_rc);
   big_plus->Move(big_plus_rc);
   little_plus->Move(little_plus_rc);
@@ -233,9 +234,9 @@ MacCreadyEditPanel::Move(const PixelRect &rc_unused)
 }
 
 void
-MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
+MacCreadyEditPanel::CalculateLayout(const PixelRect &rc, unsigned value_height)
 {
-  NumberButtonSubNumberLayout::CalculateLayout(content_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_rc, value_height);
 
   PixelRect content_right_rc = content_rc;
   PixelRect content_left_rc = content_rc;
@@ -243,7 +244,7 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
   // split content area into two columns, buttons on the right, fg on left
   content_right_rc.left += Layout::Scale(50);
 
-  NumberButtonSubNumberLayout::CalculateLayout(content_right_rc);
+  NumberButtonSubNumberLayout::CalculateLayout(content_right_rc, value_height);
   content_left_rc.right = big_plus_rc.left - 1;
   fg_rc = content_left_rc;
 
@@ -257,17 +258,19 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc)
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   sub_number_rc.left = sub_number_rc.right -
       dialog_look.text_font.TextSize(_T("333 km/h")).cx + Layout::Scale(1);
-
-
-
-
 }
 
 void
 MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  CalculateLayout(rc);
+
+  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  big_dialog_look.Initialise(320);
+  value_font_height = big_dialog_look.text_font.GetHeight();
+
+  CalculateLayout(rc, value_font_height);
 
   WindowStyle style;
   const Look &look = UIGlobals::GetLook();
@@ -277,10 +280,6 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           (UPixelScalar)(fg_rc.right - fg_rc.left),
                           (UPixelScalar)(fg_rc.bottom - fg_rc.top),
                           style, look);
-
-  const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  big_dialog_look.Initialise(320);
 
   WindowStyle button_style;
   button_style.TabStop();

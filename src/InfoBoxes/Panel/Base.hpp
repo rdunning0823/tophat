@@ -173,8 +173,9 @@ protected:
    * Sizes the rectangles for the layout of the buttons and the frame in the center
    * of the rc
    * @param parent_rc The rc of the parent window's usable area
+   * @param value_height.  If > 0, defines min value height
    */
-  void CalculateLayout(const PixelRect &parent_rc);
+  void CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height);
 };
 
 
@@ -195,9 +196,9 @@ protected:
 protected:
   /*
    * Sizes the rectangles for the layout
-   * @param parent_rc The rc of the parent window's usable area
+   * @param value_height.  If > 0, defines min value height
    */
-  void CalculateLayout(const PixelRect &parent_rc);
+  void CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height);
 };
 
 /**
