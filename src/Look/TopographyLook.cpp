@@ -32,7 +32,7 @@ TopographyLook::Initialise()
   regular_label_font.Load(FontDescription(_T("RasterGothicTwelveCond"), 13));
   important_label_font.Load(FontDescription(_T("RasterGothicTwelveCond"), 13));
 #else
-  regular_label_font.Load(FontDescription(Layout::FontScale(8), false, false));
-  important_label_font.Load(FontDescription(Layout::FontScale(8), true, false));
+  regular_label_font.Load(FontDescription(Layout::FontScale(11), false, false));
+  important_label_font.Load(FontDescription(Layout::FontScale(11), true, false));
 #endif
 }
