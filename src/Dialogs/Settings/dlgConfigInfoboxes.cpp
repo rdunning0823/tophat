@@ -103,7 +103,8 @@ class InfoBoxesConfigWidget final
   StaticArray<InfoBoxPreview, InfoBoxSettings::Panel::MAX_CONTENTS> previews;
   unsigned current_preview;
 
-  Button copy_button, paste_button, close_button;
+  Button copy_button, paste_button;
+  WndSymbolButton close_button;
 
 public:
   InfoBoxesConfigWidget(ActionListener &_dialog,
@@ -245,9 +246,9 @@ InfoBoxesConfigWidget::Layout::Layout(PixelRect rc,
   buttons.top = form.bottom -= ::Layout::GetMaximumControlHeight();
 
   copy_button = paste_button = close_button = buttons;
-  copy_button.right = paste_button.left =
+  close_button.right = copy_button.left =
     (2 * buttons.left + buttons.right) / 3;
-  paste_button.right = close_button.left =
+  copy_button.right = paste_button.left =
     (buttons.left + 2 * buttons.right) / 3;
 }
 
@@ -295,7 +296,7 @@ InfoBoxesConfigWidget::Prepare(ContainerWindow &parent,
                      button_style, *this, COPY);
   paste_button.Create(parent, button_look, _("Paste"), layout.paste_button,
                       button_style, *this, PASTE);
-  close_button.Create(parent, button_look, _("Close"), layout.close_button,
+  close_button.Create(parent, button_look, _("_X"), layout.close_button,
                       button_style, dialog, mrOK);
 
   WindowStyle preview_style;
