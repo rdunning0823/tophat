@@ -24,8 +24,39 @@ Copyright_License {
 #ifndef TIMECONFIGPANEL_HPP
 #define TIMECONFIGPANEL_HPP
 
-class Widget;
+#include "Widget/RowFormWidget.hpp"
+#include "Form/DataField/Listener.hpp"
+#include "UIGlobals.hpp"
 
+
+class TimeConfigPanel final
+  : public RowFormWidget, DataFieldListener {
+protected:
+  /* reference to parent form */
+  //WndForm *_form;
+
+public:
+  TimeConfigPanel()
+    :RowFormWidget(UIGlobals::GetDialogLook()) {}
+
+public:
+/*
+  void SetForm(WndForm *_form) {
+    assert(_form != nullptr);
+    form = _form;
+  }
+*/
+
+  void SetLocalTime(RoughTimeDelta utc_offset);
+
+  /* methods from Widget */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual bool Save(bool &changed) override;
+
+private:
+  /* methods from DataFieldListener */
+  virtual void OnModified(DataField &df) override;
+};
 Widget *
 CreateTimeConfigPanel();
 

@@ -21,30 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_INFOBOX_CONTENT_TIME_HPP
-#define XCSOAR_INFOBOX_CONTENT_TIME_HPP
+#ifndef XCSOAR_TIME_INFOBOX_PANEL_HPP
+#define XCSOAR_TIME_INFOBOX_PANEL_HPP
 
-#include "InfoBoxes/Content/Base.hpp"
+class Widget;
 
-class InfoBoxContentTime : public InfoBoxContentNonTabbed
-{
-public:
-  virtual const InfoBoxPanel *GetDialogContent() override;
-};
-
-class InfoBoxContentTimeLocal : public InfoBoxContentTime
-{
-public:
-  virtual void Update(InfoBoxData &data) override;
-};
-
-class InfoBoxContentTimeUTC : public InfoBoxContentTime
-{
-public:
-  virtual void Update(InfoBoxData &data) override;
-};
-
-void
-UpdateInfoBoxTimeFlight(InfoBoxData &data);
+Widget *
+LoadTimeInfoBoxPanel(unsigned id);
 
 #endif

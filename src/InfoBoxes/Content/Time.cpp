@@ -22,15 +22,36 @@ Copyright_License {
 */
 
 #include "InfoBoxes/Content/Time.hpp"
+#include "InfoBoxes/Panel/TimeInfoBox.hpp"
 #include "InfoBoxes/Data.hpp"
 #include "Interface.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/LocalTimeFormatter.hpp"
+#include "Language/Language.hpp"
+#include "InfoBoxes/Panel/Panel.hpp"
 
 #include <tchar.h>
 
+/*
+ * Subpart callback function pointers
+ */
+
+static constexpr InfoBoxPanel panels[] = {
+  { N_("Edit"), LoadTimeInfoBoxPanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentTime::GetDialogContent() {
+  return panels;
+}
+
+/*
+ * Subpart normal operations
+ */
+
 void
-UpdateInfoBoxTimeLocal(InfoBoxData &data)
+InfoBoxContentTimeLocal::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
@@ -49,7 +70,7 @@ UpdateInfoBoxTimeLocal(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxTimeUTC(InfoBoxData &data)
+InfoBoxContentTimeUTC::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
 

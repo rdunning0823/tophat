@@ -603,7 +603,7 @@ static constexpr MetaData meta_data[] = {
     N_("Time local"),
     N_("Time loc"),
     N_("GPS time expressed in local time zone."),
-    UpdateInfoBoxTimeLocal,
+    IBFHelper<InfoBoxContentTimeLocal>::Create,
     e_TimeUTC, // Time UTC
     e_TimeSinceTakeoff, // Time flt
     STANDARD,
@@ -614,7 +614,7 @@ static constexpr MetaData meta_data[] = {
     N_("Time UTC"),
     N_("Time UTC"),
     N_("GPS time expressed in UTC."),
-    UpdateInfoBoxTimeUTC,
+    IBFHelper<InfoBoxContentTimeUTC>::Create,
     e_Fin_Time, // Fin ETE
     e_TimeLocal, // Time local
     DEPRECATED,

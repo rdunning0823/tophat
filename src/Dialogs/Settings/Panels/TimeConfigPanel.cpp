@@ -23,37 +23,16 @@ Copyright_License {
 
 #include "TimeConfigPanel.hpp"
 #include "Form/DataField/Float.hpp"
-#include "Form/DataField/Listener.hpp"
 #include "Formatter/LocalTimeFormatter.hpp"
 #include "Time/LocalTime.hpp"
 #include "Profile/Profile.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
-#include "Widget/RowFormWidget.hpp"
-#include "UIGlobals.hpp"
 
 enum ControlIndex {
   UTCOffset,
   LocalTime,
   SystemTimeFromGPS
-};
-
-class TimeConfigPanel final
-  : public RowFormWidget, DataFieldListener {
-public:
-  TimeConfigPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook()) {}
-
-public:
-  void SetLocalTime(RoughTimeDelta utc_offset);
-
-  /* methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual bool Save(bool &changed) override;
-
-private:
-  /* methods from DataFieldListener */
-  virtual void OnModified(DataField &df) override;
 };
 
 void
