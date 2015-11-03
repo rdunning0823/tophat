@@ -150,7 +150,7 @@ ProfileListWidget::UpdateList()
   list.clear();
 
   ProfileFileVisitor pfv(list);
-  VisitDataFiles(_T("*.prf"), pfv);
+  VisitDataFiles(_T("*.top"), pfv);
 
   unsigned len = list.size();
 
@@ -229,7 +229,7 @@ ProfileListWidget::NewClicked()
 
   StaticString<80> filename;
   filename = name;
-  filename += _T(".prf");
+  filename += _T(".top");
 
   StaticString<MAX_PATH> path;
   LocalPath(path.buffer(), filename);
@@ -292,7 +292,7 @@ ProfileListWidget::CopyClicked()
 
   StaticString<80> new_filename;
   new_filename = new_name;
-  new_filename += _T(".prf");
+  new_filename += _T(".top");
 
   StaticString<MAX_PATH> new_path;
   LocalPath(new_path.buffer(), new_filename);

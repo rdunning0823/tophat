@@ -8,7 +8,8 @@ Top Hat Soaring 2.1.2 Beta TBD
 * Charts - clean up axis display
 * FAI task.  Show km if not default distance unit
 * Add "Home" icon in waypoint details
-* Local Time Infoboxe allows setting UTC offset 
+* Local Time Infoboxe allows setting UTC offset
+* Profile manager: add/delete/password protect
 * merge XCSoar 6.8.2
 	* fix freeze bug when starting without GPS fix
 	* fix crash with empty xcsoar-checklist.txt file
