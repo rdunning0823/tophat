@@ -28,6 +28,7 @@ Copyright_License {
 #include "Resources.hpp"
 #include "Version.hpp"
 #include "Language/Language.hpp"
+#include "Math/fixed.hpp"
 #ifdef KOBO
 #include "Kobo/System.hpp"
 #endif
@@ -54,9 +55,42 @@ Center(unsigned canvas_size, unsigned element_size)
 }
 
 void
-LogoView::draw(Canvas &canvas, const PixelRect &rc)
+LogoView::draw(Canvas &canvas, const PixelRect &rc_outer)
 {
-  const unsigned width = rc.right - rc.left, height = rc.bottom - rc.top;
+#ifndef USE_GDI
+  canvas.Select(font);
+#endif
+
+  const int text_height = canvas.CalcTextSize(TopHat_ProductToken).cy;
+  canvas.SetTextColor(COLOR_BLACK);
+  canvas.SetBackgroundTransparent();
+  unsigned y = 2;
+  canvas.DrawText(2, y, TopHat_ProductToken);
+  y += 2 + text_height;
+  canvas.DrawText(2, y, XCSoar_ProductTokenShort);
+  y += 2 + text_height;
+  canvas.DrawText(2, y, XCSoar_GitSuffix);
+#ifdef KOBO
+  WriteSystemInfo();
+  if (IsKoboUsbHostKernel()) {
+    y += 2 + text_height;
+    canvas.DrawText(2, y, _T("USB host supported"));
+  }
+#endif
+#ifdef NO_HORIZON
+  y += 2 + text_height;
+  canvas.DrawText(2, y, _("Horizon: disabled"));
+#endif
+
+#ifndef NDEBUG
+  y += 2 + text_height;
+  canvas.DrawText(2, y, _T("DEBUG"));
+#endif
+
+  PixelRect rc = rc_outer;
+  rc.Grow(-1 * Layout::Scale(15), -1 * Layout::Scale(10));
+  const unsigned logo_top = y + 2 + text_height;
+  const unsigned width = rc.right - rc.left, height = rc.bottom - rc.top - logo_top;
 
   enum {
     LANDSCAPE, PORTRAIT, SQUARE,
@@ -103,16 +137,16 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
     break;
   }
 
-  const unsigned magnification =
-    std::min((width - 16u) / estimated_width,
-             (height - 16u) / estimated_height);
+  const fixed magnification =
+    std::min(fixed(width) / fixed(estimated_width),
+             fixed(height) / fixed(estimated_height));
 
-  if (magnification > 1) {
-    logo_size.cx *= magnification;
-    logo_size.cy *= magnification;
-    title_size.cx *= magnification;
-    title_size.cy *= magnification;
-    spacing *= magnification;
+  if (magnification > fixed(1)) {
+    logo_size.cx = int(fixed(logo_size.cx) * magnification);
+    logo_size.cy = int(fixed(logo_size.cy) * magnification);
+    title_size.cx = int(fixed(title_size.cx) * magnification);
+    title_size.cy = int(fixed(title_size.cy) * magnification);
+    spacing = int(fixed(spacing) * magnification);
   }
 
   int logox, logoy, titlex, titley;
@@ -120,16 +154,16 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   // Determine logo and title positions
   switch (orientation) {
   case LANDSCAPE:
-    logox = Center(width, logo_size.cx + spacing + title_size.cx);
-    logoy = Center(height, logo_size.cy);
+    logox = Center(width, logo_size.cx + spacing + title_size.cx) + rc.left;
+    logoy = Center(height, logo_size.cy) + logo_top;
     titlex = logox + logo_size.cx + spacing;
-    titley = Center(height, title_size.cy);
+    titley = Center(height, title_size.cy) + logo_top;
     break;
   case PORTRAIT:
   case SQUARE:
-    logox = (width - logo_size.cx) / 2;
-    logoy = (height - (logo_size.cy + title_size.cy * 2)) / 2;
-    titlex = (width - title_size.cx) / 2;
+    logox = (width - logo_size.cx) / 2 + rc.left;
+    logoy = (height - (logo_size.cy + title_size.cy * 2)) / 2  + logo_top;
+    titlex = (width - title_size.cx) / 2 + rc.left;
     titley = logoy + logo_size.cy + title_size.cy;
     break;
   }
@@ -142,34 +176,4 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc)
   canvas.Stretch(logox, logoy, logo_size.cx, logo_size.cy, bitmap_logo);
 
   // Draw full XCSoar version number
-
-#ifndef USE_GDI
-  canvas.Select(font);
-#endif
-
-  const int text_height = canvas.CalcTextSize(TopHat_ProductToken).cy;
-  canvas.SetTextColor(COLOR_BLACK);
-  canvas.SetBackgroundTransparent();
-  unsigned y = 2;
-  canvas.DrawText(2, y, TopHat_ProductToken);
-  y += 2 + text_height;
-  canvas.DrawText(2, y, XCSoar_ProductTokenShort);
-  y += 2 + text_height;
-  canvas.DrawText(2, y, XCSoar_GitSuffix);
-#ifdef KOBO
-  WriteSystemInfo();
-  if (IsKoboUsbHostKernel()) {
-    y += 2 + text_height;
-    canvas.DrawText(2, y, _T("USB host supported"));
-  }
-#endif
-#ifdef NO_HORIZON
-  y += 2 + text_height;
-  canvas.DrawText(2, y, _("Horizon: disabled"));
-#endif
-
-#ifndef NDEBUG
-  y += 2 + text_height;
-  canvas.DrawText(2, y, _T("DEBUG"));
-#endif
 }
