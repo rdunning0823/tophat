@@ -177,9 +177,12 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
   }
   else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &bmp = icon_look.hBmpClose;
-    DrawIconOrBitmap(canvas, rc, bmp, focused);
-
+    if (!icon_look.valid) {
+      DrawCaption(canvas, _("OK"), rc, enabled, focused, pressed);
+    } else {
+      const MaskedIcon &bmp = icon_look.hBmpClose;
+      DrawIconOrBitmap(canvas, rc, bmp, focused);
+    }
   } else if (caption.StartsWith(_T("_chkmark_"))) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon &icon = icon_look.hBmpCheckMark;

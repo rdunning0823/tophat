@@ -27,6 +27,7 @@ Copyright_License {
 void
 IconLook::Initialise()
 {
+  valid = true;
   hBmpScreensButton.LoadResource(IDB_SCREENS_BUTTON, IDB_SCREENS_BUTTON_HD, IDB_SCREENS_BUTTON_HD2);
   hBmpMenuButton.LoadResource(IDB_MENU_BUTTON, IDB_MENU_BUTTON_HD, IDB_MENU_BUTTON_HD2);
   hBmpCheckMark.LoadResource(IDB_CHECK_MARK, IDB_CHECK_MARK_HD, IDB_CHECK_MARK_HD2);

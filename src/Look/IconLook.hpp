@@ -30,6 +30,8 @@ Copyright_License {
  * This class manages the icons of various XCSoar dialogs.
  */
 struct IconLook {
+  /* can't draw icons until screen is initialized which initializes this IconLook */
+  bool valid;
   // task dialog
   MaskedIcon hBmpTabTask;
   MaskedIcon hBmpTabWrench;
