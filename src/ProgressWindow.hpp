@@ -53,6 +53,8 @@ class ProgressWindow : public ContainerWindow {
 
   unsigned text_height;
   unsigned progress_border_height;
+  /* use same calculation as sim window b/c that is shown prior on startup */
+  unsigned simulator_bottom_margin;
 
 public:
   explicit ProgressWindow(ContainerWindow &parent);

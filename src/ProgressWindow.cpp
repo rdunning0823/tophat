@@ -25,6 +25,8 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Look/FontDescription.hpp"
 #include "Resources.hpp"
+#include "Look/DialogLook.hpp"
+#include "UIGlobals.hpp"
 
 #ifdef USE_GDI
 #include "Screen/VirtualCanvas.hpp"
@@ -138,11 +140,14 @@ void
 ProgressWindow::OnResize(PixelSize new_size)
 {
   ContainerWindow::OnResize(new_size);
+  const DialogLook &look = UIGlobals::GetDialogLook();
 
   // Make progress bar height proportional to window height
   const unsigned progress_height = new_size.cy / 20;
   const unsigned progress_horizontal_border = progress_height / 2;
   progress_border_height = progress_height * 2;
+  simulator_bottom_margin = look.text_font.GetHeight() +
+      Layout::GetTextPadding() + Layout::Scale(50);
 
   if (message.IsDefined())
     message.Move(0,
@@ -171,7 +176,7 @@ ProgressWindow::OnPaint(Canvas &canvas)
   logo_rect.left = 0;
   logo_rect.top = 0;
   logo_rect.right = window_width;
-  logo_rect.bottom = window_height - progress_border_height;
+  logo_rect.bottom = window_height - simulator_bottom_margin;
   logo.draw(canvas, logo_rect);
 
   // Draw progress bar background
