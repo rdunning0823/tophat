@@ -51,7 +51,7 @@ ProgressWindow::ProgressWindow(ContainerWindow &parent)
 
   // Determine text height
 #ifndef USE_GDI
-  font.Load(FontDescription(Layout::FontScale(10)));
+  font.Load(FontDescription(Layout::FontScale(12)));
   text_height = font.GetHeight();
 #else
   VirtualCanvas canvas({1, 1});
