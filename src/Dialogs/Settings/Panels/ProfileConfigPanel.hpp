@@ -21,16 +21,13 @@ Copyright_License {
 }
 */
 
-#include "Util/tstring.hpp"
-#include <tchar.h>
+#ifndef PROFILECONFIGPANEL_HPP
+#define PROFILECONFIGPANEL_HPP
 
-void
-ProfileListDialog();
 
-/**
- * Let the user select a profile file.  Returns the absolute path of
- * the selected file or an empty string if the user has cancelled the
- * dialog.
- */
-tstring
-SelectProfileDialog(tstring::const_pointer selected_path, const TCHAR *title);
+class Widget;
+
+Widget *
+CreateProfileConfigPanel();
+
+#endif

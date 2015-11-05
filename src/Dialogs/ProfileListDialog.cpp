@@ -391,14 +391,13 @@ ProfileListDialog()
 }
 
 tstring
-SelectProfileDialog(tstring::const_pointer selected_path)
+SelectProfileDialog(tstring::const_pointer selected_path, const TCHAR *title)
 {
   ProfileListWidget widget(true);
   WidgetDialog dialog(UIGlobals::GetDialogLook());
-  dialog.CreateFull(UIGlobals::GetMainWindow(), _("Select profile"), &widget);
-  dialog.AddButton(_("Select"), mrOK);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), title, &widget);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   widget.CreateButtons(dialog);
-  dialog.AddButton(_("Cancel"), mrCancel);
   dialog.EnableCursorSelection();
 
   if (selected_path != nullptr) {

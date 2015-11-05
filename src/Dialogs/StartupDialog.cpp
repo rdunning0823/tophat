@@ -153,7 +153,7 @@ SelectProfileCallback(const TCHAR *caption, DataField &_df,
 {
   FileDataField &df = (FileDataField &)_df;
 
-  const auto path = SelectProfileDialog(df.GetPathFile());
+  const auto path = SelectProfileDialog(df.GetPathFile(), _("Select profile"));
   if (path.empty())
     return false;
 

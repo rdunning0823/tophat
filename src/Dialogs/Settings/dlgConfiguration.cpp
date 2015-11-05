@@ -61,6 +61,7 @@ Copyright_License {
 #include "Panels/TaskRulesConfigPanel.hpp"
 #include "Panels/ScoringConfigPanel.hpp"
 #include "Panels/InfoBoxesConfigPanel.hpp"
+#include "Panels/ProfileConfigPanel.hpp"
 #include "Dialogs/Airspace/Airspace.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
@@ -149,6 +150,7 @@ static constexpr TabMenuPage setup_pages[] = {
   { N_("Time"), CreateTimeConfigPanel },
 #ifdef HAVE_TRACKING
   { N_("Tracking"), CreateTrackingConfigPanel },
+  { N_("User profiles"), CreateProfileConfigPanel },
 #endif
 #ifdef HAVE_MODEL_TYPE
   { N_("Experimental Features"), CreateExperimentalConfigPanel, },
