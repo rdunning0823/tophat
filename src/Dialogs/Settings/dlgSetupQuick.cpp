@@ -52,6 +52,8 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "UIGlobals.hpp"
 #include "Profile/Profile.hpp"
+#include "Profile/Map.hpp"
+#include "Profile/Current.hpp"
 #include "Device/Register.hpp"
 #include "Device/MultipleDevices.hpp"
 #include "Formatter/UserUnits.hpp"
@@ -59,12 +61,12 @@ Copyright_License {
 #include "Units/UnitsStore.hpp"
 #include "Dialogs/Settings/Panels/NationalityConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SiteConfigPanel.hpp"
-#include "Dialogs/Settings/Panels/LoggerConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SafetyFactorsConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/LayoutConfigPanel.hpp"
 #include "UtilsSettings.hpp"
 #include "Simulator.hpp"
 #include "Event/Timer.hpp"
+#include "Dialogs/TextEntry.hpp"
 
 #include <math.h>
 #include <assert.h>
@@ -246,10 +248,6 @@ ShowPanel(unsigned page)
     widget = CreateSafetyFactorsConfigPanel();
     title = _("Safety factors");
     break;
-  case PILOT:
-    widget = CreateLoggerConfigPanel();
-    title = _("Pilot");
-    break;
   case SCREENS:
     widget = CreateLayoutConfigPanel(true);
     title = _("Set up screen");
@@ -257,6 +255,7 @@ ShowPanel(unsigned page)
   case DEVICE:
   case PLANE:
   case ADVANCED:
+  case PILOT:
   case OK:
     gcc_unreachable();
     return;
@@ -266,6 +265,22 @@ ShowPanel(unsigned page)
   SystemConfiguration(*widget, title.c_str());
 }
 
+static
+void
+dlgPilotTextEntry()
+{
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  LoggerSettings &logger = settings_computer.logger;
+
+  StaticString<64>name(logger.pilot_name.c_str());
+
+  if (TextEntryDialog(name.buffer(), name.CAPACITY, _("Pilot name"))) {
+    logger.pilot_name = name;
+    Profile::Set(ProfileKeys::PilotName, name.c_str());
+    Profile::map.SetModified(true);
+  }
+}
+
 void
 SetupQuick::OnAction(int id)
 {
@@ -273,9 +288,12 @@ SetupQuick::OnAction(int id)
   case NATIONALITY:
   case SITE_FILES:
   case SAFETY:
-  case PILOT:
   case SCREENS:
     ShowPanel(id);
+    break;
+
+  case PILOT:
+    dlgPilotTextEntry();
     break;
 
   case PLANE:
