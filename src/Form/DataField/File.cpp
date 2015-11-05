@@ -29,6 +29,7 @@ Copyright_License {
 #include "OS/PathName.hpp"
 #include "OS/FileUtil.hpp"
 #include "Language/Language.hpp"
+#include "Util/StaticString.hxx"
 
 #if defined(_WIN32_WCE) && !defined(GNAV)
 #include "OS/FlashCardEnumerator.hpp"
@@ -87,6 +88,7 @@ public:
 FileDataField::Item::~Item()
 {
   free(path);
+  free(filename_no_extension);
 }
 
 inline void
@@ -97,6 +99,10 @@ FileDataField::Item::Set(const TCHAR *_path)
   filename = BaseName(path);
   if (filename == nullptr)
     filename = path;
+  StaticString<64>filename_short(filename);
+  if (StringLength(filename) > 4)
+    filename_short.Truncate(StringLength(filename) - 4);
+  filename_no_extension = _tcsdup(filename_short.c_str());
 }
 
 FileDataField::FileDataField(DataFieldListener *listener)
@@ -105,7 +111,7 @@ FileDataField::FileDataField(DataFieldListener *listener)
 
    current_index(0),
    loaded(false), postponed_sort(false), sort_reverse(false),
-   postponed_value(_T("")), enable_file_download(false) {}
+   postponed_value(_T("")), enable_file_download(false), hide_file_extension(false) {}
 
 int
 FileDataField::GetAsInteger() const
@@ -240,6 +246,7 @@ FileDataField::AddNull()
   Item &item = files.append();
   item.filename = _T("");
   item.path = _tcsdup(_T(""));
+  item.filename_no_extension = _tcsdup(_T(""));
 }
 
 const TCHAR *
@@ -267,7 +274,8 @@ FileDataField::GetAsDisplayString() const
   }
 
   if (current_index < files.size())
-    return files[current_index].filename;
+    return hide_file_extension ? files[current_index].filename_no_extension
+        : files[current_index].filename;
   else
     return _T("");
 }
@@ -343,7 +351,8 @@ FileDataField::CreateComboList(const TCHAR *reference) const
   TCHAR buffer[MAX_PATH];
 
   for (unsigned i = 0; i < files.size(); i++) {
-    const TCHAR *path = files[i].filename;
+    const TCHAR *path = hide_file_extension ? files[i].filename_no_extension :
+        files[i].filename;
     assert(path != nullptr);
 
     /* is a file with the same base name present in another data
@@ -351,7 +360,9 @@ FileDataField::CreateComboList(const TCHAR *reference) const
 
     bool found = false;
     for (unsigned j = 1; j < files.size(); j++) {
-      if (j != i && StringIsEqual(path, files[j].filename)) {
+      if (j != i && StringIsEqual(path, hide_file_extension ?
+          files[j].filename_no_extension :
+          files[j].filename)) {
         found = true;
         break;
       }
@@ -422,4 +433,10 @@ void
 FileDataField::EnableInternetDownload()
 {
   enable_file_download = true;
+}
+
+void
+FileDataField::SetExtensionVisible(bool _show)
+{
+  hide_file_extension = !_show;
 }

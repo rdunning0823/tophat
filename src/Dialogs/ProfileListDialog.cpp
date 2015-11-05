@@ -38,6 +38,7 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Look/DialogLook.hpp"
 #include "Language/Language.hpp"
+#include "Util/StringAPI.hpp"
 
 #include <vector>
 
@@ -72,7 +73,10 @@ class ProfileListWidget final
     ProfileFileVisitor(std::vector<ListItem> &_list):list(_list) {}
 
     void Visit(const TCHAR* path, const TCHAR* filename) {
-      list.emplace_back(filename, path);
+      StaticString<32>shortname(filename);
+      if (StringLength(filename) > 4)
+        shortname.Truncate(StringLength(filename) - 4);
+      list.emplace_back(shortname, path);
     }
   };
 
@@ -317,12 +321,9 @@ static bool
 ConfirmDeleteProfile(const TCHAR *name)
 {
   StaticString<256> tmp;
-  StaticString<256> tmp_name(name);
-  if (tmp_name.length() > 4)
-    tmp_name.Truncate(tmp_name.length() - 4);
 
   tmp.Format(_("Delete \"%s\"?"),
-             tmp_name.c_str());
+             name);
   return ShowMessageBox(tmp, _("Delete"), MB_YESNO) == IDYES;
 }
 

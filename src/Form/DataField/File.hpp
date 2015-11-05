@@ -46,11 +46,14 @@ public:
     const TCHAR *filename;
     /** Path including Filename */
     TCHAR *path;
+    /** filename without extension */
+    TCHAR *filename_no_extension;
 
-    Item():filename(nullptr), path(nullptr) {}
+    Item():filename(nullptr), path(nullptr), filename_no_extension(nullptr) {}
 
-    Item(Item &&src):filename(src.filename), path(src.path) {
-      src.filename = src.path = nullptr;
+    Item(Item &&src):filename(src.filename), path(src.path),
+        filename_no_extension(src.filename_no_extension) {
+      src.filename = src.filename_no_extension = src.path = nullptr;
     }
 
     Item(const Item &) = delete;
@@ -60,6 +63,7 @@ public:
     Item &operator=(Item &&src) {
       std::swap(filename, src.filename);
       std::swap(path, src.path);
+      std::swap(filename_no_extension, src.filename_no_extension);
       return *this;
     }
 
@@ -113,6 +117,9 @@ private:
    * the user is responsible for handling this selection
    */
   bool enable_file_download;
+
+  /* don't display the file extension */
+  bool hide_file_extension;
 
 public:
   /**
@@ -215,6 +222,9 @@ public:
    * The user is responsible for handling the action when selected
    */
   void EnableInternetDownload();
+
+  void SetExtensionVisible(bool _visible);
+
 
   /* virtual methods from class DataField */
   void Inc() override;

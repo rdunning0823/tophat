@@ -165,7 +165,7 @@ void
 StartupWidget::Prepare(ContainerWindow &parent,
                        const PixelRect &rc)
 {
-  auto *pe = Add(_("Profile"), nullptr, df);
+  WndProperty *pe = Add(_("Profile"), nullptr, df);
   pe->SetEditCallback(SelectProfileCallback);
 
   AddButton(_("Continue"), action_listener, mrOK);
@@ -213,6 +213,7 @@ dlgStartupShowModal()
   /* scan all profile files */
   auto *dff = new FileDataField();
   dff->ScanDirectoryTop(_T("*.top"));
+  dff->SetExtensionVisible(false);
 
   /* skip this dialog if there is only one (or none) */
   if (dff->GetNumFiles() <= 1) {
