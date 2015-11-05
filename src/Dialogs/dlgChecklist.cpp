@@ -137,7 +137,7 @@ dlgChecklistShowModal()
   if (first) {
     LoadChecklist();
     if (nLists == 0)
-      addChecklist(_("No checklist loaded"), _("Create xcsoar-checklist.txt"));
+      addChecklist(_("No checklist loaded"), _("Create xcsoar-checklist.txt.  Use [square brackets] to separate checklist sections"));
     first = false;
   }
 
