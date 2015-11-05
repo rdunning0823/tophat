@@ -411,7 +411,7 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
 
   fixed map_width = projection.GetScreenWidthMeters();
 
-  canvas.Select(Fonts::map_bold);
+  canvas.Select(UIGlobals::GetLook().dialog.bold_font);
   FormatUserMapScale(map_width, buffer.buffer(), true);
   PixelSize text_size = canvas.CalcTextSize(buffer);
   const PixelScalar text_padding_x = Layout::Scale(2);
