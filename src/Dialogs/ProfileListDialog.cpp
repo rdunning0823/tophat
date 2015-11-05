@@ -286,8 +286,7 @@ ProfileListWidget::CopyClicked()
     return;
   }
 
-  if (!CheckProfilePasswordResult(CheckProfilePassword(data)))
-    return;
+  ClearProfilePassword(data);
 
   StaticString<64> new_name;
   new_name.clear();

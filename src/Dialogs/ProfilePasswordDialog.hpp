@@ -69,4 +69,7 @@ CheckProfilePasswordResult(ProfilePasswordResult result);
 bool
 SetProfilePasswordDialog(ProfileMap &map);
 
+void
+ClearProfilePassword(ProfileMap &map);
+
 #endif

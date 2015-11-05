@@ -101,3 +101,9 @@ SetProfilePasswordDialog(ProfileMap &map)
 
   return true;
 }
+
+void
+ClearProfilePassword(ProfileMap &map)
+{
+  map.erase(ProfileKeys::Password);
+}
