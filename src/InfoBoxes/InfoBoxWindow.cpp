@@ -232,7 +232,7 @@ InfoBoxWindow::PaintComment(Canvas &canvas)
 
   canvas.SetTextColor(look.GetCommentColor(data.comment_color));
 
-  const Font &font = look.title_font;
+  const Font &font = look.comment_font;
   canvas.Select(font);
 
   PixelSize tsize = canvas.CalcTextSize(data.comment);
@@ -452,7 +452,7 @@ InfoBoxWindow::OnResize(PixelSize new_size)
   title_rect.bottom = rc.top + look.title_font.GetHeight();
 
   comment_rect = rc;
-  comment_rect.top = comment_rect.bottom - (look.title_font.GetHeight() + 2);
+  comment_rect.top = comment_rect.bottom - (look.comment_font.GetHeight() + 2);
   value_rect = rc;
   value_rect.top = title_rect.bottom;
   value_rect.bottom = comment_rect.top;

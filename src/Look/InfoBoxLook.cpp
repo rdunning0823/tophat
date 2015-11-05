@@ -61,6 +61,7 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
   small_value_font.Load(FontDescription(_T("RasterGothicEighteenCond"),
                                         19, true));
   title_font.Load(FontDescription(_T("RasterGothicNineCond"), 10));
+  comment_font.Load(FontDescription(_T("RasterGothicNineCond"), 10));
 #else
   ReinitialiseLayout(width);
 
@@ -84,6 +85,10 @@ InfoBoxLook::ReinitialiseLayout(unsigned width)
   FontDescription title_font_d(Layout::FontScale(14));
   AutoSizeFont(title_font_d, width, _T("MC MANUALXX"));
   title_font.Load(title_font_d);
+
+  FontDescription comment_font_d(Layout::FontScale(14));
+  AutoSizeFont(comment_font_d, width, _T("MC MANUALi"));
+  comment_font.Load(comment_font_d);
 
 #ifndef GNAV
   FontDescription value_font_d(10, true);
