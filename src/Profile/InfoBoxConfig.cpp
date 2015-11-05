@@ -128,8 +128,7 @@ Profile::Load(const ProfileMap &map, InfoBoxSettings &settings)
   settings.use_colors = HasColors();
   //map.Get(ProfileKeys::AppInfoBoxColors, settings.use_colors);
 
-  // use default
-  //map.GetEnum(ProfileKeys::AppInfoBoxBorder, settings.border_style);
+  map.GetEnum(ProfileKeys::AppInfoBoxBorder, settings.border_style);
 
   GetV60InfoBoxManagerConfig(map, settings);
   char profileKey[32];

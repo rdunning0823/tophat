@@ -47,9 +47,11 @@ Copyright_License {
 enum ControlIndex {
   MapOrientation,
   AppInfoBoxGeom,
+  AppStatusMessageAlignment,
   ScreensButtonLocation,
   AppInverseInfoBox,
   AppInfoBoxColors,
+  AppInfoBoxBorder,
   CustomizeScreens,
   CustomizeInfoBoxes,
 };
@@ -79,6 +81,26 @@ static constexpr StaticEnumChoice screens_button_location_list[] = {
   { 0 }
 };
 #endif
+
+static constexpr StaticEnumChoice popup_msg_position_list[] = {
+  { (unsigned)UISettings::PopupMessagePosition::CENTER, N_("Center"),
+    N_("Center the status message boxes.") },
+  { (unsigned)UISettings::PopupMessagePosition::TOP_LEFT, N_("Topleft"),
+    N_("Show status message boxes ina the top left corner.") },
+  { 0 }
+};
+
+static constexpr StaticEnumChoice infobox_border_list[] = {
+  { unsigned(InfoBoxSettings::BorderStyle::BOX),
+    N_("Box"), N_("Draws boxes around each InfoBox.") },
+  { unsigned(InfoBoxSettings::BorderStyle::TAB),
+    N_("Tab"), N_("Draws a tab at the top of the InfoBox across the title.") },
+  { unsigned(InfoBoxSettings::BorderStyle::SHADED),
+    N_("Shaded"), nullptr /* TODO: help text */ },
+  { unsigned(InfoBoxSettings::BorderStyle::GLASS),
+    N_("Glass"), nullptr /* TODO: help text */ },
+  { 0 }
+};
 
 static constexpr StaticEnumChoice info_box_geometry_list[] = {
   { (unsigned)InfoBoxSettings::Geometry::SPLIT_8,
@@ -166,6 +188,11 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           _("A list of possible InfoBox layouts. Do some trials to find the best for your screen size."),
           info_box_geometry_list, (unsigned)ui_settings.info_boxes.geometry);
 
+  AddEnum(_("Message display"), nullptr,
+          popup_msg_position_list,
+          (unsigned)ui_settings.popup_message_position);
+  SetExpertRow(AppStatusMessageAlignment);
+
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   AddDummy();
 #else
@@ -189,6 +216,10 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     SetExpertRow(AppInfoBoxColors);
   } else
     AddDummy();
+
+  AddEnum(_("InfoBox border"), nullptr, infobox_border_list,
+          unsigned(ui_settings.info_boxes.border_style));
+  SetExpertRow(AppInfoBoxBorder);
 
   if (quick_setup) {
     AddButton(_("Edit screens"), *this, CustomizeScreens);
@@ -237,6 +268,12 @@ LayoutConfigPanel::Save(bool &_changed)
       SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors,
                 ui_settings.info_boxes.use_colors))
     require_restart = changed = true;
+
+  changed |= SaveValueEnum(AppStatusMessageAlignment, ProfileKeys::AppStatusMessageAlignment,
+                           ui_settings.popup_message_position);
+
+  changed |= SaveValueEnum(AppInfoBoxBorder, ProfileKeys::AppInfoBoxBorder,
+                           ui_settings.info_boxes.border_style);
 
   if (orientation_changed) {
     assert(Display::RotateSupported());
