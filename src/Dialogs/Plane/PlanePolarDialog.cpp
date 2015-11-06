@@ -298,8 +298,8 @@ dlgPlanePolarShowModal(Plane &_plane)
   WidgetDialog dialog(look);
   PlanePolarWidget widget(_plane, look);
   dialog.CreateAuto(UIGlobals::GetMainWindow(), caption, &widget);
+  dialog.AddSymbolButton(_("_X"), mrOK);
   widget.CreateButtons(dialog);
-  dialog.AddButton(_("OK"), mrOK);
   dialog.AddButton(_("Cancel"), mrCancel);
   const int result = dialog.ShowModal();
   dialog.StealWidget();
