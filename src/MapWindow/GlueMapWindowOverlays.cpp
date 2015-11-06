@@ -184,7 +184,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   TaskType task_mode = TaskType::GOTO;
   TaskFactoryType task_factory_type = TaskFactoryType::RACING;
   const OrderedTask *ot;
-  const Waypoint *wp;
+  const Waypoint *wp = nullptr;
   if (true) {
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
     ot = &task_manager->GetOrderedTask();
@@ -194,7 +194,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   }
   StaticString<255> wp_name(_T(""));
   unsigned task_size = 1;
-  bool has_entered, has_exited;
+  bool has_entered = false, has_exited = false;
   unsigned idx = 0;
   bool tp_valid = tp != nullptr;
 
