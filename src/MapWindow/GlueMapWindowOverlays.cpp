@@ -127,15 +127,6 @@ GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
   const int offsety = (menu_button_height - icon_size.cy) / 2;
   icon->DrawUpperLeft(canvas, rc_main_menu_button.left + offsetx,
                       rc_main_menu_button.top + offsety);
-
-/*
-  canvas.CopyAnd(rc_main_menu_button.left + offsetx,
-                 rc_main_menu_button.top + offsety,
-                  icon_size.cx / 2,
-                  icon_size.cy,
-                  *icon,
-                  icon_size.cx / 2, 0);
-*/
 }
 
 void
@@ -154,27 +145,10 @@ GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
   const int offsety = (rc_zoom_in_button.bottom - rc_zoom_in_button.top - icon_in_size.cy) / 2;
   icon_zoom_in->DrawUpperLeft(canvas, rc_zoom_in_button.left + offsetx,
                               rc_zoom_in_button.top + offsety);
-/*
-  canvas.CopyAnd(rc_zoom_in_button.left + offsetx,
-                  rc_zoom_in_button.top + offsety,
-                  icon_in_size.cx / 2,
-                  icon_in_size.cy,
-                  *icon_zoom_in,
-                  icon_in_size.cx / 2, 0);
-*/
 
   const MaskedIcon *icon_zoom_out = &icon_look.hBmpZoomOutButton;
   icon_zoom_out->DrawUpperLeft(canvas, rc_zoom_out_button.left + offsetx,
                                rc_zoom_out_button.top + offsety);
-/*
-  canvas.CopyAnd(rc_zoom_out_button.left + offsetx,
-                  rc_zoom_out_button.top + offsety,
-                  icon_out_size.cx / 2,
-                  icon_out_size.cy,
-                  *icon_zoom_out,
-                  icon_out_size.cx / 2, 0);
-*/
-
 }
 
 void
