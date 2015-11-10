@@ -24,6 +24,7 @@ Copyright_License {
 #include "TimeInfoBox.hpp"
 #include "Base.hpp"
 #include "Dialogs/Settings/Panels/TimeConfigPanel.hpp"
+#include "Dialogs/DialogSettings.hpp"
 #include "Form/Edit.hpp"
 #include "Form/DataField/Float.hpp"
 #include "Interface.hpp"
@@ -32,24 +33,22 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "UIGlobals.hpp"
+#include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Screen/Layout.hpp"
 
-enum ControlIndex {
-  WindSpeed,
-  WindDirection,
-  LastItemInList,
-};
 
 class TimeInfoBoxPanel: public BaseAccessPanel {
-
+  bool expert_save;
 public:
   TimeInfoBoxPanel(unsigned id, TimeConfigPanel *time_config_panel)
-    :BaseAccessPanel(id, time_config_panel) {
+    :BaseAccessPanel(id, time_config_panel), expert_save(UIGlobals::GetDialogSettings().expert) {
+    CommonInterface::SetUISettings().dialog.expert = false;
   };
   virtual void Hide();
-
-protected:
+  ~TimeInfoBoxPanel() {
+    CommonInterface::SetUISettings().dialog.expert = expert_save;
+  }
 };
 
 void
@@ -69,6 +68,5 @@ LoadTimeInfoBoxPanel(unsigned id)
 {
   TimeConfigPanel *inner_widget = new TimeConfigPanel();
   TimeInfoBoxPanel *outer_widget = new TimeInfoBoxPanel(id, inner_widget);
-  //inner_widget->SetForm(outer_widget);
   return outer_widget;
 }
