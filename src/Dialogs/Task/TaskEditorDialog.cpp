@@ -687,7 +687,7 @@ void
 TaskPointUsDialog::OnActivateItem(unsigned i)
 {
   if (i == ordered_task->TaskSize()) {
-    AppendTurnpoint();
+    OnAddClicked();
     return;
   }
 }
