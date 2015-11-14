@@ -330,7 +330,7 @@ public:
    */
   gcc_malloc
   FinishPoint* CreateFinish(const TaskPointFactoryType type,
-                            const Waypoint &wp) const;
+                            const Waypoint &wp, fixed oz_size = fixed(-1)) const;
 
   /**
    * Create start point of default type
@@ -356,11 +356,12 @@ public:
    * Create finish point of default type
    *
    * @param wp Waypoint reference
+   * @param oz_size the size of the oz.  if omitted, uses default
    *
    * @return Initialised FinishPoint if valid, otherwise NULL
    */
   gcc_malloc
-  FinishPoint* CreateFinish(const Waypoint &wp) const;
+  FinishPoint* CreateFinish(const Waypoint &wp, fixed oz_size = fixed(-1)) const;
 
   /**
    * Create start point given an OZ

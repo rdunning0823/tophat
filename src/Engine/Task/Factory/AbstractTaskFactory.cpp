@@ -143,9 +143,9 @@ AbstractTaskFactory::CreateIntermediate(const Waypoint &wp) const
 }
 
 FinishPoint* 
-AbstractTaskFactory::CreateFinish(const Waypoint &wp) const
+AbstractTaskFactory::CreateFinish(const Waypoint &wp, fixed oz_size) const
 {
-  return CreateFinish(GetDefaultFinishType(), wp);
+  return CreateFinish(GetDefaultFinishType(), wp, oz_size);
 }
 
 TaskPointFactoryType 
@@ -384,12 +384,12 @@ AbstractTaskFactory::CreateIntermediate(const TaskPointFactoryType type,
 
 FinishPoint* 
 AbstractTaskFactory::CreateFinish(const TaskPointFactoryType type,
-                                  const Waypoint &wp) const
+                                  const Waypoint &wp, fixed oz_size) const
 {
   if (!IsValidFinishType(type))
     return NULL;
 
-  return (FinishPoint*)CreatePoint(type, wp);
+  return (FinishPoint*)CreatePoint(type, wp, fixed(-1), fixed(-1), oz_size);
 }
 
 bool 
@@ -740,7 +740,9 @@ AbstractTaskFactory::CheckAddFinish()
  if (task.HasFinish())
    return false;
 
- FinishPoint *fp = CreateFinish(task.GetPoint(task.TaskSize() - 1).GetWaypoint());
+ OrderedTaskPoint &tp = task.GetPoint(task.TaskSize() - 1);
+ fixed oz_size = GetOZSize(tp.GetObservationZone());
+ FinishPoint *fp = CreateFinish(tp.GetWaypoint(), oz_size);
  assert(fp);
  Remove(task.TaskSize() - 1, false);
  Append(*fp, false);
