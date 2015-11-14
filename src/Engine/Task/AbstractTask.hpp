@@ -102,6 +102,13 @@ public:
     task_behaviour = tb;
   }
 
+  /**
+   * returns editable object for the current task
+   */
+  TaskBehaviour &GetTaskBehaviour() {
+    return task_behaviour;
+  }
+
   /** 
    * Retrieves the active task point sequence.
    * 

@@ -306,15 +306,15 @@ static void UpdateTaskDefaults(OrderedTask &task)
   task_behaviour.sector_defaults.finish_radius = radius;
 
   if (task.TaskSize() > 2) {
-    index = 1;
-    point_type = (TaskPointFactoryType)factory.GetType(task.GetPoint(index));
-    Profile::Set(ProfileKeys::TurnpointType, (unsigned)point_type);
-    task_behaviour.sector_defaults.turnpoint_type =
-        (TaskPointFactoryType)point_type;
 
-    radius = factory.GetOZSize(task.GetPoint(index).GetObservationZone());
-    Profile::Set(ProfileKeys::TurnpointRadius, radius);
-    task_behaviour.sector_defaults.turnpoint_radius = radius;
+    task_behaviour.sector_defaults.turnpoint_radius =
+        task.GetTaskBehaviour().sector_defaults.turnpoint_radius;
+    Profile::Set(ProfileKeys::TurnpointRadius, task_behaviour.sector_defaults.turnpoint_radius);
+
+    task_behaviour.sector_defaults.turnpoint_type =
+        task.GetTaskBehaviour().sector_defaults.turnpoint_type;
+    Profile::Set(ProfileKeys::TurnpointType,
+                 (unsigned)task_behaviour.sector_defaults.turnpoint_type);
   }
 
   auto factory_type = task.GetFactoryType();

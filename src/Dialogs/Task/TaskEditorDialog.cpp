@@ -174,6 +174,11 @@ public:
   void OnRelocateClicked();
   void OnTypeClicked();
 
+  /**
+   * updates the turnpoing (no start or finish) defaults in the
+   * task behavior of the task being build
+   */
+  void UpdateTurnpointDefaults();
   void CreateButtons() {
     /* tab order works for portrait. */
     /* landscape is problem b/c widget and list are created elsewhere */
@@ -677,9 +682,37 @@ TaskPointUsDialog::OnTypeClicked()
 }
 
 void
+TaskPointUsDialog::UpdateTurnpointDefaults()
+{
+  if (ordered_task->TaskSize() < 2)
+    return;
+
+  const AbstractTaskFactory& factory = ordered_task->GetFactory();
+
+  switch (ordered_task->GetPoint(active_index).GetType()) {
+  case TaskPointType::AST:
+  case TaskPointType::AAT: {
+    auto point_type = (TaskPointFactoryType)factory.GetType(
+        ordered_task->GetPoint(active_index));
+    ordered_task->GetTaskBehaviour().sector_defaults.turnpoint_type = (TaskPointFactoryType)point_type;
+
+    fixed radius = factory.GetOZSize(
+        ordered_task->GetPoint(active_index).GetObservationZone());
+    ordered_task->GetTaskBehaviour().sector_defaults.turnpoint_radius = radius;
+    break;
+  }
+  case TaskPointType::UNORDERED:
+  case TaskPointType::START:
+  case TaskPointType::FINISH:
+    break;
+  }
+}
+
+void
 TaskPointUsDialog::OnModified(ObservationZoneEditWidget &widget)
 {
   ReadValues();
+  UpdateTurnpointDefaults();
 }
 
 
