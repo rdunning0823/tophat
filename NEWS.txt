@@ -2,6 +2,7 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.1.2 Beta TBD
+* Task editor turnpoint default improvements
 * Task Restart prompt
 * Configure default startup settings via Advanced Configuration (fly, sim, quick)
 * Auto switch portait / landscape in all dialogs
@@ -10,89 +11,88 @@ Top Hat Soaring 2.1.2 Beta TBD
 * Add "Home" icon in waypoint details
 * Local Time Infoboxe allows setting UTC offset
 * Profile manager: add/delete/password protect
-* merge XCSoar 6.8.2
-	* fix freeze bug when starting without GPS fix
-	* fix crash with empty xcsoar-checklist.txt file
-	* Rubik R-26S polar
-	* map
-	  - fix crash in the topography renderer
-	* calculations
-	  - fix task progress display after finish achieved (#3657)
-	  - wave assistant
-	  - use maximum speed configured in plane setup as limit for calculations
-	  - use WGS84 earth ellipsoid for distance calculations (#2809)
-	  - remove setting "Prefer external wind"
-	  - reduce EKF wind latency
-	  - fix bogus value in "Nearest Airspace H" InfoBox (#3589)
-	  - obey the maximum start speed (#2841)
-	  - faster triangle score calculation
-	  - fix crash in triangle score calculation (#3576)
-	* devices
-	  - remove option "Ignore checksum"
-	  - CAI302: add sink tone configuration
-	  - LX: implement LXNAV Nano3 task declaration (#3295)
-	  - LX: remove support for LX1600 pass-through mode
-	  - ATR833: new driver
-	  - Volkslogger: support DAeC keyhole declaration
-	  - Westerboer VW921: remove buggy driver (#3215)
-	  - added TCP port 2000 to portlist (part of #3326)
-	  - support LXNAV V7 pass-through mode (#1913, #2808, #2919)
-	  - fix wrong baud rate after task declaration (#3654)
-	* Android
-	  - fix IOIO connection on Android 4.x (#2959, #3260)
-	  - support IOIO-OTG with the Android device in USB host mode
-	  - support IOIO over Bluetooth
-	  - support Bluetooth LE
-	  - timeout for the HTTP client (e.g. LiveTrack24)
-	  - support the "escape" key (#3647)
-	  - fix all RS232 permissions on Android (#3648)
-	  - fix USB-RS232-OTG permissions on Android
-	  - timeout for the HTTP client (e.g. LiveTrack24)
-	* Kobo
-	  - support Wifi with WEP (#3138)
-	  - support open Wifi networks (#3391)
-	  - support USB-OTG
-	  - support the Kobo Aura screen (#3490)
-	  - fix wrong IP address display (#3650)
-	  - enable crash dumps in XCSoarData/crash/
-	* Raspberry Pi / Cubieboard
-	  - support digit and letter keys (#3611)
-	* Windows
-	  - fix the airspace file parser (#3633)
-	  - Allow site files download from Internet
-	* data files
-	  - store user-edited waypoints and markers in "user.cup"
-	* infoboxes
-	  - add "Fin MC0 AltD" infobox (#2824)
-	  - add "Next arrow" infobox (#3128)
-	  - fix data for OLC infoboxes if "OLC League" is used (#3461)
-	* map
-	  - allow "Mark Drop" while panning
-	  - airspace labels
-	  - sync zoom with cross-section & map
-	* user interface
-	  - fix crash while panning the map
-	  - improved font renderer
-	  - allow horizontal speeds in m/s
-	  - show airspace warning at top
-	  - use configured coordinate format in waypoint editor
-	  - replace custom font support with global "text size" setting
-	  - bigger icons on high-dpi screens (#2795, #3267, #3397, #3540)
-	  - improved keypad support (#3281)
-	  - new translation: Simplified Chinese
-	  - save settings after copy&pasting an InfoBox set (#3649)
-	* tracking
-	  - new option disables tracking while roaming on the cell network
-	  - queue SkyLines tracking fixes while data connection is unavailable
-	  - fix SkyLines traffic display on southern hemisphere (#3601)
-	  - show SkyLines traffic even if we have no GPS fix yet
-	  - show nearby waypoint in SkyLines traffic list
-	  - show altitude in list (#3606)
-	  - show all nearby traffic (#2814)
-	  - pass vehicle name to LiveTrack24
-	* airspace
-	  - accept airspaces of class RMZ in OpenAir format files (#3437)
-	  - fix wrong AGL height due to longitude east/west wraparound (#3468)
+* Show airspace warning at screen top
+* merge XCSoar 6.7.7 - 6.8.2
+  * fix freeze bug when starting without GPS fix
+  * Rubik R-26S polar
+  * map
+    - fix crash in the topography renderer
+  * calculations
+    - fix task progress display after finish achieved (#3657)
+    - wave assistant
+    - use maximum speed configured in plane setup as limit for calculations
+    - use WGS84 earth ellipsoid for distance calculations (#2809)
+    - remove setting "Prefer external wind"
+    - reduce EKF wind latency
+    - fix bogus value in "Nearest Airspace H" InfoBox (#3589)
+    - obey the maximum start speed (#2841)
+    - faster triangle score calculation
+    - fix crash in triangle score calculation (#3576)
+  * devices
+    - remove option "Ignore checksum"
+    - CAI302: add sink tone configuration
+    - LX: implement LXNAV Nano3 task declaration (#3295)
+    - LX: remove support for LX1600 pass-through mode
+    - ATR833: new driver
+    - Volkslogger: support DAeC keyhole declaration
+    - Westerboer VW921: remove buggy driver (#3215)
+    - added TCP port 2000 to portlist (part of #3326)
+    - support LXNAV V7 pass-through mode (#1913, #2808, #2919)
+    - fix wrong baud rate after task declaration (#3654)
+  * Android
+    - fix IOIO connection on Android 4.x (#2959, #3260)
+    - support IOIO-OTG with the Android device in USB host mode
+    - support IOIO over Bluetooth
+    - support Bluetooth LE
+    - timeout for the HTTP client (e.g. LiveTrack24)
+    - support the "escape" key (#3647)
+    - fix all RS232 permissions on Android (#3648)
+    - fix USB-RS232-OTG permissions on Android
+    - timeout for the HTTP client (e.g. LiveTrack24)
+  * Kobo
+    - support Wifi with WEP (#3138)
+    - support open Wifi networks (#3391)
+    - support USB-OTG
+    - support the Kobo Aura screen (#3490)
+    - fix wrong IP address display (#3650)
+    - enable crash dumps in XCSoarData/crash/
+  * Raspberry Pi / Cubieboard
+    - support digit and letter keys (#3611)
+  * Windows
+    - fix the airspace file parser (#3633)
+    - Allow site files download from Internet
+  * data files
+    - store user-edited waypoints and markers in "user.cup"
+  * infoboxes
+    - add "Fin MC0 AltD" infobox (#2824)
+    - add "Next arrow" infobox (#3128)
+    - fix data for OLC infoboxes if "OLC League" is used (#3461)
+  * map
+    - allow "Mark Drop" while panning
+    - airspace labels
+    - sync zoom with cross-section & map
+  * user interface
+    - fix crash while panning the map
+    - improved font renderer
+    - allow horizontal speeds in m/s
+    - use configured coordinate format in waypoint editor
+    - replace custom font support with global "text size" setting
+    - bigger icons on high-dpi screens (#2795, #3267, #3397, #3540)
+    - improved keypad support (#3281)
+    - new translation: Simplified Chinese
+    - save settings after copy&pasting an InfoBox set (#3649)
+  * tracking
+    - new option disables tracking while roaming on the cell network
+    - queue SkyLines tracking fixes while data connection is unavailable
+    - fix SkyLines traffic display on southern hemisphere (#3601)
+    - show SkyLines traffic even if we have no GPS fix yet
+    - show nearby waypoint in SkyLines traffic list
+    - show altitude in list (#3606)
+    - show all nearby traffic (#2814)
+    - pass vehicle name to LiveTrack24
+  * airspace
+    - accept airspaces of class RMZ in OpenAir format files (#3437)
+    - fix wrong AGL height due to longitude east/west wraparound (#3468)
 
 Top Hat Soaring 2.1.1b Beta September 15, 2015
 * Smooth the circle diameter infobox
