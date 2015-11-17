@@ -72,11 +72,11 @@ public:
   TaskButtonWidget(const TCHAR *_caption)
     :caption(_caption) {};
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide();
-  virtual void Move(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual void Show(const PixelRect &rc) override;
+  virtual void Hide() override;
+  virtual void Move(const PixelRect &rc) override;
 
   WndSymbolButton& CreateButton(ContainerWindow &parent,
                                 const ButtonLook &button_look,
@@ -92,12 +92,12 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget) = 0;
+                                bool is_top_widget) override = 0;
 
   /**
    * How much height does this widget use at the top of the map screen
    */
-  virtual UPixelScalar HeightFromTop() {
+  virtual UPixelScalar HeightFromTop() override {
     return height;
   }
 
@@ -105,7 +105,7 @@ public:
    * The OnAction is derived from ActionListener
    * Sets the previous task point if available
    */
-  virtual void OnAction(int id) { }
+  virtual void OnAction(int id)  override { }
 private:
 
 };

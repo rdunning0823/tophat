@@ -49,11 +49,11 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget);
+                                bool is_top_widget) override;
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Move(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual void Move(const PixelRect &rc) override;
 
   /**
    * updates the text on the button
@@ -64,7 +64,7 @@ public:
   /**
    * The OnAction is derived from ActionListener
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /* virtual methods from class BlackboardListener */
   virtual void OnUIStateUpdate() override;

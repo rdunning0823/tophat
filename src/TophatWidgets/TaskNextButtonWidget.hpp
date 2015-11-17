@@ -37,7 +37,7 @@ public:
   TaskNextButtonWidget()
     :TaskButtonWidget(_T(">")) {};
 
-  virtual void Move(const PixelRect &rc);
+  virtual void Move(const PixelRect &rc) override;
 
   /**
    * Shows or hides the widgets based on these parameters
@@ -49,13 +49,13 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget);
+                                bool is_top_widget) override;
 
   /**
    * The OnAction is derived from ActionListener
    * Sets the previous task point if available
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 private:
 
 };

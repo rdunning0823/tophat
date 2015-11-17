@@ -60,22 +60,22 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget) = 0;
+                                bool is_top_widget) override = 0;
 
   /**
    * Must call Prepare() at end of derived class Prepare()
    * Derived class Prepare() must call SetBitmap()
    */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual void Show(const PixelRect &rc) override;
+  virtual void Hide() override;
 
   /* moves the widget only if it needs to be moved
    * This eliminates performance issues
    * @param rc new position
    */
-  virtual void Move(const PixelRect &rc);
+  virtual void Move(const PixelRect &rc) override;
   MapOverlayButton& CreateButton(ContainerWindow &parent,
                                  const ButtonLook &button_look,
                                  const IconLook &icon_look,
@@ -84,7 +84,7 @@ public:
   /**
    * How much height does this widget use at the bottom right of the map screen
    */
-  virtual UPixelScalar HeightFromBottomRight();
+  virtual UPixelScalar HeightFromBottomRight() override;
 
   /**
    * returns width of button
@@ -104,7 +104,7 @@ public:
   /**
    * The OnAction is derived from ActionListener
    */
-  virtual void OnAction(int id) = 0;
+  virtual void OnAction(int id) override = 0;
 
 protected:
   /**

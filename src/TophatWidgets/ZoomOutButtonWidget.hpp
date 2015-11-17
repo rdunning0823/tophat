@@ -47,13 +47,13 @@ public:
   ZoomOutButtonWidget(ZoomInButtonWidget *_zoom_in)
     :OverlayButtonWidget(), zoom_in(_zoom_in) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) final;
-  virtual void Move(const PixelRect &rc) final;
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Move(const PixelRect &rc) override;
 
   /**
    * How much height does this widget use at the bottom of the map screen
    */
-  virtual UPixelScalar HeightFromBottomLeft();
+  virtual UPixelScalar HeightFromBottomLeft() override;
 
   /**
    * Shows or hides the widgets based on these parameters
@@ -64,14 +64,14 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget);
+                                bool is_top_widget) override;
 
   /**
    * The OnAction is derived from ActionListener
    * Toggles between the more/less menus (MapDisplay1, MapDisplay2)
    * and hiding the menu
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 private:
 
 };

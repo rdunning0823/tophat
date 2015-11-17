@@ -99,14 +99,14 @@ public:
    */
   virtual void UpdateVisibility(const PixelRect &rc, bool is_panning,
                                 bool is_main_window_widget, bool is_map,
-                                bool is_top_widget);
+                                bool is_top_widget) override;
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide();
-  virtual void Move(const PixelRect &rc);
-  virtual bool SetFocus() {
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual void Show(const PixelRect &rc) override;
+  virtual void Hide() override;
+  virtual void Move(const PixelRect &rc) override;
+  virtual bool SetFocus() override {
     GetList().KillFocus();
     return false;
   }
@@ -114,7 +114,7 @@ public:
   /**
    * How much height does this widget use at the top of the map screen
    */
-  virtual UPixelScalar HeightFromTop();
+  virtual UPixelScalar HeightFromTop() override;
 
   /**
    * Updates the cached values of the task from the protected_task_manager
@@ -183,23 +183,23 @@ protected:
    * Inherited from ListControl::Handler
    */
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
-                           unsigned idx);
+                           unsigned idx) override;
 
   /**
    * Toggles through the menu modes or hides if last mode
    */
-  virtual void OnActivateItem(unsigned index);
+  virtual void OnActivateItem(unsigned index) override;
 
-  virtual void OnCursorMoved(unsigned index);
+  virtual void OnCursorMoved(unsigned index) override;
 
-  virtual bool CanActivateItem(unsigned index) const {
+  virtual bool CanActivateItem(unsigned index) const override {
     return true;
   }
 
   /**
    * hide the menu if it's being moved
    */
-  virtual void OnPixelMove();
+  virtual void OnPixelMove() override;
 };
 
 #endif
