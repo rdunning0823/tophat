@@ -765,7 +765,7 @@ public:
   /**
    * is this type of task optimizable?
    */
-  virtual bool IsOptimizable() const;
+  virtual bool IsOptimizable() const override;
 
 protected:
   /* virtual methods from class AbstractTask */
@@ -821,7 +821,7 @@ protected:
                             const GlideResult &solution_remaining_leg) override;
 
   void UpdateNavBarStatistics(const AircraftState &aircraft,
-                              const GlidePolar &polar);
+                              const GlidePolar &polar) override;
 
 protected:
   bool IsScored() const override;
