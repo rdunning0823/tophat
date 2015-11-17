@@ -45,12 +45,12 @@ public:
   void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   bool Save(bool &changed) override;
 
-  virtual const TCHAR* GetOzSummary();
+  virtual const TCHAR* GetOzSummary() override;
 
   /**
    * Is this widget encapsulated by a summary widget
    */
-  virtual bool IsSummarized() {
+  virtual bool IsSummarized() override {
     return true;
   }
 

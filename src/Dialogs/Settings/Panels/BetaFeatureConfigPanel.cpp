@@ -46,7 +46,7 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
-  virtual void OnModified(DataField &df) {};
+  virtual void OnModified(DataField &df) override {};
 };
 
 void

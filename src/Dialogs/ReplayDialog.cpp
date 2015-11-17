@@ -110,7 +110,7 @@ public:
   /* virtual methods from class Widget */
   virtual void Prepare(ContainerWindow &parent,
                        const PixelRect &rc) override;
-  virtual void Unprepare();
+  virtual void Unprepare() override;
 
 private:
   /* virtual methods from ActionListener */

@@ -148,7 +148,7 @@ public:
   virtual bool Save(bool &changed) override;
 
   /** from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 };
 
 void

@@ -126,12 +126,12 @@ public:
              _T(""), GetDialogStyle())
   {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual bool Save(bool &changed);
-  virtual void Show(const PixelRect &rc);
-  virtual void Hide() {};
-  virtual void Move(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual bool Save(bool &changed) override;
+  virtual void Show(const PixelRect &rc) override;
+  virtual void Hide() override {};
+  virtual void Move(const PixelRect &rc) override;
 
   /**
    * returns height of TaskNavSlider bar
@@ -141,7 +141,7 @@ public:
   /**
    * from ActionListener
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /**
    * sets the current tip and advances ui_settings.last_startup_tip

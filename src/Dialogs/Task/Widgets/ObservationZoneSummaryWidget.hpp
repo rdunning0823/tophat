@@ -57,7 +57,7 @@ public:
 
 public:
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
 
 protected:
@@ -65,7 +65,7 @@ protected:
    * virtual from ActionListener
    * causes the ObservationZoneEditWidget to display
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /**
    * Updates the button caption with info from the edit widget

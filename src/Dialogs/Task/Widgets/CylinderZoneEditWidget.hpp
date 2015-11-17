@@ -50,7 +50,7 @@ public:
   void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   bool Save(bool &changed) override;
 
-  virtual tstring::const_pointer GetOzSummary() {
+  virtual tstring::const_pointer GetOzSummary() override {
     return _T("");
   }
 };

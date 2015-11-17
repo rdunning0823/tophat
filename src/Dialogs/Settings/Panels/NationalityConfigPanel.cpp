@@ -75,7 +75,7 @@ public:
   void RefreshForm();
 
 protected:
-  void OnModified(DataField &df);
+  void OnModified(DataField &df) override;
 };
 
 #ifndef HAVE_NATIVE_GETTEXT

@@ -50,7 +50,7 @@ public:
 void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 bool Save(bool &changed) override;
 
-  virtual const TCHAR* GetOzSummary() {
+  virtual const TCHAR* GetOzSummary() override {
     return _T("");
   }
 };

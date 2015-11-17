@@ -121,10 +121,10 @@ public:
   void RefreshForm();
   void RefreshDeviceStatus();
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc) {};
-  virtual void Hide() {};
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual void Show(const PixelRect &rc) override {};
+  virtual void Hide() override {};
 
   /**
    * sets up rectangles for layout of screen
@@ -142,7 +142,7 @@ public:
   /**
    * from ActionListener
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /**
    * Reads relevant devices and puts them into a string

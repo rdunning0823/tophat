@@ -51,8 +51,8 @@ public:
   void RefreshAltitudeControl();
   void SetQNH(AtmosphericPressure qnh);
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual bool Save(bool &changed);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual bool Save(bool &changed) override;
   virtual void Show(const PixelRect &rc) override {
     RowFormWidget::Show(rc);
     Timer::Schedule(500);
@@ -67,7 +67,7 @@ public:
 
 private:
   /* virtual methods from DataFieldListener */
-  virtual void OnModified(DataField &df);
+  virtual void OnModified(DataField &df) override;
 
   /* virtual methods from Timer */
   virtual void OnTimer() override;

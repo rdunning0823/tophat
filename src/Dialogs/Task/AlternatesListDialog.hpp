@@ -79,9 +79,9 @@ public:
 
   /* virtual methods from class List::Handler */
   virtual void OnPaintItem(Canvas &canvas, const PixelRect rc,
-                           unsigned index);
+                           unsigned index) override;
 
-  virtual bool CanActivateItem(unsigned index) const {
+  virtual bool CanActivateItem(unsigned index) const override {
     return true;
   }
 
@@ -109,7 +109,7 @@ public:
   }
 
   /* virtual methods from class Widget */
-  virtual PixelSize GetMinimumSize() const {
+  virtual PixelSize GetMinimumSize() const override {
     return GetMaximumSize();
   }
   virtual void Move(const PixelRect &rc) override;
@@ -133,15 +133,15 @@ public:
   AlternatesListHeaderWidget()
     :TwoWidgets(new TextWidget(), new TextWidget(), false, true) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
   void Show(const PixelRect &rc) override;
   virtual void Move(const PixelRect &rc) override;
 
-  virtual PixelSize GetMinimumSize() const {
+  virtual PixelSize GetMinimumSize() const override {
     return PixelSize { 25u, Layout::GetMinimumControlHeight() / 2 };
   }
-  virtual PixelSize GetMaximumSize() const {
+  virtual PixelSize GetMaximumSize() const override {
     return PixelSize { 25u, Layout::GetMaximumControlHeight() };
   }
   void CalculateLayout(const PixelRect &rc);

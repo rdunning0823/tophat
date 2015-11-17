@@ -116,17 +116,17 @@ public:
   {}
 
   /* override from Timer */
-  virtual bool OnTimer(WindowTimer &timer);
+  virtual bool OnTimer(WindowTimer &timer) override;
 
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual bool Save(bool &changed) {
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual bool Save(bool &changed) override {
     return true;
   }
-  virtual void Show(const PixelRect &rc) {};
-  virtual void Hide() {};
-  virtual void Move(const PixelRect &rc) {};
+  virtual void Show(const PixelRect &rc) override {};
+  virtual void Hide() override {};
+  virtual void Move(const PixelRect &rc) override {};
 
   /* overrides from WndForm */
   virtual void OnResize(PixelSize new_size) override;
@@ -135,7 +135,7 @@ public:
   /**
    * from ActionListener
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
 protected:
   /**

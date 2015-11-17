@@ -292,16 +292,16 @@ public:
   const char* GetRepositoryUri(FileType type);
 
   /* virtual methods from class Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
   virtual void Show(const PixelRect &rc) override;
-  virtual bool Save(bool &changed);
+  virtual bool Save(bool &changed) override;
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
 
   /* methods from DataFieldListener */
-  virtual void OnModified(DataField &df);
+  virtual void OnModified(DataField &df) override;
 
   /**
    * locks and unlocks the mutex on the repository and downloading status

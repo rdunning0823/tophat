@@ -140,11 +140,11 @@ public:
    waypoint_list(UIGlobals::GetDialogLook()) {}
 
   /* virtual methods from Widget */
-  void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  void Unprepare();
-  void Show(const PixelRect &rc);
-  void Hide();
-  void Move(const PixelRect &rc) {
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void Unprepare() override;
+  void Show(const PixelRect &rc) override;
+  void Hide() override;
+  void Move(const PixelRect &rc) override {
     SetRectangles(rc);
     MoveChildren(rc);
   }
@@ -153,7 +153,7 @@ public:
                            unsigned idx) override;
 
   /* virtual method from ObservationZoneEditWidget */
-  void OnModified(ObservationZoneEditWidget &widget);
+  void OnModified(ObservationZoneEditWidget &widget) override;
 
   /* virtual methods from ListCursorHandler */
   virtual void OnCursorMoved(unsigned index) override;
@@ -163,7 +163,8 @@ public:
   virtual void OnActivateItem(unsigned index) override;
 
   /* from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
+
   void OnCloseClicked();
   void OnRemoveClicked();
   void OnTaskPropertiesClicked();
