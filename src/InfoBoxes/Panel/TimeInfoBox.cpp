@@ -45,7 +45,7 @@ public:
     :BaseAccessPanel(id, time_config_panel), expert_save(UIGlobals::GetDialogSettings().expert) {
     CommonInterface::SetUISettings().dialog.expert = false;
   };
-  virtual void Hide();
+  virtual void Hide() override;
   ~TimeInfoBoxPanel() {
     CommonInterface::SetUISettings().dialog.expert = expert_save;
   }

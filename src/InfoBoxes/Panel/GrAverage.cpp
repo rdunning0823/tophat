@@ -49,9 +49,9 @@ public:
    */
   WndForm *form;
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual bool Save(bool &changed);
-  void Show(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual bool Save(bool &changed) override;
+  void Show(const PixelRect &rc) override;
   virtual void Move(const PixelRect &rc) override;
   void SetForm(WndForm *_form) {
     assert(_form != nullptr);

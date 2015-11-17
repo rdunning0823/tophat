@@ -58,7 +58,7 @@ class OnlineContestPanel : public BaseAccessPanel {
     /**
      * draws the the OLC image
      */
-    virtual void OnPaint(Canvas &canvas);
+    virtual void OnPaint(Canvas &canvas) override;
   };
 
     PixelRect graph_rc;
@@ -85,14 +85,14 @@ protected:
   /**
    * render the chart periodically
    */
-  virtual bool OnTimer(WindowTimer &timer);
+  virtual bool OnTimer(WindowTimer &timer) override;
 
 public:
   OnlineContestPanel(unsigned id)
     :BaseAccessPanel(id), dialog_timer(*this) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
   /* Move must discard rc and use GetMainWindow()'s ClientRect */
   virtual void Move(const PixelRect &rc) override;
   void CalculateLayout(const PixelRect &rc);

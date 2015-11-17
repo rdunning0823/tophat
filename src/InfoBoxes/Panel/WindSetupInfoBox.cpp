@@ -49,7 +49,7 @@ public:
   WindSetupInfoBoxPanel(unsigned id, WindSettingsPanel *wind_settings_panel)
     :BaseAccessPanel(id, wind_settings_panel) {
   };
-  virtual void Hide();
+  virtual void Hide() override;
 
 protected:
 };

@@ -55,7 +55,7 @@ protected:
   /**
    * Follow widget API for calling.
    */
-  virtual void Hide();
+  virtual void Hide() override;
 
   /**
    * the rect of the usable windows space below the header
@@ -67,7 +67,7 @@ protected:
    * Call this at the end of any derived class Show() operations
    * because this starts the dialog loop.
    */
-  virtual void Show(const PixelRect &rc);
+  virtual void Show(const PixelRect &rc) override;
 
   /* this is a hack.  The derived class must discard rc and use GetMainWindow() */
   virtual void Move(const PixelRect &rc) override;
@@ -75,7 +75,7 @@ protected:
   /**
    * Called by a derived class at the beginning of its OnPaint
    */
-  virtual void OnPaint(Canvas &canvas);
+  virtual void OnPaint(Canvas &canvas) override;
 
   /**
    * Caption for InfoBox dialog
@@ -91,9 +91,9 @@ public:
    * Called at the start of a derived class Prepare()
    * Draws the header text and the Setup button
    */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 
-  virtual void Unprepare();
+  virtual void Unprepare() override;
   /**
    * calculates the rectangles on the base class itself
    */
@@ -106,7 +106,7 @@ protected:
   /**
    * Called at the end of the derived class OnAction.
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /**
    * Closes the dialog

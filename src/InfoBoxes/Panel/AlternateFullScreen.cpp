@@ -65,9 +65,9 @@ public:
   AlternateFullScreen(unsigned _id)
     :BaseAccessPanel(_id), dialog_timer(*this) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc);
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
+  virtual void Show(const PixelRect &rc) override;
   /* This is a hack because Move() must discard rc and use GetMainWindow() */
   virtual void Move(const PixelRect &rc) override;
 
@@ -75,10 +75,10 @@ protected:
   /**
    * refresh the glide solutions
    */
-  virtual bool OnTimer(WindowTimer &timer);
+  virtual bool OnTimer(WindowTimer &timer) override;
 
   /* methods from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 };
 
 void

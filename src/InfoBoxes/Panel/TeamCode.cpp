@@ -172,16 +172,16 @@ public:
     :BaseAccessPanel(_id) {}
 
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
 
   /* This is a hack because Move() must discard rc and use GetMainWindow() */
   virtual void Move(const PixelRect &rc) override;
   virtual void Show(const PixelRect &rc) override;
-  virtual void Hide();
+  virtual void Hide() override;
 protected:
   /* methods from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
 
 private:

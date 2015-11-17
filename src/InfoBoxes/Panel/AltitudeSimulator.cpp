@@ -91,8 +91,8 @@ public:
   AltitudeSimulatorPanel(unsigned id, bool _is_agl)
     :BaseAccessPanel(id), dialog_timer(*this), is_agl(_is_agl) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
   /* Move must discard rc and use GetMainWindow()'s ClientRect */
   virtual void Move(const PixelRect &rc) override;
   void CalculateLayout(const PixelRect &rc, unsigned value_height);
@@ -102,10 +102,10 @@ protected:
   /**
    * sync blackboards
    */
-  virtual bool OnTimer(WindowTimer &timer);
+  virtual bool OnTimer(WindowTimer &timer) override;
 
   /* methods from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 };
 
 

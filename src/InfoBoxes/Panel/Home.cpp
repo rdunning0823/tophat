@@ -67,15 +67,15 @@ public:
   HomePanel(unsigned _id)
     :BaseAccessPanel(_id) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
 
   void Refresh();
 
 protected:
 
   /* methods from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 };
 
 void

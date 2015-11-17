@@ -77,7 +77,7 @@ class MacCreadyEditPanel : public BaseAccessPanel, NumberButtonSubNumberLayout {
     /**
      * draws the the Final Glide bar
      */
-    virtual void OnPaint(Canvas &canvas);
+    virtual void OnPaint(Canvas &canvas) override;
   };
 
 protected:
@@ -116,8 +116,8 @@ public:
   MacCreadyEditPanel(unsigned _id)
     :BaseAccessPanel(_id), dialog_timer(*this) {}
 
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual void Unprepare() override;
   /* Move must discard rc and use GetMainWindow()'s ClientRect */
   virtual void Move(const PixelRect &rc) override;
   void CalculateLayout(const PixelRect &rc, unsigned value_height);
@@ -131,10 +131,10 @@ protected:
    * renderer to not always use value updated with the
    * buttons
    */
-  virtual bool OnTimer(WindowTimer &timer);
+  virtual bool OnTimer(WindowTimer &timer) override;
 
   /* methods from ActionListener */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 };
 
 

@@ -46,7 +46,7 @@ public:
   InfoBoxDescriptionPanel(int _id)
     :BaseAccessPanel(_id) {}
 
- virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
+ virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
 
  /* Move must discard rc and use GetMainWindow()'s ClientRect */
  virtual void Move(const PixelRect &rc) override;
