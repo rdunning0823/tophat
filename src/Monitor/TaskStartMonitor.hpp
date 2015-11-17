@@ -29,7 +29,7 @@ Copyright_License {
 
 #include <tchar.h>
 
-class StartStats;
+struct StartStats;
 
 typedef StaticString<128> message_string;
 
