@@ -304,12 +304,12 @@ public:
 
   virtual void DrawItems(Canvas &canvas, unsigned start, unsigned end) const;
 
-  virtual void OnPaint(Canvas &canvas);
-  virtual void OnPaint(Canvas &canvas, const PixelRect &dirty);
+  virtual void OnPaint(Canvas &canvas) override;
+  virtual void OnPaint(Canvas &canvas, const PixelRect &dirty) override;
   /**
    * handles bouncing to center an item
    */
-  virtual bool OnTimer(WindowTimer &timer);
+  virtual bool OnTimer(WindowTimer &timer) override;
 #ifndef _WIN32_WCE
   void OnDestroy() override;
 #endif
@@ -409,17 +409,17 @@ public:
    * The OnMouseDown event is called when the mouse is pressed over the button
    * (derived from Window)
    */
-  virtual bool OnMouseDown(PixelScalar x, PixelScalar y);
+  virtual bool OnMouseDown(PixelScalar x, PixelScalar y) override;
   /**
    * The OnMouseUp event is called when the mouse is released over the button
    * (derived from Window)
    */
-  virtual bool OnMouseUp(PixelScalar x, PixelScalar y);
+  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override;
   /**
    * The OnMouseMove event is called when the mouse is moved over the button
    * (derived from Window)
    */
-  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys);
+  virtual bool OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys) override;
   bool OnMouseWheel(PixelScalar x, PixelScalar y, int delta) override;
 
   bool OnKeyCheck(unsigned key_code) const override;
