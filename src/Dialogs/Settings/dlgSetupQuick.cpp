@@ -151,6 +151,7 @@ public:
   void CreateDeviceList(TCHAR *buffer_out, size_t buffer_size);
 
 private:
+  using Window::OnTimer;
   virtual void OnTimer() override;
 };
 
