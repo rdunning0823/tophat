@@ -148,7 +148,6 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   canvas.Select(text_font);
 
   // Draw distance and arrival altitude
-  StaticString<256> buffer;
   TCHAR dist[20], alt[20];
   FormatUserDistance(distance, dist, true, 0);
   FormatRelativeUserAltitude(arrival_altitude, alt, true);
