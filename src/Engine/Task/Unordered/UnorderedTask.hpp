@@ -61,7 +61,7 @@ public:
                                       const GlidePolar &polar,
                                       GlideResult &total, GlideResult &leg) override;
   virtual void UpdateNavBarStatistics(const AircraftState &aircraft,
-                                      const GlidePolar &polar);
+                                      const GlidePolar &polar) override;
   virtual void GlideSolutionTravelled(const AircraftState &state_now,
                                       const GlidePolar &glide_polar,
                                       GlideResult &total, GlideResult &leg) override;
@@ -74,7 +74,7 @@ public:
                                     const GlideResult &solution_remaining_total,
                                     const GlideResult &solution_remaining_leg) override;
   virtual bool IsScored() const override { return false; }
-  virtual bool IsOptimizable() const { return false; }
+  virtual bool IsOptimizable() const override { return false; }
 };
 
 #endif
