@@ -57,7 +57,7 @@ class WaypointManagerWidget final
     DELETE,
   };
 
-  Button *new_button, *edit_button, *save_button, *delete_button;
+  Button *new_button, *edit_button, *delete_button;
 
   WaypointList items;
 
