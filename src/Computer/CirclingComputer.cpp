@@ -30,8 +30,6 @@ Copyright_License {
 #include "Util/Clamp.hpp"
 
 static constexpr Angle MIN_TURN_RATE = Angle::Degrees(4);
-static constexpr fixed CRUISE_CLIMB_SWITCH(15);
-static constexpr fixed CLIMB_CRUISE_SWITCH(10);
 
 void
 CirclingComputer::Reset()
