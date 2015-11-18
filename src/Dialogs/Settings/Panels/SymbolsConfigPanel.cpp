@@ -78,13 +78,6 @@ SymbolsConfigPanel::OnModified(DataField &df)
   }
 }
 
-static constexpr StaticEnumChoice ground_track_mode_list[] = {
-  { (unsigned)DisplayGroundTrack::OFF, N_("Off"), N_("Disable display of ground track line.") },
-  { (unsigned)DisplayGroundTrack::ON, N_("On"), N_("Always display ground track line.") },
-  { (unsigned)DisplayGroundTrack::AUTO, N_("Auto"), N_("Display ground track line if there is a significant difference to plane heading.") },
-  { 0 }
-};
-
 static constexpr StaticEnumChoice trail_length_list[] = {
   { (unsigned)TrailSettings::Length::OFF, N_("Off") },
   { (unsigned)TrailSettings::Length::LONG, N_("Long") },
