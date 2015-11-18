@@ -60,7 +60,6 @@ enum ControlIndex {
 class SiteConfigPanel final : public RowFormWidget, DataFieldListener,
     public ActionListener {
 private:
-  Button *buttonWaypoints;
   StaticString<50> download_name;
   /**
    * is this a stand-alone widget, or displayed in the dlgConfiguration menu?
@@ -69,11 +68,11 @@ private:
 
 public:
   SiteConfigPanel()
-  :RowFormWidget(UIGlobals::GetDialogLook()), buttonWaypoints(nullptr),
+  :RowFormWidget(UIGlobals::GetDialogLook()),
    download_name(N_("Download from internet")) {}
 
   SiteConfigPanel(bool _stand_alone)
-    :RowFormWidget(UIGlobals::GetDialogLook()), buttonWaypoints(nullptr),
+    :RowFormWidget(UIGlobals::GetDialogLook()),
      download_name(N_("Download from internet")), stand_alone(_stand_alone){}
 
 public:
