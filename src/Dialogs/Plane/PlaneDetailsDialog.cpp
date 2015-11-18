@@ -169,14 +169,12 @@ class PlaneEditMoreWidget final
     MAX_SPEED,
   };
 
-  WndForm *dialog;
-
   Plane &plane;
 
 public:
   PlaneEditMoreWidget(Plane &_plane, const DialogLook &_look,
                   WndForm *_dialog)
-    :RowFormWidget(_look), dialog(_dialog), plane(_plane) {}
+    :RowFormWidget(_look), plane(_plane) {}
 
   const Plane &GetValue() const {
     return plane;
