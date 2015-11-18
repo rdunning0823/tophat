@@ -219,7 +219,6 @@ const char BallastSecsToEmpty[] = "BallastSecsToEmpty";
 const char StartupTipDeclineVersion[] = "StartupTipDeclineVersion";
 const char ShowWaypointListWarning[] = "ShowWaypointListWarning";
 const char StartupTipId[] = "StartupTipId";
-const char UseCustomFonts[] = "UseCustomFonts";
 const char DialogFont[] = "DialogFont";
 const char FontInfoWindowFont[] = "InfoWindowFont";
 const char FontTitleWindowFont[] = "TitleWindowFont";
