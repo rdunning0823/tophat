@@ -27,6 +27,7 @@ Copyright_License {
 #include "OS/Sleep.h"
 #include "IO/Async/GlobalIOThread.hpp"
 #include "Util/StringAPI.hxx"
+#include "Util/StringFormat.hpp"
 
 #include <time.h>
 #include <fcntl.h>
