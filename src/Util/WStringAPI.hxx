@@ -27,8 +27,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef WSTRING_API_HPP
-#define WSTRING_API_HPP
+#ifndef WSTRING_API_HXX
+#define WSTRING_API_HXX
 
 #include "Compiler.h"
 

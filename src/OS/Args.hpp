@@ -27,7 +27,7 @@ Copyright_License {
 #include "Compiler.h"
 #include "Util/tstring.hpp"
 #include "Util/NumberParser.hpp"
-#include "Util/StringAPI.hpp"
+#include "Util/StringAPI.hxx"
 
 #ifdef _UNICODE
 #include "OS/ConvertPathName.hpp"

@@ -32,7 +32,7 @@ Copyright_License {
 #include "Util/StringUtil.hpp"
 #include "Logger/Settings.hpp"
 #include "Util/ConvertString.hpp"
-#include "Util/StringAPI.hpp"
+#include "Util/StringAPI.hxx"
 
 #include <stdlib.h>
 
