@@ -87,7 +87,7 @@ LogoPageWindow::OnPaint(Canvas &canvas)
   y += Layout::FastScale(22);
 
   canvas.DrawText(x, y, XCSoar_ProductTokenShort);
-#ifdef GIT_COMMIT_ID
+#if defined(GIT_COMMIT_ID) && !defined(NDEBUG)
   y += Layout::FastScale(22);
 
   canvas.DrawText(x, y, _T("git: "));

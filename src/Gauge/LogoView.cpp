@@ -68,8 +68,10 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc_outer)
   canvas.DrawText(2, y, TopHat_ProductToken);
   y += 2 + text_height;
   canvas.DrawText(2, y, XCSoar_ProductTokenShort);
+#ifndef NDEBUG
   y += 2 + text_height;
   canvas.DrawText(2, y, XCSoar_GitSuffix);
+#endif
 #ifdef KOBO
   WriteSystemInfo();
   if (IsKoboUsbHostKernel()) {
