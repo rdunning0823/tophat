@@ -29,7 +29,9 @@
 #include "Task/ObservationZones/AnnularSectorZone.hpp"
 #include "XML/DataNode.hpp"
 #include "Compiler.h"
-
+#ifdef WIN32
+#include "LogFile.hpp" // fixes weird crash
+#endif
 #include <assert.h>
 #include <memory>
 
@@ -286,7 +288,12 @@ SaveTask(WritableDataNode &node, const OrderedTask &task)
 
   for (const auto &tp : task.GetPoints())
     Serialise(node, tp, false);
-
+#ifdef WIN32
+  // crash in PC build fixed with this line and #indlude LogFile.hpp
+  // introduced in fe9441c06a90c1b2e9c487eb91d90082675364e3
+  LogFormat(_T("SaveTask(WritableDataNode &node, const OrderedTask &task) 4 HasOptionalStarts():%u"),
+            task.HasOptionalStarts());
+#endif
   for (const auto &tp : task.GetOptionalStartPoints())
     Serialise(node, tp, true);
 }
