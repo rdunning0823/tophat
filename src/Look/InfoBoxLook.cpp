@@ -87,12 +87,12 @@ InfoBoxLook::ReinitialiseLayout(unsigned width,
                                 unsigned font_scale_infobox_value)
 {
   FontDescription title_font_d(Layout::FontScale(14));
-  AutoSizeFont(title_font_d, width, _T("MC MANUALXX"));
+  AutoSizeFont(title_font_d, width, _T("MC MANUAL "));
   title_font_d.SetHeight((title_font_d.GetHeight() * font_scale_infobox_title) / 100);
   title_font.Load(title_font_d);
 
   FontDescription comment_font_d(Layout::FontScale(14));
-  AutoSizeFont(comment_font_d, width, _T("MC MANUALi"));
+  AutoSizeFont(comment_font_d, width, _T("MC MANUA "));
   comment_font_d.SetHeight((comment_font_d.GetHeight() * font_scale_infobox_title) / 100);
   comment_font.Load(comment_font_d);
 
