@@ -38,6 +38,7 @@ Copyright_License {
 #include "UtilsSettings.hpp"
 #include "Dialogs/Settings/Panels/PagesConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/InfoBoxesConfigPanel.hpp"
+#include "Dialogs/Settings/Panels/FontConfigPanel.hpp"
 
 #ifdef KOBO
 #include "Event/Globals.hpp"
@@ -54,6 +55,7 @@ enum ControlIndex {
   AppInfoBoxBorder,
   CustomizeScreens,
   CustomizeInfoBoxes,
+  CustomizeFonts,
 };
 
 static constexpr StaticEnumChoice display_orientation_list[] = {
@@ -166,6 +168,10 @@ LayoutConfigPanel::OnAction(int id)
     widget = CreateInfoBoxesConfigPanel();
     title = _("Set up infoboxes");
     break;
+  case CustomizeFonts:
+    widget = CreateFontConfigPanel();
+    title = _("Change Font size");
+    break;
   }
   assert(widget != nullptr);
   SystemConfiguration(*widget, title.c_str());
@@ -224,8 +230,10 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   if (quick_setup) {
     AddButton(_("Edit screens"), *this, CustomizeScreens);
     AddButton(_("Edit infoboxes"), *this, CustomizeInfoBoxes);
+    AddButton(_("Fonts"), *this, CustomizeFonts);
 
   } else {
+    AddDummy();
     AddDummy();
     AddDummy();
   }

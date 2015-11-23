@@ -56,6 +56,7 @@ Copyright_License {
 #include "Audio/VarioGlue.hpp"
 #include "PageActions.hpp"
 #include "Profile/Profile.hpp"
+#include "Dialogs/Message.hpp"
 
 #if defined(__BORLANDC__)  // due to compiler bug
   #include "Waypoint/Waypoints.hpp"
@@ -233,6 +234,10 @@ SystemConfiguration(Widget &widget, const TCHAR *caption)
   SettingsEnter();
   dlgConfigurationSingle(widget, caption);
   SettingsLeave(old_ui_settings);
+  if (require_restart)
+    ShowMessageBox(_("Changes to configuration saved.  Restart Top Hat to apply changes."),
+                _T(""), MB_OK);
+  require_restart = false;
 }
 
 void
