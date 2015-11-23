@@ -133,8 +133,9 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
   //map.Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 
 #ifndef GNAV
-  map.Get(ProfileKeys::UIScale, settings.scale);
-  CheckFontScale(settings.scale);
+  // use default.  Fonts are controlled individually.
+  //map.Get(ProfileKeys::UIScale, settings.scale);
+  //CheckFontScale(settings.scale);
 
   map.Get(ProfileKeys::FontNavBarWaypointName, settings.font_scale_nav_bar_waypoint_name);
   map.Get(ProfileKeys::FontNavBarDistance, settings.font_scale_nav_bar_distance);
