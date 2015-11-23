@@ -26,7 +26,7 @@ Copyright_License {
 
 #include "Form/Button.hpp"
 #include "Look/ButtonLook.hpp"
-#include "Look/NavSliderLook.hpp"
+#include "Look/OverlayButtonLook.hpp"
 #include "Util/tstring.hpp"
 #include "Renderer/ButtonRenderer.hpp"
 
@@ -49,37 +49,25 @@ protected:
 
   const IconLook &icon_look;
   const ButtonLook &button_look;
-  const NavSliderLook &nav_slider_look;
+  const OverlayButtonLook &overlay_button_look;
   /**
    * the bitmap displayed in the button
    */
   const Bitmap *bmp;
 
   ButtonFrameRenderer frame_renderer;
-
-public:
-  /**
-   * size from 2 (tiny) to 6 (huge) of map overlay buttons
-   */
-  static unsigned GetScale();
-
-  /**
-   * returns standard button height.  Not scaled by GetScale()
-   */
-  static unsigned GetStandardButtonHeight();
-
 public:
 
   MapOverlayButton(ContainerWindow &parent, const ButtonLook &_button_look,
                    const IconLook &_icon_look,
-                   const NavSliderLook &_nav_slider_look,
+                   const OverlayButtonLook &_overlay_button_look,
                     const Bitmap *_bmp,
                     const PixelRect &rc,
                     WindowStyle style,
                     ActionListener& listener, int id)
   :Button(parent, _button_look, _T(""), rc, style, listener, id),
    icon_look(_icon_look), button_look(_button_look),
-   nav_slider_look(_nav_slider_look),
+   overlay_button_look(_overlay_button_look),
    bmp(_bmp),
    frame_renderer(_button_look) {}
 
@@ -105,12 +93,12 @@ public:
 
   const Font &GetLargeFont() const
   {
-    return nav_slider_look.large_font;
+    return overlay_button_look.large_font;
   }
 
   const Font &GetMediumFont() const
   {
-    return nav_slider_look.small_font;
+    return overlay_button_look.small_font;
   }
 };
 

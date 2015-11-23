@@ -226,7 +226,7 @@ const char FontMapWaypointName[] = "FontMapWaypointName";
 const char FontMapPlaceName[] = "FontMapPlaceName";
 const char FontInfoBoxValue[] = "FontInfoBoxValue";
 const char FontInfoBoxTitle[] = "FontInfoBoxTitle";
-const char FontMenuButton[] = "FontMenuButton";
+const char FontOverlayButton[] = "FontOverlayButton";
 const char FontDialog[] = "FontDialog";
 
 const char UseFinalGlideDisplayMode[] = "UseFinalGlideDisplayMode";

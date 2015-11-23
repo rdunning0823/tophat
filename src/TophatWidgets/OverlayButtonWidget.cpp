@@ -31,22 +31,39 @@ Copyright_License {
 #include "MainWindow.hpp"
 #include "Look/Look.hpp"
 #include "Look/NavSliderLook.hpp"
+#include "Look/OverlayButtonLook.hpp"
 #include "Interface.hpp"
 
+
+OverlayButtonWidget::OverlayButtonWidget()
+    : prepared(false), bmp(nullptr),
+      overlay_button_look(UIGlobals::GetLook().overlay_button) {}
 
 UPixelScalar
 OverlayButtonWidget::HeightFromBottomRight()
 {
-  return GetHeight();
+  return overlay_button_look.scaled_button_width;
+}
+
+UPixelScalar
+OverlayButtonWidget::GetWidth() const
+{
+  return overlay_button_look.scaled_button_width;
+}
+
+
+UPixelScalar
+OverlayButtonWidget::GetHeight() const
+{
+  return overlay_button_look.scaled_button_width;
 }
 
 void
 OverlayButtonWidget::Prepare(ContainerWindow &parent,
                               const PixelRect &rc)
 {
-  const MapLook &map_look = UIGlobals::GetMapLook();
   assert(prepared == false);
-  white_look.Initialise(*map_look.overlay_font);
+  white_look.Initialise(overlay_button_look.large_font);
   white_look.background_transparent = true;
 
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
@@ -83,20 +100,6 @@ OverlayButtonWidget::Hide()
   GetWindow().Hide();
 }
 
-UPixelScalar
-OverlayButtonWidget::GetWidth() const
-{
-  return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
-}
-
-UPixelScalar
-OverlayButtonWidget::GetHeight() const
-{
-  return MapOverlayButton::GetStandardButtonHeight() *
-      MapOverlayButton::GetScale();
-}
-
 PixelRect
 OverlayButtonWidget::GetPosition() const
 {
@@ -113,10 +116,9 @@ OverlayButtonWidget::CreateButton(ContainerWindow &parent,
                                    const PixelRect &rc_map)
 {
   WindowStyle button_style;
-  const NavSliderLook &nav_slider_look = UIGlobals::GetLook().nav_slider;
 
   MapOverlayButton *button =
-    new MapOverlayButton(parent, button_look, icon_look, nav_slider_look, bmp,
+    new MapOverlayButton(parent, button_look, icon_look, overlay_button_look, bmp,
                          rc_map, button_style, *this, 0);
   SetWindow(button);
   return *button;

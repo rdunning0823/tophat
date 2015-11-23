@@ -44,7 +44,7 @@ enum ControlIndex {
   FontMapPlaceName,
   FontInfoBoxValue,
   FontInfoBoxTitle,
-/*  FontMenuButton,*/
+  FontOverlayButton,
   FontDialog,
 };
 
@@ -98,10 +98,10 @@ FontConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
              settings.font_scale_infobox_title);
 
-/*  AddInteger(_("Map menu button size"),
+  AddInteger(_("Main menu button size"),
              nullptr,
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
-             settings.font_scale_menu_button);*/
+             settings.font_scale_overlay_button);
 
   AddInteger(_("Dialog and menu text"),
              nullptr,
@@ -140,9 +140,9 @@ FontConfigPanel::Save(bool &_changed)
                     settings.font_scale_infobox_title))
     require_restart = changed = true;
 
-/*  if (SaveValueEnum(FontMenuButton, ProfileKeys::FontMenuButton,
-                    settings.font_scale_menu_button))
-    require_restart = changed = true;*/
+  if (SaveValueEnum(FontOverlayButton, ProfileKeys::FontOverlayButton,
+                    settings.font_scale_overlay_button))
+    require_restart = changed = true;
 
   if (SaveValueEnum(FontDialog, ProfileKeys::FontDialog,
                     settings.font_scale_dialog))

@@ -222,7 +222,7 @@ extern const char FontMapWaypointName[];
 extern const char FontMapPlaceName[];
 extern const char FontInfoBoxValue[];
 extern const char FontInfoBoxTitle[];
-extern const char FontMenuButton[];
+extern const char FontOverlayButton[];
 extern const char FontDialog[];
 
 extern const char UseFinalGlideDisplayMode[];

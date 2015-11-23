@@ -37,18 +37,6 @@ Copyright_License {
 #include "Renderer/TextInBox.hpp"
 #include "Renderer/ButtonRenderer.hpp"
 
-unsigned
-MapOverlayButton::GetScale()
-{
-  return 3;
-}
-
-unsigned
-MapOverlayButton::GetStandardButtonHeight()
-{
-  return Layout::FontScale(16);
-}
-
 void
 MapOverlayButton::OnPaint(Canvas &canvas)
 {

@@ -43,6 +43,7 @@ Copyright_License {
 #include "IconLook.hpp"
 #include "ThermalAssistantLook.hpp"
 #include "NavSliderLook.hpp"
+#include "OverlayButtonLook.hpp"
 
 struct UISettings;
 class Font;
@@ -70,6 +71,7 @@ struct Look {
   ThermalAssistantLook thermal_assistant_gauge;
   ThermalAssistantLook thermal_assistant_dialog;
   NavSliderLook nav_slider;
+  OverlayButtonLook overlay_button;
 
   void Initialise(const Font &map_font);
   void InitialiseConfigured(const UISettings &settings,

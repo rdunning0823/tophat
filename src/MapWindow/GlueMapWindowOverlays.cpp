@@ -56,6 +56,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
+#include "Look/OverlayButtonLook.hpp"
 #ifndef ENABLE_OPENGL
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #endif
@@ -392,8 +393,8 @@ GlueMapWindow::DrawMapScale(Canvas &canvas, const PixelRect &rc,
   PixelSize icon_size = look.map_scale_left_icon.GetSize();
   const PixelScalar icon_y = (text_size.cy + icon_size.cy) / 2;
 
-  UPixelScalar zoom_button_width = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale();
+  UPixelScalar zoom_button_width =
+      UIGlobals::GetLook().overlay_button.scaled_button_width;
 
   PixelScalar x = rc.left + (Layout::landscape ? 0 : 1) * zoom_button_width;
 
@@ -419,9 +420,8 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
                               unsigned nav_slider_bar_visible_height) const
 {
   PixelSize button_size;
-  button_size.cx = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale();
-  button_size.cy = button_size.cx;
+  button_size.cy = button_size.cx =
+      UIGlobals::GetLook().overlay_button.scaled_button_width;
 
   // draw flight mode
   const MaskedIcon *icon;
@@ -617,9 +617,8 @@ GlueMapWindow::SetMainMenuButtonRect()
 {
   PixelSize menu_button_size;
 
-  menu_button_size.cx = MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale();
-  menu_button_size.cy = menu_button_size.cx;
+  menu_button_size.cy = menu_button_size.cx =
+      UIGlobals::GetLook().overlay_button.scaled_button_width;
 
   UPixelScalar pen_width = Layout::Scale(2);
   rc_main_menu_button = GetClientRect();
@@ -636,8 +635,7 @@ GlueMapWindow::SetZoomButtonsRect()
 
   PixelSize button_size;
   button_size.cx = button_size.cy =
-      MapOverlayButton::GetStandardButtonHeight()
-      * MapOverlayButton::GetScale();
+      UIGlobals::GetLook().overlay_button.scaled_button_width;
 
   rc_zoom_in_button.left = rc_map.left;
   if (Layout::landscape) {

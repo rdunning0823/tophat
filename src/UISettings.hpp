@@ -55,7 +55,7 @@ struct UISettings {
   unsigned font_scale_map_place_name;
   unsigned font_scale_infobox_title;
   unsigned font_scale_infobox_value;
-  unsigned font_scale_menu_button;
+  unsigned font_scale_overlay_button;
   unsigned font_scale_dialog;
 #endif
 

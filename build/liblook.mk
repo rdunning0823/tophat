@@ -34,6 +34,7 @@ LOOK_SOURCES := \
 	$(SRC)/Look/UnitsLook.cpp \
 	$(SRC)/Look/ThermalAssistantLook.cpp \
 	$(SRC)/Look/NavSliderLook.cpp \
+	$(SRC)/Look/OverlayButtonLook.cpp \
 	$(SRC)/Look/WaveLook.cpp
 
 LOOK_CPPFLAGS_INTERNAL = $(SCREEN_CPPFLAGS)

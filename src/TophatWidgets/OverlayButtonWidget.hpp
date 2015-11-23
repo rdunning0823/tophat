@@ -32,6 +32,7 @@ struct IconLook;
 class ContainerWindow;
 class Bitmap;
 struct PixelRect;
+struct OverlayButtonLook;
 
 class OverlayButtonWidget : public MapOverlayBaseWidget, protected ActionListener {
 protected:
@@ -47,9 +48,10 @@ protected:
    */
   const Bitmap *bmp;
 
+  const OverlayButtonLook &overlay_button_look;
+
 public:
-  OverlayButtonWidget()
-    : prepared(false), bmp(nullptr) {}
+  OverlayButtonWidget();
 
   /**
    * Shows or hides the widgets based on these parameters

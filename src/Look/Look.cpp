@@ -65,6 +65,7 @@ Look::InitialiseConfigured(const UISettings &settings,
                  settings.font_scale_map_place_name);
   icon.Initialise();
   nav_slider.Initialise(settings.font_scale_nav_bar_waypoint_name, settings.font_scale_nav_bar_distance);
+  overlay_button.Initialise(settings.font_scale_overlay_button);
 }
 
 void
@@ -74,4 +75,5 @@ Look::ReinitialiseLayout(const UISettings &settings, unsigned infobox_width)
                               settings.font_scale_infobox_value);
   nav_slider.ReinitialiseLayout(settings.font_scale_nav_bar_waypoint_name,
                                 settings.font_scale_nav_bar_distance);
+  overlay_button.ReinitialiseLayout(settings.font_scale_overlay_button);
 }
