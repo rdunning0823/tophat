@@ -40,7 +40,8 @@ Copyright_License {
 
 void
 InfoBoxLook::Initialise(bool _inverse, bool use_colors,
-                        unsigned width)
+                        unsigned width, unsigned font_scale_infobox_title,
+                        unsigned font_scale_infobox_value)
 {
   inverse = _inverse;
 
@@ -63,7 +64,8 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
   title_font.Load(FontDescription(_T("RasterGothicNineCond"), 10));
   comment_font.Load(FontDescription(_T("RasterGothicNineCond"), 10));
 #else
-  ReinitialiseLayout(width);
+  ReinitialiseLayout(width, font_scale_infobox_title,
+                     font_scale_infobox_value);
 
   unit_fraction_pen.Create(1, value.fg_color);
 #endif
@@ -80,19 +82,24 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 }
 
 void
-InfoBoxLook::ReinitialiseLayout(unsigned width)
+InfoBoxLook::ReinitialiseLayout(unsigned width,
+                                unsigned font_scale_infobox_title,
+                                unsigned font_scale_infobox_value)
 {
   FontDescription title_font_d(Layout::FontScale(14));
   AutoSizeFont(title_font_d, width, _T("MC MANUALXX"));
+  title_font_d.SetHeight((title_font_d.GetHeight() * font_scale_infobox_title) / 100);
   title_font.Load(title_font_d);
 
   FontDescription comment_font_d(Layout::FontScale(14));
   AutoSizeFont(comment_font_d, width, _T("MC MANUALi"));
+  comment_font_d.SetHeight((comment_font_d.GetHeight() * font_scale_infobox_title) / 100);
   comment_font.Load(comment_font_d);
 
 #ifndef GNAV
   FontDescription value_font_d(10, true);
   AutoSizeFont(value_font_d, width, _T("1234m"));
+  value_font_d.SetHeight((value_font_d.GetHeight() * font_scale_infobox_value) / 100);
   value_font.Load(value_font_d);
 
   FontDescription small_value_font_d(10);

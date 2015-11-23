@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Screen/Icon.hpp"
 #include "Screen/Brush.hpp"
+#include "Screen/Font.hpp"
 
 class Font;
 struct WaypointRendererSettings;
@@ -44,10 +45,12 @@ struct WaypointLook {
 
   Brush white_brush, light_gray_brush, magenta_brush, orange_brush;
 
+  // pointers to the instances, to avoid refactoring all references to these
   const Font *font, *bold_font;
+  Font font_instance, bold_font_instance;
 
   void Initialise(const WaypointRendererSettings &settings,
-                  const Font &font, const Font &bold_font);
+                  unsigned font_scale_map_waypoint_name);
 
   void Reinitialise(const WaypointRendererSettings &settings);
 };

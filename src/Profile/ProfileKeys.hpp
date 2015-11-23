@@ -215,19 +215,15 @@ extern const char ShowWaypointListWarning[];
 extern const char StartupTipId[];
 extern const char StartupTipDeclineVersion[];
 extern const char AccelerometerZero[];
-extern const char DialogFont[];
-extern const char FontInfoWindowFont[];
-extern const char FontTitleWindowFont[];
-extern const char FontMapWindowFont[];
-extern const char FontMapWindowBoldFont[];
-extern const char FontCDIWindowFont[];
-extern const char FontMapLabelFont[];
-extern const char FontMapLabelImportantFont[];
-extern const char FontStatisticsFont[];
-extern const char FontBugsBallastFont[];
-extern const char FontAirspacePressFont[];
-extern const char FontAirspaceColourDlgFont[];
-extern const char FontTeamCodeFont[];
+
+extern const char FontNavBarWaypointName[];
+extern const char FontNavBarDistance[];
+extern const char FontMapWaypointName[];
+extern const char FontMapPlaceName[];
+extern const char FontInfoBoxValue[];
+extern const char FontInfoBoxTitle[];
+extern const char FontMenuButton[];
+extern const char FontDialog[];
 
 extern const char UseFinalGlideDisplayMode[];
 

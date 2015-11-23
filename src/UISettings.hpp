@@ -49,6 +49,14 @@ struct UISettings {
 
 #ifndef GNAV
   unsigned scale;
+  unsigned font_scale_nav_bar_waypoint_name;
+  unsigned font_scale_nav_bar_distance;
+  unsigned font_scale_map_waypoint_name;
+  unsigned font_scale_map_place_name;
+  unsigned font_scale_infobox_title;
+  unsigned font_scale_infobox_value;
+  unsigned font_scale_menu_button;
+  unsigned font_scale_dialog;
 #endif
 
   /** last startup tip display. 1 is first tip, 0 means never shown */

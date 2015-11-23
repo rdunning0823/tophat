@@ -55,6 +55,7 @@ Copyright_License {
 #include "Panels/SafetyFactorsConfigPanel.hpp"
 #include "Panels/RouteConfigPanel.hpp"
 #include "Panels/InterfaceConfigPanel.hpp"
+#include "Panels/FontConfigPanel.hpp"
 #include "Panels/LayoutConfigPanel.hpp"
 #include "Panels/GaugesConfigPanel.hpp"
 #include "Panels/VarioConfigPanel.hpp"
@@ -135,6 +136,7 @@ static constexpr TabMenuPage task_pages[] = {
 static constexpr TabMenuPage look_pages[] = {
   { N_("Language, Input"), CreateInterfaceConfigPanel },
   { N_("Screen Layout"), CreateLayoutConfigPanel },
+  { N_("Fonts"), CreateFontConfigPanel },
   { N_("Pages"), CreatePagesConfigPanel },
   { N_("InfoBox Sets"), CreateInfoBoxesConfigPanel },
   { nullptr, nullptr }

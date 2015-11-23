@@ -113,6 +113,12 @@ Profile::Load(const ProfileMap &map, SoundSettings &settings)
   Load(map, settings.vario);
 }
 
+static void CheckFontScale(unsigned &scale)
+{
+  if (scale < 75 || scale > 150)
+    scale = 100;
+}
+
 void
 Profile::Load(const ProfileMap &map, UISettings &settings)
 {
@@ -128,8 +134,24 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
 
 #ifndef GNAV
   map.Get(ProfileKeys::UIScale, settings.scale);
-  if (settings.scale < 50 || settings.scale > 200)
-    settings.scale = 100;
+  CheckFontScale(settings.scale);
+
+  map.Get(ProfileKeys::FontNavBarWaypointName, settings.font_scale_nav_bar_waypoint_name);
+  map.Get(ProfileKeys::FontNavBarDistance, settings.font_scale_nav_bar_distance);
+  map.Get(ProfileKeys::FontMapWaypointName, settings.font_scale_map_waypoint_name);
+  map.Get(ProfileKeys::FontMapPlaceName, settings.font_scale_map_place_name);
+  map.Get(ProfileKeys::FontInfoBoxTitle, settings.font_scale_infobox_title);
+  map.Get(ProfileKeys::FontInfoBoxValue, settings.font_scale_infobox_value);
+  map.Get(ProfileKeys::FontMenuButton, settings.font_scale_menu_button);
+  map.Get(ProfileKeys::FontDialog, settings.font_scale_dialog);
+  CheckFontScale(settings.font_scale_nav_bar_waypoint_name);
+  CheckFontScale(settings.font_scale_nav_bar_distance);
+  CheckFontScale(settings.font_scale_map_waypoint_name);
+  CheckFontScale(settings.font_scale_map_place_name);
+  CheckFontScale(settings.font_scale_infobox_title);
+  CheckFontScale(settings.font_scale_infobox_value);
+  CheckFontScale(settings.font_scale_menu_button);
+  CheckFontScale(settings.font_scale_dialog);
 #endif
 
   map.Get(ProfileKeys::EnableTAGauge, settings.enable_thermal_assistant_gauge);

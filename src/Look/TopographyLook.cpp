@@ -26,13 +26,14 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 
 void
-TopographyLook::Initialise()
+TopographyLook::Initialise(unsigned font_scale_map_place_name)
 {
 #ifdef GNAV
   regular_label_font.Load(FontDescription(_T("RasterGothicTwelveCond"), 13));
   important_label_font.Load(FontDescription(_T("RasterGothicTwelveCond"), 13));
 #else
-  regular_label_font.Load(FontDescription(Layout::FontScale(11), false, false));
-  important_label_font.Load(FontDescription(Layout::FontScale(11), true, false));
+  unsigned font_scale = (Layout::FontScale(11) * font_scale_map_place_name) / 100;
+  regular_label_font.Load(FontDescription(font_scale, false, false));
+  important_label_font.Load(FontDescription(font_scale, true, false));
 #endif
 }

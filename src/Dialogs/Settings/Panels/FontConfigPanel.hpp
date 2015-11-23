@@ -21,18 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_TOPOGRAPHY_LOOK_HPP
-#define XCSOAR_TOPOGRAPHY_LOOK_HPP
+#ifndef FONTCONFIGPANEL_HPP
+#define FONTCONFIGPANEL_HPP
 
-#include "Screen/Font.hpp"
+class Widget;
 
-struct TopographyLook {
-  Font regular_label_font;
-
-  /** for big/medium cities */
-  Font important_label_font;
-
-  void Initialise(unsigned font_scale_map_place_name);
-};
+Widget *
+CreateFontConfigPanel();
 
 #endif

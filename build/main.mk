@@ -99,6 +99,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/Panels/WindConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/InfoBoxesConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/InterfaceConfigPanel.cpp \
+	$(SRC)/Dialogs/Settings/Panels/FontConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/LayoutConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/LoggerConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/StartupConfigPanel.cpp \

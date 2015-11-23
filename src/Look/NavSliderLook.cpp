@@ -34,18 +34,21 @@ Copyright_License {
 #include <algorithm>
 
 void
-NavSliderLook::Initialise()
+NavSliderLook::Initialise(unsigned font_scale_nav_bar_waypoint_name,
+                          unsigned font_scale_nav_bar_distance)
 {
   border_color = COLOR_BLACK;
   background_pen_width = 2;
   background_pen.Create(background_pen_width, COLOR_WHITE);
   background_brush.Create(COLOR_WHITE);
   background_brush_selected.Create(COLOR_RED);
-  ReinitialiseLayout();
+  ReinitialiseLayout(font_scale_nav_bar_waypoint_name,
+                     font_scale_nav_bar_distance);
 }
 
 void
-NavSliderLook::ReinitialiseLayout()
+NavSliderLook::ReinitialiseLayout(unsigned font_scale_nav_bar_waypoint_name,
+                                  unsigned font_scale_nav_bar_distance)
 {
   border_pen_width_thin = Layout::ScalePenWidth(1);
   border_pen_width_thick = Layout::ScalePenWidth(2);
@@ -56,12 +59,15 @@ NavSliderLook::ReinitialiseLayout()
   border_pen_thin.Create(border_pen_width_thin, border_color);
   border_pen_thick.Create(border_pen_width_thick, border_color);
 
-  const FontDescription large_font_d(std::min(Layout::FontScale(24),
-                                             (Layout::min_screen_pixels) / 12), true);
-  const FontDescription medium_font_d(std::min(Layout::FontScale(13),
-                                             (Layout::min_screen_pixels) / 20), true);
-  const FontDescription small_font_d(std::min(Layout::FontScale(12),
-                                             (Layout::min_screen_pixels) / 20));
+  const FontDescription large_font_d((std::min(Layout::FontScale(24),
+                                             (Layout::min_screen_pixels) / 12) *
+      font_scale_nav_bar_waypoint_name) / 100, true);
+  const FontDescription medium_font_d((std::min(Layout::FontScale(13),
+                                             (Layout::min_screen_pixels) / 20) *
+      font_scale_nav_bar_distance) / 100, true);
+  const FontDescription small_font_d((std::min(Layout::FontScale(12),
+                                             (Layout::min_screen_pixels) / 20) *
+      font_scale_nav_bar_distance) / 100);
   large_font.Load(large_font_d);
   medium_font.Load(medium_font_d);
   small_font.Load(small_font_d);

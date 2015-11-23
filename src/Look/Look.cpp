@@ -27,7 +27,7 @@ Copyright_License {
 void
 Look::Initialise(const Font &map_font)
 {
-  dialog.Initialise();
+  dialog.Initialise(100);
   traffic.Initialise(map_font);
   flarm_dialog.Initialise(traffic, false);
   gesture.Initialise();
@@ -40,7 +40,7 @@ Look::InitialiseConfigured(const UISettings &settings,
                            const Font &map_font, const Font &map_bold_font,
                            unsigned infobox_width)
 {
-  dialog.Initialise();
+  dialog.Initialise(settings.font_scale_dialog);
   terminal.Initialise();
   units.Initialise();
   cross_section.Initialise(map_font);
@@ -50,7 +50,8 @@ Look::InitialiseConfigured(const UISettings &settings,
   trace_history.Initialise(settings.info_boxes.inverse);
   info_box.Initialise(settings.info_boxes.inverse,
                       settings.info_boxes.use_colors,
-                      infobox_width);
+                      infobox_width, settings.font_scale_infobox_title,
+                      settings.font_scale_infobox_value);
   vario.Initialise(settings.info_boxes.inverse,
                    settings.info_boxes.use_colors,
                    info_box.title_font);
@@ -59,14 +60,18 @@ Look::InitialiseConfigured(const UISettings &settings,
   thermal_assistant_gauge.Initialise(true, settings.info_boxes.inverse);
   final_glide_bar.Initialise(dialog.bold_font);
   vario_bar.Initialise(map_font);
-  map.Initialise(settings.map, map_font, map_bold_font);
+  map.Initialise(settings.map, map_font, map_bold_font,
+                 settings.font_scale_map_waypoint_name,
+                 settings.font_scale_map_place_name);
   icon.Initialise();
-  nav_slider.Initialise();
+  nav_slider.Initialise(settings.font_scale_nav_bar_waypoint_name, settings.font_scale_nav_bar_distance);
 }
 
 void
-Look::ReinitialiseLayout(unsigned infobox_width)
+Look::ReinitialiseLayout(const UISettings &settings, unsigned infobox_width)
 {
-  info_box.ReinitialiseLayout(infobox_width);
-  nav_slider.ReinitialiseLayout();
+  info_box.ReinitialiseLayout(infobox_width, settings.font_scale_infobox_title,
+                              settings.font_scale_infobox_value);
+  nav_slider.ReinitialiseLayout(settings.font_scale_nav_bar_waypoint_name,
+                                settings.font_scale_nav_bar_distance);
 }

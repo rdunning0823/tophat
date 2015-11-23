@@ -45,9 +45,11 @@ struct NavSliderLook {
   unsigned border_pen_width_thin, border_pen_width_thick, background_pen_width;
   Font large_font, medium_font, small_font;
 
-  void Initialise();
+  void Initialise(unsigned font_scale_nav_bar_waypoint_name,
+                  unsigned font_scale_nav_bar_distance);
 
-  void ReinitialiseLayout();
+  void ReinitialiseLayout(unsigned font_scale_nav_bar_waypoint_name,
+                          unsigned font_scale_nav_bar_distance);
   const Pen &GetBorderPen(bool use_wide_pen) const {
     return use_wide_pen ? border_pen_thick : border_pen_thin;
   }

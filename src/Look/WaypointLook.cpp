@@ -23,11 +23,14 @@ Copyright_License {
 
 #include "WaypointLook.hpp"
 #include "Renderer/WaypointRendererSettings.hpp"
+#include "Screen/Layout.hpp"
+#include "FontDescription.hpp"
+#include "AutoFont.hpp"
 #include "Resources.hpp"
 
 void
 WaypointLook::Initialise(const WaypointRendererSettings &settings,
-                         const Font &_font, const Font &_bold_font)
+                         unsigned font_scale_map_waypoint_name)
 {
   small_icon.LoadResource(IDB_SMALL, IDB_SMALL_HD, IDB_SMALL_HD2);
   turn_point_icon.LoadResource(IDB_TURNPOINT, IDB_TURNPOINT_HD, IDB_TURNPOINT_HD2);
@@ -51,8 +54,14 @@ WaypointLook::Initialise(const WaypointRendererSettings &settings,
 
   Reinitialise(settings);
 
-  font = &_font;
-  bold_font = &_bold_font;
+  const FontDescription font_d((Layout::FontScale(18) *
+                                         font_scale_map_waypoint_name) / 100);
+  const FontDescription font_bold_d((Layout::FontScale(18) *
+                                         font_scale_map_waypoint_name / 100), true);
+  font_instance.Load(font_d);
+  bold_font_instance.Load(font_bold_d);
+  font = & font_instance;
+  bold_font = &bold_font_instance;
 }
 
 void

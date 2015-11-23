@@ -28,9 +28,11 @@ Copyright_License {
 
 void
 MapLook::Initialise(const MapSettings &settings,
-                    const Font &font, const Font &bold_font)
+                    const Font &font, const Font &bold_font,
+                    unsigned font_scale_map_waypoint_name,
+                    unsigned font_scale_map_place_name)
 {
-  waypoint.Initialise(settings.waypoint, font, bold_font);
+  waypoint.Initialise(settings.waypoint, font_scale_map_waypoint_name);
   aircraft.Initialise();
   task.Initialise();
   trail.Initialise(settings.trail);
@@ -90,6 +92,6 @@ MapLook::Initialise(const MapSettings &settings,
 
   overlay_font = &bold_font;
 
-  topography.Initialise();
+  topography.Initialise(font_scale_map_place_name);
   airspace.Initialise(settings.airspace, topography.important_label_font);
 }

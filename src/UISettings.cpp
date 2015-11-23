@@ -36,6 +36,14 @@ UISettings::SetDefaults()
 
 #ifndef GNAV
   scale = 100;
+  font_scale_nav_bar_waypoint_name = 100;
+  font_scale_nav_bar_distance = 100;
+  font_scale_map_waypoint_name = 100;
+  font_scale_map_place_name = 100;
+  font_scale_infobox_title = 100;
+  font_scale_infobox_value = 100;
+  font_scale_menu_button = 100;
+  font_scale_dialog = 100;
 #endif
 
   enable_thermal_assistant_gauge = false;
