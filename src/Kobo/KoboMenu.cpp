@@ -273,7 +273,7 @@ Main()
   Layout::Initialize(screen_size);
 
   DialogLook dialog_look;
-  dialog_look.Initialise();
+  dialog_look.Initialise(100);
 
   IconLook icon_look;
   icon_look.Initialise();
