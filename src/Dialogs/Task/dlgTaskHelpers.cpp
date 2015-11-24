@@ -314,7 +314,6 @@ OrderedTaskSave(OrderedTask &task)
 
   if (!MatchesExtension(fname, _T(".tsk")))
     _tcscat(fname, _T(".tsk"));
-  task.SetName(StaticString<64>(fname));
   LocalPath(path, _T("tasks"), fname);
   SaveTask(path, task);
   return true;
