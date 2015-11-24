@@ -44,6 +44,7 @@ Copyright_License {
 #include "Util/StringUtil.hpp"
 #include "Util/StaticString.hxx"
 #include "Interface.hpp"
+#include "OS/PathName.hpp"
 
 #include <assert.h>
 #include <stdio.h>
@@ -311,7 +312,8 @@ OrderedTaskSave(OrderedTask &task)
   LocalPath(path, _T("tasks"));
   Directory::Create(path);
 
-  _tcscat(fname, _T(".tsk"));
+  if (!MatchesExtension(fname, _T(".tsk")))
+    _tcscat(fname, _T(".tsk"));
   task.SetName(StaticString<64>(fname));
   LocalPath(path, _T("tasks"), fname);
   SaveTask(path, task);
