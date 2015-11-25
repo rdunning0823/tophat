@@ -76,4 +76,6 @@ Look::ReinitialiseLayout(const UISettings &settings, unsigned infobox_width)
   nav_slider.ReinitialiseLayout(settings.font_scale_nav_bar_waypoint_name,
                                 settings.font_scale_nav_bar_distance);
   overlay_button.ReinitialiseLayout(settings.font_scale_overlay_button);
+  map.Reinitialise(settings.map, settings.font_scale_map_waypoint_name,
+                   settings.font_scale_map_place_name);
 }

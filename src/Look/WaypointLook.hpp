@@ -52,7 +52,8 @@ struct WaypointLook {
   void Initialise(const WaypointRendererSettings &settings,
                   unsigned font_scale_map_waypoint_name);
 
-  void Reinitialise(const WaypointRendererSettings &settings);
+  void Reinitialise(const WaypointRendererSettings &settings,
+                    unsigned font_scale_map_waypoint_name);
 };
 
 #endif

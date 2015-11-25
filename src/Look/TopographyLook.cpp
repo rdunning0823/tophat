@@ -28,6 +28,12 @@ Copyright_License {
 void
 TopographyLook::Initialise(unsigned font_scale_map_place_name)
 {
+  Reinitialise(font_scale_map_place_name);
+}
+
+void
+TopographyLook::Reinitialise(unsigned font_scale_map_place_name)
+{
 #ifdef GNAV
   regular_label_font.Load(FontDescription(_T("RasterGothicTwelveCond"), 13));
   important_label_font.Load(FontDescription(_T("RasterGothicTwelveCond"), 13));
@@ -37,3 +43,4 @@ TopographyLook::Initialise(unsigned font_scale_map_place_name)
   important_label_font.Load(FontDescription(font_scale, true, false));
 #endif
 }
+

@@ -33,6 +33,7 @@ struct TopographyLook {
   Font important_label_font;
 
   void Initialise(unsigned font_scale_map_place_name);
+  void Reinitialise(unsigned font_scale_map_place_name);
 };
 
 #endif

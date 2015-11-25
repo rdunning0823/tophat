@@ -52,20 +52,12 @@ WaypointLook::Initialise(const WaypointRendererSettings &settings,
   magenta_brush.Create(COLOR_MAGENTA);
   orange_brush.Create(COLOR_ORANGE);
 
-  Reinitialise(settings);
-
-  const FontDescription font_d((Layout::FontScale(18) *
-                                         font_scale_map_waypoint_name) / 100);
-  const FontDescription font_bold_d((Layout::FontScale(18) *
-                                         font_scale_map_waypoint_name / 100), true);
-  font_instance.Load(font_d);
-  bold_font_instance.Load(font_bold_d);
-  font = & font_instance;
-  bold_font = &bold_font_instance;
+  Reinitialise(settings, font_scale_map_waypoint_name);
 }
 
 void
-WaypointLook::Reinitialise(const WaypointRendererSettings &settings)
+WaypointLook::Reinitialise(const WaypointRendererSettings &settings,
+                           unsigned font_scale_map_waypoint_name)
 {
   switch (settings.landable_style) {
   case WaypointRendererSettings::LandableStyle::PURPLE_CIRCLE:
@@ -107,4 +99,12 @@ WaypointLook::Reinitialise(const WaypointRendererSettings &settings)
                                     IDB_OUTFIELD_UNREACHABLE2_HD, IDB_OUTFIELD_UNREACHABLE2_HD2);
     break;
   }
+  const FontDescription font_d((Layout::FontScale(18) *
+                                         font_scale_map_waypoint_name) / 100);
+  const FontDescription font_bold_d((Layout::FontScale(18) *
+                                         font_scale_map_waypoint_name / 100), true);
+  font_instance.Load(font_d);
+  bold_font_instance.Load(font_bold_d);
+  font = & font_instance;
+  bold_font = &bold_font_instance;
 }

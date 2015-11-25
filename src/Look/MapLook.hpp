@@ -97,6 +97,11 @@ struct MapLook {
                   const Font &font, const Font &bold_font,
                   unsigned font_scale_map_waypoint_name,
                   unsigned font_scale_map_place_name);
+
+  void Reinitialise(const MapSettings &settings,
+                    unsigned font_scale_map_waypoint_name,
+                    unsigned font_scale_map_place_name);
+
 };
 
 #endif

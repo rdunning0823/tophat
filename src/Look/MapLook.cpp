@@ -92,6 +92,15 @@ MapLook::Initialise(const MapSettings &settings,
 
   overlay_font = &bold_font;
 
-  topography.Initialise(font_scale_map_place_name);
   airspace.Initialise(settings.airspace, topography.important_label_font);
+  Reinitialise(settings, font_scale_map_waypoint_name, font_scale_map_place_name);
+}
+
+void
+MapLook::Reinitialise(const MapSettings &settings,
+                      unsigned font_scale_map_waypoint_name,
+                      unsigned font_scale_map_place_name)
+{
+  waypoint.Reinitialise(settings.waypoint, font_scale_map_waypoint_name);
+  topography.Reinitialise(font_scale_map_place_name);
 }

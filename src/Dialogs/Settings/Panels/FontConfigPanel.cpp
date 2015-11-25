@@ -112,43 +112,44 @@ FontConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 bool
 FontConfigPanel::Save(bool &_changed)
 {
-  bool changed = false;
-
   UISettings &settings = CommonInterface::SetUISettings();
 
-  if (SaveValueEnum(FontNavBarWaypointName, ProfileKeys::FontNavBarWaypointName,
-                    settings.font_scale_nav_bar_waypoint_name))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontNavBarWaypointName,
+                                 ProfileKeys::FontNavBarWaypointName,
+                                 settings.font_scale_nav_bar_waypoint_name);
 
-  if (SaveValueEnum(FontNavBarDistance, ProfileKeys::FontNavBarDistance,
-                    settings.font_scale_nav_bar_distance))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontNavBarDistance,
+                                 ProfileKeys::FontNavBarDistance,
+                                 settings.font_scale_nav_bar_distance);
 
-  if (SaveValueEnum(FontMapWaypointName, ProfileKeys::FontMapWaypointName,
-                    settings.font_scale_map_waypoint_name))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontMapWaypointName,
+                                 ProfileKeys::FontMapWaypointName,
+                                 settings.font_scale_map_waypoint_name);
 
-  if (SaveValueEnum(FontMapPlaceName, ProfileKeys::FontMapPlaceName,
-                    settings.font_scale_map_place_name))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontMapPlaceName,
+                                 ProfileKeys::FontMapPlaceName,
+                                 settings.font_scale_map_place_name);
 
-  if (SaveValueEnum(FontInfoBoxValue, ProfileKeys::FontInfoBoxValue,
-                    settings.font_scale_infobox_value))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontInfoBoxValue,
+                                 ProfileKeys::FontInfoBoxValue,
+                                 settings.font_scale_infobox_value);
 
-  if (SaveValueEnum(FontInfoBoxTitle, ProfileKeys::FontInfoBoxTitle,
-                    settings.font_scale_infobox_title))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontInfoBoxTitle,
+                                 ProfileKeys::FontInfoBoxTitle,
+                                 settings.font_scale_infobox_title);
 
-  if (SaveValueEnum(FontOverlayButton, ProfileKeys::FontOverlayButton,
-                    settings.font_scale_overlay_button))
-    require_restart = changed = true;
+  fonts_changed |= SaveValueEnum(FontOverlayButton,
+                                 ProfileKeys::FontOverlayButton,
+                                 settings.font_scale_overlay_button);
 
-  if (SaveValueEnum(FontDialog, ProfileKeys::FontDialog,
-                    settings.font_scale_dialog))
-    require_restart = changed = true;
+  bool dialog_font_changed = SaveValueEnum(FontDialog,
+                                           ProfileKeys::FontDialog,
+                                           settings.font_scale_dialog);
+  require_restart |= dialog_font_changed;
+  _changed |= dialog_font_changed;
 
-  _changed |= changed;
+  _changed |= fonts_changed;
+
 
   return true;
 }

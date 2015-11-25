@@ -69,6 +69,7 @@ bool AirfieldFileChanged = false;
 bool WaypointFileChanged = false;
 bool InputFileChanged = false;
 bool LanguageChanged = false;
+bool fonts_changed = false;
 bool require_restart;
 
 static void
@@ -86,6 +87,7 @@ SettingsEnter()
   InputFileChanged = false;
   DevicePortChanged = false;
   LanguageChanged = false;
+  fonts_changed = false;
   require_restart = false;
 }
 
@@ -208,8 +210,12 @@ SettingsLeave(const UISettings &old_ui_settings)
       settings_map.trail.scaling_enabled != old_settings_map.trail.scaling_enabled)
     main_window.SetLook().map.trail.Initialise(settings_map.trail);
 
-  if (settings_map.waypoint.landable_style != old_settings_map.waypoint.landable_style)
-    main_window.SetLook().map.waypoint.Reinitialise(settings_map.waypoint);
+  if (fonts_changed)
+    main_window.ReinitialiseLayout();
+  else if (settings_map.waypoint.landable_style !=
+      old_settings_map.waypoint.landable_style)
+    main_window.SetLook().map.waypoint.Reinitialise(settings_map.waypoint,
+                                                    ui_settings.font_scale_map_waypoint_name);
 
   ResumeAllThreads();
   main_window.ResumeThreads();
