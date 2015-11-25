@@ -53,7 +53,7 @@ OverlayButtonLook::ReinitialiseLayout(unsigned font_scale_overlay_button)
   large_font.Load(large_font_d);
   small_font.Load(small_font_d);
 
-  scaled_button_width = large_font_d.GetHeight() * 3;
+  scaled_button_width = (large_font_d.GetHeight() * 5) / 2;
 
 #ifdef HAVE_TEXT_CACHE
   TextCache::Flush();
