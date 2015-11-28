@@ -88,12 +88,12 @@ FontConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
              settings.font_scale_map_place_name);
 
-  AddInteger(_("Infbox value"),
+  AddInteger(_("Infobox value"),
              nullptr,
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
              settings.font_scale_infobox_value);
 
-  AddInteger(_("Infbox title"),
+  AddInteger(_("Infobox title"),
              nullptr,
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
              settings.font_scale_infobox_title);
