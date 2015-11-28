@@ -38,7 +38,7 @@ protected:
 
   TextRenderer text_renderer;
 
-  StaticString<64> caption;
+  StaticString<96> caption;
 
 public:
   explicit TextButtonRenderer(const ButtonLook &_look)
@@ -49,7 +49,7 @@ public:
   }
 
   TextButtonRenderer(const ButtonLook &_look,
-                     StaticString<64>::const_pointer _caption)
+                     StaticString<96>::const_pointer _caption)
     :frame_renderer(_look), caption(_caption) {
     text_renderer.SetCenter();
     text_renderer.SetVCenter();
@@ -60,11 +60,11 @@ public:
     return frame_renderer.GetLook();
   }
 
-  StaticString<64>::const_pointer GetCaption() const {
+  StaticString<96>::const_pointer GetCaption() const {
     return caption;
   }
 
-  void SetCaption(StaticString<64>::const_pointer _caption) {
+  void SetCaption(StaticString<96>::const_pointer _caption) {
     caption = _caption;
     text_renderer.InvalidateLayout();
   }
@@ -79,7 +79,7 @@ protected:
   void DrawCaption(Canvas &canvas, const PixelRect &rc,
                    bool enabled, bool focused, bool pressed) const;
 
-  void DrawCaption(Canvas &canvas, StaticString<64>::const_pointer _caption,
+  void DrawCaption(Canvas &canvas, StaticString<96>::const_pointer _caption,
                    const PixelRect &rc,
                    bool enabled, bool focused, bool pressed) const;
 

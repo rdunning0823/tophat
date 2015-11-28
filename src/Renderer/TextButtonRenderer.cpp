@@ -40,7 +40,7 @@ TextButtonRenderer::DrawCaption(Canvas &canvas, const PixelRect &rc,
 
 void
 TextButtonRenderer::DrawCaption(Canvas &canvas,
-                                StaticString<64>::const_pointer _caption,
+                                StaticString<96>::const_pointer _caption,
                                 const PixelRect &rc, bool enabled,
                                 bool focused, bool pressed) const
 {

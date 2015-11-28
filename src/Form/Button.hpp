@@ -107,7 +107,7 @@ public:
    */
   void SetCaption(const TCHAR *caption);
 
-  StaticString<64>::const_pointer GetCaption();
+  StaticString<96>::const_pointer GetCaption();
 
   void SetSelected(bool _selected);
 

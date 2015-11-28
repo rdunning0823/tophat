@@ -125,7 +125,7 @@ Button::SetCaption(const TCHAR *caption)
   Invalidate();
 }
 
-StaticString<64>::const_pointer
+StaticString<96>::const_pointer
 Button::GetCaption()
 {
   TextButtonRenderer &r = *(TextButtonRenderer *)renderer;

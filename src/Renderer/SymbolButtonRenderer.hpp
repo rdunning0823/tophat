@@ -38,7 +38,7 @@ class SymbolButtonRenderer : public TextButtonRenderer {
 
 public:
   SymbolButtonRenderer(const ButtonLook &_look,
-                       StaticString<64>::const_pointer _caption)
+                       StaticString<96>::const_pointer _caption)
     :TextButtonRenderer(_look, _caption) {}
 
 
