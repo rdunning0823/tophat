@@ -125,21 +125,6 @@ public:
   }
 
   /**
-   * the font used to display the turnpoint name
-   */
-  const Font &GetLargeFont();
-
-  /**
-   * the font used to display the Distance about the turnpoint
-   */
-  const Font &GetMediumFont();
-
-  /**
-   * the font used to display the turnpoint name
-   */
-  const Font &GetSmallFont();
-
-  /**
    * The summed height of all three fonts.
    * A proxy for whether a change in font height requires resizing the shape
    */

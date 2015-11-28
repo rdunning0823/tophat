@@ -48,30 +48,12 @@ Copyright_License {
 #include "Screen/OpenGL/Compatibility.hpp"
 #endif
 
-const Font &
-SliderShape::GetLargeFont()
-{
-  return nav_slider_look.large_font;
-}
-
-const Font &
-SliderShape::GetMediumFont()
-{
-  return nav_slider_look.medium_font;
-}
-
-const Font &
-SliderShape::GetSmallFont()
-{
-  return nav_slider_look.small_font;
-}
-
 unsigned
 SliderShape::GetSumFontHeight()
 {
-  return GetSmallFont().GetHeight() +
-      GetMediumFont().GetHeight() +
-      GetLargeFont().GetHeight();
+  return nav_slider_look.small_font.GetHeight() +
+      nav_slider_look.medium_font.GetHeight() +
+      nav_slider_look.large_font.GetHeight();
 }
 
 SliderShape::VisibilityLevel
@@ -256,10 +238,10 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       && ((idx > 0 && has_entered) || (idx == 0 && has_exited));
 
   StaticString<120> type_buffer;
-  const Font &name_font = GetLargeFont();
-  const Font &distance_font = GetMediumFont();
-  const Font &type_font = GetSmallFont();
-  const Font &altitude_font = GetSmallFont();
+  const Font &name_font = nav_slider_look.large_font;
+  const Font &distance_font = nav_slider_look.medium_font;
+  const Font &type_font = nav_slider_look.small_font;
+  const Font &altitude_font = nav_slider_look.small_font;
   UPixelScalar width;
   PixelScalar left;
   PixelRect rc = rc_outer;
@@ -268,7 +250,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   if (!tp_valid) {
     StaticString<120> nav_buffer;
-    const Font &nav_font = GetMediumFont();
+    const Font &nav_font = nav_slider_look.medium_font;
     canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
     canvas.Select(nav_slider_look.GetBackgroundBrush(selected));
     DrawOutline(canvas, rc_outer, use_wide_pen);
@@ -505,13 +487,11 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
 void
 SliderShape::Resize(UPixelScalar map_width)
 {
-  const UPixelScalar large_font_height = GetLargeFont().GetHeight();
-  const UPixelScalar medium_font_height = GetMediumFont().GetHeight();
   const UPixelScalar arrow_point_bluntness = 0;
   const UPixelScalar raw_total_width = Layout::Scale(360);
 
-  UPixelScalar total_height = large_font_height
-      + medium_font_height - Layout::Scale(2);
+  UPixelScalar total_height = nav_slider_look.large_font.GetHeight()
+      + nav_slider_look.medium_font.GetHeight() - Layout::Scale(2);
 
   total_height = std::max(total_height, UPixelScalar(
       bearing_icon_size.cy));
@@ -526,7 +506,7 @@ SliderShape::Resize(UPixelScalar map_width)
       raw_hint_width * 2 + arrow_point_bluntness));
 
   SetLine1Y(0u);
-  SetLine2Y(total_height - large_font_height - 1);
+  SetLine2Y(total_height - nav_slider_look.large_font.GetHeight() - 1);
   SetLine3Y(0u);
 
   //top
