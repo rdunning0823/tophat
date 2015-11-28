@@ -140,6 +140,12 @@ public:
   const Font &GetSmallFont();
 
   /**
+   * The summed height of all three fonts.
+   * A proxy for whether a change in font height requires resizing the shape
+   */
+  unsigned GetSumFontHeight();
+
+  /**
    * the y position of line one text for painting
    */
   void SetLine1Y(UPixelScalar y) {

@@ -59,7 +59,7 @@ TaskNavSliderWidget::TaskNavSliderWidget()
   :task_manager_time_stamp(0u),
    ordered_task_size(0u),
    mode(TaskType::NONE),
-   last_rc_map(PixelRect(0, 0, 0, 0)) {}
+   last_rc_map(PixelRect(0, 0, 0, 0)), last_sum_font_height(0) {}
 
 void
 TaskNavSliderWidget::UpdateVisibility(const PixelRect &rc, bool is_panning,
@@ -314,13 +314,15 @@ TaskNavSliderWidget::Move(const PixelRect &rc_map)
   if (rc.left == last_rc_map.left &&
       rc.right == last_rc_map.right &&
       rc.top == last_rc_map.top &&
-      rc.bottom == last_rc_map.bottom)
+      rc.bottom == last_rc_map.bottom &&
+      slider_shape.GetSumFontHeight() == last_sum_font_height)
     return;
 
   last_rc_map.left = rc.left;
   last_rc_map.right = rc.right;
   last_rc_map.top = rc.top;
   last_rc_map.bottom = rc.bottom;
+  last_sum_font_height = slider_shape.GetSumFontHeight();
 
   slider_shape.Resize(rc_map.right - rc_map.left);
   rc.bottom = rc.top + slider_shape.GetHeight();

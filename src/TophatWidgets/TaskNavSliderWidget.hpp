@@ -58,6 +58,10 @@ protected:
   unsigned ordered_task_size;
   TaskType mode;
   PixelRect last_rc_map;
+  /**
+   * the summed font heights of the slider shape when last resized
+   */
+  unsigned last_sum_font_height;
 
 protected:
 

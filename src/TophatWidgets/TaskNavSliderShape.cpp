@@ -66,6 +66,14 @@ SliderShape::GetSmallFont()
   return nav_slider_look.small_font;
 }
 
+unsigned
+SliderShape::GetSumFontHeight()
+{
+  return GetSmallFont().GetHeight() +
+      GetMediumFont().GetHeight() +
+      GetLargeFont().GetHeight();
+}
+
 SliderShape::VisibilityLevel
 SliderShape::GetVisibilityLevel(Canvas &canvas, RasterPoint poly[])
 {
