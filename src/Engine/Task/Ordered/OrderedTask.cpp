@@ -793,14 +793,14 @@ OrderedTask::CheckTask() const
 }
 
 AATPoint*
-OrderedTask::GetAATTaskPoint(unsigned TPindex)
+OrderedTask::GetAATTaskPoint(unsigned tp_index)
 {
- if (TPindex > task_points.size() - 1) {
+ if (tp_index > task_points.size() - 1) {
    return nullptr;
  }
 
- if (task_points[TPindex]->GetType() == TaskPointType::AAT)
-   return (AATPoint *)task_points[TPindex];
+ if (task_points[tp_index]->GetType() == TaskPointType::AAT)
+   return (AATPoint *)task_points[tp_index];
  else
    return (AATPoint *)nullptr;
 }
