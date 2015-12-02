@@ -793,7 +793,7 @@ OrderedTask::CheckTask() const
 }
 
 AATPoint*
-OrderedTask::GetAATTaskPoint(unsigned TPindex) const
+OrderedTask::GetAATTaskPoint(unsigned TPindex)
 {
  if (TPindex > task_points.size() - 1) {
    return nullptr;

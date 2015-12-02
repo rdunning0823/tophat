@@ -346,7 +346,7 @@ public:
   *
   * @return pointer to tp if valid, else nullptr
   */
- AATPoint* GetAATTaskPoint(unsigned index) const;
+ AATPoint* GetAATTaskPoint(unsigned index);
 
   /**
    * Check whether the task point with the specified index exists.

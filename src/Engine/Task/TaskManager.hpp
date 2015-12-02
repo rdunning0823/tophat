@@ -42,6 +42,7 @@ class GotoTask;
 class AlternateTask;
 class AlternateList;
 class TaskWaypoint;
+class AATPoint;
 class AbortIntersectionTest;
 struct Waypoint;
 struct RangeAndRadial;
@@ -106,6 +107,13 @@ public:
    * @param offset Offset value
    */
   void IncrementActiveTaskPoint(int offset);
+
+  /**
+   * @param tp_index index of the task
+   * @return writable pointer to AAT task point or null if
+   * the turnpoint is not an AAT task point
+   */
+  AATPoint* GetAATTaskPoint(unsigned tp_index);
 
   /**
    * Sets active taskpoint sequence for active task

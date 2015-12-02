@@ -86,7 +86,7 @@ TargetMapWindow::isInSector(const int x, const int y)
 
   GeoPoint gp = projection.ScreenToGeo(x, y);
 
-  ProtectedTaskManager::Lease lease(*task);
-  AATPoint *p = lease->GetOrderedTask().GetAATTaskPoint(target_index);
+  ProtectedTaskManager::ExclusiveLease lease(*task);
+  AATPoint *p = lease->GetAATTaskPoint(target_index);
   return p != nullptr && p->GetObservationZone().IsInSector(gp);
 }
