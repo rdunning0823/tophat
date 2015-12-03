@@ -183,10 +183,12 @@ static bool
 ReadLatitude(NMEAInputLine &line, Angle &value_r)
 {
   Angle value;
-  if (!ReadGeoAngle(line, value))
-    return false;
-
+  // NOTE: To properly skip over bad values, read both angle and
+  // hemisphere flag character BEFORE returning if invalid
+  bool angle_valid = ReadGeoAngle(line, value);
   char ch = line.ReadOneChar();
+  if (!angle_valid)
+    return false;
   if (ch == 'S')
     value.Flip();
   else if (ch != 'N')
@@ -200,10 +202,10 @@ static bool
 ReadLongitude(NMEAInputLine &line, Angle &value_r)
 {
   Angle value;
-  if (!ReadGeoAngle(line, value))
-    return false;
-
+  bool angle_valid = ReadGeoAngle(line, value);
   char ch = line.ReadOneChar();
+  if (!angle_valid)
+    return false;
   if (ch == 'W')
     value.Flip();
   else if (ch != 'E')
