@@ -627,12 +627,7 @@ TargetWidget::OnRangeModified(fixed new_value)
 
   {
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
-    AATPoint *ap = lease->GetAATTaskPoint(target_point);
-    if (ap == nullptr)
-      return;
-
-    ap->SetTarget(range_and_radial,
-                  lease->GetOrderedTask().GetTaskProjection());
+    lease->SetTarget(target_point, range_and_radial);
   }
 
   map.Invalidate();
@@ -669,12 +664,7 @@ TargetWidget::OnRadialModified(fixed new_value)
 
   {
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
-    AATPoint *ap = lease->GetAATTaskPoint(target_point);
-    if (ap == nullptr)
-      return;
-
-    ap->SetTarget(range_and_radial,
-                  lease->GetOrderedTask().GetTaskProjection());
+    lease->SetTarget(target_point, range_and_radial);
   }
 
   if (must_reload_radial)
