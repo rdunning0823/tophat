@@ -254,10 +254,6 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc, unsigned value_height)
     (content_rc.bottom - big_minus_rc.bottom) / 4;
   checkbox_rc.left = big_minus_rc.left;
   checkbox_rc.right = little_minus_rc.right;
-
-  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  sub_number_rc.left = sub_number_rc.right -
-      dialog_look.text_font.TextSize(_T("333 km/h")).cx + Layout::Scale(1);
 }
 
 void
@@ -309,7 +305,6 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   speed_to_fly = new WndFrame(GetClientAreaWindow(), dialog_look,
                           sub_number_rc, style_frame);
-  speed_to_fly->SetAlignCenter();
   speed_to_fly->SetVAlignCenter();
 
   WindowStyle checkbox_style;
