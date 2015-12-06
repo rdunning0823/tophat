@@ -147,6 +147,27 @@ TaskManagerDialogUs::Save(bool &changed)
 }
 
 void
+TaskManagerDialogUs::ReinitialiseLayout(const PixelRect &parent_rc)
+{
+  WndForm::Move(parent_rc);
+}
+
+void
+TaskManagerDialogUs::OnResize(PixelSize new_size)
+{
+  WndForm::OnResize(new_size);
+  SetRectangles(GetClientRect());
+
+  task_summary->Move(rc_task_summary);
+  fly_button->Move(rc_fly_button);
+  save_as_button->Move(rc_save_as_button);
+  back_button->Move(rc_back_button);
+  task_view.SetFullScreenRect(GetClientRect());
+  task_view.SetPartialScreenRect(rc_task_view);
+  task_view.Restore();
+}
+
+void
 TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   NullWidget::Prepare(parent, rc);
@@ -222,17 +243,12 @@ TaskManagerDialogUs::SetRectangles(const PixelRect &rc_outer)
 TaskManagerDialogUs::TaskView::TaskView(OrderedTask **_ordered_task_pointer)
   :ordered_task_pointer(_ordered_task_pointer), fullscreen(false) {}
 
-
 bool
 TaskManagerDialogUs::TaskView::OnMouseUp(PixelScalar x, PixelScalar y)
 {
-  if (!fullscreen) {
-   Move(rc_full_screen);
-  } else {
-   Move(rc_partial_screen);
-  }
-  ShowOnTop();
   fullscreen = !fullscreen;
+  Restore();
+  ShowOnTop();
 
   return true;
 }
@@ -240,8 +256,10 @@ TaskManagerDialogUs::TaskView::OnMouseUp(PixelScalar x, PixelScalar y)
 void
 TaskManagerDialogUs::TaskView::Restore()
 {
-  fullscreen = false;
-  Move(rc_partial_screen);
+  if (fullscreen)
+   Move(rc_full_screen);
+  else
+   Move(rc_partial_screen);
 }
 
 void
