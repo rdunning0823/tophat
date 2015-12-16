@@ -1,0 +1,26 @@
+20090126 Stuart Hughes <stuarth at freescale dot com>
+This is a forward port of alsa-lib-1.0.11rc2-relink.patch:
+
+Tue May  1 15:01:01 BST 2007, Stuart Hughes <stuarth at freescale dot com>
+
+This patch fixes relink problems by removing -L/usr/lib (libdir):
+
+libtool: install: warning: relinking `smixer-sbase.la'
+(cd /home/seh/ltib_bsps/head/rpm/BUILD/alsa-lib-1.0.11rc2/modules/mixer/simple; /bin/sh ../../../libtool --mode=relink gcc -g -O2 -W -Wall -g -O2 -o smixer-sbase.la -rpath /usr/lib/alsa-lib/smixer -module -avoid-version sbase.lo ../../../src/libasound.la -inst-prefix-dir /home/seh/ltib_bsps/head/tmp/alsa-lib//opt/freescale/rootfs/arm)
+gcc -shared  .libs/sbase.o  -L/usr/lib -L/home/seh/ltib_bsps/head/tmp/alsa-lib//opt/freescale/rootfs/arm/usr/lib -lasound  -Wl,-soname -Wl,smixer-sbase.so -o .libs/smixer-sbase.so
+/opt/freescale/usr/local/gcc-4.1.1-glibc-2.4-nptl-6/arm-none-linux-gnueabi/lib/gcc/arm-none-linux-gnueabi/4.1.1/../../../../arm-none-linux-gnueabi/bin/ld: skipping incompatible /usr/lib/libasound.so when searching for -lasound
+
+
+diff --exclude CVS -uNr alsa-lib-1.0.18/ltmain.sh alsa-lib-1.0.18.modified/ltmain.sh
+--- alsa-lib-1.0.18/ltmain.sh	2006-11-25 05:04:27.000000000 -0600
++++ alsa-lib-1.0.18.modified/ltmain.sh	2009-01-26 05:20:54.000000000 -0600
+@@ -2761,7 +2761,8 @@
+ 	      fi
+ 	    else
+ 	      # We cannot seem to hardcode it, guess we'll fake it.
+-	      add_dir="-L$libdir"
++	      ### seh: 20090126: comment this out as it breaks cross compiling
++	      ### add_dir="-L$libdir"
+ 	      # Try looking first in the location we're being installed to.
+ 	      if test -n "$inst_prefix_dir"; then
+ 		case $libdir in

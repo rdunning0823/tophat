@@ -55,7 +55,7 @@ endif
 ifeq ($(TARGET_IS_KOBO),y)
 
 .PHONY: kobo-libs
-kobo-libs:
+kobo-libs: alsa-lib
 	./kobo/build.py $(TARGET_OUTPUT_DIR) $(HOST_ARCH) $(CC) $(CXX) $(AR) $(STRIP)
 
 KOBO_POWER_OFF_SOURCES = \
@@ -159,6 +159,32 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/media
 	$(Q)install -m 0755 $(topdir)/kobo/10-media-automount.rules $(@D)/KoboRoot/etc/udev/rules.d
 	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
+	PWD=`pwd`; cd lib/alsa-lib;\
+	make install DESTDIR=${PWD}/$(@D)/KoboRoot;\
+	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/include; \
+	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/bin; \
+	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/lib; \
+	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/share/aclocal; \
+	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/include; \
+	cd ../..
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 
+alsa-lib:
+	PWD=`pwd`; \
+	cd lib/alsa-lib; \
+	git checkout -f v1.0.18; \
+	patch -p1 <../../kobo/alsa-lib-1.0.18-nommu.patch; \
+	libtoolize --force --copy --automake; \
+	aclocal; \
+	autoheader; \
+	automake --foreign --copy --add-missing; \
+	autoconf; \
+	./configure --host=arm-linux-gnueabihf --prefix=/mnt/onboard/XCSoarData/alsa-lib \
+		--disable-aload --disable-mixer --disable-rawmidi \
+		--disable-hwdep --disable-seq --disable-alisp \
+		--disable-old-symbols --disable-python --enable-static \
+		--disable-shared; \
+	patch -p1 <../../kobo/alsa-lib-1.0.18-relink.patch; \
+	make -j all; \
+	cd ../..
 endif

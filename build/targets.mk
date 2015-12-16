@@ -747,7 +747,12 @@ ifeq ($(HAVE_POSIX),y)
 ifneq ($(TARGET),ANDROID)
   TARGET_LDLIBS += -lpthread
   ifeq ($(TARGET_IS_LINUX),y)
-  TARGET_LDLIBS += -lrt # for clock_gettime()
+    TARGET_LDLIBS += -lrt # for clock_gettime()
+    ifeq ($(TARGET_IS_KOBO),y)
+      TARGET_LDLIBS += $(topdir)/lib/alsa-lib/src/.libs/libasound.a
+    else ifeq ($(TARGET),UNIX)
+      TARGET_LDLIBS += -lpulse-simple -lpulse -lasound
+    endif
   endif
 endif
 endif
