@@ -920,9 +920,8 @@ TrafficWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
   details_button = new Button(GetContainer(), look.dialog.button,
                               _("Details"), rc, WindowStyle(),
                               *this, DETAILS);
-  close_button = new Button(GetContainer(), look.dialog.button,
-                            _T("_X"), rc, WindowStyle(),
-                            *this, CLOSE);
+  close_button = NewSymbolButton(GetContainer(), look.dialog.button,
+                                 _T("_X"), rc, *this, CLOSE);
 #endif
 
   WindowStyle style;
