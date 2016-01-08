@@ -609,6 +609,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/OS/LogError.cpp \
 	$(SRC)/Version.cpp \
 	$(SRC)/Audio/Sound.cpp \
+	$(SRC)/Audio/raw_play.cpp \
 	$(SRC)/Audio/VegaVoice.cpp \
 	$(SRC)/Audio/VegaVoiceSettings.cpp \
 	$(SRC)/Compatibility/fmode.c \

@@ -753,6 +753,7 @@ ifneq ($(TARGET),ANDROID)
     else ifeq ($(TARGET),UNIX)
       TARGET_LDLIBS += -lpulse-simple -lpulse -lasound
     endif
+    TARGET_LDLIBS += -ldl
   endif
 endif
 endif
