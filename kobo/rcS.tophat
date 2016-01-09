@@ -175,14 +175,14 @@ else
         [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
         cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
         touch ${DotKobo}/KoboRoot.tgz
-        rm -rf ${DotKobo}/force_uimage
+        rm -f ${DotKobo}/force_uimage
         reboot
     fi
     if [ -f ${DotKobo}/force_uimage -a -f ${DotKobo}/uImage-USB-hot-plug ] ; then
         [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
         cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
         touch ${DotKobo}/KoboRoot.tgz
-        rm -rf ${DotKobo}/force_uimage
+        rm -f ${DotKobo}/force_uimage
         reboot
     fi
     # disable the flashing led
