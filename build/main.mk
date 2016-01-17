@@ -609,7 +609,6 @@ XCSOAR_SOURCES := \
 	$(SRC)/OS/LogError.cpp \
 	$(SRC)/Version.cpp \
 	$(SRC)/Audio/Sound.cpp \
-	$(SRC)/Audio/raw_play.cpp \
 	$(SRC)/Audio/VegaVoice.cpp \
 	$(SRC)/Audio/VegaVoiceSettings.cpp \
 	$(SRC)/Compatibility/fmode.c \
@@ -716,6 +715,13 @@ XCSOAR_SOURCES := \
 	$(SRC)/Hardware/Battery.cpp
 
 $(call SRC_TO_OBJ,$(SRC)/Dialogs/Inflate.cpp): CPPFLAGS += $(ZLIB_CPPFLAGS)
+
+ifeq ($(HAVE_WIN32),n)
+ifneq ($(TARGET),ANDROID)
+XCSOAR_SOURCES += \
+	$(SRC)/Audio/raw_play.cpp
+endif
+endif
 
 ifeq ($(HAVE_CE),y)
 XCSOAR_SOURCES += \
