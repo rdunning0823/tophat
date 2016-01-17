@@ -35,6 +35,16 @@ Copyright_License {
 #include <mmsystem.h>
 #endif
 
+#if !defined(ANDROID) && !(defined(WIN32) && !defined(GNAV))
+#include <string.h>
+#include "Audio/raw_play.hpp"
+#include "LocalPath.hpp"
+#include <windef.h>
+
+const char *beep_id_str = "IDR_";
+const char *wav_str = "WAV_";
+#endif
+
 bool
 PlayResource(const TCHAR *resource_name)
 {
@@ -53,6 +63,23 @@ PlayResource(const TCHAR *resource_name)
                       SND_MEMORY | SND_ASYNC | SND_NODEFAULT);
 
 #else
-  return false;
+  static TCHAR raw_file_name[MAX_PATH];
+  InitialiseDataPath();
+  LocalPath(raw_file_name, _T("sound/"));
+
+  if (strncasecmp(resource_name, beep_id_str, strlen(beep_id_str)) == 0) {
+    resource_name += strlen(beep_id_str);
+    if (strncasecmp(resource_name, wav_str, strlen(wav_str)) == 0)
+      resource_name += strlen(wav_str);
+  }
+  strncat(raw_file_name, _T(resource_name), sizeof(raw_file_name));
+  strncat(raw_file_name, ".raw", sizeof(raw_file_name));
+
+  RawPlayback *raw_playback = new RawPlayback();
+  int ret = raw_playback->playback_file(raw_file_name);
+  delete raw_playback;
+  if (ret < 0)
+    return false;
+  return true;
 #endif
 }
