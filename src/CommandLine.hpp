@@ -45,7 +45,7 @@ namespace CommandLine {
 
 extern bool show_dialog_setup_quick;
 
-#if defined(__linux__) && !defined(ANDROID)
+#if defined(__linux__)
 #define HAVE_CMDLINE_REPLAY
   extern ReplayPathType replay_path;
 #endif
