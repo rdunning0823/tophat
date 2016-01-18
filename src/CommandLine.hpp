@@ -23,8 +23,11 @@ Copyright_License {
 
 #ifndef XCSOAR_OS_COMMAND_LINE_HPP
 #define XCSOAR_OS_COMMAND_LINE_HPP
+#include "Util/StaticString.hxx"
 
 class Args;
+
+typedef StaticString<256> ReplayPathType;
 
 namespace CommandLine {
 #ifndef _WIN32_WCE
@@ -44,7 +47,7 @@ extern bool show_dialog_setup_quick;
 
 #if defined(__linux__) && !defined(ANDROID)
 #define HAVE_CMDLINE_REPLAY
-  extern const char *replay_path;
+  extern ReplayPathType replay_path;
 #endif
 
 /**

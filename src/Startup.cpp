@@ -150,7 +150,7 @@ LoadTophatArguments()
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
   if (file != nullptr) {
-    StaticString<64> line;
+    StaticString<256> line;
 #ifndef _WIN32_WCE
           // program name is not included in command line on CE
     line.Format(_T("%s %s"), _T("Top Hat Soaring"), file->ReadLine());
@@ -378,8 +378,8 @@ Startup()
   replay = new Replay(logger, *protected_task_manager);
 
 #ifdef HAVE_CMDLINE_REPLAY
-  if (CommandLine::replay_path != nullptr)
-    replay->Start(CommandLine::replay_path);
+  if (CommandLine::replay_path.length() > 0)
+    replay->Start(CommandLine::replay_path.c_str());
 #endif
 
 

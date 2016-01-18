@@ -49,7 +49,7 @@ namespace CommandLine {
 #endif
 
 #ifdef HAVE_CMDLINE_REPLAY
-  const char *replay_path;
+  ReplayPathType replay_path;
 #endif
 
   bool show_dialog_setup_quick = true;
