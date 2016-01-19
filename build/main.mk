@@ -247,6 +247,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/FLARM/FlarmNetDatabase.cpp \
 	$(SRC)/FLARM/FlarmNetReader.cpp \
 	$(SRC)/FLARM/Traffic.cpp \
+	$(SRC)/FLARM/FlarmAudibleAlert.cpp \
 	$(SRC)/FLARM/FlarmCalculations.cpp \
 	$(SRC)/FLARM/Friends.cpp \
 	$(SRC)/FLARM/FlarmComputer.cpp \
@@ -710,6 +711,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Monitor/TaskAdvanceMonitor.cpp \
 	$(SRC)/Monitor/MatTaskMonitor.cpp \
 	$(SRC)/Monitor/TaskStartMonitor.cpp \
+	$(SRC)/Monitor/TrafficWarningMonitor.cpp \
 	$(SRC)/Monitor/AllMonitors.cpp \
 	\
 	$(SRC)/Hardware/Battery.cpp
