@@ -128,7 +128,7 @@ AVCONF = avconv -y
 
 RAW_DIR = $(TARGET_OUTPUT_DIR)/resources/raw
 
-SOUNDS = fail insert remove beep_bweep beep_clear beep_drip
+SOUNDS = fail insert remove beep_bweep beep_clear beep_drip traffic_low traffic_important traffic_urgent above below one_oclock two_oclock three_oclock four_oclock five_oclock six_oclock seven_oclock eight_oclock nine_oclock ten_oclock eleven_oclock twelve_oclock
 SOUND_FILES = $(patsubst %,$(RAW_DIR)/%.raw,$(SOUNDS))
 
 $(SOUND_FILES): $(RAW_DIR)/%.raw: Data/sound/%.wav | $(RAW_DIR)/dirstamp

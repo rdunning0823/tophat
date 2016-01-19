@@ -42,6 +42,23 @@ public class SoundUtil {
     resources.put("IDR_WAV_BEEPBWEEP", R.raw.beep_bweep);
     resources.put("IDR_WAV_CLEAR", R.raw.beep_clear);
     resources.put("IDR_WAV_DRIP", R.raw.beep_drip);
+    resources.put("IDR_WAV_TRAFFIC_LOW", R.raw.traffic_low);
+    resources.put("IDR_WAV_TRAFFIC_IMPORTANT", R.raw.traffic_important);
+    resources.put("IDR_WAV_TRAFFIC_URGENT", R.raw.traffic_urgent);
+    resources.put("IDR_WAV_ABOVE", R.raw.above);
+    resources.put("IDR_WAV_BELOW", R.raw.below);
+    resources.put("IDR_WAV_ONE_OCLOCK", R.raw.one_oclock);
+    resources.put("IDR_WAV_TWO_OCLOCK", R.raw.two_oclock);
+    resources.put("IDR_WAV_THREE_OCLOCK", R.raw.three_oclock);
+    resources.put("IDR_WAV_FOUR_OCLOCK", R.raw.four_oclock);
+    resources.put("IDR_WAV_FIVE_OCLOCK", R.raw.five_oclock);
+    resources.put("IDR_WAV_SIX_OCLOCK", R.raw.six_oclock);
+    resources.put("IDR_WAV_SEVEN_OCLOCK", R.raw.seven_oclock);
+    resources.put("IDR_WAV_EIGHT_OCLOCK", R.raw.eight_oclock);
+    resources.put("IDR_WAV_NINE_OCLOCK", R.raw.nine_oclock);
+    resources.put("IDR_WAV_TEN_OCLOCK", R.raw.ten_oclock);
+    resources.put("IDR_WAV_ELEVEN_OCLOCK", R.raw.eleven_oclock);
+    resources.put("IDR_WAV_TWELVE_OCLOCK", R.raw.twelve_oclock);
   }
   private static MediaPlayer instance;
 
