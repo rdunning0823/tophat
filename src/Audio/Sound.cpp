@@ -36,9 +36,10 @@ Copyright_License {
 #endif
 
 #if !defined(ANDROID) && !(defined(WIN32) && !defined(GNAV))
-#include <string.h>
 #include "Audio/raw_play.hpp"
 #include "LocalPath.hpp"
+#include "Util/StringUtil.hpp"
+#include "Util/StaticString.hxx"
 #include <windef.h>
 
 const char *beep_id_str = "IDR_";
@@ -63,17 +64,20 @@ PlayResource(const TCHAR *resource_name)
                       SND_MEMORY | SND_ASYNC | SND_NODEFAULT);
 
 #else
-  static TCHAR raw_file_name[MAX_PATH];
+  StaticString<MAX_PATH> raw_file_name;
   InitialiseDataPath();
-  LocalPath(raw_file_name, _T("sound/"));
+  LocalPath(raw_file_name.buffer(), _T("sound/"));
 
-  if (strncasecmp(resource_name, beep_id_str, strlen(beep_id_str)) == 0) {
+  if (strncmp(resource_name, beep_id_str, strlen(beep_id_str)) == 0) {
     resource_name += strlen(beep_id_str);
-    if (strncasecmp(resource_name, wav_str, strlen(wav_str)) == 0)
+    if (strncmp(resource_name, wav_str, strlen(wav_str)) == 0)
       resource_name += strlen(wav_str);
   }
-  strncat(raw_file_name, _T(resource_name), sizeof(raw_file_name));
-  strncat(raw_file_name, ".raw", sizeof(raw_file_name));
+  StaticString<64> lower_resource_name;
+  CopyASCIILower(lower_resource_name.buffer(), resource_name);
+
+  raw_file_name.append(lower_resource_name.c_str());
+  raw_file_name.append(".raw");
 
   RawPlayback *raw_playback = new RawPlayback();
   int ret = raw_playback->playback_file(raw_file_name);
