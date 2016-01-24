@@ -198,7 +198,7 @@ AfterStartup()
 
   InfoBoxManager::SetDirty();
 
-  if (CommandLine::show_dialog_setup_quick)
+  if (CommandLine::show_dialog_setup_quick && replay == nullptr)
     dlgStartupAssistantShowModal(true);
 
   ForceCalculation();
