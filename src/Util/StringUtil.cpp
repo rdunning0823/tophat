@@ -143,6 +143,20 @@ CopyASCIIUpper(char *dest, const char *src)
   } while (*src++ != '\0');
 }
 
+void
+CopyASCIILower(char *dest, const char *src)
+{
+  do {
+    char ch = *src;
+    if (IsASCII(ch)) {
+      if (IsUpperAlphaASCII(ch))
+        ch += 'a' - 'A';
+
+      *dest++ = ch;
+    }
+  } while (*src++ != '\0');
+}
+
 const char *
 StripLeft(const char *p)
 {
