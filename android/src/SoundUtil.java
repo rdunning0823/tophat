@@ -25,9 +25,14 @@ package org.tophat;
 
 import java.util.HashMap;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.content.Context;
+import java.util.Queue;
+import java.util.LinkedList;
+import android.util.Log;
 
 public class SoundUtil {
+  private static final String TAG = "TopHat";
   private static HashMap<String, Integer> resources = new HashMap();
 
   static {
@@ -38,15 +43,69 @@ public class SoundUtil {
     resources.put("IDR_WAV_CLEAR", R.raw.beep_clear);
     resources.put("IDR_WAV_DRIP", R.raw.beep_drip);
   }
+  private static MediaPlayer instance;
 
+  static Boolean isPlaying = false;
+  static Context _context;
+
+  static Queue<Integer> queuedSounds = new LinkedList<Integer>();
+
+  private static Boolean deQueueAndPlay() {
+    synchronized (queuedSounds) {
+      if (isPlaying) {
+        return true;
+      }
+
+      Integer id = queuedSounds.poll();
+      if (id == null) {
+        return false;
+      }
+
+      isPlaying = true;
+      isPlaying = playNow(_context, id);
+    }
+    return true;
+  }
+
+  /**
+   * queues the sound and triggers play of the queue
+   */
   public static boolean play(Context context, String name) {
+
     Integer id = resources.get(name);
-    if (id == null)
+    if (id == null) {
+      Log.w(TAG, "SoundUtil::play error:  Resource not found: " + name);
       return false;
+    }
+    synchronized (queuedSounds) {
+      queuedSounds.offer(id);
+    }
+    _context = context;
+
+    return deQueueAndPlay();
+  }
+
+  private static boolean playNow(Context context, Integer id) {
+    if (id == null) {
+      Log.w(TAG, "SoundUtil::PlayNow error: id null");
+      return false;
+    }
 
     MediaPlayer mp = MediaPlayer.create(context, id);
-    if (mp == null)
+    if (mp == null) {
+      Log.w(TAG, "SoundUtil::PlayNow error.  Could not create Media Player. id: " + id);
       return false;
+    }
+
+    mp.setOnCompletionListener(new OnCompletionListener() {
+	  @Override
+	  public void onCompletion(MediaPlayer mp) {
+		mp.release();
+		mp = null;
+		isPlaying = false;
+        deQueueAndPlay();
+      }
+	});
 
     mp.start();
     return true;
