@@ -124,6 +124,17 @@ UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
 FORCE_UIMAGE:
 	touch $(TARGET_OUTPUT_DIR)/force_uimage
 
+AVCONF = avconv -y
+
+RAW_DIR = $(TARGET_OUTPUT_DIR)/resources/raw
+
+SOUNDS = fail insert remove beep_bweep beep_clear beep_drip
+SOUND_FILES = $(patsubst %,$(RAW_DIR)/%.raw,$(SOUNDS))
+
+$(SOUND_FILES): $(RAW_DIR)/%.raw: Data/sound/%.wav | $(RAW_DIR)/dirstamp
+	@$(NQ)echo "  AVCONF  $@"
+	$(AVCONF) -i $< -f s16le -ar 16000 $@
+
 # from Debian package libgcc1-armhf-cross
 KOBO_SYS_LIB_NAMES += libgcc_s.so.1
 
@@ -137,6 +148,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(UIMAGE_PREREQUISITES) \
 	$(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) \
 	$(BITSTREAM_VERA_FILES) \
+	$(SOUND_FILES) \
 	$(topdir)/kobo/rcS.tophat \
 	$(topdir)/kobo/50-tophat-usb.rules \
 	$(topdir)/kobo/10-media-automount.rules \
@@ -168,7 +180,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/share/aclocal; \
 	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/include; \
 	cd ../..
-	$(Q)install -m 0644 Data/sound/*.raw $(@D)/KoboRoot/mnt/onboard/XCSoarData/sound
+	$(Q)install -m 0644 $(RAW_DIR)/*.raw $(@D)/KoboRoot/mnt/onboard/XCSoarData/sound
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 
 alsa-lib:
