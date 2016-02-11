@@ -512,7 +512,7 @@ AirspaceWarningListWidget::UpdateList()
       const unsigned sound_interval =
         ((tt_closest_airspace * 3 / warning_config.warning_time) + 1) * 2;
       if (sound_interval_counter >= sound_interval) {
-        PlayResource(_T("IDR_WAV_BEEPBWEEP"));
+        PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
         sound_interval_counter = 1;
       } else
         ++sound_interval_counter;
