@@ -38,9 +38,9 @@ public class SoundUtil {
     resources.put("IDR_FAIL", R.raw.fail);
     resources.put("IDR_INSERT", R.raw.insert);
     resources.put("IDR_REMOVE", R.raw.remove);
-    resources.put("IDR_WAV_BEEPBWEEP", R.raw.beep_bweep);
-    resources.put("IDR_WAV_CLEAR", R.raw.beep_clear);
-    resources.put("IDR_WAV_DRIP", R.raw.beep_drip);
+    resources.put("IDR_WAV_BEEP_BWEEP", R.raw.beep_bweep);
+    resources.put("IDR_WAV_BEEP_CLEAR", R.raw.beep_clear);
+    resources.put("IDR_WAV_BEEP_DRIP", R.raw.beep_drip);
     resources.put("IDR_WAV_TRAFFIC_LOW", R.raw.traffic_low);
     resources.put("IDR_WAV_TRAFFIC_IMPORTANT", R.raw.traffic_important);
     resources.put("IDR_WAV_TRAFFIC_URGENT", R.raw.traffic_urgent);

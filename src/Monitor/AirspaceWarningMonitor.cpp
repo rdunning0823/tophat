@@ -170,7 +170,7 @@ AirspaceWarningMonitor::Check()
 
     // un-blank the display, play a sound
     ResetUserIdle();
-    PlayResource(_T("IDR_WAV_BEEPBWEEP"));
+    PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
 
     // show airspace warnings dialog
     if (CommonInterface::GetUISettings().enable_airspace_warning_dialog)
@@ -213,5 +213,5 @@ AirspaceWarningMonitor::Check()
 
   // un-blank the display, play a sound
   ResetUserIdle();
-  PlayResource(_T("IDR_WAV_BEEPBWEEP"));
+  PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
 }

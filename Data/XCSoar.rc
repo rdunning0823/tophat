@@ -326,9 +326,9 @@ SOUND(IDR_INSERT, "insert")
 SOUND(IDR_REMOVE, "remove")
 
 #ifndef GNAV
-SOUND(IDR_WAV_BEEPBWEEP, "beep_bweep")
-SOUND(IDR_WAV_CLEAR, "beep_clear")
-SOUND(IDR_WAV_DRIP, "beep_drip")
+SOUND(IDR_WAV_BEEP_BWEEP, "beep_bweep")
+SOUND(IDR_WAV_BEEP_CLEAR, "beep_clear")
+SOUND(IDR_WAV_BEEP_DRIP, "beep_drip")
 SOUND(IDR_WAV_ABOVE, "above")
 SOUND(IDR_WAV_BELOW, "below")
 SOUND(IDR_WAV_TRAFFIC_LOW, "traffic_low")
