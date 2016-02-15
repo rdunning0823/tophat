@@ -722,6 +722,10 @@ XCSOAR_SOURCES += \
 	$(SRC)/Audio/raw_play.cpp
 endif
 endif
+ifneq ($(TARGET),ANDROID)
+XCSOAR_SOURCES += \
+	$(SRC)/Audio/SoundQueue.cpp
+endif
 
 ifeq ($(HAVE_CE),y)
 XCSOAR_SOURCES += \

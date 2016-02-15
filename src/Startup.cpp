@@ -101,6 +101,9 @@ Copyright_License {
 #include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
 #include "OS/Args.hpp"
 #include "Util/StaticString.hxx"
+#if !defined(ANDROID)
+#include "Audio/SoundQueue.hpp"
+#endif
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
@@ -223,6 +226,9 @@ Startup()
 
 #ifdef HAVE_DOWNLOAD_MANAGER
   Net::DownloadManager::Initialise();
+#endif
+#if !defined(ANDROID)
+  SoundQueue::Initialise();
 #endif
 
   LogFormat("Display dpi=%u,%u", Display::GetXDPI(), Display::GetYDPI());
@@ -591,6 +597,9 @@ Shutdown()
 
   // Stop threads
   LogFormat("Stop threads");
+#if !defined(ANDROID)
+  SoundQueue::BeginDeinitialise();
+#endif
 #ifdef HAVE_DOWNLOAD_MANAGER
   Net::DownloadManager::BeginDeinitialise();
 #endif
@@ -636,6 +645,9 @@ Shutdown()
 
   // Stop sound
   AudioVarioGlue::Deinitialise();
+#if !defined(ANDROID)
+  SoundQueue::Deinitialise();
+#endif
 
   // Save the task for the next time
   operation.SetText(_("Shutdown, saving task..."));

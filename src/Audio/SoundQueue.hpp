@@ -21,18 +21,40 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_AUDIO_SOUND_HPP
-#define XCSOAR_AUDIO_SOUND_HPP
+#ifndef XCSOAR_AUDIO_SOUND_QUEUE_HPP
+#define XCSOAR_AUDIO_SOUND_QUEUE_HPP
 
-#include "SoundQueue.hpp"
-#include <tchar.h>
-
-/// play resource queued.  Normally always use this.
-bool PlayResource(const TCHAR *resource_name);
-
-/// plays the resource immediately
 #if !defined(ANDROID)
-bool PlayResourceNow(const SoundQueue::SoundName resource_name);
-#endif
 
+#include "Util/StaticString.hxx"
+
+/**
+ * Allows queuing of multiple sounds that will be played in order
+ * Does not apply to ANDROID sounds
+ */
+namespace SoundQueue {
+  typedef StaticString<256> SoundName;
+
+
+  /**
+   * Global initialisation on startup.
+   */
+  void Initialise();
+
+  /**
+   * Global deinitialisation on shutdown.
+   */
+  void Deinitialise();
+
+  void BeginDeinitialise();
+
+  /**
+   *  queues the sound to be played
+   *  @param sound_name. string holding sound resource
+   */
+  bool Enqueue(SoundName sound_name);
+
+};
+
+#endif
 #endif
