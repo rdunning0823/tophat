@@ -96,7 +96,6 @@ RawPlayback::playback_chunk(short *buff, int count)
   /* 5 seconds in microseconds divided by
    * period time */
   loops = PLAYBACK_CHUNK / val;
-
   p = buff;
   while (loops > 0) {
     loops--;
@@ -110,6 +109,7 @@ RawPlayback::playback_chunk(short *buff, int count)
     if (rc == -EPIPE) {
       /* EPIPE means underrun */
       LogFormat("underrun occurred\n");
+      ++underrun_count;
       snd_pcm_prepare(handle);
     } else if (rc < 0) {
       LogFormat("error from writei: %s\n",
