@@ -27,6 +27,8 @@ Copyright_License {
 #include "Android/Main.hpp"
 #include "Android/SoundUtil.hpp"
 #include "Android/Context.hpp"
+#else
+#include "SoundQueue.hpp"
 #endif
 
 #if defined(WIN32) && !defined(GNAV)
@@ -46,35 +48,32 @@ const char *beep_id_str = "IDR_";
 const char *wav_str = "WAV_";
 #endif
 
-bool
-PlayResource(const TCHAR *resource_name)
+#if !defined(ANDROID)
+bool PlayResourceNow(const SoundQueue::SoundName resource_name)
 {
-#ifdef ANDROID
+#if defined(WIN32) && !defined(GNAV)
+  if (_tcsstr(resource_name.c_str(), TEXT(".wav")))
+    return sndPlaySound(resource_name.c_str(), SND_SYNC | SND_NODEFAULT);
 
-  return SoundUtil::Play(Java::GetEnv(), context->Get(), resource_name);
-
-#elif defined(WIN32) && !defined(GNAV)
-
-  if (_tcsstr(resource_name, TEXT(".wav")))
-    return sndPlaySound(resource_name, SND_ASYNC | SND_NODEFAULT);
-
-  ResourceLoader::Data data = ResourceLoader::Load(resource_name, _T("WAVE"));
+  ResourceLoader::Data data = ResourceLoader::Load(resource_name.c_str(), _T("WAVE"));
   return !data.IsNull() &&
          sndPlaySound((LPCTSTR)data.data,
-                      SND_MEMORY | SND_ASYNC | SND_NODEFAULT);
-
+                      SND_MEMORY | SND_SYNC | SND_NODEFAULT);
 #else
+  // Linux, Kobo
+  SoundQueue::SoundName resource_name2(resource_name);
+  const TCHAR *resource_name_pointer = resource_name2.buffer();
   StaticString<MAX_PATH> raw_file_name;
   InitialiseDataPath();
   LocalPath(raw_file_name.buffer(), _T("sound/"));
 
-  if (strncmp(resource_name, beep_id_str, strlen(beep_id_str)) == 0) {
-    resource_name += strlen(beep_id_str);
-    if (strncmp(resource_name, wav_str, strlen(wav_str)) == 0)
-      resource_name += strlen(wav_str);
+  if (strncmp(resource_name_pointer, beep_id_str, strlen(beep_id_str)) == 0) {
+    resource_name_pointer += strlen(beep_id_str);
+    if (strncmp(resource_name_pointer, wav_str, strlen(wav_str)) == 0)
+      resource_name_pointer += strlen(wav_str);
   }
   StaticString<64> lower_resource_name;
-  CopyASCIILower(lower_resource_name.buffer(), resource_name);
+  CopyASCIILower(lower_resource_name.buffer(), resource_name_pointer);
 
   raw_file_name.append(lower_resource_name.c_str());
   raw_file_name.append(".raw");
@@ -84,6 +83,20 @@ PlayResource(const TCHAR *resource_name)
   delete raw_playback;
   if (ret < 0)
     return false;
+
+  return true;
+#endif
+}
+#endif
+
+bool
+PlayResource(const TCHAR *resource_name)
+{
+#ifdef ANDROID
+  return SoundUtil::Play(Java::GetEnv(), context->Get(), resource_name);
+#else
+  SoundQueue::SoundName sound_name(resource_name);
+  SoundQueue::Enqueue(sound_name);
   return true;
 #endif
 }
