@@ -37,8 +37,11 @@ class RawPlayback
 private:
   snd_pcm_t *handle;
   int playback_chunk(short *buff, int count);
+  /// number of underruns during playback
+  unsigned underrun_count;
 public:
   RawPlayback()
+  :underrun_count(0)
   {
     /* Open PCM device for playback. */
     int rc = snd_pcm_open(&handle, "default",
@@ -54,7 +57,22 @@ public:
     if (handle)
       snd_pcm_close(handle);
   };
-  int playback_mem(short *buff, int count);
+
+  /**
+   * How many underruns occurred during the playback?
+   * If more than about 10, then on a Linux machine with Pulse Audio installed
+   * Pulse probably needs to be configured:
+   *   %sudo nano /etc/pulse/default.pa:
+   *      remove / comment out: module-udev-detect
+   *      remove / comment out: module-detect
+   *      add: load-module module-alsa-sink device=dmix
+   *      uncomment: module-alsa-sink
+   */
+  unsigned GetUnderrunCount() {
+    return underrun_count;
+  }
   int playback_file(const char *name);
+private:
+  int playback_mem(short *buff, int count);
 };
 #endif /* RAW_PLAY_HPP */
