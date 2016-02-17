@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import android.util.Log;
 
 public class SoundUtil {
+  private static final String TAG = "TopHat";
   private static HashMap<String, Integer> resources = new HashMap();
 
   static {
