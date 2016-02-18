@@ -41,9 +41,14 @@ KOBO_MENU_SOURCES = \
 	$(SRC)/Profile/ProfileMap.cpp \
 	$(SRC)/Profile/Map.cpp \
 	$(SRC)/Profile/Current.cpp \
+	$(SRC)/LogFile.cpp \
+	$(SRC)/Time/BrokenDateTime.cpp \
+	$(SRC)/Time/BrokenTime.cpp \
+	$(SRC)/Formatter/TimeFormatter.cpp \
+	$(SRC)/Profile/File.cpp \
 	$(SRC)/Kobo/KoboMenu.cpp
 KOBO_MENU_LDADD = $(FAKE_LIBS)
-KOBO_MENU_DEPENDS = WIDGET FORM SCREEN EVENT RESOURCE IO ASYNC LIBNET OS THREAD MATH UTIL
+KOBO_MENU_DEPENDS = WIDGET FORM SCREEN EVENT RESOURCE IO ASYNC LIBNET OS THREAD MATH UTIL PROFILE
 KOBO_MENU_STRIP = y
 
 $(eval $(call link-program,KoboMenu,KOBO_MENU))
