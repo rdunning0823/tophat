@@ -112,6 +112,11 @@ bool CopyFlightsToSDCard();
 bool UploadSDCardToDevice();
 
 /**
+ * Cleanup the XCSoarData frolder on the SDCard
+ */
+bool CleanSDCard();
+
+/**
  * copies the XCSoarData folder on the device to the SD Card
  */
 bool CopyTopHatDataToSDCard();

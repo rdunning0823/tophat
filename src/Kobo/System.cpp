@@ -368,6 +368,19 @@ UploadSDCardToDevice()
 }
 
 bool
+CleanSDCard()
+{
+#ifdef KOBO
+  bool retval = Run("/bin/rm", "-r", "-f", "/mnt/onboard/XCSoarData");
+  mkdir("/mnt/onboard/XCSoarData", 0777);
+  mkdir("/mnt/onboard/XCSoarData/kobo", 0777);
+  return retval;
+#else
+  return false;
+#endif
+}
+
+bool
 CopyTopHatDataToSDCard()
 {
 #ifdef KOBO
