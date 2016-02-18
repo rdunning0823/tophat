@@ -211,7 +211,7 @@ else
     fi
 
     echo 3 > /sys/class/graphics/fb0/rotate
-    /opt/tophat/bin/KoboMenu &
+    /opt/tophat/bin/KoboMenu 1> /dev/null 2> /dev/null &
     /sbin/udevadm control --env=STARTUP=1
     killall plug
 fi
