@@ -162,7 +162,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)$(UIMAGE_CMD)
 	$(Q)install -m 0644 $(TARGET_OUTPUT_DIR)/force_uimage $(@D)/KoboRoot/mnt/onboard/.kobo/force_uimage
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
-	$(Q)install -m 0755 -d $(@D)/KoboRoot/mnt/onboard/XCSoarData/sound
+	$(Q)install -m 0755 -d $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
 	$(Q)install -m 0644 $(topdir)/kobo/inetd.conf $(@D)/KoboRoot/etc
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc/init.d
@@ -181,7 +181,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/share/aclocal; \
 	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/share/alsa-lib/include; \
 	cd ../..
-	$(Q)install -m 0644 $(RAW_DIR)/*.raw $(@D)/KoboRoot/mnt/onboard/XCSoarData/sound
+	$(Q)install -m 0644 $(RAW_DIR)/*.raw $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 
 alsa-lib:
