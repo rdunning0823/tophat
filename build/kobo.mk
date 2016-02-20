@@ -137,6 +137,7 @@ $(SOUND_FILES): $(RAW_DIR)/%.raw: Data/sound/%.wav | $(RAW_DIR)/dirstamp
 
 # from Debian package libgcc1-armhf-cross
 KOBO_SYS_LIB_NAMES += libgcc_s.so.1
+ALSA_DIR=/opt/tophat/share/alsa-lib
 
 KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 
@@ -174,11 +175,11 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
 	PWD=`pwd`; cd lib/alsa-lib;\
 	make install DESTDIR=${PWD}/$(@D)/KoboRoot;\
-	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/include; \
-	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/bin; \
-	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/lib; \
-	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/share/aclocal; \
-	rm -rf ${PWD}/$(@D)/KoboRoot/mnt/onboard/XCSoarData/alsa-lib/include; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/include; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/bin; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/lib; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/share/aclocal; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/share/alsa-lib/include; \
 	cd ../..
 	$(Q)install -m 0644 $(RAW_DIR)/*.raw $(@D)/KoboRoot/mnt/onboard/XCSoarData/sound
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
@@ -193,7 +194,7 @@ alsa-lib:
 	autoheader; \
 	automake --foreign --copy --add-missing; \
 	autoconf; \
-	./configure --host=arm-linux-gnueabihf --prefix=/mnt/onboard/XCSoarData/alsa-lib \
+	./configure --host=arm-linux-gnueabihf --prefix=$(ALSA_DIR)/ \
 		--disable-aload --disable-rawmidi \
 		--disable-hwdep --disable-seq --disable-alisp \
 		--disable-old-symbols --disable-python --enable-static \
