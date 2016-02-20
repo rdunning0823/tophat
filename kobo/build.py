@@ -143,6 +143,16 @@ class Project:
         os.makedirs(path, exist_ok=True)
         return path
 
+class DejaVuArchiveProject(Project):
+    def __init__(self, url, md5, installed, **kwargs):
+        Project.__init__(self, url, md5, installed, **kwargs)
+
+    def build(self):
+        src = self.unpack(out_of_tree=False)
+
+        subprocess.check_call(['/bin/mkdir', '-p', root_path + '/share/fonts/'], cwd=src)
+        subprocess.check_call(['/bin/cp', '-r', 'ttf/', root_path + '/share/fonts/dejavu/'], cwd=src)
+
 class ZlibProject(Project):
     def __init__(self, url, md5, installed,
                  **kwargs):
@@ -282,6 +292,12 @@ thirdparty_libs = [
             '--disable-shared', '--enable-static',
             '--enable-arm-neon',
         ]
+    ),
+
+    DejaVuArchiveProject(
+        'https://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.tar.bz2',
+        '59eaca5acf5c7c8212e92778e3e01f32',
+        'share/fonts/dejavu/DejaVuSans.ttf',
     ),
 ]
 

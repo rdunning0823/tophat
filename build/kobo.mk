@@ -141,6 +141,11 @@ ALSA_DIR=/opt/tophat/share/alsa-lib
 
 KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 
+DEJAVU_FONT_FILES = DejaVuSansCondensed.ttf DejaVuSansCondensed-Bold.ttf DejaVuSansCondensed-Oblique.ttf \
+	DejaVuSansCondensed-BoldOblique.ttf DejaVuSansMono.ttf
+DEJAVU_FONT_PATHS = $(addprefix $(TARGET_OUTPUT_DIR)/lib/$(HOST_ARCH)/root/share/fonts/dejavu/,$(DEJAVU_FONT_FILES))
+
+
 # /mnt/onboard/.kobo/KoboRoot.tgz is a file that is picked up by
 # /etc/init.d/rcS, extracted to / on each boot; we can use it to
 # install TopHat
@@ -173,6 +178,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/media
 	$(Q)install -m 0755 $(topdir)/kobo/10-media-automount.rules $(@D)/KoboRoot/etc/udev/rules.d
 	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
+	$(Q)install -m 0644 $(DEJAVU_FONT_PATHS) $(@D)/KoboRoot/opt/tophat/share/fonts
 	PWD=`pwd`; cd lib/alsa-lib;\
 	make install DESTDIR=${PWD}/$(@D)/KoboRoot;\
 	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/include; \
@@ -183,6 +189,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	cd ../..
 	$(Q)install -m 0644 $(RAW_DIR)/*.raw $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
+
 
 alsa-lib:
 	PWD=`pwd`; \
