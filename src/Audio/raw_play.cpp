@@ -10,6 +10,9 @@ to the default PCM device for 5 seconds of data.
 #include "raw_play.hpp"
 #include <unistd.h>
 #include <stdlib.h>
+#include <alsa/mixer.h>
+
+void list_mixer_elements(snd_mixer_t *mhandle);
 
 int
 RawPlayback::playback_chunk(short *buff, int count)
@@ -51,7 +54,7 @@ RawPlayback::playback_chunk(short *buff, int count)
     goto _return;
   }
 
-  /* Two channels (stereo) */
+  /* single channel (mono) */
   rc = snd_pcm_hw_params_set_channels(handle, params, 1);
   if (rc < 0) {
     rc = -6;
@@ -205,4 +208,65 @@ RawPlayback::playback_file(const char *name)
   close(raw_file);
  _return:
   return rc;
+}
+
+void list_mixer_elements(snd_mixer_t *mhandle) {
+  snd_mixer_elem_t* elem = snd_mixer_first_elem(mhandle);
+  while (elem != NULL) {
+    const char* name = snd_mixer_selem_get_name(elem);
+    LogFormat("mixer element name: %s", name);
+    elem = snd_mixer_elem_next(elem);
+  }
+}
+
+void
+RawPlayback::setAlsaMasterVolume(int volume) {
+ long min, max;
+    int rc;
+    snd_mixer_t *mhandle;
+    snd_mixer_selem_id_t *sid;
+    snd_mixer_elem_t* elem;
+
+    if ( 0 != (rc = snd_mixer_open(&mhandle, 0))) {
+      LogFormat("unable to open mixer: %d", rc);
+      return;
+    }
+
+    if ( 0 != (rc = snd_mixer_attach(mhandle, PLAYBACK_CARD_NAME)) ) {
+      LogFormat("unable to attach card %s to mixer code %d", PLAYBACK_CARD_NAME, rc);
+      goto _return;
+    }
+
+    if ( 0 != (rc = snd_mixer_selem_register(mhandle, NULL, NULL)) ) {
+      LogFormat("unable to register mixer handle: %d", rc);
+      goto _return;
+    }
+
+    if ( 0 != (rc = snd_mixer_load(mhandle)) ) {
+      LogFormat("unable to load mixer elements: %d", rc);
+      goto _return;
+    }
+
+    snd_mixer_selem_id_alloca(&sid);
+    snd_mixer_selem_id_set_index(sid, 0);
+    snd_mixer_selem_id_set_name(sid, PLAYBACK_MIXER_NAME);
+
+    if ( NULL == (elem = snd_mixer_find_selem(mhandle, sid)) ) {
+      LogFormat("unable to fine mixer element %s see defined mixer elements below", PLAYBACK_MIXER_NAME);
+      list_mixer_elements(mhandle);
+      goto _return;
+    }
+
+    if ( 0 != (rc = snd_mixer_selem_get_playback_volume_range(elem, &min, &max)) ) {
+      LogFormat("unable to get min/max %ld,%ld volume settings for mixer element %s",
+                min, max, PLAYBACK_MIXER_NAME);
+      goto _return;
+    }
+
+    if ( 0 != (rc = snd_mixer_selem_set_playback_volume_all(elem, min + volume * max / 100)) ) {
+      LogFormat("unable to set volume, code: %d", rc);
+    }
+
+_return:
+    snd_mixer_close(mhandle);
 }

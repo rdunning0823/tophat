@@ -199,7 +199,7 @@ alsa-lib:
 	automake --foreign --copy --add-missing; \
 	autoconf; \
 	./configure --host=arm-linux-gnueabihf --prefix=/mnt/onboard/XCSoarData/alsa-lib \
-		--disable-aload --disable-mixer --disable-rawmidi \
+		--disable-aload --disable-rawmidi \
 		--disable-hwdep --disable-seq --disable-alisp \
 		--disable-old-symbols --disable-python --enable-static \
 		--disable-shared; \
