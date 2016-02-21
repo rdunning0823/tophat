@@ -31,6 +31,9 @@ Copyright_License {
 
 #define PLAYBACK_RATE 16000
 #define PLAYBACK_CHUNK 500000
+#define PLAYBACK_CARD_NAME "default"
+#define PLAYBACK_MIXER_NAME "Speaker"
+
 
 class RawPlayback
 {
@@ -44,13 +47,16 @@ public:
   :underrun_count(0)
   {
     /* Open PCM device for playback. */
-    int rc = snd_pcm_open(&handle, "default",
+    int rc = snd_pcm_open(&handle, PLAYBACK_CARD_NAME,
 		      SND_PCM_STREAM_PLAYBACK, 0);
     if (rc < 0) {
       LogFormat("can't open default sound device: %s\n",
 		snd_strerror(rc));
       handle = NULL;
+      return;
     }
+    /* TODO: volume settings will be extracted soon */
+    setAlsaMasterVolume(30);
   };
   ~RawPlayback()
   {
@@ -74,5 +80,6 @@ public:
   int playback_file(const char *name);
 private:
   int playback_mem(short *buff, int count);
+  void setAlsaMasterVolume(int volume);
 };
 #endif /* RAW_PLAY_HPP */
