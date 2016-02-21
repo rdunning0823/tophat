@@ -50,11 +50,13 @@ class SDCardSyncWidget final
     InstallKoboRoot,
     UploadEverything,
     DownloadEverything,
+    CleanAndUploadEverything,
     HelpButton,
   };
 
   Button *upload_everything_button, *download_everything_button;
   Button *upload_tasks_button, *download_flights_button;
+  Button *clean_and_upload_everything_button;
 
   Button *install_koboroot_button;
 
@@ -124,6 +126,10 @@ SDCardSyncWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       _T("Download everything to USB card"),
       *this, DownloadEverything);
 
+  clean_and_upload_everything_button = AddButton(
+      _T("Clean Kobo data directory and then upload everything to Kobo"),
+      *this, CleanAndUploadEverything);
+
   install_koboroot_button = AddButton(
       _T("Upgrade Top Hat"),
       *this, InstallKoboRoot);
@@ -181,6 +187,14 @@ SDCardSyncWidget::OnAction(int id)
 
     case UploadEverything:
       if (UploadSDCardToDevice()) {
+        ShowMessageBox(_T("USB card successfully copied to Kobo"),
+                       _T("Success"), MB_OK);
+        return;
+      }
+      break;
+
+    case CleanAndUploadEverything:
+      if (CleanSDCard() && UploadSDCardToDevice()) {
         ShowMessageBox(_T("USB card successfully copied to Kobo"),
                        _T("Success"), MB_OK);
         return;
