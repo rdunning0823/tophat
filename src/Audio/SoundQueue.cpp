@@ -117,6 +117,12 @@ SoundQueue::BeginDeinitialise()
   play_queue->StopAsync();
 }
 
+#if CLANG_OR_GCC_VERSION(4,7)
+/* PlayQueue doesn't need a virtual destructor, but StandbyThread should
+ * probably make its destructor virtual, but that's XCSoar not Tophat */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#endif
 void
 SoundQueue::Deinitialise()
 {
@@ -125,5 +131,8 @@ SoundQueue::Deinitialise()
   delete play_queue;
   play_queue = nullptr;
 }
+#if CLANG_OR_GCC_VERSION(4,7)
+#pragma GCC diagnostic pop
+#endif
 
 #endif // !ANDROID

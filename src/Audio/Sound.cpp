@@ -39,7 +39,6 @@ Copyright_License {
 
 #if !defined(ANDROID) && !(defined(WIN32) && !defined(GNAV))
 #include "Audio/raw_play.hpp"
-#include "LocalPath.hpp"
 #include "Util/StringUtil.hpp"
 #include "Util/StaticString.hxx"
 #include <windef.h>
@@ -64,8 +63,7 @@ bool PlayResourceNow(const SoundQueue::SoundName resource_name)
   SoundQueue::SoundName resource_name2(resource_name);
   const TCHAR *resource_name_pointer = resource_name2.buffer();
   StaticString<MAX_PATH> raw_file_name;
-  InitialiseDataPath();
-  LocalPath(raw_file_name.buffer(), _T("sound/"));
+  raw_file_name = _T("/opt/tophat/share/sounds/");
 
   if (strncmp(resource_name_pointer, beep_id_str, strlen(beep_id_str)) == 0) {
     resource_name_pointer += strlen(beep_id_str);
