@@ -36,6 +36,8 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Event/Timer.hpp"
 #include "Formatter/TimeFormatter.hpp"
+#include "UISettings.hpp"
+#include "Interface.hpp"
 
 enum Buttons {
   START,
@@ -364,5 +366,8 @@ ShowReplayDialog()
   widget->CreateButtons(dialog);
   widget->SetDialog(dialog);
 
+  UISettings &ui_settings = CommonInterface::SetUISettings();
+  ui_settings.replay_dialog_visible = true;
   dialog.ShowModal();
+  ui_settings.replay_dialog_visible = false;
 }

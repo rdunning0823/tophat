@@ -57,6 +57,8 @@ Copyright_License {
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
 #include "Look/OverlayButtonLook.hpp"
+#include "UISettings.hpp"
+#include "Replay/Replay.hpp"
 #ifndef ENABLE_OPENGL
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #endif
@@ -439,6 +441,10 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
   icon->Draw(canvas, rc.right - offset,
              rc.bottom - icon->GetSize().cy - Layout::Scale(1));
 
+  /** don't display replay if text the Replay button is visible */
+  if (replay->IsActive() && !GetMapSettings().replay_dialog_visible)
+    return;
+
   // draw "Simulator/Replay
   StaticString<80> buffer;
 
@@ -448,9 +454,7 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
 
   buffer.clear();
 
-  if (Basic().gps.replay)
-    buffer += _T("REPLAY");
-  else if (Basic().gps.simulator) {
+  if (Basic().gps.simulator && !Basic().gps.replay) {
     buffer += _("Simulator");
   }
 

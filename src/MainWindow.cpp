@@ -59,6 +59,7 @@ Copyright_License {
 #include "Pan.hpp"
 #include "MapWindow/MapWidgetOverlays.hpp"
 #include "TophatWidgets/MainMenuButtonWidget.hpp"
+#include "TophatWidgets/ReplayButtonWidget.hpp"
 #include "TophatWidgets/ScreensButtonWidget.hpp"
 #include "TophatWidgets/TaskNavSliderWidget.hpp"
 #include "TophatWidgets/ZoomInButtonWidget.hpp"
@@ -316,6 +317,8 @@ MainWindow::InitialiseConfigured()
   widget_overlays.Add(new ZoomOutButtonWidget(z_in_but), rc_current);
   widget_overlays.Add(screens_button_widget, rc_current);
 #endif
+  replay_button_widget = new ReplayButtonWidget();
+  widget_overlays.Add(replay_button_widget, rc_current);
   widget_overlays.Initialise(*this, rc_current);
   widget_overlays.Prepare(*this, rc_current);
 
@@ -455,6 +458,7 @@ MainWindow::ReinitialiseLayout()
 
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
+  replay_button_widget->SetTopOffset(widget_overlays.HeightFromTop());
 #if defined(ENABLE_OPENGL) | defined(KOBO)
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
 #else
@@ -781,6 +785,7 @@ MainWindow::OnTimer(WindowTimer &_timer)
                                    HaveTopWidget());
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+  replay_button_widget->SetTopOffset(widget_overlays.HeightFromTop());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
     map->SetMainMenuButtonRect();
     map->SetZoomButtonsRect();
@@ -911,6 +916,7 @@ MainWindow::SetFullScreen(bool _full_screen)
   widget_overlays.Move(FullScreen ? GetClientRect() : map_rect);
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+  replay_button_widget->SetTopOffset(widget_overlays.HeightFromTop());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();
@@ -1013,6 +1019,7 @@ MainWindow::ActivateMap()
                                    HaveTopWidget());
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   map->SetGPSStatusOffset(widget_overlays.HeightFromBottomLeft());
+  replay_button_widget->SetTopOffset(widget_overlays.HeightFromTop());
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
   map->SetMainMenuButtonRect();
   map->SetZoomButtonsRect();

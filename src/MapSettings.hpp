@@ -182,6 +182,13 @@ struct MapSettings {
    */
   bool show_flarm_alarm_level;
 
+  /**
+   * Copy of UISettings::replay_dialog_visible.
+   * The MapWindowOverlays need this info in the DrawThread
+   * and can't access the InterfaceBlackboard directly
+   */
+  bool replay_dialog_visible;
+
   /** Display climb band on map */
   bool show_thermal_profile;
 

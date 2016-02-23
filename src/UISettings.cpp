@@ -52,6 +52,7 @@ UISettings::SetDefaults()
   clear_gesture_help = false;
 
   screens_button_location = ScreensButtonLocation::MENU;
+  replay_dialog_visible = false;
 
   enable_airspace_warning_dialog = true;
 

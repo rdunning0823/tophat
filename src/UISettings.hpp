@@ -84,6 +84,8 @@ struct UISettings {
     MENU,
   } screens_button_location;
 
+  /// is the replay dialog visible
+  bool replay_dialog_visible;
   /**
    * if true, gesture zone help timer will be reset to draw next time
    */

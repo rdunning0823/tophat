@@ -680,6 +680,7 @@ XCSOAR_SOURCES := \
 	\
 	$(SRC)/TophatWidgets/OverlayButtonWidget.cpp \
 	$(SRC)/TophatWidgets/MainMenuButtonWidget.cpp \
+	$(SRC)/TophatWidgets/ReplayButtonWidget.cpp \
 	$(SRC)/TophatWidgets/ScreensButtonWidget.cpp \
 	$(SRC)/TophatWidgets/MapOverlayButton.cpp \
 	$(SRC)/TophatWidgets/TaskNavSliderWidget.cpp \

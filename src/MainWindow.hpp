@@ -46,6 +46,7 @@ class TopographyStore;
 class MapWindowProjection;
 class TaskNavSliderWidget;
 class ScreensButtonWidget;
+class ReplayButtonWidget;
 class PopupMessage;
 
 /**
@@ -148,6 +149,9 @@ private:
   * used to access the widget to update the task
   */
   TaskNavSliderWidget *task_nav_slider_widget;
+
+  ///
+  ReplayButtonWidget *replay_button_widget;
 
 #if defined(ENABLE_OPENGL) | defined(KOBO)
   /**
