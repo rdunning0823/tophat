@@ -251,7 +251,6 @@ ReplayControlWidget::OnStartClicked()
   case Replay::PlayState::FASTFORWARD:
     FastForwardCancel();
     replay->SetPlayState(Replay::PlayState::PAUSED);
-    SetReplayRate(fixed(0));
     break;
   case Replay::PlayState::PLAYING:
     replay->SetPlayState(Replay::PlayState::PAUSED);
