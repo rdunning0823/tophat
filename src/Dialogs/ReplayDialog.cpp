@@ -157,7 +157,7 @@ ReplayControlWidget::UpdateDialogTitle()
     TCHAR buffer[32];
     FormatTime(buffer, replay->GetTime());
     header.AppendFormat(_T(" %s"), buffer);
-    if (replay->IsFastForward())
+    if (replay->CheckFastForward())
       header.AppendFormat(_T(" %s"), _("FF"));
 
     if (play_state == PlayState::PAUSED)
@@ -207,7 +207,7 @@ ReplayControlWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 bool
 ReplayControlWidget::CheckFastForward()
 {
-  return replay->IsFastForward();
+  return replay->CheckFastForward();
 }
 
 void

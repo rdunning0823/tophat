@@ -145,7 +145,7 @@ public:
     return virtual_time;
   }
 
-  bool IsFastForward() {
+  bool CheckFastForward() {
     return !negative(fast_forward);
   }
 
