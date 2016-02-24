@@ -51,6 +51,7 @@ Look::InitialiseConfigured(const UISettings &settings,
   info_box.Initialise(settings.info_boxes.inverse,
                       settings.info_boxes.use_colors,
                       infobox_width, settings.font_scale_infobox_title,
+                      settings.font_scale_infobox_comment,
                       settings.font_scale_infobox_value);
   vario.Initialise(settings.info_boxes.inverse,
                    settings.info_boxes.use_colors,
@@ -72,6 +73,7 @@ void
 Look::ReinitialiseLayout(const UISettings &settings, unsigned infobox_width)
 {
   info_box.ReinitialiseLayout(infobox_width, settings.font_scale_infobox_title,
+                              settings.font_scale_infobox_comment,
                               settings.font_scale_infobox_value);
   nav_slider.ReinitialiseLayout(settings.font_scale_nav_bar_waypoint_name,
                                 settings.font_scale_nav_bar_distance);

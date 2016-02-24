@@ -221,6 +221,7 @@ extern const char FontMapWaypointName[];
 extern const char FontMapPlaceName[];
 extern const char FontInfoBoxValue[];
 extern const char FontInfoBoxTitle[];
+extern const char FontInfoBoxComment[];
 extern const char FontOverlayButton[];
 extern const char FontDialog[];
 

@@ -142,6 +142,7 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
   map.Get(ProfileKeys::FontMapWaypointName, settings.font_scale_map_waypoint_name);
   map.Get(ProfileKeys::FontMapPlaceName, settings.font_scale_map_place_name);
   map.Get(ProfileKeys::FontInfoBoxTitle, settings.font_scale_infobox_title);
+  map.Get(ProfileKeys::FontInfoBoxComment, settings.font_scale_infobox_comment);
   map.Get(ProfileKeys::FontInfoBoxValue, settings.font_scale_infobox_value);
   map.Get(ProfileKeys::FontOverlayButton, settings.font_scale_overlay_button);
   map.Get(ProfileKeys::FontDialog, settings.font_scale_dialog);
@@ -150,6 +151,7 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
   CheckFontScale(settings.font_scale_map_waypoint_name);
   CheckFontScale(settings.font_scale_map_place_name);
   CheckFontScale(settings.font_scale_infobox_title);
+  CheckFontScale(settings.font_scale_infobox_comment);
   CheckFontScale(settings.font_scale_infobox_value);
   CheckFontScale(settings.font_scale_overlay_button);
   CheckFontScale(settings.font_scale_dialog);

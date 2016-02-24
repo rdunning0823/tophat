@@ -41,6 +41,7 @@ UISettings::SetDefaults()
   font_scale_map_waypoint_name = 100;
   font_scale_map_place_name = 100;
   font_scale_infobox_title = 100;
+  font_scale_infobox_comment = 100;
   font_scale_infobox_value = 100;
   font_scale_overlay_button = 100;
   font_scale_dialog = 100;
