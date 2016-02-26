@@ -52,27 +52,15 @@ class ReplayControlWidget final
     FILE,
     RATE,
   };
-
-  enum PlayState {
-    NOFILE,
-    NOTSTARTED,
-    PLAYING,
-    PAUSED,
-    FASTFORWARD,
-  };
-
-  PlayState play_state;
   Button *play_pause_button;
   Button *stop_button;
   Button *rewind_button;
   Button *fast_forward_button;
-  fixed user_speed;
   WidgetDialog *dialog;
 
 public:
   ReplayControlWidget(const DialogLook &look)
-    :RowFormWidget(look), play_state(PlayState::NOFILE), user_speed(fixed(0)),
-     dialog(nullptr) {}
+    :RowFormWidget(look), dialog(nullptr) {}
 
   void CreateButtons(WidgetDialog &dialog) {
     play_pause_button = dialog.AddSymbolButton(_(">"), *this, START);
@@ -102,7 +90,7 @@ private:
   void OnFastForwardDone();
 
   void FastForwardCancel();
-  /* exits PlayState::PAUSED */
+  /* exits Replay::PlayState::PAUSED */
   void Resume();
 
 private:
@@ -125,24 +113,24 @@ private:
 void
 ReplayControlWidget::UpdateButtons()
 {
-  play_pause_button->SetEnabled(play_state != PlayState::NOFILE);
-  fast_forward_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING);
-  rewind_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING);
-  stop_button->SetEnabled(play_state == PlayState::PAUSED || play_state == PlayState::PLAYING
-                          || play_state == PlayState::FASTFORWARD);
+  play_pause_button->SetEnabled(!replay->IsNoFile());
+  fast_forward_button->SetEnabled(replay->IsPaused() || replay->IsPlaying());
+  rewind_button->SetEnabled(replay->IsPaused() || replay->IsPlaying());
+  stop_button->SetEnabled(replay->IsPaused() || replay->IsPlaying()
+                          || replay->IsFastForward());
 
-  switch(play_state) {
-  case PlayState::NOFILE:
-  case PlayState::NOTSTARTED:
+  switch(replay->GetPlayState()) {
+  case Replay::PlayState::NOFILE:
+  case Replay::PlayState::NOTSTARTED:
     play_pause_button->SetCaption(_(">"));
     break;
-  case PlayState::PLAYING:
+  case Replay::PlayState::PLAYING:
     play_pause_button->SetCaption(_("||"));
     break;
-  case PlayState::PAUSED:
+  case Replay::PlayState::PAUSED:
     play_pause_button->SetCaption(_(">"));
     break;
-  case PlayState::FASTFORWARD:
+  case Replay::PlayState::FASTFORWARD:
     break;
   }
 }
@@ -160,7 +148,7 @@ ReplayControlWidget::UpdateDialogTitle()
     if (replay->CheckFastForward())
       header.AppendFormat(_T(" %s"), _("FF"));
 
-    if (play_state == PlayState::PAUSED)
+    if (replay->IsPaused())
       header.AppendFormat(_T(" %s"), _("Paused"));
 
   }
@@ -189,18 +177,12 @@ ReplayControlWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   ((FileDataField *)file->GetDataField())->Lookup(replay->GetFilename());
   file->RefreshDisplay();
 
-  user_speed = replay->GetTimeScale();
-
   AddFloat(_("Rate"),
            _("Time acceleration of replay. Set to 0 for pause, 1 for normal real-time replay."),
            _T("%.0f x"), _T("%.0f"),
            fixed(0), fixed(10), fixed(1), false,
-           user_speed,
+           replay->GetTimeScale(),
            this);
-
-  if (replay->IsActive())
-    play_state = PlayState::PLAYING;
-
   Timer::Schedule(500);
 }
 
@@ -214,12 +196,12 @@ void
 ReplayControlWidget::OnTimer()
 {
   if (!replay->IsActive())
-    play_state = PlayState::NOTSTARTED;
+    replay->SetPlayState(Replay::PlayState::NOTSTARTED);
 
   UpdateButtons();
   UpdateDialogTitle();
 
-  if (play_state == PlayState::FASTFORWARD && !CheckFastForward())
+  if (replay->IsFastForward() && !CheckFastForward())
     OnFastForwardDone();
 }
 
@@ -236,11 +218,9 @@ ReplayControlWidget::StartReplay()
     GetDataField(FILE);
   const TCHAR *path = df.GetPathFile();
   if (replay->Start(path)) {
-    SetReplayRate(user_speed);
-    play_state = PlayState::PLAYING;
     return true;
   } else {
-    play_state = PlayState::NOFILE;
+    replay->SetPlayState(Replay::PlayState::NOFILE);
   }
   return false;
 }
@@ -249,37 +229,34 @@ inline void
 ReplayControlWidget::OnStopClicked()
 {
   replay->Stop();
-  play_state = PlayState::NOTSTARTED;
 }
 
 inline void
 ReplayControlWidget::Resume()
 {
-  SetReplayRate(user_speed);
-  play_state = PlayState::PLAYING;
+  replay->SetPlayState(Replay::PlayState::PLAYING);
 }
 
 inline void
 ReplayControlWidget::OnStartClicked()
 {
-  switch(play_state) {
-  case PlayState::NOFILE:
+  switch(replay->GetPlayState()) {
+  case Replay::PlayState::NOFILE:
     break;
-  case PlayState::NOTSTARTED:
+  case Replay::PlayState::NOTSTARTED:
     if (!StartReplay())
       ShowMessageBox(_("Could not open IGC file!"),
                      _("Replay"), MB_OK | MB_ICONINFORMATION);
     break;
-  case PlayState::FASTFORWARD:
+  case Replay::PlayState::FASTFORWARD:
     FastForwardCancel();
-    play_state = PlayState::PAUSED;
+    replay->SetPlayState(Replay::PlayState::PAUSED);
     SetReplayRate(fixed(0));
     break;
-  case PlayState::PLAYING:
-    play_state = PlayState::PAUSED;
-    SetReplayRate(fixed(0));
+  case Replay::PlayState::PLAYING:
+    replay->SetPlayState(Replay::PlayState::PAUSED);
     break;
-  case PlayState::PAUSED:
+  case Replay::PlayState::PAUSED:
     Resume();
     break;
   }
@@ -311,29 +288,29 @@ ReplayControlWidget::OnAction(int id)
 inline void
 ReplayControlWidget::OnRewindClicked()
 {
-  if (play_state == PlayState::PAUSED)
+  if (replay->IsPaused())
     Resume();
 
   if (replay->Rewind(fixed(10 * 60))) {
-    play_state = PlayState::FASTFORWARD;
+    replay->SetPlayState(Replay::PlayState::FASTFORWARD);
   }
 }
 
 inline void
 ReplayControlWidget::OnFastForwardClicked()
 {
-  if (play_state == PlayState::PAUSED)
+  if (replay->IsPaused())
     Resume();
 
   if (replay->FastForward(fixed(10 * 60))) {
-    play_state = PlayState::FASTFORWARD;
+    replay->SetPlayState(Replay::PlayState::FASTFORWARD);
   }
 }
 
 inline void
 ReplayControlWidget::OnFastForwardDone()
 {
-  play_state = PlayState::PLAYING;
+  replay->SetPlayState(Replay::PlayState::PLAYING);
 }
 
 inline void
@@ -347,11 +324,10 @@ ReplayControlWidget::OnModified(DataField &_df)
 {
   if (&_df == &GetDataField(RATE)) {
     const DataFieldFloat &df = (const DataFieldFloat &)_df;
-    user_speed = df.GetAsFixed();
-    SetReplayRate(user_speed);
+    SetReplayRate(df.GetAsFixed());
   } else if (&_df == &GetDataField(FILE)) {
     OnStopClicked();
-    play_state = PlayState::NOTSTARTED;
+    replay->SetPlayState(Replay::PlayState::NOTSTARTED);
   }
 }
 

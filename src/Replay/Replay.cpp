@@ -53,6 +53,8 @@ Replay::Rewind(fixed delta_s) {
 void
 Replay::Stop()
 {
+  play_state = Replay::PlayState::NOTSTARTED;
+
   if (replay == nullptr)
     return;
 
@@ -113,6 +115,7 @@ Replay::Start(const TCHAR *_path)
   fast_forward = fixed(-1);
   rewind = fixed(-1);
   next_data.Reset();
+  play_state = Replay::PlayState::PLAYING;
 
   Timer::Schedule(100);
 
@@ -125,7 +128,7 @@ Replay::Update()
   if (replay == nullptr)
     return false;
 
-  if (!positive(time_scale)) {
+  if (!positive(time_scale) || play_state == PlayState::PAUSED) {
     /* replay is paused */
     /* to avoid a big fast-forward with the next
        PeriodClock::ElapsedUpdate() call below after unpausing, update
