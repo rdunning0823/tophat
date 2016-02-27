@@ -120,11 +120,11 @@ protected:
   void PaintTrafficInfo(Canvas &canvas) const;
 
   /**
-   * paints a metric on the screen at the upper right of the rect on row 0-2
+   * paints a metric on the screen at the upper right of the rect in column 0-2
    *
    */
   void PaintMetric(Canvas &canvas, PixelRect rc, fixed value, const TCHAR *value_text,
-                   const Unit &unit, const TCHAR *label, unsigned row,
+                   const Unit &unit, const TCHAR *label, unsigned column,
                    bool draw_arrow, SymbolRenderer::Direction arrow_direction =
                        SymbolRenderer::Direction::UP) const;
   /**
@@ -349,7 +349,7 @@ void
 FlarmTrafficControl::PaintMetric(Canvas &canvas, PixelRect rc, fixed value,
                                  const TCHAR *value_text,
                                  const Unit &unit, const TCHAR *label,
-                                 unsigned row, bool draw_arrow,
+                                 unsigned column, bool draw_arrow,
                                  SymbolRenderer::Direction arrow_direction) const
 {
   // Calculate unit size
@@ -357,49 +357,60 @@ FlarmTrafficControl::PaintMetric(Canvas &canvas, PixelRect rc, fixed value,
   const unsigned unit_width = UnitSymbolRenderer::GetSize(canvas, unit).cx;
   const unsigned unit_height =
       UnitSymbolRenderer::GetAscentHeight(look.info_units_font, unit);
+  unsigned column_width = rc.GetSize().cx / 4;
 
   UPixelScalar space_width = unit_width / 3;
+
+  /// never draw arrow.  Confusing.
+  draw_arrow = false;
+
+  // Calculate positions
+  const int column_left = (column + 1) * column_width;
+  const unsigned arrow_width = draw_arrow ? Layout::Scale(6): 0;
+
+
+  canvas.Select(look.info_labels_font);
+  const unsigned label_height = look.info_labels_font.GetAscentHeight();
+  const unsigned label_width = canvas.CalcTextSize(label).cx;
+  const unsigned value_top = label_height;
+
+  // Paint label
+  unsigned label_left = label_width > column_width ? column_left :
+      column_left + (column_width - label_width) / 2;
+  canvas.DrawText(label_left, 0, label);
 
   // Calculate value size
   canvas.Select(look.info_values_font);
   const unsigned value_height = look.info_values_font.GetAscentHeight();
   const unsigned value_width = canvas.CalcTextSize(value_text).cx;
 
-  // Calculate positions
-  const int y = rc.top + value_height * (row + 1);
-  const unsigned arrow_width = draw_arrow ? Layout::Scale(6): 0;
-
-  if (draw_arrow) {
-    PixelRect rc_arrow = rc;
-    rc_arrow.left = rc_arrow.right - arrow_width;
-    rc_arrow.bottom = y;
-    rc_arrow.top = y - arrow_width;
-    if (arrow_direction == SymbolRenderer::Direction::UP) {
-      rc_arrow.bottom -= arrow_width;
-      rc_arrow.top -= arrow_width;
-    }
-
-    SymbolRenderer::DrawArrow(canvas, rc_arrow, arrow_direction, true);
-  }
-
   // Paint value
-  canvas.DrawText(rc.right - unit_width - space_width - value_width -
-                  arrow_width, y - value_height, value_text);
+  const unsigned total_value_width = unit_width + space_width + value_width +
+      -                  arrow_width;
+  const unsigned value_left = total_value_width > column_width ? column_left :
+      column_left + (column_width - total_value_width) / 2;
+  canvas.DrawText(value_left, value_top, value_text);
 
   // Paint unit
   canvas.Select(look.info_units_font);
   UnitSymbolRenderer::Draw(canvas,
-                           RasterPoint(rc.right - unit_width - arrow_width,
-                                       y - unit_height),
+                           RasterPoint(value_left + value_width + space_width ,
+                                       value_top + value_height - unit_height),
                            unit, look.unit_fraction_pen);
+  if (draw_arrow) {
+    PixelRect rc_arrow = rc;
+    rc_arrow.left = value_left + value_width + space_width + unit_width;
+    rc_arrow.right = rc_arrow.left + arrow_width;
+    rc_arrow.bottom = value_top + value_height;
+    rc_arrow.top = value_top;
+    if (arrow_direction == SymbolRenderer::Direction::UP) {
+      rc_arrow.bottom -= arrow_width;
+      rc_arrow.top -= arrow_width;
+    }
+    SymbolRenderer::DrawArrow(canvas, rc_arrow, arrow_direction, true);
+  }
 
-  // Paint label
-  canvas.Select(look.info_labels_font);
-  const unsigned label_width = canvas.CalcTextSize(label).cx;
-  const unsigned label_height = look.info_labels_font.GetAscentHeight();
-  canvas.DrawText(rc.right - label_width - unit_width - 2 * space_width -
-                  value_width - arrow_width,
-                  y - label_height, label);
+
 }
 
 void
@@ -411,7 +422,7 @@ FlarmTrafficControl::PaintClimbRate(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserVerticalSpeedUnit();
   FormatUserVerticalSpeed(climb_rate, buffer, false);
 
-  PaintMetric(canvas, rc, climb_rate, buffer, unit, _("Vario"), 0, false);
+  PaintMetric(canvas, rc, climb_rate, buffer, unit, _("Vario"), 2, false);
 }
 
 static unsigned GetButtonHeight()
@@ -428,7 +439,7 @@ FlarmTrafficControl::PaintDistance(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserDistanceUnit();
   FormatUserDistance(distance, buffer, false, 1);
 
-  PaintMetric(canvas, rc, distance, buffer, unit, _(""), 1, false);
+  PaintMetric(canvas, rc, distance, buffer, unit, _("Dist."), 0, false);
 
 }
 
@@ -441,10 +452,10 @@ FlarmTrafficControl::PaintRelativeAltitude(Canvas &canvas, PixelRect rc,
   Unit unit = Units::GetUserAltitudeUnit();
   FormatRelativeUserAltitude(relative_altitude, buffer, false);
 
-  PaintMetric(canvas, rc, relative_altitude, buffer, unit, _T(""), 2,
-              true, positive(relative_altitude) ? SymbolRenderer::Direction::UP :
-                  SymbolRenderer::Direction::DOWN);
-
+  PaintMetric(canvas, rc, relative_altitude, buffer, unit,
+              positive(relative_altitude) ? _("Above") : _("Below"), 1, true,
+              positive(relative_altitude) ? SymbolRenderer::Direction::UP :
+              SymbolRenderer::Direction::DOWN);
 }
 
 void
@@ -816,12 +827,7 @@ TrafficWidget::UpdateLayout()
   const unsigned button_width =  std::max(unsigned(rc.right / 6),
                                           GetButtonHeight());
 
-  const PixelScalar x1 = rc.right / 2;
-  const PixelScalar x0 = x1 - button_width;
-  const PixelScalar x2 = x1 + button_width;
-
   PixelRect button_rc;
-
   button_rc.left = 0;
   button_rc.right = button_width * (Layout::landscape ? 2 : 1);
   button_rc.bottom = rc.bottom;
@@ -848,21 +854,15 @@ TrafficWidget::UpdateLayout()
   button_rc.top = button_rc.bottom - button_height;
   zoom_out_button->Move(button_rc);
 
-  button_rc.left = x0;
-  button_rc.top = 0;
-  button_rc.right = x1 - margin;
-  button_rc.bottom = button_height;
-  previous_item_button->Move(button_rc);
-
-  button_rc.left = x1;
-  button_rc.right = x2 - margin;
-  next_item_button->Move(button_rc);
-
   button_rc.left = margin;
   button_rc.top = button_height;
   button_rc.right = button_rc.left + Layout::Scale(50);
   button_rc.bottom = button_rc.top + button_height;
   details_button->Move(button_rc);
+
+  button_rc.top = button_rc.bottom;
+  button_rc.bottom = button_rc.top + button_height;
+  next_item_button->Move(button_rc);
 
 #endif
 }
@@ -878,7 +878,6 @@ TrafficWidget::UpdateButtons()
 
   zoom_in_button->SetEnabled(unlocked && view->CanZoomIn());
   zoom_out_button->SetEnabled(unlocked && view->CanZoomOut());
-  previous_item_button->SetEnabled(unlocked && two_or_more);
   next_item_button->SetEnabled(unlocked && two_or_more);
   details_button->SetEnabled(unlocked && not_empty);
 #endif
@@ -913,8 +912,6 @@ TrafficWidget::Prepare(ContainerWindow &parent, const PixelRect &_rc)
                                    _T("+"), rc, *this, ZOOM_IN);
   zoom_out_button = NewSymbolButton(GetContainer(), look.dialog.button,
                                     _T("-"), rc, *this, ZOOM_OUT);
-  previous_item_button = NewSymbolButton(GetContainer(), look.dialog.button,
-                                         _T("<"), rc, *this, PREVIOUS_ITEM);
   next_item_button = NewSymbolButton(GetContainer(), look.dialog.button,
                                      _T(">"), rc, *this, NEXT_ITEM);
   details_button = new Button(GetContainer(), look.dialog.button,
@@ -939,7 +936,6 @@ TrafficWidget::Unprepare()
 #ifndef GNAV
   delete zoom_in_button;
   delete zoom_out_button;
-  delete previous_item_button;
   delete next_item_button;
   delete details_button;
   delete close_button;
