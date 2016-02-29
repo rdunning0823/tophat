@@ -35,6 +35,7 @@ struct SoundSettings {
   bool sound_task_enabled;
   bool sound_modes_enabled;
   uint8_t sound_deadband;
+  uint8_t volume;
 
   VarioSoundSettings vario;
 

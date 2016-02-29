@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2015 The XCSoar Project
+  Copyright (C) 2000-2016 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,15 +21,27 @@ Copyright_License {
 }
 */
 
-#include "Settings.hpp"
+#ifndef KOBOSYSTEMCONFIGPANEL_HPP
+#define KOBOSYSTEMCONFIGPANEL_HPP
 
-void
-SoundSettings::SetDefaults()
-{
-  sound_task_enabled = true;
-  sound_modes_enabled = true;
-  sound_deadband = 5;
-  volume = 85;
+#include "Widget/RowFormWidget.hpp"
+#include "UIGlobals.hpp"
 
-  vario.SetDefaults();
-}
+
+class KoboSystemConfigPanel final : public RowFormWidget {
+protected:
+
+public:
+  KoboSystemConfigPanel()
+    :RowFormWidget(UIGlobals::GetDialogLook()) {}
+
+public:
+  /* methods from Widget */
+  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  virtual bool Save(bool &changed) override;
+};
+
+Widget *
+CreateKoboSystemConfigPanel();
+
+#endif

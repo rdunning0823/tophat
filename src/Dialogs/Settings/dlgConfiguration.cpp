@@ -84,6 +84,9 @@ Copyright_License {
 #ifdef BETA_FEATURE
 #include "Panels/BetaFeatureConfigPanel.hpp"
 #endif
+#ifdef KOBO
+#include "Panels/KoboSystemConfigPanel.hpp"
+#endif
 
 #include <assert.h>
 
@@ -152,11 +155,15 @@ static constexpr TabMenuPage setup_pages[] = {
   { N_("Time"), CreateTimeConfigPanel },
 #ifdef HAVE_TRACKING
   { N_("Tracking"), CreateTrackingConfigPanel },
+#ifdef KOBO
+  { N_("Kobo System"), CreateKoboSystemConfigPanel },
+#endif
   { N_("User profiles"), CreateProfileConfigPanel },
 #endif
 #ifdef HAVE_MODEL_TYPE
   { N_("Experimental Features"), CreateExperimentalConfigPanel, },
 #endif
+
   { nullptr, nullptr }
 };
 

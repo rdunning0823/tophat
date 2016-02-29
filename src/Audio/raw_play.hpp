@@ -55,14 +55,13 @@ public:
       handle = NULL;
       return;
     }
-    /* TODO: volume settings will be extracted soon */
-    setAlsaMasterVolume(30);
   };
   ~RawPlayback()
   {
     if (handle)
       snd_pcm_close(handle);
   };
+  static void setAlsaMasterVolume(int volume);
 
   /**
    * How many underruns occurred during the playback?
@@ -80,6 +79,5 @@ public:
   int playback_file(const char *name);
 private:
   int playback_mem(short *buff, int count);
-  void setAlsaMasterVolume(int volume);
 };
 #endif /* RAW_PLAY_HPP */
