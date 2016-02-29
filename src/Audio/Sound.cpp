@@ -98,3 +98,15 @@ PlayResource(const TCHAR *resource_name)
   return true;
 #endif
 }
+
+#if !defined(ANDROID)
+void ConfigureSoundDevice(const SoundSettings &sound_settings)
+{
+#if defined(WIN32) && !defined(GNAV)
+  return;
+#else
+  RawPlayback::setAlsaMasterVolume(sound_settings.volume);
+  return;
+#endif
+}
+#endif

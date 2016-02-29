@@ -214,7 +214,9 @@ void list_mixer_elements(snd_mixer_t *mhandle) {
   snd_mixer_elem_t* elem = snd_mixer_first_elem(mhandle);
   while (elem != NULL) {
     const char* name = snd_mixer_selem_get_name(elem);
-    LogFormat("mixer element name: %s", name);
+    LogFormat("mixer element name: %s direction %d", name, snd_mixer_selem_is_enum_playback(elem));
+    LogFormat("snd_mixer_selem_has_playback_volume %d", snd_mixer_selem_has_playback_volume(elem));
+    LogFormat("snd_mixer_selem_has_playback_volume_joined %d", snd_mixer_selem_has_playback_volume_joined(elem));
     elem = snd_mixer_elem_next(elem);
   }
 }
@@ -226,6 +228,11 @@ RawPlayback::setAlsaMasterVolume(int volume) {
     snd_mixer_t *mhandle;
     snd_mixer_selem_id_t *sid;
     snd_mixer_elem_t* elem;
+
+    if (volume < 0 && volume > 100) {
+      LogFormat("requested volume settings is out of range %d, value 50 will be used", volume);
+      volume = 50;
+    }
 
     if ( 0 != (rc = snd_mixer_open(&mhandle, 0))) {
       LogFormat("unable to open mixer: %d", rc);
@@ -268,5 +275,5 @@ RawPlayback::setAlsaMasterVolume(int volume) {
     }
 
 _return:
-    snd_mixer_close(mhandle);
+  snd_mixer_close(mhandle);
 }
