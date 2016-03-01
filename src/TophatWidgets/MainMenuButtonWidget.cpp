@@ -34,7 +34,6 @@ Copyright_License {
 #include "Look/Look.hpp"
 #include "Look/GlobalFonts.hpp"
 #include "Screen/Canvas.hpp"
-#include "Interface.hpp"
 #include "Util/StaticString.hxx"
 
 void

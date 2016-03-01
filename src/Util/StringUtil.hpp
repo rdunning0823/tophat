@@ -111,6 +111,13 @@ void
 CopyASCIIUpper(char *dest, const char *src);
 
 /**
+ * Like CopyUpper(), but convert all letters to lower-case.
+ */
+gcc_nonnull_all
+void
+CopyASCIILower(char *dest, const char *src);
+
+/**
  * Skips whitespace at the beginning of the string, and returns the
  * first non-whitespace character.  If the string has no
  * non-whitespace characters, then a pointer to the NULL terminator is

@@ -64,7 +64,11 @@ OverlayButtonWidget::Prepare(ContainerWindow &parent,
 {
   assert(prepared == false);
   white_look.Initialise(overlay_button_look.large_font);
+#ifdef WIN32
+  white_look.background_transparent = false;
+#else
   white_look.background_transparent = true;
+#endif
 
   const IconLook &icon_look = CommonInterface::main_window->GetLook().icon;
   CreateButton(parent, white_look, icon_look, rc);

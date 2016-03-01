@@ -246,7 +246,6 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   altitude_type = new WndFrame(GetClientAreaWindow(), dialog_look,
                                 sub_number_rc, style_frame);
-  altitude_type->SetAlignCenter();
   altitude_type->SetVAlignCenter();
 
   WindowStyle checkbox_style;

@@ -194,6 +194,15 @@ SDCardSyncWidget::OnAction(int id)
       break;
 
     case CleanAndUploadEverything:
+<<<<<<< HEAD
+=======
+      if (ShowMessageBox(_T("This will erase all Top Hat data from your Kobo."),
+                         _T("Are you sure?"), MB_YESNO | MB_ICONQUESTION) != IDYES) {
+        ShowMessageBox(_T("Aborted"),
+                       _T("Aborted"), MB_OK);
+        return;
+      }
+>>>>>>> tophat/TopHat_master
       if (CleanSDCard() && UploadSDCardToDevice()) {
         ShowMessageBox(_T("USB card successfully copied to Kobo"),
                        _T("Success"), MB_OK);

@@ -134,6 +134,10 @@ protected:
     GetButton().SetCaption(_text);
   }
 
+  const TCHAR *GetText() {
+    return GetButton().GetCaption();
+  }
+
   /**
    * Updates subscript text of button
    * Button must be created before this is called

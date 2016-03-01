@@ -247,6 +247,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/FLARM/FlarmNetDatabase.cpp \
 	$(SRC)/FLARM/FlarmNetReader.cpp \
 	$(SRC)/FLARM/Traffic.cpp \
+	$(SRC)/FLARM/FlarmAudibleAlert.cpp \
 	$(SRC)/FLARM/FlarmCalculations.cpp \
 	$(SRC)/FLARM/Friends.cpp \
 	$(SRC)/FLARM/FlarmComputer.cpp \
@@ -679,6 +680,7 @@ XCSOAR_SOURCES := \
 	\
 	$(SRC)/TophatWidgets/OverlayButtonWidget.cpp \
 	$(SRC)/TophatWidgets/MainMenuButtonWidget.cpp \
+	$(SRC)/TophatWidgets/ReplayButtonWidget.cpp \
 	$(SRC)/TophatWidgets/ScreensButtonWidget.cpp \
 	$(SRC)/TophatWidgets/MapOverlayButton.cpp \
 	$(SRC)/TophatWidgets/TaskNavSliderWidget.cpp \
@@ -710,11 +712,23 @@ XCSOAR_SOURCES := \
 	$(SRC)/Monitor/TaskAdvanceMonitor.cpp \
 	$(SRC)/Monitor/MatTaskMonitor.cpp \
 	$(SRC)/Monitor/TaskStartMonitor.cpp \
+	$(SRC)/Monitor/TrafficWarningMonitor.cpp \
 	$(SRC)/Monitor/AllMonitors.cpp \
 	\
 	$(SRC)/Hardware/Battery.cpp
 
 $(call SRC_TO_OBJ,$(SRC)/Dialogs/Inflate.cpp): CPPFLAGS += $(ZLIB_CPPFLAGS)
+
+ifeq ($(HAVE_WIN32),n)
+ifneq ($(TARGET),ANDROID)
+XCSOAR_SOURCES += \
+	$(SRC)/Audio/raw_play.cpp
+endif
+endif
+ifneq ($(TARGET),ANDROID)
+XCSOAR_SOURCES += \
+	$(SRC)/Audio/SoundQueue.cpp
+endif
 
 ifeq ($(HAVE_CE),y)
 XCSOAR_SOURCES += \

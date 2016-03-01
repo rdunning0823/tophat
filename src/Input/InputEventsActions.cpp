@@ -186,7 +186,7 @@ InputEvents::eventMarkLocation(const TCHAR *misc)
     SuspendAppendSaveWaypoint(std::move(wp));
 
     if (CommonInterface::GetUISettings().sound.sound_modes_enabled)
-      PlayResource(_T("IDR_WAV_CLEAR"));
+      PlayResource(_T("IDR_WAV_BEEP_CLEAR"));
   }
 
   trigger_redraw();
@@ -501,7 +501,7 @@ InputEvents::eventBeep(gcc_unused const TCHAR *misc)
 #elif defined(WIN32)
   MessageBeep(MB_ICONEXCLAMATION);
 #else
-  PlayResource(_T("IDR_WAV_CLEAR"));
+  PlayResource(_T("IDR_WAV_BEEP_CLEAR"));
   #endif
 }
 

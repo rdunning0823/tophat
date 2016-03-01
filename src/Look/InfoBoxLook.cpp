@@ -41,6 +41,7 @@ Copyright_License {
 void
 InfoBoxLook::Initialise(bool _inverse, bool use_colors,
                         unsigned width, unsigned font_scale_infobox_title,
+                        unsigned font_scale_infobox_comment,
                         unsigned font_scale_infobox_value)
 {
   inverse = _inverse;
@@ -65,6 +66,7 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
   comment_font.Load(FontDescription(_T("RasterGothicNineCond"), 10));
 #else
   ReinitialiseLayout(width, font_scale_infobox_title,
+                     font_scale_infobox_comment,
                      font_scale_infobox_value);
 
   unit_fraction_pen.Create(1, value.fg_color);
@@ -84,6 +86,7 @@ InfoBoxLook::Initialise(bool _inverse, bool use_colors,
 void
 InfoBoxLook::ReinitialiseLayout(unsigned width,
                                 unsigned font_scale_infobox_title,
+                                unsigned font_scale_infobox_comment,
                                 unsigned font_scale_infobox_value)
 {
   FontDescription title_font_d(Layout::FontScale(14));
@@ -93,7 +96,7 @@ InfoBoxLook::ReinitialiseLayout(unsigned width,
 
   FontDescription comment_font_d(Layout::FontScale(14));
   AutoSizeFont(comment_font_d, width, _T("MC MANUA "));
-  comment_font_d.SetHeight((comment_font_d.GetHeight() * font_scale_infobox_title) / 100);
+  comment_font_d.SetHeight((comment_font_d.GetHeight() * font_scale_infobox_comment) / 100);
   comment_font.Load(comment_font_d);
 
 #ifndef GNAV

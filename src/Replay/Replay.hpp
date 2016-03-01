@@ -40,6 +40,18 @@ class CatmullRomInterpolator;
 class Replay final
   : private Timer
 {
+public:
+  enum PlayState {
+    NOFILE,
+    NOTSTARTED,
+    PLAYING,
+    PAUSED,
+    FASTFORWARD,
+  };
+
+private:
+  PlayState play_state;
+
   fixed time_scale;
 
   AbstractReplay *replay;
@@ -86,13 +98,40 @@ class Replay final
 
 public:
   Replay(Logger *_logger, ProtectedTaskManager &_task_manager)
-    :time_scale(fixed(1)), replay(nullptr),
+    :play_state(PlayState::NOFILE), time_scale(fixed(1)), replay(nullptr),
      logger(_logger), task_manager(_task_manager), cli(nullptr) {
     path[0] = _T('\0');
   }
 
   ~Replay() {
     Stop();
+  }
+
+  void SetPlayState(PlayState state) {
+    play_state = state;
+  }
+
+  bool IsNoFile() {
+    return play_state == PlayState::NOFILE;
+  }
+  bool IsNotStarted() {
+    return play_state == PlayState::NOTSTARTED;
+  }
+
+  bool IsPlaying() {
+    return play_state == PlayState::PLAYING;
+  }
+
+  bool IsPaused() {
+    return play_state == PlayState::PAUSED;
+  }
+
+  bool IsFastForward() {
+    return play_state == PlayState::FASTFORWARD;
+  }
+
+  PlayState GetPlayState() {
+    return play_state;
   }
 
   bool IsActive() const {
@@ -145,7 +184,7 @@ public:
     return virtual_time;
   }
 
-  bool IsFastForward() {
+  bool CheckFastForward() {
     return !negative(fast_forward);
   }
 

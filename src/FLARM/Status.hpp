@@ -31,6 +31,8 @@ Copyright_License {
 
 /**
  * The FLARM operation status read from the PFLAU sentence.
+ * BUG:: According to Flarm 7.0.3 dataport, values are:
+ * 0 = no GPS reception 1 = 3d-fix on ground, i.e. not airborne 2 = 3d-fix when airborne
  */
 struct FlarmStatus {
   enum class GPSStatus: uint8_t {
@@ -38,6 +40,70 @@ struct FlarmStatus {
     GPS_2D = 1,
     GPS_3D = 2,
   };
+
+  /**
+   * Save the prioirty alert info from the PFLAU record
+   * These targets are not sync'd with  the traffic list because the IDs are different
+   * when stealth mode is in use.
+   */
+  struct PriorityIntruder {
+
+    /// PFLAU alarm type
+    enum class AlarmTypePFLAU: uint16_t {
+      NONE = 0x0,             // 0 = no aircraft within range or no-alarm traffic information
+      AIRCRAFT = 0x2,         // 2 = aircraft alarm
+      ALERT_ZONE = 0x3,       // 3 = obstacle/Alert Zone alarm (if data port version < 7, otherwise only obstacle alarms are indicated by <AlarmType> = 3)
+      TRAFFIC_ADVISORY = 0x4, // 4 = traffic advisory (sent once each time an aircraft enters within distance 1.5 km and vertical distance 300 m from own ship)
+      ZONE_SKYDIVER_DROP = 0x41,        // = Skydiver drop zone
+      ZONE_AERODROME_TRAFFIC = 0x42,    // 0x42 = Aerodrome traffic zone
+      ZONE_MILITARY_FIRING_AREA = 0x43, //0x43 = Military firing area
+      ZONE_KITE_FLYING_ZONE = 0x44,     //44 = Kite flying zone
+      ZONE_WINCH_LAUNCHING_AREA = 0x45, // 0x45 = Winch launching area
+      ZONE_RC_FLYING_AREA = 0x46,       // 0x46 = RC flying area
+      ZONE_UAS_FLYING_AREA = 0x47,      // 0x47 = UAS flying area
+      ZONE_AEROBATIC_BOX = 0x48,        // 0x48 = Aerobatic box
+      ZONE_GENERIC_DANGER_AREA = 0x7E,  // 0x7E = Generic danger area
+      ZONE_PROHIBITED_AREA = 0x7F,      // 0x7F = Generic prohibited area
+    };
+
+    FlarmId id;
+
+    /** type of alert in the PFLAU sentence */
+    AlarmTypePFLAU alarm_type;
+
+    /**
+     * Relative bearing in degrees from true ground track to the intruder’s position.
+     * Positive values are clockwise. 0° indicates that the object is exactly ahead.
+     * Field is empty for non-directional targets or when no aircraft are within range.
+     * For obstacle alarm and Alert Zone alarm, this field is 0.
+     */
+    fixed relative_bearing_degrees;
+    bool relative_bearing_degrees_valid;
+
+    /**
+     * Decimal integer value. Range: from 0 to 2147483647.
+     * Relative horizontal distance in meters to the target or obstacle.
+     * For non-directional targets this value is estimated based on signal strength.
+     * Field is empty when no aircraft are within range and no alarms are generated.
+     * For Alert Zone, this field is 0.
+     */
+    fixed distance;
+    bool distance_valid;
+
+    fixed relative_altitude;
+    bool relative_altitude_valid;
+
+    void Reset() {
+      distance_valid = false;
+      relative_bearing_degrees_valid = false;
+      relative_altitude_valid = false;
+    }
+
+    bool IsAircraftAlert() {
+      return alarm_type == AlarmTypePFLAU::AIRCRAFT;
+    }
+  } priority_intruder;
+
 
   /** Number of received FLARM devices */
   unsigned short rx;
@@ -55,6 +121,7 @@ struct FlarmStatus {
 
   void Clear() {
     available.Clear();
+    priority_intruder.Reset();
   }
 
   void Complement(const FlarmStatus &add) {

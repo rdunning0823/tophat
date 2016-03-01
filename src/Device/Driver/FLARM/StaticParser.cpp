@@ -75,14 +75,34 @@ ParsePFLAU(NMEAInputLine &line, FlarmStatus &flarm, fixed clock)
 
   // PFLAU,<RX>,<TX>,<GPS>,<Power>,<AlarmLevel>,<RelativeBearing>,<AlarmType>,
   //   <RelativeVertical>,<RelativeDistance>(,<ID>)
+  fixed value;
+
   flarm.rx = line.Read(0);
   flarm.tx = line.Read(false);
   flarm.gps = (FlarmStatus::GPSStatus)
     line.Read((int)FlarmStatus::GPSStatus::NONE);
 
-  line.Skip();
+  line.Skip(); // power
   flarm.alarm_level = (FlarmTraffic::AlarmType)
     line.Read((int)FlarmTraffic::AlarmType::NONE);
+
+  flarm.priority_intruder.relative_bearing_degrees_valid =
+      line.ReadChecked(value);
+  flarm.priority_intruder.relative_bearing_degrees = value;
+
+  flarm.priority_intruder.alarm_type = (FlarmStatus::PriorityIntruder::AlarmTypePFLAU)
+      line.Read((int)FlarmStatus::PriorityIntruder::AlarmTypePFLAU::NONE);
+
+  flarm.priority_intruder.relative_altitude_valid = line.ReadChecked(value);
+  flarm.priority_intruder.relative_altitude = value;
+
+  flarm.priority_intruder.distance_valid = line.ReadChecked(value);
+  flarm.priority_intruder.distance = value;
+
+  // 5 id, 6 digit hex
+  char id_string[16];
+  line.Read(id_string, 16);
+  flarm.priority_intruder.id = FlarmId::Parse(id_string, nullptr);
 }
 
 /**

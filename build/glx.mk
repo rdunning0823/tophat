@@ -15,7 +15,7 @@ else ifeq ($(USE_SDL2),y)
 GLX = n
 else ifneq ($(EGL),y)
 # default to GLX/X11
-GLX ?= y
+GLX ?= n
 endif
 
 ifeq ($(GLX),y)

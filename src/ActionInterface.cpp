@@ -230,6 +230,10 @@ ActionInterface::SendMapSettings(const bool trigger_draw)
   SetMapSettings().show_flarm_alarm_level =
     !GetUISettings().traffic.enable_gauge;
 
+  /* Don't show replay overlay button if reply dialog is visible */
+  SetMapSettings().replay_dialog_visible =
+    GetUISettings().replay_dialog_visible;
+
   main_window->SetMapSettings(GetMapSettings());
 
   if (trigger_draw) {

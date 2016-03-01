@@ -111,7 +111,7 @@ TaskManager::SetMode(const TaskType _mode)
   return mode;
 }
 
-AATPoint*
+const AATPoint*
 TaskManager::GetAATTaskPoint(unsigned tp_index)
 {
   return ordered_task->GetAATTaskPoint(tp_index);

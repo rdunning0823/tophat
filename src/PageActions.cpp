@@ -396,6 +396,7 @@ PageActions::ShowTrafficRadar()
     /* generate a "special" page based on the current page */
     layout.main = PageLayout::Main::FLARM_RADAR;
     layout.bottom = PageLayout::Bottom::NOTHING;
+    layout.infobox_config.enabled = false;
     OpenLayout(layout);
   }
 }

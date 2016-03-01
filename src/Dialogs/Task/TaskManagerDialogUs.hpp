@@ -74,7 +74,7 @@ class TaskManagerDialogUs : public NullWidget, public WndForm
     void SetPartialScreenRect(PixelRect _rc_partial_screen);
 
     /**
-     * restores to partial screen display
+     * restores to partial or full screen display based on fullscreen property
      */
     void Restore();
   };
@@ -136,6 +136,10 @@ public:
   virtual void Unprepare();
   virtual void Show(const PixelRect &rc) {};
   virtual void Hide() {};
+
+  /* overrides from WndForm */
+  virtual void OnResize(PixelSize new_size) override;
+  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
 
   virtual bool Save(bool &changed);
 

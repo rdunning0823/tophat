@@ -101,6 +101,9 @@ Copyright_License {
 #include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
 #include "OS/Args.hpp"
 #include "Util/StaticString.hxx"
+#if !defined(ANDROID)
+#include "Audio/SoundQueue.hpp"
+#endif
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
@@ -150,7 +153,7 @@ LoadTophatArguments()
   LocalPath(path, _T(TOPHAT_ARGUMENTS));
   FileLineReader *file = new FileLineReader(path);
   if (file != nullptr) {
-    StaticString<64> line;
+    StaticString<256> line;
 #ifndef _WIN32_WCE
           // program name is not included in command line on CE
     line.Format(_T("%s %s"), _T("Top Hat Soaring"), file->ReadLine());
@@ -198,7 +201,7 @@ AfterStartup()
 
   InfoBoxManager::SetDirty();
 
-  if (CommandLine::show_dialog_setup_quick)
+  if (CommandLine::show_dialog_setup_quick && replay == nullptr)
     dlgStartupAssistantShowModal(true);
 
   ForceCalculation();
@@ -223,6 +226,9 @@ Startup()
 
 #ifdef HAVE_DOWNLOAD_MANAGER
   Net::DownloadManager::Initialise();
+#endif
+#if !defined(ANDROID)
+  SoundQueue::Initialise();
 #endif
 
   LogFormat("Display dpi=%u,%u", Display::GetXDPI(), Display::GetYDPI());
@@ -378,8 +384,8 @@ Startup()
   replay = new Replay(logger, *protected_task_manager);
 
 #ifdef HAVE_CMDLINE_REPLAY
-  if (CommandLine::replay_path != nullptr)
-    replay->Start(CommandLine::replay_path);
+  if (CommandLine::replay_path.length() > 0)
+    replay->Start(CommandLine::replay_path.c_str());
 #endif
 
 
@@ -591,6 +597,9 @@ Shutdown()
 
   // Stop threads
   LogFormat("Stop threads");
+#if !defined(ANDROID)
+  SoundQueue::BeginDeinitialise();
+#endif
 #ifdef HAVE_DOWNLOAD_MANAGER
   Net::DownloadManager::BeginDeinitialise();
 #endif
@@ -636,6 +645,9 @@ Shutdown()
 
   // Stop sound
   AudioVarioGlue::Deinitialise();
+#if !defined(ANDROID)
+  SoundQueue::Deinitialise();
+#endif
 
   // Save the task for the next time
   operation.SetText(_("Shutdown, saving task..."));

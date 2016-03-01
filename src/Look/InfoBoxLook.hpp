@@ -68,9 +68,11 @@ struct InfoBoxLook {
 
   void Initialise(bool inverse, bool use_colors,
                   unsigned width, unsigned font_scale_infobox_title,
+                  unsigned font_scale_infobox_comment,
                   unsigned font_scale_infobox_value);
 
   void ReinitialiseLayout(unsigned width, unsigned font_scale_infobox_title,
+                          unsigned font_scale_infobox_comment,
                           unsigned font_scale_infobox_value);
 
   Color GetColor(int i, Color default_color) const {

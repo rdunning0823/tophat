@@ -30,6 +30,7 @@ Copyright_License {
 #include "WindMonitor.hpp"
 #include "AirspaceWarningMonitor.hpp"
 #include "TaskConstraintsMonitor.hpp"
+#include "TrafficWarningMonitor.hpp"
 
 /**
  * A container that combines all monitor classes.
@@ -39,6 +40,7 @@ class AllMonitors final : NullBlackboardListener, RateLimiter {
   WindMonitor wind;
   AirspaceWarningMonitor airspace_warnings;
   TaskConstraintsMonitor task_constraints;
+  TrafficWarningMonitor traffic_alerts;
 
 public:
   AllMonitors();
@@ -49,6 +51,7 @@ public:
     wind.Reset();
     airspace_warnings.Reset();
     task_constraints.Reset();
+    traffic_alerts.Reset();
   }
 
   void Check() {
@@ -56,6 +59,7 @@ public:
     wind.Check();
     airspace_warnings.Check();
     task_constraints.Check();
+    traffic_alerts.Check();
   }
 
 private:

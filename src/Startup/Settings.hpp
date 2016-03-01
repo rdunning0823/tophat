@@ -33,7 +33,7 @@ Copyright_License {
  * Startup settings
  */
 struct StartupSettings {
-  StaticString<64> tophat_arguments;
+  StaticString<256> tophat_arguments;
 
   void SetDefaults(const TCHAR *string);
 };

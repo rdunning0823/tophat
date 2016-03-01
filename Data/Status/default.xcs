@@ -1,5 +1,5 @@
 key=DEFAULT
-sound=IDR_WAV_DRIP
+sound=IDR_WAV_BEEP_DRIP
 delay=1500
 
 key=Pan mode ON
@@ -51,7 +51,7 @@ sound=IDR_REMOVE
 delay=1500
 
 key=Dropped marker
-sound=IDR_WAV_BEEPBWEEP
+sound=IDR_WAV_BEEP_BWEEP
 delay=1500
 
 key=Waiting for GPS connection

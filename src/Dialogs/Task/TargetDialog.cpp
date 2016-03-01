@@ -399,10 +399,9 @@ UseRecommendedCaptionWidths(Args&&... args)
   WndProperty *controls[] = { &args... };
 
   unsigned width = 0;
-  for (const auto *i : controls)
+  for (WndProperty *i = controls[0]; i != NULL; i++)
     width = std::max(width, i->GetRecommendedCaptionWidth());
-
-  for (auto *i : controls)
+  for (WndProperty *i = controls[0]; i != NULL; i++)
     i->SetCaptionWidth(width);
 }
 
@@ -627,12 +626,7 @@ TargetWidget::OnRangeModified(fixed new_value)
 
   {
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
-    AATPoint *ap = lease->GetAATTaskPoint(target_point);
-    if (ap == nullptr)
-      return;
-
-    ap->SetTarget(range_and_radial,
-                  lease->GetOrderedTask().GetTaskProjection());
+    lease->SetTarget(target_point, range_and_radial);
   }
 
   map.Invalidate();
@@ -669,12 +663,7 @@ TargetWidget::OnRadialModified(fixed new_value)
 
   {
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
-    AATPoint *ap = lease->GetAATTaskPoint(target_point);
-    if (ap == nullptr)
-      return;
-
-    ap->SetTarget(range_and_radial,
-                  lease->GetOrderedTask().GetTaskProjection());
+    lease->SetTarget(target_point, range_and_radial);
   }
 
   if (must_reload_radial)

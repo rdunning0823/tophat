@@ -390,7 +390,7 @@ dlgFlarmTrafficDetailsShowModal(FlarmId id)
     new FlarmTrafficDetailsWidget(dialog, id);
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("FLARM Traffic Details"),
                     widget);
+  dialog.AddSymbolButton(_T("_X"), mrCancel);
   widget->CreateButtons(dialog);
-  dialog.AddButton(_("Close"), mrCancel);
   dialog.ShowModal();
 }

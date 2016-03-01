@@ -54,6 +54,7 @@ struct UISettings {
   unsigned font_scale_map_waypoint_name;
   unsigned font_scale_map_place_name;
   unsigned font_scale_infobox_title;
+  unsigned font_scale_infobox_comment;
   unsigned font_scale_infobox_value;
   unsigned font_scale_overlay_button;
   unsigned font_scale_dialog;
@@ -84,6 +85,8 @@ struct UISettings {
     MENU,
   } screens_button_location;
 
+  /// is the replay dialog visible
+  bool replay_dialog_visible;
   /**
    * if true, gesture zone help timer will be reset to draw next time
    */

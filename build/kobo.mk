@@ -55,7 +55,7 @@ endif
 ifeq ($(TARGET_IS_KOBO),y)
 
 .PHONY: kobo-libs
-kobo-libs:
+kobo-libs: alsa-lib
 	./kobo/build.py $(TARGET_OUTPUT_DIR) $(HOST_ARCH) $(CC) $(CXX) $(AR) $(STRIP)
 
 KOBO_POWER_OFF_SOURCES = \
@@ -124,8 +124,20 @@ UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
 FORCE_UIMAGE:
 	touch $(TARGET_OUTPUT_DIR)/force_uimage
 
+AVCONF = avconv -y
+
+RAW_DIR = $(TARGET_OUTPUT_DIR)/resources/raw
+
+SOUNDS = fail insert remove beep_bweep beep_clear beep_drip traffic_low traffic_important traffic_urgent above below one_oclock two_oclock three_oclock four_oclock five_oclock six_oclock seven_oclock eight_oclock nine_oclock ten_oclock eleven_oclock twelve_oclock
+SOUND_FILES = $(patsubst %,$(RAW_DIR)/%.raw,$(SOUNDS))
+
+$(SOUND_FILES): $(RAW_DIR)/%.raw: Data/sound/%.wav | $(RAW_DIR)/dirstamp
+	@$(NQ)echo "  AVCONF  $@"
+	$(AVCONF) -i $< -f s16le -ar 16000 $@
+
 # from Debian package libgcc1-armhf-cross
 KOBO_SYS_LIB_NAMES += libgcc_s.so.1
+ALSA_DIR=/opt/tophat/share/alsa-lib
 
 KOBO_SYS_LIB_PATHS = $(addprefix $(SYSROOT)/lib/,$(KOBO_SYS_LIB_NAMES))
 
@@ -137,6 +149,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(UIMAGE_PREREQUISITES) \
 	$(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) \
 	$(BITSTREAM_VERA_FILES) \
+	$(SOUND_FILES) \
 	$(topdir)/kobo/rcS.tophat \
 	$(topdir)/kobo/50-tophat-usb.rules \
 	$(topdir)/kobo/10-media-automount.rules \
@@ -149,6 +162,7 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)$(UIMAGE_CMD)
 	$(Q)install -m 0644 $(TARGET_OUTPUT_DIR)/force_uimage $(@D)/KoboRoot/mnt/onboard/.kobo/force_uimage
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
+	$(Q)install -m 0755 -d $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
 	$(Q)install -m 0644 $(topdir)/kobo/inetd.conf $(@D)/KoboRoot/etc
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc/init.d
@@ -159,6 +173,33 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/media
 	$(Q)install -m 0755 $(topdir)/kobo/10-media-automount.rules $(@D)/KoboRoot/etc/udev/rules.d
 	$(Q)install -m 0644 $(BITSTREAM_VERA_FILES) $(@D)/KoboRoot/opt/tophat/share/fonts
+	PWD=`pwd`; cd lib/alsa-lib;\
+	make install DESTDIR=${PWD}/$(@D)/KoboRoot;\
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/include; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/bin; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/lib; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/share/aclocal; \
+	rm -rf ${PWD}/$(@D)/KoboRoot$(ALSA_DIR)/share/alsa-lib/include; \
+	cd ../..
+	$(Q)install -m 0644 $(RAW_DIR)/*.raw $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)fakeroot tar czfC $@ $(@D)/KoboRoot .
 
+alsa-lib:
+	PWD=`pwd`; \
+	cd lib/alsa-lib; \
+	git checkout -f v1.0.18; \
+	patch -p1 <../../kobo/alsa-lib-1.0.18-nommu.patch; \
+	libtoolize --force --copy --automake; \
+	aclocal; \
+	autoheader; \
+	automake --foreign --copy --add-missing; \
+	autoconf; \
+	./configure --host=arm-linux-gnueabihf --prefix=$(ALSA_DIR)/ \
+		--disable-aload --disable-rawmidi \
+		--disable-hwdep --disable-seq --disable-alisp \
+		--disable-old-symbols --disable-python --enable-static \
+		--disable-shared; \
+	patch -p1 <../../kobo/alsa-lib-1.0.18-relink.patch; \
+	make -j all; \
+	cd ../..
 endif

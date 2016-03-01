@@ -25,28 +25,104 @@ package org.tophat;
 
 import java.util.HashMap;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.content.Context;
+import java.util.Queue;
+import java.util.LinkedList;
+import android.util.Log;
 
 public class SoundUtil {
+  private static final String TAG = "TopHat";
   private static HashMap<String, Integer> resources = new HashMap();
 
   static {
     resources.put("IDR_FAIL", R.raw.fail);
     resources.put("IDR_INSERT", R.raw.insert);
     resources.put("IDR_REMOVE", R.raw.remove);
-    resources.put("IDR_WAV_BEEPBWEEP", R.raw.beep_bweep);
-    resources.put("IDR_WAV_CLEAR", R.raw.beep_clear);
-    resources.put("IDR_WAV_DRIP", R.raw.beep_drip);
+    resources.put("IDR_WAV_BEEP_BWEEP", R.raw.beep_bweep);
+    resources.put("IDR_WAV_BEEP_CLEAR", R.raw.beep_clear);
+    resources.put("IDR_WAV_BEEP_DRIP", R.raw.beep_drip);
+    resources.put("IDR_WAV_TRAFFIC_LOW", R.raw.traffic_low);
+    resources.put("IDR_WAV_TRAFFIC_IMPORTANT", R.raw.traffic_important);
+    resources.put("IDR_WAV_TRAFFIC_URGENT", R.raw.traffic_urgent);
+    resources.put("IDR_WAV_ABOVE", R.raw.above);
+    resources.put("IDR_WAV_BELOW", R.raw.below);
+    resources.put("IDR_WAV_ONE_OCLOCK", R.raw.one_oclock);
+    resources.put("IDR_WAV_TWO_OCLOCK", R.raw.two_oclock);
+    resources.put("IDR_WAV_THREE_OCLOCK", R.raw.three_oclock);
+    resources.put("IDR_WAV_FOUR_OCLOCK", R.raw.four_oclock);
+    resources.put("IDR_WAV_FIVE_OCLOCK", R.raw.five_oclock);
+    resources.put("IDR_WAV_SIX_OCLOCK", R.raw.six_oclock);
+    resources.put("IDR_WAV_SEVEN_OCLOCK", R.raw.seven_oclock);
+    resources.put("IDR_WAV_EIGHT_OCLOCK", R.raw.eight_oclock);
+    resources.put("IDR_WAV_NINE_OCLOCK", R.raw.nine_oclock);
+    resources.put("IDR_WAV_TEN_OCLOCK", R.raw.ten_oclock);
+    resources.put("IDR_WAV_ELEVEN_OCLOCK", R.raw.eleven_oclock);
+    resources.put("IDR_WAV_TWELVE_OCLOCK", R.raw.twelve_oclock);
+  }
+  private static MediaPlayer instance;
+
+  static Boolean isPlaying = false;
+  static Context _context;
+
+  static Queue<Integer> queuedSounds = new LinkedList<Integer>();
+
+  private static Boolean deQueueAndPlay() {
+    synchronized (queuedSounds) {
+      if (isPlaying) {
+        return true;
+      }
+
+      Integer id = queuedSounds.poll();
+      if (id == null) {
+        return false;
+      }
+
+      isPlaying = true;
+      isPlaying = playNow(_context, id);
+    }
+    return true;
   }
 
+  /**
+   * queues the sound and triggers play of the queue
+   */
   public static boolean play(Context context, String name) {
+
     Integer id = resources.get(name);
-    if (id == null)
+    if (id == null) {
+      Log.w(TAG, "SoundUtil::play error:  Resource not found: " + name);
       return false;
+    }
+    synchronized (queuedSounds) {
+      queuedSounds.offer(id);
+    }
+    _context = context;
+
+    return deQueueAndPlay();
+  }
+
+  private static boolean playNow(Context context, Integer id) {
+    if (id == null) {
+      Log.w(TAG, "SoundUtil::PlayNow error: id null");
+      return false;
+    }
 
     MediaPlayer mp = MediaPlayer.create(context, id);
-    if (mp == null)
+    if (mp == null) {
+      Log.w(TAG, "SoundUtil::PlayNow error.  Could not create Media Player. id: " + id);
       return false;
+    }
+
+    mp.setOnCompletionListener(new OnCompletionListener() {
+	  @Override
+	  public void onCompletion(MediaPlayer mp) {
+		mp.release();
+		mp = null;
+		isPlaying = false;
+        deQueueAndPlay();
+      }
+	});
 
     mp.start();
     return true;
