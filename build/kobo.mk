@@ -199,6 +199,7 @@ alsa-lib:
 	autoheader; \
 	automake --foreign --copy --add-missing; \
 	autoconf; \
+	./configure --host=arm-linux-gnueabihf --prefix=/mnt/onboard/XCSoarData/alsa-lib \
 	./configure --host=arm-linux-gnueabihf --prefix=$(ALSA_DIR)/ \
 		--disable-aload --disable-rawmidi \
 		--disable-hwdep --disable-seq --disable-alisp \
