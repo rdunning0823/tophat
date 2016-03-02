@@ -312,9 +312,7 @@ Startup()
     return false;
 
   operation.SetText(_("Initialising"));
-#if !defined(ANDROID)
   ConfigureSoundDevice(ui_settings.sound);
-#endif
 
   /* create XCSoarData on the first start */
   CreateDataPath();

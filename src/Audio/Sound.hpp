@@ -34,7 +34,8 @@ bool PlayResource(const TCHAR *resource_name);
 /// plays the resource immediately
 #if !defined(ANDROID)
 bool PlayResourceNow(const SoundQueue::SoundName resource_name);
-void ConfigureSoundDevice(const SoundSettings &sound_settings);
 #endif
+
+void ConfigureSoundDevice(const SoundSettings &sound_settings);
 
 #endif

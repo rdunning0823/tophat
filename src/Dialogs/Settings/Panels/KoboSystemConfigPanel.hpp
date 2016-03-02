@@ -27,6 +27,7 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
+#ifdef KOBO
 
 class KoboSystemConfigPanel final : public RowFormWidget {
 protected:
@@ -43,5 +44,7 @@ public:
 
 Widget *
 CreateKoboSystemConfigPanel();
+
+#endif
 
 #endif
