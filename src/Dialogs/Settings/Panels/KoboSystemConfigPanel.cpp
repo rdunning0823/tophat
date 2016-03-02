@@ -28,6 +28,7 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Audio/Sound.hpp"
 
+#ifdef KOBO
 enum ControlIndex {
   ALSAVolumeControl
 };
@@ -71,3 +72,5 @@ CreateKoboSystemConfigPanel()
 {
   return new KoboSystemConfigPanel();
 }
+#endif
+
