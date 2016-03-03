@@ -143,6 +143,10 @@ public:
     CheckUSBStorage();
   }
 
+  const TCHAR *GetWifiCaption() {
+      return IsKoboWifiOn() ? _T("_chkmark_ Wifi") : _T("Wifi");
+  }
+
   const TCHAR *
   GetPowerOffCaption(bool do_reboot)
   {
@@ -175,7 +179,6 @@ KoboMenuWidget::UpdateButtons()
   wifi_button->SetPrefixIcon(IsKoboWifiOn() ?
       SymbolButtonRenderer::PrefixIcon::CHECK_MARK :
       SymbolButtonRenderer::PrefixIcon::NONE);
-
   if (do_reboot)
     return;
 
