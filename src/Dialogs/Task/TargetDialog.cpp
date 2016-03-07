@@ -399,9 +399,9 @@ UseRecommendedCaptionWidths(Args&&... args)
   WndProperty *controls[] = { &args... };
 
   unsigned width = 0;
-  for (WndProperty *i = controls[0]; i != NULL; i++)
+  for (const auto *i : controls)
     width = std::max(width, i->GetRecommendedCaptionWidth());
-  for (WndProperty *i = controls[0]; i != NULL; i++)
+  for (auto *i : controls)
     i->SetCaptionWidth(width);
 }
 
