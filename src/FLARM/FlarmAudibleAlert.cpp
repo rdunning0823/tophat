@@ -97,7 +97,7 @@ FlarmAudibleAlert::PlayAlarm()
     break;
   }
 
-  if (traffic_oclock != 0) {
+  if (traffic_oclock != -1) {
     switch (traffic_oclock) {
     case (0):
       break;
@@ -160,14 +160,16 @@ FlarmAudibleAlert::IsAlertAudible(FlarmTraffic::AlarmType type)
 void
 FlarmAudibleAlert::Update(const FlarmStatus& status)
 {
-  if (!status.priority_intruder.relative_altitude_valid ||
-      !status.priority_intruder.relative_bearing_degrees_valid) {
+  if (!status.priority_intruder.relative_altitude_valid) {
     return;
   }
 
   const FlarmStatus::PriorityIntruder intruder = status.priority_intruder;
   const FlarmTraffic::AlarmType new_alarm_level = status.alarm_level;
-  int new_clock = CalculatTrafficClock(status.priority_intruder.relative_bearing_degrees);
+  const int new_clock =
+      status.priority_intruder.relative_bearing_degrees_valid ?
+      CalculatTrafficClock(status.priority_intruder.relative_bearing_degrees) :
+      -1;
   TrafficAboveBelow new_above_below =
       CalculateAboveBelow(intruder.relative_altitude,
                           intruder.relative_altitude_valid,
