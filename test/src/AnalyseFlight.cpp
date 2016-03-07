@@ -35,7 +35,7 @@
 #include "FlightPhaseJSON.hpp"
 #include "ThermalWriter.hpp"
 #include "Computer/Settings.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "Computer/Wind/Computer.hpp"
 #include "Engine/GlideSolvers/GlidePolar.hpp"
 

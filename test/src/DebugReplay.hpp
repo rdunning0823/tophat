@@ -32,7 +32,7 @@ Copyright_License {
 #include "Time/WrapClock.hpp"
 #include "OS/Args.hpp"
 #include "Logger/Settings.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "IGC/IGCParser.hpp"
 #include "Atmosphere/Pressure.hpp"
 

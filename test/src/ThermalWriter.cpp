@@ -22,7 +22,7 @@
 
 #include "ThermalWriter.hpp"
 #include "Formatter/TimeFormatter.hpp"
-#include "Util/StaticString.hpp"
+#include "Util/StaticString.hxx"
 #include "IO/TextWriter.hpp"
 
 
