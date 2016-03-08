@@ -34,17 +34,35 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "UIGlobals.hpp"
 #include "Formatter/HexColor.hpp"
-#include "Util/tstring.hpp"
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Scope.hpp"
 #include "Screen/OpenGL/Compatibility.hpp"
 #endif
-#ifndef USE_GDI
-
 #include <algorithm>
+#ifndef USE_GDI
 #include <winuser.h>
 #endif
+
+unsigned
+SymbolButtonRenderer::GetMinimumButtonWidth() const
+{
+  unsigned text_width = TextButtonRenderer::GetMinimumButtonWidth();
+  unsigned icon_width = 0;
+  const IconLook &icon_look = UIGlobals::GetIconLook();
+
+  switch (prefix_icon) {
+  case PrefixIcon::NONE:
+    break;
+  case PrefixIcon::HOME:
+    icon_width += icon_look.icon_home.GetSize().cx + Layout::GetTextPadding();
+    break;
+  case PrefixIcon::CHECK_MARK:
+    icon_width += icon_look.hBmpCheckMark.GetSize().cx + Layout::GetTextPadding();
+    break;
+  }
+  return icon_width + text_width;
+}
 
 static void
 DrawIconOrBitmap(Canvas &canvas, PixelRect rc, const MaskedIcon &icon, bool pressed)
@@ -54,32 +72,46 @@ DrawIconOrBitmap(Canvas &canvas, PixelRect rc, const MaskedIcon &icon, bool pres
 
 void
 SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
-                                      const MaskedIcon &icon,
-                                      const TCHAR *full_text,
-                                      const TCHAR *matched_text,
-                                      bool enabled, bool focused, bool pressed) const
+                                      const TCHAR *text, bool enabled, bool
+                                      focused, bool pressed) const
 {
   const ButtonLook &look = GetLook();
+  const IconLook &icon_look = UIGlobals::GetIconLook();
+
   const Font &font = *look.font;
-  tstring temp_string = full_text;
-  unsigned matched_len = StringLength(matched_text);
-  tstring sub_string = temp_string.substr(matched_len,
-                                          StringLength(full_text) - matched_len);
-  PixelSize sz_text = font.TextSize(sub_string.c_str());
+  PixelSize sz_text = font.TextSize(text);
   UPixelScalar padding = Layout::GetTextPadding();
 
-  PixelSize sz_icon = icon.GetSize();
+  PixelSize sz_icon;
+  sz_icon.cx = sz_icon.cy = 0;
+  PixelRect rc_caption = rc;
   PixelRect rc_icon = rc;
+  const MaskedIcon *icon = nullptr;
+  switch (prefix_icon) {
+  case PrefixIcon::NONE:
+    break;
+  case PrefixIcon::HOME:
+    icon = &icon_look.icon_home;
+    sz_icon = icon->GetSize();
+    break;
+  case PrefixIcon::CHECK_MARK:
+    icon = &icon_look.hBmpCheckMark;
+    sz_icon = icon->GetSize();
+    break;
+  }
+
   rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
   rc_icon.right = rc_icon.left + sz_icon.cx;
 
-  PixelRect rc_caption = rc;
-  rc_caption.left = rc_icon.right + padding;
+  rc_caption.left = rc_icon.right +
+      (prefix_icon == PrefixIcon::NONE ? 0 : padding);
   rc_caption.right = rc_caption.left + sz_text.cx + padding;
 
-  DrawIconOrBitmap(canvas, rc_icon, icon, focused);
+  if (prefix_icon != PrefixIcon::NONE) {
+    icon->Draw(canvas, rc_icon, focused);
+  }
 
-  DrawCaption(canvas, sub_string.c_str(), rc_caption, enabled, focused, pressed);
+  DrawCaption(canvas, text, rc_caption, enabled, focused, pressed);
 }
 
 inline void
@@ -183,16 +215,8 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
       const MaskedIcon &bmp = icon_look.hBmpClose;
       DrawIconOrBitmap(canvas, rc, bmp, focused);
     }
-  } else if (caption.StartsWith(_T("_chkmark_"))) {
-    const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &icon = icon_look.hBmpCheckMark;
-    DrawIconAndText(canvas, rc, icon, caption.c_str(), _T("_chkmark_"),
-                    enabled, focused, pressed);
-
-  } else if (caption.StartsWith(_T("_home_"))) {
-    const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &icon = icon_look.icon_home;
-    DrawIconAndText(canvas, rc, icon, caption.c_str(), _T("_home_"),
+  } else if (prefix_icon != PrefixIcon::NONE) {
+    DrawIconAndText(canvas, rc, caption.c_str(),
                     enabled, focused, pressed);
 
   } else if (caption == _("More") || caption == _("Less")) {
@@ -230,6 +254,7 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     canvas.SelectHollowBrush();
     canvas.DrawCircle(left, (rc.top + rc.bottom) / 2, (UPixelScalar)(size * 1.5));
   } else
+
     DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed);
 }
 

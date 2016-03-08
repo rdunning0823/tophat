@@ -37,10 +37,23 @@ Copyright_License {
 class SymbolButtonRenderer : public TextButtonRenderer {
 
 public:
+
+  enum PrefixIcon {
+    NONE,
+    CHECK_MARK,
+    HOME,
+  } prefix_icon;
+
   SymbolButtonRenderer(const ButtonLook &_look,
                        StaticString<96>::const_pointer _caption)
-    :TextButtonRenderer(_look, _caption) {}
+    :TextButtonRenderer(_look, _caption), prefix_icon(PrefixIcon::NONE) {}
 
+  gcc_pure
+  virtual unsigned GetMinimumButtonWidth() const;
+
+  void SetPrefixIcon(PrefixIcon type) {
+    prefix_icon = type;
+  }
 
 private:
   virtual void DrawButton(Canvas &canvas, const PixelRect &rc,
@@ -50,16 +63,13 @@ private:
                   bool enabled, bool focused, bool pressed) const;
 
   /**
-   * Displays icon plus remainder of text after matched_text
-   * @param full_text.  starts with matched text followed by optional caption
-   * @param matched_text.  The text to be discarded
-   * @icon.  The icon to display before the optional text
+   * Displays icon if exists plus caption based on prefix_icon value
+   * @param text
+   *
    */
   void DrawIconAndText(Canvas &canvas, PixelRect rc,
-                       const MaskedIcon &icon,
-                       const TCHAR *full_text,
-                       const TCHAR *matched_text,
-                       bool enabled, bool focused, bool pressed) const;
+                       const TCHAR *text, bool enabled, bool
+                       focused, bool pressed) const;
 };
 
 #endif

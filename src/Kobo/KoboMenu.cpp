@@ -97,6 +97,7 @@ class KoboMenuWidget final : public WindowWidget, ActionListener, Timer {
   ActionListener &dialog;
   SimulatorPromptWindow w;
   Button *poweroff_button;
+  WndSymbolButton *wifi_button;
 
   /* should poweroff button behave as a reboot button ? */
   bool do_reboot;
@@ -153,7 +154,8 @@ void
 KoboMenuWidget::CreateButtons(WidgetDialog &buttons)
 {
   buttons.AddButton(("PC connect"), *this, LAUNCH_NICKEL);
-  buttons.AddButton(_("Wifi"), *this, NETWORK);
+  wifi_button = (WndSymbolButton*)buttons.AddSymbolButton("Wifi", *this, NETWORK);
+  wifi_button->SetPrefixIcon(SymbolButtonRenderer::NONE);
   poweroff_button = buttons.AddButton(GetPowerOffCaption(false), *this, POWEROFF);
   UpdateButtons();
 }
@@ -170,6 +172,10 @@ KoboMenuWidget::CheckUSBStorage()
 void
 KoboMenuWidget::UpdateButtons()
 {
+  wifi_button->SetPrefixIcon(IsKoboWifiOn() ?
+      SymbolButtonRenderer::PrefixIcon::CHECK_MARK :
+      SymbolButtonRenderer::PrefixIcon::NONE);
+
   if (do_reboot)
     return;
 

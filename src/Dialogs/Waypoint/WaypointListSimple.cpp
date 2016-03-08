@@ -360,15 +360,15 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           rc_search_button,
                           button_style, *this, SearchClick);
 
-    name_header.Create(GetClientAreaWindow(), button_look, _T(""),
+    name_header.Create(GetClientAreaWindow(), button_look, _T("Name"),
                         rc_name_header,
                         button_style, *this, NameHeaderClick);
 
-    elevation_header.Create(GetClientAreaWindow(), button_look, _T(""),
+    elevation_header.Create(GetClientAreaWindow(), button_look, _T("Arriv."),
                              rc_elevation_header,
                              button_style, *this, ElevationHeaderClick);
 
-    distance_header.Create(GetClientAreaWindow(), button_look, _T(""),
+    distance_header.Create(GetClientAreaWindow(), button_look, _T("Dist."),
                            rc_distance_header,
                            button_style, *this, DistanceHeaderClick);
 
@@ -391,15 +391,15 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           rc_search_button,
                           button_style, *this, SearchClick);
 
-    name_header.Create(GetClientAreaWindow(), button_look, _T(""),
+    name_header.Create(GetClientAreaWindow(), button_look, _T("Name"),
                         rc_name_header,
                         button_style, *this, NameHeaderClick);
 
-    elevation_header.Create(GetClientAreaWindow(), button_look, _T(""),
+    elevation_header.Create(GetClientAreaWindow(), button_look, _T("Arriv."),
                              rc_elevation_header,
                              button_style, *this, ElevationHeaderClick);
 
-    distance_header.Create(GetClientAreaWindow(), button_look, _T(""),
+    distance_header.Create(GetClientAreaWindow(), button_look, _T("Dist."),
                            rc_distance_header,
                            button_style, *this, DistanceHeaderClick);
 
@@ -492,15 +492,15 @@ WaypointListSimpleDialog::UpdateHeaders()
   elevation_header.Move(rc_elevation_header);
   distance_header.Move(rc_distance_header);
 
-  name_header.SetCaption(sort_direction ==
+  name_header.SetPrefixIcon(sort_direction ==
       UISettings::WaypointSortDirection::NAME ?
-      _("_chkmark_Name") : _("Name"));
-  elevation_header.SetCaption(sort_direction ==
-      UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE ?
-      _("_chkmark_Arr.") : _("Arriv."));
-  distance_header.SetCaption(sort_direction ==
+          SymbolButtonRenderer::CHECK_MARK : SymbolButtonRenderer::NONE);
+  distance_header.SetPrefixIcon(sort_direction ==
       UISettings::WaypointSortDirection::DISTANCE ?
-      _("_chkmark_Dist.") : _("Dist."));
+          SymbolButtonRenderer::CHECK_MARK : SymbolButtonRenderer::NONE);
+  elevation_header.SetPrefixIcon(sort_direction ==
+      UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE ?
+          SymbolButtonRenderer::CHECK_MARK : SymbolButtonRenderer::NONE);
 }
 
 void

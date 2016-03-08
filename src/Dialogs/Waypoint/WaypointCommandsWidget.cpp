@@ -39,6 +39,7 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Operation/MessageOperationEnvironment.hpp"
 #include "Profile/Current.hpp"
+#include "Form/Button.hpp"
 
 enum Commands {
   REPLACE_IN_TASK,
@@ -288,7 +289,10 @@ WaypointCommandsWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       AddButton(_("Remove from Task"), *this, REMOVE_FROM_TASK);
   }
 
-  AddSymbolButton(_("_home_Set as New Home"), *this, SET_HOME);
+  WndSymbolButton *home_button = (WndSymbolButton*)AddSymbolButton(
+      _("Set as New Home"), *this, SET_HOME);
+  home_button->SetPrefixIcon(SymbolButtonRenderer::HOME);
+
   AddButton(_("Pan to Waypoint"), *this, PAN);
 //  AddButton(_("Set Active Frequency"), *this, SET_ACTIVE_FREQUENCY);
 //  AddButton(_("Set Standby Frequency"), *this, SET_STANDBY_FREQUENCY);

@@ -26,13 +26,15 @@ Copyright_License {
 
 #include "Screen/PaintWindow.hpp"
 #include "Util/StaticString.hxx"
+#include "Renderer/SymbolButtonRenderer.hpp"
+
+
 
 #include <tchar.h>
 
 struct ButtonLook;
 class ContainerWindow;
 class ActionListener;
-class ButtonRenderer;
 
 /**
  * This class is used for creating buttons.
@@ -168,6 +170,8 @@ public:
               int _id);
 
   void SetCaption(const TCHAR *caption);
+  void SetPrefixIcon(SymbolButtonRenderer::PrefixIcon);
+
 };
 
 #endif

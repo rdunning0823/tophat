@@ -26,8 +26,6 @@
 #include "Look/ButtonLook.hpp"
 #include "Screen/Key.h"
 #include "Asset.hpp"
-#include "Renderer/TextButtonRenderer.hpp"
-#include "Renderer/SymbolButtonRenderer.hpp"
 #include "Hardware/Vibrator.hpp"
 
 WndSymbolButton::WndSymbolButton(ContainerWindow &parent,
@@ -64,6 +62,13 @@ WndSymbolButton::SetCaption(const TCHAR *caption)
   r.SetCaption(caption);
 
   Invalidate();
+}
+
+void
+WndSymbolButton::SetPrefixIcon(SymbolButtonRenderer::PrefixIcon type)
+{
+  ((SymbolButtonRenderer&)GetRenderer()).SetPrefixIcon(type);
+
 }
 
 Button::~Button() {

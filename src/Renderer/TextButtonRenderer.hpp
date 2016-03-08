@@ -70,7 +70,7 @@ public:
   }
 
   gcc_pure
-  unsigned GetMinimumButtonWidth() const override;
+  virtual unsigned GetMinimumButtonWidth() const;
 
   void DrawButton(Canvas &canvas, const PixelRect &rc,
                   bool enabled, bool focused, bool pressed) const override;
