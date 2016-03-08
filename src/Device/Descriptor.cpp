@@ -113,7 +113,7 @@ DeviceDescriptor::DeviceDescriptor(unsigned _index,
    voltage(nullptr),
 #endif
    n_failures(0u),
-   ticker(false), borrowed(false)
+   ticker(false), borrowed(false), initial_gps_time_achieved(false)
 {
   config.Clear();
 
@@ -1164,7 +1164,18 @@ DeviceDescriptor::DataReceived(const void *data, size_t length)
 void
 DeviceDescriptor::LineReceived(const char *line)
 {
-  NMEALogger::Log(line);
+  if (!initial_gps_time_achieved) {
+    ScopeLock protect(device_blackboard->mutex);
+    const MoreData &gps_info = device_blackboard->Basic();
+    initial_gps_time_achieved = gps_info.date_time_utc.IsDatePlausible();
+    if (initial_gps_time_achieved)
+      initial_gps_time = (const BrokenDateTime &)gps_info.date_time_utc;
+  }
+
+  // don't start nmea logger until we have a valid time from the GPS
+  // so file name is correct (machine time may be junk)
+  if (initial_gps_time_achieved)
+    NMEALogger::Log(line, initial_gps_time);
 
   if (dispatcher != nullptr)
     dispatcher->LineReceived(line);

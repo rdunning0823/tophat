@@ -24,6 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_NMEA_LOGGER_HPP
 #define XCSOAR_NMEA_LOGGER_HPP
 
+struct BrokenDateTime;
+
 namespace NMEALogger
 {
   extern bool enabled;
@@ -33,8 +35,9 @@ namespace NMEALogger
   /**
    * Logs NMEA string to log file
    * @param text
+   * @param gps_time when first nmea stream first started
    */
-  void Log(const char *line);
+  void Log(const char *line, const BrokenDateTime &initial_gps_time);
 }
 
 #endif

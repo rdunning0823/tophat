@@ -39,16 +39,15 @@ namespace NMEALogger
 
   bool enabled = false;
 
-  static bool Start();
+  static bool Start(const BrokenDateTime &initial_gps_time);
 }
 
 bool
-NMEALogger::Start()
+NMEALogger::Start(const BrokenDateTime &dt)
 {
   if (writer != nullptr)
     return true;
 
-  BrokenDateTime dt = BrokenDateTime::NowUTC();
   assert(dt.IsPlausible());
 
   StaticString<64> name;
@@ -73,12 +72,12 @@ NMEALogger::Shutdown()
 }
 
 void
-NMEALogger::Log(const char *text)
+NMEALogger::Log(const char *text, const BrokenDateTime &initial_gps_time)
 {
   if (!enabled)
     return;
 
   ScopeLock protect(mutex);
-  if (Start())
+  if (Start(initial_gps_time))
     writer->WriteLine(text);
 }

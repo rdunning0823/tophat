@@ -33,6 +33,7 @@ Copyright_License {
 #include "RadioFrequency.hpp"
 #include "NMEA/ExternalSettings.hpp"
 #include "Time/PeriodClock.hpp"
+#include "Time/BrokenDateTime.hpp"
 #include "Job/Async.hpp"
 #include "Event/Notify.hpp"
 #include "Thread/Mutex.hpp"
@@ -213,6 +214,16 @@ class DeviceDescriptor final : private Notify, private PortLineSplitter {
    * @see CanBorrow(), Borrow()
    */
   bool borrowed;
+
+  /**
+   * First read time from gps
+   */
+  BrokenDateTime initial_gps_time;
+
+  /**
+   * have we set a valid gps time?
+   */
+  bool initial_gps_time_achieved;
 
 public:
   DeviceDescriptor(unsigned index, PortListener *port_listener);
