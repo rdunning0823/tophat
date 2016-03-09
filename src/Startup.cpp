@@ -103,8 +103,8 @@ Copyright_License {
 #include "Util/StaticString.hxx"
 #if !defined(ANDROID)
 #include "Audio/SoundQueue.hpp"
-#include "Audio/Sound.hpp"
 #endif
+#include "Audio/Sound.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Globals.hpp"
