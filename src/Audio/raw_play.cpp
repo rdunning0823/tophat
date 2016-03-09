@@ -12,8 +12,6 @@ to the default PCM device for 5 seconds of data.
 #include <stdlib.h>
 #include <alsa/mixer.h>
 
-void list_mixer_elements(snd_mixer_t *mhandle);
-
 int
 RawPlayback::playback_chunk(short *buff, int count)
 {
@@ -210,23 +208,11 @@ RawPlayback::playback_file(const char *name)
   return rc;
 }
 
-void list_mixer_elements(snd_mixer_t *mhandle) {
-  snd_mixer_elem_t* elem = snd_mixer_first_elem(mhandle);
-  while (elem != NULL) {
-    const char* name = snd_mixer_selem_get_name(elem);
-    LogFormat("mixer element name: %s direction %d", name, snd_mixer_selem_is_enum_playback(elem));
-    LogFormat("snd_mixer_selem_has_playback_volume %d", snd_mixer_selem_has_playback_volume(elem));
-    LogFormat("snd_mixer_selem_has_playback_volume_joined %d", snd_mixer_selem_has_playback_volume_joined(elem));
-    elem = snd_mixer_elem_next(elem);
-  }
-}
-
 void
 RawPlayback::setAlsaMasterVolume(int volume) {
  long min, max;
     int rc;
     snd_mixer_t *mhandle;
-    snd_mixer_selem_id_t *sid;
     snd_mixer_elem_t* elem;
 
     if (volume < 0 && volume > 100) {
@@ -254,24 +240,18 @@ RawPlayback::setAlsaMasterVolume(int volume) {
       goto _return;
     }
 
-    snd_mixer_selem_id_alloca(&sid);
-    snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, PLAYBACK_MIXER_NAME);
+    for (elem = snd_mixer_first_elem(mhandle); elem != NULL; elem = snd_mixer_elem_next(elem)) {
+      const char* name = snd_mixer_selem_get_name(elem);
 
-    if ( NULL == (elem = snd_mixer_find_selem(mhandle, sid)) ) {
-      LogFormat("unable to fine mixer element %s see defined mixer elements below", PLAYBACK_MIXER_NAME);
-      list_mixer_elements(mhandle);
-      goto _return;
-    }
+      if ( 0 != (rc = snd_mixer_selem_get_playback_volume_range(elem, &min, &max)) ) {
+        LogFormat("unable to get min/max %ld,%ld volume settings for mixer element %s, error %d"
+            " - skipping this element", min, max, name, rc);
+        continue;
+      }
 
-    if ( 0 != (rc = snd_mixer_selem_get_playback_volume_range(elem, &min, &max)) ) {
-      LogFormat("unable to get min/max %ld,%ld volume settings for mixer element %s",
-                min, max, PLAYBACK_MIXER_NAME);
-      goto _return;
-    }
-
-    if ( 0 != (rc = snd_mixer_selem_set_playback_volume_all(elem, min + volume * max / 100)) ) {
-      LogFormat("unable to set volume, code: %d", rc);
+      if ( 0 != (rc = snd_mixer_selem_set_playback_volume_all(elem, min + volume * max / 100)) ) {
+        LogFormat("unable to set volume for mixer element %s, error code: %d", name, rc);
+      }
     }
 
 _return:
