@@ -21,35 +21,35 @@ Copyright_License {
 }
 */
 
-#include "KoboSystemConfigPanel.hpp"
+#include "UnixSystemConfigPanel.hpp"
 #include "Profile/Profile.hpp"
 #include "Language/Language.hpp"
 #include "Interface.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Audio/Sound.hpp"
 
-#ifdef KOBO
+#if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
 enum ControlIndex {
   ALSAVolumeControl
 };
 
 void
-KoboSystemConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
+UnixSystemConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   RowFormWidget::Prepare(parent, rc);
 
   auto &sound_settings = CommonInterface::SetUISettings().sound;
 
-  AddInteger(_("USB sound volume"),
-             _("Volume of sound card connected to your system. For KOBO it is UBS audio card. "
-                 "Volume value can be set beetwen 5% and 100%"),
+  AddInteger(_("Sound volume"),
+             _("Volume of sound card connected to your system. For KOBO it is usually UBS audio card. "
+                 "Volume value can be set between 5% and 100%"),
                  _T("%d"), _T("%d"), 5, 100, 5, sound_settings.volume);
 
   SetExpertRow(ALSAVolumeControl);
 }
 
 bool
-KoboSystemConfigPanel::Save(bool &_changed)
+UnixSystemConfigPanel::Save(bool &_changed)
 {
   bool changed = false;
   int new_volume = GetValueInteger(ALSAVolumeControl);
@@ -68,9 +68,9 @@ KoboSystemConfigPanel::Save(bool &_changed)
 }
 
 Widget *
-CreateKoboSystemConfigPanel()
+CreateUnixSystemConfigPanel()
 {
-  return new KoboSystemConfigPanel();
+  return new UnixSystemConfigPanel();
 }
 #endif
 
