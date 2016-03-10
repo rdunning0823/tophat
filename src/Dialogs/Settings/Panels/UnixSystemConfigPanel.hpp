@@ -21,19 +21,19 @@ Copyright_License {
 }
 */
 
-#ifndef KOBOSYSTEMCONFIGPANEL_HPP
-#define KOBOSYSTEMCONFIGPANEL_HPP
+#ifndef UNIXSYSTEMCONFIGPANEL_HPP
+#define UNIXSYSTEMCONFIGPANEL_HPP
 
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
-#ifdef KOBO
+#if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
 
-class KoboSystemConfigPanel final : public RowFormWidget {
+class UnixSystemConfigPanel final : public RowFormWidget {
 protected:
 
 public:
-  KoboSystemConfigPanel()
+  UnixSystemConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 public:
@@ -43,7 +43,7 @@ public:
 };
 
 Widget *
-CreateKoboSystemConfigPanel();
+CreateUnixSystemConfigPanel();
 
 #endif
 
