@@ -29,11 +29,11 @@ Copyright_License {
 #include <alsa/asoundlib.h>
 #include "LogFile.hpp"
 
+#define HAVE_RAW_PLAY
+
 #define PLAYBACK_RATE 16000
 #define PLAYBACK_CHUNK 500000
 #define PLAYBACK_CARD_NAME "default"
-#define PLAYBACK_MIXER_NAME "Speaker"
-
 
 class RawPlayback
 {
@@ -55,14 +55,13 @@ public:
       handle = NULL;
       return;
     }
-    /* TODO: volume settings will be extracted soon */
-    setAlsaMasterVolume(30);
   };
   ~RawPlayback()
   {
     if (handle)
       snd_pcm_close(handle);
   };
+  static void setAlsaMasterVolume(int volume);
 
   /**
    * How many underruns occurred during the playback?
@@ -80,6 +79,5 @@ public:
   int playback_file(const char *name);
 private:
   int playback_mem(short *buff, int count);
-  void setAlsaMasterVolume(int volume);
 };
 #endif /* RAW_PLAY_HPP */

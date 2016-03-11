@@ -98,3 +98,10 @@ PlayResource(const TCHAR *resource_name)
   return true;
 #endif
 }
+
+void ConfigureSoundDevice(const SoundSettings &sound_settings)
+{
+#ifdef HAVE_RAW_PLAY
+  RawPlayback::setAlsaMasterVolume(sound_settings.volume);
+#endif
+}

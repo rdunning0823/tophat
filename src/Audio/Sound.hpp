@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_AUDIO_SOUND_HPP
 
 #include "SoundQueue.hpp"
+#include "Audio/Settings.hpp"
 #include <tchar.h>
 
 /// play resource queued.  Normally always use this.
@@ -34,5 +35,7 @@ bool PlayResource(const TCHAR *resource_name);
 #if !defined(ANDROID)
 bool PlayResourceNow(const SoundQueue::SoundName resource_name);
 #endif
+
+void ConfigureSoundDevice(const SoundSettings &sound_settings);
 
 #endif

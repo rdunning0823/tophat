@@ -286,4 +286,5 @@ const char ScreensButtonLocation[] = "ScreensButtonLocation";
 const char WaypointSortDirection[] = "WaypointSortDirection";
 const char WaveAssistant[] = "WaveAssistant";
 
+const char SystemSoundVolume [] = "SystemSoundVolume";
 }

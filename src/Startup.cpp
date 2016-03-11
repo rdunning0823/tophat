@@ -103,6 +103,7 @@ Copyright_License {
 #include "Util/StaticString.hxx"
 #if !defined(ANDROID)
 #include "Audio/SoundQueue.hpp"
+#include "Audio/Sound.hpp"
 #endif
 
 #ifdef ENABLE_OPENGL
@@ -311,6 +312,7 @@ Startup()
     return false;
 
   operation.SetText(_("Initialising"));
+  ConfigureSoundDevice(ui_settings.sound);
 
   /* create XCSoarData on the first start */
   CreateDataPath();

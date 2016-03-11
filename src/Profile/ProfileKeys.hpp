@@ -283,6 +283,7 @@ extern const char ScreensButtonLocation[];
 extern const char WaypointSortDirection[];
 extern const char WaveAssistant[];
 
+extern const char SystemSoundVolume [];
 }
 
 #endif
