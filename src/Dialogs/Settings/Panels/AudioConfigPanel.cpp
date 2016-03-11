@@ -21,7 +21,7 @@ Copyright_License {
 }
 */
 
-#include "UnixSystemConfigPanel.hpp"
+#include "AudioConfigPanel.hpp"
 #include "Profile/Profile.hpp"
 #include "Language/Language.hpp"
 #include "Interface.hpp"
@@ -34,7 +34,7 @@ enum ControlIndex {
 };
 
 void
-UnixSystemConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
+AudioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   RowFormWidget::Prepare(parent, rc);
 
@@ -49,7 +49,7 @@ UnixSystemConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 }
 
 bool
-UnixSystemConfigPanel::Save(bool &_changed)
+AudioConfigPanel::Save(bool &_changed)
 {
   bool changed = false;
   int new_volume = GetValueInteger(ALSAVolumeControl);
@@ -68,9 +68,9 @@ UnixSystemConfigPanel::Save(bool &_changed)
 }
 
 Widget *
-CreateUnixSystemConfigPanel()
+CreateAudioConfigPanel()
 {
-  return new UnixSystemConfigPanel();
+  return new AudioConfigPanel();
 }
 #endif
 

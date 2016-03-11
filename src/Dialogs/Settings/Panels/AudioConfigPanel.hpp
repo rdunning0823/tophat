@@ -21,19 +21,19 @@ Copyright_License {
 }
 */
 
-#ifndef UNIXSYSTEMCONFIGPANEL_HPP
-#define UNIXSYSTEMCONFIGPANEL_HPP
+#ifndef AUDIOCONFIGPANEL_HPP
+#define AUDIOCONFIGPANEL_HPP
 
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
 #if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
 
-class UnixSystemConfigPanel final : public RowFormWidget {
+class AudioConfigPanel final : public RowFormWidget {
 protected:
 
 public:
-  UnixSystemConfigPanel()
+  AudioConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 public:
@@ -43,7 +43,7 @@ public:
 };
 
 Widget *
-CreateUnixSystemConfigPanel();
+CreateAudioConfigPanel();
 
 #endif
 

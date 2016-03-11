@@ -85,7 +85,7 @@ Copyright_License {
 #include "Panels/BetaFeatureConfigPanel.hpp"
 #endif
 #if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
-#include "Panels/UnixSystemConfigPanel.hpp"
+#include "Panels/AudioConfigPanel.hpp"
 #endif
 
 #include <assert.h>
@@ -156,7 +156,7 @@ static constexpr TabMenuPage setup_pages[] = {
 #ifdef HAVE_TRACKING
   { N_("Tracking"), CreateTrackingConfigPanel },
 #if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
-  { N_("Unix System"), CreateUnixSystemConfigPanel },
+  { N_("Audio Config"), CreateAudioConfigPanel },
 #endif
   { N_("User profiles"), CreateProfileConfigPanel },
 #endif
