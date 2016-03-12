@@ -29,8 +29,6 @@ Copyright_License {
 #include <alsa/asoundlib.h>
 #include "LogFile.hpp"
 
-#define HAVE_RAW_PLAY
-
 #define PLAYBACK_RATE 16000
 #define PLAYBACK_CHUNK 500000
 #define PLAYBACK_CARD_NAME "default"

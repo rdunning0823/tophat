@@ -34,6 +34,10 @@ Copyright_License {
 #define HAVE_PCM_PLAYER
 #endif
 
+#if !defined(ANDROID) && !(defined(WIN32) && !defined(GNAV))
+#define HAVE_RAW_PLAY
+#endif
+
 constexpr
 static inline bool
 HavePCMPlayer()
