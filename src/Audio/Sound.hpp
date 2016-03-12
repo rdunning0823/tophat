@@ -38,4 +38,7 @@ bool PlayResourceNow(const SoundQueue::SoundName resource_name);
 
 void ConfigureSoundDevice(const SoundSettings &sound_settings);
 
+/// returns true if device has controllable volume setting
+bool HasVolumeControl();
+
 #endif

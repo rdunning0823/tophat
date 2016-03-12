@@ -27,8 +27,6 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
-#if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
-
 class AudioConfigPanel final : public RowFormWidget {
 protected:
 
@@ -44,7 +42,5 @@ public:
 
 Widget *
 CreateAudioConfigPanel();
-
-#endif
 
 #endif

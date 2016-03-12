@@ -109,3 +109,12 @@ void ConfigureSoundDevice(const SoundSettings &sound_settings)
   RawPlayback::setAlsaMasterVolume(sound_settings.volume);
 #endif
 }
+
+bool HasVolumeControl()
+{
+#ifdef HAVE_RAW_PLAY
+  return RawPlayback::HasAlsaMasterVolume();
+#else
+  return false;
+#endif
+}

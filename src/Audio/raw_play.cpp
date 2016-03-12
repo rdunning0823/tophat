@@ -257,3 +257,54 @@ RawPlayback::setAlsaMasterVolume(int volume) {
 _return:
   snd_mixer_close(mhandle);
 }
+
+bool
+RawPlayback::HasAlsaMasterVolume()
+{
+  long min, max;
+  int rc;
+  snd_mixer_t *mhandle;
+  snd_mixer_elem_t* elem;
+  bool success = false;
+
+  if (0 != (rc = snd_mixer_open(&mhandle, 0))) {
+    LogFormat("unable to open mixer: %d", rc);
+    return false;
+  }
+
+  if (0 != (rc = snd_mixer_attach(mhandle, PLAYBACK_CARD_NAME))) {
+    LogFormat("unable to attach card %s to mixer code %d", PLAYBACK_CARD_NAME,
+              rc);
+    goto _return;
+  }
+
+  if (0 != (rc = snd_mixer_selem_register(mhandle, NULL, NULL))) {
+    LogFormat("unable to register mixer handle: %d", rc);
+    goto _return;
+  }
+
+  if (0 != (rc = snd_mixer_load(mhandle))) {
+    LogFormat("unable to load mixer elements: %d", rc);
+    goto _return;
+  }
+
+  for (elem = snd_mixer_first_elem(mhandle); elem != NULL;
+      elem = snd_mixer_elem_next(elem)) {
+    const char* name = snd_mixer_selem_get_name(elem);
+
+    if (0
+        != (rc = snd_mixer_selem_get_playback_volume_range(elem, &min, &max))) {
+      LogFormat(
+          "unable to get min/max %ld,%ld volume settings for mixer element %s, error %d"
+          " - skipping this element",
+          min, max, name, rc);
+      continue;
+    } else {
+      success = true;
+    }
+  }
+
+  _return: snd_mixer_close(mhandle);
+  return success;
+}
+

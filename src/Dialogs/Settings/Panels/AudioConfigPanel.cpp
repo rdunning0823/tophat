@@ -28,7 +28,6 @@ Copyright_License {
 #include "Widget/RowFormWidget.hpp"
 #include "Audio/Sound.hpp"
 
-#if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
 enum ControlIndex {
   ALSAVolumeControl
 };
@@ -40,10 +39,15 @@ AudioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   auto &sound_settings = CommonInterface::SetUISettings().sound;
 
-  AddInteger(_("Sound volume"),
-             _("Volume of sound card connected to your system. For KOBO it is usually UBS audio card. "
-                 "Volume value can be set between 5% and 100%"),
-                 _T("%d"), _T("%d"), 5, 100, 5, sound_settings.volume);
+  WndProperty *w = AddInteger(
+      _("Sound volume"),
+      _("Volume of sound card connected to your system. For KOBO it is usually UBS audio card. "
+        "Volume value can be set between 5% and 100%"),
+      _T("%d"), _T("%d"), 5, 100, 5, sound_settings.volume);
+
+  if (w != nullptr) {
+    w->SetEnabled(HasVolumeControl());
+  }
 
   SetExpertRow(ALSAVolumeControl);
 }
@@ -72,5 +76,3 @@ CreateAudioConfigPanel()
 {
   return new AudioConfigPanel();
 }
-#endif
-

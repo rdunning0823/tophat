@@ -63,6 +63,7 @@ Copyright_License {
 #include "Panels/ScoringConfigPanel.hpp"
 #include "Panels/InfoBoxesConfigPanel.hpp"
 #include "Panels/ProfileConfigPanel.hpp"
+#include "Panels/AudioConfigPanel.hpp"
 #include "Dialogs/Airspace/Airspace.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
@@ -83,9 +84,6 @@ Copyright_License {
 
 #ifdef BETA_FEATURE
 #include "Panels/BetaFeatureConfigPanel.hpp"
-#endif
-#if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
-#include "Panels/AudioConfigPanel.hpp"
 #endif
 
 #include <assert.h>
@@ -155,11 +153,9 @@ static constexpr TabMenuPage setup_pages[] = {
   { N_("Time"), CreateTimeConfigPanel },
 #ifdef HAVE_TRACKING
   { N_("Tracking"), CreateTrackingConfigPanel },
-#if defined(KOBO) || !(defined(WIN32) || defined(GNAV) || defined(ANDROID))
-  { N_("Audio Config"), CreateAudioConfigPanel },
 #endif
+  { N_("Audio"), CreateAudioConfigPanel },
   { N_("User profiles"), CreateProfileConfigPanel },
-#endif
 #ifdef HAVE_MODEL_TYPE
   { N_("Experimental Features"), CreateExperimentalConfigPanel, },
 #endif

@@ -62,6 +62,11 @@ public:
   static void setAlsaMasterVolume(int volume);
 
   /**
+   * returns true if the AlsaMasterVolume functions on this device
+   */
+  static bool HasAlsaMasterVolume();
+
+  /**
    * How many underruns occurred during the playback?
    * If more than about 10, then on a Linux machine with Pulse Audio installed
    * Pulse probably needs to be configured:
