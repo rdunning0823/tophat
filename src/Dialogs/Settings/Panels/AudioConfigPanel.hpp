@@ -24,10 +24,11 @@ Copyright_License {
 #ifndef AUDIOCONFIGPANEL_HPP
 #define AUDIOCONFIGPANEL_HPP
 
+#include "Form/ActionListener.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
 
-class AudioConfigPanel final : public RowFormWidget {
+class AudioConfigPanel final : public RowFormWidget, ActionListener {
 protected:
 
 public:
@@ -38,6 +39,10 @@ public:
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
+  virtual void OnAction(int id);
+
+private:
+  void UpdateSoundConfig();
 };
 
 Widget *
