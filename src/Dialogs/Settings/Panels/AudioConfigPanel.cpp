@@ -27,9 +27,11 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "Audio/Sound.hpp"
+#include "Audio/Settings.hpp"
 
 enum ControlIndex {
-  ALSAVolumeControl
+  ALSAVolumeControl,
+  AudioTest
 };
 
 void
@@ -49,7 +51,25 @@ AudioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     w->SetEnabled(HasVolumeControl());
   }
 
+  AddButton(_T("Test Sound"), *this, AudioTest);
+
   SetExpertRow(ALSAVolumeControl);
+}
+
+void
+AudioConfigPanel::OnAction(int id) {
+  if (id == AudioTest) {
+    UpdateSoundConfig();
+    PlayResource(_T("IDR_WAV_TRAFFIC_URGENT"));
+  }
+}
+
+void
+AudioConfigPanel::UpdateSoundConfig() {
+  SoundSettings tmp_settings = CommonInterface::SetUISettings().sound;
+
+  tmp_settings.volume = GetValueInteger(ALSAVolumeControl);;
+  ConfigureSoundDevice(tmp_settings);
 }
 
 bool
