@@ -38,10 +38,12 @@ class AirspaceWarningMonitor {
   bool alarm_active = false;
 
   Validity last;
-  BrokenDateTime last_alarm_time = BrokenDateTime::NowUTC();
+  BrokenDateTime last_alarm_time;
 
 public:
-  AirspaceWarningMonitor():widget(nullptr) {}
+  AirspaceWarningMonitor():widget(nullptr) {
+    last_alarm_time = BrokenDateTime::NowUTC();
+  }
 
   void Reset();
   void Check();
