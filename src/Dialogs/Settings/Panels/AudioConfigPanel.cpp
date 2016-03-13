@@ -45,7 +45,7 @@ AudioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
       _("Sound volume"),
       _("Volume of sound card connected to your system. For KOBO it is usually UBS audio card. "
         "Volume value can be set between 5% and 100%"),
-      _T("%d"), _T("%d"), 5, 100, 5, sound_settings.volume);
+      _T("%d"), _T("%d"), 5, 100, 5, sound_settings.volume, this);
 
   if (w != nullptr) {
     w->SetEnabled(HasVolumeControl());
@@ -61,6 +61,14 @@ AudioConfigPanel::OnAction(int id) {
   if (id == AudioTest) {
     UpdateSoundConfig();
     PlayResource(_T("IDR_WAV_TRAFFIC_URGENT"));
+  }
+}
+
+void
+AudioConfigPanel::OnModified(DataField &df)
+{
+  if (IsDataField(ALSAVolumeControl, df)) {
+    OnAction(AudioTest);
   }
 }
 

@@ -26,9 +26,10 @@ Copyright_License {
 
 #include "Form/ActionListener.hpp"
 #include "Widget/RowFormWidget.hpp"
+#include "Form/DataField/Listener.hpp"
 #include "UIGlobals.hpp"
 
-class AudioConfigPanel final : public RowFormWidget, ActionListener {
+class AudioConfigPanel final : public RowFormWidget, ActionListener, DataFieldListener {
 protected:
 
 public:
@@ -40,6 +41,9 @@ public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
   virtual void OnAction(int id);
+
+  /* method from DataFieldListener */
+  void OnModified(DataField &df);
 
 private:
   void UpdateSoundConfig();
