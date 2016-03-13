@@ -156,10 +156,14 @@ AirspaceWarningMonitor::Check()
 
   last = calculated.airspace_warnings.latest;
   auto *airspace_warnings = GetAirspaceWarnings();
+
   if (airspace_warnings == nullptr) {
+    alarmClear();
     HideWidget();
     return;
   }
+
+  replayAlarmSound(*airspace_warnings);
 
   if (!HasPointer()) {
     /* "classic" list-only view for devices without touch screen */
@@ -170,7 +174,7 @@ AirspaceWarningMonitor::Check()
 
     // un-blank the display, play a sound
     ResetUserIdle();
-    PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
+    alarmSet();
 
     // show airspace warnings dialog
     if (CommonInterface::GetUISettings().enable_airspace_warning_dialog)
@@ -193,6 +197,7 @@ AirspaceWarningMonitor::Check()
   }
 
   if (airspace == nullptr) {
+    alarmClear();
     HideWidget();
     return;
   }
@@ -209,9 +214,65 @@ AirspaceWarningMonitor::Check()
     widget = new AirspaceWarningWidget(*this, *airspace_warnings,
                                        *airspace, state, solution);
     PageActions::SetCustomTop(widget);
+    alarmSet();
   }
 
   // un-blank the display, play a sound
   ResetUserIdle();
-  PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
 }
+
+void
+AirspaceWarningMonitor::alarmSet() {
+  if (!alarm_active) {
+    last_alarm_time = CommonInterface::Calculated().date_time_local;
+    /* it is a place where 'airspace' sound should be played - such sound needs to be added */
+    //PlayResource(_T("IDR_WAV_AIRSPACE"));
+    PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
+  }
+  alarm_active = true;
+}
+
+void
+AirspaceWarningMonitor::replayAlarmSound(ProtectedAirspaceWarningManager &airspace_warnings) {
+  if (isAlarmActive()) {
+    if (!airspace_warnings.IsEmpty()) {
+      const auto current_time = CommonInterface::Calculated().date_time_local;
+      const int seconds_since_last_alarm = current_time - last_alarm_time;
+
+      // Process repetitive sound warnings if they are enabled in config
+      const AirspaceWarningConfig &warning_config =
+          CommonInterface::GetComputerSettings().airspace.warnings;
+      if (warning_config.repetitive_sound) {
+        unsigned tt_closest_airspace = timeToClosestAirspace(airspace_warnings);
+
+        const unsigned sound_interval =((tt_closest_airspace * 3 / warning_config.warning_time) + 1) * 2;
+        if (seconds_since_last_alarm > 0  && ((unsigned)seconds_since_last_alarm) >= sound_interval) {
+          /* repetitive alarm sound */
+          PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
+          last_alarm_time = current_time;
+        }
+      }
+    }
+  }
+}
+
+unsigned
+AirspaceWarningMonitor::timeToClosestAirspace(ProtectedAirspaceWarningManager &airspace_warnings) {
+  unsigned tt_closest_airspace = 3600;
+  const ProtectedAirspaceWarningManager::Lease lease(airspace_warnings);
+
+  for (auto it = lease->begin(), end = lease->end(); it != end; ++it) {
+    /* Find smallest time to nearest and active aispace (cannot always rely
+       on fact that closest airspace should be in the beginning of
+       the list) */
+    if (it->IsAckExpired()) {
+      if ( it->GetWarningState() < AirspaceWarning::WARNING_INSIDE)
+        tt_closest_airspace = std::min(tt_closest_airspace,
+                                       unsigned(it->GetSolution().elapsed_time));
+      else
+        return 0;
+      }
+  }
+  return tt_closest_airspace;
+}
+

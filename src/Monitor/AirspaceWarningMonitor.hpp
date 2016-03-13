@@ -25,6 +25,8 @@ Copyright_License {
 #define XCSOAR_AIRSPACE_WARNING_MONITOR_HPP
 
 #include "NMEA/Validity.hpp"
+#include "Airspace/ProtectedAirspaceWarningManager.hpp"
+#include "Time/BrokenDateTime.hpp"
 
 /**
  * Check for new airspace warnings and show the airspace warning
@@ -33,17 +35,26 @@ Copyright_License {
 class AirspaceWarningMonitor {
   friend class AirspaceWarningWidget;
   class AirspaceWarningWidget *widget;
+  bool alarm_active;
 
   Validity last;
+  BrokenDateTime last_alarm_time;
 
 public:
-  AirspaceWarningMonitor():widget(nullptr) {}
+  AirspaceWarningMonitor():widget(nullptr) {
+    alarm_active = false;
+    last_alarm_time = BrokenDateTime::NowUTC();
+  }
 
   void Reset();
   void Check();
-
+  bool isAlarmActive() const { return alarm_active; }
 private:
   void HideWidget();
+  void alarmSet();
+  void alarmClear() { alarm_active = false; }
+  unsigned timeToClosestAirspace(ProtectedAirspaceWarningManager &airspace_warnings);
+  void replayAlarmSound(ProtectedAirspaceWarningManager &airspace_warnings);
 
   void Schedule() {
     last.Clear();
