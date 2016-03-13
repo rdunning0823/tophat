@@ -35,13 +35,14 @@ Copyright_License {
 class AirspaceWarningMonitor {
   friend class AirspaceWarningWidget;
   class AirspaceWarningWidget *widget;
-  bool alarm_active = false;
+  bool alarm_active;
 
   Validity last;
   BrokenDateTime last_alarm_time;
 
 public:
   AirspaceWarningMonitor():widget(nullptr) {
+    alarm_active = false;
     last_alarm_time = BrokenDateTime::NowUTC();
   }
 
