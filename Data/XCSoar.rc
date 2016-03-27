@@ -346,5 +346,5 @@ SOUND(IDR_WAV_NINE_OCLOCK, "nine_oclock")
 SOUND(IDR_WAV_TEN_OCLOCK, "ten_oclock")
 SOUND(IDR_WAV_ELEVEN_OCLOCK, "eleven_oclock")
 SOUND(IDR_WAV_TWELVE_OCLOCK, "twelve_oclock")
-
+SOUND(IDR_WAV_AIRSPACE, "airspace")
 #endif

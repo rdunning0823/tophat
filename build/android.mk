@@ -101,7 +101,7 @@ $(ANDROID_BUILD)/res/drawable-xxxhdpi/notification_icon.png: $(ICON_WHITE_SVG) |
 
 OGGENC = oggenc --quiet --quality 1
 
-SOUNDS = fail insert remove beep_bweep beep_clear beep_drip traffic_low traffic_important traffic_urgent above below one_oclock two_oclock three_oclock four_oclock five_oclock six_oclock seven_oclock eight_oclock nine_oclock ten_oclock eleven_oclock twelve_oclock
+SOUNDS = fail insert remove beep_bweep beep_clear beep_drip traffic_low traffic_important traffic_urgent above below one_oclock two_oclock three_oclock four_oclock five_oclock six_oclock seven_oclock eight_oclock nine_oclock ten_oclock eleven_oclock twelve_oclock airspace
 SOUND_FILES = $(patsubst %,$(RAW_DIR)/%.ogg,$(SOUNDS))
 
 $(SOUND_FILES): $(RAW_DIR)/%.ogg: Data/sound/%.wav | $(RAW_DIR)/dirstamp

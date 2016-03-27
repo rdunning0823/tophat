@@ -59,6 +59,7 @@ public class SoundUtil {
     resources.put("IDR_WAV_TEN_OCLOCK", R.raw.ten_oclock);
     resources.put("IDR_WAV_ELEVEN_OCLOCK", R.raw.eleven_oclock);
     resources.put("IDR_WAV_TWELVE_OCLOCK", R.raw.twelve_oclock);
+    resources.put("IDR_WAV_AIRSPACE", R.raw.airspace);
   }
   private static MediaPlayer instance;
 

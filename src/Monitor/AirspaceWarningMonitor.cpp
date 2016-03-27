@@ -225,9 +225,7 @@ void
 AirspaceWarningMonitor::alarmSet() {
   if (!alarm_active) {
     last_alarm_time = CommonInterface::Calculated().date_time_local;
-    /* it is a place where 'airspace' sound should be played - such sound needs to be added */
-    //PlayResource(_T("IDR_WAV_AIRSPACE"));
-    PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
+    PlayResource(_T("IDR_WAV_AIRSPACE"));
   }
   alarm_active = true;
 }
@@ -248,7 +246,7 @@ AirspaceWarningMonitor::replayAlarmSound(ProtectedAirspaceWarningManager &airspa
         const unsigned sound_interval =((tt_closest_airspace * 3 / warning_config.warning_time) + 1) * 2;
         if (seconds_since_last_alarm > 0  && ((unsigned)seconds_since_last_alarm) >= sound_interval) {
           /* repetitive alarm sound */
-          PlayResource(_T("IDR_WAV_BEEP_BWEEP"));
+          PlayResource(_T("IDR_WAV_AIRSPACE"));
           last_alarm_time = current_time;
         }
       }
