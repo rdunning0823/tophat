@@ -438,6 +438,9 @@ SetupQuick::RefreshForm()
 
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
   text = settings.plane.registration;
+  if (!settings.plane.competition_id.empty()) {
+    text.AppendFormat(_T(" - %s"), settings.plane.competition_id.c_str());
+  }
   if (text.empty())
       text = gettext(unconfigured);
   plane_text->SetCaption(text.c_str());
