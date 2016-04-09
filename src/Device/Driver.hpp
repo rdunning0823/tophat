@@ -144,6 +144,11 @@ public:
                                    OperationEnvironment &env) = 0;
 
   /**
+   * Play alarm sound on the device (vario).
+   */
+  virtual bool PlayAlarm(OperationEnvironment &env) = 0;
+
+  /**
    * Enable pass-through mode.  This may be used to communicate
    * directly with the device that is "behind" this one (e.g. a LX1600
    * connected to a FLARM).
@@ -252,6 +257,7 @@ public:
   bool PutStandbyFrequency(RadioFrequency frequency,
                            const TCHAR *name,
                            OperationEnvironment &env) override;
+  bool PlayAlarm(OperationEnvironment &env) override;
 
   bool EnablePassThrough(OperationEnvironment &env) override;
 
@@ -341,6 +347,11 @@ struct DeviceRegister {
      * EnablePassThrough() is implemented.
      */
     PASS_THROUGH = 0x200,
+
+    /**
+     * Is this driver capable of playing alarm sounds?
+     */
+    PLAY_ALARMS = 0x400,
   };
 
   /**
@@ -378,6 +389,10 @@ struct DeviceRegister {
    */
   bool CanSendSettings() const {
     return (flags & SEND_SETTINGS) != 0;
+  }
+
+  bool CanPlayAlarms() const {
+    return (flags & PLAY_ALARMS) != 0;
   }
 
   /**

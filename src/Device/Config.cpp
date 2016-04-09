@@ -226,6 +226,7 @@ DeviceConfig::Clear()
   enabled = true;
   sync_from_device = true;
   sync_to_device = true;
+  play_alarms = true;
   k6bt = false;
 #ifndef NDEBUG
   dump_port = false;

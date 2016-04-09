@@ -90,6 +90,7 @@ public:
   void PutStandbyFrequency(RadioFrequency frequency, const TCHAR *name,
                            OperationEnvironment &env);
   void PutQNH(const AtmosphericPressure &pres, OperationEnvironment &env);
+  void PlayAlarm(OperationEnvironment &env);
   void NotifySensorUpdate(const MoreData &basic);
   void NotifyCalculatedUpdate(const MoreData &basic,
                               const DerivedInfo &calculated);

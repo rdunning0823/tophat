@@ -69,6 +69,8 @@ public:
   virtual bool PutBallast(fixed fraction, fixed overload,
                           OperationEnvironment &env) override;
 
+  virtual bool PlayAlarm(OperationEnvironment &env) override;
+
   virtual bool Declare(const Declaration &declaration, const Waypoint *home,
                        OperationEnvironment &env) override;
 

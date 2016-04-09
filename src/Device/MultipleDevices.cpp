@@ -88,6 +88,12 @@ MultipleDevices::PutVolume(unsigned volume, OperationEnvironment &env)
     i->PutVolume(volume, env);
 }
 
+void MultipleDevices::PlayAlarm(OperationEnvironment &env)
+{
+  for (DeviceDescriptor *i : devices)
+    i->PlayAlarm(env);
+}
+
 void
 MultipleDevices::PutActiveFrequency(RadioFrequency frequency,
                                     const TCHAR *name,

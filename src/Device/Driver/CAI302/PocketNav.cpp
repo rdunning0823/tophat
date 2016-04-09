@@ -56,3 +56,12 @@ CAI302::PutBallast(Port &port, fixed fraction, OperationEnvironment &env)
   sprintf(buffer, "!g,b%u\r", ballast);
   return port.Write(buffer);
 }
+
+bool
+CAI302::PlayAlarm(Port &port, OperationEnvironment &env)
+{
+  unsigned beep_type = 0;
+  char buffer[32];
+  sprintf(buffer, "!c,%u,255,0\r", beep_type);
+  return port.Write(buffer);
+}

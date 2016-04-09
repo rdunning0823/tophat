@@ -62,6 +62,7 @@ enum ControlIndex {
   IP_ADDRESS,
   TCPPort,
   I2CBus, I2CAddr, PressureUsage, Driver, UseSecondDriver, SecondDriver,
+  PlayAlarms,
   SyncFromDevice, SyncToDevice,
   K6Bt,
 };
@@ -517,6 +518,12 @@ DeviceEditWidget::SetConfig(const DeviceConfig &_config)
   driver_df.Set(config.driver_name);
   driver_control.RefreshDisplay();
 
+  WndProperty &play_alarms_control = GetControl(PlayAlarms);
+  DataFieldBoolean &play_alarms_df =
+      *(DataFieldBoolean *)play_alarms_control.GetDataField();
+  play_alarms_df.Set(config.play_alarms);
+  play_alarms_control.RefreshDisplay();
+
   WndProperty &sync_from_control = GetControl(SyncFromDevice);
   DataFieldBoolean &sync_from_df =
       *(DataFieldBoolean *)sync_from_control.GetDataField();
@@ -584,6 +591,21 @@ CanSendSettings(const DataField &df)
 }
 
 gcc_pure
+static bool
+CanPlayAlarms(const DataField &df)
+{
+  const TCHAR *driver_name = df.GetAsString();
+  if (driver_name == NULL)
+    return false;
+
+  const struct DeviceRegister *driver = FindDriverByName(driver_name);
+  if (driver == NULL)
+    return false;
+
+  return driver->CanPlayAlarms();
+}
+
+gcc_pure
 static DeviceConfig::PortType
 GetPortType(const DataField &df)
 {
@@ -640,11 +662,13 @@ DeviceEditWidget::UpdateVisibilities()
   SetRowVisible(SecondDriver, DeviceConfig::UsesDriver(type)
                 && CanPassThrough(GetDataField(Driver))
                 && GetValueBoolean(UseSecondDriver));
-
+  SetRowVisible(PlayAlarms, DeviceConfig::UsesDriver(type) &&
+                  CanPlayAlarms(GetDataField(Driver)));
   SetRowVisible(SyncFromDevice, DeviceConfig::UsesDriver(type) &&
                 CanReceiveSettings(GetDataField(Driver)));
   SetRowVisible(SyncToDevice, DeviceConfig::UsesDriver(type) &&
                 CanSendSettings(GetDataField(Driver)));
+
   SetRowAvailable(K6Bt, maybe_bluetooth);
 }
 
@@ -727,6 +751,10 @@ DeviceEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   driver2_df->Set(config.driver2_name);
 
   Add(_("Second Driver"), nullptr, driver2_df);
+
+  AddBoolean(_("Play alarm sounds"),
+             _("This option lets you play sound on vario device."),
+             config.play_alarms, this);
 
   AddBoolean(_("Sync. from device"),
              _("This option lets you configure if XCSoar should use settings "
@@ -846,6 +874,9 @@ DeviceEditWidget::Save(bool &_changed)
 
   if (config.UsesDriver()) {
     changed |= SaveValue(Driver, config.driver_name);
+
+    if (CanPlayAlarms(GetDataField(Driver)))
+      changed |= SaveValue(PlayAlarms, config.play_alarms);
 
     if (CanReceiveSettings(GetDataField(Driver)))
       changed |= SaveValue(SyncFromDevice, config.sync_from_device);

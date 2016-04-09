@@ -42,3 +42,9 @@ CAI302Device::PutBallast(fixed fraction, gcc_unused fixed overload,
 {
   return CAI302::PutBallast(port, fraction, env);
 }
+
+bool
+CAI302Device::PlayAlarm(OperationEnvironment &env)
+{
+  return CAI302::PlayAlarm(port, env);
+}
