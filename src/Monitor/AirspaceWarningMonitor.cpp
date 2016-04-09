@@ -28,6 +28,7 @@ Copyright_License {
 #include "Audio/Sound.hpp"
 #include "Dialogs/Airspace/AirspaceWarningDialog.hpp"
 #include "Event/Idle.hpp"
+#include "Operation/Operation.hpp"
 #include "PageActions.hpp"
 #include "Widget/QuestionWidget.hpp"
 #include "Form/ActionListener.hpp"
@@ -37,6 +38,7 @@ Copyright_License {
 #include "Engine/Airspace/AbstractAirspace.hpp"
 #include "Airspace/ProtectedAirspaceWarningManager.hpp"
 #include "Formatter/TimeFormatter.hpp"
+#include "Blackboard/DeviceBlackboard.hpp"
 
 class AirspaceWarningWidget final
   : public QuestionWidget, private ActionListener {
@@ -226,6 +228,8 @@ AirspaceWarningMonitor::alarmSet() {
   if (!alarm_active) {
     last_alarm_time = CommonInterface::Calculated().date_time_local;
     PlayResource(_T("IDR_WAV_AIRSPACE"));
+    NullOperationEnvironment env;
+    device_blackboard->PlayAlarm(env);
   }
   alarm_active = true;
 }
@@ -247,6 +251,8 @@ AirspaceWarningMonitor::replayAlarmSound(ProtectedAirspaceWarningManager &airspa
         if (seconds_since_last_alarm > 0  && ((unsigned)seconds_since_last_alarm) >= sound_interval) {
           /* repetitive alarm sound */
           PlayResource(_T("IDR_WAV_AIRSPACE"));
+          NullOperationEnvironment env;
+          device_blackboard->PlayAlarm(env);
           last_alarm_time = current_time;
         }
       }

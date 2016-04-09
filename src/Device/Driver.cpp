@@ -63,6 +63,12 @@ AbstractDevice::PutBallast(fixed fraction, fixed overload,
 }
 
 bool
+AbstractDevice::PlayAlarm(OperationEnvironment &env)
+{
+  return true;
+}
+
+bool
 AbstractDevice::PutQNH(const AtmosphericPressure &pres,
                        OperationEnvironment &env)
 {

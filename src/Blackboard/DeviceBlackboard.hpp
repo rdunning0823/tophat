@@ -148,6 +148,7 @@ public:
   void SetStandbyFrequency(RadioFrequency frequency,
                            const TCHAR *name,
                            OperationEnvironment &env);
+  void PlayAlarm(OperationEnvironment &env);
 
   /**
    * Check the expiry time of the device connection with the wall

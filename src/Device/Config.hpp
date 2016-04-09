@@ -231,6 +231,11 @@ struct DeviceConfig {
   bool sync_from_device;
 
   /**
+   * Should XCSoar play sound alarms using the device
+   */
+  bool play_alarms;
+
+  /**
    * Does this port type use a baud rate?
    */
   static bool UsesSpeed(PortType port_type) {

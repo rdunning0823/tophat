@@ -480,6 +480,7 @@ public:
                            const TCHAR *name,
                            OperationEnvironment &env);
   bool PutQNH(const AtmosphericPressure &pres, OperationEnvironment &env);
+  bool PlayAlarm(OperationEnvironment &env);
 
   /**
    * Caller is responsible for calling Borrow() and Return().

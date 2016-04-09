@@ -304,3 +304,10 @@ DeviceBlackboard::SetStandbyFrequency(RadioFrequency frequency,
   if (devices != nullptr)
     devices->PutStandbyFrequency(frequency, name, env);
 }
+
+void
+DeviceBlackboard::PlayAlarm(OperationEnvironment &env)
+{
+  if (devices != nullptr)
+    devices->PlayAlarm(env);
+}

@@ -931,6 +931,22 @@ DeviceDescriptor::PutQNH(const AtmosphericPressure &value,
   return true;
 }
 
+bool
+DeviceDescriptor::PlayAlarm(OperationEnvironment &env)
+{
+  assert(InMainThread());
+
+  if (device == nullptr || !config.play_alarms)
+    return true;
+
+  if (!Borrow())
+    /* TODO: postpone until the borrowed device has been returned */
+    return false;
+  ScopeReturnDevice restore(*this, env);
+
+  return device->PlayAlarm(env);
+}
+
 static bool
 DeclareToFLARM(const struct Declaration &declaration, Port &port,
                const Waypoint *home, OperationEnvironment &env)

@@ -33,6 +33,7 @@ namespace CAI302 {
   bool PutMacCready(Port &port, fixed mc, OperationEnvironment &env);
   bool PutBugs(Port &port, fixed bugs, OperationEnvironment &env);
   bool PutBallast(Port &port, fixed fraction, OperationEnvironment &env);
+  bool PlayAlarm(Port &port, OperationEnvironment &env);
 }
 
 #endif

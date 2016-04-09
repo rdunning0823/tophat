@@ -35,6 +35,7 @@ const struct DeviceRegister cai302_driver = {
   _T("Cambridge CAI302"),
   DeviceRegister::BULK_BAUD_RATE |
   DeviceRegister::DECLARE | DeviceRegister::LOGGER | DeviceRegister::MANAGE |
-  DeviceRegister::RECEIVE_SETTINGS | DeviceRegister::SEND_SETTINGS,
+  DeviceRegister::RECEIVE_SETTINGS | DeviceRegister::SEND_SETTINGS |
+  DeviceRegister::PLAY_ALARMS,
   CAI302CreateOnPort,
 };
