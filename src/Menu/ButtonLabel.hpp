@@ -58,6 +58,7 @@ namespace ButtonLabel {
 gcc_pure
   bool IsEnabled(unsigned i);
 
+  /// Performs macro substitution and translates text
   bool ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size);
 
   void OnResize(const PixelRect &rc);

@@ -417,7 +417,7 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
 {
   // ToDo, check Buffer Size
   bool invalid = false;
-  CopyString(OutBuffer, In, Size);
+  CopyString(OutBuffer, gettext(In), Size);
 
   if (_tcsstr(OutBuffer, _T("$(")) == nullptr)
     return false;

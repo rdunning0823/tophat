@@ -123,34 +123,16 @@ ButtonLabel::Expand(const TCHAR *text, TCHAR *buffer, size_t size)
       expanded.text = gettext(text);
     return expanded;
   } else {
-    const TCHAR *macros = dollar;
-    /* backtrack until the first non-whitespace character, because we
-       don't want to translate whitespace between the text and the
-       macro */
-    macros = StripRight(text, macros);
 
-    TCHAR s[100];
-    expanded.enabled = !ExpandMacros(text, s, ARRAY_SIZE(s));
-    if (s[0] == _T('\0') || s[0] == _T(' ')) {
+    // ExpandMacros translates text
+    expanded.enabled = !ExpandMacros(text, buffer, size);
+    if (buffer[0] == _T('\0') || buffer[0] == _T(' ')) {
       expanded.visible = false;
       return expanded;
     }
 
-    /* copy the text (without trailing whitespace) to a new buffer and
-       translate it */
-    TCHAR translatable[256];
-    const TCHAR *translated = GetTextN(text, macros, translatable,
-                                       ARRAY_SIZE(translatable));
-    if (translated == nullptr) {
-      /* buffer too small: fail */
-      // TODO: find a more clever fallback
-      expanded.visible = false;
-      return expanded;
-    }
-
-    /* concatenate the translated text and the macro output */
     expanded.visible = true;
-    expanded.text = BuildString(buffer, size, translated, s + (macros - text));
+    expanded.text = buffer;
     return expanded;
   }
 }
