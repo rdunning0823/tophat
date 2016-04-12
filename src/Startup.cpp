@@ -66,6 +66,7 @@ Copyright_License {
 #include "Replay/Replay.hpp"
 #include "LocalPath.hpp"
 #include "IO/FileCache.hpp"
+#include "OS/FileUtil.hpp"
 #include "Net/HTTP/DownloadManager.hpp"
 #include "Hardware/AltairControl.hpp"
 #include "Hardware/DisplayDPI.hpp"
@@ -101,6 +102,7 @@ Copyright_License {
 #include "Dialogs/Settings/Panels/StartupConfigPanel.hpp"
 #include "OS/Args.hpp"
 #include "Util/StaticString.hxx"
+#include "Util/ConvertString.hpp"
 #if !defined(ANDROID)
 #include "Audio/SoundQueue.hpp"
 #endif
@@ -168,6 +170,46 @@ LoadTophatArguments()
   }
   if (prior_sim_set_in_cmd_line_flag)
     global_simulator_flag = prior_global_simulator_flag;
+}
+
+#ifndef HAVE_NATIVE_GETTEXT
+static const TCHAR *last_language_file = _T("LanguageLast.tx0");
+#endif
+
+static void
+WriteLastLanguage()
+{
+#ifndef HAVE_NATIVE_GETTEXT
+
+  TCHAR value[MAX_PATH];
+  TCHAR path[MAX_PATH];
+  LocalPath(path, last_language_file);
+
+  if (!Profile::GetPath(ProfileKeys::LanguageFile, value))
+    value[0] = _T('\0');
+
+  File::CreateExclusive(path);
+  WideToUTF8Converter narrow_value(value);
+  if (!narrow_value.IsValid())
+    return;
+
+  File::WriteExisting(path, narrow_value);
+#endif
+}
+
+static void
+ReadLastLanguage()
+{
+#ifndef HAVE_NATIVE_GETTEXT
+  char value[MAX_PATH];
+  TCHAR path[MAX_PATH];
+  LocalPath(path, last_language_file);
+
+  if (File::ReadString(path, value, sizeof(value))) {
+    Profile::Set(ProfileKeys::LanguageFile, value);
+    ReadLanguageFile();
+  }
+#endif
 }
 
 static void
@@ -280,6 +322,7 @@ Startup()
   main_window->Initialise();
 
   LoadTophatArguments();
+  ReadLastLanguage();
 
 #ifdef SIMULATOR_AVAILABLE
   // prompt for simulator if not set by command line argument "-simulator" or "-fly"
@@ -594,6 +637,9 @@ Shutdown()
   // Save settings to profile
   operation.SetText(_("Shutdown, saving profile..."));
   Profile::Save();
+
+  // save last language to file to be used as startup screen language
+  WriteLastLanguage();
 
   operation.SetText(_("Shutdown, please wait..."));
 
