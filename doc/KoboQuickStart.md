@@ -15,7 +15,7 @@ and then release. The second method of starting up of the device is to connect i
 Regardless of how the process of starting up is initiated software startup process is indicated by the LED next to the switch.
 After initialisation there will be control buttons visible on the screen. Buttons allows controlling the program.
 
-Welcome screen allows you to select the operating mode of the device. There are two buttons `FLY` and SIM` visible 
+Welcome screen allows you to select the operating mode of the device. There are two buttons `FLY` and `SIM` visible
 lightly below the centre of the screen. The first mode is intended for actual flight. In this mode, program reads the
 position from the GPS receiver and actual navigation calculations are carried out. The second mode labeled `SIM` is designed
 to learn to use the navigation. In this mode, instead of getting the actual location from GPS receiver position and glider
@@ -98,11 +98,11 @@ mode selection screen (as after turning power on) it is able to recognise new co
 connected to the Kobo TopHat navigation sycnchornization menu should appear on the screen. This sychrobization menu 
 contains several buttons that allow you to select the direction of data transfer.
 
-For the purposes of synchronization TopHhat is using a directory named XCSoarData located on a connected USB drive.
+For the purposes of synchronization TopHat is using a directory named XCSoarData located on a connected USB drive.
 
 #### Transfer flight logs to USB drive
 
-_`Download Flights to USB card`_ - copy all flight logs saved by TopHat to a subdirectory `XCSaorData / logs`
+_`Download Flights to USB card`_ - copy all flight logs saved by TopHat to a subdirectory `XCSoarData / logs`
 
 #### Upload Tasks to Kobo
 

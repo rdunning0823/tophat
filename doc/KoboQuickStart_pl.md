@@ -116,7 +116,7 @@ Dla potrzeb synchronizacji używany jest katalog o nazwie XCSoarData znajdujący
 
 #### Przesłanie lotów na pamięć USB
 _`Download flights to USB card`_ - powoduje skopiowanie wszystkich zapisanych przez nawigację lotów do
-podkatalogu `XCSaorData/logs`.
+podkatalogu `XCSoarData/logs`.
 
 #### Przesłanie zadań do Kobo
 _`Upload tasks`_ - powoduje skopiowania zadań z katalogu `XCSoarData/tasks`
