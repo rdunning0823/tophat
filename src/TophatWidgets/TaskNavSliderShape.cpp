@@ -39,7 +39,9 @@ Copyright_License {
 #include "Terrain/TerrainSettings.hpp"
 #include "Screen/Color.hpp"
 #include "Formatter/AngleFormatter.hpp"
+#include "Formatter/GlideRatioFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Util/StringFormat.hpp"
 #include "Asset.hpp"
 
 #ifdef ENABLE_OPENGL
@@ -228,6 +230,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   bool altitude_difference_valid,
                   Angle delta_bearing,
                   bool bearing_valid,
+                  fixed gr_value,
+                  bool gr_valid,
                   bool use_wide_pen)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
@@ -288,7 +292,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   UPixelScalar distance_width = 0u;
   UPixelScalar label_width = 0u;
   UPixelScalar height_width = 0u;
-  StaticString<100> distance_buffer(_T(""));
+  StaticString<30> distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
 
   // calculate but don't yet draw label "goto" abort, tp#
@@ -351,6 +355,23 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   // draw label if room
   if (distance_valid) {
     FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
+  }
+
+  if (gr_valid) {
+    if (gr_value <= 0) {
+      distance_buffer.append(" [##]");
+    }
+    else if (gr_value >= 100.0) {
+      distance_buffer.append(" [99+]");
+    }
+    else {
+      StaticString<10> glide_ratio_buffer(_T(""));
+      FormatGlideRatio(glide_ratio_buffer.buffer(), glide_ratio_buffer.capacity(), gr_value);
+      distance_buffer.AppendFormat(" [%s]", glide_ratio_buffer.c_str());
+    }
+  }
+
+  if (distance_valid || gr_valid) {
     canvas.Select(distance_font);
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 

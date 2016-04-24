@@ -227,6 +227,8 @@ public:
             bool altitude_difference_valid,
             Angle delta_bearing,
             bool bearing_valid,
+            fixed gr_value,
+            bool gr_valid,
             bool use_wide_pen);
 
 #ifdef _WIN32

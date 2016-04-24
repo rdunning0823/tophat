@@ -43,6 +43,7 @@ Copyright_License {
 #include "Task/Ordered/OrderedTask.hpp"
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
+#include "Engine/Util/Gradient.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 
 #ifdef ENABLE_OPENGL
@@ -203,6 +204,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                     basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
                     result.vector.bearing - basic.track,
                     basic.location_available && result.vector.IsValid(),
+                    ::AngleToGradient(result.DestinationAngleGround()),
+                    result.IsOk(),
                     use_wide_pen);
 }
 
