@@ -358,16 +358,16 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   }
 
   if (gr_valid) {
-    if (gr_value <= 0) {
-      distance_buffer.append(" [##]");
+    if (gr_value <= fixed(0)) {
+      distance_buffer.append(_T(" [##]"));
     }
-    else if (gr_value >= 100.0) {
-      distance_buffer.append(" [99+]");
+    else if (gr_value >= fixed(99.5)) {
+      distance_buffer.append(_T(" [99+]"));
     }
     else {
       StaticString<10> glide_ratio_buffer(_T(""));
       FormatGlideRatio(glide_ratio_buffer.buffer(), glide_ratio_buffer.capacity(), gr_value);
-      distance_buffer.AppendFormat(" [%s]", glide_ratio_buffer.c_str());
+      distance_buffer.AppendFormat(_T(" [%s]"), glide_ratio_buffer.c_str());
     }
   }
 

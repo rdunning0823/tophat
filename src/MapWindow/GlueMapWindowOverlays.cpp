@@ -56,6 +56,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
+#include "Engine/Util/Gradient.hpp"
 #include "Look/OverlayButtonLook.hpp"
 #include "UISettings.hpp"
 #include "Replay/Replay.hpp"
@@ -226,8 +227,12 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
     }
 
   }
+  const GlideResult &result2 = (task_mode == TaskType::ORDERED) ?
+      Calculated().task_stats.glide_results[idx] :
+      Calculated().task_stats.glide_result_goto;
+
   const TerrainRendererSettings &terrain = GetMapSettings().terrain;
-  unsigned border_width = Layout::ScalePenWidth(terrain.enable ? 1 : 2);
+  bool use_wide_pen = !terrain.enable;
   PixelRect outer_rect = slider_shape.GetOuterRect();
   UPixelScalar x_offset = (GetClientRect().right - GetClientRect().left -
       (outer_rect.right - outer_rect.left)) / 2;
@@ -245,7 +250,9 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                     altitude_difference_valid,
                     bearing,
                     bearing_valid,
-                    border_width);
+                    ::AngleToGradient(result2.DestinationAngleGround()),
+                    result2.IsOk(),
+                    use_wide_pen);
 }
 #endif
 
