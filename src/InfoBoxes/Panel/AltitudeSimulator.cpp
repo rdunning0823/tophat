@@ -252,7 +252,7 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   checkbox_style.TabStop();
   show_alternate_units.Create(GetClientAreaWindow(),
                               dialog_look,
-                              _T("Show feet and meters"),
+                              _("Show feet and meters"),
                               show_alternate_units_rc,
                               checkbox_style,
                               *this, AlternateUnits);
