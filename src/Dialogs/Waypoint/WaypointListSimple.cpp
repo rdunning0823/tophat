@@ -169,7 +169,7 @@ public:
                            bool _goto_mode)
   :WndForm(UIGlobals::GetMainWindow(), UIGlobals::GetDialogLook(),
            UIGlobals::GetMainWindow().GetClientRect(),
-           _T("Select Waypoint"), GetDialogStyle()),
+           _("Select Waypoint"), GetDialogStyle()),
    goto_mode(_goto_mode), location(_location),
    ordered_task(_ordered_task),
    ordered_task_index(_ordered_task_index),
@@ -348,7 +348,7 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
   button_style.TabStop();
 
   if (Layout::landscape) {
-    cancel_button.Create(GetClientAreaWindow(), button_look, _T("Cancel"),
+    cancel_button.Create(GetClientAreaWindow(), button_look, _("Cancel"),
                          rc_cancel_button,
                          button_style, *this, CloseClick);
 
@@ -360,15 +360,15 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           rc_search_button,
                           button_style, *this, SearchClick);
 
-    name_header.Create(GetClientAreaWindow(), button_look, _T("Name"),
+    name_header.Create(GetClientAreaWindow(), button_look, _("Name"),
                         rc_name_header,
                         button_style, *this, NameHeaderClick);
 
-    elevation_header.Create(GetClientAreaWindow(), button_look, _T("Arriv."),
+    elevation_header.Create(GetClientAreaWindow(), button_look, _("Arriv."),
                              rc_elevation_header,
                              button_style, *this, ElevationHeaderClick);
 
-    distance_header.Create(GetClientAreaWindow(), button_look, _T("Dist."),
+    distance_header.Create(GetClientAreaWindow(), button_look, _("Dist."),
                            rc_distance_header,
                            button_style, *this, DistanceHeaderClick);
 
@@ -378,7 +378,7 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           button_style, *this, SelectClick);
 
   } else {
-    cancel_button.Create(GetClientAreaWindow(), button_look, _T("Cancel"),
+    cancel_button.Create(GetClientAreaWindow(), button_look, _("Cancel"),
                          rc_cancel_button,
                          button_style, *this, CloseClick);
 
@@ -391,15 +391,15 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           rc_search_button,
                           button_style, *this, SearchClick);
 
-    name_header.Create(GetClientAreaWindow(), button_look, _T("Name"),
+    name_header.Create(GetClientAreaWindow(), button_look, _("Name"),
                         rc_name_header,
                         button_style, *this, NameHeaderClick);
 
-    elevation_header.Create(GetClientAreaWindow(), button_look, _T("Arriv."),
+    elevation_header.Create(GetClientAreaWindow(), button_look, _("Arriv."),
                              rc_elevation_header,
                              button_style, *this, ElevationHeaderClick);
 
-    distance_header.Create(GetClientAreaWindow(), button_look, _T("Dist."),
+    distance_header.Create(GetClientAreaWindow(), button_look, _("Dist."),
                            rc_distance_header,
                            button_style, *this, DistanceHeaderClick);
 
