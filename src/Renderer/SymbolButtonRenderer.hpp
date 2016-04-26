@@ -42,6 +42,8 @@ public:
     NONE,
     CHECK_MARK,
     HOME,
+    SEARCH,
+    SEARCH_CHECKED,
   } prefix_icon;
 
   SymbolButtonRenderer(const ButtonLook &_look,

@@ -356,7 +356,7 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                  button_style,
                                  WaypointListRenderer::GetHeight(dialog_look));
 
-    search_button.Create(GetClientAreaWindow(), button_look, _T("Search"),
+    search_button.Create(GetClientAreaWindow(), button_look, _T(""),
                           rc_search_button,
                           button_style, *this, SearchClick);
 
@@ -387,7 +387,7 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                           rc_select_button,
                           button_style, *this, SelectClick);
 
-    search_button.Create(GetClientAreaWindow(), button_look, _T("Search"),
+    search_button.Create(GetClientAreaWindow(), button_look, _T(""),
                           rc_search_button,
                           button_style, *this, SearchClick);
 
@@ -407,6 +407,8 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                  button_style,
                                  WaypointListRenderer::GetHeight(dialog_look));
   }
+
+  search_button.SetPrefixIcon(SymbolButtonRenderer::PrefixIcon::SEARCH);
 
   waypoint_list_control.SetItemRenderer(this);
   waypoint_list_control.SetCursorHandler(this);
@@ -473,9 +475,9 @@ void
 WaypointListSimpleDialog::UpdateButtons()
 {
   if (dialog_state.name.empty())
-    search_button.SetCaption(_T("Search"));
+    search_button.SetPrefixIcon(SymbolButtonRenderer::PrefixIcon::SEARCH);
   else
-    search_button.SetCaption(_T("SearchChecked"));
+    search_button.SetPrefixIcon(SymbolButtonRenderer::PrefixIcon::SEARCH_CHECKED);
 }
 
 /**

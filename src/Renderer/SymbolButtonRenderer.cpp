@@ -60,6 +60,12 @@ SymbolButtonRenderer::GetMinimumButtonWidth() const
   case PrefixIcon::CHECK_MARK:
     icon_width += icon_look.hBmpCheckMark.GetSize().cx + Layout::GetTextPadding();
     break;
+  case PrefixIcon::SEARCH:
+    icon_width += icon_look.hBmpSearch.GetSize().cx + Layout::GetTextPadding();
+    break;
+  case PrefixIcon::SEARCH_CHECKED:
+    icon_width += icon_look.hBmpSearchChecked.GetSize().cx + Layout::GetTextPadding();
+    break;
   }
   return icon_width + text_width;
 }
@@ -98,6 +104,14 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
     icon = &icon_look.hBmpCheckMark;
     sz_icon = icon->GetSize();
     break;
+  case PrefixIcon::SEARCH:
+    icon = &icon_look.hBmpSearch;
+    sz_icon = icon->GetSize();
+    break;
+  case PrefixIcon::SEARCH_CHECKED:
+    icon = &icon_look.hBmpSearchChecked;
+    sz_icon = icon->GetSize();
+    break;
   }
 
   rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
@@ -121,7 +135,7 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
   const ButtonLook &look = GetLook();
 
   // If button has text on it
-  if (caption.empty())
+  if (caption.empty() && prefix_icon == PrefixIcon::NONE)
     return;
 
   canvas.SelectNullPen();
@@ -191,23 +205,13 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     rc.Grow(-3);
     canvas.DrawFilledRectangle(rc, Color(color));
 
-    //draw search icon
-  } else if (caption == _("Search") || caption == _("SearchChecked")) {
-    const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon *icon;
-    icon = caption == _("Search") ? &icon_look.hBmpSearch :
-        &icon_look.hBmpSearchChecked;
-
-    DrawIconOrBitmap(canvas, rc, *icon, focused);
-  }
-
   //draw gear for set up icon
-  else if (caption == _("Setup")) {
+  } else if (caption == _("Setup")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon &icon = icon_look.hBmpTabSettings;
     DrawIconOrBitmap(canvas, rc, icon, focused);
-  }
-  else if (caption == _("_X")) {
+
+  } else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     if (!icon_look.valid) {
       DrawCaption(canvas, _("OK"), rc, enabled, focused, pressed);
@@ -265,7 +269,7 @@ SymbolButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
 {
   frame_renderer.DrawButton(canvas, rc, focused, pressed);
 
-  if (!caption.empty())
+  if (!caption.empty() || prefix_icon != PrefixIcon::NONE)
     DrawSymbol(canvas, frame_renderer.GetDrawingRect(rc, pressed),
                enabled, focused, pressed);
 }
