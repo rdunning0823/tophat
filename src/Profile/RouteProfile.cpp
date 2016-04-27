@@ -33,7 +33,7 @@ Profile::Load(const ProfileMap &map, RoutePlannerConfig &settings)
   //map.GetEnum(ProfileKeys::RoutePlannerMode, settings.mode);
   //map.Get(ProfileKeys::RoutePlannerAllowClimb, settings.allow_climb);
   //map.Get(ProfileKeys::RoutePlannerUseCeiling, settings.use_ceiling);
-  //map.GetEnum(ProfileKeys::TurningReach, settings.reach_calc_mode);
+  map.GetEnum(ProfileKeys::TurningReach, settings.reach_calc_mode);
   //map.GetEnum(ProfileKeys::ReachPolarMode, settings.reach_polar_mode);
 
 // turn off Route planning for Top Hat
