@@ -39,6 +39,7 @@ ReplayButtonWidget::UpdateVisibility(const PixelRect &rc,
   const UISettings &ui_settings = CommonInterface::GetUISettings();
 
   if (is_map && !is_main_window_widget && !is_top_widget &&
+      replay != nullptr &&
       replay->IsActive() && !ui_settings.replay_dialog_visible)
     Show(rc);
   else
