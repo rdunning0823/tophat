@@ -68,7 +68,7 @@ void
 WndSymbolButton::SetPrefixIcon(SymbolButtonRenderer::PrefixIcon type)
 {
   ((SymbolButtonRenderer&)GetRenderer()).SetPrefixIcon(type);
-
+  Invalidate();
 }
 
 Button::~Button() {
