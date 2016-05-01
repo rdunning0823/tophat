@@ -173,11 +173,11 @@ AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   PixelSize sz_space = dialog_look.text_font.TextSize(_T("     "));
   distance_label_width =
-      dialog_look.text_font.TextSize(distance_label_text).cx + sz_space.cx;
+      dialog_look.text_font.TextSize(gettext(distance_label_text)).cx + sz_space.cx;
 
   StaticString<1000> caption;
-  caption.Format(_T("%s     %s"),distance_label_text,
-                       arrival_alt_label_text);
+  caption.Format(_T("%s     %s"),gettext(distance_label_text),
+                 gettext(arrival_alt_label_text));
 
   ((TextWidget&)GetSecond()).SetText(caption.c_str());
 }

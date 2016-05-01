@@ -136,11 +136,11 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WindowStyle button_style;
   button_style.TabStop();
-  goto_button = new Button(GetClientAreaWindow(), button_look, _T("Goto"),
+  goto_button = new Button(GetClientAreaWindow(), button_look, _("Goto"),
                               left_button_rc,
                               button_style, *this, Goto);
 
-  details_button = new Button(GetClientAreaWindow(), button_look, _T("Details"),
+  details_button = new Button(GetClientAreaWindow(), button_look, _("Details"),
                                  right_button_rc,
                                  button_style, *this, Details);
   dialog_timer.Schedule(1000);
