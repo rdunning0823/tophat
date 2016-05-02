@@ -243,7 +243,7 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
           0, 36000, 60, 180);
 
   StaticString<25> label;
-  StaticString<100> help;
+  StaticString<200> help;
   if (IsUs()) {
     label = _("Start max. height (MSL)");
     help = _("Maximum height based on start height reference (MSL) while starting the task.  Set to 0 for no limit.");
