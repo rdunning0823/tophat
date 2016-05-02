@@ -115,14 +115,15 @@ OrderedTaskSummary(const OrderedTask *task, TCHAR *text, bool linebreaks)
     FormatUserAltitude(fixed(otb.start_constraints.max_height), start_height.buffer(), true);
     FormatUserAltitude(fixed(otb.finish_constraints.min_height), finish_height.buffer(), true);
 
-    gate_info.Format(_T("\n%s: %s %s. Finish Height: %s %s. "),
+    gate_info.Format(_T("\n%s: %s %s. %s: %s %s. "),
                      _("Start Height"),
                      start_height.c_str(),
                      (otb.start_constraints.max_height_ref == AltitudeReference::AGL)
                      ? _("AGL") : _("MSL"),
-                         finish_height.c_str(),
-                         (otb.finish_constraints.min_height_ref == AltitudeReference::AGL)
-                         ? _("AGL") : _("MSL"));
+                     _("Finish Height"),
+                     finish_height.c_str(),
+                     (otb.finish_constraints.min_height_ref == AltitudeReference::AGL)
+                     ? _("AGL") : _("MSL"));
   }
 
   if (task->HasTargets()) {
