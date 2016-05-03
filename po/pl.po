@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: xcsoar\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-26 16:33-0400\n"
-"PO-Revision-Date: 2016-04-28 23:48+0200\n"
+"PO-Revision-Date: 2016-05-02 23:02+0200\n"
 "Last-Translator: Maciej Rydlewicz <maciej@rydlewicz.pl>\n"
 "Language-Team: aeroklubzar.pl <maciej@rydlewicz.pl>\n"
 "Language: pl_PL\n"
@@ -55,7 +55,7 @@ msgstr "FAI docel"
 #: src/Task/TypeStrings.cpp:37
 #, no-c-format
 msgid "Racing"
-msgstr "Prędkościowe"
+msgstr "Zadanie prędkościowe"
 
 #: src/Task/TypeStrings.cpp:38
 #, no-c-format
@@ -75,7 +75,7 @@ msgstr "AAT+PZty"
 #: src/Task/TypeStrings.cpp:41 src/Task/TypeStrings.cpp:53
 #, no-c-format
 msgid "Touring"
-msgstr "Treningowy"
+msgstr "Przelot treningowy"
 
 #: src/Task/TypeStrings.cpp:49
 #, no-c-format
@@ -124,9 +124,10 @@ msgid ""
 "Racing task around turn points.  Can also be used for FAI badge and record "
 "tasks.  Allows all shapes of observation zones."
 msgstr ""
-"Konkurencja prędkościowa wzdłuż trasy z Punktami Zwrotnymi (PZ). Można "
-"zadeklarować zadania do warunków na odznaki lub rekordów FAI. Dopuszcza "
-"wszystkie kształty stref PZ-tów."
+"Zadanie prędkościowe po trasie zawierającej Punkty Trasy (PT): początek w "
+"Punkcie Startu (PS) i koniec w Punkcie Mety (PM), z Punktami Zwrotnymi (PZ). "
+"Można zadeklarować zadania do warunków na odznaki lub rekordów FAI. "
+"Dopuszcza wszystkie kształty stref PZ-tów."
 
 #: src/Task/TypeStrings.cpp:78
 #, no-c-format
@@ -135,7 +136,7 @@ msgid ""
 "cylinder and sector observation zones."
 msgstr ""
 "Trasa przez zadane obszary, stosuje się minimalny czas oblotu. Ograniczenia "
-"kształtu obszarów do okręgu lub sektora."
+"kształtu obszarów PZ do okręgu lub sektora."
 
 #: src/Task/TypeStrings.cpp:80
 #, no-c-format
@@ -154,8 +155,8 @@ msgid ""
 "Racing task with a mix of assigned areas and turn points, minimum task time "
 "applies."
 msgstr ""
-"Konkurencja szybkościowa z mieszanymi obszarami i punktami zwrotnymi; "
-"stosuje się min. czas oblotu."
+"Zadanie prędkościowe z mieszanymi obszarami i punktami zwrotnymi; stosuje "
+"się minimalny deklarowany czas oblotu."
 
 #: src/Task/TypeStrings.cpp:82 src/Task/TypeStrings.cpp:95
 #, no-c-format
@@ -163,8 +164,8 @@ msgid ""
 "Casual touring task, uses start and finish cylinders and FAI sector turn "
 "points."
 msgstr ""
-"Zwykły przelot, z cylindrami na starcie i mecie oraz sektorami FAI na PZ-"
-"tach."
+"Zwykły przelot treningowy, z obszarami Punktów Trasy: cylindrami na starcie "
+"(Punkt Startu) i mecie (Punkt Mety) oraz sektorami FAI na PZ-tach."
 
 #: src/Task/TypeStrings.cpp:91
 #, no-c-format
@@ -196,20 +197,25 @@ msgid ""
 "A 90 degree sector with 1km radius. Cross corner edge from inside area to "
 "start."
 msgstr ""
-"90stopniowy sektor z promieniem 1km. Przekrocz krawędź narożną od wewnątrz "
-"rejonu aby rozpocząć."
+"Obszar 90-stopniowego sektora przestrzeni (kwadrantu) o wierzchołku w "
+"Punkcie Startu i promieniu 1km. W celu rozpoczęcia zadania należy wlecieć do "
+"środka obszaru, a następnie przekroczyć dowolną jego krawędź."
 
 #: src/Task/TypeStrings.cpp:114
 #, no-c-format
 msgid ""
 "A straight line start gate.  Cross start gate from inside area to start."
 msgstr ""
-"Bramka startowa-prosta linia. Przekrocz bramkę od wewnątrz aby rozpocząć."
+"Prosta Linia startu, ze środkiem w Punkcie Startu i podanej długości, "
+"prostopadła do pierwszego boku Zadania. W celu rozpoczęcia zadania należy "
+"przekroczyć linię startu lecąc w kierunku pierwszego Punktu Zwrotnego (1PZ)."
 
 #: src/Task/TypeStrings.cpp:115
 #, no-c-format
 msgid "A cylinder.  Exit area to start."
-msgstr "Cylinder. Opuść obszar by rozpocząć przelot."
+msgstr ""
+"Cylinder startu. Rozpoczęcie zadania polega na przekroczeniu granicy "
+"Cylindra Startowego."
 
 #: src/Task/TypeStrings.cpp:116
 #, no-c-format
@@ -217,8 +223,10 @@ msgid ""
 "A 90 degree sector with 'infinite' length sides.  Cross any edge, scored "
 "from corner point."
 msgstr ""
-"90stopniowy sektor z nieskończonymi bokami. Przekrocz dowolną krawędź,"
-"punktowane od narożnika."
+"Obszar 90-stopniowego sektora przestrzeni (kwadrantu) o wierzchołku w "
+"Punkcie Startu, wyznaczony przez ramiona kąta skierowane w stronę przeciwną "
+"do pierwszego boku trasy. W celu rozpoczęcia zadania wleć do obszaru "
+"sektora, a następnie przekrocz dowolną jego krawędź."
 
 #: src/Task/TypeStrings.cpp:118
 #, no-c-format
@@ -226,8 +234,9 @@ msgid ""
 "(German rules) Any point within 1/2 km of center or 10km of a 90 degree "
 "sector.  Scored from center."
 msgstr ""
-"(Zasady niemieckie). Jakikolwiek punkt w zasięgu 1/2km od centrum lub 10km z "
-"sektora 90st. Punktowane z centrum."
+"(Zasady niemieckie). Dowolny punkt w odległości 500m od centrum lub w "
+"obszarze sektora 90st. i odległości nie większej niż 10km od PZ. W "
+"kalkulacjach prędkości brane jest położenie PZ."
 
 #: src/Task/TypeStrings.cpp:120
 #, no-c-format
@@ -235,8 +244,9 @@ msgid ""
 "(British rules) Any point within 1/2 km of center or 20km of a 90 degree "
 "sector.  Scored from center."
 msgstr ""
-"(Zasady brytyjskie). Jakikolwiek punkt w zasięgu 1/2km od centrum lub 20km z "
-"sektora 90st. Punktowane z centrum."
+"(Zasady brytyjskie). Dowolny punkt w odległości 500m od centrum lub w "
+"obszarze sektora 90st. i odległości nie większej niż 20km od PZ. W "
+"kalkulacjach prędkości brane jest położenie PZ."
 
 #: src/Task/TypeStrings.cpp:122
 #, no-c-format
@@ -244,13 +254,16 @@ msgid ""
 "(British rules) Any point within 1/2 km of center or 10km of a 180 degree "
 "sector.  Scored from center."
 msgstr ""
-"(Zasady brytyjskie). Jakikolwiek punkt w zasięgu 1/2km od centrum lub 10km z "
-"sektora 180st. Punktowane z centrum."
+"(Zasady brytyjskie). Dowolny punkt w odległości 500m od centrum lub w "
+"obszarze sektora 180st. i odległości nie większej niż 10km od PZ. W "
+"kalkulacjach prędkości brane jest położenie PZ."
 
 #: src/Task/TypeStrings.cpp:124
 #, no-c-format
 msgid "A cylinder.  Any point within area scored from center."
-msgstr "Cylinder. Jakikolwiek punkt w rejonie punktowany z centrum"
+msgstr ""
+"Obszar o kształcie cylindra. W celu zaliczenia PZ przekrocz jego granicę w "
+"dowolnym punkcie. Prędkość liczona jest z uwzględnieniem położenia PZ."
 
 #: src/Task/TypeStrings.cpp:125
 #, no-c-format
@@ -279,19 +292,21 @@ msgstr "Sektor 90st z promieniem 1km. Przekrocz krawędź aby zakończyć."
 #: src/Task/TypeStrings.cpp:130
 #, no-c-format
 msgid "Cross finish gate line into area to finish."
-msgstr "Aby zakończyć, przekrocz linię mety do wnętrza obszaru."
+msgstr ""
+"Aby zakończyć, przekrocz linię mety od strony ostatniego boku do wnętrza "
+"obszaru mety."
 
 #: src/Task/TypeStrings.cpp:131
 #, no-c-format
 msgid "Enter cylinder to finish."
-msgstr "Wleć do cylindra aby ukończyć."
+msgstr "Aby zakończyć zadanie, wleć do wnętrza cylindra."
 
 #: src/Task/TypeStrings.cpp:132
 #, no-c-format
 msgid ""
 "A 180 degree sector with 5km radius.  Exit area in any direction to start."
 msgstr ""
-"180stopniowy sektor z promieniem 5km. Opuść rejon w dowolnym kierunku aby "
+"180-stopniowy sektor o promieniu 5km. Opuść rejon w dowolnym kierunku aby "
 "rozpocząć."
 
 #: src/Task/TypeStrings.cpp:133
@@ -306,7 +321,7 @@ msgstr ""
 #: src/Task/TypeStrings.cpp:135
 #, no-c-format
 msgid "A symmetric quadrant with a custom radius."
-msgstr "Symetryczny sektor o zadanym promieniu."
+msgstr "Symetryczny sektor 90-stopni o zadanym promieniu."
 
 #: src/Task/TypeStrings.cpp:136
 #, no-c-format
@@ -371,7 +386,7 @@ msgstr "Sektor obszaru"
 #: src/Task/TypeStrings.cpp:160
 #, no-c-format
 msgid "FAI finish quadrant"
-msgstr "FAI kwadrant mety."
+msgstr "Kwadrant mety FAI."
 
 #: src/Task/TypeStrings.cpp:161
 #, no-c-format
@@ -391,7 +406,7 @@ msgstr "Sektor startowy BGA"
 #: src/Task/TypeStrings.cpp:164
 #, no-c-format
 msgid "Area sector with inner radius"
-msgstr "Sektor rejonu z wewnętrznym promieniem."
+msgstr "Sektor o zadanym R wewn"
 
 #: src/Task/TypeStrings.cpp:165 src/Dialogs/Task/dlgTaskHelpers.cpp:293
 #, no-c-format
@@ -421,7 +436,7 @@ msgstr "Nie zakończono zadania"
 #: src/Task/ValidationErrorStrings.cpp:35
 #, no-c-format
 msgid "All turnpoints not the same type"
-msgstr "Wszystkie punkty nie są tego samego typu"
+msgstr "Nie wszystkie punkty są tego samego rodzaju"
 
 #: src/Task/ValidationErrorStrings.cpp:36
 #, no-c-format
@@ -843,7 +858,7 @@ msgstr "Auto"
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:43
 #, no-c-format
 msgid "Track up"
-msgstr "Rzeczywista Linia Drogi"
+msgstr "Rzecz. Linia Drogi"
 
 #: src/Menu/ExpandMacros.cpp:382 src/Menu/ExpandMacros.cpp:596
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:47
@@ -941,7 +956,7 @@ msgstr "Pokaż"
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:49
 #, no-c-format
 msgid "Target up"
-msgstr "Docelowy Punkt Trasy"
+msgstr "Akt. PTrasy"
 
 #: src/Menu/ExpandMacros.cpp:610 src/Menu/ExpandMacros.cpp:629
 #: src/Input/InputEventsSettings.cpp:310 src/Dialogs/Message.cpp:120
@@ -1609,12 +1624,12 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:535
 #, no-c-format
 msgid "Barometric altitude"
-msgstr "H QNH: wysokość barometryczna AMSL wzgl. QNH"
+msgstr "H AMSL: wys. AMSL (względem QNH)"
 
 #: src/InfoBoxes/Content/Factory.cpp:536
 #, no-c-format
 msgid "Alt Baro"
-msgstr "H QNH"
+msgstr "H AMSL"
 
 #: src/InfoBoxes/Content/Factory.cpp:537
 #, no-c-format
@@ -1622,8 +1637,9 @@ msgid ""
 "This is the barometric altitude obtained from a device equipped with a "
 "pressure sensor."
 msgstr ""
-"H QNH: wysokość barometryczna AMSL na podstawie odczytu ciśnienia "
-"statycznego wzgl. QNH."
+"H AMSL: wysokość barometryczna AMSL (nad uśrednionym poziomem morza) na "
+"podstawie odczytu ciśnienia statycznego, wyliczana względem powierzchni "
+"ciśnienia QNH."
 
 #: src/InfoBoxes/Content/Factory.cpp:547
 #, no-c-format
@@ -2585,7 +2601,7 @@ msgstr "T H<max: czas poniżej maks.H odejścia"
 #: src/Dialogs/Task/dlgTaskHelpers.cpp:119
 #, no-c-format
 msgid "Start Height"
-msgstr "T H<max"
+msgstr "Hmaks odejścia"
 
 #: src/InfoBoxes/Content/Factory.cpp:1120
 #, no-c-format
@@ -2953,12 +2969,12 @@ msgstr ""
 #: src/InfoBoxes/Content/Factory.cpp:1326
 #, no-c-format
 msgid "Home arrival altitude AGL"
-msgstr "DOM HPrzyl: Wysokość przylotu"
+msgstr "DOM Hprzyl: Wysokość przylotu"
 
 #: src/InfoBoxes/Content/Factory.cpp:1327
 #, no-c-format
 msgid "Home AltA"
-msgstr "DOM HPrzyl"
+msgstr "DOM Hprzyl"
 
 #: src/InfoBoxes/Content/Factory.cpp:1328
 #, no-c-format
@@ -2966,7 +2982,7 @@ msgid ""
 "Arrival altitude AGL for the home waypoint (including safety height).  User "
 "can change the home waypoint by clicking.  Distance shown in comment."
 msgstr ""
-"DOM HPrzyl: Wysokość przelotu nad punkt wybrany jako DOM (z uwzględnieniem "
+"DOM Hprzyl: Wysokość przylotu nad punkt wybrany jako DOM (z uwzględnieniem "
 "zapasu bezpieczeństwa). Można zmienić DOM kliknięciem na InfoBox. Dodatkowo "
 "odległość."
 
@@ -3656,7 +3672,7 @@ msgstr "Odległość"
 #: src/Dialogs/Airspace/AirspaceList.cpp:470
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:98
 msgid "Direction"
-msgstr "Kąt drogi"
+msgstr "Kierunek"
 
 #: src/Renderer/MapItemListRenderer.cpp:146
 #: src/Renderer/MapItemListRenderer.cpp:148
@@ -4968,7 +4984,7 @@ msgstr ""
 
 #: src/Dialogs/MapItemListSettingsPanel.cpp:45
 msgid "Show Arrival Altitude"
-msgstr "Pokaż Wysokość przylotu"
+msgstr "Pokaż Wys. przylotu"
 
 #: src/Dialogs/MapItemListSettingsPanel.cpp:46
 msgid ""
@@ -5115,12 +5131,14 @@ msgstr ""
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:58
 #, no-c-format
 msgid "Internal calculation"
-msgstr "Obliczenia wewn."
+msgstr "Oblicz. Top Hat"
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:59
 #, no-c-format
 msgid "Requires only a GPS source."
-msgstr "Wymaga tylko informacji z GPS."
+msgstr ""
+"Obliczany przez program Top Hat, na podstawie np. znoszenia w krążeniu - "
+"wymaga tylko informacji z GPS."
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:60
 #, no-c-format
@@ -5133,8 +5151,8 @@ msgid ""
 "If enabled, then the wind vector received from external devices overrides "
 "Top Hat's internal wind calculation."
 msgstr ""
-"Jeśli włączono to wektor wiatru odebrany z zewnętrznego urządzenia zastępuje "
-"wewnętrzne kalkulacje TopHat."
+"Jeśli wybrano tę opcję, to kierunek wiatru będzie pobierany z danych z "
+"zewnętrznego urządzenia. Zastępuje to wewnętrzne obliczenia Top Hat."
 
 #
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:66
@@ -5143,7 +5161,7 @@ msgstr "U wiatru: Prędkość wiatru"
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:67
 msgid "Select the source of the wind calculation."
-msgstr "Wybierz źródło obliczeń wiatru."
+msgstr "Wybierz źródło danych określających kierunek wiatru."
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:72
 #: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:155
@@ -5159,7 +5177,7 @@ msgid ""
 msgstr ""
 "Określa czy ślad lotu ma być znoszony z wiatrem podczas wyświetlania w "
 "trybie krążenia. Wyłączenie tej opcji skutkuje tym, że ślad pozostaje "
-"nieruchomy względem ziemi mimo wiatru."
+"nieruchomy względem ziemi mimo wpływu wiatru."
 
 #: src/Dialogs/Settings/WindSettingsPanel.cpp:86
 msgid "Manual adjustment of wind speed."
@@ -5427,8 +5445,9 @@ msgid ""
 "Area pressure for barometric altimeter calibration.  This is set "
 "automatically if Vega connected."
 msgstr ""
-"Ciśnienie zewn. do kalibracji wysok.barometrycznego. Ustawienie automatyczne "
-"gdy podłączono Vega."
+"QNH: lokalne ciśnienie atmosferyczne sprowadzone do poziomu morza, "
+"wprowadzane w celu skalibrowania wysokościomierza barometrycznego. "
+"Ustawienie automatyczne gdy podłączono Vega."
 
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:118
 #: src/Dialogs/Settings/dlgSetupQuick.cpp:478
@@ -6409,7 +6428,7 @@ msgstr "Brak rozwiązania"
 
 #: src/Dialogs/Waypoint/WaypointInfoWidget.cpp:129
 msgid "Arrival altitude"
-msgstr "Wysokość przylotu"
+msgstr "Wys. przylotu"
 
 #: src/Dialogs/Waypoint/WaypointInfoWidget.cpp:151
 msgid "Glide ratio"
@@ -6681,7 +6700,7 @@ msgstr "Określa jakie opisy (etykiety) są wyświetlane."
 
 #: src/Dialogs/Settings/Panels/AirspaceConfigPanel.cpp:197
 msgid "Airspace display"
-msgstr "Wyświetlanie Przestrzeni"
+msgstr "Wyświetl. Przestrzeni"
 
 #: src/Dialogs/Settings/Panels/AirspaceConfigPanel.cpp:198
 msgid ""
@@ -7297,7 +7316,7 @@ msgstr "Pokazuj przycisk [S] w menu"
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:89
 #, no-c-format
 msgid "Center the status message boxes."
-msgstr "Wycentruj prostokąty wiadomości statusu."
+msgstr "Wyświetlaj komunikaty w centrum ekranu."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:90
 #, no-c-format
@@ -7307,7 +7326,7 @@ msgstr "Górny lewy róg"
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:91
 #, no-c-format
 msgid "Show status message boxes ina the top left corner."
-msgstr "Komunikaty w lewym górnym rogu."
+msgstr "Wyświetlaj komunikaty w lewym górnym narożniku."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:97
 #, no-c-format
@@ -7317,7 +7336,7 @@ msgstr "Pole"
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:97
 #, no-c-format
 msgid "Draws boxes around each InfoBox."
-msgstr "Rysuje prostokąty wokół każdego InfoBox'a."
+msgstr "Ramka prostokątna każdego InfoBox'a."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:99
 #, no-c-format
@@ -7327,7 +7346,7 @@ msgstr "Zakładka"
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:99
 #, no-c-format
 msgid "Draws a tab at the top of the InfoBox across the title."
-msgstr "Rysuje zakładkę na górze InfoBox'a wzdłuż tytułu."
+msgstr "Ramka zakładki w górnej części InfoBox’a, wokół tytułu."
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:101
 #, no-c-format
@@ -7443,7 +7462,7 @@ msgstr ""
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:197
 msgid "Message display"
-msgstr "Wyświetlanie wiadomości."
+msgstr "Wyświetl wiadomości"
 
 #: src/Dialogs/Settings/Panels/LayoutConfigPanel.cpp:205
 msgid "Screens button location"
@@ -7611,7 +7630,7 @@ msgstr "Względem aktualnego punktu docelowego."
 
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:110
 msgid "Cruise orientation"
-msgstr "Kierunek do góry na przeskoku"
+msgstr "Kier. do góry na przeskoku"
 
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:111
 msgid "Determines how the screen is rotated with the glider"
@@ -7619,7 +7638,7 @@ msgstr "Określa jak ekran jest obrócony względem szybowca."
 
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:116
 msgid "Circling orientation"
-msgstr "Kierunek do góry w krążeniu"
+msgstr "Kier. do góry w krążeniu"
 
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:117
 msgid "Determines how the screen is rotated with the glider while circling"
@@ -7643,7 +7662,7 @@ msgstr "Sposób przesuwania mapy."
 
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:127
 msgid "Determines what is used to shift the glider from the map center"
-msgstr "Określa co jest używane aby przesunąć szybowiec od środka mapy."
+msgstr "Określa odniesienie używane przy przesuwaniu szybowiec od środka mapy."
 
 #: src/Dialogs/Settings/Panels/MapDisplayConfigPanel.cpp:133
 msgid "Max. auto zoom distance"
@@ -7671,7 +7690,7 @@ msgstr "Reguły FAI"
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:51
 #, no-c-format
 msgid "Use FAI contest rules for flying contests."
-msgstr "Reguły konkurencji wg przepisów sportowych FAI"
+msgstr "Reguły konkurencji wg Kodeksu FAI"
 
 #: src/Dialogs/Settings/Panels/NationalityConfigPanel.cpp:103
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:52
@@ -7963,7 +7982,7 @@ msgstr "Prezentacja obszaru zasięgu"
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:63
 #: src/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp:124
 msgid "Arrival height"
-msgstr "Wysokość przylotu AGL"
+msgstr "Hmin AGL nad lądow."
 
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:64
 msgid ""
@@ -7975,7 +7994,7 @@ msgstr ""
 
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:69
 msgid "Terrain height"
-msgstr "H AGL min. na dolocie"
+msgstr "Hmin AGL na dolocie"
 
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:70
 msgid ""
@@ -8019,7 +8038,7 @@ msgstr ""
 
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:85
 msgid "Alternates mode"
-msgstr "Wybór lądowiska"
+msgstr "Sposób wyb. lądowiska"
 
 #: src/Dialogs/Settings/Panels/SafetyFactorsConfigPanel.cpp:86
 msgid ""
@@ -8097,7 +8116,7 @@ msgstr ""
 
 #: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:164
 msgid "Watched waypoints"
-msgstr "Specjalne Punkty na trasie"
+msgstr "Punkty specjalne"
 
 #: src/Dialogs/Settings/Panels/SiteConfigPanel.cpp:165
 msgid ""
@@ -8292,7 +8311,8 @@ msgid ""
 "can reach."
 msgstr ""
 "Wybierz, czy na mapie ma być wyświetlana obwiednia zasięgu w locie "
-"ślizgowym, pokazująca jak daleko możesz dolecieć z aktualnej pozycji."
+"ślizgowym, pokazująca jak daleko możesz dolecieć z aktualnej pozycji lotem "
+"ślizgowym przy aktualnych ustawieniach MacCready’ego."
 
 #: src/Dialogs/Settings/Panels/SymbolsConfigPanel.cpp:146
 msgid "FLARM traffic"
@@ -8338,39 +8358,40 @@ msgstr "Symbol szybowca"
 
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:64
 msgid "Start max. speed margin"
-msgstr "Maks. prędk. odej. - toler."
+msgstr "Margines V maks. odejścia"
 
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:65
 msgid ""
 "Maximum speed above maximum start speed to tolerate.  Set to 0 for no "
 "tolerance."
 msgstr ""
-"Maksymalna tolerowana prędkość ponad maksymalną prędkość startu. Ustaw 0 w "
-"przypadku braku tolerancji."
+"Maksymalna tolerowana zwiększenie prędkości ponad maksymalną dopuszczalną "
+"prędkość odejścia na trasę (startu). Ustaw 0 w przypadku braku tolerancji."
 
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:70
 msgid "Start max. height margin"
-msgstr "Maks. wysok. odejścia - toler."
+msgstr "Margines H maks. odejścia."
 
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:71
 msgid ""
 "Maximum height above maximum start height to tolerate.  Set to 0 for no "
 "tolerance."
 msgstr ""
-"Maksymalna tolerowana wysokość ponad maksymalną wysokość startu. Ustaw 0 w "
-"przypadku braku tolerancji."
+"Maksymalna tolerowane przewyższenie ponad maksymalną wysokość startu. Ustaw "
+"0 w przypadku braku tolerancji."
 
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:76
 msgid "Optimisation margin"
-msgstr "Margines optymalizacji"
+msgstr "Margines Czasu obszarówki"
 
 #: src/Dialogs/Settings/Panels/TaskRulesConfigPanel.cpp:77
 msgid ""
 "Safety margin for AAT task optimisation.  Optimisation seeks to complete the "
 "task at the minimum time plus this margin time."
 msgstr ""
-"Margines bezpieczeństwa przy optymalizacji konkurencji AAT. Obliczenia "
-"wykonywane są dla min.czasu do zakończenia plus margines."
+"Margines bezpieczeństwa obliczeń przy optymalizacji konkurencji obszarowej "
+"AAT. Obliczenia wykonywane są przy założeniu pozostałego sumarycznego czasu: "
+"min.czasu do zakończenia wg deklaracji plus podany tutaj margines."
 
 #: src/Dialogs/Settings/Panels/ScoringConfigPanel.cpp:93
 #, no-c-format
@@ -8384,9 +8405,12 @@ msgid ""
 "leg less than 28% of total except for tasks longer than 500km: No leg less "
 "than 25% or larger than 45%."
 msgstr ""
-"Zgodnie z regułami trójkąta FAI. Trzy zakręty oraz wspólny start i meta. "
-"Brak części krótszych niż 28% całości za wyjątkiem zadań ponad 500km: Brak "
-"części krótszych niż 25% lub większych niż 45%"
+"Wg Kodeksu FAI: Dla przelotów rekordowych po trasie trójkąta o długości 750 "
+"km lub większej, długość każdego BOKU musi zawierać się w przedziale od 25% "
+"do 45% OFICJALNEJ DŁUGOŚCI trasy. W przypadku przelotów rekordowych po "
+"trasie trójkąta krótszej niż 750 km, żaden z boków nie może mieć długości "
+"krótszej niż 28% OFICJALNEJ DŁUGOŚCI Trasy. (Kodeks FAI, SC3-2015, tłum.: "
+"Maciej Rydlewicz)"
 
 #: src/Dialogs/Settings/Panels/ScoringConfigPanel.cpp:98
 #, no-c-format
@@ -8394,8 +8418,8 @@ msgid ""
 "Up to seven points including start and finish, finish height must not be "
 "lower than start height less 1000 meters."
 msgstr ""
-"Do siedmiu punktów wliczając start i metę, wysokość mety musi być nie "
-"mniejsza niż 1000metrów poniżej startu."
+"Do siedmiu punktów wliczając start i metę, H QNH mety musi być co najmniej "
+"1000 m poniżej H QNH odejścia na trasę."
 
 #: src/Dialogs/Settings/Panels/ScoringConfigPanel.cpp:101
 #, no-c-format
@@ -8671,7 +8695,7 @@ msgstr "węzły"
 
 #: src/Dialogs/Settings/Panels/UnitsConfigPanel.cpp:150
 msgid "Aircraft/Wind speed"
-msgstr "Prędkość szybowca/wiatru"
+msgstr "Prędkość szyb./wiatru"
 
 #: src/Dialogs/Settings/Panels/UnitsConfigPanel.cpp:151
 msgid ""
@@ -8714,7 +8738,7 @@ msgstr "Jednostki używane dla temperatury"
 
 #: src/Dialogs/Settings/Panels/UnitsConfigPanel.cpp:208
 msgid "Task speed"
-msgstr "Średnia prędkość przelotu"
+msgstr "V śr. zadania"
 
 #: src/Dialogs/Settings/Panels/UnitsConfigPanel.cpp:208
 msgid "Units used for task speeds."
@@ -9205,7 +9229,7 @@ msgstr "Ustaw jako Pkt końcowy"
 
 #: src/Dialogs/Task/Manager/TaskEditPanel.cpp:179
 msgid "Reverse"
-msgstr "Odwrotnie"
+msgstr "Odwróć"
 
 #: src/Dialogs/Task/Manager/TaskEditPanel.cpp:182
 msgid "Clear All"
@@ -9222,16 +9246,16 @@ msgstr "Edycja trasy"
 
 #: src/Dialogs/Task/Manager/TaskEditPanel.cpp:411
 msgid "Add Turnpoint"
-msgstr "Dodać punkt zwrotny?"
+msgstr "Dodaj punkt zwrotny"
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:225
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:240
 msgid "Task type"
-msgstr "Rodzaj przelotu"
+msgstr "Rodzaj Zadania"
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:225
 msgid "Sets the behaviour for the current task."
-msgstr "Ustawia zachowanie dla obecnej trasy."
+msgstr "Ustawia zachowanie dla obecnego zadania."
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:227
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:242
@@ -9267,13 +9291,13 @@ msgstr "Maks. prędk. odejścia"
 msgid ""
 "Maximum speed allowed in start observation zone.  Set to 0 for no limit."
 msgstr ""
-"Maksymalna prędkość dozwolona w obserwowanej strefie startu. Ustaw 0 dla "
-"nieograniczonej."
+"Maksymalna prędkość dozwolona w obserwowanej strefie startu. Ustaw 0 przy "
+"braku ograniczeń."
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:248
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:251
 msgid "Start max. height"
-msgstr "Maks. wysok. odejścia"
+msgstr "Maks. H odejścia"
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:249
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:252
@@ -9281,8 +9305,8 @@ msgid ""
 "Maximum height based on start height reference (AGL or MSL) while starting "
 "the task.  Set to 0 for no limit."
 msgstr ""
-"Maksymalna wysokość względem wysokości startu (AGL lub MGL) podczas "
-"rozpoczynania zadania. Ustaw 0 dla nieograniczonej."
+"Maks. H odejścia: maksymalna wysokość względem wysokości startu (AGL lub "
+"MSL) podczas odejścia na trasę. Ustaw 0 jeśli nie ma ograniczeń."
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:255
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:223
@@ -9294,7 +9318,9 @@ msgstr "Poziom odniesienia to wysokość nad punktem trasy."
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:225
 #, no-c-format
 msgid "Reference is altitude above mean sea level."
-msgstr "Poziom odniesienia to wys.nad poziom morza."
+msgstr ""
+"Poziom odniesienia to wys. nad średnim poziomem morza (AMSL wg nastawy "
+"ciśnienia QNH)."
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:261
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:260
@@ -9309,7 +9335,7 @@ msgstr "Poz.odn. użyto do wyznaczenia maks.wys.startu."
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:265
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:269
 msgid "Finish min. height"
-msgstr "Min. wysok. na mecie"
+msgstr "Min. H na mecie"
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:266
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:270
@@ -9317,8 +9343,8 @@ msgid ""
 "Minimum height based on finish height reference (AGL or MSL) while finishing "
 "the task.  Set to 0 for no limit."
 msgstr ""
-"Minimalna wysokość w oparciu o wysokość odniesienia(AGL lub MSL) w momencie "
-"kończenia zadania. Ustaw 0 na nieograniczony."
+"Min. H na mecie: Minimalna wysokość na mecie względem wysokość "
+"odniesienia(AGL lub MSL). Ustaw 0 przy braku ograniczeń."
 
 #: src/Dialogs/Task/Manager/TaskPropertiesPanel.cpp:270
 #: src/Dialogs/Task/TaskPropertiesDialogUs.cpp:278
@@ -11288,6 +11314,9 @@ msgid ""
 msgstr ""
 "Kod\n"
 "Zesp."
+
+msgid "Finish Height"
+msgstr "Hmin przyl."
 
 #~ msgid "Set zoom"
 #~ msgstr "Autozoom"
