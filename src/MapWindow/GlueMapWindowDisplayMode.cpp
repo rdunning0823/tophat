@@ -28,7 +28,7 @@ Copyright_License {
 #include "Profile/Profile.hpp"
 #include "Screen/Layout.hpp"
 #include "Util/Clamp.hpp"
-
+#include "LogFile.hpp" //debug
 void
 OffsetHistory::Reset()
 {
@@ -187,9 +187,12 @@ GlueMapWindow::UpdateDisplayMode()
     SwitchZoomClimb();
 }
 
+
+
 void
 GlueMapWindow::UpdateScreenAngle()
 {
+
   /* not using MapWindowBlackboard here because these methods are
      called by the main thread */
   const NMEAInfo &basic = CommonInterface::Basic();
@@ -202,26 +205,46 @@ GlueMapWindow::UpdateScreenAngle()
     ? settings.circling_orientation
     : settings.cruise_orientation;
 
-  if (orientation == MapOrientation::TARGET_UP &&
-      calculated.task_stats.current_leg.vector_remaining.IsValid())
-    visible_projection.SetScreenAngle(calculated.task_stats.current_leg.
-                                      vector_remaining.bearing);
-  else if (orientation == MapOrientation::HEADING_UP)
+  if (orientation == MapOrientation::TARGET_UP) {
+    if (!calculated.task_stats.current_leg.vector_remaining.IsValid()) {
+      visible_projection.SetScreenAngle(last_screen_angle);
+    } else if (calculated.task_stats.active_index == 0 &&
+        positive(calculated.task_stats.current_leg.next_leg_vector.distance)) {
+      // if in start cylinder, normal start target is nonsense
+      visible_projection.SetScreenAngle(
+          calculated.task_stats.current_leg.next_leg_vector.bearing);
+    } else if (calculated.task_stats.current_leg.
+        vector_remaining.distance == fixed(0)) {
+      // "pushing the target," so use track up
+      if (positive(calculated.task_stats.current_leg.next_leg_vector.distance)) {
+        visible_projection.SetScreenAngle(calculated.task_stats.current_leg.next_leg_vector.bearing);
+      } else {
+        // fallback, keep pushing target smoothly
+        visible_projection.SetScreenAngle(basic.track_available ?
+            basic.track : Angle::Zero());
+      }
+
+    } else {
+      // Target up
+      visible_projection.SetScreenAngle(calculated.task_stats.current_leg.
+                                        vector_remaining.bearing);
+    }
+  } else if (orientation == MapOrientation::HEADING_UP) {
     visible_projection.SetScreenAngle(
       basic.attitude.IsHeadingUseable() ? basic.attitude.heading : Angle::Zero());
-  else if (orientation == MapOrientation::NORTH_UP)
+  } else if (orientation == MapOrientation::NORTH_UP) {
     visible_projection.SetScreenAngle(Angle::Zero());
-  else if (orientation == MapOrientation::WIND_UP &&
+  } else if (orientation == MapOrientation::WIND_UP &&
            calculated.wind_available &&
-           calculated.wind.norm >= fixed(0.5))
+           calculated.wind.norm >= fixed(0.5)) {
     visible_projection.SetScreenAngle(calculated.wind.bearing);
-  else
-    // normal, glider forward
+  } else {
+    // normal, glider forward TRACK_UP
     visible_projection.SetScreenAngle(
       basic.track_available ? basic.track : Angle::Zero());
-
+  }
   OnProjectionModified();
-
+  last_screen_angle = visible_projection.GetScreenAngle();
   compass_visible = orientation != MapOrientation::NORTH_UP;
 }
 

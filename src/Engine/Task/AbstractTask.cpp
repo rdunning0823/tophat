@@ -152,6 +152,8 @@ AbstractTask::UpdateStatsDistances(const GeoPoint &location,
     stats.current_leg.next_leg_vector = GeoVector::Invalid();
   }
 
+
+
   if (full_update)
     stats.distance_nominal = ScanDistanceNominal();
 

@@ -158,6 +158,7 @@ public:
   virtual bool CheckTask() const = 0;
 
 protected:
+
   /**
    * Pure abstract method to be defined for concrete task classes to update
    * internal states when aircraft state advances.

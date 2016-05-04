@@ -137,6 +137,9 @@ class GlueMapWindow : public MapWindow {
 
   DisplayMode last_display_mode;
 
+  /** keep last angle to use if temporary INVALID status of vector_remaining */
+  Angle last_screen_angle;
+
   OffsetHistory offset_history;
 
 #ifndef ENABLE_OPENGL

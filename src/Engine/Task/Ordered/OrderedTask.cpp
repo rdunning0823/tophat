@@ -26,6 +26,7 @@
 #include "Points/OrderedTaskPoint.hpp"
 #include "Points/StartPoint.hpp"
 #include "Points/FinishPoint.hpp"
+#include "Points/AATPoint.hpp"
 #include "Task/Solvers/TaskMacCreadyTravelled.hpp"
 #include "Task/Solvers/TaskMacCreadyRemaining.hpp"
 #include "Task/Solvers/TaskMacCreadyTotal.hpp"
