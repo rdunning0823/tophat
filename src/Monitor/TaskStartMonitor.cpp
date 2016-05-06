@@ -98,7 +98,7 @@ TaskStartMonitor::GetMessage1(const StartStats &start, message_string &message)
   const CommonStats &common_stats = calculated.common_stats;
 
 
-  const TCHAR task_start[] = N_("Start");
+  const TCHAR task_start[] = N_("Task Start");
   unsigned rows_text = 2;
   TCHAR time_start[32];
   TCHAR altitude_start[32];
