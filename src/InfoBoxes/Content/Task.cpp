@@ -523,14 +523,14 @@ UpdateInfoBoxTaskSpeedAchieved(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (!task_stats.task_valid ||
-      !task_stats.total.remaining_effective.IsDefined()) {
+      !task_stats.total.pirker.IsDefined()) {
     data.SetInvalid();
     return;
   }
 
   // Set Value
   data.SetValue(_T("%2.0f"),
-                    Units::ToUserTaskSpeed(task_stats.total.remaining_effective.GetSpeed()));
+                    Units::ToUserTaskSpeed(task_stats.total.pirker.GetSpeed()));
 
   // Set Unit
   data.SetValueUnit(Units::current.task_speed_unit);
