@@ -104,6 +104,9 @@ struct ElementStat
   /** Rate of change of altitude difference (m/s) */
   TaskVario vario;
 
+  /** Debug dump of structure info */
+  void DumpStat() const;
+
   /** Resets all to zero. */
   void Reset();
 

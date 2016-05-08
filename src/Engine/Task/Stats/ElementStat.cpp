@@ -22,6 +22,8 @@
 
 #include "ElementStat.hpp"
 #include "Navigation/Aircraft.hpp"
+#include "LogFile.hpp"
+#include <tchar.h>
 #include <algorithm>
 
 void
@@ -47,6 +49,40 @@ ElementStat::Reset()
   solution_mc0.Reset();
 
   vario.Reset();
+}
+
+static void
+DumpGeoVector(const GeoVector &g, const TCHAR* name)
+{
+  if (!g.IsValid()) {
+    LogFormat(_T("  GeoVector: %s INVALID"), name);
+    return;
+  }
+  LogFormat(_T("  GeoVector: %s dist:%i, bearing:%i"),
+            name, (int)g.distance, (int)g.bearing.AsBearing().Degrees());
+}
+
+static void
+DumpDistanceStat(const DistanceStat &d, const TCHAR* name)
+{
+  if (!d.IsDefined()) {
+    LogFormat(_T("  DistanceStat: %s INVALID"), name);
+    return;
+  }
+  LogFormat(_T("  DistanceStat: %s dist:%i, speed:%i speed_incremental:%i"),
+            name, (int)d.GetDistance(), (int)d.GetSpeed(), (int)d.GetSpeedIncremental());
+}
+
+void
+ElementStat::DumpStat() const
+{
+  DumpGeoVector(vector_remaining,       _T("     vector_remaining"));
+  DumpGeoVector(next_leg_vector,        _T("      next_leg_vector"));
+  DumpDistanceStat(remaining_effective, _T("  remaining_effective"));
+  DumpDistanceStat(remaining,           _T("            remaining"));
+  DumpDistanceStat(planned,             _T("              planned"));
+  DumpDistanceStat(travelled,           _T("            travelled"));
+  DumpDistanceStat(pirker,              _T("               pirker"));
 }
 
 void
