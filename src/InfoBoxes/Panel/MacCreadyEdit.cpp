@@ -312,7 +312,7 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   auto_mc.Create(GetClientAreaWindow(),
                  dialog_look,
-                 _T("Auto MC"),
+                 _("Auto MC"),
                  checkbox_rc,
                  checkbox_style,
                  *this, AutoMc);

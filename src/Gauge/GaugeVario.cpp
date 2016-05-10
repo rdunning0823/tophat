@@ -28,6 +28,7 @@ Copyright_License {
 #include "Screen/UnitSymbol.hpp"
 #include "Screen/Layout.hpp"
 #include "Math/FastRotation.hpp"
+#include "Language/Language.hpp"
 #include "Units/Units.hpp"
 #include "Util/Clamp.hpp"
 
@@ -94,7 +95,7 @@ GaugeVario::OnPaintBuffer(Canvas &canvas)
     } else {
       RenderValue(canvas, top_position.x, top_position.y,
                   &value_top, &label_top,
-                  Units::ToUserVSpeed(Calculated().average), _T("Avg"));
+                  Units::ToUserVSpeed(Calculated().average), _("Avg"));
     }
   }
 
@@ -103,7 +104,7 @@ GaugeVario::OnPaintBuffer(Canvas &canvas)
     RenderValue(canvas, bottom_position.x, bottom_position.y,
                 &value_bottom, &label_bottom,
                 mc,
-                GetComputerSettings().task.auto_mc ? _T("Auto MC") : _T("MC"));
+                GetComputerSettings().task.auto_mc ? _("Auto MC") : _T("MC"));
   }
 
   if (Settings().show_speed_to_fly)
