@@ -3,15 +3,12 @@
 # This file is distributed under the same license as the xcsoar package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
 #
-#: src/Menu/ExpandMacros.cpp:722 src/Dialogs/FilePickAndDownload.cpp:799
-#: src/Dialogs/Settings/dlgSetupQuick.cpp:364 src/Dialogs/dlgAnalysis.cpp:449
-#: src/Dialogs/dlgAnalysis.cpp:458 src/Dialogs/dlgAnalysis.cpp:494
 msgid ""
 msgstr ""
 "Project-Id-Version: xcsoar\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-09 20:54-0400\n"
-"PO-Revision-Date: 2016-05-09 22:38+0200\n"
+"PO-Revision-Date: 2016-05-10 22:27+0200\n"
 "Last-Translator: Maciej Rydlewicz <maciej@rydlewicz.pl>\n"
 "Language-Team: aeroklubzar.pl <maciej@rydlewicz.pl>\n"
 "Language: pl_PL\n"
@@ -22,7 +19,6 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
 
-#. #-#-#-#-#  cpp.pot (PACKAGE VERSION)  #-#-#-#-#
 #. .. append " - Task #[n]" suffix to the task name
 #: src/Task/TaskStore.cpp:65 src/Menu/ExpandMacros.cpp:612
 #: src/Menu/ExpandMacros.cpp:639 src/InfoBoxes/Panel/MacCreadyEdit.cpp:368
@@ -2140,12 +2136,12 @@ msgid "V Task Inst"
 msgstr "WchwPirk"
 
 #: src/InfoBoxes/Content/Factory.cpp:827
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Instantaneous cross country speed while on current task, not compensated for "
 "altitude."
 msgstr ""
-"WprzŚr: Średnia prędkość na bieżącej trasie bez uwzględnienia różnic "
+"WchwPirk: Chwilowa prędkość na bieżącej trasie, bez uwzględnienia różnic "
 "wysokości na początku i w aktualnym położeniu szybowca."
 
 #: src/InfoBoxes/Content/Factory.cpp:836
@@ -2176,13 +2172,13 @@ msgid "V Task Ach"
 msgstr "WprzPirk"
 
 #: src/InfoBoxes/Content/Factory.cpp:849
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Achieved cross country speed while on current task, not compensated for "
 "altitude."
 msgstr ""
-"WprzŚr: Średnia prędkość na bieżącej trasie bez uwzględnienia różnic "
-"wysokości na początku i w aktualnym położeniu szybowca."
+"WprzPirk: Osiągnięta średnia prędkość na bieżącej trasie bez uwzględnienia "
+"różnic wysokości na początku i w aktualnym położeniu szybowca."
 
 #: src/InfoBoxes/Content/Factory.cpp:858
 #, no-c-format
@@ -2941,8 +2937,7 @@ msgstr ""
 msgid "Next radial"
 msgstr "PT Radial"
 
-#: src/InfoBoxes/Content/Factory.cpp:1305
-#: src/Dialogs/Task/TargetDialog.cpp:442
+#: src/InfoBoxes/Content/Factory.cpp:1305 src/Dialogs/Task/TargetDialog.cpp:442
 #, no-c-format
 msgid "Radial"
 msgstr "PT Radial"
@@ -3160,8 +3155,7 @@ msgstr "Ladow.%d"
 msgid "Simulator"
 msgstr "Symul."
 
-#: src/InfoBoxes/Content/Altitude.cpp:94
-#: src/InfoBoxes/Content/Altitude.cpp:208
+#: src/InfoBoxes/Content/Altitude.cpp:94 src/InfoBoxes/Content/Altitude.cpp:208
 #: src/InfoBoxes/Content/Altitude.cpp:276
 msgid "no QNH"
 msgstr "Brak QNH"
@@ -3633,8 +3627,7 @@ msgstr "Opisy Pkt Trasy"
 msgid "Topography/Terrain"
 msgstr "Topografia/Teren"
 
-#: src/PageSettings.cpp:59
-#: src/Dialogs/Settings/Panels/GaugesConfigPanel.cpp:84
+#: src/PageSettings.cpp:59 src/Dialogs/Settings/Panels/GaugesConfigPanel.cpp:84
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:201
 #: src/Dialogs/Settings/Panels/PagesConfigPanel.cpp:379
 #, no-c-format
@@ -3938,9 +3931,8 @@ msgstr "Kończenie, zapisywanie profilu..."
 msgid "Shutdown, saving task..."
 msgstr "Kończenie, zapisywanie trasy..."
 
-#: src/TophatWidgets/ReplayButtonWidget.cpp:54
-#: src/Dialogs/ReplayDialog.cpp:143 src/Dialogs/ReplayDialog.cpp:249
-#: src/Dialogs/ReplayDialog.cpp:339
+#: src/TophatWidgets/ReplayButtonWidget.cpp:54 src/Dialogs/ReplayDialog.cpp:143
+#: src/Dialogs/ReplayDialog.cpp:249 src/Dialogs/ReplayDialog.cpp:339
 msgid "Replay"
 msgstr "Odtwórz"
 
@@ -4016,8 +4008,7 @@ msgstr "Pośredni sterownik GPS"
 msgid "Built-in GPS & sensors"
 msgstr "Wbudowany GPS i czujniki"
 
-#: src/Dialogs/Message.cpp:115
-#: src/Dialogs/StatusPanels/RulesStatusPanel.cpp:57
+#: src/Dialogs/Message.cpp:115 src/Dialogs/StatusPanels/RulesStatusPanel.cpp:57
 #: src/Dialogs/StatusPanels/RulesStatusPanel.cpp:60
 msgid "Yes"
 msgstr "Tak"
@@ -4073,8 +4064,7 @@ msgstr "Pomoc"
 
 #: src/Dialogs/FileManager.cpp:406 src/Dialogs/FilePickAndDownload.cpp:809
 #: src/Dialogs/FilePicker.cpp:48 src/Dialogs/Weather/NOAAList.cpp:192
-#: src/Dialogs/Weather/NOAAList.cpp:204
-#: src/Dialogs/Weather/NOAADetails.cpp:105
+#: src/Dialogs/Weather/NOAAList.cpp:204 src/Dialogs/Weather/NOAADetails.cpp:105
 #: src/Dialogs/DownloadFilePicker.cpp:125
 #: src/Dialogs/DownloadFilePicker.cpp:289
 #: src/Dialogs/DownloadFilePicker.cpp:387
@@ -4121,8 +4111,7 @@ msgstr "Pobieranie"
 #: src/Dialogs/Task/dlgMatItemClick.cpp:832
 #: src/Dialogs/Task/dlgMatItemClick.cpp:838
 #: src/Dialogs/Weather/NOAAList.cpp:177 src/Dialogs/Weather/NOAAList.cpp:183
-#: src/Dialogs/Weather/NOAAList.cpp:290
-#: src/Dialogs/Weather/NOAADetails.cpp:168
+#: src/Dialogs/Weather/NOAAList.cpp:290 src/Dialogs/Weather/NOAADetails.cpp:168
 #: src/Dialogs/DownloadFilePicker.cpp:369
 msgid "Error"
 msgstr "Błąd"
@@ -5876,9 +5865,8 @@ msgstr ""
 msgid "Max. Cruise Speed"
 msgstr "Maksymalna prędkość na przeskoku"
 
-#: src/Dialogs/Plane/PlaneDetailsDialog.cpp:296
-#: src/Dialogs/ReplayDialog.cpp:66 src/Dialogs/ReplayDialog.cpp:125
-#: src/Dialogs/ReplayDialog.cpp:131
+#: src/Dialogs/Plane/PlaneDetailsDialog.cpp:296 src/Dialogs/ReplayDialog.cpp:66
+#: src/Dialogs/ReplayDialog.cpp:125 src/Dialogs/ReplayDialog.cpp:131
 msgid ">"
 msgstr ">"
 
@@ -9148,9 +9136,9 @@ msgstr "długość L.Startu"
 msgid "Width of the start/finish gate."
 msgstr ""
 "Długość Linii Startu/Mety - inaczej określana jako szerokość ‚bramki’ startu/"
-"mety. Wg Kodeksu FAI: 1.2.9 Pozioma linia o długości 1 km zorientowana mniej "
-"więcej prostopadle do pierwszego/ostatniego BOKU. Środek linii (PUNKT STARTU/"
-"METY) znajduje się na wysokości ziemi."
+"mety. Wg Kodeksu FAI: 1.2.9 Pozioma linia o długości 1 km zorientowana mniej "
+"więcej prostopadle do pierwszego/ostatniego BOKU. Środek linii (PUNKT STARTU/"
+"METY) znajduje się na wysokości ziemi."
 
 #: src/Dialogs/Task/Widgets/SectorZoneEditWidget.cpp:52
 #: src/Dialogs/Task/Widgets/KeyholeZoneEditWidget.cpp:47
@@ -9798,8 +9786,8 @@ msgstr "Aktualna godzina"
 msgid "Adjust time you started the task"
 msgstr "Czas rozpoczęcia Zadania"
 
-#: src/Dialogs/Task/StartTimeEntry.cpp:310
-#: src/Dialogs/Weather/NOAAList.cpp:114 src/Dialogs/Weather/NOAADetails.cpp:74
+#: src/Dialogs/Task/StartTimeEntry.cpp:310 src/Dialogs/Weather/NOAAList.cpp:114
+#: src/Dialogs/Weather/NOAADetails.cpp:74
 msgid "Update"
 msgstr "Aktualizuj"
 
@@ -9904,8 +9892,7 @@ msgid ""
 msgstr ""
 "Proszę nie używać znaków specjalnych w kodzie czteroliterowym żądanej stacji."
 
-#: src/Dialogs/Weather/NOAAList.cpp:216
-#: src/Dialogs/Weather/NOAADetails.cpp:114
+#: src/Dialogs/Weather/NOAAList.cpp:216 src/Dialogs/Weather/NOAADetails.cpp:114
 #, c-format
 msgid "Do you want to remove station %s?"
 msgstr "Czy chcesz wycofać stację %s?"
@@ -9915,8 +9902,7 @@ msgstr "Czy chcesz wycofać stację %s?"
 msgid "METAR and TAF"
 msgstr "METAR i TAF"
 
-#: src/Dialogs/Weather/NOAAList.cpp:289
-#: src/Dialogs/Weather/NOAADetails.cpp:167
+#: src/Dialogs/Weather/NOAAList.cpp:289 src/Dialogs/Weather/NOAADetails.cpp:167
 msgid "This function is not available on your platform yet."
 msgstr "Ta funkcja nie jest jeszcze dostępna na Twoim urządzeniu."
 
@@ -9953,7 +9939,7 @@ msgid "Accept"
 msgstr "Zatwierdź"
 
 #: src/Monitor/TaskStartMonitor.cpp:101
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Task Start"
 msgstr "START"
 
@@ -11343,6 +11329,9 @@ msgid ""
 msgstr ""
 "Lista\n"
 "PTrasy$(CheckWaypointFile)"
+
+msgid "Auto MC"
+msgstr "MC Auto"
 
 #~ msgid ""
 #~ "Instantaneous cross country speed while on current task, compensated for "
