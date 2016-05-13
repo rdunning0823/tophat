@@ -119,6 +119,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/TrackingConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/AudioConfigPanel.cpp \
+	$(SRC)/Dialogs/Settings/Panels/NavBarConfigPanel.cpp \
 	\
 	$(SRC)/Dialogs/Task/Widgets/ObservationZoneEditWidget.cpp \
 	$(SRC)/Dialogs/Task/Widgets/CylinderZoneEditWidget.cpp \

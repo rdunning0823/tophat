@@ -64,6 +64,7 @@ Copyright_License {
 #include "Panels/InfoBoxesConfigPanel.hpp"
 #include "Panels/ProfileConfigPanel.hpp"
 #include "Panels/AudioConfigPanel.hpp"
+#include "Panels/NavBarConfigPanel.hpp"
 #include "Dialogs/Airspace/Airspace.hpp"
 #include "Interface.hpp"
 #include "Language/Language.hpp"
@@ -140,6 +141,7 @@ static constexpr TabMenuPage look_pages[] = {
   { N_("Fonts"), CreateFontConfigPanel },
   { N_("Pages"), CreatePagesConfigPanel },
   { N_("InfoBox Sets"), CreateInfoBoxesConfigPanel },
+  { N_("NavBar"), CreateNavBarConfigPanel },
   { nullptr, nullptr }
 };
 

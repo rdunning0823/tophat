@@ -357,7 +357,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
   }
 
-  if (gr_valid) {
+  if (gr_valid && ui_settings.navbar_enable_gr) {
     if (gr_value <= fixed(0)) {
       distance_buffer.append(_T(" [##]"));
     }
@@ -371,7 +371,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     }
   }
 
-  if (distance_valid || gr_valid) {
+  if (distance_valid || (gr_valid && ui_settings.navbar_enable_gr) ) {
     canvas.Select(distance_font);
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
@@ -381,7 +381,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
             Layout::FastScale(15))) {
       canvas.Select(type_font);
       left = rc.left;
-      if (left > 0)
+      if (left > 0 && ui_settings.navbar_enable_tp_index)
         canvas.TextAutoClipped(left, line_one_y_offset, type_buffer.c_str());
       offset = rc.left + label_width +
           (rc.right - rc.left - distance_width - height_width
@@ -397,52 +397,57 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if (do_bearing)
       bearing_direction = DrawBearing(canvas, rc_outer,bearing);
 
-  } else // just type type label
-    canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
-
-  // Draw tp name, truncated to leave space before rt. bearing if drawn
-  canvas.Select(name_font);
-  PixelSize icon_size {0, 0};
-  UPixelScalar left_icon;
-  const MaskedIcon *icon = &icon_look.hBmpCheckMark;
-  if (draw_checkmark)
-    icon_size = icon->GetSize();
-
-  PixelRect rc_name(rc_outer.left + GetHintWidth(), rc_outer.top,
-                    rc_outer.right - GetHintWidth(), rc_outer.bottom);
-
-  width = canvas.CalcTextWidth(tp_name) + icon_size.cx;
-
-  if ((PixelScalar)width > (rc_name.right - rc_name.left)) {
-    if (is_current_tp && bearing_direction != 1)
-        rc_name.right += GetHintWidth() / 2;
-    if (is_current_tp && bearing_direction == 1)
-        rc_name.right -= Layout::Scale(5);
-
-    left_icon = rc_name.left;
-
-  } else
-    left_icon = rc_name.left + (rc_name.right - rc_name.left - width) / 2;
-
-  // TODO make clip to show bearing icon and also clip for canvas
-  canvas.DrawClippedText(left_icon + icon_size.cx,
-                  line_two_y_offset,
-                  rc_name.right - rc_name.left - icon_size.cx / 2, tp_name);
-
-  // draw checkmark next to name if oz entered
-  if (draw_checkmark) {
-
-    const int offsety = ((PixelScalar)line_two_y_offset + icon_size.cy <= rc.bottom) ?
-        line_two_y_offset + (rc.bottom - line_two_y_offset - icon_size.cy) / 2 - Layout::Scale(1)
-        : rc.bottom - icon_size.cy - Layout::Scale(1);
-
-    RasterPoint upper_left(left_icon, rc.top + offsety);
-    RasterPoint lower_right(upper_left.x,
-                            upper_left.y);
-    if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right)) {
-      icon->DrawUpperLeft(canvas, upper_left); // draws from center of icon
+  }
+  else { // just type type label
+    if (ui_settings.navbar_enable_tp_index) {
+      canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
     }
+  }
 
+  if (ui_settings.navbar_enable_tp_name) {
+    // Draw tp name, truncated to leave space before rt. bearing if drawn
+    canvas.Select(name_font);
+    PixelSize icon_size {0, 0};
+    UPixelScalar left_icon;
+    const MaskedIcon *icon = &icon_look.hBmpCheckMark;
+    if (draw_checkmark)
+      icon_size = icon->GetSize();
+
+    PixelRect rc_name(rc_outer.left + GetHintWidth(), rc_outer.top,
+                      rc_outer.right - GetHintWidth(), rc_outer.bottom);
+
+    width = canvas.CalcTextWidth(tp_name) + icon_size.cx;
+
+    if ((PixelScalar)width > (rc_name.right - rc_name.left)) {
+      if (is_current_tp && bearing_direction != 1)
+          rc_name.right += GetHintWidth() / 2;
+      if (is_current_tp && bearing_direction == 1)
+          rc_name.right -= Layout::Scale(5);
+
+      left_icon = rc_name.left;
+
+    } else
+      left_icon = rc_name.left + (rc_name.right - rc_name.left - width) / 2;
+
+    // TODO make clip to show bearing icon and also clip for canvas
+    canvas.DrawClippedText(left_icon + icon_size.cx,
+                    line_two_y_offset,
+                    rc_name.right - rc_name.left - icon_size.cx / 2, tp_name);
+
+    // draw checkmark next to name if oz entered
+    if (draw_checkmark) {
+
+      const int offsety = ((PixelScalar)line_two_y_offset + icon_size.cy <= rc.bottom) ?
+          line_two_y_offset + (rc.bottom - line_two_y_offset - icon_size.cy) / 2 - Layout::Scale(1)
+          : rc.bottom - icon_size.cy - Layout::Scale(1);
+
+      RasterPoint upper_left(left_icon, rc.top + offsety);
+      RasterPoint lower_right(upper_left.x,
+                              upper_left.y);
+      if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right)) {
+        icon->DrawUpperLeft(canvas, upper_left); // draws from center of icon
+      }
+    }
   }
 }
 

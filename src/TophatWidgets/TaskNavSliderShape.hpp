@@ -28,6 +28,7 @@ Copyright_License {
 #include "Math/fixed.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "UIGlobals.hpp"
+#include "Interface.hpp"
 #include "Look/Look.hpp"
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 
@@ -69,6 +70,7 @@ protected:
 
   const DialogLook &dialog_look;
   const NavSliderLook &nav_slider_look;
+  const UISettings &ui_settings;
 
   /**
    * height of the bearing icon
@@ -87,6 +89,7 @@ public:
   SliderShape()
   :dialog_look(UIGlobals::GetDialogLook()),
    nav_slider_look(UIGlobals::GetLook().nav_slider),
+   ui_settings(CommonInterface::GetUISettings()),
    bearing_icon_hor_margin(0) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *bmp_bearing;

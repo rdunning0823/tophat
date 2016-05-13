@@ -285,6 +285,10 @@ extern const char WaypointSortDirection[];
 extern const char WaveAssistant[];
 
 extern const char SystemSoundVolume [];
+
+extern const char NavBarDisplayGR [];
+extern const char NavBarDisplayTpIndex [];
+extern const char NavBarDisplayTpName [];
 }
 
 #endif

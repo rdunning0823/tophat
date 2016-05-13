@@ -181,4 +181,8 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
   Load(map, settings.pages);
   Load(map, settings.dialog);
   Load(map, settings.sound);
+
+  map.Get(ProfileKeys::NavBarDisplayGR, settings.navbar_enable_gr);
+  map.Get(ProfileKeys::NavBarDisplayTpIndex, settings.navbar_enable_tp_index);
+  map.Get(ProfileKeys::NavBarDisplayTpName, settings.navbar_enable_tp_name);
 }
