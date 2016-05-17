@@ -383,9 +383,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       left = rc.left;
       if (left > 0 && ui_settings.navbar_enable_tp_index)
         canvas.TextAutoClipped(left, line_one_y_offset, type_buffer.c_str());
-      offset = rc.left + label_width +
-          (rc.right - rc.left - distance_width - height_width
-              - label_width) / 2;
+      offset = rc.left +
+          (rc.right - rc.left - distance_width) / 2;
 
     }
 
