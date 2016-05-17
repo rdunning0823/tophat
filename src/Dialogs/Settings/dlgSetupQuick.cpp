@@ -217,25 +217,15 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - bottom_row_height;
-  if (Layout::landscape) {
-    rc_advanced.top = rc_ok.top;
-    rc_advanced.bottom = rc.bottom;
+  rc_advanced.top = rc_ok.top;
+  rc_advanced.bottom = rc.bottom;
 
-    rc_advanced.right = rc_right.right;
-    rc_advanced.left = rc_advanced.right - Layout::Scale(80);
-    rc_screens_button = rc_advanced;
-    rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
+  rc_advanced.right = rc_right.right;
+  rc_advanced.left = rc_advanced.right - Layout::Scale(80);
+  rc_screens_button = rc_advanced;
+  rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
 
-    rc_ok.right = rc_screens_button.left;
-
-  } else {
-    rc_advanced.right = rc_right.right;
-    rc_advanced.left = rc_advanced.right - Layout::Scale(80);
-    rc_advanced.bottom = rc_ok.top - 1;
-    rc_advanced.top = rc_advanced.bottom - height;
-    rc_screens_button = rc_advanced;
-    rc_screens_button.Offset(-rc_advanced.GetSize().cx, 0);
-  }
+  rc_ok.right = rc_screens_button.left;
 }
 
 static void
