@@ -111,9 +111,17 @@ TaskLeg::GetTravelledVector(const GeoPoint &ref) const
                                  destination.GetLocationTravelled());
     else if (!ref.IsValid())
       return GeoVector::Zero();
-    else
-      return memo_travelled.calc(GetOrigin()->GetLocationTravelled(), ref);
+    else {
+      // not in cylinder (or has entered and left)
+      // this provides vector with bearing to center (which is NOT bearing to plane)
+      // and Dist from last travelled to center minus dist from glider to center.
+      fixed dist = GetOrigin()->GetLocationTravelled().Distance(destination.GetLocation())
+          - ref.Distance(destination.GetLocation());
 
+      return GeoVector(
+          std::max(fixed(0), dist),
+          GetOrigin()->GetLocationTravelled().Bearing(destination.GetLocation()));
+    }
   case OrderedTaskPoint::AFTER_ACTIVE:
     if (!GetOrigin())
       return GeoVector::Zero();
