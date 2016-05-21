@@ -356,9 +356,9 @@ static constexpr MetaData meta_data[] = {
 
   // e_SpeedTaskAvg
   {
-    N_("Speed task average"),
-    N_("V Task Avg"),
-    N_("Average cross country speed while on current task, not compensated for altitude."),
+    N_("Speed on task"),
+    N_("V Task"),
+    N_("Average speed while on current task, not compensated for altitude."),
     UpdateInfoBoxTaskSpeed,
     e_CC_SpeedInst, // V Task Inst
     e_Fin_AltReq, // Fin AltR
