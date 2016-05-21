@@ -485,6 +485,8 @@ private:
 
   /**
    * @return true if a solution was found (and applied)
+   * Updates search point max for each tp in task
+   * Updates search point achieved for prior tps in task
    */
   bool RunDijsktraMax();
 
