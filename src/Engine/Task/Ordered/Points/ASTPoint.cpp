@@ -28,5 +28,6 @@ ASTPoint::Equals(const OrderedTaskPoint &_other) const
   const ASTPoint &other = (const ASTPoint &)_other;
 
   return IntermediateTaskPoint::Equals(_other) &&
-    other.GetScoreExit() == GetScoreExit();
+    other.GetScoreExit() == GetScoreExit() &&
+    other.IsBoundaryScored() == IsBoundaryScored();
 }
