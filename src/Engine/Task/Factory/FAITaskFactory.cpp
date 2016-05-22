@@ -65,6 +65,12 @@ FAITaskFactory::FAITaskFactory(OrderedTask& _task,
 }
 
 bool
+FAITaskFactory::IsStartBoundaryScored(bool is_american_task) const
+{
+  return false;
+}
+
+bool
 FAITaskFactory::Validate()
 {
   bool valid = AbstractTaskFactory::Validate();

@@ -60,6 +60,13 @@ public:
   bool Validate() override;
 
   /**
+   * Is the boundary of the start cylinder scored
+   * instead of the center with an adjustment?
+   * Start line not affected
+   */
+  bool IsStartBoundaryScored(bool is_american_task) const override;
+
+  /**
    * swaps non FAI OZs with either FAI OZs
    * based on the shape of the input point
    * @param tp

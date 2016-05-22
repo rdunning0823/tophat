@@ -94,12 +94,21 @@ AbstractTaskFactory::GetMutatedPointType(const OrderedTaskPoint &tp) const
   return newtype;
 }
 
+bool
+AbstractTaskFactory::IsStartBoundaryScored(bool is_american_task) const
+{
+  return is_american_task;
+}
+
 StartPoint*
 AbstractTaskFactory::CreateStart(ObservationZonePoint* oz,
                                  const Waypoint& wp) const
 {
+  bool is_american_task =
+      behaviour.contest_nationality == ContestNationalities::AMERICAN;
   return new StartPoint(oz, wp, behaviour,
-                        GetOrderedTaskSettings().start_constraints);
+                        GetOrderedTaskSettings().start_constraints,
+                        IsStartBoundaryScored(is_american_task));
 }
 
 FinishPoint*

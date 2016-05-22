@@ -45,6 +45,11 @@ class StartPoint final : public OrderedTaskPoint {
   TaskStartMargins margins;
 
   /**
+   * should the start radius be subtracted from the first leg for scoring?
+   */
+  bool subtract_start_radius;
+
+  /**
    * A copy of OrderedTaskSettings::start_constraints, managed by
    * SetOrderedTaskSettings().
    */
@@ -59,13 +64,15 @@ public:
    * @param wp Waypoint origin of turnpoint
    * @param tb Task Behaviour defining options (esp safety heights)
    * @param to OrderedTask Behaviour defining options
+   * @param is the start scored by the real location of the boundary exit
    *
    * @return Partially-initialised object
    */
   StartPoint(ObservationZonePoint *_oz,
              const Waypoint &wp,
              const TaskBehaviour &tb,
-             const StartConstraints &constraints);
+             const StartConstraints &constraints,
+             bool boundary_scored = false);
 
   bool DoesRequireArm() const {
     return constraints.require_arm;
@@ -85,6 +92,7 @@ public:
    *   - for FAI use closest point on boundary of cylinder
    * Updates stats, samples and states for start, intermediate and finish transitions
    * Should only be performed when the aircraft state is inside the sector
+   * Also saves subtract_start_radius as member property
    *
    * @param state Current aircraft state
    * @param next Next task point following the start
@@ -109,6 +117,9 @@ public:
   void SetNeighbours(OrderedTaskPoint *prev,
                      OrderedTaskPoint *next) override;
   bool IsInSector(const AircraftState &ref) const override;
+
+  /* virtual methods from class ObservationZoneClient */
+  fixed ScoreAdjustment() const override;
 
 private:
   /* virtual methods from class ScoredTaskPoint */

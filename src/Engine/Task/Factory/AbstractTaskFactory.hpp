@@ -368,11 +368,18 @@ public:
    *
    * @param pt OZ to be used
    * @param wp Waypoint reference
+   * @param boundary_scored
    *
    * @return Initialised object.  Ownership is transferred to client.
    */
   gcc_malloc
   StartPoint* CreateStart(ObservationZonePoint* pt, const Waypoint &wp) const;
+
+  /**
+   * is the boundary of the start cylinder scored
+   * instead of the center with an adjustment
+   */
+  virtual bool IsStartBoundaryScored(bool is_american_task) const;
 
   /**
    * returns size of OZ in meters

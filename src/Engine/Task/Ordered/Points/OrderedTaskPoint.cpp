@@ -159,7 +159,8 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
   case TaskPointType::START:
     return new StartPoint(GetObservationZone().Clone(waypoint->location),
                           *waypoint, task_behaviour,
-                          ordered_task_settings.start_constraints);
+                          ordered_task_settings.start_constraints,
+                          IsBoundaryScored());
 
   case TaskPointType::AST: {
     const ASTPoint &src = *(const ASTPoint *)this;
