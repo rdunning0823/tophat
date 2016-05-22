@@ -238,7 +238,7 @@ public:
    * distance calculation
    */
   gcc_pure
-  bool SubtractStartRadius() const;
+  bool ScoredAdjustmentStart() const;
 
   /**
    * Insert taskpoint before specified index in task.  May fail if the candidate

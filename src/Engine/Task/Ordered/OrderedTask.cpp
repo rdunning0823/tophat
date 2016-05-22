@@ -227,7 +227,7 @@ OrderedTask::ScanLegStartTime()
 // DISTANCES
 
 inline bool
-OrderedTask::SubtractStartRadius() const {
+OrderedTask::ScoredAdjustmentStart() const {
   if (taskpoint_start == nullptr)
     return false;
 
@@ -265,7 +265,7 @@ OrderedTask::RunDijsktraMin(const GeoPoint &location)
   TaskDijkstraMin &dijkstra = *dijkstra_min;
 
   // only let Dijstra set min for start if we're subtracting start radius
-  const unsigned active_index = std::max((SubtractStartRadius() ? 0u : 1u),
+  const unsigned active_index = std::max((ScoredAdjustmentStart() ? 0u : 1u),
                                          GetActiveIndex());
   dijkstra.SetTaskSize(task_size - active_index);
   for (unsigned i = active_index; i != task_size; ++i) {
@@ -339,7 +339,7 @@ OrderedTask::RunDijsktraMax()
   }
 
   fixed start_radius(-1), finish_radius(-1);
-  if (SubtractStartRadius()) {
+  if (ScoredAdjustmentStart()) {
     const auto &start = *task_points.front();
     start_radius = GetCylinderRadiusOrMinusOne(start);
     if (positive(start_radius))
@@ -381,7 +381,7 @@ OrderedTask::RunDijsktraMax()
 
     SetPointSearchMax(i, solution);
     // only do this for start if we're subtracting the start radius
-    if (i <= active_index && ((i > 0) || SubtractStartRadius()))
+    if (i <= active_index && ((i > 0) || ScoredAdjustmentStart()))
       set_tp_search_achieved(i, solution);
   }
 
@@ -566,7 +566,7 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   if (stats.start.task_started && !last_started) {
     /* calculates location of start and updates samples, and state_entered */
     taskpoint_start->find_best_start(state, *task_points[1], task_projection,
-                                     SubtractStartRadius());
+                                     ScoredAdjustmentStart());
 
     const AircraftState start_state = taskpoint_start->GetEnteredState();
     stats.start.SetStarted(start_state);
@@ -638,7 +638,7 @@ void
 OrderedTask::SavedStartRestore()
 {
   taskpoint_start->find_best_start(saved_start_state_pushed, *task_points[1],
-                                   task_projection, SubtractStartRadius());
+                                   task_projection, ScoredAdjustmentStart());
   stats.start.SetStarted(saved_start_state_pushed);
   taskpoint_finish->set_fai_finish_height(saved_start_state_pushed.altitude - fixed(1000));
 
