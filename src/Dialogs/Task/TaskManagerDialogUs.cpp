@@ -24,7 +24,7 @@ Copyright_License {
 #include "TaskManagerDialogUs.hpp"
 #include "UIGlobals.hpp"
 #include "Dialogs/Message.hpp"
-#include "Dialogs/Task/TaskEditorDialog.hpp"
+#include "Dialogs/Task/TaskEditorDialogUs.hpp"
 #include "Dialogs/Task/dlgTaskHelpers.hpp"
 #include "Dialogs/Message.hpp"
 #include "Screen/Layout.hpp"
