@@ -226,31 +226,18 @@ OrderedTask::ScanLegStartTime()
 
 // DISTANCES
 
+/**
+ * @return true for FAI and non-US tasks.  False for US AT, TAT, MAT
+ */
 inline bool
 OrderedTask::ScoredAdjustmentStart() const {
   if (taskpoint_start == nullptr)
     return false;
 
   if (!taskpoint_start->HasEntered())
-    return true;
+    return false;
 
-  switch (GetFactoryType()) {
-  case TaskFactoryType::FAI_GENERAL:
-  case TaskFactoryType::FAI_TRIANGLE:
-  case TaskFactoryType::FAI_OR:
-  case TaskFactoryType::FAI_GOAL:
-    return true;
-
-  case TaskFactoryType::MIXED:
-  case TaskFactoryType::TOURING:
-  case TaskFactoryType::COUNT:
-
-  case TaskFactoryType::RACING:
-  case TaskFactoryType::AAT:
-  case TaskFactoryType::MAT:
-    return task_behaviour.contest_nationality != ContestNationalities::AMERICAN;
-  }
-  return false;
+  return !taskpoint_start->IsBoundaryScored();
 }
 
 inline bool
