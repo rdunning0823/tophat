@@ -29,6 +29,10 @@
 fixed
 CylinderZone::ScoreAdjustment() const
 {
+  // This handles both MAT and US AT tasks
+  if (this->GetShape() == ObservationZone::Shape::MAT_CYLINDER)
+    return fixed(0);
+
   return radius;
 }
 
