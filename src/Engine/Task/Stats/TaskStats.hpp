@@ -129,6 +129,13 @@ public:
     return total.pirker.GetSpeedIncremental();
   }
 
+  fixed GetScoredSpeed() const {
+    if (positive(total.time_elapsed))
+      return distance_scored / total.time_elapsed;
+    else
+      return fixed(0);
+  }
+
   /** Reset each element (for incremental speeds). */
   void reset();
 

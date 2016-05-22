@@ -54,6 +54,7 @@ class TaskLeg {
 
   DistanceMemento memo_max;
   DistanceMemento memo_min;
+  DistanceMemento memo_scored;
   GeoVectorMemento memo_nominal;
   GeoVectorMemento memo_planned;
   GeoVectorMemento memo_travelled;
@@ -197,6 +198,12 @@ private:
   
   gcc_pure
   GeoVector GetRemainingVector(const GeoPoint &ref) const;
+
+  /**
+   * return the leg's landout distance for a point whose oz has not entered
+   */
+  gcc_pure
+  fixed GetScoredLegDistanceLandout(const GeoPoint &ref) const;
 
   gcc_pure
   fixed GetScoredDistance(const GeoPoint &ref) const;

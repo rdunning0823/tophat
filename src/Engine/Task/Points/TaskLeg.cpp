@@ -140,6 +140,18 @@ TaskLeg::GetTravelledVector(const GeoPoint &ref) const
   return GeoVector::Invalid();
 }
 
+fixed
+TaskLeg::GetScoredLegDistanceLandout(const GeoPoint &ref) const
+{
+  assert(!destination.HasEntered());
+  assert(ref.IsValid());
+
+  return std::max(fixed(0),
+                  GetOrigin()->GetLocationScored().Distance(destination.GetLocation())
+                  - ref.Distance(destination.GetLocation())
+                  - GetOrigin()->ScoreAdjustment());
+}
+
 inline fixed
 TaskLeg::GetScoredDistance(const GeoPoint &ref) const
 {
@@ -149,31 +161,45 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   switch (destination.GetActiveState()) {
   case OrderedTaskPoint::BEFORE_ACTIVE:
     // this leg totally included
-    return std::max(fixed(0),
-                    GetOrigin()->GetLocationScored().Distance(destination.GetLocationScored())
-                    - GetOrigin()->ScoreAdjustment()-destination.ScoreAdjustment());
+    if (destination.HasEntered()) {
+      return std::max(fixed(0),
+                      memo_scored.Distance(GetOrigin()->GetLocationScored(),
+                                  destination.GetLocationScored())
+                                  - GetOrigin()->ScoreAdjustment()
+                                  - destination.ScoreAdjustment());
+    } else {
+      // if we missed an OZ in the past, or just advance the task bar fwd
+      // then
+      if (ref.IsValid()) {
+        return GetScoredLegDistanceLandout(ref);
+      } else {
+        return fixed(0);
+      }
+
+    }
 
   case OrderedTaskPoint::CURRENT_ACTIVE:
     // this leg partially included
     if (destination.HasEntered()) {
       return std::max(fixed(0),
-                      GetOrigin()->GetLocationScored().Distance(destination.GetLocationScored())
-                      - GetOrigin()->ScoreAdjustment()-destination.ScoreAdjustment());
-    } else if (ref.IsValid())
-      return std::max(fixed(0),
-                      ref.ProjectedDistance(GetOrigin()->GetLocationScored(),
-                                            destination.GetLocationScored())
-                      -GetOrigin()->ScoreAdjustment());
-    else
+                      memo_scored.Distance(GetOrigin()->GetLocationScored(),
+                                           destination.GetLocationScored())
+                      - GetOrigin()->ScoreAdjustment() - destination.ScoreAdjustment());
+    } else if (ref.IsValid()) {
+      // not in cylinder (or has entered and left)
+      // this provides vector with bearing to center (which is NOT bearing to plane)
+      // and Dist from last travelled to center minus dist from glider to center.
+      return GetScoredLegDistanceLandout(ref);
+    } else
       return fixed(0);
 
   case OrderedTaskPoint::AFTER_ACTIVE:
+
     // this leg may be partially included
     if (GetOrigin()->HasEntered() && ref.IsValid()) {
       return std::max(fixed(0),
-                      memo_travelled.calc(GetOrigin()->GetLocationScored(),
-                                          ref).distance
-                      -GetOrigin()->ScoreAdjustment());
+                      memo_scored.Distance(GetOrigin()->GetLocationScored(), ref)
+                      - GetOrigin()->ScoreAdjustment());
     }
 
     return fixed(0);
