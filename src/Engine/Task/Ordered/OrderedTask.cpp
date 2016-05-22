@@ -565,8 +565,7 @@ OrderedTask::CheckTransitions(const AircraftState &state,
 
   if (stats.start.task_started && !last_started) {
     /* calculates location of start and updates samples, and state_entered */
-    taskpoint_start->find_best_start(state, *task_points[1], task_projection,
-                                     ScoredAdjustmentStart());
+    taskpoint_start->find_best_start(state, *task_points[1], task_projection);
 
     const AircraftState start_state = taskpoint_start->GetEnteredState();
     stats.start.SetStarted(start_state);
@@ -638,7 +637,7 @@ void
 OrderedTask::SavedStartRestore()
 {
   taskpoint_start->find_best_start(saved_start_state_pushed, *task_points[1],
-                                   task_projection, ScoredAdjustmentStart());
+                                   task_projection);
   stats.start.SetStarted(saved_start_state_pushed);
   taskpoint_finish->set_fai_finish_height(saved_start_state_pushed.altitude - fixed(1000));
 

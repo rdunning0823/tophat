@@ -45,11 +45,6 @@ class StartPoint final : public OrderedTaskPoint {
   TaskStartMargins margins;
 
   /**
-   * should the start radius be subtracted from the first leg for scoring?
-   */
-  bool subtract_start_radius;
-
-  /**
    * A copy of OrderedTaskSettings::start_constraints, managed by
    * SetOrderedTaskSettings().
    */
@@ -97,12 +92,10 @@ public:
    * @param state Current aircraft state
    * @param next Next task point following the start
    * @param
-   * @para do we find a point on the border instead of the actual start point
    */
   void find_best_start(const AircraftState &state,
                        const OrderedTaskPoint &next,
-                       const FlatProjection &projection,
-                       bool subtract_start_radius);
+                       const FlatProjection &projection);
 
   /* virtual methods from class TaskPoint */
   fixed GetElevation() const override;
