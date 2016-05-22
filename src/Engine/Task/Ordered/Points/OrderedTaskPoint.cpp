@@ -166,7 +166,7 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
     const ASTPoint &src = *(const ASTPoint *)this;
     ASTPoint *dest = new
         ASTPoint(GetObservationZone().Clone(waypoint->location),
-                 *waypoint, task_behaviour, IsBoundaryScored());
+                 *waypoint, task_behaviour);
     dest->SetScoreExit(src.GetScoreExit());
     tp_temp = (OrderedTaskPoint*)dest;
     break;
