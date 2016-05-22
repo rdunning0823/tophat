@@ -42,6 +42,7 @@ public:
   enum class Shape : uint8_t {
     LINE,
     CYLINDER,
+    /** used for both MAT and US AT tasks */
     MAT_CYLINDER,
     SECTOR,
     FAI_SECTOR,
