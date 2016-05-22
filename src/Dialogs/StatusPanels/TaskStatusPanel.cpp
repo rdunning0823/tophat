@@ -43,7 +43,7 @@ Copyright_License {
 #include "Formatter/TimeFormatter.hpp"
 
 enum Controls {
-  SPEED_ACHIEVED,
+  SPEED,
   DISTANCE_DONE,
   DISTANCE_REMAINING,
   AAT_TIME,
@@ -71,11 +71,11 @@ TaskStatusPanel::Refresh()
     SetText(AAT_ESTIMATED, time.c_str());
   }
 
-  fixed distance_achieved = task_stats.total.travelled.IsDefined()
-    ? task_stats.total.travelled.GetDistance()
+  fixed distance = positive(task_stats.distance_scored)
+    ? task_stats.distance_scored
     : fixed(0);
-  if (positive(distance_achieved))
-    LoadValue(DISTANCE_DONE, distance_achieved,
+  if (positive(distance))
+    LoadValue(DISTANCE_DONE, distance,
               UnitGroup::DISTANCE);
   else
     ClearValue(DISTANCE_DONE);
@@ -90,11 +90,11 @@ TaskStatusPanel::Refresh()
   else
     ClearValue(DISTANCE_REMAINING);
 
-  if (task_stats.total.travelled.IsDefined())
-    LoadValue(SPEED_ACHIEVED, task_stats.total.travelled.GetSpeed(),
+  if (task_stats.task_valid && positive(task_stats.distance_scored))
+    LoadValue(SPEED, task_stats.GetScoredSpeed(),
               UnitGroup::TASK_SPEED);
   else
-    ClearValue(SPEED_ACHIEVED);
+    ClearValue(SPEED);
 }
 
 void
@@ -104,9 +104,9 @@ TaskStatusPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   instance = this;
 
-  AddReadOnly(_("Achieved speed"), NULL, _T("%.0f %s"),
+  AddReadOnly(_("Task speed"), NULL, _T("%.0f %s"),
               UnitGroup::TASK_SPEED, fixed(0));
-  AddReadOnly(_("Achieved distance"), NULL, _T("%.0f %s"),
+  AddReadOnly(_("Distance done"), NULL, _T("%.0f %s"),
               UnitGroup::DISTANCE, fixed(0));
   AddReadOnly(_("Distance remaining"), NULL, _T("%.0f %s"),
               UnitGroup::DISTANCE, fixed(0));
