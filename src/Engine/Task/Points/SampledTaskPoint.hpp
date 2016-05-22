@@ -166,6 +166,10 @@ public:
     return nominal_points;
   }
 
+  /**
+   * Whether trace boundaries are used in scoring distance, or just the
+   * reference point
+   */
   bool IsBoundaryScored() const {
     return boundary_scored;
   }
