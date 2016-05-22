@@ -99,8 +99,8 @@ public:
 #endif
 
 static constexpr StaticEnumChoice  task_rules_types[] = {
-  { (unsigned)ContestNationalities::FAI, N_("FAI rules"), N_("Use FAI contest rules for flying contests.") },
-  { (unsigned)ContestNationalities::AMERICAN, N_("US rules"), N_("Use US contest rules for flying contests.") },
+  { (unsigned)ContestNationalities::FAI, N_("FAI rules"), N_("Use FAI contest rules for flying contests.  Requires restart.") },
+  { (unsigned)ContestNationalities::AMERICAN, N_("US rules"), N_("Use US contest rules for flying contests.  Requires restart.") },
   { 0 }
 };
 
@@ -260,8 +260,9 @@ NationalityConfigPanel::Save(bool &_changed)
   bool changed = false;;
 
 
-  SaveValueEnum(ContestNationality, ProfileKeys::ContestNationality,
-                task_behaviour.contest_nationality);
+  require_restart |= SaveValueEnum(ContestNationality,
+                                   ProfileKeys::ContestNationality,
+                                   task_behaviour.contest_nationality);
 
   DataFieldEnum* dfe = (DataFieldEnum*)
       RowFormWidget::GetControl(UnitsPreset).GetDataField();
