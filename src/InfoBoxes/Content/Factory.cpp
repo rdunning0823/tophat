@@ -278,7 +278,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("MacCready setting"),
     N_("MC"),
-    N_("The current MacCready setting and the current MacCready mode (manual or auto). (Touch-screen/PC only) Also used to adjust the MacCready setting if the InfoBox is active, by using the up/down cursor keys."),
+    N_("The current MacCready setting and the current MacCready mode. Also the inter-thermal speed-to-fly.  Auto MC will set it to your thermal rate of climb."),
     IBFHelper<InfoBoxContentMacCready>::Create,
     e_WP_Speed_MC, // V MC
     NextLegEqThermal,
