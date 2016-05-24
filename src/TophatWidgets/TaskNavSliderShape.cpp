@@ -306,8 +306,11 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       type_buffer = _("Start");
     else if (idx + 1 == task_size)
       type_buffer = _("Finish");
+    else if (task_factory_type ==  TaskFactoryType::AAT && navigate_to_target)
+      // append "Target" text to distance in center
+      type_buffer.clear();
     else if (task_factory_type ==  TaskFactoryType::AAT)
-      _stprintf(type_buffer.buffer(), _T("%s %u"), navigate_to_target ? _("Target") : _("Center"), idx);
+      _stprintf(type_buffer.buffer(), _T("%s %u"), _("Center"), idx);
     else
       _stprintf(type_buffer.buffer(), _T("%s %u"), _("TP"), idx);
 
@@ -354,10 +357,20 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   // draw distance centered between label and altitude.
   // draw label if room
+  StaticString<30> distance_only_buffer(_T(""));
+
   if (distance_valid) {
-    FormatUserDistance(tp_distance, distance_buffer.buffer(), true, 1);
+    FormatUserDistance(tp_distance, distance_only_buffer.buffer(), true, 1);
   }
 
+  distance_buffer.clear();
+  if (navigate_to_target &&
+      task_size > 0 &&
+      idx != 0 &&
+      (idx + 1 != task_size)) {
+    distance_buffer.Format(_T("%s: "), _("Target"));
+  }
+  distance_buffer.append(distance_only_buffer.c_str());
   if (gr_valid && ui_settings.navbar_enable_gr) {
     if (gr_value <= fixed(0)) {
       distance_buffer.append(_T(" [##]"));
