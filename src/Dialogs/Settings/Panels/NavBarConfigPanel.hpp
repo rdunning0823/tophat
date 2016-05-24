@@ -24,9 +24,7 @@ Copyright_License {
 #ifndef NAVBARCONFIGPANEL_HPP
 #define NAVBARCONFIGPANEL_HPP
 
-#include "Form/ActionListener.hpp"
 #include "Widget/RowFormWidget.hpp"
-#include "Form/DataField/Listener.hpp"
 #include "UIGlobals.hpp"
 
 class NavBarConfigPanel final : public RowFormWidget {
