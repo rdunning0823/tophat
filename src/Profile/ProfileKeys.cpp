@@ -292,5 +292,6 @@ const char SystemSoundVolume [] = "SystemSoundVolume";
 
 const char NavBarDisplayGR [] = "NavBarDisplayGR";
 const char NavBarDisplayTpIndex [] = "NavBarDisplayTpIndex";
+const char NavBarDisplayAATMinimumDistance [] = "NavBarDisplayAATMinimumDistance";
 const char NavBarNavigateToAATTarget [] = "NavBarNavigateToAATTarget";
 }
