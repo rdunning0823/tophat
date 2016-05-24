@@ -32,7 +32,6 @@ Copyright_License {
 enum ControlIndex {
   DisplayGR,
   DisplayTpIndex,
-  DisplayTpName,
   NavBarNavigateToAATTarget
 };
 
@@ -51,10 +50,6 @@ NavBarConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Display TP index"),
              _("Enable/disable displaying TP index number in TopHat NavBar."),
              ui_settings.navbar_enable_tp_index);
-
-  AddBoolean(_("Display TP name"),
-             _("Enable/disable displaying TP name in TopHat NavBar."),
-             ui_settings.navbar_enable_tp_name);
 
   StaticString<25> label;
   StaticString<100> desc;
@@ -86,9 +81,6 @@ NavBarConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(DisplayTpIndex, ProfileKeys::NavBarDisplayTpIndex,
                        ui_settings.navbar_enable_tp_index);
-
-  changed |= SaveValue(DisplayTpName, ProfileKeys::NavBarDisplayTpName,
-                       ui_settings.navbar_enable_tp_name);
 
   changed |= SaveValue(NavBarNavigateToAATTarget, ProfileKeys::NavBarNavigateToAATTarget,
                        ui_settings.navbar_navigate_to_aat_target);
