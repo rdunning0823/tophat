@@ -70,7 +70,7 @@ UISettings::SetDefaults()
   dialog.SetDefaults();
   sound.SetDefaults();
 
-  navbar_enable_gr = true;
+  navbar_enable_gr = false;
   navbar_enable_tp_index = true;
   navbar_enable_tp_name = true;
   navbar_navigate_to_aat_target = false;
