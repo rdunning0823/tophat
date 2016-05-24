@@ -26,11 +26,14 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "Interface.hpp"
 #include "Widget/RowFormWidget.hpp"
+#include "Util/StaticString.hxx"
+#include "Task/TaskBehaviour.hpp"
 
 enum ControlIndex {
   DisplayGR,
   DisplayTpIndex,
-  DisplayTpName
+  DisplayTpName,
+  NavBarNavigateToAATTarget
 };
 
 void
@@ -52,6 +55,24 @@ NavBarConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(_("Display TP name"),
              _("Enable/disable displaying TP name in TopHat NavBar."),
              ui_settings.navbar_enable_tp_name);
+
+  StaticString<25> label;
+  StaticString<100> desc;
+
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &task_behaviour = settings_computer.task;
+
+  if (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) {
+    label = _("Navigate to TAT targets");
+    desc = _("The Nav Bar will navigate to TAT targets instead of the centers of the observation zones.");
+  } else {
+    label = _("Navigate to AAT targets");
+    desc = _("The Nav Bar will navigate to AAT targets instead of the centers of the observation zones.");
+  }
+
+  AddBoolean(label,
+             desc,
+             ui_settings.navbar_navigate_to_aat_target);
 }
 
 bool
@@ -68,6 +89,9 @@ NavBarConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(DisplayTpName, ProfileKeys::NavBarDisplayTpName,
                        ui_settings.navbar_enable_tp_name);
+
+  changed |= SaveValue(NavBarNavigateToAATTarget, ProfileKeys::NavBarNavigateToAATTarget,
+                       ui_settings.navbar_navigate_to_aat_target);
 
   _changed |= changed;
 

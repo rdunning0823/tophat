@@ -232,7 +232,8 @@ public:
             bool bearing_valid,
             fixed gr_value,
             bool gr_valid,
-            bool use_wide_pen);
+            bool use_wide_pen,
+            bool navigate_to_target);
 
 #ifdef _WIN32
   /**

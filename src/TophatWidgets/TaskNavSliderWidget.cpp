@@ -188,25 +188,52 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool has_entered = tp_valid && is_ordered && otp->HasEntered();
   bool has_exited = tp_valid && is_ordered && otp->HasExited();
 
-  slider_shape.Draw(canvas, rc_outer,
-                    idx, GetList().GetCursorDownIndex() == (int)idx,
-                    idx == waypoint_index,
-                    tp_valid ? twp->name.c_str() : _T(""),
-                    has_entered, has_exited,
-                    mode,
-                    factory_type,
-                    task_size,
-                    tp_valid,
-                    result.vector.distance,
-                    basic.location_available && result.vector.IsValid(),
-                    result.SelectAltitudeDifference(settings.task.glide) -
-                        settings.task.safety_height_arrival,
-                    basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
-                    result.vector.bearing - basic.track,
-                    basic.location_available && result.vector.IsValid(),
-                    ::AngleToGradient(result.DestinationAngleGround()),
-                    result.IsOk(),
-                    use_wide_pen);
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+
+  if (factory_type == TaskFactoryType::AAT &&
+      ui_settings.navbar_navigate_to_aat_target &&
+      mode == TaskType::ORDERED) {
+    slider_shape.Draw(canvas, rc_outer,
+                      idx, GetList().GetCursorDownIndex() == (int)idx,
+                      idx == waypoint_index,
+                      tp_valid ? twp->name.c_str() : _T(""),
+                      has_entered, has_exited,
+                      mode,
+                      factory_type,
+                      task_size,
+                      tp_valid,
+                      basic.location.Distance(otp->GetLocationRemaining()),
+                      basic.location_available && otp->GetLocationRemaining().IsValid(),
+                      fixed(0),
+                      false,
+                      basic.location.Bearing(otp->GetLocationRemaining()) - basic.track,
+                      basic.location_available && otp->GetLocationRemaining().IsValid(),
+                      fixed(0),
+                      false,
+                      use_wide_pen,
+                      true);
+  } else {
+    slider_shape.Draw(canvas, rc_outer,
+                      idx, GetList().GetCursorDownIndex() == (int)idx,
+                      idx == waypoint_index,
+                      tp_valid ? twp->name.c_str() : _T(""),
+                      has_entered, has_exited,
+                      mode,
+                      factory_type,
+                      task_size,
+                      tp_valid,
+                      result.vector.distance,
+                      basic.location_available && result.vector.IsValid(),
+                      result.SelectAltitudeDifference(settings.task.glide) -
+                          settings.task.safety_height_arrival,
+                      basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
+                      result.vector.bearing - basic.track,
+                      basic.location_available && result.vector.IsValid(),
+                      ::AngleToGradient(result.DestinationAngleGround()),
+                      result.IsOk(),
+                      use_wide_pen,
+                      false);
+  }
 }
 
 void

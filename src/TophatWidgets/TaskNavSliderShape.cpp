@@ -232,7 +232,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   bool bearing_valid,
                   fixed gr_value,
                   bool gr_valid,
-                  bool use_wide_pen)
+                  bool use_wide_pen,
+                  bool navigate_to_target)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
@@ -306,7 +307,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     else if (idx + 1 == task_size)
       type_buffer = _("Finish");
     else if (task_factory_type ==  TaskFactoryType::AAT)
-      _stprintf(type_buffer.buffer(), _T("%s %u"), _("Center"), idx);
+      _stprintf(type_buffer.buffer(), _T("%s %u"), navigate_to_target ? _("Target") : _("Center"), idx);
     else
       _stprintf(type_buffer.buffer(), _T("%s %u"), _("TP"), idx);
 

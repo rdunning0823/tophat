@@ -238,21 +238,48 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
       (outer_rect.right - outer_rect.left)) / 2;
   outer_rect.Offset(x_offset, 0);
 
-  slider_shape.Draw(canvas, outer_rect,
-                    idx, false, false,
-                    wp_name.c_str(),
-                    has_entered, has_exited,
-                    task_mode,
-                    task_factory_type,
-                    task_size,
-                    tp_valid, distance, distance_valid,
-                    altitude_difference,
-                    altitude_difference_valid,
-                    bearing,
-                    bearing_valid,
-                    ::AngleToGradient(result2.DestinationAngleGround()),
-                    result2.IsOk(),
-                    use_wide_pen);
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+
+  if (task_factory_type == TaskFactoryType::AAT &&
+      ui_settings.navbar_navigate_to_aat_target &&
+      task_mode == TaskType::ORDERED) {
+    slider_shape.Draw(canvas, outer_rect,
+                      idx, false, false,
+                      wp_name.c_str(),
+                      has_entered, has_exited,
+                      task_mode,
+                      task_factory_type,
+                      task_size,
+                      tp_valid,
+                      Basic().location.Distance(tp->GetLocationRemaining()),
+                      Basic().location_available && tp->GetLocationRemaining().IsValid(),
+                      fixed(0),
+                      false,
+                      Basic().location.Bearing(tp->GetLocationRemaining()) - Basic().track,
+                      Basic().location_available && tp->GetLocationRemaining().IsValid(),
+                      fixed(0),
+                      false,
+                      use_wide_pen,
+                      true);
+
+  } else {
+    slider_shape.Draw(canvas, outer_rect,
+                      idx, false, false,
+                      wp_name.c_str(),
+                      has_entered, has_exited,
+                      task_mode,
+                      task_factory_type,
+                      task_size,
+                      tp_valid, distance, distance_valid,
+                      altitude_difference,
+                      altitude_difference_valid,
+                      bearing,
+                      bearing_valid,
+                      ::AngleToGradient(result2.DestinationAngleGround()),
+                      result2.IsOk(),
+                      use_wide_pen,
+                      false);
+  }
 }
 #endif
 

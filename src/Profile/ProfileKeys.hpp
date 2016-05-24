@@ -289,6 +289,7 @@ extern const char SystemSoundVolume [];
 extern const char NavBarDisplayGR [];
 extern const char NavBarDisplayTpIndex [];
 extern const char NavBarDisplayTpName [];
+extern const char NavBarNavigateToAATTarget [];
 }
 
 #endif

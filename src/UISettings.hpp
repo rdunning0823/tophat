@@ -128,6 +128,8 @@ struct UISettings {
   bool navbar_enable_gr;
   bool navbar_enable_tp_index;
   bool navbar_enable_tp_name;
+  /** if true, navigates to target instead of center in AAT mode */
+  bool navbar_navigate_to_aat_target;
 
   void SetDefaults();
 
