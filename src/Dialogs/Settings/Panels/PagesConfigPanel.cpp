@@ -215,7 +215,7 @@ PageLayoutEditWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     { 0 }
   };
 
-  WndProperty *wp = AddEnum(_("Infobox sets"),
+  WndProperty *wp = AddEnum(_("Infoboxes"),
                             _("Specifies which Infobox set should be displayed on this page."),
                             ib_list, IBP_AUTO, this);
   DataFieldEnum &ib = *(DataFieldEnum *)wp->GetDataField();
