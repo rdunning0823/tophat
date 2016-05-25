@@ -32,8 +32,7 @@ Copyright_License {
 enum ControlIndex {
   DisplayGR,
   DisplayTpIndex,
-  NavBarNavigateToAATTarget,
-  DisplayAATMinDistance
+  NavBarNavigateToAATTarget
 };
 
 void
@@ -69,10 +68,6 @@ NavBarConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(label,
              desc,
              ui_settings.navbar_navigate_to_aat_target);
-
-  AddBoolean(_("Display min. distance"),
-             _("Display the minimum distance to reach the edge of the turnpoint observation zone"),
-             ui_settings.navbar_enable_aat_min_distance);
 }
 
 bool
@@ -89,9 +84,6 @@ NavBarConfigPanel::Save(bool &_changed)
 
   changed |= SaveValue(NavBarNavigateToAATTarget, ProfileKeys::NavBarNavigateToAATTarget,
                        ui_settings.navbar_navigate_to_aat_target);
-
-  changed |= SaveValue(DisplayAATMinDistance, ProfileKeys::NavBarDisplayAATMinimumDistance,
-                       ui_settings.navbar_enable_aat_min_distance);
 
   _changed |= changed;
 

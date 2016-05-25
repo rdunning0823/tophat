@@ -184,6 +184,5 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
 
   map.Get(ProfileKeys::NavBarDisplayGR, settings.navbar_enable_gr);
   map.Get(ProfileKeys::NavBarDisplayTpIndex, settings.navbar_enable_tp_index);
-  map.Get(ProfileKeys::NavBarDisplayAATMinimumDistance, settings.navbar_enable_aat_min_distance);
   map.Get(ProfileKeys::NavBarNavigateToAATTarget, settings.navbar_navigate_to_aat_target);
 }
