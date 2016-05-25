@@ -228,8 +228,8 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   SetExpertRow(AppInfoBoxBorder);
 
   if (quick_setup) {
-    AddButton(_("Edit screens"), *this, CustomizeScreens);
-    AddButton(_("Edit infoboxes"), *this, CustomizeInfoBoxes);
+    AddButton(_("Screens"), *this, CustomizeScreens);
+    AddButton(_("Infoboxes"), *this, CustomizeInfoBoxes);
     AddButton(_("Fonts"), *this, CustomizeFonts);
 
   } else {
