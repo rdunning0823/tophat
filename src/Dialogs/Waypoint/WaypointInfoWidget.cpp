@@ -138,12 +138,12 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
       CommonInterface::GetComputerSettings().task;
 
     StaticString<10> gr_text(_T("+++"));
-    const fixed safety_height = task_behaviour.safety_height_arrival;
-    const fixed target_altitude = waypoint.elevation + safety_height;
-    const fixed delta_h = basic.nav_altitude - target_altitude;
-    if (positive(delta_h)) {
+    const fixed safety_height_gr = task_behaviour.safety_height_arrival_gr;
+    const fixed target_altitude_gr = waypoint.elevation + safety_height_gr;
+    const fixed delta_h_gr = basic.nav_altitude - target_altitude_gr;
+    if (positive(delta_h_gr)) {
       const fixed distance = basic.location.Distance(waypoint.location);
-      const fixed gr = distance / delta_h;
+      const fixed gr = distance / delta_h_gr;
       if (GradientValid(gr)) {
         ::FormatGlideRatio(gr_text.buffer(), gr_text.CAPACITY, gr);
       }

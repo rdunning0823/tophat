@@ -146,6 +146,15 @@ GlideResult::DestinationAngleGround() const
   return fixed(1000);
 }
 
+fixed
+GlideResult::DestinationAngleWithGRSafety(fixed safetyLimit) const
+{
+  if (positive(vector.distance))
+    return (altitude_difference + pure_glide_height - safetyLimit) / vector.distance;
+
+  return fixed(1000);
+}
+
 bool
 GlideResult::IsFinalGlide() const
 {

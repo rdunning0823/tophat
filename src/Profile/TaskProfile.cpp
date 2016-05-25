@@ -104,6 +104,7 @@ Profile::Load(const ProfileMap &map, TaskBehaviour &settings)
   //  settings.safety_mc = fixed(Temp) / 10;
 
   map.Get(ProfileKeys::SafetyAltitudeArrival, settings.safety_height_arrival);
+  map.Get(ProfileKeys::SafetyAltitudeArrivalGR, settings.safety_height_arrival_gr);
   map.GetEnum(ProfileKeys::TaskType, settings.task_type_default);
   Load(map, settings.start_margins);
 

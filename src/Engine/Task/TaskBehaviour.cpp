@@ -57,6 +57,7 @@ TaskBehaviour::SetDefaults()
   risk_gamma = fixed(0);
   safety_mc = fixed(0.5);
   safety_height_arrival = fixed(0);
+  safety_height_arrival_gr = fixed(0);
   task_type_default = TaskFactoryType::RACING;
   start_margins.SetDefaults();
   sector_defaults.SetDefaults();

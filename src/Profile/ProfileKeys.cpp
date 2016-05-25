@@ -76,6 +76,7 @@ const char PolarName[] = "PolarName";
 const char PolarDegradation[] = "PolarDegradation";
 const char AutoBugs[] = "AutoBugs";
 const char SafetyAltitudeArrival[] = "SafetyAltitudeArrival";
+const char SafetyAltitudeArrivalGR[] = "SafetyAltitudeArrivalGR";
 const char SafetyAltitudeTerrain[] = "SafetyAltitudeTerrain";
 const char SafteySpeed[] = "SafteySpeed";
 const char DryMass[] = "DryMass";

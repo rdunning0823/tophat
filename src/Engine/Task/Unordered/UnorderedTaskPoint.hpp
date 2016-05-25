@@ -35,6 +35,7 @@ struct TaskBehaviour;
  */
 class UnorderedTaskPoint final : public TaskWaypoint {
   fixed safety_height_arrival;
+  fixed safety_height_arrival_gr;
 
 public:
   /**

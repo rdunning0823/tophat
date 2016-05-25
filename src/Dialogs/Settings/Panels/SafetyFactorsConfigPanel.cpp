@@ -37,6 +37,7 @@ Copyright_License {
 
 enum ControlIndex {
   ArrivalHeight,
+  ArrivalHeightGR,
   TerrainHeight,
   AlternateMode,
   PolarDegradation,
@@ -65,6 +66,12 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival);
+
+  AddFloat(_("Arrival height for GR"),
+           _("FOR GR CALCULATIONS The height above terrain that the glider should arrive at for a safe landing.  This is also added to height to complete a task."),
+           _T("%.0f %s"), _T("%.0f"),
+           fixed(0), fixed(10000), fixed(100), false,
+           UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival_gr);
 
   AddFloat(_("Terrain height"),
            _("The height above terrain that the glider must clear during final glide.  This does not affect arrival height, but displays warnings on the screen where a mountain will be hit or an X in the final glide bar."),
@@ -115,6 +122,10 @@ SafetyFactorsConfigPanel::Save(bool &_changed)
   changed |= SaveValue(ArrivalHeight, UnitGroup::ALTITUDE,
                        ProfileKeys::SafetyAltitudeArrival,
                        task_behaviour.safety_height_arrival);
+
+  changed |= SaveValue(ArrivalHeightGR, UnitGroup::ALTITUDE,
+                       ProfileKeys::SafetyAltitudeArrivalGR,
+                       task_behaviour.safety_height_arrival_gr);
 
   changed |= SaveValue(TerrainHeight, UnitGroup::ALTITUDE,
                        ProfileKeys::SafetyAltitudeTerrain,

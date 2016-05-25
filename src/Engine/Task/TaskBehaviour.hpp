@@ -124,6 +124,9 @@ struct TaskBehaviour {
   /** Minimum height above terrain for arrival height at landable waypoint (m) */
   fixed safety_height_arrival;
 
+  /** Minimum height above terrain for arrival height at landable waypoint (m) - for GR calculations */
+  fixed safety_height_arrival_gr;
+
   /** Default task type to use for new tasks */
   TaskFactoryType task_type_default;
 

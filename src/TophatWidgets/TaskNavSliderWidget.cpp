@@ -229,7 +229,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
                       result.vector.bearing - basic.track,
                       basic.location_available && result.vector.IsValid(),
-                      ::AngleToGradient(result.DestinationAngleGround()),
+                      ::AngleToGradient(result.DestinationAngleWithGRSafety(settings.task.safety_height_arrival_gr)),
                       result.IsOk(),
                       use_wide_pen,
                       false);

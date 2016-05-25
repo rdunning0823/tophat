@@ -241,15 +241,15 @@ protected:
       if (!basic.location_available || !basic.NavAltitudeAvailable())
         return;
 
-      const fixed safety_height = task_behaviour.safety_height_arrival;
-      const fixed target_altitude = way_point.elevation + safety_height;
-      const fixed delta_h = basic.nav_altitude - target_altitude;
-      if (!positive(delta_h))
+      const fixed safety_height_gr = task_behaviour.safety_height_arrival_gr;
+      const fixed target_altitude_gr = way_point.elevation + safety_height_gr;
+      const fixed delta_h_gr = basic.nav_altitude - target_altitude_gr;
+      if (!positive(delta_h_gr))
         /* no L/D if below waypoint */
         return;
 
       const fixed distance = basic.location.DistanceS(way_point.location);
-      const fixed gr = distance / delta_h;
+      const fixed gr = distance / delta_h_gr;
       if (!GradientValid(gr))
         return;
 
