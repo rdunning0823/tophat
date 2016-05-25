@@ -215,6 +215,9 @@ public:
    */
   bool DrawOutline(Canvas &canvas, const PixelRect &rc, bool use_wide_pen);
 
+  void DrawInvalid(Canvas &canvas, const PixelRect rc_outer, const PixelRect rc,
+                   unsigned idx,
+                   bool selected, bool use_wide_pen);
   /**
    * Draws the text and the outline of the shape
    * @param rc_outer. rc of list item.  This may not be visible in the canvas

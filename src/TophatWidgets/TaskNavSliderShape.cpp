@@ -220,6 +220,31 @@ SliderShape::PaintBackground(Canvas &canvas, unsigned idx,
 #endif
 
 void
+SliderShape::DrawInvalid(Canvas &canvas, const PixelRect rc_outer,
+                         const PixelRect rc, unsigned idx,
+                         bool selected, bool use_wide_pen)
+{
+  StaticString<120> nav_buffer;
+  const Font &nav_font = nav_slider_look.medium_font;
+  canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
+  canvas.Select(nav_slider_look.GetBackgroundBrush(selected));
+  DrawOutline(canvas, rc_outer, use_wide_pen);
+  canvas.Select(nav_font);
+  nav_buffer = _("Click to navigate");
+  unsigned width = canvas.CalcTextWidth(nav_buffer.c_str());
+  int left = rc.left + (rc.right - rc.left - width) / 2;
+  if (left > 0)
+    canvas.TextAutoClipped(left,
+                           rc.top + (rc.bottom - rc.top -
+                               nav_font.GetHeight()) / 2,
+                               nav_buffer.c_str());
+#ifdef _WIN32
+  if (HasDraggableScreen()) // PC or WM
+    PaintBackground(canvas, idx, 1, dialog_look, rc_outer);
+#endif
+}
+
+void
 SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   unsigned idx, bool selected, bool is_current_tp,
                   const TCHAR *tp_name, bool has_entered, bool has_exited,
@@ -243,6 +268,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       && ((idx > 0 && has_entered) || (idx == 0 && has_exited));
 
   StaticString<120> type_buffer;
+
   const Font &name_font = nav_slider_look.large_font;
   const Font &distance_font = nav_slider_look.medium_font;
   const Font &type_font = nav_slider_look.small_font;
@@ -254,24 +280,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   rc.right -= 3 * GetHintWidth() / 2;
 
   if (!tp_valid) {
-    StaticString<120> nav_buffer;
-    const Font &nav_font = nav_slider_look.medium_font;
-    canvas.SetTextColor(dialog_look.list.GetTextColor(selected, true, false));
-    canvas.Select(nav_slider_look.GetBackgroundBrush(selected));
-    DrawOutline(canvas, rc_outer, use_wide_pen);
-    canvas.Select(nav_font);
-    nav_buffer = _("Click to navigate");
-    width = canvas.CalcTextWidth(nav_buffer.c_str());
-    left = rc.left + (rc.right - rc.left - width) / 2;
-    if (left > 0)
-      canvas.TextAutoClipped(left,
-                             rc.top + (rc.bottom - rc.top -
-                                 nav_font.GetHeight()) / 2,
-                                 nav_buffer.c_str());
-#ifdef _WIN32
-    if (HasDraggableScreen()) // PC or WM
-      PaintBackground(canvas, idx, 1, dialog_look, rc_outer);
-#endif
+    DrawInvalid(canvas, rc_outer, rc, idx, selected, use_wide_pen);
     return;
   }
 
