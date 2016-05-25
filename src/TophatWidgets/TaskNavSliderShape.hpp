@@ -42,6 +42,15 @@ class Canvas;
 enum class TaskType : uint8_t;
 
 class SliderShape {
+public:
+  // Direction of bearing to be drawn
+  enum BearingDirection {
+    Left,
+    Right,
+    // no bearing
+    None
+  };
+
 private:
   /**
    * how much of the shape is visible in the canvas
@@ -100,11 +109,9 @@ public:
   /**
    * Draws bearing symbol
    * returns direction bearing symbol.
-   *   -1 if to left, +1 if to right
-   *   or 0 if no bearing is drawn
    */
-  int DrawBearing(Canvas &canvas, const PixelRect &rc_outer,
-                   const Angle &bearing);
+  unsigned DrawBearing(Canvas &canvas, const PixelRect &rc_outer,
+                               const Angle &bearing);
 
   UPixelScalar GetWidth() const {
     return points[2].x - points[6].x;

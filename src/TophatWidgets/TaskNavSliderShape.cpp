@@ -351,7 +351,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   // bearing chevrons for ordered when not start
   // or for non ordered task
-  int bearing_direction = 0; // directiong of bearing if drawn
+  BearingDirection bearing_direction = BearingDirection::None;
   bool do_bearing = false;
   Angle bearing;
   if (is_current_tp && bearing_valid && task_mode ==
@@ -417,7 +417,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
 
     if (do_bearing)
-      bearing_direction = DrawBearing(canvas, rc_outer,bearing);
+      bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
 
   }
   else { // just type type label
@@ -440,9 +440,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   width = canvas.CalcTextWidth(tp_name) + icon_size.cx;
 
   if ((PixelScalar)width > (rc_name.right - rc_name.left)) {
-    if (is_current_tp && bearing_direction != 1)
+    if (is_current_tp && bearing_direction != BearingDirection::Right)
         rc_name.right += GetHintWidth() / 2;
-    if (is_current_tp && bearing_direction == 1)
+    if (is_current_tp && bearing_direction == BearingDirection::Right)
         rc_name.right -= Layout::Scale(5);
 
     left_icon = rc_name.left;
@@ -471,7 +471,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   }
 }
 
-int
+unsigned
 SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle &bearing)
 {
   enum bearing_levels {
@@ -482,7 +482,7 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
   };
   const IconLook &icon_look = UIGlobals::GetIconLook();
   const MaskedIcon *icon_bearing = nullptr;
-  int direction = 0;
+  BearingDirection direction = BearingDirection::None;
   if (bearing.AsDelta().Degrees() > fixed(first)) {
     if (bearing.AsDelta().Degrees() > fixed(fourth))
       icon_bearing = &icon_look.hBmpBearingRightFour;
@@ -492,7 +492,7 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
       icon_bearing = &icon_look.hBmpBearingRightTwo;
     else
       icon_bearing = &icon_look.hBmpBearingRightOne;
-    direction = 1;
+    direction = BearingDirection::Right;
   }
 
   if (bearing.AsDelta().Degrees() < fixed(-first)) {
@@ -504,16 +504,16 @@ SliderShape::DrawBearing(Canvas &canvas, const PixelRect &rc_outer, const Angle 
       icon_bearing = &icon_look.hBmpBearingLeftTwo;
     else
       icon_bearing = &icon_look.hBmpBearingLeftOne;
-    direction = -1;
+    direction = BearingDirection::Left;
   }
 
-  if (direction == 0)
-    return 0;
+  if (direction == BearingDirection::None)
+    return direction;
 
   PixelSize icon_bearing_size = icon_bearing->GetSize();
   const PixelScalar vert_margin = points[2].y - icon_bearing_size.cy / 2;
 
-  UPixelScalar x_offset = (direction == -1) ? 1 :
+  UPixelScalar x_offset = (direction == BearingDirection::Left) ? 1 :
       GetWidth() - icon_bearing_size.cx;
 
   RasterPoint upper_left(rc_outer.left + x_offset, vert_margin);
