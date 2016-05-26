@@ -48,9 +48,16 @@ StartPoint::SetTaskBehaviour(const TaskBehaviour &tb)
 }
 
 fixed
+StartPoint::GetRequiredElevation(fixed safety_limit) const
+{
+  return GetBaseElevation() + safety_limit;
+}
+
+//TODO
+fixed
 StartPoint::GetElevation() const
 {
-  return GetBaseElevation() + safety_height;
+  return StartPoint::GetRequiredElevation(safety_height);
 }
 
 void

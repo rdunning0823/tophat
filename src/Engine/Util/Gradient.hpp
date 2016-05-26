@@ -24,6 +24,8 @@
 
 #include "Math/fixed.hpp"
 #include "Compiler.h"
+#include "Waypoint/Waypoint.hpp"
+#include "NMEA/MoreData.hpp"
 
 /** 
  * Convert angle or (approximate) inverse-gradient to gradient.
@@ -48,5 +50,27 @@ AngleToGradient(const fixed d);
 gcc_const
 bool
 GradientValid(const fixed d);
+
+/**
+ * Calculate Gradient (GR) to specified destination. This calculation assumes
+ * that you will flight specified distance it can be longer than straight flight due to
+ * additional TPs or avoiding terrain.
+ *
+ * @param distance - distance specified over other TPs
+ */
+gcc_const
+fixed
+CalculateGradient(const Waypoint &destination, fixed distance,
+                  const MoreData &basic, fixed safety_height);
+
+
+/**
+ * Calculate Gradient (GR) to specified destination. Assumes direct flight to
+ * the destination point.
+ */
+gcc_const
+fixed
+CalculateGradient(const Waypoint &destination,
+                  const MoreData &basic, fixed safety_height);
 
 #endif

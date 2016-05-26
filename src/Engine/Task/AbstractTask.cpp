@@ -326,7 +326,8 @@ AbstractTask::CalcLegGradient(const AircraftState &aircraft) const
     return fixed(0);
 
   // Calculate the geometric gradient (height divided by distance)
-  return (aircraft.altitude - tp->GetElevation()) / d;
+  return (aircraft.altitude -
+      tp->GetRequiredElevation(task_behaviour.safety_height_arrival_gr)) / d;
 }
 
 bool 
