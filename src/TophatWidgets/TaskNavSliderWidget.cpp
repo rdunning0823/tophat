@@ -193,6 +193,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   if (factory_type == TaskFactoryType::AAT &&
       ui_settings.navbar_navigate_to_aat_target &&
       mode == TaskType::ORDERED) {
+
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
                       idx == waypoint_index,
@@ -208,11 +209,14 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       false,
                       basic.location.Bearing(otp->GetLocationRemaining()) - basic.track,
                       basic.location_available && otp->GetLocationRemaining().IsValid(),
-                      fixed(0),
+                      fixed(0), // TODO: GR should be calculated based on otp elevation
                       false,
                       use_wide_pen,
                       true);
   } else {
+    fixed gradient = ::CalculateGradient(*twp, result.vector.distance,
+                                         basic, settings.task.safety_height_arrival_gr);
+
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
                       idx == waypoint_index,
@@ -229,7 +233,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
                       result.vector.bearing - basic.track,
                       basic.location_available && result.vector.IsValid(),
-                      ::AngleToGradient(result.DestinationAngleWithGRSafety(settings.task.safety_height_arrival_gr)),
+                      gradient,
                       result.IsOk(),
                       use_wide_pen,
                       false);

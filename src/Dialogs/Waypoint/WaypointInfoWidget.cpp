@@ -134,19 +134,12 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
 
   if (basic.location_available && basic.NavAltitudeAvailable()) {
-    const TaskBehaviour &task_behaviour =
-      CommonInterface::GetComputerSettings().task;
-
     StaticString<10> gr_text(_T("+++"));
-    const fixed safety_height_gr = task_behaviour.safety_height_arrival_gr;
-    const fixed target_altitude_gr = waypoint.elevation + safety_height_gr;
-    const fixed delta_h_gr = basic.nav_altitude - target_altitude_gr;
-    if (positive(delta_h_gr)) {
-      const fixed distance = basic.location.Distance(waypoint.location);
-      const fixed gr = distance / delta_h_gr;
-      if (GradientValid(gr)) {
-        ::FormatGlideRatio(gr_text.buffer(), gr_text.CAPACITY, gr);
-      }
+    fixed gr = ::CalculateGradient(waypoint, basic,
+                                   CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
+
+    if (positive(gr) &&  GradientValid(gr)) {
+      ::FormatGlideRatio(gr_text.buffer(), gr_text.CAPACITY, gr);
     }
     AddReadOnly(_("Glide ratio"), nullptr, gr_text.c_str());
   }

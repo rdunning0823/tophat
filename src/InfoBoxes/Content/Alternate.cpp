@@ -110,6 +110,12 @@ InfoBoxContentAlternateName::GetDialogContent()
 void
 InfoBoxContentAlternateGR::Update(InfoBoxData &data)
 {
+  const MoreData &basic = CommonInterface::Basic();
+  if (!basic.NavAltitudeAvailable()) {
+    data.SetInvalid();
+    return;
+  }
+
   if (protected_task_manager == NULL) {
     data.SetInvalid();
     return;
@@ -137,9 +143,8 @@ InfoBoxContentAlternateGR::Update(InfoBoxData &data)
 
   data.SetComment(alternate->waypoint.name.c_str());
 
-  fixed gradient =
-    ::AngleToGradient(alternate->solution.DestinationAngleGround());
-
+  fixed gradient = ::CalculateGradient(alternate->waypoint, alternate->solution.vector.distance,
+                                       basic, CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
   if (negative(gradient)) {
     data.SetValueColor(0);
     data.SetValue(_T("+++"));

@@ -138,6 +138,7 @@ struct GlideResult {
    */
   fixed altitude_difference;
 
+
   fixed effective_wind_speed;
   Angle effective_wind_angle;
 
@@ -307,15 +308,6 @@ struct GlideResult {
    */
   gcc_pure
   fixed DestinationAngleGround() const;
-
-  /**
-   * Find the gradient of the target relative to ground with specified safty limit
-   * (uses up AltitudeDifference)
-   *
-   * @return Glide gradient (positive down), or inf if no distance to travel.
-   */
-  gcc_pure
-  fixed DestinationAngleWithGRSafety(fixed safetyLimit) const;
 
   /** Reset/clear the solution */
   void Reset();
