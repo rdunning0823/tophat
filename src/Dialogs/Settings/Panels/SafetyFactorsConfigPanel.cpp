@@ -68,7 +68,7 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival);
 
   AddFloat(_("Arrival height for GR"),
-           _("FOR GR CALCULATIONS The height above terrain that the glider should arrive at for a safe landing.  This is also added to height to complete a task."),
+           _("For gradient (GR) calculations. The safety height above terrain at the destination used to calculated the gradient (slope) to arrive there."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival_gr);
