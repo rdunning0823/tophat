@@ -105,6 +105,15 @@ public:
   virtual fixed GetElevation() const = 0;
 
   /**
+   * Retrieve elevation of taskpoint, taking into account
+   * rules and specified safety limit/margin.
+   *
+   * @return Minimum allowable elevation of task point
+   */
+  gcc_pure
+  virtual fixed GetRequiredElevation(fixed safety_limit) const = 0;
+
+  /**
    * distance from this to the reference
    */
   fixed Distance(const GeoPoint &ref) const {

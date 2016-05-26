@@ -38,3 +38,24 @@ GradientValid(const fixed d)
 {
   return fabs(d) < fixed(999);
 }
+
+fixed
+CalculateGradient(const Waypoint &destination, fixed distance,
+                  const MoreData &basic, fixed safety_height) {
+
+  if (!positive(distance) || !basic.NavAltitudeAvailable()) {
+    return fixed(1000);
+  }
+
+  fixed target_altitude = destination.elevation + safety_height;
+  fixed height = basic.nav_altitude - target_altitude;
+  return ::AngleToGradient(height / distance);
+}
+
+gcc_const
+fixed
+CalculateGradient(const Waypoint &destination,
+                  const MoreData &basic, fixed safety_height) {
+  return ::CalculateGradient(destination, basic.location.Distance(destination.location),
+                             basic, safety_height);
+}

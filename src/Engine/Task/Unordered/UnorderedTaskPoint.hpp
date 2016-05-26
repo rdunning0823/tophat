@@ -52,6 +52,8 @@ public:
   /* virtual methods from class TaskPoint */
   virtual GeoVector GetVectorRemaining(const GeoPoint &reference) const override;
   virtual fixed GetElevation() const override;
+  virtual fixed GetRequiredElevation(fixed safety_limit) const override;
+
 };
 
 #endif

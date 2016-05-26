@@ -61,6 +61,8 @@ public:
 
   /* virtual methods from class TaskPoint */
   fixed GetElevation() const override;
+  fixed GetRequiredElevation(fixed safety_limit) const override;
+
 
   /* virtual methods from class OrderedTaskPoint */
   void SetTaskBehaviour(const TaskBehaviour &tb) override;

@@ -57,9 +57,9 @@ FinishPoint::EntryPrecondition() const
 }
 
 fixed
-FinishPoint::GetElevation() const
+FinishPoint::GetRequiredElevation(fixed safety_limit) const
 {
-  const fixed nominal_elevation = GetBaseElevation() + safety_height;
+  const fixed nominal_elevation = GetBaseElevation() + safety_limit;
 
   if (constraints.fai_finish) {
     return std::max(nominal_elevation, fai_finish_height);
@@ -69,6 +69,12 @@ FinishPoint::GetElevation() const
                     (constraints.min_height_ref == AltitudeReference::AGL
                      ? GetBaseElevation() : fixed(0)));
   }
+}
+
+fixed
+FinishPoint::GetElevation() const
+{
+  return FinishPoint::GetRequiredElevation(safety_height);
 }
 
 void
