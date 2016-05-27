@@ -240,8 +240,6 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   if (task_factory_type == TaskFactoryType::AAT &&
       ui_settings.navbar_navigate_to_aat_target &&
       task_mode == TaskType::ORDERED) {
-    fixed gradient = ::CalculateGradient(tp, Basic().location.Distance(tp->GetLocationRemaining()),
-                                         Basic(), CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
 
     slider_shape.Draw(canvas, outer_rect,
                       idx, false, false,
@@ -263,7 +261,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       true);
 
   } else {
-    fixed gradient = ::CalculateGradient(wp, distance,
+    fixed gradient = ::CalculateGradient(*wp, distance,
                                          Basic(), CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
 
     slider_shape.Draw(canvas, outer_rect,
