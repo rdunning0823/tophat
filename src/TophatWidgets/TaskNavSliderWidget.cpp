@@ -209,7 +209,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       false,
                       basic.location.Bearing(otp->GetLocationRemaining()) - basic.track,
                       basic.location_available && otp->GetLocationRemaining().IsValid(),
-                      fixed(0), // TODO: GR should be calculated based on otp elevation
+                      fixed(0), // GR is irrelevant to Target which move
                       false,
                       use_wide_pen,
                       true);
