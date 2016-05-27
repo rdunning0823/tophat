@@ -209,7 +209,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       false,
                       basic.location.Bearing(otp->GetLocationRemaining()) - basic.track,
                       basic.location_available && otp->GetLocationRemaining().IsValid(),
-                      fixed(0), // GR is irrelevant to Target which move
+                      fixed(0), // GR is irrelevant to Target which moves
                       false,
                       use_wide_pen,
                       true);
@@ -234,7 +234,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       result.vector.bearing - basic.track,
                       basic.location_available && result.vector.IsValid(),
                       gradient,
-                      result.IsOk(),
+                      result.IsOk() && GradientValid(gradient),
                       use_wide_pen,
                       false);
   }
