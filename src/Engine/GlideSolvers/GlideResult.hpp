@@ -291,24 +291,6 @@ struct GlideResult {
    */
   void Add(const GlideResult &s2);
 
-  /**
-   * Find the gradient of this solution relative to ground.
-   * (does not use up AltitudeDifference)
-   *
-   * @return Glide gradient (positive down), or inf if no distance to travel.
-   */
-  gcc_pure
-  fixed GlideAngleGround() const;
-
-  /**
-   * Find the gradient of the target relative to ground
-   * (uses up AltitudeDifference)
-   *
-   * @return Glide gradient (positive down), or inf if no distance to travel.
-   */
-  gcc_pure
-  fixed DestinationAngleGround() const;
-
   /** Reset/clear the solution */
   void Reset();
 
