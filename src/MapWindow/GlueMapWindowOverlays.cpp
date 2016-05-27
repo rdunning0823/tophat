@@ -227,9 +227,6 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
     }
 
   }
-  const GlideResult &result2 = (task_mode == TaskType::ORDERED) ?
-      Calculated().task_stats.glide_results[idx] :
-      Calculated().task_stats.glide_result_goto;
 
   const TerrainRendererSettings &terrain = GetMapSettings().terrain;
   bool use_wide_pen = !terrain.enable;
@@ -282,7 +279,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       bearing,
                       bearing_valid,
                       gradient,
-                      result2.IsOk(),
+                      ::GradientValid(gradient),
                       use_wide_pen,
                       false);
   }
