@@ -40,6 +40,7 @@ Copyright_License {
 #include "Screen/UnitSymbol.hpp"
 #include "Terrain/RasterWeatherCache.hpp"
 #include "Terrain/RasterWeatherStore.hpp"
+#include "Formatter/GlideRatioFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "UIState.hpp"
@@ -328,12 +329,16 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
     /* TODO: obtain offset from CompassRenderer */
     y += Layout::Scale(19) + Layout::FastScale(13);
 
+  fixed elevation = fixed(0);
+  bool elevation_valid = false;
   if (terrain) {
-    short elevation = terrain->GetTerrainHeight(location);
-    if (!RasterBuffer::IsSpecial(elevation)) {
+    short terrain_elevation = terrain->GetTerrainHeight(location);
+    if (!RasterBuffer::IsSpecial(terrain_elevation)) {
+      elevation = fixed(terrain_elevation);
+      elevation_valid = true;
       StaticString<64> elevation_long;
       elevation_long = _("Elevation: ");
-      elevation_long += FormatUserAltitude(fixed(elevation));
+      elevation_long += FormatUserAltitude(elevation);
 
       TextInBox(canvas, elevation_long, x, y, mode,
                 render_projection.GetScreenWidth(),
@@ -343,8 +348,10 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
     }
   }
 
+  fixed dist = fixed(-1.0);
+
   if (Basic().location_available) {
-    fixed dist = location.Distance(Basic().location);
+    dist = location.Distance(Basic().location);
     StaticString<64> distance_short;
     StaticString<64> distance_long;
     FormatUserDistance(dist, distance_short.buffer(), true, 1);
@@ -375,6 +382,22 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
       break;
 
     start = newline + 1;
+  }
+
+  if (Basic().location_available && elevation_valid && Basic().NavAltitudeAvailable()) {
+    StaticString<15> gr_buffer;
+    StaticString<10> gr_val_buffer(_T(""));
+
+    fixed height = Basic().nav_altitude - elevation - GetComputerSettings().task.safety_height_arrival;
+    FormatGlideRatio(gr_val_buffer.buffer(), gr_val_buffer.capacity(),
+                     ::AngleToGradient(height/dist));
+
+    gr_buffer.Format(_T("GR: %s"), gr_val_buffer.c_str());
+
+    TextInBox(canvas, gr_buffer, x, y, mode,
+              render_projection.GetScreenWidth(),
+              render_projection.GetScreenHeight());
+    y += PixelScalar(height);
   }
 }
 
