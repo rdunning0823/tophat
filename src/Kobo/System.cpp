@@ -351,8 +351,9 @@ CopyFlightsToSDCard()
 #ifdef KOBO
   Directory::Create(_T("/media/usb_storage/XCSoarData"));
   Directory::Create(_T("/media/usb_storage/XCSoarData/logs"));
-  return Run("/bin/cp", "-r", "-p", "/mnt/onboard/XCSoarData/logs/", "/media/usb_storage/XCSoarData/");
-#else
+  bool retval = Run("/bin/cp", "-r", "-p", "/mnt/onboard/XCSoarData/logs/", "/media/usb_storage/XCSoarData/");
+  return retval && Run("/bin/sync");
+  #else
   return false;
 #endif
 }
@@ -374,7 +375,7 @@ CleanSDCard()
   bool retval = Run("/bin/rm", "-r", "-f", "/mnt/onboard/XCSoarData");
   mkdir("/mnt/onboard/XCSoarData", 0777);
   mkdir("/mnt/onboard/XCSoarData/kobo", 0777);
-  return retval;
+  return retval && Run("/bin/sync");
 #else
   return false;
 #endif
