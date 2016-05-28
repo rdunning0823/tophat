@@ -135,11 +135,11 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   if (basic.location_available && basic.NavAltitudeAvailable()) {
     StaticString<10> gr_text(_T("+++"));
-    fixed gr = ::CalculateGradient(waypoint, basic,
+    fixed gradient = ::CalculateGradient(waypoint, basic,
                                    CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
 
-    if (positive(gr) &&  GradientValid(gr)) {
-      ::FormatGlideRatio(gr_text.buffer(), gr_text.CAPACITY, gr);
+    if (positive(gradient) &&  GradientValid(gradient)) {
+      ::FormatGlideRatio(gr_text.buffer(), gr_text.CAPACITY, gradient);
     }
     AddReadOnly(_("Glide ratio"), nullptr, gr_text.c_str());
   }

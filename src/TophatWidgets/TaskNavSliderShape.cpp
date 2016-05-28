@@ -255,7 +255,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   bool altitude_difference_valid,
                   Angle delta_bearing,
                   bool bearing_valid,
-                  fixed gr_value,
+                  fixed gradient,
                   bool gr_valid,
                   bool use_wide_pen,
                   bool navigate_to_target)
@@ -381,15 +381,15 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   }
   distance_buffer.append(distance_only_buffer.c_str());
   if (gr_valid && ui_settings.navbar_enable_gr) {
-    if (gr_value <= fixed(0)) {
+    if (gradient <= fixed(0)) {
       distance_buffer.append(_T(" [##]"));
     }
-    else if (gr_value >= fixed(99.5)) {
+    else if (gradient >= fixed(99.5)) {
       distance_buffer.append(_T(" [99+]"));
     }
     else {
       StaticString<10> glide_ratio_buffer(_T(""));
-      FormatGlideRatio(glide_ratio_buffer.buffer(), glide_ratio_buffer.capacity(), gr_value);
+      FormatGlideRatio(glide_ratio_buffer.buffer(), glide_ratio_buffer.capacity(), gradient);
       distance_buffer.AppendFormat(_T(" [%s]"), glide_ratio_buffer.c_str());
     }
   }
