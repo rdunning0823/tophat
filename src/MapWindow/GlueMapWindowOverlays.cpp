@@ -386,18 +386,22 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
 
   if (Basic().location_available && elevation_valid && Basic().NavAltitudeAvailable()) {
     StaticString<15> gradient_buffer_long;
-    StaticString<10> gradient_buffer(_T(""));
+    StaticString<10> gradient_buffer(_T("++"));
 
     fixed height = Basic().nav_altitude - elevation - GetComputerSettings().task.safety_height_arrival;
-    FormatGlideRatio(gradient_buffer.buffer(), gradient_buffer.capacity(),
-                     ::AngleToGradient(height/dist));
+    fixed gradient = height / dist;
+    if (::GradientValid(gradient)) {
+      if(positive(gradient)) {
+        FormatGlideRatio(gradient_buffer.buffer(), gradient_buffer.capacity(),
+                         ::AngleToGradient(gradient));
+      }
+      gradient_buffer_long.Format(_T("GR: %s"), gradient_buffer.c_str());
 
-    gradient_buffer_long.Format(_T("GR: %s"), gradient_buffer.c_str());
-
-    TextInBox(canvas, gradient_buffer_long, x, y, mode,
-              render_projection.GetScreenWidth(),
-              render_projection.GetScreenHeight());
-    y += PixelScalar(height);
+      TextInBox(canvas, gradient_buffer_long, x, y, mode,
+                render_projection.GetScreenWidth(),
+                render_projection.GetScreenHeight());
+      y += PixelScalar(height);
+    }
   }
 }
 
