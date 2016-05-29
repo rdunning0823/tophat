@@ -211,6 +211,11 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const MaskedIcon &icon = icon_look.hBmpTabSettings;
     DrawIconOrBitmap(canvas, rc, icon, focused);
 
+  } else if (caption == _("_SetupNavBar")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon &icon = icon_look.hBmpTabSettingsNavBar;
+    DrawIconOrBitmap(canvas, rc, icon, focused);
+
   } else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     if (!icon_look.valid) {

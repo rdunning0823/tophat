@@ -50,6 +50,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/dlgConfigurationSingle.cpp \
 	$(SRC)/Dialogs/Settings/dlgQNH.cpp \
 	$(SRC)/Dialogs/Settings/dlgSetupQuick.cpp \
+	$(SRC)/Dialogs/Settings/dlgSetupNavBar.cpp \
 	$(SRC)/Dialogs/Settings/dlgConfigInfoboxes.cpp \
 	$(SRC)/Dialogs/Traffic/TrafficList.cpp \
 	$(SRC)/Dialogs/Traffic/FlarmTrafficDetails.cpp \

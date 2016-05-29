@@ -49,6 +49,7 @@ IconLook::Initialise()
   hBmpTabTask.LoadResource(IDB_TASK, IDB_TASK_HD, IDB_TASK_HD2);
   hBmpTabWrench.LoadResource(IDB_WRENCH, IDB_WRENCH_HD, IDB_WRENCH_HD2);
   hBmpTabSettings.LoadResource(IDB_SETTINGS, IDB_SETTINGS_HD, IDB_SETTINGS_HD2);
+  hBmpTabSettingsNavBar.LoadResource(IDB_SETTINGS_NAVBAR, IDB_SETTINGS_NAVBAR_HD, IDB_SETTINGS_NAVBAR_HD2);
   hBmpTabCalculator.LoadResource(IDB_CALCULATOR, IDB_CALCULATOR_HD, IDB_CALCULATOR_HD2);
 
   hBmpTabFlight.LoadResource(IDB_GLOBE, IDB_GLOBE_HD, IDB_GLOBE_HD2);
