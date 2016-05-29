@@ -39,6 +39,11 @@ void dlgBasicSettingsShowModal();
 void ShowDialogSetupQuick();
 
 /**
+ * Allows setting up of the Navbar for Top Hat
+ */
+void ShowDialogSetupNavBar();
+
+/**
  * displays a popup describing the "what if" task stats if the
  * wp is appended before the finish of the current MAT task
  * Allows user to either append it or cancel

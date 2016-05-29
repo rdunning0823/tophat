@@ -59,7 +59,6 @@ Copyright_License {
 #include "Formatter/UserUnits.hpp"
 #include "Task/TaskBehaviour.hpp"
 #include "Units/UnitsStore.hpp"
-#include "Dialogs/Settings/Panels/NavBarConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/NationalityConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SiteConfigPanel.hpp"
 #include "Dialogs/Settings/Panels/SafetyFactorsConfigPanel.hpp"
@@ -80,7 +79,6 @@ Copyright_License {
     SAFETY,
     PLANE,
     PILOT,
-    NAVBAR,
     OK,
     SCREENS,
     ADVANCED,
@@ -103,7 +101,6 @@ private:
   PixelRect rc_site_files_button, rc_plane_button, rc_device_button;
   PixelRect rc_safety_text, rc_nationality_text, rc_pilot_text;
   PixelRect rc_safety_button, rc_nationality_button, rc_pilot_button;
-  PixelRect rc_navbar_button;
   PixelRect rc_screens_button;
   PixelRect rc_ok, rc_advanced;
 
@@ -111,7 +108,6 @@ private:
   WndFrame *safety_text, *nationality_text, *pilot_text;
   Button *site_files_button, *plane_button, *device_button;
   Button *safety_button, *nationality_button, *pilot_button;
-  Button *navbar_button;
   Button *screens_button;
   Button *ok, *advanced;
 
@@ -184,16 +180,15 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       = rc_nationality_text = rc_pilot_text = rc_right;
   rc_site_files_button = rc_plane_button = rc_device_button
       = rc_safety_button = rc_nationality_button = rc_pilot_button
-      = rc_navbar_button =   rc_left;
+      = rc_left;
 
-  PixelScalar top1, top2, top3, top4, top5, top6, top7;
+  PixelScalar top1, top2, top3, top4, top5, top6;
   top1 = rc.top;
   top2 = top1 + height;
   top3 = top1 + height * 2;
   top4 = top1 + height * 3;
   top5 = top1 + height * 4;
   top6 = top1 + height * 5;
-  top7 = top1 + height * 6;
 
   rc_nationality_button.top = rc_nationality_text.top = top1;
   rc_device_button.top = rc_device_text.top = top2;
@@ -201,7 +196,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
   rc_safety_button.top = rc_safety_text.top = top4;
   rc_plane_button.top = rc_plane_text.top = top5;
   rc_pilot_button.top = rc_pilot_text.top = top6;
-  rc_navbar_button.top = top7;
 
   rc_nationality_button.bottom = rc_nationality_text.bottom =
       rc_nationality_text.top + height;
@@ -213,7 +207,6 @@ SetupQuick::SetRectangles(const PixelRect &rc_outer)
       rc_safety_text.top + height;
   rc_plane_button.bottom = rc_plane_text.bottom = rc_plane_text.top + height;
   rc_pilot_button.bottom = rc_pilot_text.bottom = rc_pilot_text.top + height;
-  rc_navbar_button.bottom = rc_navbar_button.top + height;
 
   rc_ok = rc;
   rc_ok.top = rc_ok.bottom - bottom_row_height;
@@ -250,10 +243,6 @@ ShowPanel(unsigned page)
   case SCREENS:
     widget = CreateLayoutConfigPanel(true);
     title = _("Set up screen");
-    break;
-  case NAVBAR:
-    widget = CreateNavBarConfigPanel();
-    title = _("TopHat NavBar");
     break;
   case DEVICE:
   case PLANE:
@@ -292,7 +281,6 @@ SetupQuick::OnAction(int id)
   case SITE_FILES:
   case SAFETY:
   case SCREENS:
-  case NAVBAR:
     ShowPanel(id);
     break;
 
@@ -482,7 +470,6 @@ SetupQuick::RefreshForm()
   safety_button->SetCaption(_("Safety heights"));
   pilot_button->SetCaption(_("Pilot"));
   plane_button->SetCaption(_("Plane"));
-  navbar_button->SetCaption(_("NavBar"));
   screens_button->SetCaption(_("Screen"));
   advanced->SetCaption(_("Advanced"));
   WndForm::SetCaption(_("Set up Top Hat"));
@@ -563,11 +550,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                rc_pilot_button,
                                button_style, *this, PILOT);
 
-  navbar_button = new Button(GetClientAreaWindow(), button_look,
-                               _("NavBar"),
-                               rc_navbar_button,
-                               button_style, *this, NAVBAR);
-
   ok = new WndSymbolButton(GetClientAreaWindow(), button_look, _T("_X"),
                            rc_ok,
                            button_style, *this, OK);
@@ -616,7 +598,6 @@ SetupQuick::OnResize(PixelSize new_size)
   device_button->Move(rc_device_button);
   safety_button->Move(rc_safety_button);
   pilot_button->Move(rc_pilot_button);
-  navbar_button->Move(rc_navbar_button);
   screens_button->Move(rc_screens_button);
   ok->Move(rc_ok);
   advanced->Move(rc_advanced);
@@ -639,7 +620,6 @@ SetupQuick::Unprepare()
   delete device_button;
   delete safety_button;
   delete pilot_button;
-  delete navbar_button;
   delete screens_button;
   delete ok;
   delete advanced;

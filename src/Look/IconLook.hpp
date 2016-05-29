@@ -36,6 +36,7 @@ struct IconLook {
   MaskedIcon hBmpTabTask;
   MaskedIcon hBmpTabWrench;
   MaskedIcon hBmpTabSettings;
+  MaskedIcon hBmpTabSettingsNavBar;
   MaskedIcon hBmpTabCalculator;
 
   // status dialog
