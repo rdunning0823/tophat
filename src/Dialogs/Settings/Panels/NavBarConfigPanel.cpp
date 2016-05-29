@@ -30,32 +30,21 @@ Copyright_License {
 #include "Task/TaskBehaviour.hpp"
 
 enum ControlIndex {
+  NavBarNavigateToAATTarget,
   DisplayGR,
-  DisplayTpIndex,
-  NavBarNavigateToAATTarget
+  DisplayTpIndex
 };
 
 void
 NavBarConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  const UISettings &ui_settings =
-    CommonInterface::GetUISettings();
-
-  RowFormWidget::Prepare(parent, rc);
-
-  AddBoolean(_("Display GR"),
-             _("Enable/disable displaying glide ratio required to reach TP."),
-             ui_settings.navbar_enable_gr);
-
-  AddBoolean(_("Display TP index"),
-             _("Enable/disable displaying TP index number in TopHat NavBar."),
-             ui_settings.navbar_enable_tp_index);
+  const UISettings &ui_settings = CommonInterface::GetUISettings();
+  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+  const TaskBehaviour &task_behaviour = settings_computer.task;
 
   StaticString<25> label;
   StaticString<100> desc;
 
-  const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
-  const TaskBehaviour &task_behaviour = settings_computer.task;
 
   if (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) {
     label = _("Navigate to TAT targets");
@@ -68,6 +57,16 @@ NavBarConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   AddBoolean(label,
              desc,
              ui_settings.navbar_navigate_to_aat_target);
+
+  RowFormWidget::Prepare(parent, rc);
+
+  AddBoolean(_("Display GR"),
+             _("Enable/disable displaying glide ratio required to reach TP."),
+             ui_settings.navbar_enable_gr);
+
+  AddBoolean(_("Display TP index"),
+             _("Enable/disable displaying TP index number in TopHat NavBar."),
+             ui_settings.navbar_enable_tp_index);
 }
 
 bool
@@ -76,14 +75,14 @@ NavBarConfigPanel::Save(bool &_changed)
   bool changed = false;
   UISettings &ui_settings = CommonInterface::SetUISettings();
 
+  changed |= SaveValue(NavBarNavigateToAATTarget, ProfileKeys::NavBarNavigateToAATTarget,
+                       ui_settings.navbar_navigate_to_aat_target);
+
   changed |= SaveValue(DisplayGR, ProfileKeys::NavBarDisplayGR,
                        ui_settings.navbar_enable_gr);
 
   changed |= SaveValue(DisplayTpIndex, ProfileKeys::NavBarDisplayTpIndex,
                        ui_settings.navbar_enable_tp_index);
-
-  changed |= SaveValue(NavBarNavigateToAATTarget, ProfileKeys::NavBarNavigateToAATTarget,
-                       ui_settings.navbar_navigate_to_aat_target);
 
   _changed |= changed;
 
