@@ -319,9 +319,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       // append "Target" text to distance in center
       type_buffer.clear();
     else if (task_factory_type ==  TaskFactoryType::AAT)
-      _stprintf(type_buffer.buffer(), _T("%s %u"), _("Center"), idx);
+      type_buffer.Format(_T("%s %u"), _("Center"), idx);
     else
-      _stprintf(type_buffer.buffer(), _T("%s %u"), _("TP"), idx);
+      type_buffer.Format(_T("%s %u"), _("TP"), idx);
 
     break;
   case TaskType::GOTO:
