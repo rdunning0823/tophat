@@ -2,6 +2,10 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Top Hat Soaring 2.1.4 Beta TBD
+* Navigation bar
+  * Customization
+  * Optional navigate to AAT/TAT targets
+  * Optional show glide ratio to destination
 * Task speed and distance calculations improved US and FAI tasks
 * Fix Map Orientation Target prior to start
 * Airspace voice alert
@@ -11,7 +15,7 @@ Top Hat Soaring 2.1.4 Beta TBD
 * Language support for startup page
 * Fix button widths with icons
 * Support audible non-directional traffic alerts (PCAS)
-* Fix bug where terrain visibility was no saving
+* Fix bug where terrain visibility was not saving
 * Polish translation update
 
 Top Hat Soaring 2.1.3 Beta Feb 29, 2016
