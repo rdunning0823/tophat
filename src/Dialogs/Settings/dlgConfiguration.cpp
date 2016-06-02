@@ -141,7 +141,7 @@ static constexpr TabMenuPage look_pages[] = {
   { N_("Fonts"), CreateFontConfigPanel },
   { N_("Pages"), CreatePagesConfigPanel },
   { N_("InfoBoxes"), CreateInfoBoxesConfigPanel },
-  { N_("NavBar"), CreateNavBarConfigPanel },
+  { N_("Nav Bar"), CreateNavBarConfigPanel },
   { nullptr, nullptr }
 };
 

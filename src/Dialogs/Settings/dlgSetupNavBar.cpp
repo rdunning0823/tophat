@@ -39,7 +39,7 @@ ShowDialogSetupNavBar()
   StaticString<120> title;
 
   widget = new NavBarConfigPanel();
-  title = _("Set Up TopHat NavBar");
+  title = _("Set Up Nav Bar");
 
   assert(widget != nullptr);
   SystemConfiguration(*widget, title.c_str());
