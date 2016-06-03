@@ -385,6 +385,7 @@ protected:
    * to be calculated which take into account the time value of height.
    *
    * @param state_now Aircraft state
+   * @param glide_polar Polar used for calculation
    * @param total Glide result accumulated for total task
    * @param leg Glide result for current leg of task
    * @param total_remaining_effective
