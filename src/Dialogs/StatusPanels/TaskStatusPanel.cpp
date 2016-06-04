@@ -117,8 +117,6 @@ TaskStatusPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 void
 TaskStatusPanel::Show(const PixelRect &rc)
 {
-  emc = CommonInterface::Calculated().ordered_task_stats.effective_mc;
-
   Refresh();
 
   CommonInterface::GetLiveBlackboard().AddListener(*this);
