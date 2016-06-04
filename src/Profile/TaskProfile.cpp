@@ -88,6 +88,8 @@ Profile::Load(const ProfileMap &map, TaskBehaviour &settings)
 {
   Load(map, settings.glide);
 
+  map.GetEnum(ProfileKeys::TaskPlanningSpeedMode, settings.task_planning_speed_mode);
+  map.Get(ProfileKeys::TaskPlanningSpeedOverride, settings.task_planning_speed_override);
   map.Get(ProfileKeys::AATTimeMargin, settings.optimise_targets_margin);
   map.Get(ProfileKeys::AutoMc, settings.auto_mc);
   map.GetEnum(ProfileKeys::AutoMcMode, settings.auto_mc_mode);

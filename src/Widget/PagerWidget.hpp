@@ -57,7 +57,7 @@ class PagerWidget : public Widget {
   PixelRect position;
 
   unsigned current;
-  StaticArray<Child, 32u> children;
+  StaticArray<Child, 48u> children;
 
   PageFlippedCallback page_flipped_callback;
 

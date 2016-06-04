@@ -183,6 +183,8 @@ const char FinishRadius[] = "FinishRadius";
 const char TaskType[] = "TaskType";
 const char AATMinTime[] = "AATMinTime";
 const char AATTimeMargin[] = "AATTimeMargin";
+const char TaskPlanningSpeedMode[] = "TaskPlanningSpeedMode";
+const char TaskPlanningSpeedOverride[] = "TaskPlanningSpeedOverride";
 const char ContestNationality[] = "ContestNationality";
 
 const char EnableNavBaroAltitude[] = "EnableNavBaroAltitude";
