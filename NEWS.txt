@@ -1,12 +1,13 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Top Hat Soaring 2.1.4 Beta TBD
+Top Hat Soaring 2.1.4 Beta June 4, 2016
 * Navigation bar
   * Customization
   * Optional navigate to AAT/TAT targets
   * Optional show glide ratio to destination
 * Task speed and distance calculations improved US and FAI tasks
+* Gradient arrival height setting
 * Fix Map Orientation Target prior to start
 * Airspace voice alert
 * CAI 302 Airspace alarm
