@@ -119,6 +119,19 @@ struct TaskBehaviour {
   /** Options available for task building and behaviour */
   ContestNationalities contest_nationality;
 
+  /** Enumeration of auto MC modes */
+  enum class TaskPlanningSpeedMode: uint8_t {
+    /** Optimize the task based on the speed so far */
+    PastPerformanceSpeed,
+    /** Optimize the task based on the override speed the user enters */
+    OverrideSpeed,
+    /** Optimize task targets based on the speed predicted by the MC value */
+    MacCreadyValue,
+  } task_planning_speed_mode;
+
+  /** Task speed on which to base task planning instead of actual speed */
+  fixed task_planning_speed_override;
+
   fixed safety_mc;
 
   /** Minimum height above terrain for arrival height at landable waypoint (m) */

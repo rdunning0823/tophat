@@ -59,6 +59,7 @@ Copyright_License {
 #include "Panels/LayoutConfigPanel.hpp"
 #include "Panels/GaugesConfigPanel.hpp"
 #include "Panels/VarioConfigPanel.hpp"
+#include "Panels/TaskComputerConfigPanel.hpp"
 #include "Panels/TaskRulesConfigPanel.hpp"
 #include "Panels/ScoringConfigPanel.hpp"
 #include "Panels/InfoBoxesConfigPanel.hpp"
@@ -131,6 +132,7 @@ static constexpr TabMenuPage gauge_pages[] = {
 
 static constexpr TabMenuPage task_pages[] = {
   { N_("Task Rules"), CreateTaskRulesConfigPanel },
+  { N_("Task Computer"), CreateTaskComputerConfigPanel },
   { N_("Scoring"), CreateScoringConfigPanel },
   { nullptr, nullptr }
 };
@@ -170,7 +172,7 @@ static constexpr TabMenuGroup main_menu_captions[] = {
   { N_("Map Display"), map_pages },
   { N_("Glide Computer"), computer_pages },
   { N_("Gauges"), gauge_pages },
-  { N_("Task Defaults"), task_pages },
+  { N_("Task"), task_pages },
   { N_("Look"), look_pages },
   { N_("Setup"), setup_pages },
 };
