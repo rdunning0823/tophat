@@ -29,6 +29,11 @@
 struct WindowStats;
 class TaskStats;
 
+/**
+ * Class to compute the last-hour's scored speed
+ * When under an hour, this is less accurate than the
+ * calculated scored speed.
+ */
 class WindowStatsComputer {
   DifferentialWindowFilter<60> travelled_distance;
 
