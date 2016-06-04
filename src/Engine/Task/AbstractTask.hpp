@@ -388,10 +388,10 @@ protected:
    * @param glide_polar Polar used for calculation
    * @param total Glide result accumulated for total task
    * @param leg Glide result for current leg of task
-   * @param total_remaining_effective
-   * @param leg_remaining_effective
-   * @param total_t_elapsed Total planned task time (s)
-   * @param leg_t_elapsed Leg planned task time (s)
+   * @param total_remaining_effective.  Distance is updated
+   * @param leg_remaining_effective. Distance is updated
+   * @param solution_remaining_total Total remaining solution
+   * @param solution_remaining_leg Leg Total remaining solution
    */
   virtual void GlideSolutionPlanned(const AircraftState &state_now,
                                     const GlidePolar &glide_polar,
