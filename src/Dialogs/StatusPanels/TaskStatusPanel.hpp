@@ -35,8 +35,6 @@ class Button;
 class TaskStatusPanel final
   : public RowFormWidget,
     private NullBlackboardListener {
-  fixed emc;
-
 public:
 
   TaskStatusPanel(const DialogLook &look)
