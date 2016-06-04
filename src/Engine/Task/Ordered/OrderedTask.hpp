@@ -497,6 +497,7 @@ private:
    * time remaining with the current glide polar, equal to a target value.
    *
    * @param state_now Aircraft state
+   * @param glide_polar Glide polar to be used
    * @param t_target Desired time for remainder of task (s)
    *
    * @return Target range parameter (0-1)
