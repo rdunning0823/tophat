@@ -556,8 +556,21 @@ UpdateInfoBoxTaskSpeedInstant(InfoBoxData &data)
 void
 UpdateInfoBoxTaskSpeedHour(InfoBoxData &data)
 {
-  const WindowStats &window =
-    CommonInterface::Calculated().task_stats.last_hour;
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+  if (task_stats.total.time_elapsed < fixed(3600)) {
+    if (!task_stats.task_valid || !positive(task_stats.distance_scored)) {
+      data.SetInvalid();
+      return;
+    }
+    // Set Value
+    data.SetValue(_T("%2.0f"),
+                      Units::ToUserTaskSpeed(task_stats.GetScoredSpeed()));
+    // Set Unit
+    data.SetValueUnit(Units::current.task_speed_unit);
+    return;
+  }
+
+  const WindowStats &window = task_stats.last_hour;
   if (negative(window.duration)) {
     data.SetInvalid();
     return;
