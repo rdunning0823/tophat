@@ -38,6 +38,8 @@ Copyright_License {
 #include <fcntl.h>
 #endif
 
+bool disable_debug_logging;
+
 static TextWriter
 OpenLog()
 {
