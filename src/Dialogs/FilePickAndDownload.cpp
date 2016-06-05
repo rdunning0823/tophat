@@ -306,8 +306,8 @@ ManagedFilePickAndDownloadWidget::GetRepositoryUri(FileType type)
 {
 #define REPOSITORY_MAP_URI "http://download.xcsoar.org/repository"
 //#define REPOSITORY_URI          "http://downloads.tophatsoaring.org/repository/repository_waypoint_tophat.txt"
-#define REPOSITORY_WAYPOINT_URI "http://raspberryridgesheepfarm.com/tophat/repository/repository_waypoint_tophat.txt"
-#define REPOSITORY_AIRSPACE_URI "http://raspberryridgesheepfarm.com/tophat/repository/repository_airspace_tophat.txt"
+#define REPOSITORY_WAYPOINT_URI "http://www.tophatsoaring.org/downloads/repository/repository_waypoint_tophat.txt"
+#define REPOSITORY_AIRSPACE_URI "http://www.tophatsoaring.org/downloads/repository/repository_airspace_tophat.txt"
 
 
   switch (type) {
