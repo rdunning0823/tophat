@@ -22,6 +22,7 @@
 
 #include "GlideResult.hpp"
 #include "GlideState.hpp"
+#include "LogFile.hpp"
 
 GlideResult::GlideResult(const GlideState &task, const fixed V)
   :head_wind(task.head_wind),
@@ -139,3 +140,14 @@ GlideResult::Reset()
 {
   validity = Validity::NO_SOLUTION;
 }
+
+void
+GlideResult::DumpGlideResult()
+{
+  LogDebug("GlideResult:        v_opt:%4.0f     start_alt:%4.0f  min_arrive_atl:%4.0f  altitude_difference:%4.0f           pure_glide_height:%4.0f v.dist:%4.0f  v.bearing:%4.0f",
+           (double)v_opt, (double)start_altitude, (double)min_arrival_altitude, (double)altitude_difference, (double)pure_glide_height, (double)vector.distance, (double)vector.bearing.AbsoluteDegrees());
+
+  LogDebug("GlideResult: height_climb:%4.0f  height_glide:%4.0f       t_elapsed:%4.0f            t_virtual:%4.0f    pure_glide_min_arriv_alt:%4.0f  valid:%i",
+           (double)height_climb, (double)height_glide, (double)time_elapsed, (double)time_virtual, (double)pure_glide_min_arrival_altitude, validity);
+}
+
