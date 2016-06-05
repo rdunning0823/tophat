@@ -29,6 +29,8 @@ Copyright_License {
 #ifdef _UNICODE
 #include <tchar.h>
 #endif
+  /** should we skip debugging entries */
+extern bool disable_debug_logging;
 
 /**
  * Write a formatted line to the log file.
@@ -40,6 +42,20 @@ gcc_printf(1, 2)
 void
 LogFormat(const char *fmt, ...);
 
+//void LogDebugEnable(bool val);
+//bool GetLogDebugEnabled();
+static inline bool
+GetLogDebugEnabled()
+{
+  return !disable_debug_logging;
+}
+
+static inline void
+LogDebugEnable(bool val)
+{
+  disable_debug_logging = !val;
+}
+
 #ifdef _UNICODE
 void
 LogFormat(const TCHAR *fmt, ...);
@@ -47,7 +63,8 @@ LogFormat(const TCHAR *fmt, ...);
 
 #if !defined(NDEBUG) && !defined(GNAV)
 
-#define LogDebug(...) LogFormat(__VA_ARGS__)
+#define LogDebug(...) if (!disable_debug_logging) LogFormat(__VA_ARGS__)
+//#define LogDebugEnable(val) disable_debug_logging = !val
 
 #else /* NDEBUG */
 
