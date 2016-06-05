@@ -165,6 +165,8 @@ struct GlideResult {
     return validity != Validity::NO_SOLUTION;
   }
 
+  void DumpGlideResult();
+
   /**
    * Calculate additional items (CruiseTrackBearing and AltitudeRequired) that were
    * deferred.
