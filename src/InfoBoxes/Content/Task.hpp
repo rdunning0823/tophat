@@ -28,6 +28,39 @@ Copyright_License {
 
 extern const InfoBoxPanel next_waypoint_infobox_panels[];
 
+extern const InfoBoxPanel task_computer_setup_infobox_panels[];
+
+class InfoBoxTaskComputerSetup: public InfoBoxContentNonTabbed
+{
+public:
+  virtual const InfoBoxPanel *GetDialogContent() override;
+};
+
+class InfoBoxTaskSpeed: public InfoBoxTaskComputerSetup
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxTaskSpeedHour: public InfoBoxTaskComputerSetup
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxTaskSpeedInstant: public InfoBoxTaskComputerSetup
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxTaskSpeedAchieved: public InfoBoxTaskComputerSetup
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
+
+
 class InfoBoxContentBearingDiff: public InfoBoxContent
 {
 public:

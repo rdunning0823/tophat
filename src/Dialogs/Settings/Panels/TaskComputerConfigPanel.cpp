@@ -37,24 +37,8 @@ enum ControlIndex {
   TaskOptimizationSpeed,
 };
 
-class TaskComputerConfigPanel final
-  : public RowFormWidget, DataFieldListener {
-public:
-  TaskComputerConfigPanel()
-    :RowFormWidget(UIGlobals::GetDialogLook()) {}
-
-protected:
-  void UpdateVisibility(TaskBehaviour::TaskPlanningSpeedMode mode);
-
-public:
-  /* methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual bool Save(bool &changed) override;
-
-private:
-  /* methods from DataFieldListener */
-  virtual void OnModified(DataField &df) override;
-};
+TaskComputerConfigPanel::TaskComputerConfigPanel()
+  :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
 void
 TaskComputerConfigPanel::OnModified(DataField &df)

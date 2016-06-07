@@ -21,36 +21,12 @@ Copyright_License {
 }
 */
 
-#ifndef TASK_COMPUTER_CONFIG_PANEL_HPP
-#define TASK_COMPUTER_CONFIG_PANEL_HPP
+#ifndef TASK_COMPUTER_SETUP_INFOBOX_PANEL_HPP
+#define TASK_COMPUTER_SETUP_INFOBOX_PANEL_HPP
 
-#include "Widget/RowFormWidget.hpp"
-#include "Form/ActionListener.hpp"
-#include "Form/DataField/Listener.hpp"
-#include "Blackboard/BlackboardListener.hpp"
-#include "Form/Form.hpp"
-#include "Task/TaskBehaviour.hpp"
-
-
-class TaskComputerConfigPanel final
-  : public RowFormWidget, DataFieldListener {
-public:
-  TaskComputerConfigPanel();
-
-protected:
-  void UpdateVisibility(TaskBehaviour::TaskPlanningSpeedMode mode);
-
-public:
-  /* methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual bool Save(bool &changed) override;
-
-private:
-  /* methods from DataFieldListener */
-  virtual void OnModified(DataField &df) override;
-};
+class Widget;
 
 Widget *
-CreateTaskComputerConfigPanel();
+LoadTaskComputerSetupInfoBoxPanel(unsigned id);
 
 #endif
