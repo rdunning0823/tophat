@@ -420,6 +420,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/Panel/ATCReference.cpp \
 	$(SRC)/InfoBoxes/Panel/TimeInfoBox.cpp \
 	$(SRC)/InfoBoxes/Panel/WindSetupInfoBox.cpp \
+	$(SRC)/InfoBoxes/Panel/TaskComputerSetupInfoBox.cpp \
 	$(SRC)/InfoBoxes/Panel/NextWaypoint.cpp \
 	$(SRC)/InfoBoxes/Panel/TeamCode.cpp \
 	$(SRC)/Pan.cpp \

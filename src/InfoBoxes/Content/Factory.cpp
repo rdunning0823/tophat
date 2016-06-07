@@ -359,7 +359,7 @@ static constexpr MetaData meta_data[] = {
     N_("Speed on task"),
     N_("V Task"),
     N_("Average speed while on current task, not compensated for altitude."),
-    UpdateInfoBoxTaskSpeed,
+    IBFHelper<InfoBoxTaskSpeed>::Create,
     e_CC_SpeedInst, // V Task Inst
     e_Fin_AltReq, // Fin AltR
     STANDARD,
@@ -825,7 +825,7 @@ static constexpr MetaData meta_data[] = {
     N_("Speed task instantaneous"),
     N_("V Task Inst"),
     N_("Instantaneous cross country speed while on current task, compensated for altitude. Equivalent to instantaneous Pirker cross-country speed."),
-    UpdateInfoBoxTaskSpeedInstant,
+    IBFHelper<InfoBoxTaskSpeedInstant>::Create,
     e_CC_Speed, // V Task Ach
     e_SpeedTaskAvg, // V Task Av
     DEPRECATED,
@@ -847,7 +847,7 @@ static constexpr MetaData meta_data[] = {
     N_("Speed task achieved"),
     N_("V Task Ach"),
     N_("Achieved cross country speed while on current task, compensated for altitude.  Equivalent to Pirker cross-country speed remaining."),
-    UpdateInfoBoxTaskSpeedAchieved,
+    IBFHelper<InfoBoxTaskSpeedAchieved>::Create,
     TASK_SPEED_HOUR,
     e_CC_SpeedInst, // V Task Inst
     DEPRECATED,
@@ -1336,7 +1336,7 @@ static constexpr MetaData meta_data[] = {
     N_("Speed task last hour"),
     N_("V Task H"),
     N_("Average cross country speed while on current task over the last hour, not compensated for altitude."),
-    UpdateInfoBoxTaskSpeedHour,
+    IBFHelper<InfoBoxTaskSpeedHour>::Create,
     e_Fin_Distance,
     e_CC_Speed,
     STANDARD,

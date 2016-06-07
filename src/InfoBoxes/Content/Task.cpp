@@ -37,6 +37,7 @@ Copyright_License {
 #include "GlideSolvers/MacCready.hpp"
 #include "GlideSolvers/GlideState.hpp"
 #include "InfoBoxes/Panel/Home.hpp"
+#include "InfoBoxes/Panel/TaskComputerSetupInfoBox.hpp"
 #include "InfoBoxes/Panel/NextWaypoint.hpp"
 #include "Renderer/BestCruiseArrowRenderer.hpp"
 #include "Look/TaskLook.hpp"
@@ -49,6 +50,7 @@ Copyright_License {
 
 #include <tchar.h>
 #include <stdio.h>
+
 
 #ifdef __clang__
 /* gcc gives "redeclaration differs in 'constexpr'" */
@@ -501,8 +503,23 @@ UpdateInfoBoxFinalAltitudeRequire(InfoBoxData &data)
   data.SetValueFromAltitude(task_stats.total.solution_remaining.GetRequiredAltitude());
 }
 
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel task_computer_setup_infobox_panels[] = {
+  { N_("Set Up Task Computer"), LoadTaskComputerSetupInfoBoxPanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxTaskComputerSetup::GetDialogContent()
+{
+  return task_computer_setup_infobox_panels;
+}
+
 void
-UpdateInfoBoxTaskSpeed(InfoBoxData &data)
+InfoBoxTaskSpeed::Update(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (!task_stats.task_valid || !positive(task_stats.distance_scored)) {
@@ -519,7 +536,7 @@ UpdateInfoBoxTaskSpeed(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxTaskSpeedAchieved(InfoBoxData &data)
+InfoBoxTaskSpeedAchieved::Update(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (!task_stats.task_valid ||
@@ -537,7 +554,7 @@ UpdateInfoBoxTaskSpeedAchieved(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxTaskSpeedInstant(InfoBoxData &data)
+InfoBoxTaskSpeedInstant::Update(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (!task_stats.task_valid || !task_stats.IsPirkerSpeedAvailable()) {
@@ -554,7 +571,7 @@ UpdateInfoBoxTaskSpeedInstant(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxTaskSpeedHour(InfoBoxData &data)
+InfoBoxTaskSpeedHour::Update(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (task_stats.total.time_elapsed < fixed(3600)) {
