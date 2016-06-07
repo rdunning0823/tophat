@@ -140,6 +140,77 @@ TaskLeg::GetTravelledVector(const GeoPoint &ref) const
   return GeoVector::Invalid();
 }
 
+inline GeoVector
+TaskLeg::GetScoredVector(const GeoPoint &ref) const
+{
+  switch (destination.GetActiveState()) {
+  case OrderedTaskPoint::BEFORE_ACTIVE:
+    if (!GetOrigin()) {
+      return GeoVector::Zero();
+    }
+
+    // this leg totally included
+    return memo_travelled.calc(GetOrigin()->GetLocationScored(),
+                               destination.GetLocationScored(),
+                               GetOrigin()->ScoreAdjustment() +
+                                   destination.ScoreAdjustment());
+
+  case OrderedTaskPoint::CURRENT_ACTIVE:
+    // this leg partially included
+    if (!GetOrigin()) {
+      return GeoVector(fixed(0),
+                       ref.IsValid()
+                       ? ref.Bearing(destination.GetLocationRemaining())
+                       : Angle::Zero());
+    }
+
+    if (destination.HasEntered()) {
+      return memo_travelled.calc(GetOrigin()->GetLocationScored(),
+                                 destination.GetLocationScored(),
+                                 GetOrigin()->ScoreAdjustment() +
+                                     destination.ScoreAdjustment());
+    }
+    else if (!ref.IsValid())
+      return GeoVector::Zero();
+    else {
+      // not in cylinder (or has entered and left)
+      // this provides vector with bearing to center (which is NOT bearing to plane)
+      // and Dist from last travelled to center minus dist from glider to center.
+      fixed dist = GetOrigin()->GetLocationScored().Distance(destination.GetLocation())
+          - ref.Distance(destination.GetLocation()) - GetOrigin()->ScoreAdjustment();
+
+
+      return GeoVector(
+          std::max(fixed(0), dist),
+          GetOrigin()->GetLocationScored().Bearing(destination.GetLocation()));
+    }
+  case OrderedTaskPoint::AFTER_ACTIVE:
+    if (!GetOrigin()) {
+      return GeoVector::Zero();
+    }
+
+    // this leg may be partially included
+    if (GetOrigin()->HasEntered()) {
+      if (ref.IsValid()) {
+        return memo_travelled.calc(GetOrigin()->GetLocationScored(),
+                                   ref,
+                                   GetOrigin()->ScoreAdjustment() +
+                                       destination.ScoreAdjustment());
+      } else {
+        return memo_travelled.calc(GetOrigin()->GetLocationScored(),
+                                   destination.GetLocationScored(),
+                                   GetOrigin()->ScoreAdjustment() +
+                                       destination.ScoreAdjustment());
+      }
+    }
+    return GeoVector::Zero();
+  }
+
+  gcc_unreachable();
+  assert(false);
+  return GeoVector::Invalid();
+}
+
 fixed
 TaskLeg::GetScoredLegDistanceLandout(const GeoPoint &ref) const
 {
@@ -242,7 +313,8 @@ TaskLeg::GetMinimumLegDistance() const
 fixed 
 TaskLeg::ScanDistanceTravelled(const GeoPoint &ref)
 {
-  vector_travelled = GetTravelledVector(ref);
+  vector_travelled = GetScoredVector(ref);
+
   return vector_travelled.distance +
     (GetNext() ? GetNext()->ScanDistanceTravelled(ref) : fixed(0));
 }
