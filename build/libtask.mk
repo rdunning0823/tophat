@@ -13,6 +13,7 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/Ordered/FinishConstraints.cpp \
 	$(TASK_SRC_DIR)/Ordered/Settings.cpp \
 	$(TASK_SRC_DIR)/Ordered/OrderedTask.cpp \
+	$(TASK_SRC_DIR)/Ordered/EffectiveMCFromSpeed.cpp \
 	$(TASK_SRC_DIR)/Ordered/TaskAdvance.cpp \
 	$(TASK_SRC_DIR)/Ordered/SmartTaskAdvance.cpp \
 	$(TASK_SRC_DIR)/Ordered/Points/IntermediatePoint.cpp \

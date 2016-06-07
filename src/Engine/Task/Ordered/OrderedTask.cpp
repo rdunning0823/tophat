@@ -52,6 +52,8 @@
 #include "Task/ObservationZones/CylinderZone.hpp"
 #include "GlideSolvers/GlideState.hpp"
 #include "GlideSolvers/MacCready.hpp"
+#include "Util/Clamp.hpp"
+#include "EffectiveMCFromSpeed.hpp"
 
 /**
  * According to "FAI Sporting Code / Annex A to Section 3 - Gliding",
@@ -96,6 +98,7 @@ OrderedTask::OrderedTask(const TaskBehaviour &tb)
    active_factory(nullptr),
    ordered_settings(tb.ordered_defaults),
    dijkstra_min(nullptr), dijkstra_max(nullptr),
+   effective_mc_from_speed(new EffectiveMCFromSpeed()),
    saved_start_pushed_valid(false)
 {
   ClearName();
@@ -111,6 +114,7 @@ OrderedTask::~OrderedTask()
 
   delete dijkstra_min;
   delete dijkstra_max;
+  delete effective_mc_from_speed;
 }
 
 const TaskFactoryConstraints &
@@ -1157,12 +1161,15 @@ OrderedTask::CalcEffectiveMC(const AircraftState &aircraft,
                              fixed &val) const
 {
   if (AllowIncrementalBoundaryStats(aircraft)) {
+
     TaskEffectiveMacCready bce(task_points, active_task_point, aircraft,
                                task_behaviour.glide, glide_polar);
     val = bce.search(glide_polar.GetMC());
+
     return true;
   } else {
     val = glide_polar.GetMC();
+
     return false;
   }
 }
@@ -1170,9 +1177,51 @@ OrderedTask::CalcEffectiveMC(const AircraftState &aircraft,
 
 inline fixed
 OrderedTask::CalcMinTarget(const AircraftState &aircraft,
-                           const GlidePolar &glide_polar,
+                           const GlidePolar &_p,
                            const fixed t_target)
 {
+  GlidePolar glide_polar = _p;
+  fixed mc_effective = glide_polar.GetMC();
+
+  switch (task_behaviour.task_planning_speed_mode) {
+
+  case TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed: {
+    fixed speed = Clamp(task_behaviour.task_planning_speed_override, fixed(5), fixed(200));
+
+    effective_mc_from_speed->Calc(aircraft,
+                                  glide_polar,
+                                  speed,
+                                  task_behaviour,
+                                  task_projection,
+                                  mc_effective);
+    break;
+  }
+
+  case TaskBehaviour::TaskPlanningSpeedMode::PastPerformanceSpeed:
+  {
+    if (stats.total.time_elapsed > fixed(3600) &&
+        !negative(stats.last_hour.duration)) {
+      fixed speed = stats.last_hour.speed;
+      mc_effective = Clamp(stats.effective_mc, fixed(0.1), fixed(10));
+
+      effective_mc_from_speed->Calc(aircraft,
+                                    glide_polar,
+                                    speed,
+                                    task_behaviour,
+                                    task_projection,
+                                    mc_effective);
+    } else {
+      mc_effective = Clamp(stats.effective_mc, fixed(0.1), fixed(10));
+    }
+
+    break;
+  }
+  case TaskBehaviour::TaskPlanningSpeedMode::MacCreadyValue:
+    break;
+  }
+
+  glide_polar.SetMC(mc_effective);
+
   if (stats.has_targets) {
     // only perform scan if modification is possible
     const fixed t_rem = std::max(fixed(0),
@@ -1505,6 +1554,14 @@ OrderedTask::Commit(const OrderedTask& that)
     UpdateGeometry();
     // @todo also re-scan task sample state,
     // potentially resetting task
+
+  if (TaskSize() > 1)
+    effective_mc_from_speed->CreateDummyTask((const StartPoint*)task_points[0],
+                                             (const OrderedTaskPoint*)task_points[1],
+                                             task_behaviour,
+                                             ordered_settings);
+  else
+    effective_mc_from_speed->DeleteDummyTask();
 
   return modified;
 }
