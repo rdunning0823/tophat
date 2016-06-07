@@ -525,12 +525,16 @@ TargetWidget::RefreshCalculator()
   // update outputs
   const auto &calculated = CommonInterface::Calculated();
   const TaskStats &task_stats = calculated.ordered_task_stats;
-  const fixed aat_time_estimated = task_stats.GetEstimatedTotalTime();
 
   ete.SetVisible(!nodisplay);
 
   if (!nodisplay) {
-    ete.SetText(FormatTimespanSmart((int)aat_time_estimated, 2));
+    if (!task_stats.task_valid || !task_stats.current_leg.IsAchievable()) {
+      ete.SetText(_T("--"));
+    } else {
+      assert(!negative(task_stats.current_leg.time_remaining_now));
+      ete.SetText(FormatTimespanSmart((int)task_stats.current_leg.time_remaining_now, 2));
+    }
   }
 
   const ElementStat &total = task_stats.total;
