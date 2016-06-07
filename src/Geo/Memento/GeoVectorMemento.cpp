@@ -21,18 +21,31 @@
  */
 
 #include "GeoVectorMemento.hpp"
+#include <assert.h>
 
 GeoVector 
 GeoVectorMemento::calc(const GeoPoint& _origin,
-                       const GeoPoint& _destination) const
+                       const GeoPoint& _destination,
+                       const fixed _distance_adjustment) const
 {
   if (!value.IsValid() ||
       _origin != origin ||
-      _destination != destination) {
+      _destination != destination ||
+      _distance_adjustment != distance_adjustment) {
+    assert(!negative(distance_adjustment));
     origin = _origin;
     destination = _destination;
-    value = GeoVector(origin, destination);
-  }
+    distance_adjustment = _distance_adjustment;
+    if (positive(distance_adjustment)) {
+      fixed t =  distance_adjustment / origin.Distance(destination);
+      if (t > fixed(1))
+        t = fixed(1);
 
+      value = GeoVector(origin, origin.Interpolate(destination, fixed(1) - t));
+    } else {
+      value = GeoVector(origin, destination);
+    }
+
+  }
   return value;
 }

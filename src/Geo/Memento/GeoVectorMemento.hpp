@@ -27,6 +27,7 @@
 #include "Geo/GeoVector.hpp"
 #include "Compiler.h"
 
+
 /** Memento object to store results of previous GeoVector constructors. */
 class GeoVectorMemento 
 {
@@ -39,17 +40,21 @@ class GeoVectorMemento
   /** GeoVector saved from previous query */
   mutable GeoVector value;
 
+  /** distance adjustment.  Must be positive, shortens distance. */
+  mutable fixed distance_adjustment;
+
 public:
   /** Constructor, initialises to trigger update on first call. */
   GeoVectorMemento()
-    :value(GeoVector::Invalid()) {}
+    :value(GeoVector::Invalid()), distance_adjustment(fixed(0)) {}
 
   /**
    * Returns a GeoVector object from the origin to destination, 
    * from previously saved value if input arguments are identical. 
    */
   gcc_pure
-  GeoVector calc(const GeoPoint& _origin, const GeoPoint& _destination) const;
+  GeoVector calc(const GeoPoint& _origin, const GeoPoint& _destination,
+                 const fixed _distance_adjustment = fixed(0)) const;
 };
 
 #endif
