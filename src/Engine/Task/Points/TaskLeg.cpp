@@ -140,6 +140,19 @@ TaskLeg::GetTravelledVector(const GeoPoint &ref) const
   return GeoVector::Invalid();
 }
 
+GeoVector
+TaskLeg::GetScoredLegVectorLandout(const GeoPoint &ref) const
+{
+  assert(!destination.HasEntered());
+  assert(ref.IsValid());
+
+  fixed dist = GetScoredLegDistanceLandout(ref);
+
+  return GeoVector(
+      std::max(fixed(0), dist),
+      GetOrigin()->GetLocationScored().Bearing(ref));
+}
+
 inline GeoVector
 TaskLeg::GetScoredVector(const GeoPoint &ref) const
 {
@@ -176,13 +189,7 @@ TaskLeg::GetScoredVector(const GeoPoint &ref) const
       // not in cylinder (or has entered and left)
       // this provides vector with bearing to center (which is NOT bearing to plane)
       // and Dist from last travelled to center minus dist from glider to center.
-      fixed dist = GetOrigin()->GetLocationScored().Distance(destination.GetLocation())
-          - ref.Distance(destination.GetLocation()) - GetOrigin()->ScoreAdjustment();
-
-
-      return GeoVector(
-          std::max(fixed(0), dist),
-          GetOrigin()->GetLocationScored().Bearing(destination.GetLocation()));
+      return GetScoredLegVectorLandout(ref);
     }
   case OrderedTaskPoint::AFTER_ACTIVE:
     if (!GetOrigin()) {
@@ -203,9 +210,18 @@ TaskLeg::GetScoredVector(const GeoPoint &ref) const
                                        destination.ScoreAdjustment());
       }
     }
+    if (GetOrigin()->HasEntered()) {
+      if (destination.HasEntered()) {
+        return memo_travelled.calc(GetOrigin()->GetLocationScored(),
+                                   destination.GetLocationScored(),
+                                   GetOrigin()->ScoreAdjustment() +
+                                       destination.ScoreAdjustment());
+      } else if (ref.IsValid()) {
+        return GetScoredLegVectorLandout(ref);
+      }
+    }
     return GeoVector::Zero();
   }
-
   gcc_unreachable();
   assert(false);
   return GeoVector::Invalid();
@@ -266,11 +282,17 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
 
   case OrderedTaskPoint::AFTER_ACTIVE:
 
-    // this leg may be partially included
-    if (GetOrigin()->HasEntered() && ref.IsValid()) {
-      return std::max(fixed(0),
-                      memo_scored.Distance(GetOrigin()->GetLocationScored(), ref)
-                      - GetOrigin()->ScoreAdjustment());
+    // Include this leg, assume pilot has neglected to advance task;
+    if (GetOrigin()->HasEntered()) {
+      if (destination.HasEntered()) {
+        return std::max(fixed(0),
+                        memo_scored.Distance(GetOrigin()->GetLocationScored(),
+                                             destination.GetLocationScored())
+                        - GetOrigin()->ScoreAdjustment() - destination.ScoreAdjustment());
+
+      } else if (ref.IsValid()) {
+        return GetScoredLegDistanceLandout(ref);
+      }
     }
 
     return fixed(0);
