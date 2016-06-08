@@ -197,6 +197,9 @@ private:
   GeoVector GetTravelledVector(const GeoPoint &ref) const;
   
   gcc_pure
+  GeoVector GetScoredLegVectorLandout(const GeoPoint &ref) const;
+
+  gcc_pure
   GeoVector GetScoredVector(const GeoPoint &ref) const;
 
   gcc_pure
