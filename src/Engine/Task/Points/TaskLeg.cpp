@@ -234,8 +234,8 @@ TaskLeg::GetScoredLegDistanceLandout(const GeoPoint &ref) const
   assert(ref.IsValid());
 
   return std::max(fixed(0),
-                  GetOrigin()->GetLocationScored().Distance(destination.GetLocation())
-                  - ref.Distance(destination.GetLocation())
+                  GetOrigin()->GetLocationScored().Distance(destination.GetLocationMax())
+                  - ref.Distance(destination.GetLocationMax())
                   - GetOrigin()->ScoreAdjustment());
 }
 
