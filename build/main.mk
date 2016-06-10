@@ -179,6 +179,9 @@ XCSOAR_SOURCES := \
 	$(SRC)/Airspace/ActivePredicate.cpp \
 	$(SRC)/Task/Serialiser.cpp \
 	$(SRC)/Task/Deserialiser.cpp \
+	$(SRC)/Task/StateSerialiser.cpp \
+	$(SRC)/Task/StateDeserialiser.cpp \
+	$(SRC)/Task/PointStateDeserialiser.cpp \
 	$(SRC)/Task/SaveFile.cpp \
 	$(SRC)/Task/LoadFile.cpp \
 	$(SRC)/Task/TaskFile.cpp \

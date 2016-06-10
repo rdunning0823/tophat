@@ -18,23 +18,15 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
+#ifndef STATE_SERIALISER_HPP
+#define STATE_SERIALISER_HPP
 
-#ifndef TASK_LOAD_FILE_HPP
-#define TASK_LOAD_FILE_HPP
-
-#include <tchar.h>
-
+class WritableDataNode;
 class OrderedTask;
-class Waypoints;
-struct TaskBehaviour;
 
-
-OrderedTask *
-LoadTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
-         const Waypoints *waypoints=nullptr);
-
-bool
-LoadTaskState(OrderedTask &task);
+/** serialises the state of the task */
+void
+SaveTaskState(WritableDataNode &node, const OrderedTask &task);
 
 #endif

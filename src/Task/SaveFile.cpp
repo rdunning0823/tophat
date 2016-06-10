@@ -22,8 +22,17 @@
 
 #include "SaveFile.hpp"
 #include "Serialiser.hpp"
+#include "StateSerialiser.hpp"
 #include "XML/DataNodeXML.hpp"
 #include "IO/TextWriter.hpp"
+#include "OS/FileUtil.hpp"
+#include "LocalPath.hpp"
+#include "Simulator.hpp"
+#include "Time/PeriodClock.hpp"
+
+#include "LogFile.hpp" //debug
+
+#include <windef.h>
 
 bool
 SaveTask(const TCHAR *path, const OrderedTask &task)
@@ -41,4 +50,46 @@ SaveTask(const TCHAR *path, const OrderedTask &task)
 
   root_node.Serialise(writer, true);
   return true;
+}
+
+void
+RemoveTaskState()
+{
+  LogDebug("RemoveTaskState()");
+  TCHAR path[MAX_PATH];
+  LocalPath(path, _T("task_state"));
+  if (File::Exists(path))
+    File::Delete(path);
+}
+
+bool
+SaveTaskState(bool transitioned, bool in_sector, const OrderedTask &task)
+{
+#ifdef NDEBUG
+  if (is_simulator())
+    return false;
+#endif
+
+  static PeriodClock clock;
+
+  if (transitioned || (in_sector && clock.Check(10000))) {
+    TCHAR path[MAX_PATH];
+    LocalPath(path, _T("task_state"));
+
+    XMLNode root_node = XMLNode::CreateRoot(_T("TaskState"));
+    {
+      WritableDataNodeXML root(root_node);
+      SaveTaskState(root, task);
+    }
+
+    TextWriter writer(path);
+    if (!writer.IsOpen())
+      return false;
+
+    root_node.Serialise(writer, true);
+
+    clock.Update();
+    return true;
+  }
+  return false;
 }

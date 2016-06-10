@@ -32,6 +32,8 @@
 #include "Task/Visitors/TaskPointVisitor.hpp"
 #include "Geo/Math.hpp"
 
+#include "LogFile.hpp" //debug
+
 #include <assert.h>
 
 OrderedTaskPoint::OrderedTaskPoint(TaskPointType _type,
@@ -111,6 +113,7 @@ bool
 OrderedTaskPoint::UpdateSampleNear(const AircraftState &state,
                                    const FlatProjection &projection)
 {
+  LogDebug("OrderedTaskPoint::UpdateSampleNear IsInSector:%u", IsInSector(state));
   if (!IsInSector(state))
     // return false (no update required)
     return false;

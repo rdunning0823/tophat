@@ -23,6 +23,7 @@
 #include "SampledTaskPoint.hpp"
 #include "Task/ObservationZones/Boundary.hpp"
 #include "Navigation/Aircraft.hpp"
+#include "LogFile.hpp" //debug
 
 SampledTaskPoint::SampledTaskPoint(const GeoPoint &location,
                                    const bool b_scored)
@@ -43,6 +44,7 @@ SampledTaskPoint::AddInsideSample(const AircraftState& state,
 {
   assert(state.location.IsValid());
 
+  LogDebug("SampledTaskPoint::AddInsideSample IsInside(sampled polygon):%u", sampled_points.IsInside(state.location));
   // if sample is inside sample polygon
   if (sampled_points.IsInside(state.location))
     // return false (no update required)

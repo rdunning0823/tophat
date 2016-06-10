@@ -23,6 +23,7 @@
 #include "TaskLeg.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 
+#include "LogFile.hpp" //debug
 #include <assert.h>
 #include <algorithm>
 
@@ -249,11 +250,14 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   case OrderedTaskPoint::BEFORE_ACTIVE:
     // this leg totally included
     if (destination.HasEntered()) {
-      return std::max(fixed(0),
+      fixed temp =  std::max(fixed(0),
                       memo_scored.Distance(GetOrigin()->GetLocationScored(),
                                   destination.GetLocationScored())
                                   - GetOrigin()->ScoreAdjustment()
                                   - destination.ScoreAdjustment());
+      GetOrigin()->GetLocationScored().Dump(_T("TaskLeg::GetScoredDistance BEFORE_ACTIVE ENTERED Ori.LocScored:"));
+      destination.GetLocationScored().Dump(_T("TaskLeg::GetScoredDistance BEFORE_ACTIVE ENTERED Dest.LocScored:"));
+      return temp;
     } else {
       // if we missed an OZ in the past, or just advance the task bar fwd
       // then
@@ -283,6 +287,7 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   case OrderedTaskPoint::AFTER_ACTIVE:
 
     // Include this leg, assume pilot has neglected to advance task;
+
     if (GetOrigin()->HasEntered()) {
       if (destination.HasEntered()) {
         return std::max(fixed(0),
@@ -381,6 +386,8 @@ TaskLeg::ScanDistanceNominal() const
 fixed 
 TaskLeg::ScanDistanceScored(const GeoPoint &ref) const
 {
-  return GetScoredDistance(ref) +
+  fixed temp = GetScoredDistance(ref);
+  LogDebug("ScanDistanceScored leg dist:%.0f", temp);
+  return temp +
     (GetNext() ? GetNext()->ScanDistanceScored(ref) : fixed(0));
 }

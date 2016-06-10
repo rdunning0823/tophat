@@ -42,6 +42,9 @@ struct AircraftState;
  *   zone is modified (e.g. due to previous/next taskpoint moving) in update_oz
  */
 class SampledTaskPoint {
+
+  friend class PointStateDeserialiser;
+
   /**
    * Whether boundaries are used in scoring distance, or just the
    * reference point

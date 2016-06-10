@@ -39,6 +39,8 @@
  */
 class ScoredTaskPoint : public SampledTaskPoint
 {
+  friend class PointStateDeserialiser;
+
   AircraftState state_entered;
   bool has_exited;
 

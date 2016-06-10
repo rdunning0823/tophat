@@ -18,23 +18,17 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
-
-#ifndef TASK_LOAD_FILE_HPP
-#define TASK_LOAD_FILE_HPP
+ */
+#ifndef STATE_DESERIALISER_HPP
+#define STATE_DESERIALISER_HPP
 
 #include <tchar.h>
 
-class OrderedTask;
+class ConstDataNode;
 class Waypoints;
-struct TaskBehaviour;
-
-
-OrderedTask *
-LoadTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
-         const Waypoints *waypoints=nullptr);
+class OrderedTask;
 
 bool
-LoadTaskState(OrderedTask &task);
+LoadTaskState(OrderedTask &task, const ConstDataNode &node);
 
 #endif
