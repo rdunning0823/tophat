@@ -54,6 +54,8 @@
 #include "GlideSolvers/MacCready.hpp"
 #include "Util/Clamp.hpp"
 #include "EffectiveMCFromSpeed.hpp"
+#include "Task/LoadFile.hpp"
+#include "Task/SaveFile.hpp"
 
 /**
  * According to "FAI Sporting Code / Annex A to Section 3 - Gliding",
@@ -268,8 +270,9 @@ OrderedTask::RunDijsktraMin(const GeoPoint &location)
   if (!dijkstra.DistanceMin(ac))
     return false;
 
-  for (unsigned i = active_index; i != task_size; ++i)
+  for (unsigned i = active_index; i != task_size; ++i) {
     SetPointSearchMin(i, dijkstra.GetSolution(i - active_index));
+  }
 
   return true;
 }
@@ -372,8 +375,9 @@ OrderedTask::RunDijsktraMax()
 
     SetPointSearchMax(i, solution);
     // only do this for start if we're subtracting the start radius
-    if (i <= active_index && ((i > 0) || ScoredAdjustmentStart()))
+    if (i <= active_index && ((i > 0) || ScoredAdjustmentStart())) {
       set_tp_search_achieved(i, solution);
+    }
   }
 
   return true;
@@ -496,6 +500,7 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   AircraftState last_start_state = taskpoint_start->GetEnteredState();
   bool last_started = stats.start.task_started;
   const bool last_finished = stats.task_finished;
+  bool transitioned = false;
 
   const int t_min = std::max(0, (int)active_task_point - 1);
   const int t_max_active = std::max(active_task_point, GetLastIntermediateAchieved() + 1);
@@ -519,6 +524,7 @@ OrderedTask::CheckTransitions(const AircraftState &state,
                                         transition_enter, transition_exit,
                                         last_started, i == 0);
 
+    transitioned |= transition_enter || transition_exit;
     if (i == (int)active_task_point) {
       const bool last_request_armed = task_advance.NeedToArm();
 
@@ -576,6 +582,8 @@ OrderedTask::CheckTransitions(const AircraftState &state,
     if (stats.task_finished && !last_finished)
       task_events->TaskFinish();
   }
+
+  SaveTaskState(transitioned, full_update, *this);
 
   return full_update;
 }
@@ -647,6 +655,12 @@ bool
 OrderedTask::SavedStartIsValid()
 {
   return saved_start_pushed_valid;
+}
+
+void
+OrderedTask::RestoreTaskState()
+{
+  LoadTaskState(*this);
 }
 
 bool
@@ -1764,3 +1778,4 @@ OrderedTask::UpdateSummary(TaskSummary& ordered_summary) const
     ordered_summary.update(stats.total.remaining.GetDistance(),
                            stats.total.planned.GetDistance());
 }
+

@@ -60,6 +60,10 @@ public:
     return task;
   }
 
+  ProtectedTaskManager &SetProtectedTaskManager() {
+    return task;
+  }
+
   const ProtectedRoutePlanner &GetProtectedRoutePlanner() const {
     return route.GetProtectedRoutePlanner();
   }
@@ -80,6 +84,11 @@ public:
                          const GeoPoint &location, fixed resolution) const {
     trace.LockedCopyTo(v, min_time, location, resolution);
   }
+
+  /**
+   * Restores state of task from serialised data
+   */
+  void RestoreTaskState();
 
   /**
    * Triggers the task to calculate and update its internal Calculated settings and

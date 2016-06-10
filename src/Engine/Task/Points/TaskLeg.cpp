@@ -249,7 +249,7 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   case OrderedTaskPoint::BEFORE_ACTIVE:
     // this leg totally included
     if (destination.HasEntered()) {
-      return std::max(fixed(0),
+      return  std::max(fixed(0),
                       memo_scored.Distance(GetOrigin()->GetLocationScored(),
                                   destination.GetLocationScored())
                                   - GetOrigin()->ScoreAdjustment()
@@ -283,6 +283,7 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   case OrderedTaskPoint::AFTER_ACTIVE:
 
     // Include this leg, assume pilot has neglected to advance task;
+
     if (GetOrigin()->HasEntered()) {
       if (destination.HasEntered()) {
         return std::max(fixed(0),

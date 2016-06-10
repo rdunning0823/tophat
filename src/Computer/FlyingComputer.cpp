@@ -25,6 +25,7 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
 #include "Engine/Navigation/Aircraft.hpp"
+#include "Task/SaveFile.hpp"
 
 void
 FlyingComputer::Reset()
@@ -300,6 +301,11 @@ FlyingComputer::Compute(fixed takeoff_speed,
            (CheckLandingSpeed(takeoff_speed, basic) &&
             (!any_altitude.first || !CheckClimbing(dt, any_altitude.second))))
     Stationary(flying, basic.time, dt, basic.location);
+
+  /// if we've been sitting on the ground, then don't resume task on takeoff
+  if (positive(stationary_since) && (basic.time - stationary_since > fixed(120))) {
+    RemoveTaskState();
+  }
 
   if (basic.engine_noise_level_available)
     CheckPowered(dt, basic, flying);

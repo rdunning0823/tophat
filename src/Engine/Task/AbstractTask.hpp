@@ -137,6 +137,9 @@ public:
     return stats;
   }
 
+  TaskStats &SetStats() {
+    return stats;
+  }
   /** 
    * Update auto MC.  Internally uses TaskBehaviour to determine settings
    * 

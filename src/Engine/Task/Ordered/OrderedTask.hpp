@@ -65,6 +65,8 @@ struct TaskFactoryConstraints;
  */
 class OrderedTask final : public AbstractTask
 {
+  friend class PointStateDeserialiser;
+
 public:
   /** Storage type of task points */
   typedef std::vector<OrderedTaskPoint*> OrderedTaskPointVector;
@@ -476,6 +478,9 @@ public:
    * Are the saved start valid?
    */
   bool SavedStartIsValid();
+
+  /** restores state of task from saved file */
+  void RestoreTaskState();
 
 private:
 

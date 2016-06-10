@@ -300,6 +300,8 @@ GlideComputer::OnTakeoff()
   // reset stats on takeoff
   air_data_computer.ResetFlight(SetCalculated(), false);
 
+  task_computer.RestoreTaskState();
+
   // save stats in case we never finish
   SaveFinish();
 }
@@ -312,6 +314,7 @@ GlideComputer::OnLanding()
 
   if (Calculated().ordered_task_stats.task_finished)
     RestoreFinish();
+
 }
 
 inline void

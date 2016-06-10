@@ -29,6 +29,7 @@ Copyright_License {
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
 #include "Settings.hpp"
+#include "Task/LoadFile.hpp"
 
 #include <algorithm>
 
@@ -59,6 +60,14 @@ TaskComputer::ResetFlight(const bool full)
   last_flying = false;
 
   last_location_available.Clear();
+}
+
+void
+TaskComputer::RestoreTaskState()
+{
+  ProtectedTaskManager::ExclusiveLease _task(task);
+
+  _task->RestoreTaskState();
 }
 
 void

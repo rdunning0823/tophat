@@ -18,22 +18,46 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
-*/
+ */
+#ifndef SERIALISED_TASK_POINT_STATE_HPP
+#define SERIALISED_TASK_POINT_STATE_HPP
 
-#ifndef TASK_LOAD_FILE_HPP
-#define TASK_LOAD_FILE_HPP
+#include "Task/Points/Type.hpp"
+#include "Navigation/Aircraft.hpp"
 
 #include <tchar.h>
 
-class OrderedTask;
+class ConstDataNode;
 class Waypoints;
-struct TaskBehaviour;
+class OrderedTask;
 
-OrderedTask *
-LoadTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
-         const Waypoints *waypoints=nullptr);
+/** a class to serialise and deserialise the state of a task point
+ * This class relies on the friend declaration to update task properties in
+ *   OrderedTask
+ *   SampledTaskPoint
+ *   ScoredTaskPoint
+ */
 
-bool
-LoadTaskState(OrderedTask &task);
+class PointStateDeserialiser {
+public:
+  bool has_sampled;
+  bool has_exited;
+  AircraftState state_entered;
+  GeoPoint location_min;
+  void Reset() {
+    has_sampled = false;
+    has_exited = false;
+    state_entered.Reset();
+    location_min = GeoPoint::Invalid();
+  }
+  PointStateDeserialiser() {
+    Reset();
+  }
+
+  /**
+   * update the task point using (or abusing) the friend declaration
+   */
+  bool UpdatePoint(OrderedTask &task, unsigned idx);
+};
 
 #endif

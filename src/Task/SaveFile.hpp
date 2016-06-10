@@ -30,4 +30,17 @@ class OrderedTask;
 bool
 SaveTask(const TCHAR *path, const OrderedTask &task);
 
+/**
+ * Saves the task if a transition occurred or periodically if we're in the sector
+ * Don't save every second while in sector to reduce probability of
+ * write-in-progress when crashes
+ *
+ * @transitioned. did a transition just occur
+ * @in_sector. are we in a sector
+ */
+bool
+SaveTaskState(bool transitioned, bool in_sector, const OrderedTask &task);
+
+void RemoveTaskState();
+
 #endif

@@ -158,6 +158,13 @@ TaskManager::SavedStartIsValid()
 }
 
 void
+TaskManager::RestoreTaskState()
+{
+  assert(ordered_task != nullptr);
+  ordered_task->RestoreTaskState();
+}
+
+void
 TaskManager::IncrementActiveTaskPoint(int offset)
 {
   if (active_task) {

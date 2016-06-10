@@ -154,6 +154,9 @@ public:
    */
   bool SavedStartIsValid();
 
+  /** restores task state from serialised data */
+  void RestoreTaskState();
+
   /**
    * Accessor of current task point of active task
    *

@@ -27,6 +27,12 @@
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Util/StringUtil.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
+#include "Task/StateDeserialiser.hpp"
+#include "LocalPath.hpp"
+#include "OS/FileUtil.hpp"
+#include "Simulator.hpp"
+
+#include <windef.h>
 
 #include <memory>
 
@@ -61,4 +67,29 @@ LoadTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
 
   // Return the parsed task
   return task;
+}
+
+bool
+LoadTaskState(OrderedTask &task)
+{
+#ifdef NDEBUG
+  if (is_simulator())
+    return false;
+#endif
+
+  TCHAR path[MAX_PATH];
+  LocalPath(path, _T("task_state"));
+
+  if (!File::Exists(path))
+    return false;
+
+    // Load root node
+  std::unique_ptr<XMLNode> xml_root(XML::ParseFile(path));
+  if (!xml_root)
+    return false;
+
+  const ConstDataNodeXML root(*xml_root);
+  LoadTaskState(task, root);
+
+  return true;
 }

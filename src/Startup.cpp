@@ -84,6 +84,7 @@ Copyright_License {
 #include "Task/TaskManager.hpp"
 #include "Task/ProtectedTaskManager.hpp"
 #include "Task/DefaultTask.hpp"
+#include "Task/SaveFile.hpp"
 #include "Engine/Task/Ordered/OrderedTask.hpp"
 #include "Operation/VerboseOperationEnvironment.hpp"
 #include "PageActions.hpp"
@@ -676,6 +677,9 @@ Shutdown()
     delete calculation_thread;
     calculation_thread = nullptr;
   }
+
+  /** delete the task state file so when we restart, it is not restored */
+  RemoveTaskState();
 
   //  Wait for the drawing thread to finish
 #ifndef ENABLE_OPENGL
