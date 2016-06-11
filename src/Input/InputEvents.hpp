@@ -126,7 +126,7 @@ namespace InputEvents
   void ReleaseMenuItems();
 
   // -------
-
+  void eventDRNtestHook(gcc_unused const TCHAR *misc);
   void eventAbortTask(const TCHAR *misc);
   void eventAdjustForecastTemperature(const TCHAR *misc);
   void eventAdjustVarioFilter(const TCHAR *misc);
