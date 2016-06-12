@@ -25,6 +25,12 @@
 #include "Math.hpp"
 #include "SimplifiedMath.hpp"
 
+#ifndef NDEBUG
+#include "LogFile.hpp"
+#include "Formatter/UserGeoPointFormatter.hpp"
+#include "Util/Macros.hpp"
+#endif
+
 GeoPoint 
 GeoPoint::Parametric(const GeoPoint &delta, const fixed t) const
 {
@@ -94,4 +100,14 @@ GeoPoint::IntermediatePoint(const GeoPoint &destination,
                              const fixed distance) const
 {
   return ::IntermediatePoint(*this, destination, distance);
+}
+
+void
+GeoPoint::Dump(const TCHAR *label) const
+{
+#ifndef NDEBUG
+  TCHAR buffer[256];
+  FormatGeoPoint(*this, buffer, ARRAY_SIZE(buffer), _T(' '));
+  LogDebug(_T("GeoPoint::Dump(%s):%s"), label, buffer);
+#endif
 }

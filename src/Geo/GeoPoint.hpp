@@ -29,6 +29,7 @@ Copyright_License {
 #include "Rough/RoughAltitude.hpp"
 #include "Compiler.h"
 
+#include <tchar.h>
 #include <type_traits>
 
 struct GeoVector;
@@ -308,6 +309,8 @@ struct GeoPoint {
    */
   gcc_pure
   bool Sort(const GeoPoint &other) const;
+
+  void Dump(const TCHAR *label) const;
 };
 
 static_assert(std::is_trivial<GeoPoint>::value, "type is not trivial");
