@@ -57,8 +57,6 @@
 #include "Task/LoadFile.hpp"
 #include "Task/SaveFile.hpp"
 
-#include "LogFile.hpp"
-
 /**
  * According to "FAI Sporting Code / Annex A to Section 3 - Gliding",
  * 6.3.1c and 6.3.2dii, the radius of the "start/finish ring" must be
@@ -273,9 +271,6 @@ OrderedTask::RunDijsktraMin(const GeoPoint &location)
     return false;
 
   for (unsigned i = active_index; i != task_size; ++i) {
-    if (i == 1) {
-      dijkstra.GetSolution(i - active_index).GetLocation().Dump(_T("RunDijsktraMin SetPointSearchMin 1:"));
-    }
     SetPointSearchMin(i, dijkstra.GetSolution(i - active_index));
   }
 
@@ -381,9 +376,6 @@ OrderedTask::RunDijsktraMax()
     SetPointSearchMax(i, solution);
     // only do this for start if we're subtracting the start radius
     if (i <= active_index && ((i > 0) || ScoredAdjustmentStart())) {
-      if (i == 1) {
-        solution.GetLocation().Dump(_T("RunDijsktraMax SetPointSearchMin 1:"));
-      }
       set_tp_search_achieved(i, solution);
     }
   }
@@ -551,7 +543,6 @@ OrderedTask::CheckTransitions(const AircraftState &state,
 
           // on sector exit, must update samples since start sector
           // exit transition clears samples
-          LogDebug("CheckTransitions arming full_update");
           full_update = true;
         }
       } else if (!last_request_armed && task_advance.NeedToArm()) {
@@ -581,7 +572,6 @@ OrderedTask::CheckTransitions(const AircraftState &state,
 
     if (!SavedStartIsValid()) {
       saved_start_pushed_valid = SavedStartSave(last_start_stats, last_start_state);
-      LogDebug("CheckTransitions SaveStartSave");
     }
   }
 
@@ -595,7 +585,6 @@ OrderedTask::CheckTransitions(const AircraftState &state,
 
   SaveTaskState(transitioned, full_update, *this);
 
-  LogDebug("CheckTransitions EXIT");
   return full_update;
 }
 

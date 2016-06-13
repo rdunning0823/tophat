@@ -28,8 +28,6 @@
 #include "Components.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 
-#include "LogFile.hpp" //debug
-
 #include <memory>
 
 static void
@@ -50,11 +48,6 @@ Deserialise(AircraftState &data, const ConstDataNode &node)
   node.GetAttribute(_T("altitude"), data.altitude);
   node.GetAttribute(_T("time"), data.time);
   node.GetAttribute(_T("ground_speed"), data.ground_speed);
-  if (positive(data.time)) {
-    LogDebug("Just deserialiszed AircraftState time:%.0f, altitude:%.0f",
-             (double) data.time, (double)data.altitude);
-  }
-
 }
 
 static void
@@ -66,8 +59,6 @@ Deserialise(StartStats &data, const ConstDataNode &node)
     start_stats_node->GetAttribute(_T("time"), data.time);
     start_stats_node->GetAttribute(_T("altitude"), data.altitude);
     start_stats_node->GetAttribute(_T("ground_speed"), data.ground_speed);
-    LogDebug("Just deserialiszed task_started:%u, time:%.0f, altitude:%.0f speed:%.0f", data.task_started,
-             (double) data.time, (double)data.altitude, (double)data.ground_speed);
   }
 }
 
@@ -97,7 +88,6 @@ LoadTaskState(OrderedTask &task, const ConstDataNode &node)
 {
   int task_size;
   node.GetAttribute(_T("task_size"), task_size);
-  LogDebug("Deserialized Task_size:%i", task_size);
   if (task_size < 0)
     return false;
   if ((unsigned)task_size != task.TaskSize())
@@ -107,16 +97,14 @@ LoadTaskState(OrderedTask &task, const ConstDataNode &node)
   node.GetAttribute(_T("active_turnpoint"), active_turnpoint);
   if (active_turnpoint >= 0)
     task.SetActiveTaskPoint((unsigned)active_turnpoint);
-  LogDebug("Deserialized active_turnpoint:%i", active_turnpoint);
 
   Deserialise(task.SetStats().start, node);
 
-  const BrokenDateTime &now = device_blackboard->Basic().date_time_utc;
   int time;
   node.GetAttribute(_T("date_time"), time);
 #ifdef NDEBUG
+  const BrokenDateTime &now = device_blackboard->Basic().date_time_utc;
   if (time > now.ToUnixTimeUTC() || now.ToUnixTimeUTC() - time > 3600) {
-    LogDebug("LoadTaskState FAIL -- date time too distant");
     return false;
   }
 #endif
@@ -128,11 +116,7 @@ LoadTaskState(OrderedTask &task, const ConstDataNode &node)
     PointStateDeserialiser task_point_state;
     task_point_state.Reset();
     DeserialiseTaskpointState(task_point_state, *point_node);
-    if (idx == 1) {
-      LogDebug("LoadTaskState() About to update point(%u)", idx);
-    }
     task_point_state.UpdatePoint(task, idx++);
   }
-  LogDebug("LoadTaskState SUCCEED now.ToUnixTimeUTC() - time:: %i", (int)(now.ToUnixTimeUTC() - time));
   return true;
 }

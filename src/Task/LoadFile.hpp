@@ -29,7 +29,6 @@ class OrderedTask;
 class Waypoints;
 struct TaskBehaviour;
 
-
 OrderedTask *
 LoadTask(const TCHAR *path, const TaskBehaviour &task_behaviour,
          const Waypoints *waypoints=nullptr);

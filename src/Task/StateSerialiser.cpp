@@ -34,8 +34,6 @@
 #include "LogFile.hpp" // fixes weird crash
 #endif
 
-#include "LogFile.hpp" //debug
-
 #include <memory>
 #include <assert.h>
 
@@ -74,7 +72,6 @@ static void
 Serialise(WritableDataNode &node,
           const OrderedTaskPoint &data)
 {
-
   std::unique_ptr<WritableDataNode> child(node.AppendChild(_T("Point")));
   child->SetAttribute(_T("has_sampled"), data.HasSampled());
   child->SetAttribute(_T("has_exited"), data.HasExited());
@@ -92,16 +89,13 @@ void
 SaveTaskState(WritableDataNode &node, const OrderedTask &task)
 {
   const BrokenDateTime &date_time = device_blackboard->Basic().date_time_utc;
-  LogDebug("SaveTaskState ENTER");
 
   node.SetAttribute(_T("task_size"), task.TaskSize());
   node.SetAttribute(_T("active_turnpoint"), task.GetActiveIndex());
   node.SetAttribute(_T("date_time"), (int)date_time.ToUnixTimeUTC());
 
   Serialise(node, task.GetStats().start);
-  unsigned idx = 0;
   for (const OrderedTaskPoint &tp : task.GetPoints()) {
-    LogDebug("SaveTaskState Saving tp:%u has_sampled:%u has_exited:%u", idx++, tp.HasSampled(), tp.HasExited());
     Serialise(node, tp);
   }
 #ifdef WIN32

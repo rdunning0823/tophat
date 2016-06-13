@@ -30,8 +30,6 @@
 #include "Simulator.hpp"
 #include "Time/PeriodClock.hpp"
 
-#include "LogFile.hpp" //debug
-
 #include <windef.h>
 
 bool
@@ -55,7 +53,6 @@ SaveTask(const TCHAR *path, const OrderedTask &task)
 void
 RemoveTaskState()
 {
-  LogDebug("RemoveTaskState()");
   TCHAR path[MAX_PATH];
   LocalPath(path, _T("task_state"));
   if (File::Exists(path))
@@ -87,7 +84,6 @@ SaveTaskState(bool transitioned, bool in_sector, const OrderedTask &task)
       return false;
 
     root_node.Serialise(writer, true);
-
     clock.Update();
     return true;
   }

@@ -28,26 +28,9 @@
 #include "Util/StringAPI.hxx"
 #include "XML/DataNode.hpp"
 
-#include "LogFile.hpp" //debug
-#include "Formatter/UserGeoPointFormatter.hpp" //debug
-#include "Util/Macros.hpp" //debug
-
 bool
 PointStateDeserialiser::UpdatePoint(OrderedTask &task, unsigned idx)
 {
-
-  TCHAR entered_loc[256];
-  entered_loc[0] = '\0';
-  if (positive(state_entered.time))
-    FormatGeoPoint(state_entered.location, entered_loc, ARRAY_SIZE(entered_loc), _T(' '));
-
-  TCHAR min_loc[256];
-  FormatGeoPoint(location_min, min_loc, ARRAY_SIZE(min_loc), _T(' '));
-
-  if (idx == 0) {
-    LogDebug(_T("SerialisedTaskPointState::UpdatePoint idx:%u task.size:%u has_sampled:%u has_exited:%u entered:%s min:%s"),
-             idx, task.TaskSize(), has_sampled, has_exited, entered_loc, min_loc);
-  }
   if (idx >= task.TaskSize())
     return false;
 
@@ -59,14 +42,9 @@ PointStateDeserialiser::UpdatePoint(OrderedTask &task, unsigned idx)
 
   // ScoredTaskPoint public methods
   p->SetStateEntered(state_entered);
-  //p->SetPast(idx <= 1); // ********** <<<<<<<<<<<<< DEBUG
 
   if (has_sampled) {
     // ScoredTaskPoint friend access
-    if (idx == 1) {
-      location_min.Dump(_T("SerialisedTaskPointState::UpdatePoint SetPointSearchMin 1:"));
-    }
-
     p->SetSearchMin(SearchPoint(location_min,
                                 task.task_projection));
 

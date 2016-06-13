@@ -43,9 +43,4 @@ SaveTaskState(bool transitioned, bool in_sector, const OrderedTask &task);
 
 void RemoveTaskState();
 
-
-
-
-
-
 #endif

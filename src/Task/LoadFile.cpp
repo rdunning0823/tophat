@@ -32,8 +32,6 @@
 #include "OS/FileUtil.hpp"
 #include "Simulator.hpp"
 
-#include "LogFile.hpp" //debug
-
 #include <windef.h>
 
 #include <memory>
@@ -92,8 +90,6 @@ LoadTaskState(OrderedTask &task)
 
   const ConstDataNodeXML root(*xml_root);
   LoadTaskState(task, root);
-
-  LogDebug("LoadTaskState SUCCESS");
 
   return true;
 }
