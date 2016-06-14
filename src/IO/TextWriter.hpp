@@ -130,9 +130,10 @@ public:
    */
   bool Write(const char *s, size_t length) {
     assert(file.IsOpen());
+#ifndef WIN32
     assert(memchr(s, '\r', length) == nullptr);
     assert(memchr(s, '\n', length) == nullptr);
-
+#endif
     return file.Write(s, sizeof(*s), length) == length;
   }
 
