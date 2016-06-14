@@ -153,7 +153,7 @@ OrderedTaskPoint::Clone(const TaskBehaviour &task_behaviour,
   if (waypoint == NULL)
     waypoint = &GetWaypoint();
 
-  OrderedTaskPoint* tp_temp;
+  OrderedTaskPoint* tp_temp = nullptr;
 
   switch (GetType()) {
   case TaskPointType::START:
