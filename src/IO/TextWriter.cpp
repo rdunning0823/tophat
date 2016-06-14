@@ -63,8 +63,10 @@ TextWriter::Write(const TCHAR *s, size_t src_length)
 bool
 TextWriter::Write(const TCHAR *s)
 {
+#ifndef WIN32
   assert(StringFind(s, _T('\r')) == nullptr);
   assert(StringFind(s, _T('\n')) == nullptr);
+#endif
 
   return Write(s, _tcslen(s));
 }
