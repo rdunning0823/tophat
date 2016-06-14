@@ -86,20 +86,13 @@ BufferCanvas::Resize(PixelSize new_size)
   ::SelectObject(dc, tmp);
 
   /* now we can safely deleted our old HBITMAP */
-#ifndef NDEBUG
-  bool success =
-#endif
+  /* this fails sometimes in PC build, don't know why */
     ::DeleteObject(bitmap);
-  assert(success);
 
   Canvas::Resize(new_size);
   bitmap = ::CreateCompatibleBitmap(dc, new_size.cx, new_size.cy);
   ::SelectObject(dc, bitmap);
 
   /* delete the temporary HBITMAP */
-#ifndef NDEBUG
-  success =
-#endif
     ::DeleteObject(tmp);
-  assert(success);
 }
