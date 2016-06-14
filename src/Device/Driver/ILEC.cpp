@@ -50,6 +50,7 @@
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
 #include "Operation/Operation.hpp"
 #include "Units/System.hpp"
+#include "Util/ConvertString.hpp"
 
 // ...additional required headers
 #include "Protection.hpp"
@@ -366,7 +367,8 @@ Waypoint SN10taskInfo_T::Get_XCSoar_waypoint(int SN10_pt_idx) {
     return *wpFromDB; // Use this waypoint for the task
    }
   Waypoint wp = Waypoint(pt.center);
-  wp.name = pt.name;
+  ACPToWideConverter name(pt.name);
+  wp.name = name;
   return wp;
 }
 
@@ -653,7 +655,7 @@ void ILEC_Process_Any_Pending_SN10_task_update(const ComputerSettings &settings_
 // ==========================================================================
 #if 1
 
-#if 1
+#if 0
   /// temporary debug hook to catch assertion failures - set breakpoint here!
   void __assert_fail (const char *__assertion, const char *__file,
                       unsigned int __line, const char *__function) {
