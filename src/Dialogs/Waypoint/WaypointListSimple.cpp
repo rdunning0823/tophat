@@ -597,7 +597,7 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
     canvas.Select(name_font);
     canvas.DrawText(rc.left + Layout::FastScale(2),
                     rc.top + line_height / 2 - name_font.GetHeight() / 2,
-                    dialog_state.IsDefined() || way_points.IsEmpty() ?
+                    dialog_state.IsDefined() ?
                 _ ("No Match!") : _("Too many points. Use Search or click here"));
     return;
   }
