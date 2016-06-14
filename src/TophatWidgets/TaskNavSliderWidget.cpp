@@ -214,8 +214,10 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       use_wide_pen,
                       true);
   } else {
-    fixed gradient = ::CalculateGradient(*twp, result.vector.distance,
-                                         basic, settings.task.safety_height_arrival_gr);
+    fixed gradient = tp_valid ? ::CalculateGradient(*twp, result.vector.distance,
+                                                    basic,
+                                                    settings.task.safety_height_arrival_gr)
+        : fixed(1000);
 
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
