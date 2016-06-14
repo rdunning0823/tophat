@@ -44,6 +44,9 @@ Copyright_License {
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Engine/Navigation/Aircraft.hpp"
 #include "Dialogs/Task/StartTimeEntry.hpp"
+#include "Util/StringFormat.hpp"
+#include "Util/Macros.hpp"
+
 
 #include <windef.h> /* for MAX_PATH */
 
@@ -338,7 +341,7 @@ InputEvents::eventTaskTransition(const TCHAR *misc)
       return;
 
     TCHAR TempAll[120];
-    _stprintf(TempAll, _T("\r\n%s: %s\r\n%s:%s\r\n%s: %s"),
+    StringFormat(TempAll, ARRAY_SIZE(TempAll), _T("\r\n%s: %s\r\n%s:%s\r\n%s: %s"),
               _("Altitude"),
               FormatUserAltitude(start_stats.altitude).c_str(),
               _("Speed"),
