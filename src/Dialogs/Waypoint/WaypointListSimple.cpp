@@ -464,7 +464,7 @@ WaypointListSimpleDialog::FillList(WaypointList &list, const Waypoints &src,
     list.SortByElevation();
     break;
   case UISettings::WaypointSortDirection::ARRIVAL_ALTITUDE:
-    list.SortByArrivalAltitude();
+    list.SortByArrivalAltitude(location);
     break;
   case UISettings::WaypointSortDirection::BEARING:
     break;
