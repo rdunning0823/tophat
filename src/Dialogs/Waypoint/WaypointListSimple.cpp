@@ -115,7 +115,7 @@ protected:
     int direction_index;
     TypeFilter type_index;
 
-    WaypointListDialogState(): distance_index(0), direction_index(0) {}
+    WaypointListDialogState(): distance_index(0), direction_index(0), type_index(TypeFilter::ALL) {}
 
     bool IsDefined() const {
       return !name.empty() || distance_index > 0 ||
@@ -126,7 +126,7 @@ protected:
       assert(distance_index == 0);
       assert(direction_index == 0);
       if (type_index != TypeFilter::ALL) {
-        LogFormat("type_index != TypeFilter::ALL is:%u", type_index);
+        LogFormat("type_index != TypeFilter::ALL is:%u", (unsigned)type_index);
       }
       filter.name = name;
       filter.distance =
@@ -138,8 +138,9 @@ protected:
             fixed(direction_filter_items[direction_index]));
       else
         filter.direction = heading;
-      LogFormat("WaypointListDialogState::ToFilter filter.direction:%.1f filter.distance:%.1f type_index:%u", filter.direction.AbsoluteDegrees(),
-               filter.distance, type_index);
+      LogFormat("WaypointListDialogState::ToFilter filter.direction:%.1f filter.distance:%.1f type_index:%u",
+                (double)filter.direction.AbsoluteDegrees(),
+               (double)filter.distance, (unsigned)type_index);
     }
   };
 
@@ -442,7 +443,7 @@ WaypointListSimpleDialog::FillList(WaypointList &list, const Waypoints &src,
   };
   if (src.size() == 0)
     LogFormat(_T("WaypointListSimpleDialog::FillList returned 0.  dist:%.0f dir:%.0f type:%u name:%s"),
-              (double)filter.distance, (double)filter.direction.AbsoluteDegrees(), filter.type_index, filter.name.c_str());
+              (double)filter.distance, (double)filter.direction.AbsoluteDegrees(), (unsigned)filter.type_index, filter.name.c_str());
 
   unsigned size = (unsigned)src.size();
   if (!state.IsDefined() && size >= MAX_LIST_SIZE) {
