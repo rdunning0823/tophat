@@ -115,7 +115,7 @@ protected:
     int direction_index;
     TypeFilter type_index;
 
-    WaypointListDialogState(): distance_index(0), direction_index(0) {}
+    WaypointListDialogState(): distance_index(0), direction_index(0), type_index(TypeFilter::ALL) {}
 
     bool IsDefined() const {
       return !name.empty() || distance_index > 0 ||
@@ -123,6 +123,10 @@ protected:
     }
 
     void ToFilter(WaypointFilter &filter, Angle heading) const {
+      assert(distance_index == 0);
+      assert(direction_index == 0);
+      assert(type_index == TypeFilter::ALL);
+
       filter.name = name;
       filter.distance =
         Units::ToSysDistance(fixed(distance_filter_items[distance_index]));
