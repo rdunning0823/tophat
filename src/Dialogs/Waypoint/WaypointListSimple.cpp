@@ -123,6 +123,11 @@ protected:
     }
 
     void ToFilter(WaypointFilter &filter, Angle heading) const {
+      assert(distance_index == 0);
+      assert(direction_index == 0);
+      if (type_index != TypeFilter::ALL) {
+        LogFormat("type_index != TypeFilter::ALL is:%u", type_index);
+      }
       filter.name = name;
       filter.distance =
         Units::ToSysDistance(fixed(distance_filter_items[distance_index]));
@@ -133,6 +138,8 @@ protected:
             fixed(direction_filter_items[direction_index]));
       else
         filter.direction = heading;
+      LogFormat("WaypointListDialogState::ToFilter filter.direction:%.1f filter.distance:%.1f type_index:%u", filter.direction.AbsoluteDegrees(),
+               filter.distance, type_index);
     }
   };
 
@@ -433,6 +440,9 @@ WaypointListSimpleDialog::FillList(WaypointList &list, const Waypoints &src,
   enum MaxListSize {
     MAX_LIST_SIZE = 425,
   };
+  if (src.size() == 0)
+    LogFormat(_T("WaypointListSimpleDialog::FillList returned 0.  dist:%.0f dir:%.0f type:%u name:%s"),
+              (double)filter.distance, (double)filter.direction.AbsoluteDegrees(), filter.type_index, filter.name.c_str());
 
   unsigned size = (unsigned)src.size();
   if (!state.IsDefined() && size >= MAX_LIST_SIZE) {
@@ -451,6 +461,7 @@ WaypointListSimpleDialog::FillList(WaypointList &list, const Waypoints &src,
     }
   }
 
+  LogFormat("WaypointListSimpleDialog::FillList size:%u, src.size()%u", size, src.size());
   switch (sort_direction) {
   case UISettings::WaypointSortDirection::NAME:
     if (size >= MAX_LIST_SIZE)

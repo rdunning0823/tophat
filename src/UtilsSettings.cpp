@@ -108,6 +108,7 @@ SettingsLeave(const UISettings &old_ui_settings)
 
   bool TerrainFileChanged = false, TopographyFileChanged = false;
   if (MapFileChanged) {
+    LogFormat("SettingsLeave MapFileChanged");
     /* set these flags, because they may be loaded from the map
        file */
     AirspaceFileChanged = true;
@@ -145,6 +146,7 @@ SettingsLeave(const UISettings &old_ui_settings)
   }
 
   if (WaypointFileChanged && protected_task_manager != nullptr) {
+    LogFormat("SettingsLeave::WaypointsFileChanged");
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
     OrderedTask *task = lease->Clone(CommonInterface::GetComputerSettings().task);
     if (task) {
