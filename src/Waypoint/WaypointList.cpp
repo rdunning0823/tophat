@@ -98,21 +98,21 @@ class WaypointArrivalAltitudeCompare
 {
   const MoreData &more_data;
   const DerivedInfo &calculated;
-  const NMEAInfo &basic;
+  const GeoPoint &location;
   const ComputerSettings &settings;
 
 public:
-  WaypointArrivalAltitudeCompare()
+  WaypointArrivalAltitudeCompare(const GeoPoint &_location)
   :more_data(CommonInterface::Basic()),
    calculated(CommonInterface::Calculated()),
-   basic(CommonInterface::Basic()),
+   location(_location),
    settings(CommonInterface::GetComputerSettings()) { }
 
   fixed CalcAltitudeDifferential(const WaypointListItem &a) const
   {
     // altitude differential
     const GlideState glide_state(
-      basic.location.DistanceBearing(a.waypoint->location),
+      location.DistanceBearing(a.waypoint->location),
       a.waypoint->elevation + settings.task.safety_height_arrival,
       more_data.nav_altitude,
       calculated.GetWindOrZero());
@@ -132,6 +132,6 @@ public:
   }
 };
 
-void WaypointList::SortByArrivalAltitude() {
-  std::sort(begin(), end(), WaypointArrivalAltitudeCompare());
+void WaypointList::SortByArrivalAltitude(const GeoPoint &location) {
+  std::sort(begin(), end(), WaypointArrivalAltitudeCompare(location));
 }
