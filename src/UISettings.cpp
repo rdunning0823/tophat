@@ -52,7 +52,12 @@ UISettings::SetDefaults()
   restart_gesture_help = true;
   clear_gesture_help = false;
 
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  // WIN32 does not support screens button on map
   screens_button_location = ScreensButtonLocation::MENU;
+#else
+  screens_button_location = ScreensButtonLocation::MAP;
+#endif
   replay_dialog_visible = false;
 
   enable_airspace_warning_dialog = true;
