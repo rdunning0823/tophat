@@ -84,10 +84,11 @@ ScreensButtonWidget::UpdateVisibility(const PixelRect &rc,
                                        bool is_map,
                                        bool is_top_widget)
 {
-  if (!is_panning &&
+  if ((!is_panning &&
       CommonInterface::GetUISettings().screens_button_location ==
           UISettings::ScreensButtonLocation::MAP &&
-          CommonInterface::SetUISettings().pages.n_pages > 1) {
+          CommonInterface::SetUISettings().pages.n_pages > 1)
+      || CommonInterface::GetUIState().pages.special_page.IsDefined()) {
     Show(rc);
   } else
     Hide();
