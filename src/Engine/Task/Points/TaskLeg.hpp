@@ -60,6 +60,9 @@ class TaskLeg {
   GeoVectorMemento memo_travelled;
   GeoVectorMemento memo_remaining;
 
+  /** this provides access to all task points via
+   * OrderedTaskPoint::GetPrevious() and GetNext()
+   */
   OrderedTaskPoint& destination;
 
 public:
