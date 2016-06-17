@@ -57,6 +57,7 @@
 #include "Task/LoadFile.hpp"
 #include "Task/SaveFile.hpp"
 
+
 /**
  * According to "FAI Sporting Code / Annex A to Section 3 - Gliding",
  * 6.3.1c and 6.3.2dii, the radius of the "start/finish ring" must be
@@ -206,6 +207,7 @@ OrderedTask::UpdateGeometry()
       /// so stats are updated
     }
   }
+  SetLandoutDistanceGeometry();
 
   force_full_update = true;
 }
@@ -275,6 +277,13 @@ OrderedTask::RunDijsktraMin(const GeoPoint &location)
   }
 
   return true;
+}
+
+void
+OrderedTask::SetLandoutDistanceGeometry()
+{
+  if (taskpoint_start != nullptr)
+    taskpoint_start->ScanLandoutDistanceGeometry();
 }
 
 inline fixed
@@ -584,6 +593,8 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   }
 
   SaveTaskState(transitioned, full_update, *this);
+  if (transitioned)
+    SetLandoutDistanceGeometry();
 
   return full_update;
 }

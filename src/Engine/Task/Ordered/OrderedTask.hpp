@@ -485,6 +485,11 @@ public:
 private:
 
   /**
+   * calculate angles for calculating landout distances for speed calculations
+   */
+  void SetLandoutDistanceGeometry();
+
+  /**
    * @return true if a solution was found (and applied)
    */
   bool RunDijsktraMin(const GeoPoint &location);

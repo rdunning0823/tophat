@@ -23,6 +23,7 @@
 #include "TaskLeg.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 
+
 #include <assert.h>
 #include <algorithm>
 
@@ -233,10 +234,9 @@ TaskLeg::GetScoredLegDistanceLandout(const GeoPoint &ref) const
   assert(!destination.HasEntered());
   assert(ref.IsValid());
 
+  fixed distance_new = landout_distance.GetDistance(ref);
   return std::max(fixed(0),
-                  GetOrigin()->GetLocationScored().Distance(destination.GetLocationMax())
-                  - ref.Distance(destination.GetLocationMax())
-                  - GetOrigin()->ScoreAdjustment());
+                  distance_new - GetOrigin()->ScoreAdjustment());
 }
 
 inline fixed
@@ -384,4 +384,11 @@ TaskLeg::ScanDistanceScored(const GeoPoint &ref) const
 {
   return GetScoredDistance(ref) +
     (GetNext() ? GetNext()->ScanDistanceScored(ref) : fixed(0));
+}
+
+bool
+TaskLeg::ScanLandoutDistanceGeometry()
+{
+  return landout_distance.SetLandoutDistanceGeometry() &&
+    (GetNext() ? GetNext()->ScanLandoutDistanceGeometry() : true);
 }

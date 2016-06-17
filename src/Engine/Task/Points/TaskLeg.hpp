@@ -27,6 +27,7 @@
 #include "Geo/Memento/DistanceMemento.hpp"
 #include "Geo/Memento/GeoVectorMemento.hpp"
 #include "Compiler.h"
+#include "Task/Ordered/Points/TaskLegLandoutDistance.hpp"
 
 struct AircraftState;
 
@@ -65,12 +66,15 @@ class TaskLeg {
    */
   OrderedTaskPoint& destination;
 
+  TaskLegLandoutDistance landout_distance;
+
+
 public:
   /**
    * Constructor.  Takes local copy of taskpoint data used in internal computations
    */
   TaskLeg(OrderedTaskPoint &_destination)
-    :destination(_destination) {}
+    :destination(_destination), landout_distance(_destination) {}
 
   /**
    * Calculate distance of nominal task (sum of distances from each
@@ -191,6 +195,12 @@ public:
   const GeoVector &GetVectorTravelled() const {
     return vector_travelled;
   }
+
+  /**
+   * Calculate oz points farthest right and left for landout distance
+   * calculations
+   */
+  bool ScanLandoutDistanceGeometry();
 
 private:
   gcc_pure

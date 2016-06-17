@@ -22,6 +22,7 @@ TASK_SOURCES = \
 	$(TASK_SRC_DIR)/Ordered/Points/FinishPoint.cpp \
 	$(TASK_SRC_DIR)/Ordered/Points/ASTPoint.cpp \
 	$(TASK_SRC_DIR)/Ordered/Points/AATPoint.cpp \
+	$(TASK_SRC_DIR)/Ordered/Points/TaskLegLandoutDistance.cpp \
 	$(TASK_SRC_DIR)/Ordered/AATIsoline.cpp \
 	$(TASK_SRC_DIR)/Ordered/AATIsolineSegment.cpp \
 	$(TASK_SRC_DIR)/Unordered/UnorderedTask.cpp \
