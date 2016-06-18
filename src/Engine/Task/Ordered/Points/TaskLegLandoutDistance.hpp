@@ -38,8 +38,9 @@ class OrderedTaskPoint;
  */
 
 class TaskLegLandoutDistance {
-  /** the two points of the zone farthest left and right with respect
-   * to the prior points location scored;
+  /**
+   * The two points on the edge of the destination oz farthest left and right
+   * where the tangent lines touch from the prior point's location scored.
    */
   GeoPoint oz_point_farthest_left;
   GeoPoint oz_point_farthest_right;
