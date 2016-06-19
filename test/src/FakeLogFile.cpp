@@ -26,6 +26,9 @@ Copyright_License {
 #include <cstdarg>
 #include <cstdio>
 
+  /** should we skip debugging entries */
+bool disable_debug_logging;
+
 void
 LogFormat(const char *fmt, ...)
 {
