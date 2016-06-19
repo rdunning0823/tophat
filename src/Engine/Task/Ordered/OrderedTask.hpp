@@ -809,17 +809,6 @@ protected:
   bool CalcCruiseEfficiency(const AircraftState &state_now,
                             const GlidePolar &glide_polar,
                             fixed &value) const override;
-  /**
-   * Calculates effective MC using the polar and solely the speed_travelled
-   * with no altitude difference.
-   * Requires task to have a start point, finish and 1 intermediary point.
-   *
-   * @return false if task has no start point.
-   */
-  bool CalcEffectiveMCFromSpeed(const AircraftState &aircraft,
-                                const GlidePolar &glide_polar,
-                                fixed speed_travelled,
-                                fixed &val) const;
   bool CalcEffectiveMC(const AircraftState &state_now,
                        const GlidePolar &glide_polar,
                        fixed &value) const override;
