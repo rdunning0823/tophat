@@ -1213,6 +1213,7 @@ OrderedTask::CalcMinTarget(const AircraftState &aircraft,
   case TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed: {
     fixed speed = Clamp(task_behaviour.task_planning_speed_override, fixed(5), fixed(200));
 
+    // updates mc_effective
     effective_mc_from_speed->Calc(aircraft,
                                   glide_polar,
                                   speed,
@@ -1229,6 +1230,7 @@ OrderedTask::CalcMinTarget(const AircraftState &aircraft,
       fixed speed = stats.last_hour.speed;
       mc_effective = Clamp(stats.effective_mc, fixed(0.1), fixed(10));
 
+      // updates mc_effective
       effective_mc_from_speed->Calc(aircraft,
                                     glide_polar,
                                     speed,
