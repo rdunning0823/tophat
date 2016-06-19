@@ -47,7 +47,7 @@ class OrderedTaskPoint;
  */
 class TaskLeg {
   /** Saved vector for current leg's travelled route */
-  GeoVector vector_travelled;
+  GeoVector vector_travelled; // Actually use scored vector
   /** Saved vector for current leg's remaining route */
   GeoVector vector_remaining;
   /** Saved vector for current leg's planned route */
