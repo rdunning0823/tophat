@@ -27,6 +27,7 @@
 #include "Compiler.h"
 
 #include <type_traits>
+#include "tchar.h"
 
 #include <stdint.h>
 
@@ -165,7 +166,7 @@ struct GlideResult {
     return validity != Validity::NO_SOLUTION;
   }
 
-  void DumpGlideResult();
+  void DumpGlideResult(const TCHAR *label) const;
 
   /**
    * Calculate additional items (CruiseTrackBearing and AltitudeRequired) that were
