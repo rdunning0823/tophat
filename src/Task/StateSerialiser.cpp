@@ -92,7 +92,8 @@ SaveTaskState(WritableDataNode &node, const OrderedTask &task)
 
   node.SetAttribute(_T("task_size"), task.TaskSize());
   node.SetAttribute(_T("active_turnpoint"), task.GetActiveIndex());
-  node.SetAttribute(_T("date_time"), (int)date_time.ToUnixTimeUTC());
+  if (date_time.IsDatePlausible())
+    node.SetAttribute(_T("date_time"), (int)date_time.ToUnixTimeUTC());
 
   Serialise(node, task.GetStats().start);
   for (const OrderedTaskPoint &tp : task.GetPoints()) {
