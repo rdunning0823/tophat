@@ -31,6 +31,7 @@
 #include "LocalPath.hpp"
 #include "OS/FileUtil.hpp"
 #include "Simulator.hpp"
+#include "LogFile.hpp"
 
 #include <windef.h>
 
@@ -90,6 +91,8 @@ LoadTaskState(OrderedTask &task)
 
   const ConstDataNodeXML root(*xml_root);
   LoadTaskState(task, root);
+
+  LogFormat(_T("Loaded task_state file"));
 
   return true;
 }
