@@ -132,6 +132,10 @@ struct TaskBehaviour {
   /** Task speed on which to base task planning instead of actual speed */
   fixed task_planning_speed_override;
 
+  /** safety_mc is only used for safety_polar, which is not used in TH.
+   * in XCSoar, this is optionally used for the RoutePlanner only, instead
+   * of the general mc value.
+   */
   fixed safety_mc;
 
   /** Minimum height above terrain for arrival height at landable waypoint (m) */
