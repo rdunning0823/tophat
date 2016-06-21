@@ -1194,9 +1194,42 @@ OrderedTask::CalcEffectiveMC(const AircraftState &aircraft,
 
 inline fixed
 OrderedTask::CalcMinTarget(const AircraftState &aircraft,
-                           const GlidePolar &glide_polar,
+                           const GlidePolar &_glide_polar,
                            const fixed t_target)
 {
+  GlidePolar glide_polar = _glide_polar;
+
+  fixed mc_effective = glide_polar.GetMC();
+
+  switch (task_behaviour.task_planning_speed_mode) {
+
+  case TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed: {
+    fixed speed = Clamp(task_behaviour.task_planning_speed_override, fixed(5), fixed(200));
+
+    mc_effective = glide_polar.EquivalentMC(speed);
+    break;
+  }
+
+  case TaskBehaviour::TaskPlanningSpeedMode::PastPerformanceSpeed:
+  {
+    if (stats.total.time_elapsed > fixed(3600) &&
+        !negative(stats.last_hour.duration)) {
+      fixed speed = stats.last_hour.speed;
+      mc_effective = glide_polar.EquivalentMC(speed);
+    } else {
+
+      fixed speed = stats.GetScoredSpeed();
+      mc_effective = glide_polar.EquivalentMC(speed);
+    }
+
+    break;
+  }
+  case TaskBehaviour::TaskPlanningSpeedMode::MacCreadyValue:
+    break;
+  }
+
+  glide_polar.SetMC(mc_effective);
+
   if (stats.has_targets) {
     // only perform scan if modification is possible
     const fixed t_rem = std::max(fixed(0),

@@ -327,6 +327,91 @@ public:
   }
 };
 
+
+/**
+ * Finds equivalent MC setting given an input speed
+ * Does not consider wind, or vertical air movement
+ * Assumes start and end altitude are the same
+ *
+ * This finds the MC Setting that with one thermal and using stf produces
+ * the desired speed
+ */
+class GlidePolarEquivalentMC final : public ZeroFinder {
+  GlidePolar polar;
+  const fixed distance;
+  const fixed speed;
+  const fixed duration;
+
+public:
+  /**
+   * Constructor.
+   *
+   * @param _polar Glide polar to optimise
+   *
+   * @return Initialised object (no search yet)
+   */
+  GlidePolarEquivalentMC(const GlidePolar &_polar, const fixed _speed) :
+    ZeroFinder(fixed(0.1), fixed(10.0), fixed(0.03)),
+    polar(_polar), distance(fixed(1000)), speed(_speed),
+                            duration(distance / speed)
+  {
+  }
+
+  /**
+   * Glide ratio over ground function
+   *
+   * @param mc
+   *
+   * @return difference in duration to cover distance
+   */
+  fixed
+  f(const fixed mc)
+  {
+    polar.SetMC(mc);
+    fixed stf = polar.SpeedToFlyStillAir();
+
+    fixed time_gliding = distance / stf;
+    fixed time_thermalling = (time_gliding * polar.SinkRate(stf)) / mc;
+    fixed total_time = time_thermalling + time_gliding;
+    fixed speed_diff = distance / total_time - speed;
+
+    return fabs(speed_diff);
+  }
+
+  /**
+   * Find best speed to fly
+   *
+   * @param Vstart Initial search speed (m/s)
+   *
+   * @return Speed to fly (m/s)
+   */
+  fixed
+  solve()
+  {
+    return find_min(speed);
+  }
+};
+
+fixed
+GlidePolar::EquivalentMC(fixed speed) const
+{
+  assert(IsValid());
+
+  GlidePolarEquivalentMC emc(*this, speed);
+  return emc.solve();
+}
+
+fixed
+GlidePolar::SpeedToFlyStillAir() const
+{
+  fixed V_stf;
+
+  GlidePolarSpeedToFly gp_stf(*this, fixed(0), fixed(0), Vmin, Vmax);
+  V_stf = gp_stf.solve(Vmax);
+
+  return std::max(Vmin, V_stf);
+}
+
 fixed
 GlidePolar::SpeedToFly(const AircraftState &state,
     const GlideResult &solution, const bool block_stf) const

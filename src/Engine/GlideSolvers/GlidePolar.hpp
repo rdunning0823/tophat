@@ -462,6 +462,19 @@ public:
       const bool block_stf) const;
 
   /**
+   * a special case of SpeedToFly where the air is still
+   */
+  gcc_pure
+  fixed SpeedToFlyStillAir() const;
+
+  /**
+   * Returns the MC that will give you the achieved speed
+   * assuming no wind, no sinc, and thermals
+   * rising at the rate of the current MC setting
+   */
+  fixed EquivalentMC(fixed speed) const;
+
+  /**
    * Compute MacCready ring setting to adjust speeds to incorporate
    * risk as the aircraft gets low.
    *
