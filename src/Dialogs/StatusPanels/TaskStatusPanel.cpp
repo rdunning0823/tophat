@@ -61,15 +61,12 @@ TaskStatusPanel::Refresh()
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   StaticString<32> time;
 
-  SetRowVisible(AAT_TIME, task_stats.has_targets);
-  FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
-  SetText(AAT_TIME, time.c_str());
 
-  SetRowVisible(AAT_ESTIMATED, task_stats.has_targets);
-  if (task_stats.has_targets) {
-    FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
-    SetText(AAT_ESTIMATED, time.c_str());
-  }
+  if (task_stats.task_valid && positive(task_stats.distance_scored))
+    LoadValue(SPEED, task_stats.GetScoredSpeed(),
+              UnitGroup::TASK_SPEED);
+  else
+    ClearValue(SPEED);
 
   fixed distance = positive(task_stats.distance_scored)
     ? task_stats.distance_scored
@@ -80,21 +77,23 @@ TaskStatusPanel::Refresh()
   else
     ClearValue(DISTANCE_DONE);
 
-
   fixed rPlanned = task_stats.total.solution_remaining.IsDefined()
     ? task_stats.total.solution_remaining.vector.distance
     : fixed(0);
-
   if (positive(rPlanned))
     LoadValue(DISTANCE_REMAINING, rPlanned, UnitGroup::DISTANCE);
   else
     ClearValue(DISTANCE_REMAINING);
 
-  if (task_stats.task_valid && positive(task_stats.distance_scored))
-    LoadValue(SPEED, task_stats.GetScoredSpeed(),
-              UnitGroup::TASK_SPEED);
-  else
-    ClearValue(SPEED);
+  SetRowVisible(AAT_TIME, task_stats.has_targets);
+  FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
+  SetText(AAT_TIME, time.c_str());
+
+  SetRowVisible(AAT_ESTIMATED, task_stats.has_targets);
+  if (task_stats.has_targets) {
+    FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
+    SetText(AAT_ESTIMATED, time.c_str());
+  }
 }
 
 void
