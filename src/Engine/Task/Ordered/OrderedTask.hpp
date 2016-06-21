@@ -48,7 +48,6 @@ class Waypoints;
 class AATPoint;
 class FlatBoundingBox;
 class GeoBounds;
-class EffectiveMCFromSpeed;
 struct TaskSummary;
 struct TaskFactoryConstraints;
 
@@ -95,9 +94,6 @@ private:
   /* state that triggered the start prior to the most recent start */
   StartStats saved_start_stats_pushed;
   AircraftState saved_start_state_pushed;
-
-  /** used to calculate effective mc directly from speed */
-  EffectiveMCFromSpeed *effective_mc_from_speed;
 
   /* is the saved start valid? */
   bool saved_start_pushed_valid;
