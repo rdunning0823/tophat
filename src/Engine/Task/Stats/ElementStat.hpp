@@ -100,6 +100,11 @@ struct ElementStat
   GlideResult solution_remaining;
   /** Glide solution for remaining element, MC=0 */
   GlideResult solution_mc0;
+  /** Glide solution for remaining element using MC=task_mc.
+   * Distances are same as solution_remaining, but glides
+   * and climbs are calculated using task_mc
+   */
+  GlideResult solution_remaining_task_mc;
 
   /** Rate of change of altitude difference (m/s) */
   TaskVario vario;

@@ -739,6 +739,7 @@ OrderedTask::UpdateIdle(const AircraftState &state,
   if (HasStart() && task_behaviour.optimise_targets_range &&
       positive(GetOrderedTaskSettings().aat_min_time)) {
 
+    UpdateTaskMC(glide_polar);
     if (IsOptimizable()) {
       CalcMinTarget(state, glide_polar,
                     GetOrderedTaskSettings().aat_min_time + fixed(task_behaviour.optimise_targets_margin));
@@ -1192,21 +1193,19 @@ OrderedTask::CalcEffectiveMC(const AircraftState &aircraft,
   }
 }
 
-inline fixed
-OrderedTask::CalcMinTarget(const AircraftState &aircraft,
-                           const GlidePolar &_glide_polar,
-                           const fixed t_target)
+inline void
+OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
 {
   GlidePolar glide_polar = _glide_polar;
 
-  fixed mc_effective = glide_polar.GetMC();
+  stats.task_mc = glide_polar.GetMC();  // THIS FAILS BC task_behaviour gets nuked by computersettings.task_behaviour
 
   switch (task_behaviour.task_planning_speed_mode) {
 
   case TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed: {
     fixed speed = Clamp(task_behaviour.task_planning_speed_override, fixed(5), fixed(200));
 
-    mc_effective = glide_polar.EquivalentMC(speed);
+    stats.task_mc = glide_polar.EquivalentMC(speed);
     break;
   }
 
@@ -1215,11 +1214,11 @@ OrderedTask::CalcMinTarget(const AircraftState &aircraft,
     if (stats.total.time_elapsed > fixed(3600) &&
         !negative(stats.last_hour.duration)) {
       fixed speed = stats.last_hour.speed;
-      mc_effective = glide_polar.EquivalentMC(speed);
+      stats.task_mc = glide_polar.EquivalentMC(speed);
     } else {
 
       fixed speed = stats.GetScoredSpeed();
-      mc_effective = glide_polar.EquivalentMC(speed);
+      stats.task_mc = glide_polar.EquivalentMC(speed);
     }
 
     break;
@@ -1227,8 +1226,16 @@ OrderedTask::CalcMinTarget(const AircraftState &aircraft,
   case TaskBehaviour::TaskPlanningSpeedMode::MacCreadyValue:
     break;
   }
+}
 
-  glide_polar.SetMC(mc_effective);
+inline fixed
+OrderedTask::CalcMinTarget(const AircraftState &aircraft,
+                           const GlidePolar &_glide_polar,
+                           const fixed t_target)
+{
+  GlidePolar glide_polar = _glide_polar;
+
+  glide_polar.SetMC(stats.task_mc);
 
   if (stats.has_targets) {
     // only perform scan if modification is possible

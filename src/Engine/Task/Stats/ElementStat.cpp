@@ -47,6 +47,7 @@ ElementStat::Reset()
   solution_travelled.Reset();
   solution_remaining.Reset();
   solution_mc0.Reset();
+  solution_remaining_task_mc.Reset();
 
   vario.Reset();
 }
@@ -98,7 +99,7 @@ ElementStat::SetTimes(const fixed until_start_s, const fixed ts,
     time_elapsed = std::max(time - fixed(ts), fixed(0));
 
   if (solution_remaining.IsOk()) {
-    time_remaining_now = solution_remaining.time_elapsed;
+    time_remaining_now = solution_remaining_task_mc.time_elapsed;
     time_remaining_start = std::max(time_remaining_now - until_start_s,
                                     fixed(0));
     time_planned = time_elapsed + time_remaining_start;

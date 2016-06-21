@@ -503,6 +503,12 @@ private:
   fixed ScanDistanceMax();
 
   /**
+   * updates the TaskBehaviour.task_mc value based on the task planning behaviour
+   * of the current task
+   */
+  void UpdateTaskMC(const GlidePolar &_glide_polar);
+
+  /**
    * Optimise target ranges (for adjustable tasks) to produce an estimated
    * time remaining with the current glide polar, equal to a target value.
    *

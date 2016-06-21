@@ -53,6 +53,8 @@ public:
   fixed effective_mc;
   /** Best MacCready setting calculated for final glide (m/s) */
   fixed mc_best;
+  /** Used for planning the task, setting target, estimating completion time. */
+  fixed task_mc;
 
   /** Nominal task distance (m) */
   fixed distance_nominal;

@@ -202,6 +202,18 @@ AbstractTask::UpdateGlideSolutions(const AircraftState &state,
     stats.current_leg.solution_mc0 = stats.current_leg.solution_remaining;
   }
 
+  if (fabs(stats.task_mc - glide_polar.GetMC()) > fixed(0.01)) {
+    GlidePolar polar_task = glide_polar;
+    polar_task.SetMC(stats.task_mc);
+
+    GlideSolutionRemaining(state, polar_task, stats.total.solution_remaining_task_mc,
+                             stats.current_leg.solution_remaining_task_mc);
+  } else {
+    // just copy
+    stats.total.solution_remaining_task_mc = stats.total.solution_remaining;
+    stats.current_leg.solution_remaining_task_mc = stats.current_leg.solution_remaining;
+  }
+
   UpdateNavBarStatistics(state, glide_polar);
 
   GlideSolutionTravelled(state, glide_polar,
