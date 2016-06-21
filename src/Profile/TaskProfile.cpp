@@ -100,8 +100,7 @@ Profile::Load(const ProfileMap &map, TaskBehaviour &settings)
 
   map.GetEnum(ProfileKeys::ContestNationality, settings.contest_nationality);
 
-  // ignore safety MC -- hard code to zero
-  settings.safety_mc = fixed(0);
+  // ignore safety MC -- hard code to default
   //if (map.Get(ProfileKeys::SafetyMacCready, Temp))
   //  settings.safety_mc = fixed(Temp) / 10;
 
