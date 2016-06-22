@@ -99,7 +99,8 @@ OrderedTask::OrderedTask(const TaskBehaviour &tb)
    active_factory(nullptr),
    ordered_settings(tb.ordered_defaults),
    dijkstra_min(nullptr), dijkstra_max(nullptr),
-   saved_start_pushed_valid(false)
+   saved_start_pushed_valid(false),
+   last_task_mc_speed(fixed(-1))
 {
   ClearName();
   active_factory = CreateTaskFactory(factory_mode, *this, task_behaviour);
@@ -1193,19 +1194,31 @@ OrderedTask::CalcEffectiveMC(const AircraftState &aircraft,
   }
 }
 
+static
+inline fixed
+UpdateTaskMCIfChanged(const fixed last_mc, fixed& last_speed, const fixed speed,
+                      const GlidePolar &glide_polar)
+{
+  if (fabs(last_speed - speed) > fixed(0.1) || !positive(last_speed)) {
+    last_speed = speed;
+    return glide_polar.EquivalentMC(speed);
+  } else {
+    return last_mc;
+  }
+}
+
 inline void
 OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
 {
   GlidePolar glide_polar = _glide_polar;
-
-  stats.task_mc = glide_polar.GetMC();  // THIS FAILS BC task_behaviour gets nuked by computersettings.task_behaviour
 
   switch (task_behaviour.task_planning_speed_mode) {
 
   case TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed: {
     fixed speed = Clamp(task_behaviour.task_planning_speed_override, fixed(5), fixed(200));
 
-    stats.task_mc = glide_polar.EquivalentMC(speed);
+    stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
+                                          speed, glide_polar);
     break;
   }
 
@@ -1214,16 +1227,17 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
     if (stats.total.time_elapsed > fixed(3600) &&
         !negative(stats.last_hour.duration)) {
       fixed speed = stats.last_hour.speed;
-      stats.task_mc = glide_polar.EquivalentMC(speed);
+      stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
+                                            speed, glide_polar);
     } else {
-
       fixed speed = stats.GetScoredSpeed();
-      stats.task_mc = glide_polar.EquivalentMC(speed);
+      stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
+                                            speed, glide_polar);
     }
-
     break;
   }
   case TaskBehaviour::TaskPlanningSpeedMode::MacCreadyValue:
+    stats.task_mc = glide_polar.GetMC();
     break;
   }
 }

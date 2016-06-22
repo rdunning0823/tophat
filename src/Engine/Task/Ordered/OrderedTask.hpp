@@ -97,6 +97,10 @@ private:
 
   /* is the saved start valid? */
   bool saved_start_pushed_valid;
+
+  /* the last speed used to calculate the task_mc */
+  fixed last_task_mc_speed;
+
     /** name of task */
   StaticString<64> name;
 
