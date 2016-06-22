@@ -66,6 +66,7 @@ doc/html/advanced/input/ALL		http://xcsoar.sourceforge.net/advanced/input/
 
 #ifdef KOBO
 #include "Screen/Key.h"
+#include "Kobo/System.hpp"
 #endif
 
 #include <assert.h>
@@ -414,8 +415,12 @@ InputEvents::ProcessKey(Mode mode, unsigned key_code)
     key_code = KEY_MENU;
 #else
   if (key_code == 0x74) { /* power slide switch */
+    // hardware shutdown -- no closure.  Handles frozen screen issues
+    return KoboPowerOff();
+/*
     UIActions::SignalShutdown(false);
     return true;
+*/
   }
 #endif
 #endif
