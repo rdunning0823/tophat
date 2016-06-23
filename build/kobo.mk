@@ -109,9 +109,10 @@ KOBO_SYS_LIB_NAMES = libc.so.6 libm.so.6 libpthread.so.0 librt.so.1 \
 # Optionally, uImage files which supports USB HOST mode are created
 # The installation is managed by the KoboMenu and rcS.tophat
 UIMAGE_BASE_DIR=$(topdir)/kobo/uimage/hw/imx507/linux-2.6.35.3-USBHOST
-UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage
+#UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage
+UIMAGE_USB=~/caz_sound_fix/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
 ifeq ($(KOBO_UIMAGE),y)
-	UIMAGE_PREREQUISITES=UIMAGE
+#	UIMAGE_PREREQUISITES=UIMAGE
 	UIMAGE_CMD=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
 endif
 
