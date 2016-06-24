@@ -380,7 +380,7 @@ type=key
 data=0
 event=Mode default
 event=Status task
-label=Stats
+label=_TaskStats
 location=17
 
 mode=NavOrdered
