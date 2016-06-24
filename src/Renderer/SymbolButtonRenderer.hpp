@@ -44,6 +44,7 @@ public:
     HOME,
     SEARCH,
     SEARCH_CHECKED,
+    SPEEDOMETER,
   } prefix_icon;
 
   SymbolButtonRenderer(const ButtonLook &_look,

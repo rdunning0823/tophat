@@ -66,6 +66,9 @@ SymbolButtonRenderer::GetMinimumButtonWidth() const
   case PrefixIcon::SEARCH_CHECKED:
     icon_width += icon_look.hBmpSearchChecked.GetSize().cx + Layout::GetTextPadding();
     break;
+  case PrefixIcon::SPEEDOMETER:
+    icon_width += icon_look.hBmpSpeedometer.GetSize().cx + Layout::GetTextPadding();
+    break;
   }
   return icon_width + text_width;
 }
@@ -96,6 +99,9 @@ SymbolButtonRenderer::GetIcon(PrefixIcon prefix_icon) const
     break;
   case PrefixIcon::SEARCH_CHECKED:
     return &icon_look.hBmpSearchChecked;
+    break;
+  case PrefixIcon::SPEEDOMETER:
+    return &icon_look.hBmpSpeedometer;
     break;
   }
   return nullptr;
@@ -230,6 +236,12 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
       const MaskedIcon &bmp = icon_look.hBmpClose;
       DrawIconOrBitmap(canvas, rc, bmp, focused);
     }
+  } else if (caption == _("_TaskStats")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon &icon = icon_look.hBmpSpeedometer;
+    DrawIconAndText(canvas, rc, _("Stats"), &icon,
+                    enabled, focused, pressed);
+
   } else if (prefix_icon != PrefixIcon::NONE) {
     const MaskedIcon *icon = GetIcon(prefix_icon);
     DrawIconAndText(canvas, rc, caption.c_str(), icon,

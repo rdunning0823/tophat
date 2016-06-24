@@ -38,6 +38,7 @@ struct IconLook {
   MaskedIcon hBmpTabSettings;
   MaskedIcon hBmpTabSettingsNavBar;
   MaskedIcon hBmpTabCalculator;
+  MaskedIcon hBmpSpeedometer;
 
   // status dialog
   MaskedIcon hBmpTabFlight;
