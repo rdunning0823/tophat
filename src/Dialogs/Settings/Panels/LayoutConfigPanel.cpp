@@ -199,13 +199,17 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           (unsigned)ui_settings.popup_message_position);
   SetExpertRow(AppStatusMessageAlignment);
 
+  if (!quick_setup) {
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  // WIN32 does not support screens button on map
   AddDummy();
 #else
   AddEnum(_("Screens button location"),
              _("Show the 'S' Screens button on the map or in the first menu."),
              screens_button_location_list, (unsigned)ui_settings.screens_button_location);
 #endif
+  } else
+    AddDummy();
 
   if (!quick_setup) {
     AddBoolean(_("Inverse InfoBoxes"), _("If true, the InfoBoxes are white on black, otherwise black on white."),
@@ -264,8 +268,10 @@ LayoutConfigPanel::Save(bool &_changed)
   changed |= info_box_geometry_changed;
 
 #if defined(ENABLE_OPENGL) | defined(KOBO)
-  changed |= SaveValueEnum(ScreensButtonLocation, ProfileKeys::ScreensButtonLocation,
-                           ui_settings.screens_button_location);
+  if (!quick_setup) {
+    changed |= SaveValueEnum(ScreensButtonLocation, ProfileKeys::ScreensButtonLocation,
+                             ui_settings.screens_button_location);
+  }
 #endif
 
   if (!quick_setup)
