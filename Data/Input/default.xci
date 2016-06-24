@@ -388,7 +388,7 @@ type=key
 data=0
 event=Calculator
 event=Mode default
-label=Edit task
+label=_EditTask
 location=18
 
 mode=NavOrdered
@@ -470,7 +470,7 @@ type=key
 data=0
 event=Calculator
 event=Mode default
-label=Edit task
+label=_EditTask
 location=18
 
 mode=NavGoto
