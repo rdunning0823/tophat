@@ -76,14 +76,39 @@ DrawIconOrBitmap(Canvas &canvas, PixelRect rc, const MaskedIcon &icon, bool pres
   icon.Draw(canvas, rc, pressed);
 }
 
+const MaskedIcon*
+SymbolButtonRenderer::GetIcon(PrefixIcon prefix_icon) const
+{
+  const IconLook &icon_look = UIGlobals::GetIconLook();
+
+  switch (prefix_icon) {
+  case PrefixIcon::NONE:
+    return nullptr;
+    break;
+  case PrefixIcon::HOME:
+    return &icon_look.icon_home;
+    break;
+  case PrefixIcon::CHECK_MARK:
+    return &icon_look.hBmpCheckMark;
+    break;
+  case PrefixIcon::SEARCH:
+    return &icon_look.hBmpSearch;
+    break;
+  case PrefixIcon::SEARCH_CHECKED:
+    return &icon_look.hBmpSearchChecked;
+    break;
+  }
+  return nullptr;
+}
+
 void
 SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
-                                      const TCHAR *text, bool enabled, bool
+                                      const TCHAR *text,
+                                      const MaskedIcon *icon,
+                                      bool enabled, bool
                                       focused, bool pressed) const
 {
   const ButtonLook &look = GetLook();
-  const IconLook &icon_look = UIGlobals::GetIconLook();
-
   const Font &font = *look.font;
   PixelSize sz_text = font.TextSize(text);
   UPixelScalar padding = Layout::GetTextPadding();
@@ -92,27 +117,8 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
   sz_icon.cx = sz_icon.cy = 0;
   PixelRect rc_caption = rc;
   PixelRect rc_icon = rc;
-  const MaskedIcon *icon = nullptr;
-  switch (prefix_icon) {
-  case PrefixIcon::NONE:
-    break;
-  case PrefixIcon::HOME:
-    icon = &icon_look.icon_home;
+  if (icon != nullptr)
     sz_icon = icon->GetSize();
-    break;
-  case PrefixIcon::CHECK_MARK:
-    icon = &icon_look.hBmpCheckMark;
-    sz_icon = icon->GetSize();
-    break;
-  case PrefixIcon::SEARCH:
-    icon = &icon_look.hBmpSearch;
-    sz_icon = icon->GetSize();
-    break;
-  case PrefixIcon::SEARCH_CHECKED:
-    icon = &icon_look.hBmpSearchChecked;
-    sz_icon = icon->GetSize();
-    break;
-  }
 
   rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
   rc_icon.right = rc_icon.left + sz_icon.cx;
@@ -121,7 +127,7 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
       (prefix_icon == PrefixIcon::NONE ? 0 : padding);
   rc_caption.right = rc_caption.left + sz_text.cx + padding;
 
-  if (prefix_icon != PrefixIcon::NONE) {
+  if (icon != nullptr) {
     icon->Draw(canvas, rc_icon, focused);
   }
 
@@ -225,7 +231,8 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
       DrawIconOrBitmap(canvas, rc, bmp, focused);
     }
   } else if (prefix_icon != PrefixIcon::NONE) {
-    DrawIconAndText(canvas, rc, caption.c_str(),
+    const MaskedIcon *icon = GetIcon(prefix_icon);
+    DrawIconAndText(canvas, rc, caption.c_str(), icon,
                     enabled, focused, pressed);
 
   } else if (caption == _("More") || caption == _("Less")) {

@@ -65,12 +65,18 @@ private:
                   bool enabled, bool focused, bool pressed) const;
 
   /**
+   * @return. Pointer to icon with this prefix, or null
+   */
+  const MaskedIcon *GetIcon(PrefixIcon prefix_icon) const;
+
+  /**
    * Displays icon if exists plus caption based on prefix_icon value
    * @param text
    *
    */
   void DrawIconAndText(Canvas &canvas, PixelRect rc,
-                       const TCHAR *text, bool enabled, bool
+                       const TCHAR *text, const MaskedIcon *icon,
+                       bool enabled, bool
                        focused, bool pressed) const;
 };
 
