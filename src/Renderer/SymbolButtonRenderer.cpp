@@ -130,8 +130,8 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
   rc_icon.right = rc_icon.left + sz_icon.cx;
 
   rc_caption.left = rc_icon.right +
-      (prefix_icon == PrefixIcon::NONE ? 0 : padding);
-  rc_caption.right = rc_caption.left + sz_text.cx + padding;
+      (prefix_icon == PrefixIcon::NONE ? 0 : padding * 2);
+  rc_caption.right = std::min((int)rc_caption.left + (int)sz_text.cx, (int)rc.right) + (int)padding;
 
   if (icon != nullptr) {
     icon->Draw(canvas, rc_icon, focused);
@@ -240,6 +240,12 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon &icon = icon_look.hBmpSpeedometer;
     DrawIconAndText(canvas, rc, _("Stats"), &icon,
+                    enabled, focused, pressed);
+
+  } else if (caption == _("_EditTask")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon &icon = icon_look.hBmpTabTask;
+    DrawIconAndText(canvas, rc, _("Edit task"), &icon,
                     enabled, focused, pressed);
 
   } else if (prefix_icon != PrefixIcon::NONE) {
