@@ -64,17 +64,17 @@ InfoBoxSettings::SetDefaults()
   static constexpr unsigned DFLT_CONFIG_PANELS = 4;
   static constexpr Type contents[DFLT_CONFIG_PANELS][DFLT_CONFIG_BOXES] = {
       //circling
-    { e_MacCready,      e_Thermal_Avg,    e_Thermal_30s,      WIND_ARROW,   e_Thermal_Gain,
-      HomeAltitudeDiff, e_TL_Gain,        e_TL_Avg,           e_HeightAGL},
+    { e_MacCready,      e_Thermal_Avg,        e_Thermal_30s,         WIND_ARROW,
+      e_Thermal_Gain,   HomeAltitudeDiff,     e_TL_Gain,             e_TL_Avg,            e_HeightAGL},
       // cruise
-    { e_MacCready,      e_Alternate_1_GR,  e_HeadWind,        WIND_ARROW,   e_Speed_GPS,
-      HomeAltitudeDiff,  e_HeightGPS,       e_GR_Avg,          e_GR_Cruise },
+    { e_MacCready,      e_Alternate_1_GR,     e_HeadWind,            WIND_ARROW,
+      e_Speed_GPS,      HomeAltitudeDiff,     e_HeightGPS,           e_GR_Avg,            e_GR_Cruise },
       //final glide
-    { e_MacCready,            e_Alternate_1_GR,  e_HeightGPS, WIND_ARROW,   e_Speed_GPS,
-      HomeAltitudeDiff, e_VerticalSpeed_Netto,   e_HeadWind,  e_GR_Avg },
+    { e_MacCready,      e_Alternate_1_GR,     e_HeightGPS,           WIND_ARROW,
+      e_Speed_GPS,      HomeAltitudeDiff,     e_VerticalSpeed_Netto, e_HeadWind,          e_GR_Avg },
       //aux 1
-    { e_MacCready,   e_Fin_TimeLocal,   e_HeadWind,           WIND_ARROW,   e_Fin_Distance,
-      e_Fin_Time,    e_TimeLocal,       e_TimeSinceTakeoff,   e_CC_Speed }
+    { e_MacCready,      e_Fin_TimeLocal,      e_HeadWind,            WIND_ARROW,
+      e_Fin_Distance,   e_Fin_Time,           e_TimeLocal,           e_TimeSinceTakeoff,  e_CC_Speed }
   };
 
   assert(MAX_PANELS >= DFLT_CONFIG_PANELS);
