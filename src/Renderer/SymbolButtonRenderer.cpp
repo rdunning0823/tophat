@@ -116,27 +116,38 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
 {
   const ButtonLook &look = GetLook();
   const Font &font = *look.font;
-  PixelSize sz_text = font.TextSize(text);
+  PixelSize sz_text_one_line = font.TextSize(text);
   UPixelScalar padding = Layout::GetTextPadding();
 
   PixelSize sz_icon;
   sz_icon.cx = sz_icon.cy = 0;
-  PixelRect rc_caption = rc;
-  PixelRect rc_icon = rc;
   if (icon != nullptr)
     sz_icon = icon->GetSize();
 
-  rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text.cx - padding) / 2;
-  rc_icon.right = rc_icon.left + sz_icon.cx;
+  PixelRect rc_caption = rc;
+  PixelRect rc_icon = rc;
 
-  rc_caption.left = rc_icon.right +
-      (prefix_icon == PrefixIcon::NONE ? 0 : padding * 2);
-  rc_caption.right = std::min((int)rc_caption.left + (int)sz_text.cx, (int)rc.right) + (int)padding;
+  if (sz_text_one_line.cx + sz_icon.cx + (int)padding <= rc.GetSize().cx ) {
+    rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text_one_line.cx - padding) / 2;
+    rc_icon.right = rc_icon.left + sz_icon.cx;
+
+    rc_caption.left = rc_icon.right +
+        (prefix_icon == PrefixIcon::NONE ? 0 : padding * 2);
+    rc_caption.right = std::min((int)rc_caption.left + (int)sz_text_one_line.cx, (int)rc.right) + (int)padding;
+
+  } else {
+    // text and icon not fit on one line
+    rc_icon.left = rc.left;
+    rc_icon.right = rc_icon.left + sz_icon.cx;
+
+    rc_caption.left = rc_icon.right +
+        (prefix_icon == PrefixIcon::NONE ? 0 : padding * 2);
+    rc_caption.right = rc.right;
+  }
 
   if (icon != nullptr) {
     icon->Draw(canvas, rc_icon, focused);
   }
-
   DrawCaption(canvas, text, rc_caption, enabled, focused, pressed);
 }
 
@@ -238,8 +249,8 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     }
   } else if (caption == _("_TaskStats")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &icon = icon_look.hBmpSpeedometer;
-    DrawIconAndText(canvas, rc, _("Stats"), &icon,
+    const MaskedIcon *icon = &icon_look.hBmpSpeedometer;
+    DrawIconAndText(canvas, rc, _("Stats"), icon,
                     enabled, focused, pressed);
 
   } else if (caption == _("_EditTask")) {
