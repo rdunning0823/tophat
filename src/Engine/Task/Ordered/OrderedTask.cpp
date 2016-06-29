@@ -1199,7 +1199,8 @@ inline fixed
 UpdateTaskMCIfChanged(const fixed last_mc, fixed& last_speed, const fixed speed,
                       const GlidePolar &glide_polar)
 {
-  if (fabs(last_speed - speed) > fixed(0.1) || !positive(last_speed)) {
+  if (fabs(last_speed - speed) > fixed(0.1) || !positive(last_speed)
+      || !positive(last_mc)) {
     last_speed = speed;
     return glide_polar.EquivalentMC(speed);
   } else {
