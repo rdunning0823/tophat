@@ -250,7 +250,7 @@ FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,
   buffer = description;
   if (buffer.length() > 5)
     buffer.Truncate(5);
-  buffer += _T(": ");
+  buffer += _T(" ");
   buffer += Value;
 
   if (text_size.cx < Layout::Scale(18)) {

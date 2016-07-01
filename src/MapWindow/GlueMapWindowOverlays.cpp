@@ -550,9 +550,22 @@ GlueMapWindow::DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const
 
 
   ProtectedTaskManager::Lease task_manager(*task);
-  if (task_manager->GetMode() == TaskType::ORDERED)
-    description = _("Task");
-  else {
+  if (task_manager->GetMode() == TaskType::ORDERED) {
+    // display task_mc value if 1/2 done task or above glide
+    if (Calculated().task_stats.total.time_planned /
+        Calculated().task_stats.total.time_remaining_now > 2 ||
+        Calculated().task_stats.flight_mode_final_glide) {
+      TCHAR mc_buffer[10];
+      FormatUserVerticalSpeed(Calculated().task_stats.task_mc, mc_buffer,
+                              false, false);
+      description.Format(_T("MC%s"), mc_buffer);
+    } else {
+      description = _("Task");
+    }
+
+
+
+  } else {
     const TaskWaypoint* wp = task_manager->GetActiveTaskPoint();
     if (wp != nullptr) {
       description = wp->GetWaypoint().name.c_str();
