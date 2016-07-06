@@ -427,17 +427,17 @@ MainWindow::ReinitialiseLayout()
 
   ReinitialiseLayout_vario(ib_layout);
 
+  const PixelRect main_rect = GetMainRect();
+  const PixelRect bottom_rect = GetBottomWidgetRect(main_rect,
+                                                    bottom_widget);
+  const PixelRect top_rect = GetTopWidgetRect(main_rect,
+                                              top_widget);
+
   if (map != nullptr) {
     if (FullScreen)
       InfoBoxManager::Hide();
     else
       InfoBoxManager::Show();
-
-    const PixelRect main_rect = GetMainRect();
-    const PixelRect bottom_rect = GetBottomWidgetRect(main_rect,
-                                                      bottom_widget);
-    const PixelRect top_rect = GetTopWidgetRect(main_rect,
-                                                top_widget);
 
     if (HaveBottomWidget())
       bottom_widget->Move(bottom_rect);
@@ -456,7 +456,6 @@ MainWindow::ReinitialiseLayout()
                                    map != NULL, FullScreen,
                                    HaveTopWidget());
 
-  const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
   map->SetNavBarVisibleHeight(widget_overlays.HeightFromTop());
   replay_button_widget->SetTopOffset(widget_overlays.HeightFromTop());
 #if defined(ENABLE_OPENGL) | defined(KOBO)
@@ -468,8 +467,12 @@ MainWindow::ReinitialiseLayout()
   if (!HasDraggableScreen())
     map->SetTaskNavSliderShape();
 
-  ReinitialiseLayout_flarm(rc_current, ib_layout);
-  ReinitialiseLayoutTA(rc_current, ib_layout);
+  PixelRect gauge_rect = main_rect;
+  gauge_rect.top += top_rect.GetSize().cy;
+  gauge_rect.bottom -= bottom_rect.GetSize().cy;
+
+  ReinitialiseLayout_flarm(gauge_rect, ib_layout);
+  ReinitialiseLayoutTA(gauge_rect, ib_layout);
 
   if (widget != nullptr)
     widget->Move(GetMainRect(rc));
@@ -807,10 +810,21 @@ MainWindow::OnTimer(WindowTimer &_timer)
     InfoBoxLayout::Calculate(rc, ui_settings.info_boxes.geometry);
   const PixelRect rc_current = FullScreen ? GetClientRect() : map_rect;
 
-  if (thermal_assistant.IsVisible())
-    ReinitialiseLayoutTA(rc_current, ib_layout);
-  if (traffic_gauge.IsVisible())
-    ReinitialiseLayout_flarm(rc_current, ib_layout);
+
+  if (thermal_assistant.IsVisible() || traffic_gauge.IsVisible()) {
+    const PixelRect top_rect = GetTopWidgetRect(rc_current,
+                                                top_widget);
+    const PixelRect bottom_rect = GetBottomWidgetRect(rc_current,
+                                                bottom_widget);
+    PixelRect gauge_rect = rc_current;
+    gauge_rect.top += top_rect.GetSize().cy;
+    gauge_rect.bottom -= bottom_rect.GetSize().cy;
+
+    if (thermal_assistant.IsVisible())
+      ReinitialiseLayoutTA(gauge_rect, ib_layout);
+    if (traffic_gauge.IsVisible())
+      ReinitialiseLayout_flarm(gauge_rect, ib_layout);
+  }
 
   return true;
 }
