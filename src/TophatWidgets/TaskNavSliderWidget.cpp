@@ -147,6 +147,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool is_ordered = false;
   unsigned task_size = 0;
   bool tp_valid = true;
+  bool is_finish = false;
   TaskFactoryType factory_type = TaskFactoryType::AAT;
 
   TaskType mode;
@@ -169,6 +170,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
       twp = (is_ordered) ? &otp->GetWaypoint() :
           &task_manager->GetActiveTaskPoint()->GetWaypoint();
+      if (idx + 1 == task_size)
+        is_finish = true;
     } else
       tp_valid = false;
   }
@@ -192,7 +195,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
   if (factory_type == TaskFactoryType::AAT &&
       ui_settings.navbar_navigate_to_aat_target &&
-      mode == TaskType::ORDERED) {
+      mode == TaskType::ORDERED && !is_finish) {
 
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
