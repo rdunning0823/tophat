@@ -726,6 +726,7 @@ OrderedTask::OverrideStartTime(const AircraftState default_state, fixed time)
 
   new_state.time = time;
   taskpoint_start->SetHasExitedOverride();
+  stats.start.SetStarted(new_state);
   taskpoint_start->SetStateEntered(new_state);
 }
 
