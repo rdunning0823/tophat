@@ -1,7 +1,13 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Top Hat Soaring 2.1.6 Beta TBD
+Top Hat Soaring 2.1.7 Beta TBD
+* Fix Task Override if set before takeoff
+* Fix Edit Start Time
+* Nav Bar: always show finish altitude for AAT tasks
+* Targets: set to minimum if task impossible due to wind
+
+Top Hat Soaring 2.1.6 Beta 6/25/2016
 * Use task speed to optimize targets and plan task
 	video: https://www.youtube.com/watch?v=xZEQ-dsZn-w
 * Add Task Calculator for Task Speed Infobox
