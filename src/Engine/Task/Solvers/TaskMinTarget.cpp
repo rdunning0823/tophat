@@ -75,8 +75,13 @@ TaskMinTarget::search(const fixed tp)
     return p;
   } else {
     force_current = true;
-    return find_zero(tp);
+    const fixed p2 = find_zero(tp);
+    if (valid(p2)) {
+      return p2;
+    }
   }
+  set_range(fixed(0));
+  return fixed(0);
 }
 
 void
