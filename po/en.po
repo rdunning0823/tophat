@@ -973,7 +973,7 @@ msgstr "Altitude AGL"
 #: src/InfoBoxes/Content/Factory.cpp:180
 #, no-c-format
 msgid "H AGL"
-msgstr "Altitude AGL"
+msgstr "Alt AGL"
 
 #: src/InfoBoxes/Content/Factory.cpp:181
 #, no-c-format
