@@ -252,6 +252,13 @@ protected:
                                fixed &val) const;
 
   /**
+   * Updates the TaskStats task_mc value
+   * That is used for task calculations;
+   */
+  gcc_pure
+  virtual void UpdateTaskMC(const GlidePolar &glide_polar);
+
+  /**
    * Calculate angle from aircraft to destination of current leg
    * (height above taskpoint divided by distance to go).
    *

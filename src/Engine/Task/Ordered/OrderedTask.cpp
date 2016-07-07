@@ -741,7 +741,6 @@ OrderedTask::UpdateIdle(const AircraftState &state,
   if (HasStart() && task_behaviour.optimise_targets_range &&
       positive(GetOrderedTaskSettings().aat_min_time)) {
 
-    UpdateTaskMC(glide_polar);
     if (IsOptimizable()) {
       CalcMinTarget(state, glide_polar,
                     GetOrderedTaskSettings().aat_min_time + fixed(task_behaviour.optimise_targets_margin));
@@ -1209,7 +1208,7 @@ UpdateTaskMCIfChanged(const fixed last_mc, fixed& last_speed, const fixed speed,
   }
 }
 
-inline void
+void
 OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
 {
   GlidePolar glide_polar = _glide_polar;
@@ -1223,7 +1222,6 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
                                           speed, glide_polar);
     break;
   }
-
   case TaskBehaviour::TaskPlanningSpeedMode::PastPerformanceSpeed:
   {
     if (stats.total.time_elapsed > fixed(3600) &&

@@ -105,8 +105,13 @@ AbstractTask::UpdateAutoMC(GlidePolar &glide_polar,
 
 bool 
 AbstractTask::UpdateIdle(const AircraftState &state,
-                         const GlidePolar &glide_polar)
+                         const GlidePolar &_glide_polar)
 {
+
+  // use the task_mc setting for all task calculations
+  GlidePolar glide_polar = _glide_polar;
+  glide_polar.SetMC(stats.task_mc);
+
   const bool valid = state.location.IsValid() && glide_polar.IsValid();
 
   if (stats.start.task_started && task_behaviour.calc_cruise_efficiency &&
@@ -202,18 +207,6 @@ AbstractTask::UpdateGlideSolutions(const AircraftState &state,
     stats.current_leg.solution_mc0 = stats.current_leg.solution_remaining;
   }
 
-  if (fabs(stats.task_mc - glide_polar.GetMC()) > fixed(0.01)) {
-    GlidePolar polar_task = glide_polar;
-    polar_task.SetMC(stats.task_mc);
-
-    GlideSolutionRemaining(state, polar_task, stats.total.solution_remaining_task_mc,
-                             stats.current_leg.solution_remaining_task_mc);
-  } else {
-    // just copy
-    stats.total.solution_remaining_task_mc = stats.total.solution_remaining;
-    stats.current_leg.solution_remaining_task_mc = stats.current_leg.solution_remaining;
-  }
-
   UpdateNavBarStatistics(state, glide_polar);
 
   GlideSolutionTravelled(state, glide_polar,
@@ -245,8 +238,13 @@ AbstractTask::UpdateGlideSolutions(const AircraftState &state,
 bool
 AbstractTask::Update(const AircraftState &state, 
                      const AircraftState &state_last,
-                     const GlidePolar &glide_polar)
+                     const GlidePolar &_glide_polar)
 {
+  // use the task_mc setting for all task calculations
+  GlidePolar glide_polar = _glide_polar;
+  UpdateTaskMC(glide_polar);
+  glide_polar.SetMC(stats.task_mc);
+
   stats.active_index = GetActiveTaskPointIndex();
   stats.task_valid = CheckTask();
 
@@ -349,6 +347,12 @@ AbstractTask::CalcEffectiveMC(const AircraftState &state_now,
 {
   val = glide_polar.GetMC();
   return true;
+}
+
+void
+AbstractTask::UpdateTaskMC(const GlidePolar &glide_polar)
+{
+  stats.task_mc = glide_polar.GetMC();
 }
 
 void
