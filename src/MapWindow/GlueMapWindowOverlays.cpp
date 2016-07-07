@@ -553,7 +553,7 @@ GlueMapWindow::DrawFinalGlide(Canvas &canvas, const PixelRect &rc) const
   if (task_manager->GetMode() == TaskType::ORDERED) {
     // display task_mc value if 1/2 done task or above glide
     if (Calculated().task_stats.total.time_planned /
-        Calculated().task_stats.total.time_remaining_now > 2 ||
+        Calculated().task_stats.total.time_remaining_now > fixed(2) ||
         Calculated().task_stats.flight_mode_final_glide) {
       TCHAR mc_buffer[10];
       FormatUserVerticalSpeed(Calculated().task_stats.task_mc, mc_buffer,
