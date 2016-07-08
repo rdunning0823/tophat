@@ -100,7 +100,8 @@ struct ElementStat
   GlideResult solution_remaining;
   /** Glide solution for remaining element, MC=0 */
   GlideResult solution_mc0;
-
+  /** Glide solution for remaining element using safety mc instead of task_mc */
+  GlideResult solution_remaining_safety_mc;
   /** Rate of change of altitude difference (m/s) */
   TaskVario vario;
 

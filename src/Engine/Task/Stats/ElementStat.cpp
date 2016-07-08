@@ -47,6 +47,7 @@ ElementStat::Reset()
   solution_travelled.Reset();
   solution_remaining.Reset();
   solution_mc0.Reset();
+  solution_remaining_safety_mc.Reset();
 
   vario.Reset();
 }
