@@ -59,6 +59,7 @@ class TaskManager:
   /**
    * Same as #glide_polar, but with the "safety" MacCready setting
    * applied.
+   * Only used for the Route Planner, which is not used by Top Hat
    */
   GlidePolar safety_polar;
 
@@ -384,7 +385,8 @@ public:
   void SetGlidePolar(const GlidePolar& glide_polar);
 
   /**
-   * Retrieve copy of safety glide polar used by task system
+   * Retrieve copy of safety glide polar used by route system
+   * This is not used by Top Hat
    *
    * @return Copy of glide polar
    */
