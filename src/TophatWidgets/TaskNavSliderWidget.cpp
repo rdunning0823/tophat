@@ -181,13 +181,6 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   const TerrainRendererSettings &terrain = settings_map.terrain;
   bool use_wide_pen = !terrain.enable;
 
-  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
-
-  const GlideResult &result = (is_ordered) ?
-      task_stats.glide_results[idx] :
-      task_stats.glide_result_goto;
-
   bool has_entered = tp_valid && is_ordered && otp->HasEntered();
   bool has_exited = tp_valid && is_ordered && otp->HasExited();
 
@@ -218,6 +211,14 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       use_wide_pen,
                       true);
   } else {
+
+    const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+    const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+
+    const GlideResult &result = (is_ordered) ?
+        task_stats.glide_results[idx] :
+        task_stats.glide_result_goto;
+
     fixed gradient = tp_valid ? ::CalculateGradient(*twp, result.vector.distance,
                                                     basic,
                                                     settings.task.safety_height_arrival_gr)
