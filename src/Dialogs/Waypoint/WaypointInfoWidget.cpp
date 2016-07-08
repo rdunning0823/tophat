@@ -127,7 +127,7 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
     fixed mc = settings.polar.glide_polar_task.GetMC();
     StaticString<10>mc_value;
-    FormatUserVerticalSpeed(mc, mc_value.buffer(), true);
+    FormatUserVerticalSpeed(mc, mc_value.buffer(), false, false);
     buffer.Format(_T("%s %s %s"), _("Arrival altitude"), _("MC"), mc_value.c_str());
     AddGlideResult(buffer.c_str(),
                    MacCready::Solve(settings.task.glide,
