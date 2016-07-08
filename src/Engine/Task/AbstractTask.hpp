@@ -431,8 +431,16 @@ protected:
   void UpdateStatsDistances(const GeoPoint &location, const bool full_update);
 
 private:
+  /**
+   * Update glide solutions for task calc and safety glides
+   * @param location Location of observer
+   * @param glide_polar_task.  Task glide polar for calculating task stats
+   * @param glide_polar_safety.  Glide polar for calculating safety glides
+   */
+
   void UpdateGlideSolutions(const AircraftState &state,
-                            const GlidePolar &glide_polar);
+                            const GlidePolar &glide_polar_task,
+                            const GlidePolar &glide_polar_safety);
 
   /**
    * @param time monotonic time of day in seconds or -1 if unknown
