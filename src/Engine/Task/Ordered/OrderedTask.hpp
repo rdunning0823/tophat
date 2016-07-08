@@ -509,6 +509,7 @@ private:
   /**
    * updates the TaskBehaviour.task_mc value based on the task planning behaviour
    * of the current task
+   * @param glide_polar.  The polar.  The mc setting is irrelevant
    */
   void UpdateTaskMC(const GlidePolar &_glide_polar);
 
