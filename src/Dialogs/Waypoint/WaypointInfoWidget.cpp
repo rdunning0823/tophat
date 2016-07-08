@@ -104,6 +104,8 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   StaticString<64> buffer;
 
+  AddReadOnly(_T(""), nullptr, waypoint.name.c_str());
+
   if (basic.location_available) {
     const GeoVector vector = basic.location.DistanceBearing(waypoint.location);
 
