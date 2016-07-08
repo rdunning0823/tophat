@@ -63,7 +63,7 @@ FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,
 
   const TaskStats &task_stats = calculated.task_stats;
   const ElementStat &total = task_stats.total;
-  const GlideResult &solution = total.solution_remaining;
+  const GlideResult &solution = total.solution_remaining_safety_mc;
   const GlideResult &solution_mc0 = total.solution_mc0;
 
   if (!task_stats.task_valid || !solution.IsOk() || !solution_mc0.IsDefined())
