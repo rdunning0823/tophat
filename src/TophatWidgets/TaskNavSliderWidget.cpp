@@ -195,8 +195,9 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
   if (factory_type == TaskFactoryType::AAT &&
       ui_settings.navbar_navigate_to_aat_target &&
-      mode == TaskType::ORDERED && !is_finish) {
+      is_ordered && !is_finish) {
 
+    // draw to targets, no gradient or altitude
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
                       idx == waypoint_index,
@@ -221,7 +222,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                                                     basic,
                                                     settings.task.safety_height_arrival_gr)
         : fixed(1000);
-
+    // draw to center with altitude and optional gradient
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
                       idx == waypoint_index,
