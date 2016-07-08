@@ -278,7 +278,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("MacCready setting"),
     N_("MC"),
-    N_("The current MacCready setting and the current MacCready mode. Also the inter-thermal speed-to-fly.  Auto MC will set it to your thermal rate of climb."),
+    N_("The current MacCready setting for safety glide calculations. Also the inter-thermal speed-to-fly.  Auto MC will set it to your thermal rate of climb."),
     IBFHelper<InfoBoxContentMacCready>::Create,
     e_WP_Speed_MC, // V MC
     NextLegEqThermal,
