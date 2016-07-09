@@ -354,7 +354,7 @@ WndProperty::OnPaint(Canvas &canvas)
   if (!value.empty()) {
     canvas.SetTextColor(text_color);
     canvas.SetBackgroundTransparent();
-    canvas.Select(look.text_font);
+    canvas.Select(look.bold_font);
 
     const int x = edit_rc.left + Layout::GetTextPadding();
     const int canvas_height = edit_rc.bottom - edit_rc.top;
