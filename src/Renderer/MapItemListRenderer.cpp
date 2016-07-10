@@ -111,6 +111,9 @@ MapItemListRenderer::CalculateLayout(const DialogLook &dialog_look,
                                       dialog_look.text_font);
 }
 
+/**
+ * unknown item type
+ */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const LocationMapItem &item,
@@ -307,7 +310,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 }
 
 /**
- * Airspeace
+ * Airspace
  */
 void
 MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
