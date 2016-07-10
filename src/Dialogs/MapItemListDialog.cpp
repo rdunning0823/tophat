@@ -191,6 +191,8 @@ class MapItemListWidget final : public ListWidget, private ActionListener {
 
   Button *details_button, *cancel_button, *goto_button;
   Button *ack_button;
+  // height of rendering area for item.  list item height may be larger.
+  unsigned inner_item_height;
 
 public:
   void CreateButtons(WidgetDialog &dialog);
@@ -296,7 +298,13 @@ void
 MapItemListWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   TwoTextRowsRenderer renderer;
-  CreateList(parent, dialog_look, rc, MapItemListRenderer::CalculateLayout(dialog_look, renderer));
+  inner_item_height = MapItemListRenderer::CalculateLayout(dialog_look, renderer);
+  // maximize the list item height to use all available space if too few items.
+  const unsigned list_size = std::max(1u, (unsigned)list.size());
+  unsigned list_item_height = (list_size * inner_item_height < (unsigned)rc.GetSize().cy) ?
+    rc.GetSize().cy / list_size : inner_item_height;
+
+  CreateList(parent, dialog_look, rc, list_item_height);
 
   GetList().SetLength(list.size());
   UpdateButtons();
@@ -318,7 +326,13 @@ MapItemListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   const TrafficLook &traffic_look = UIGlobals::GetLook().traffic;
   const FinalGlideBarLook &final_glide_look = UIGlobals::GetLook().final_glide_bar;
   const MapItem &item = *list[idx];
-  MapItemListRenderer::Draw(canvas, rc, item,
+  PixelRect rc_item = rc;
+  if (rc.GetSize().cy > (int)inner_item_height) {
+    rc_item.top += (rc.GetSize().cy - inner_item_height) / 2;
+    rc_item.bottom -= (rc.GetSize().cy - inner_item_height) / 2;
+  }
+
+  MapItemListRenderer::Draw(canvas, rc_item, item,
                             dialog_look, map_look, traffic_look,
                             final_glide_look, settings,
                             CommonInterface::GetComputerSettings().utc_offset,
