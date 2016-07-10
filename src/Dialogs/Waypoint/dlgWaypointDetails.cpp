@@ -107,6 +107,14 @@ WaypointExternalFileListHandler::OnPaintItem(Canvas &canvas,
 }
 #endif
 
+/**
+ * @param form
+ * @param waypoint
+ * @param show_all.  If true, shows additional info
+ */
+static void
+UpdateCaption(WndForm *form, const Waypoint *waypoint, bool show_all);
+
 class WaypointDetailsWidget final
   : public NullWidget,
     ActionListener {
@@ -152,6 +160,7 @@ class WaypointDetailsWidget final
   DockWindow commands_dock;
   WaypointCommandsWidget commands_widget;
   WndOwnerDrawFrame image_window;
+  WndForm &form;
 
 #ifdef HAVE_RUN_FILE
   ListControl file_list;
@@ -166,13 +175,15 @@ class WaypointDetailsWidget final
 public:
   WaypointDetailsWidget(WidgetDialog &_dialog, const Waypoint &_waypoint,
                         bool _allow_navigation,
-                        ProtectedTaskManager *_task_manager)
+                        ProtectedTaskManager *_task_manager,
+                        WndForm &_form)
     :dialog(_dialog), look(dialog.GetLook()),
      waypoint(_waypoint),
      allow_navigation(_allow_navigation),
      page(0), last_page(0),
      info_widget(look, _waypoint),
      commands_widget(look, &_dialog, _waypoint, _task_manager),
+     form(_form),
 #ifdef HAVE_RUN_FILE
      file_list(look), file_list_handler(_waypoint),
 #endif
@@ -486,6 +497,7 @@ WaypointDetailsWidget::Unprepare()
 void
 WaypointDetailsWidget::UpdatePage()
 {
+  UpdateCaption(&form, &waypoint, page != 0);
   info_dock.SetVisible(page == 0);
   details_panel.SetVisible(page == 1);
   commands_dock.SetVisible(page == 2);
@@ -635,45 +647,49 @@ WaypointDetailsWidget::OnImagePaint(gcc_unused Canvas &canvas,
 }
 
 static void
-UpdateCaption(WndForm *form, const Waypoint *waypoint)
+UpdateCaption(WndForm *form, const Waypoint *waypoint, bool show_all)
 {
   StaticString<256> buffer;
-  buffer.Format(_T("%s: %s"), _("Waypoint"), waypoint->name.c_str());
+  buffer.Format(_T("%s"), _("Waypoint"));
 
-  const char *key = nullptr;
-  const TCHAR *name = nullptr;
+  if (show_all) {
+    buffer.AppendFormat(_T(": %s"),  waypoint->name.c_str());
+    const char *key = nullptr;
+    const TCHAR *name = nullptr;
 
-  switch (waypoint->origin) {
-  case WaypointOrigin::NONE:
-    break;
+    switch (waypoint->origin) {
+    case WaypointOrigin::NONE:
+      break;
 
-  case WaypointOrigin::USER:
-    name = _T("user.cup");
-    break;
+    case WaypointOrigin::USER:
+      name = _T("user.cup");
+      break;
 
-  case WaypointOrigin::PRIMARY:
-    key = ProfileKeys::WaypointFile;
-    break;
+    case WaypointOrigin::PRIMARY:
+      key = ProfileKeys::WaypointFile;
+      break;
 
-  case WaypointOrigin::ADDITIONAL:
-    key = ProfileKeys::AdditionalWaypointFile;
-    break;
+    case WaypointOrigin::ADDITIONAL:
+      key = ProfileKeys::AdditionalWaypointFile;
+      break;
 
-  case WaypointOrigin::WATCHED:
-    key = ProfileKeys::WatchedWaypointFile;
-    break;
+    case WaypointOrigin::WATCHED:
+      key = ProfileKeys::WatchedWaypointFile;
+      break;
 
-  case WaypointOrigin::MAP:
-    key = ProfileKeys::MapFile;
-    break;
+    case WaypointOrigin::MAP:
+      key = ProfileKeys::MapFile;
+      break;
+    }
+
+    if (key != nullptr) {
+      const auto filename = Profile::map.GetPathBase(key);
+      if (!filename.IsNull())
+        buffer.AppendFormat(_T(" (%s)"), filename.c_str());
+    } else if (name != nullptr)
+      buffer.AppendFormat(_T(" (%s)"), name);
+
   }
-
-  if (key != nullptr) {
-    const auto filename = Profile::map.GetPathBase(key);
-    if (!filename.IsNull())
-      buffer.AppendFormat(_T(" (%s)"), filename.c_str());
-  } else if (name != nullptr)
-    buffer.AppendFormat(_T(" (%s)"), name);
 
   form->SetCaption(buffer);
 }
@@ -686,10 +702,8 @@ dlgWaypointDetailsShowModal(const Waypoint &_waypoint,
   const DialogLook &look = UIGlobals::GetDialogLook();
   WidgetDialog dialog(look);
   WaypointDetailsWidget widget(dialog, _waypoint, allow_navigation,
-                               protected_task_manager);
-  dialog.CreateFull(UIGlobals::GetMainWindow(), _T(""), &widget);
-
-  UpdateCaption(&dialog, &_waypoint);
+                               protected_task_manager, dialog);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), _T("Waypoint"), &widget);
 
   dialog.ShowModal();
   dialog.StealWidget();
