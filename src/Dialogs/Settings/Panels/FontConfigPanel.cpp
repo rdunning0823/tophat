@@ -74,7 +74,7 @@ FontConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
              settings.font_scale_nav_bar_waypoint_name);
 
-  AddInteger(_("Nav bar waypoint distance"),
+  AddInteger(_("Nav bar distance, altitude"),
              nullptr,
              _T("%d %%"), _T("%d"), min_scale_range, max_scale_range, 5,
              settings.font_scale_nav_bar_distance);
