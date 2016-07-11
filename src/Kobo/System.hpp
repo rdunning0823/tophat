@@ -89,6 +89,11 @@ void WriteKoboScreenOrientation(const char * rotate);
  * @return Orientation based on hardware settings
  */
 DisplayOrientation ReadKoboLastScreenOrientation();
+
+/** should screen be shrunk so Kobo Mini Sunblind does not cover edges */
+void WriteUseKoboMiniSunblind(bool value);
+bool ReadUseKoboMiniSunblind();
+
 #endif
 /**
  * returns true if a USB Storage device is currently mounted

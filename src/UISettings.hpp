@@ -108,6 +108,9 @@ struct UISettings {
     TOP_LEFT,
   } popup_message_position;
 
+  /** is a kobo mini sunblind installed */
+  bool kobo_mini_sunblind;
+
   /** Haptic feedback settings */
   enum class HapticFeedback : uint8_t {
     DEFAULT,

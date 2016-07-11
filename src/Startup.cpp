@@ -104,6 +104,9 @@ Copyright_License {
 #include "OS/Args.hpp"
 #include "Util/StaticString.hxx"
 #include "Util/ConvertString.hpp"
+#ifdef KOBO
+#include "Kobo/System.hpp"
+#endif
 #if !defined(ANDROID)
 #include "Audio/SoundQueue.hpp"
 #endif
@@ -288,6 +291,11 @@ Startup()
 
   MainWindow *const main_window = CommonInterface::main_window =
     new MainWindow();
+#ifdef KOBO
+  if (ReadUseKoboMiniSunblind()) {
+    main_window->SetMargin(11);
+  }
+#endif
   main_window->Create(SystemWindowSize(), style);
   if (!main_window->IsDefined())
     return false;

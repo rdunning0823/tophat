@@ -127,6 +127,7 @@ extern const char AppGaugeVarioGross[];
 extern const char AppStatusMessageAlignment[];
 extern const char AppTextInputStyle[];
 extern const char HapticFeedback[];
+extern const char KoboMiniSunblind[];
 extern const char AppDialogTabStyle[];
 extern const char AppDialogStyle[];
 extern const char AppInfoBoxBorder[];

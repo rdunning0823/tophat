@@ -31,6 +31,12 @@ Window::Create(ContainerWindow *parent, PixelRect rc,
                const WindowStyle window_style)
 {
   assert(IsScreenInitialized());
+#ifdef KOBO
+  if (margin > 0 && rc.GetSize().cx > margin * 2 && rc.GetSize().cy > margin * 2) {
+    rc.Grow(-1 * margin, -1 * margin);
+  }
+#endif
+
   assert(rc.left <= rc.right);
   assert(rc.right - rc.left < 0x8000);
   assert(rc.top <= rc.bottom);

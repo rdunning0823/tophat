@@ -322,6 +322,28 @@ ReadKoboLastScreenOrientation()
   }
   return orientation;
 }
+
+static const char *kobo_use_sunblind_file =
+    "/mnt/onboard/XCSoarData/SunblindKoboLast.tx0";
+void
+WriteUseKoboMiniSunblind(bool value)
+{
+  File::CreateExclusive(kobo_use_sunblind_file);
+  File::WriteExisting(kobo_use_sunblind_file, value ? "1" : "0");
+}
+
+bool
+ReadUseKoboMiniSunblind()
+{
+  char line[4];
+  if (File::ReadString(kobo_use_sunblind_file, line, sizeof(line))) {
+    if (line[0] == '1') {
+      return true;
+    }
+  }
+  return false;
+}
+
 #endif
 
 bool

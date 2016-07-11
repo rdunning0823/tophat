@@ -43,6 +43,7 @@ Copyright_License {
 #ifdef KOBO
 #include "Event/Globals.hpp"
 #include "Event/Queue.hpp"
+#include "Kobo/System.hpp"
 #endif
 
 enum ControlIndex {
@@ -51,6 +52,7 @@ enum ControlIndex {
   AppStatusMessageAlignment,
   ScreensButtonLocation,
   AppInverseInfoBox,
+  KoboMiniSunblind,
   AppInfoBoxColors,
   AppInfoBoxBorder,
   CustomizeScreens,
@@ -218,6 +220,17 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   } else
     AddDummy();
 
+#ifdef KOBO
+  if (!quick_setup) {
+    AddBoolean(_("Kobo sun blind"), _("If true, reduces the size of the Kobo Mini screen by 2mm on each edge."),
+               ui_settings.kobo_mini_sunblind);
+    SetExpertRow(KoboMiniSunblind);
+  } else
+    AddDummy();
+#else
+    AddDummy();
+#endif
+
   if (HasColors() && !quick_setup) {
     AddBoolean(_("Colored InfoBoxes"),
                _("If true, certain InfoBoxes will have coloured text.  For example, the active waypoint "
@@ -277,6 +290,15 @@ LayoutConfigPanel::Save(bool &_changed)
   if (!quick_setup)
     changed |= require_restart |=
       SaveValue(AppInverseInfoBox, ProfileKeys::AppInverseInfoBox, ui_settings.info_boxes.inverse);
+
+#ifdef KOBO
+  if (!quick_setup) {
+    changed |= require_restart |=
+        SaveValue(KoboMiniSunblind, ProfileKeys::KoboMiniSunblind,
+                  ui_settings.kobo_mini_sunblind);
+    WriteUseKoboMiniSunblind(ui_settings.kobo_mini_sunblind);
+  }
+#endif
 
   if (HasColors() && !quick_setup &&
       SaveValue(AppInfoBoxColors, ProfileKeys::AppInfoBoxColors,

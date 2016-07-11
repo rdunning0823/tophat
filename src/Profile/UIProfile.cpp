@@ -165,6 +165,8 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
   //  hard code to default value
   map.GetEnum(ProfileKeys::AppStatusMessageAlignment, settings.popup_message_position);
 
+  map.GetEnum(ProfileKeys::KoboMiniSunblind, settings.kobo_mini_sunblind);
+
   map.GetEnum(ProfileKeys::HapticFeedback, settings.haptic_feedback);
 
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)

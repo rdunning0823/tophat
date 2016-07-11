@@ -131,6 +131,7 @@ const char AppGaugeVarioGross[] = "AppGaugeVarioGross";
 const char AppStatusMessageAlignment[] = "AppStatusMessageAlignment";
 const char AppTextInputStyle[] = "AppTextInputStyle";
 const char HapticFeedback[] = "HapticFeedback";
+const char KoboMiniSunblind[] = "KoboMiniSunblind";
 const char AppDialogTabStyle[] = "AppDialogTabStyle";
 const char AppDialogStyle[] = "AppDialogStyle";
 const char AppInfoBoxColors[] = "AppInfoBoxColors";

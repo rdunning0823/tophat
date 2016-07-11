@@ -212,6 +212,10 @@ private:
 
 private:
   bool double_clicks;
+#ifdef KOBO
+  /** define an unused margin rim */
+  int margin;
+#endif
 
 public:
 #ifndef USE_GDI
@@ -219,7 +223,11 @@ public:
     :parent(nullptr), size(0, 0),
      visible(true), transparent(false),
      focused(false), capture(false), has_border(false),
-     double_clicks(false) {}
+     double_clicks(false)
+#ifdef KOBO
+     , margin(0)
+#endif
+{}
 #else
   Window():hWnd(nullptr), prev_wndproc(nullptr),
            double_clicks(false) {}
@@ -290,6 +298,17 @@ public:
     return hWnd != nullptr;
 #endif
   }
+
+#ifdef KOBO
+  /** sets margin on inside of border that is unused
+   * must be set prior to Create()
+   * @param margin width in pixels
+   */
+  void SetMargin(int _margin) {
+    margin = _margin;
+    Invalidate();
+  }
+#endif
 
 #ifndef USE_GDI
   PixelScalar GetTop() const {
@@ -798,10 +817,22 @@ public:
     assert(IsDefined());
 
 #ifndef USE_GDI
+#ifdef KOBO
+    if (margin > 0) {
+      PixelRect rc(size);
+      rc.Offset(margin, margin);
+      return rc;
+    } else {
+      return PixelRect(size);
+    }
+#else
     return PixelRect(size);
+#endif
+
 #else
     PixelRect rc;
     ::GetClientRect(hWnd, &rc);
+
     return rc;
 #endif
   }

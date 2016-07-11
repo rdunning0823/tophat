@@ -64,6 +64,8 @@ UISettings::SetDefaults()
 
   popup_message_position = PopupMessagePosition::CENTER;
 
+  kobo_mini_sunblind = false;
+
   haptic_feedback = HapticFeedback::DEFAULT;
 
   format.SetDefaults();

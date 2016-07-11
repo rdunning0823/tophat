@@ -291,6 +291,8 @@ Main()
   main_style.Resizable();
 
   SingleWindow main_window;
+  if (ReadUseKoboMiniSunblind())
+    main_window.SetMargin(11);
   main_window.Create(_T("XCSoar/KoboMenu"), {600, 800}, main_style);
   main_window.Show();
 
