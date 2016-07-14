@@ -123,6 +123,8 @@ static TaskManager *task_manager;
 static GlideComputerEvents *glide_computer_events;
 static AllMonitors *all_monitors;
 static GlideComputerTaskEvents *task_events;
+/** was the profile read successfully, or was startup aborted */
+static bool profile_loaded_at_startup;
 
 static bool
 LoadProfile()
@@ -360,8 +362,11 @@ Startup()
   const auto &ui_settings = CommonInterface::GetUISettings();
   auto &live_blackboard = CommonInterface::GetLiveBlackboard();
 
-  if (!LoadProfile())
+  profile_loaded_at_startup = LoadProfile();
+  if (!profile_loaded_at_startup) {
+    LogFormat("Aborting startup because profile load failure");
     return false;
+  }
 
   operation.SetText(_("Initialising"));
   ConfigureSoundDevice(ui_settings.sound);
@@ -645,7 +650,11 @@ Shutdown()
 
   // Save settings to profile
   operation.SetText(_("Shutdown, saving profile..."));
+  if (profile_loaded_at_startup) {
   Profile::Save();
+  } else {
+    LogFormat("Shutdown, not saving saving profile...");
+  }
 
   // save last language to file to be used as startup screen language
   WriteLastLanguage();
