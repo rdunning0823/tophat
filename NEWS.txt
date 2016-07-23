@@ -11,6 +11,7 @@ Top Hat Soaring 2.1.7 Beta 7/23/2016
 * Dialogs: use bold font for values
 * Final glide altitude: calculate using MacCready setting (not task speed)
 * Targets: set to minimum if task impossible due to wind
+* Change default MC to 3.2kts (1.7m/s)
 * Fix overlap of thermal assistant and start, airspace warnings
 * Fix Edit Start Time dialog
 * Fix Task speed Override if set before takeoff

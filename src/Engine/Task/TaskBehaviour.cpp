@@ -55,7 +55,7 @@ TaskBehaviour::SetDefaults()
   calc_glide_required = true;
   goto_nonlandable = true;
   risk_gamma = fixed(0);
-  safety_mc = fixed(0.5);
+  safety_mc = fixed(1.7);
   task_planning_speed_mode = TaskPlanningSpeedMode::PastPerformanceSpeed;
   task_planning_speed_override = fixed(25);
   safety_height_arrival = fixed(0);
