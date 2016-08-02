@@ -142,7 +142,7 @@ static bool
 ParsePOLAR(NMEAInputLine &line, NMEAInfo &info)
 {
   fixed a,b,c;
-  fixed sqrt_sigma = 1.0; // default is standard atmosphere at sea level
+  fixed sqrt_sigma = fixed(1.0); // default is standard atmosphere at sea level
   bool polarProvided =
       line.ReadChecked(a) &
       line.ReadChecked(b) &
@@ -170,7 +170,7 @@ static bool
 ParseSET(NMEAInputLine &line, NMEAInfo &info) {
   fixed altimeter_setting_millibars;
   if(line.ReadChecked(altimeter_setting_millibars)) {
-    LogFormat("QNH set to %f",altimeter_setting_millibars);
+    LogFormat("QNH set to %f",(double)altimeter_setting_millibars);
     info.settings.ProvideQNH(
         AtmosphericPressure::HectoPascal(altimeter_setting_millibars),
                                info.clock);
@@ -413,14 +413,14 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
   if(task_settings.task_type==SN10taskSettings_T::TASK_AREA && pt.is_complex_AAT_shape) {
     // WARNING: A donut (a non-zero inner radius with a FullCircle) causes assertion failure during XCSoar drawing...
     return new AnnularSectorZone(wp.location,
-                                 pt.outer_radius,
+                                 (fixed)pt.outer_radius,
                                  Angle::Degrees(pt.start_radial_degrees),
                                  Angle::Degrees(pt.end_radial_degrees),
-                                 pt.inner_radius );
+                                 (fixed)pt.inner_radius );
   };
   switch(SN10_point_type) {
   case SN10taskSettings_T::PT_CYLINDER:
-    return new CylinderZone(wp.location, radiusOrWidth/*radius, in meters*/);
+    return new CylinderZone(wp.location, (fixed)radiusOrWidth/*radius, in meters*/);
   case SN10taskSettings_T::PT_FAI:
     return SymmetricSectorZone::CreateFAISectorZone(wp.location, is_turnpoint);
   case SN10taskSettings_T::PT_LINE:
@@ -429,7 +429,7 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
   default:
     // SN10 can be set to 'None', which means disable automatic functions (used with some loggers, rarely).
     // In this case, just use fake cylinder - 'None' is unhelpful...
-    return new CylinderZone(wp.location, 500/*radius, in meters*/);
+    return new CylinderZone(wp.location, fixed(500)/*radius, in meters*/);
   }
 }
 
@@ -465,7 +465,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   OrderedTaskSettings beh = new_task->GetOrderedTaskSettings();
   if (fact_type == TaskFactoryType::AAT) {
     // XCsoar doesn't use time limit for racing tasks, oh well...
-    beh.aat_min_time = task_settings.task_time_minutes*60; // seconds
+    beh.aat_min_time = fixed(task_settings.task_time_minutes*60); // seconds
   }
   // start height is not yet provided as of SN10 2.41
   if (task_settings.StartHeightIsProvided()) {
