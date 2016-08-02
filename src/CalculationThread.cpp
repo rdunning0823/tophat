@@ -27,6 +27,7 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Components.hpp"
 #include "Hardware/CPU.hpp"
+#include "Device/Driver/ILEC.hpp"
 
 /**
  * Constructor of the CalculationThread class
@@ -114,6 +115,10 @@ CalculationThread::Tick()
     // do slow calculations last, to minimise latency
     glide_computer.ProcessIdle();
   }
+
+  // Process any pending task updates from ILEC SN10
+  // Can't do this under (do_idle) as that's not executed until GPS data flowing.
+  ILEC_Process_Any_Pending_SN10_task_update(settings_computer);
 }
 
 void
