@@ -444,6 +444,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
     xcsoar_task_declared = true;
     return;
   }
+
   // Proceed with a 'normal' SN10 task, which has a start, optional points, and a finish.
   // Task behavior from XCSoar user setup (things like autoMC behavior etc)
   const TaskBehaviour &task_behaviour = settings_computer.task;
@@ -460,43 +461,49 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
     // XCsoar doesn't use time limit for racing tasks, oh well...
     beh.aat_min_time = fixed(task_settings.task_time_minutes*60); // seconds
   }
+
   // start height is not yet provided as of SN10 2.41
   if (task_settings.StartHeightIsProvided()) {
     beh.start_constraints.max_height = task_settings.start_height;
     beh.start_constraints.max_height_ref = AltitudeReference::MSL;
   }
+
   beh.finish_constraints.min_height = task_settings.finish_height_MSL;
   beh.finish_constraints.min_height_ref = AltitudeReference::MSL;
   new_task->SetOrderedTaskSettings(beh);
   bool new_task_constructed_OK = true;
   // If provided from SN10 (should be here), add start point to new task
   assert(pts[SN10_PTIDX_START].ptbase.is_non_nil_point); // otherwise, GoTo task created above
-  if(pts[SN10_PTIDX_START].ptbase.is_non_nil_point) {
+  if (pts[SN10_PTIDX_START].ptbase.is_non_nil_point) {
     Waypoint wp = Get_XCSoar_waypoint(SN10_PTIDX_START);
     ObservationZonePoint* oz = GetNewObservationZone(wp,SN10_PTIDX_START);
     OrderedTaskPoint *startPt = fact.CreateStart(oz, wp); // Note: OrderTaskPoint dtor will free oz, but not wp
     new_task_constructed_OK &= fact.Append(*startPt, /*auto_mutate=*/false);
     delete startPt;
   }
+
   // Add any turnpoints to new task
-  for(int SN10_pt_idx=SN10_PTIDX_FIRST_TP; SN10_pt_idx<=SN10_PTIDX_LAST_TP; SN10_pt_idx++) {
+  for (int SN10_pt_idx = SN10_PTIDX_FIRST_TP; SN10_pt_idx <= SN10_PTIDX_LAST_TP; SN10_pt_idx++) {
     SN10PointRecd_T::SN10pointDetail_T &tp = pts[SN10_pt_idx].ptbase;
-    if(!tp.is_non_nil_point) continue;
+    if (!tp.is_non_nil_point)
+      continue;
     Waypoint wp = Get_XCSoar_waypoint(SN10_pt_idx);
-    ObservationZonePoint *oz = GetNewObservationZone(wp,SN10_pt_idx);
-    OrderedTaskPoint *otp = 0; // Note: OrderTaskPoint dtor will free oz, but not wp
-    if(task_settings.task_type==SN10taskSettings_T::TASK_AREA) {
+    ObservationZonePoint *oz = GetNewObservationZone(wp, SN10_pt_idx);
+    OrderedTaskPoint *otp = nullptr; // Note: OrderTaskPoint dtor will free oz, but not wp
+    if (task_settings.task_type == SN10taskSettings_T::TASK_AREA) {
       Waypoint target = wp;
-      if(tp.actual_point!=GeoPoint::Zero()) wp = Waypoint(tp.actual_point);
-      AATPoint *aatp = fact.CreateAATPoint(oz, target/*not wp*/); // target gets clobbered by XCSoar in 'commit', aarrgg...
-      aatp->LockTarget(true); // even if locked, oh well...
+      if(tp.actual_point != GeoPoint::Zero())
+        wp = Waypoint(tp.actual_point);
+      AATPoint *aatp = fact.CreateAATPoint(oz, target/*not wp*/);
+      aatp->LockTarget(true);
       otp = aatp;
     } else {
       otp = fact.CreateASTPoint(oz, wp);
     }
-    new_task_constructed_OK &= fact.Append(*otp, /*auto_mutate=*/false);
+    new_task_constructed_OK &= fact.Append(*otp, false);
     delete otp;
   }
+
   // add Finish point to new task - always present
   {
     Waypoint wp = Get_XCSoar_waypoint(SN10_PTIDX_FINISH);
@@ -505,6 +512,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
     new_task_constructed_OK &= fact.Append(*finish_pt, /*auto_mutate=*/false); // fails if no start point (SN10 club task)
     delete finish_pt;
   }
+
   // Mark active point (start point if nothing yet achieved)
   int active_XCSoar_pt_idx = 0;
   for (int SN10_pt_idx = 0; SN10_pt_idx<SN10_PT_CNT; SN10_pt_idx++) {
@@ -523,13 +531,14 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
     lease->Commit(*new_task);
     if (lease->GetOrderedTask().IsOptimizable() &&
-        task_settings.task_type==SN10taskSettings_T::TASK_AREA)
+        task_settings.task_type == SN10taskSettings_T::TASK_AREA)
     {
-      int XCSoar_pt_idx=1; // 1 is first turnpoint (0 is the start point)
-      for(int SN10_pt_idx=1; SN10_pt_idx<SN10_PTIDX_FINISH; SN10_pt_idx++) {
+      int XCSoar_pt_idx = 1; // 1 is first turnpoint (0 is the start point)
+      for (int SN10_pt_idx = 1; SN10_pt_idx<SN10_PTIDX_FINISH; SN10_pt_idx++) {
         SN10PointRecd_T::SN10pointDetail_T &pt = pts[SN10_pt_idx].ptbase;
-        if(!pt.is_non_nil_point) continue;
-        if(pt.actual_point!=GeoPoint::Zero()) {
+        if (!pt.is_non_nil_point)
+          continue;
+        if (pt.actual_point != GeoPoint::Zero()) {
           lease->SetTarget(XCSoar_pt_idx, pt.actual_point, true);
           lease->TargetLock(XCSoar_pt_idx, true);
         }
@@ -548,27 +557,41 @@ static bool ParseTSK(NMEAInputLine &line) {
   // Example TSK: $PILC,TSK,A,300,L,8045,,N,3218,256,N,1448,*5D
   char task_type_code = line.ReadOneChar();
     switch(task_type_code) {
-    case 'A': task_settings.task_type = SN10taskInfo_T::SN10taskSettings_T::TaskType_T::TASK_AREA; break;
-    case 'R': task_settings.task_type = SN10taskInfo_T::SN10taskSettings_T::TaskType_T::TASK_CLASSIC; break;
-    default:  return false;
+    case 'A':
+      task_settings.task_type = SN10taskInfo_T::SN10taskSettings_T::TaskType_T::TASK_AREA;
+      break;
+    case 'R':
+      task_settings.task_type = SN10taskInfo_T::SN10taskSettings_T::TaskType_T::TASK_CLASSIC;
+      break;
+    default:
+      return false;
   }
-  if(!line.ReadChecked(task_settings.task_time_minutes)) return false;
+  if (!line.ReadChecked(task_settings.task_time_minutes))
+    return false;
   char start_type_code = line.ReadOneChar(); // "NCFL"; // None, Cylinder, FAI, Line
-  if(!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.start_type, start_type_code)) return false;
-  if(!line.ReadChecked(task_settings.start_radius)) return false;
+  if (!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.start_type, start_type_code))
+    return false;
+  if (!line.ReadChecked(task_settings.start_radius))
+    return false;
   /*if(!*/line.ReadChecked(task_settings.start_height) /*) return false*/; // v2.41 does not yet provide start_height - nil/zero is OK...
   char finish_type_code = line.ReadOneChar(); // "NCFL"; // None, Cylinder, FAI, Line
-  if(!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.finish_type, finish_type_code)) return false;
-  if(!line.ReadChecked(task_settings.finish_radius)) return false;
-  if(!line.ReadChecked(task_settings.finish_height_MSL)) return false;
+  if (!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.finish_type, finish_type_code))
+    return false;
+  if (!line.ReadChecked(task_settings.finish_radius))
+    return false;
+  if (!line.ReadChecked(task_settings.finish_height_MSL))
+    return false;
   char turn_type_code = line.ReadOneChar(); // "NCF"; // None, Cylinder, FAI
-  if(!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.turn_type, turn_type_code)) return false;
-  if(!line.ReadChecked(task_settings.turnpoint_radius)) return false;
+  if (!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.turn_type, turn_type_code))
+    return false;
+  if (!line.ReadChecked(task_settings.turnpoint_radius))
+    return false;
   // Finished parsing. If required, update SN10_task with new settings
   {
     ScopeLock protect(SN10_task.mutex);
     // If task settings are new, build and set new XCSoar task...
-    if(SN10_task.xcsoar_task_declared && task_settings == SN10_task.task_settings) return true; // duplicate, nothing more to do
+    if (SN10_task.xcsoar_task_declared && task_settings == SN10_task.task_settings)
+      return true; // duplicate, nothing more to do
     SN10_task.task_settings_received = true;
     SN10_task.task_settings = task_settings;
   }
@@ -585,33 +608,38 @@ static bool ParsePT(NMEAInputLine &line) {
   // - simple area:  $PILC,PT,3,Orange ,4234.200,N,07217.317,W,N,,4234.200,N,07217.317,W,7500*7D
   // - complex area: $PILC,PT,2,Lebanon,4337.567,N,07218.250,W,N,,4334.867,N,07218.250,W,35000,5000,135,225*38
   int PT_number; // ordinal of PT as in above examples (not index)
-  if(!line.ReadChecked(PT_number)) return false;
-  if(PT_number<1 || PT_number>SN10_PT_CNT) return false;
-  if(!line.IsEmpty()) {
+  if (!line.ReadChecked(PT_number))
+    return false;
+  if (PT_number < 1 || PT_number > SN10_PT_CNT)
+    return false;
+  if (!line.IsEmpty()) {
     pt.is_non_nil_point = true;
-    /*if(!*/line.Read(pt.name, sizeof(pt.name)) /*) return false*/;
-    if(!NMEAParser::ReadGeoPoint(line, pt.center)) return false;
+    line.Read(pt.name, sizeof(pt.name));
+    if (!NMEAParser::ReadGeoPoint(line, pt.center))
+      return false;
     char achievedFlag = line.ReadOneChar();
-    if(achievedFlag!='Y' && achievedFlag!='N') return false;
-    pt.is_achieved = (achievedFlag=='Y');
+    if (achievedFlag!='Y' && achievedFlag != 'N')
+      return false;
+    pt.is_achieved = (achievedFlag == 'Y');
     line.ReadChecked(pt.achieved_time); // optional time this point was achieved (currently, only provided for start point/time)
     BrokenTime gcc_unused bAt = BrokenTime::FromSecondOfDay(pt.achieved_time);
     NMEAParser::ReadGeoPoint(line, pt.actual_point); // optional actual point (point actually turned, or planned point within turn area)
-    if(line.ReadChecked(pt.outer_radius)) { // provided for all AAT points, but not for racing task turnpoints
+    if (line.ReadChecked(pt.outer_radius)) { // provided for all AAT points, but not for racing task turnpoints
       pt.is_complex_AAT_shape = // optional fields below only for complex areas
           line.ReadChecked(pt.inner_radius)          &&
           line.ReadChecked(pt.start_radial_degrees)  &&
           line.ReadChecked(pt.end_radial_degrees)     ;
-    };
-  };
+    }
+  }
   // Finished parsing PT. If required, update SN10_task with new settings
   {
     ScopeLock protect(SN10_task.mutex);
     // Have we already received this point info?
-    SN10_task.pts[PT_number-1].point_received = true; // prior check below for case of received nil point
-    if(pt == SN10_task.pts[PT_number-1].ptbase) return true; // parse succeeded, but nothing more to do (already received and processed this point)
+    SN10_task.pts[PT_number - 1].point_received = true; // prior check below for case of received nil point
+    if (pt == SN10_task.pts[PT_number - 1].ptbase)
+      return true; // parse succeeded, but nothing more to do (already received and processed this point)
     // This is new/changed, so reset task
-    SN10_task.pts[PT_number-1].ptbase = pt;
+    SN10_task.pts[PT_number - 1].ptbase = pt;
   }
   SN10_task.xcsoar_task_update_pending = true; // triggers SN10_task.Update_XCSoar_task_from_SN10(); in Calc thread
   return true;
@@ -631,15 +659,6 @@ void ILEC_Process_Any_Pending_SN10_task_update(const ComputerSettings &settings_
 // ================================  Test Code  =============================
 // ==========================================================================
 #if 1
-
-#if 0
-  /// temporary debug hook to catch assertion failures - set breakpoint here!
-  void __assert_fail (const char *__assertion, const char *__file,
-                      unsigned int __line, const char *__function) {
-    LogFormat("DRN __assert_fail: Assertion %s failed at %s:%d",__assertion,__file,__line);
-    exit(1);
-  }
-#endif
 
 // Simulated NMEA data stream, generated by SN10 simulator, plus comments and debug pauses
 static const char * const NMEAsim[] = {
