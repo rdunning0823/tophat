@@ -362,7 +362,7 @@ Waypoint SN10taskInfo_T::Get_XCSoar_waypoint(int SN10_pt_idx) {
   // See if the waypoint is already in the global waypoint DB
   const Waypoint* wpFromDB = way_points.GetNearest(pt.center, fixed(70));
   // If closest waypoint found and closer than 70m to the original
-  if (wpFromDB != NULL &&
+  if (wpFromDB != nullptr &&
     wpFromDB->location.Distance(pt.center) <= fixed(70)) {
     return *wpFromDB; // Use this waypoint for the task
    }
@@ -892,7 +892,7 @@ void InputEvents::eventDRNtestHook(gcc_unused const TCHAR *misc)
   // See if the waypoint is already in the global waypoint DB
   const Waypoint* wpFromDB = way_points.GetNearest(location, fixed(33));
   // If closest waypoint found and closer than 33m to the original
-  if (wpFromDB != NULL &&
+  if (wpFromDB != nullptr &&
       wpFromDB->location.Distance(location) <= fixed(33)) {
     // Use this waypoint for the task
     wp = *wpFromDB;
