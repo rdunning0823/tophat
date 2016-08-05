@@ -491,11 +491,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
     ObservationZonePoint *oz = GetNewObservationZone(wp, SN10_pt_idx);
     OrderedTaskPoint *otp = nullptr; // Note: OrderTaskPoint dtor will free oz, but not wp
     if (task_settings.task_type == SN10taskSettings_T::TASK_AREA) {
-      Waypoint target = wp;
-      if(tp.actual_point != GeoPoint::Zero())
-        wp = Waypoint(tp.actual_point);
-      AATPoint *aatp = fact.CreateAATPoint(oz, target/*not wp*/);
-      aatp->LockTarget(true);
+      AATPoint *aatp = fact.CreateAATPoint(oz, wp);
       otp = aatp;
     } else {
       otp = fact.CreateASTPoint(oz, wp);
