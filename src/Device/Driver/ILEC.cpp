@@ -446,13 +446,6 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   }
   // Proceed with a 'normal' SN10 task, which has a start, optional points, and a finish.
   // Task behavior from XCSoar user setup (things like autoMC behavior etc)
-  #if 0
-    const ComputerSettings &settings_computer =
-      // This copy is only accessible in main thread; access from calculation thread causes assertion failure.
-      CommonInterface::SetComputerSettings();
-      // There's no obvious place to fetch the calculation thread's setting copy, so it passed in as an argument
-      // ... ComputerSettingsBlackboard::GetComputerSettings();
-  #endif
   const TaskBehaviour &task_behaviour = settings_computer.task;
   OrderedTask *new_task = new OrderedTask(task_behaviour);
   TaskFactoryType xcsoar_task_type = TaskFactoryType::RACING; // default
@@ -508,33 +501,24 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   {
     Waypoint wp = Get_XCSoar_waypoint(SN10_PTIDX_FINISH);
     ObservationZonePoint* oz = GetNewObservationZone(wp,SN10_PTIDX_FINISH);
-    /*OrderedTaskPoint*/FinishPoint *finish_pt = fact.CreateFinish(oz, wp); // Note: OrderTaskPoint dtor will free oz, but not wp
-    #if 0
-      // Finish height is set as a task setting above (not part of finish point in XCSoar)
-      // FAI finish height is a calculated value for FAI rules regarding altitude loss between start/finish; not applicable...
-      finish_pt->set_fai_finish_height(task_settings.finish_height_MSL);
-    #endif
+    FinishPoint *finish_pt = fact.CreateFinish(oz, wp); // Note: OrderTaskPoint dtor will free oz, but not wp
     new_task_constructed_OK &= fact.Append(*finish_pt, /*auto_mutate=*/false); // fails if no start point (SN10 club task)
-    //LogFormat("After adding finish point, new_task_constructed_OK = %s", new_task_constructed_OK?"OK":"nope");
     delete finish_pt;
   }
   // Mark active point (start point if nothing yet achieved)
-  int active_XCSoar_pt_idx=0;
-  for(int SN10_pt_idx=0; SN10_pt_idx<SN10_PT_CNT; SN10_pt_idx++)
-    if(pts[SN10_pt_idx].ptbase.is_achieved) active_XCSoar_pt_idx++;
-  new_task->SetActiveTaskPoint(active_XCSoar_pt_idx); // This active point is clobbered in commit; reset after commit...
-  LogDebug("setting active taskpoint ot %i", active_XCSoar_pt_idx);
+  int active_XCSoar_pt_idx = 0;
+  for (int SN10_pt_idx = 0; SN10_pt_idx<SN10_PT_CNT; SN10_pt_idx++) {
+    if (pts[SN10_pt_idx].ptbase.is_achieved) {
+      active_XCSoar_pt_idx++;
+    }
+  }
+
   // Strange finalization required to get the task all filled in
   // Overwrites complex AAT shape if nationality US! So don't do this: fact.MutateTPsToTaskType();
   new_task->ScanStartFinish(); // set task internal pointers to optional start and finish points
   // ??? task->OverrideStartTime()
   assert(new_task_constructed_OK);
   assert(new_task->CheckTask()); // Check if the newly constructed task is valid
- #if 0
-  protected_task_manager->TaskCommit(*new_task);
- #else
-  // Per Rob: update AAT target points AFTER the task has been committed.
-  // The targets set above are clobbered by XCSoar during commit...
   {
     ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
     lease->Commit(*new_task);
@@ -546,21 +530,14 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
         SN10PointRecd_T::SN10pointDetail_T &pt = pts[SN10_pt_idx].ptbase;
         if(!pt.is_non_nil_point) continue;
         if(pt.actual_point!=GeoPoint::Zero()) {
-         #if 1
           lease->SetTarget(XCSoar_pt_idx, pt.actual_point, true);
           lease->TargetLock(XCSoar_pt_idx, true);
-         #else
-          AATPoint *ap = lease->GetAATTaskPoint(XCSoar_pt_idx);
-          ap->SetTarget(pt.actual_point, true);
-          ap->LockTarget(true);
-         #endif
         }
         XCSoar_pt_idx++;
       }
-    } // aat actual point update
+    }
     lease->SetActiveTaskPoint(active_XCSoar_pt_idx);
-  } // release lease on active new_Task
- #endif
+  }
   // ToDo DRN: update remaining task state info: start time
   // ToDo DRN: maybe: XCSoar overwrites achieved AAT point position with its best-calculated point (bad during testing)
 }
