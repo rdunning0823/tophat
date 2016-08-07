@@ -215,7 +215,6 @@ public:
   }
 
   /* virtual methods from class OrderedTaskPoint */
-  bool Equals(const OrderedTaskPoint &other) const override;
   bool UpdateSampleNear(const AircraftState &state,
                         const FlatProjection &projection) override;
   bool UpdateSampleFar(const AircraftState &state,

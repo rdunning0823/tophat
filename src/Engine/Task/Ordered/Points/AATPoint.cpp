@@ -212,13 +212,3 @@ AATPoint::GetTargetRangeRadial(fixed oldrange) const
 
   return RangeAndRadial{ range, radial };
 }
-
-bool
-AATPoint::Equals(const OrderedTaskPoint &other) const
-{
-  const AATPoint &tp = (const AATPoint &)other;
-
-  return OrderedTaskPoint::Equals(other) &&
-    target_locked == tp.target_locked &&
-    target_location == tp.target_location;
-}
