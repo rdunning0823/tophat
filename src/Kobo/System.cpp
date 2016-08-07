@@ -445,7 +445,6 @@ InstallKoboRootTgz()
     return false;
 
   bool retval = Run("/bin/cp", "/media/usb_storage/KoboRoot.tgz", "/mnt/onboard/.kobo");
-  retval = retval && Run("/bin/rm", "-f", "/media/usb_storage/KoboRoot.tgz");
   return retval && Run("/bin/sync");
 #else
   return false;
