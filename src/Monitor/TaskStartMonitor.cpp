@@ -36,9 +36,10 @@ Copyright_License {
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Time/LocalTime.hpp"
+#include "Event/Timer.hpp"
 
 class TaskStartWidget final
-  : public QuestionWidget, private ActionListener {
+  : public QuestionWidget, private ActionListener, public Timer  {
   TaskStartMonitor &monitor;
 
   enum Action {
@@ -66,6 +67,12 @@ public:
 
 private:
   virtual void OnAction(int id) override;
+
+public:
+  /* virtual methods from Timer */
+  virtual void OnTimer() override {
+    OnAction(ACCEPT);
+  }
 };
 
 void
@@ -85,7 +92,7 @@ TaskStartWidget::OnAction(int id)
     task_manager->SavedStartInvalidate();
   }
   }
-
+  Timer::Cancel();
   PageActions::RestoreTop();
 }
 
@@ -171,5 +178,6 @@ TaskStartMonitor::Check()
   } else
     widget->UpdateMessage(message.c_str());
 
+  widget->Schedule(30000);
   last_start_time = stats.start.time;
 }
