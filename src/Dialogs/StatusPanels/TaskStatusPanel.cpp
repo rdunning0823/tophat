@@ -48,6 +48,8 @@ enum Controls {
   DISTANCE_REMAINING,
   AAT_TIME,
   AAT_ESTIMATED,
+  TIME_ELAPSED,
+  TIME_REMAINING
 };
 
 /** XXX this hack is needed because the form callbacks don't get a
@@ -85,14 +87,19 @@ TaskStatusPanel::Refresh()
   else
     ClearValue(DISTANCE_REMAINING);
 
-  SetRowVisible(AAT_TIME, task_stats.has_targets);
-  FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
-  SetText(AAT_TIME, time.c_str());
-
-  SetRowVisible(AAT_ESTIMATED, task_stats.has_targets);
   if (task_stats.has_targets) {
+    FormatTimespanSmart(time.buffer(), (int)common_stats.aat_time_remaining, 2);
+    SetText(AAT_TIME, time.c_str());
+
     FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_planned, 2);
     SetText(AAT_ESTIMATED, time.c_str());
+
+  } else {
+    FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_elapsed, 2);
+    SetText(TIME_ELAPSED, time.c_str());
+
+    FormatTimespanSmart(time.buffer(), (int)task_stats.total.time_remaining_now, 2);
+    SetText(TIME_REMAINING, time.c_str());
   }
 }
 
@@ -100,6 +107,8 @@ void
 TaskStatusPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   assert(protected_task_manager != nullptr);
+
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
 
   instance = this;
 
@@ -109,8 +118,22 @@ TaskStatusPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
               UnitGroup::DISTANCE, fixed(0));
   AddReadOnly(_("Distance remaining"), NULL, _T("%.0f %s"),
               UnitGroup::DISTANCE, fixed(0));
-  AddReadOnly(_("AAT Time remaining"), NULL, _T(""));
-  AddReadOnly(_("Estimated total time"), NULL, _T(""));
+
+  if (task_stats.has_targets) {
+    if (task_stats.is_mat)
+      AddReadOnly(_("MAT Time remaining"), NULL, _T(""));
+    else
+      AddReadOnly(_("AAT Time remaining"), NULL, _T(""));
+
+    AddReadOnly(_("Estimated total time"), NULL, _T(""));
+    AddDummy();
+    AddDummy();
+  } else {
+    AddDummy();
+    AddDummy();
+    AddReadOnly(_("Time Elapsed"), NULL, _T(""));
+    AddReadOnly(_("Time Remaining"), NULL, _T(""));
+  }
 }
 
 void
