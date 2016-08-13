@@ -543,6 +543,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
     }
     lease->SetActiveTaskPoint(active_XCSoar_pt_idx);
   }
+  protected_task_manager->TaskSaveDefault();
   // ToDo DRN: update remaining task state info: start time
   // ToDo DRN: maybe: XCSoar overwrites achieved AAT point position with its best-calculated point (bad during testing)
 }
