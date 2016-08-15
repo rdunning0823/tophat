@@ -507,7 +507,7 @@ private:
   fixed ScanDistanceMax();
 
   /**
-   * updates the TaskBehaviour.task_mc value based on the task planning behaviour
+   * Updates the TaskStats.task_mc value based on the task planning behaviour
    * of the current task
    * @param glide_polar.  The polar.  The mc setting is irrelevant
    */
