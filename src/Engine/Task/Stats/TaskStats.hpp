@@ -55,6 +55,8 @@ public:
   fixed mc_best;
   /** Used for planning the task, setting target, estimating completion time. */
   fixed task_mc;
+  /** The effective speed for the task calculated using the task_mc */
+  fixed task_mc_effective_speed;
 
   /** Nominal task distance (m) */
   fixed distance_nominal;

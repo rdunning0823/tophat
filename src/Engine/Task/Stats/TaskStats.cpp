@@ -37,6 +37,7 @@ TaskStats::reset()
   effective_mc = fixed(0);
   mc_best = fixed(0);
   task_mc = fixed(0);
+  task_mc_effective_speed = fixed(0);
   distance_nominal = fixed(0);
   distance_max = fixed(0);
   distance_min = fixed(0);
