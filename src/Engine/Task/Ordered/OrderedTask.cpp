@@ -1224,7 +1224,11 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
   }
   case TaskBehaviour::TaskPlanningSpeedMode::PastPerformanceSpeed:
   {
-    if (stats.total.time_elapsed > fixed(3600) &&
+    // use current mc setting for speed proxy prior to starting task
+    if (task_points.empty() || !task_points.front()->HasEntered()) {
+      stats.task_mc = glide_polar.GetMC();
+
+    } else if (stats.total.time_elapsed > fixed(3600) &&
         !negative(stats.last_hour.duration)) {
       fixed speed = stats.last_hour.speed;
       stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
