@@ -30,20 +30,30 @@ Copyright_License {
 #include "Blackboard/BlackboardListener.hpp"
 #include "Form/Form.hpp"
 #include "Task/TaskBehaviour.hpp"
+#include "Event/Timer.hpp"
 
 
 class TaskComputerConfigPanel final
-  : public RowFormWidget, DataFieldListener {
+  : public RowFormWidget, DataFieldListener, Timer {
+private:
+  // have any of the parameters changed
+  bool changed;
 public:
   TaskComputerConfigPanel();
 
 protected:
   void UpdateVisibility(TaskBehaviour::TaskPlanningSpeedMode mode);
+  void UpdateValues();
+
+  /** Inherited from class Timer */
+  void OnTimer();
 
 public:
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
+  void Hide();
+  void Show(const PixelRect &rc);
 
 private:
   /* methods from DataFieldListener */

@@ -32,23 +32,41 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Asset.hpp"
 
+
 enum ControlIndex {
   TaskOptimizationMode,
   TaskOptimizationSpeed,
+  Spacer1,
+  Spacer2,
+  EffectiveSpeed,
+  EffectiveMC,
 };
 
 TaskComputerConfigPanel::TaskComputerConfigPanel()
-  :RowFormWidget(UIGlobals::GetDialogLook()) {}
+  :RowFormWidget(UIGlobals::GetDialogLook()), changed(false) {}
 
 void
 TaskComputerConfigPanel::OnModified(DataField &df)
 {
+  changed = true;
   if (IsDataField(TaskOptimizationMode, df)) {
     const DataFieldEnum &dfe = (const DataFieldEnum &)df;
     TaskBehaviour::TaskPlanningSpeedMode mode =
         (TaskBehaviour::TaskPlanningSpeedMode)dfe.GetValue();
     UpdateVisibility(mode);
   }
+
+  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
+  TaskBehaviour &task_behaviour = settings_computer.task;
+
+  SaveValueEnum(TaskOptimizationMode,
+                ProfileKeys::TaskPlanningSpeedMode,
+                task_behaviour.task_planning_speed_mode);
+
+  SaveValue(TaskOptimizationSpeed, UnitGroup::TASK_SPEED,
+            ProfileKeys::TaskPlanningSpeedOverride,
+            task_behaviour.task_planning_speed_override);
+  UpdateValues();
 }
 
 void
@@ -78,9 +96,40 @@ TaskComputerConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            _("AAT/TAT task targets will be optimized based on the speed entered by the pilot."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(5), fixed(200), fixed(1), false,
-           UnitGroup::TASK_SPEED, task_behaviour.task_planning_speed_override);
+           UnitGroup::TASK_SPEED, task_behaviour.task_planning_speed_override, this);
+
+
+  AddReadOnly(_T(""), NULL, _T(""));
+  SetRowVisible(Spacer1, false);
+  AddSpacer();
+
+  AddReadOnly(_("Effective task speed"), NULL, _T("%.0f %s"),
+              UnitGroup::TASK_SPEED, fixed(0));
+  AddReadOnly(_("Effective task MC"), NULL, _T("%.1f %s"),
+              UnitGroup::VERTICAL_SPEED, fixed(0));
 
   UpdateVisibility(task_behaviour.task_planning_speed_mode);
+  UpdateValues();
+}
+
+void
+TaskComputerConfigPanel::Hide()
+{
+  Timer::Cancel();
+  RowFormWidget::Hide();
+}
+
+void
+TaskComputerConfigPanel::Show(const PixelRect &rc)
+{
+  RowFormWidget::Show(rc);
+  Timer::Schedule(500);
+}
+
+void
+TaskComputerConfigPanel::OnTimer()
+{
+  UpdateValues();
 }
 
 void
@@ -88,24 +137,25 @@ TaskComputerConfigPanel::UpdateVisibility(TaskBehaviour::TaskPlanningSpeedMode m
 {
   SetRowVisible(TaskOptimizationSpeed,
                 mode == TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed);
+  SetRowVisible(EffectiveSpeed,
+                mode != TaskBehaviour::TaskPlanningSpeedMode::OverrideSpeed);
+}
+
+void
+TaskComputerConfigPanel::UpdateValues()
+{
+  const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
+
+  LoadValue(EffectiveSpeed, task_stats.task_mc_effective_speed,
+            UnitGroup::TASK_SPEED);
+
+  LoadValue(EffectiveMC, task_stats.task_mc,
+            UnitGroup::VERTICAL_SPEED);
 }
 
 bool
 TaskComputerConfigPanel::Save(bool &_changed)
 {
-  bool changed = false;
-
-  ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
-  TaskBehaviour &task_behaviour = settings_computer.task;
-
-  changed |= SaveValueEnum(TaskOptimizationMode,
-                           ProfileKeys::TaskPlanningSpeedMode,
-                           task_behaviour.task_planning_speed_mode);
-
-  changed |= SaveValue(TaskOptimizationSpeed, UnitGroup::TASK_SPEED,
-                       ProfileKeys::TaskPlanningSpeedOverride,
-                       task_behaviour.task_planning_speed_override);
-
   _changed |= changed;
 
   return true;
