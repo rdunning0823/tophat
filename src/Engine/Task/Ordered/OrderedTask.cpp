@@ -1220,6 +1220,7 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
 
     stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
                                           speed, glide_polar);
+    stats.task_mc_effective_speed = speed;
     break;
   }
   case TaskBehaviour::TaskPlanningSpeedMode::PastPerformanceSpeed:
@@ -1227,21 +1228,25 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
     // use current mc setting for speed proxy prior to starting task
     if (task_points.empty() || !task_points.front()->HasEntered()) {
       stats.task_mc = glide_polar.GetMC();
-
     } else if (stats.total.time_elapsed > fixed(3600) &&
         !negative(stats.last_hour.duration)) {
       fixed speed = stats.last_hour.speed;
       stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
                                             speed, glide_polar);
+      glide_polar.SetMC(stats.task_mc);
+
     } else {
       fixed speed = stats.GetScoredSpeed();
       stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
                                             speed, glide_polar);
+      glide_polar.SetMC(stats.task_mc);
     }
+    stats.task_mc_effective_speed = glide_polar.GetMCEffectiveSpeed();
     break;
   }
   case TaskBehaviour::TaskPlanningSpeedMode::MacCreadyValue:
     stats.task_mc = glide_polar.GetMC();
+    stats.task_mc_effective_speed = glide_polar.GetMCEffectiveSpeed();
     break;
   }
 }

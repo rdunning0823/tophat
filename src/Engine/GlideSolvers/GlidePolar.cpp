@@ -265,6 +265,17 @@ GlidePolar::IsGlidePossible(const GlideState &task) const
   return true;
 }
 
+fixed
+GlidePolar::GetMCEffectiveSpeed() const
+{
+  fixed d = fixed(100);
+  fixed alt = d / GetBestLD();
+  fixed t_cir = alt / mc;
+  fixed t_cr = alt / GetSBestLD();
+  fixed t = t_cir + t_cr;
+  return d / t;
+}
+
 /**
  * Finds speed to fly for a given MacCready setting
  * Intended to be used temporarily.

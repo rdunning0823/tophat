@@ -468,8 +468,15 @@ public:
   fixed SpeedToFlyStillAir() const;
 
   /**
+   * returns no wind, no sink average speed
+   * based on mc flying using the current MC
+   */
+  gcc_pure
+  fixed GetMCEffectiveSpeed() const;
+
+  /**
    * Returns the MC that will give you the achieved speed
-   * assuming no wind, no sinc, and thermals
+   * assuming no wind, no sink, and thermals
    * rising at the rate of the current MC setting
    */
   fixed EquivalentMC(fixed speed) const;
