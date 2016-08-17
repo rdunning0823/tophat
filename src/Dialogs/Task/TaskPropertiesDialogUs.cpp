@@ -52,6 +52,8 @@ enum Controls {
   START_HEIGHT_REF,
   FINISH_MIN_HEIGHT,
   FINISH_HEIGHT_REF,
+  START_OPEN_TIME,
+  START_CLOSE_TIME,
 };
 
 /**
@@ -146,6 +148,11 @@ TaskPropertiesPanelUs::RefreshView()
   }
 
   LoadValueEnum(TASK_TYPE, ftype);
+
+  LoadValue(START_OPEN_TIME, p.start_constraints.open_time_span.GetStart());
+
+  if (!IsUs())
+    LoadValue(START_CLOSE_TIME, p.start_constraints.open_time_span.GetEnd());
 }
 
 void
@@ -166,6 +173,13 @@ TaskPropertiesPanelUs::ReadValues()
     iround(Units::ToSysAltitude(GetValueFloat(START_MAX_HEIGHT)));
   if (max_height != p.start_constraints.max_height) {
     p.start_constraints.max_height = max_height;
+    task_changed = true;
+  }
+
+  RoughTime new_open = p.start_constraints.open_time_span.GetStart();
+  RoughTime new_close = IsUs() ? RoughTime::Invalid() : p.start_constraints.open_time_span.GetEnd();
+  if (SaveValue(START_OPEN_TIME, new_open) || (!IsUs() && SaveValue(START_CLOSE_TIME, new_close))) {
+    p.start_constraints.open_time_span = RoughTimeSpan(new_open, new_close);
     task_changed = true;
   }
 
@@ -279,6 +293,15 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
             _("Reference used for finish min height rule."),
             altitude_reference_list);
   }
+
+  const RoughTimeDelta time_zone =
+    CommonInterface::GetComputerSettings().utc_offset;
+
+  AddRoughTime(_("Start open time"), nullptr, RoughTime::Invalid(), time_zone);
+  if (!IsUs())
+    AddRoughTime(_("Start close time"), nullptr, RoughTime::Invalid(), time_zone);
+  else
+    AddDummy();
 }
 
 void
@@ -326,6 +349,3 @@ dlgTaskPropertiesUsShowModal(const DialogLook &look,
   dialog.AddButton(_("Cancel"), mrCancel);
   dialog.ShowModal();
 }
-
-
-
