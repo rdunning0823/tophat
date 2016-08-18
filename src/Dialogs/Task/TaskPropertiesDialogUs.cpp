@@ -75,13 +75,14 @@ class TaskPropertiesPanelUs : public RowFormWidget,
   bool &task_changed;
 
   TaskFactoryType orig_taskType;
+  WndProperty *aat_time_property;
 
 public:
   TaskPropertiesPanelUs(const DialogLook &look,
                         OrderedTask **_active_task, bool &_task_modified)
     :RowFormWidget(look),
      ordered_task_pointer(_active_task), ordered_task(*ordered_task_pointer),
-     task_changed(_task_modified) {}
+     task_changed(_task_modified), aat_time_property(nullptr) {}
 
   void OnTaskTypeChange(DataFieldEnum &df);
 
@@ -126,6 +127,14 @@ TaskPropertiesPanelUs::RefreshView()
 
   bool aat_types = (ftype == TaskFactoryType::AAT || ftype == TaskFactoryType::MAT);
   bool fai_start_finish = p.finish_constraints.fai_finish;
+
+  if (aat_types && aat_time_property != nullptr) {
+    bool mat = ftype == TaskFactoryType::MAT;
+    StaticString<25> label (mat ? _("MAT min. time") : _("AAT min. time"));
+    StaticString<200> help (mat ? _("Minimum MAT task time in minutes.") : _("Minimum AAT task time in minutes."));
+    aat_time_property->SetCaption(label.c_str());
+    aat_time_property->SetHelpText(help.c_str());
+  }
 
   SetRowVisible(MIN_TIME, aat_types);
   LoadValueTime(MIN_TIME, (int)p.aat_min_time);
@@ -253,7 +262,7 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   }
   Add(_("Task type"), _("Sets the behavior for the current task."), dfe);
 
-  AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
+  aat_time_property = AddTime(_("AAT min. time"), _("Minimum AAT task time in minutes."),
           0, 36000, 60, 180);
 
   StaticString<25> label;
