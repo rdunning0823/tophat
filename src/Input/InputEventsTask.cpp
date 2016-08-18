@@ -109,6 +109,33 @@ InputEvents::eventArmAdvance(const TCHAR *misc)
 }
 
 void
+InputEvents::eventNavBarDestinationType(const TCHAR *misc)
+{
+  UISettings &ui_settings = CommonInterface::SetUISettings();
+  bool to_aat_target = false;
+
+  if (StringIsEqual(misc, _T("target"))) {
+    to_aat_target = true;
+  } else if (StringIsEqual(misc, _T("center"))) {
+    to_aat_target = false;
+  } else if (StringIsEqual(misc, _T("toggle"))) {
+    to_aat_target = !ui_settings.navbar_navigate_to_aat_target;
+  }
+
+  if (ui_settings.navbar_navigate_to_aat_target != to_aat_target) {
+    ui_settings.navbar_navigate_to_aat_target = to_aat_target;
+    Profile::Set(ProfileKeys::NavBarNavigateToAATTarget,
+                 ui_settings.navbar_navigate_to_aat_target);
+    Profile::SetModified(true);
+    if (to_aat_target) {
+      Message::AddMessage(_("Nav bar is navigating to turnpoint targets"));
+    } else {
+      Message::AddMessage(_("Nav bar is navigating to turnpoint centers"));
+    }
+  }
+}
+
+void
 InputEvents::eventCalculator(gcc_unused const TCHAR *misc)
 {
   TaskManagerDialogUsShowModal();

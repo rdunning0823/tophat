@@ -370,9 +370,9 @@ event=DoActiveLabel
 mode=NavOrdered
 type=key
 data=0
-event=Setup NavBar
+event=NavBarDestinationType toggle
 event=Mode default
-label=_SetupNavBar
+label=$(NavBarDestinationType)
 location=16
 
 mode=NavOrdered
@@ -460,9 +460,9 @@ event=DoActiveLabel
 mode=NavGoto
 type=key
 data=0
-event=Setup NavBar
+event=NavBarDestinationType toggle
 event=Mode default
-label=_SetupNavBar
+label=$(NavBarDestinationType)
 location=16
 
 mode=NavGoto

@@ -137,6 +137,8 @@ namespace InputEvents
   void eventAudioDeadband(const TCHAR *misc);
   void eventBallast(const TCHAR *misc);
   void eventBugs(const TCHAR *misc);
+  /** set the nav bar behavior: to AAT target or waypoint */
+  void eventNavBarDestinationType(const TCHAR *misc);
   void eventCalculator(const TCHAR *misc);
   void eventChangeInfoBoxType(const TCHAR *misc);
   void eventChecklist(const TCHAR *misc);

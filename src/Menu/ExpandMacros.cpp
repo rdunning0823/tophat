@@ -309,6 +309,20 @@ ExpandTaskMacros(TCHAR *OutBuffer, size_t Size,
     }
   }
 
+  if (_tcsstr(OutBuffer, _T("$(NavBarDestinationType)"))) {
+    if (task_manager->GetOrderedTask().GetFactoryType() == TaskFactoryType::AAT &&
+        task_manager->GetMode() == TaskType::ORDERED) {
+      const UISettings &ui_settings = CommonInterface::GetUISettings();
+      CondReplaceInString(ui_settings.navbar_navigate_to_aat_target,
+                          OutBuffer,
+                          _T("$(NavBarDestinationType)"),
+                          _("Nav to center"),
+                          _("Nav to target"), Size);
+    } else {
+      ReplaceInString(OutBuffer, _T("$(NavBarDestinationType)"), _T(""), Size);
+    }
+  }
+
   if (_tcsstr(OutBuffer, _T("$(AdvanceArmed)"))) {
     switch (task_manager->GetOrderedTask().GetTaskAdvance().GetState()) {
     case TaskAdvance::MANUAL:
