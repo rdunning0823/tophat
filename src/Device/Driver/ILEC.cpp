@@ -182,10 +182,8 @@ ParseSET(NMEAInputLine &line, NMEAInfo &info) {
 bool
 ILECDevice::ParseNMEA(const char *_line, NMEAInfo &info)
 {
-  #ifndef RLD_DEBUG
-    if (!VerifyNMEAChecksum(_line))
-      return false;
-  #endif // RLD_DEBUG
+  if (!VerifyNMEAChecksum(_line))
+    return false;
   NMEAInputLine line(_line);
   char type[16];
   line.Read(type, sizeof(type));
