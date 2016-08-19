@@ -32,6 +32,9 @@
 #include "Language/Language.hpp"
 #include "Util/Macros.hpp"
 #include "Look/FlarmTrafficLook.hpp"
+#include "MapSettings.hpp"
+#include "Interface.hpp"
+#include "UIState.hpp"
 
 #include <algorithm>
 
@@ -642,6 +645,19 @@ FlarmTrafficWindow::PaintNorth(Canvas &canvas) const
 void
 FlarmTrafficWindow::PaintRadarBackground(Canvas &canvas) const
 {
+  const MapSettings &settings = CommonInterface::GetMapSettings();
+  const UIState &ui_state = CommonInterface::GetUIState();
+
+  MapOrientation orientation =
+    ui_state.display_mode == DisplayMode::CIRCLING
+    ? settings.circling_orientation
+    : settings.cruise_orientation;
+
+  if (!small || orientation != MapOrientation::NORTH_UP) {
+    canvas.SetBackgroundTransparent();
+    PaintNorth(canvas);
+  }
+
   canvas.SelectHollowBrush();
   canvas.Select(look.radar_pen);
   canvas.SetTextColor(look.radar_color);
@@ -674,8 +690,6 @@ FlarmTrafficWindow::PaintRadarBackground(Canvas &canvas) const
                   radar_mid.y + radius / 2 - s.cy * 0.75, distance_string);
 
   canvas.SetBackgroundTransparent();
-
-  PaintNorth(canvas);
 }
 
 /**
