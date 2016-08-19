@@ -149,7 +149,7 @@ ParsePOLAR(NMEAInputLine &line, NMEAInfo &info)
       line.ReadChecked(c) ;
   bool gcc_unused sqrt_sigma_provided = // not present prior v2.41
       line.ReadChecked(sqrt_sigma);
-  if(polarProvided) {
+  if (polarProvided) {
     // ToDo DRN: set ILEC SN10 polar into XCSoar - remember, TRUE speeds here!
     // ComputerSettings &settings_computer = CommonInterface::SetComputerSettings();
     // Set settings_computer.polar. ... thread safety??
@@ -167,9 +167,10 @@ ParsePOLAR(NMEAInputLine &line, NMEAInfo &info)
  *   $PILC,SET,1013.8*41
  */
 static bool
-ParseSET(NMEAInputLine &line, NMEAInfo &info) {
+ParseSET(NMEAInputLine &line, NMEAInfo &info)
+{
   fixed altimeter_setting_millibars;
-  if(line.ReadChecked(altimeter_setting_millibars)) {
+  if (line.ReadChecked(altimeter_setting_millibars)) {
     LogFormat("QNH set to %f",(double)altimeter_setting_millibars);
     info.settings.ProvideQNH(
         AtmosphericPressure::HectoPascal(altimeter_setting_millibars),
@@ -317,11 +318,11 @@ static struct SN10taskInfo_T { // Note: heights and sizes in meters
   // but points (possibly nil) should be received for all 12 slots.
   /// Has a complete task been received from SN10?
   bool CompleteSN10taskRecd() const {
-    if(!task_settings_received) {
+    if (!task_settings_received) {
       return false;
     };
     for(int SN10_pt_idx=0; SN10_pt_idx<SN10_PT_CNT; SN10_pt_idx++) {
-      if(!pts[SN10_pt_idx].point_received) {
+      if (!pts[SN10_pt_idx].point_received) {
         return false;
       };
     };
@@ -337,10 +338,13 @@ static struct SN10taskInfo_T { // Note: heights and sizes in meters
   ObservationZonePoint *GetNewObservationZone(Waypoint pt, int SN10_pt_idx);
   void Update_XCSoar_task_from_SN10(const ComputerSettings &settings_computer);
 } SN10_task;
+
 typedef SN10taskInfo_T::SN10PointRecd_T::SN10pointDetail_T PTbase_T;
 
 /// Translate NMEA input character to SN10 point type
-bool SN10taskInfo_T::SN10taskSettings_T::GetPointType(PointType_T &result, char f) {
+bool
+SN10taskInfo_T::SN10taskSettings_T::GetPointType(PointType_T &result, char f)
+{
   switch(f) {
     case 'N': result = SN10taskInfo_T::SN10taskSettings_T::PointType_T::PT_NONE;     break; // SN10: no automatic/logger function
     case 'C': result = SN10taskInfo_T::SN10taskSettings_T::PointType_T::PT_CYLINDER; break;
@@ -352,7 +356,9 @@ bool SN10taskInfo_T::SN10taskSettings_T::GetPointType(PointType_T &result, char 
 }
 
 /// Get a waypoint, using a close database entry in preference to building a new waypoint from SN10 info
-Waypoint SN10taskInfo_T::Get_XCSoar_waypoint(int SN10_pt_idx) {
+Waypoint
+SN10taskInfo_T::Get_XCSoar_waypoint(int SN10_pt_idx)
+{
   // modeled after SeeYou CUP task construction (src/Task/TaskFileSeeYou.cpp line~530)
   assert(pts[SN10_pt_idx].point_received);
   SN10PointRecd_T::SN10pointDetail_T &pt = pts[SN10_pt_idx].ptbase;
@@ -371,7 +377,8 @@ Waypoint SN10taskInfo_T::Get_XCSoar_waypoint(int SN10_pt_idx) {
 }
 
 /// Get a new XCSoar observation zone for an SN10 point
-ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN10_pt_idx)
+ObservationZonePoint *
+SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN10_pt_idx)
 {
   // modeled after SeeYou CUP task construction (src/Task/TaskFileSeeYou.cpp, see CreateOZ)
   assert(pts[SN10_pt_idx].point_received);
@@ -381,7 +388,7 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
   int radiusOrWidth;
   SN10taskSettings_T::PointType_T SN10_point_type;
   bool is_turnpoint;
-  switch(SN10_pt_idx) {
+  switch (SN10_pt_idx) {
   case SN10_PTIDX_START:
     is_turnpoint = false;
     radiusOrWidth = task_settings.start_radius;
@@ -394,9 +401,9 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
     break;
   default:
     is_turnpoint = true;
-    if(task_settings.task_type==SN10taskSettings_T::TASK_AREA) {
+    if (task_settings.task_type == SN10taskSettings_T::TASK_AREA) {
       radiusOrWidth = pt.outer_radius;
-      if(radiusOrWidth==0) {
+      if (radiusOrWidth == 0) {
         // during transition from racing to area task, updated points may not yet be received, hence 0 radius
         radiusOrWidth = 500; // prevent disasters with dummy 500 meter radius areas
       }
@@ -408,7 +415,8 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
     break;
   }
   // Annular zone is only used for complex AAT turnpoint
-  if(task_settings.task_type==SN10taskSettings_T::TASK_AREA && pt.is_complex_AAT_shape) {
+  if (task_settings.task_type ==
+      SN10taskSettings_T::TASK_AREA && pt.is_complex_AAT_shape) {
     // WARNING: A donut (a non-zero inner radius with a FullCircle) causes assertion failure during XCSoar drawing...
     return new AnnularSectorZone(wp.location,
                                  (fixed)pt.outer_radius,
@@ -416,7 +424,7 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
                                  Angle::Degrees(pt.end_radial_degrees),
                                  (fixed)pt.inner_radius );
   };
-  switch(SN10_point_type) {
+  switch (SN10_point_type) {
   case SN10taskSettings_T::PT_CYLINDER:
     return new CylinderZone(wp.location, (fixed)radiusOrWidth/*radius, in meters*/);
   case SN10taskSettings_T::PT_FAI:
@@ -431,10 +439,13 @@ ObservationZonePoint * SN10taskInfo_T::GetNewObservationZone(Waypoint wp, int SN
   }
 }
 
-void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settings_computer) {
-  if(!CompleteSN10taskRecd()) return; // IE, points received but not task summary, because TopHat powered on after summary sent by SN10
+void
+SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settings_computer)
+{
+  if (!CompleteSN10taskRecd())
+    return; // IE, points received but not task summary, because TopHat powered on after summary sent by SN10
   // An SN10 club mode task has only the target point; XCSoar's "OrderedTask" doesn't support this.
-  if(IsClubmodeTask()) {
+  if (IsClubmodeTask()) {
     // Create a "Goto" type task.
     Waypoint wp = Get_XCSoar_waypoint(SN10_PTIDX_FINISH);
     protected_task_manager->DoGoto(wp);
@@ -448,6 +459,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   const TaskBehaviour &task_behaviour = settings_computer.task;
   OrderedTask *new_task = new OrderedTask(task_behaviour);
   TaskFactoryType xcsoar_task_type = TaskFactoryType::RACING; // default
+
   if (task_settings.task_type == SN10taskSettings_T::TaskType_T::TASK_AREA)
     xcsoar_task_type = TaskFactoryType::AAT;
   new_task->SetFactory(xcsoar_task_type);
@@ -455,6 +467,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   const TaskFactoryType fact_type = new_task->GetFactoryType();
   // Update task settings from SN10
   OrderedTaskSettings beh = new_task->GetOrderedTaskSettings();
+
   if (fact_type == TaskFactoryType::AAT) {
     // XCsoar doesn't use time limit for racing tasks, oh well...
     beh.aat_min_time = fixed(task_settings.task_time_minutes*60); // seconds
@@ -481,7 +494,8 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   }
 
   // Add any turnpoints to new task
-  for (int SN10_pt_idx = SN10_PTIDX_FIRST_TP; SN10_pt_idx <= SN10_PTIDX_LAST_TP; SN10_pt_idx++) {
+  for (int SN10_pt_idx = SN10_PTIDX_FIRST_TP;
+       SN10_pt_idx <= SN10_PTIDX_LAST_TP; SN10_pt_idx++) {
     SN10PointRecd_T::SN10pointDetail_T &tp = pts[SN10_pt_idx].ptbase;
     if (!tp.is_non_nil_point)
       continue;
@@ -501,7 +515,7 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
   // add Finish point to new task - always present
   {
     Waypoint wp = Get_XCSoar_waypoint(SN10_PTIDX_FINISH);
-    ObservationZonePoint* oz = GetNewObservationZone(wp,SN10_PTIDX_FINISH);
+    ObservationZonePoint* oz = GetNewObservationZone(wp, SN10_PTIDX_FINISH);
     FinishPoint *finish_pt = fact.CreateFinish(oz, wp); // Note: OrderTaskPoint dtor will free oz, but not wp
     new_task_constructed_OK &= fact.Append(*finish_pt, /*auto_mutate=*/false); // fails if no start point (SN10 club task)
     delete finish_pt;
@@ -547,7 +561,9 @@ void SN10taskInfo_T::Update_XCSoar_task_from_SN10(const ComputerSettings &settin
 }
 
 /// Parse NMEA SN10 task settings sentence $PILC,TSK and save in SN10_task.task_settings
-static bool ParseTSK(NMEAInputLine &line) {
+static bool
+ParseTSK(NMEAInputLine &line)
+{
   SN10taskInfo_T::SN10taskSettings_T task_settings = SN10taskInfo_T::SN10taskSettings_T();
   // Example TSK: $PILC,TSK,A,300,L,8045,,N,3218,256,N,1448,*5D
   char task_type_code = line.ReadOneChar();
@@ -568,7 +584,7 @@ static bool ParseTSK(NMEAInputLine &line) {
     return false;
   if (!line.ReadChecked(task_settings.start_radius))
     return false;
-  /*if(!*/line.ReadChecked(task_settings.start_height) /*) return false*/; // v2.41 does not yet provide start_height - nil/zero is OK...
+  /*if (!line.ReadChecked(task_settings.start_height)) return false*/; // v2.41 does not yet provide start_height - nil/zero is OK...
   char finish_type_code = line.ReadOneChar(); // "NCFL"; // None, Cylinder, FAI, Line
   if (!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.finish_type, finish_type_code))
     return false;
@@ -595,7 +611,9 @@ static bool ParseTSK(NMEAInputLine &line) {
 }
 
 /// Parse NMEA SN10 point detail sentence $PILC,PT and save point in SN10_task.pts
-static bool ParsePT(NMEAInputLine &line) {
+static bool
+ParsePT(NMEAInputLine &line)
+{
   PTbase_T pt = PTbase_T();
   // Example PTs:
   // - nil           $PILC,PT,5*27
@@ -642,9 +660,11 @@ static bool ParsePT(NMEAInputLine &line) {
 
 /// Entry point for XCSoar calculation thread who does slow task calculations.
 //  ...not a Device thread that parses NMEA (also sometimes called an I/O thread)
-void ILEC_Process_Any_Pending_SN10_task_update(const ComputerSettings &settings_computer) {
+void
+ILEC_Process_Any_Pending_SN10_task_update(const ComputerSettings &settings_computer)
+{
   ScopeLock protect(SN10_task.mutex);
-  if(SN10_task.xcsoar_task_update_pending) {
+  if (SN10_task.xcsoar_task_update_pending) {
     SN10_task.Update_XCSoar_task_from_SN10(settings_computer);
     SN10_task.xcsoar_task_update_pending = false;
   }
@@ -803,9 +823,9 @@ static void Simulate_SN10_NMEA_sequence() {
   static ILECDevice *dummyILECdevice = new ILECDevice();
   while(1) {
     const char* pTxt = NMEAsim[line_idx];
-    if(pTxt==0) return; // no more interesting lines
+    if (pTxt==0) return; // no more interesting lines
     line_idx++;
-    if(memcmp(pTxt,"pause",5)==0) {
+    if (memcmp(pTxt, "pause",5) == 0) {
       LogFormat("%s",pTxt);
       return; // end of sequence to simulate
     }
@@ -816,7 +836,8 @@ static void Simulate_SN10_NMEA_sequence() {
 #include "Input/InputEvents.hpp"
 void InputEvents::eventDRNtestHook(gcc_unused const TCHAR *misc)
 {
-  if(!is_simulator()) return; // suppress testing hook if not running in simulation mode
+  if (!is_simulator())
+    return; // suppress testing hook if not running in simulation mode
   Simulate_SN10_NMEA_sequence();
 
  #if 0 // basic parsing tests
