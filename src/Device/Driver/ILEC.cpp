@@ -607,6 +607,7 @@ ParseTSK(NMEAInputLine &line)
     SN10_task.task_settings = task_settings;
   }
   SN10_task.xcsoar_task_update_pending = true; // triggers SN10_task.Update_XCSoar_task_from_SN10(); in Calc thread
+  ForceCalculation();
   return true;
 }
 
@@ -655,6 +656,7 @@ ParsePT(NMEAInputLine &line)
     SN10_task.pts[PT_number - 1].ptbase = pt;
   }
   SN10_task.xcsoar_task_update_pending = true; // triggers SN10_task.Update_XCSoar_task_from_SN10(); in Calc thread
+  ForceCalculation();
   return true;
 }
 
