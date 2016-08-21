@@ -31,6 +31,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Look/Look.hpp"
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
+#include "MapSettings.hpp"
 
 #include <assert.h>
 #include <stdint.h>
@@ -39,6 +40,7 @@ struct DialogLook;
 struct NavSliderLook;
 class Font;
 class Canvas;
+class Waypoint;
 enum class TaskType : uint8_t;
 
 class SliderShape {
@@ -80,6 +82,7 @@ protected:
   const DialogLook &dialog_look;
   const NavSliderLook &nav_slider_look;
   const UISettings &ui_settings;
+  const WaypointRendererSettings &wp_renderer_settings;
 
   /**
    * height of the bearing icon
@@ -99,6 +102,7 @@ public:
   :dialog_look(UIGlobals::GetDialogLook()),
    nav_slider_look(UIGlobals::GetLook().nav_slider),
    ui_settings(CommonInterface::GetUISettings()),
+   wp_renderer_settings(CommonInterface::GetMapSettings().waypoint),
    bearing_icon_hor_margin(0) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *bmp_bearing;
@@ -232,6 +236,7 @@ public:
   void Draw(Canvas &canvas, const PixelRect rc_outer,
             unsigned idx, bool selected, bool is_current_tp,
             const TCHAR *tp_name,
+            const Waypoint *twp,
             bool has_entered, bool has_exited,
             TaskType task_mode, TaskFactoryType task_factory_type,
             unsigned task_size,

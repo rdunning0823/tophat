@@ -26,6 +26,11 @@ Copyright_License {
 #include "Look/DialogLook.hpp"
 #include "Look/InfoBoxLook.hpp"
 #include "Look/IconLook.hpp"
+#include "Look/MapLook.hpp"
+#include "Look/WaypointLook.hpp"
+#include "Look/TaskLook.hpp"
+#include "Renderer/WaypointIconRenderer.hpp"
+#include "Renderer/WaypointRendererSettings.hpp"
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Language/Language.hpp"
@@ -247,7 +252,9 @@ SliderShape::DrawInvalid(Canvas &canvas, const PixelRect rc_outer,
 void
 SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   unsigned idx, bool selected, bool is_current_tp,
-                  const TCHAR *tp_name, bool has_entered, bool has_exited,
+                  const TCHAR *tp_name,
+                  const Waypoint *twp,
+                  bool has_entered, bool has_exited,
                   TaskType task_mode, TaskFactoryType task_factory_type,
                   unsigned task_size,
                   bool tp_valid, fixed tp_distance, bool distance_valid,
@@ -433,8 +440,19 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   canvas.Select(name_font);
   PixelSize icon_size {0, 0};
   UPixelScalar left_icon;
-  const MaskedIcon *icon = &icon_look.hBmpCheckMark;
-  if (draw_checkmark)
+  // only draw target or turnpoint icon if no checkmark
+  const TaskLook &task_look = UIGlobals::GetMapLook().task;
+
+  const bool draw_target =    !draw_checkmark && is_aat && navigate_to_target;
+  const bool draw_turnpoint = !draw_checkmark && !draw_target && twp != nullptr;
+  const bool draw_icon = (draw_checkmark || draw_target || draw_turnpoint);
+  assert (!(draw_target && draw_turnpoint));
+
+  // icon is only used for target or checkmark.  WaypointRenderer is used otherwise
+  const MaskedIcon *icon = draw_checkmark ? &icon_look.hBmpCheckMark :
+      &task_look.target_icon;
+
+  if (draw_icon)
     icon_size = icon->GetSize();
 
   PixelRect rc_name(rc_outer.left + GetHintWidth(), rc_outer.top,
@@ -458,9 +476,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   line_two_y_offset,
                   rc_name.right - rc_name.left - icon_size.cx / 2, tp_name);
 
-  // draw checkmark next to name if oz entered
-  if (draw_checkmark) {
-
+  // draw checkmark next to name if oz entered else for aat, tp / target icon
+  if (draw_icon) {
     const int offsety = ((PixelScalar)line_two_y_offset + icon_size.cy <= rc.bottom) ?
         line_two_y_offset + (rc.bottom - line_two_y_offset - icon_size.cy) / 2 - Layout::Scale(1)
         : rc.bottom - icon_size.cy - Layout::Scale(1);
@@ -469,7 +486,29 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     RasterPoint lower_right(upper_left.x,
                             upper_left.y);
     if (canvas.GetRect().IsInside(upper_left) && canvas.GetRect().IsInside(lower_right)) {
-      icon->DrawUpperLeft(canvas, upper_left); // draws from center of icon
+      if (draw_checkmark) {
+        icon->DrawUpperLeft(canvas, upper_left); // draws from center of icon
+      } else {
+
+        RasterPoint pt = upper_left;
+        unsigned name_height = (unsigned)name_font.GetHeight() / 2;
+        pt.y += name_height / 2;
+
+        if (draw_target) {
+          icon->Draw(canvas, pt); // draws from center of icon
+
+        } else if (draw_turnpoint) {
+
+          const WaypointLook &waypoint_look = UIGlobals::GetMapLook().waypoint;
+          WaypointIconRenderer wir(wp_renderer_settings, waypoint_look, canvas);
+          WaypointIconRenderer::Reachability reachability =
+              (altitude_difference_valid && tp_altitude_difference > fixed(0)) ?
+                  WaypointIconRenderer::Reachability::ReachableTerrain :
+                  WaypointIconRenderer::Reachability::Unreachable;
+
+          wir.Draw(*twp, pt, reachability, true);
+        }
+      }
     }
   }
 }
