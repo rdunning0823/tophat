@@ -316,9 +316,9 @@ ExpandTaskMacros(TCHAR *OutBuffer, size_t Size,
       CondReplaceInString(ui_settings.navbar_navigate_to_aat_target,
                           OutBuffer,
                           _T("$(NavBarDestinationType)"),
-                          _("Nav to center"),
-                          _("Nav to target"), Size);
-    } else {
+                          _("_NavBarToCenter"),
+                          _("_NavBarToTarget"), Size);
+    } else { //hide
       ReplaceInString(OutBuffer, _T("$(NavBarDestinationType)"), _T(""), Size);
     }
   }

@@ -26,6 +26,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Look/ButtonLook.hpp"
 #include "Look/IconLook.hpp"
+#include "Look/MapLook.hpp"
 #include "Screen/Bitmap.hpp"
 #include "Renderer/SymbolRenderer.hpp"
 #include "Language/Language.hpp"
@@ -238,6 +239,18 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon &icon = icon_look.hBmpTabSettingsNavBar;
     DrawIconOrBitmap(canvas, rc, icon, focused);
+
+  } else if (caption == _("_NavBarToTarget")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon *icon = &icon_look.target_icon;
+    DrawIconAndText(canvas, rc, _("Nav to target"), icon,
+                    enabled, focused, pressed);
+
+  } else if (caption == _("_NavBarToCenter")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon *icon = &icon_look.task_turn_point_icon;
+    DrawIconAndText(canvas, rc, _("Nav to center"), icon,
+                    enabled, focused, pressed);
 
   } else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();

@@ -57,4 +57,7 @@ IconLook::Initialise()
   hBmpTabSystem.LoadResource(IDB_DEVICE, IDB_DEVICE_HD, IDB_DEVICE_HD2);
   hBmpTabRules.LoadResource(IDB_RULES, IDB_RULES_HD, IDB_RULES_HD2);
   hBmpTabTimes.LoadResource(IDB_CLOCK, IDB_CLOCK_HD, IDB_CLOCK_HD2);
+
+  target_icon.LoadResource(IDB_TARGET, IDB_TARGET_HD, IDB_TARGET_HD2);
+  task_turn_point_icon.LoadResource(IDB_TASKTURNPOINT, IDB_TASKTURNPOINT_HD, IDB_TASKTURNPOINT_HD2);
 }

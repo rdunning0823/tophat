@@ -64,6 +64,11 @@ struct IconLook {
   MaskedIcon hBmpClose;
   MaskedIcon icon_home;
 
+  // icons duplicated in WaypointLook and TaskLook for Kobo Menu's
+  // use of SymbolButtonRenderer
+  MaskedIcon target_icon;
+  MaskedIcon task_turn_point_icon;
+
   void Initialise();
 };
 
