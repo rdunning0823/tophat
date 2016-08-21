@@ -263,9 +263,13 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
 
-  bool draw_checkmark = (task_mode == TaskType::ORDERED)
-      && (task_size > 1)
-      && ((idx > 0 && has_entered) || (idx == 0 && has_exited));
+  const bool is_ordered = (task_mode == TaskType::ORDERED);
+  const bool is_aat = (task_factory_type ==  TaskFactoryType::AAT);
+  const bool is_start = idx == 0;
+  const bool is_finish = idx + 1 == task_size;
+
+  bool draw_checkmark = is_ordered && (task_size > 1)
+      && ((!is_start && has_entered) || (is_start && has_exited));
 
   StaticString<120> type_buffer;
 
@@ -311,14 +315,14 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if (task_size == 0)
       type_buffer = _("Go'n home:");
 
-    else if (idx == 0)
+    else if (is_start)
       type_buffer = _("Start");
-    else if (idx + 1 == task_size)
+    else if (is_finish)
       type_buffer = _("Finish");
-    else if (task_factory_type ==  TaskFactoryType::AAT && navigate_to_target)
+    else if (is_aat && navigate_to_target)
       // append "Target" text to distance in center
       type_buffer.clear();
-    else if (task_factory_type ==  TaskFactoryType::AAT)
+    else if (is_aat)
       type_buffer.Format(_T("%s %u"), _("Center"), idx);
     else
       type_buffer.Format(_T("%s %u"), _("TP"), idx);
@@ -354,11 +358,10 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   BearingDirection bearing_direction = BearingDirection::None;
   bool do_bearing = false;
   Angle bearing;
-  if (is_current_tp && bearing_valid && task_mode ==
-      TaskType::ORDERED && idx > 0) {
+  if (is_current_tp && bearing_valid && is_ordered && idx > 0) {
     do_bearing = true;
     bearing = delta_bearing;
-  } else if (task_mode != TaskType::ORDERED &&
+  } else if (!is_ordered &&
       bearing_valid) {
     do_bearing = true;
     bearing = delta_bearing;
@@ -375,8 +378,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   distance_buffer.clear();
   if (navigate_to_target &&
       task_size > 0 &&
-      idx != 0 &&
-      (idx + 1 != task_size)) {
+      !is_start &&
+      !is_finish) {
     distance_buffer.Format(_T("%s: "), _("Target"));
   }
   distance_buffer.append(distance_only_buffer.c_str());
