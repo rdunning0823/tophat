@@ -128,9 +128,9 @@ InputEvents::eventNavBarDestinationType(const TCHAR *misc)
                  ui_settings.navbar_navigate_to_aat_target);
     Profile::SetModified(true);
     if (to_aat_target) {
-      Message::AddMessage(_("Nav bar is navigating to turnpoint targets"));
+      Message::AddMessage(_T("Nav Bar"), _(" is navigating to turnpoint targets"));
     } else {
-      Message::AddMessage(_("Nav bar is navigating to turnpoint centers"));
+      Message::AddMessage(_T("Nav Bar"), _(" is navigating to turnpoint centers"));
     }
   }
 }
