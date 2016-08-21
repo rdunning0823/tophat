@@ -1,6 +1,6 @@
 key=DEFAULT
 sound=IDR_WAV_BEEP_DRIP
-delay=1500
+delay=2500
 
 key=Pan mode ON
 sound=IDR_INSERT
