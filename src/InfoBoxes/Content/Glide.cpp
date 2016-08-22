@@ -88,18 +88,13 @@ InfoBoxContentGRAvg::Update(InfoBoxData &data)
 {
   const fixed average_gr = CommonInterface::Calculated().average_gr;
 
-  if (average_gr == fixed(0)) {
+  if (!::GradientValid(average_gr)) {
     data.SetInvalid();
     return;
   }
 
   // Set Value
-  if (average_gr < fixed(0))
-    data.SetValue(_T("^^^"));
-  else if (!::GradientValid(average_gr))
-    data.SetValue(_T("+++"));
-  else
-    data.SetValueFromGlideRatio(average_gr);
+  data.SetValueFromGlideRatio(average_gr);
 }
 
 void
