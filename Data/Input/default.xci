@@ -477,7 +477,7 @@ mode=NavGoto
 type=key
 data=0
 event=Mode default
-event=AbortTask toggle
+event=AbortTask resume
 label=Resume task$(CheckTask)
 location=21
 
