@@ -25,12 +25,11 @@ Copyright_License {
 #include "ProfileKeys.hpp"
 #include "Map.hpp"
 #include "Engine/Contest/Settings.hpp"
-#include "Asset.hpp"
 
 void
 Profile::Load(const ProfileMap &map, ContestSettings &settings)
 {
-  if (!IsKobo() && map.GetEnum(ProfileKeys::OLCRules, settings.contest)) {
+  if (map.GetEnum(ProfileKeys::OLCRules, settings.contest)) {
     /* handle out-dated Sprint rule in profile */
     if (settings.contest == Contest::OLC_SPRINT)
       settings.contest = Contest::OLC_LEAGUE;
