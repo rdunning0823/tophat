@@ -44,7 +44,8 @@ Copyright_License {
  * Class to draw the chart of the OLC progress
  */
 class OnlineContestPanel : public BaseAccessPanel {
-    class OnlineContestChart: public PaintWindow
+
+  class OnlineContestChart: public PaintWindow
   {
   public:
     OnlineContestChart(ContainerWindow &parent,
