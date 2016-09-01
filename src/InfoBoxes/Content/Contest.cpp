@@ -30,25 +30,16 @@ Copyright_License {
 #include "Language/Language.hpp"
 #include "InfoBoxes/Panel/OnlineContest.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
-#include "Widget/CallbackWidget.hpp"
 #include "Units/Units.hpp"
+#include "InfoBoxes/Panel/OnlineContest.hpp"
 
 #include <tchar.h>
 
-static void
-ShowAnalysis8()
-{
-  dlgAnalysisShowModal(UIGlobals::GetMainWindow(),
-                       UIGlobals::GetLook(),
-                       CommonInterface::Full(), *glide_computer,
-                       &airspace_database,
-                       terrain, AnalysisPage::OLC);
-}
 
 static Widget *
 LoadAnalysis8Panel(unsigned id)
 {
-  return new CallbackWidget(ShowAnalysis8);
+  return LoadOnlineContestPanel(id);
 }
 
 static constexpr
