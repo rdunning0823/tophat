@@ -169,6 +169,7 @@ OnlineContestPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            style, look);
 
   dialog_timer.Schedule(1000);
+  online_contest_chart->Move(graph_rc);
   Refresh();
 }
 
