@@ -31,6 +31,7 @@ Copyright_License {
 #include "InfoBoxes/Panel/OnlineContest.hpp"
 #include "InfoBoxes/Panel/Panel.hpp"
 #include "Widget/CallbackWidget.hpp"
+#include "Units/Units.hpp"
 
 #include <tchar.h>
 
@@ -125,7 +126,10 @@ InfoBoxContentOLCSpeed::Update(InfoBoxData &data)
   }
 
   // Set Value
-  data.SetValueFromSpeed(result_olc.GetSpeed());
+  data.SetValue(_T("%2.0f"),
+                    Units::ToUserTaskSpeed(result_olc.GetSpeed()));
+  // Set Unit
+  data.SetValueUnit(Units::current.task_speed_unit);
 
   data.UnsafeFormatComment(_T("%.1f pts"), (double)result_olc.score);
 }
