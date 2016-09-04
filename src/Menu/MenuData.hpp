@@ -40,11 +40,14 @@ public:
   bool focused;
   /* is the expanded text non-empty, so this button is visible? */
   bool visible;
+  /* is the background transparent */
+  bool background_transparent;
 
   void Clear() {
     label = NULL;
     event = 0;
     focused = false;
+    background_transparent = false;
   }
 
   constexpr
@@ -86,7 +89,8 @@ public:
     return items[i];
   }
 
-  void Add(const TCHAR *label, int location, unsigned event_id);
+  void Add(const TCHAR *label, int location, unsigned event_id,
+           bool background_transparent = false);
 
   gcc_pure
   int FindByEvent(unsigned event) const;

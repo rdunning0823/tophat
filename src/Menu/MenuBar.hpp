@@ -64,7 +64,7 @@ public:
    * @param down.  renders button as down
    */
   void ShowButton(unsigned i, bool enabled, const TCHAR *text,
-                  unsigned event, bool down);
+                  unsigned event, bool down, bool background_transparent);
   void HideButton(unsigned i);
 
   bool IsButtonEnabled(unsigned i) const {

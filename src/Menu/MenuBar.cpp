@@ -189,7 +189,8 @@ MenuBar::MenuBar(ContainerWindow &parent, const ButtonLook &look)
 
 void
 MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
-                    unsigned event, bool focused)
+                    unsigned event, bool focused,
+                    bool background_transparent)
 {
   assert(i < MAX_BUTTONS);
 
@@ -200,6 +201,7 @@ MenuBar::ShowButton(unsigned i, bool enabled, const TCHAR *text,
   button.SetEnabled(enabled && event > 0);
   button.SetEvent(event);
   button.ShowOnTop();
+  button.SetForceTransparent(background_transparent);
 }
 
 void

@@ -262,7 +262,7 @@ InputEvents::drawButtons(Mode mode, bool full)
     ? &input_config.menus[overlay_mode]
     : NULL;
 
-  ButtonLabel::Set(menu, overlay_menu, full);
+  ButtonLabel::Set(menu, overlay_menu, full, IsPanning());
 }
 
 InputEvents::Mode

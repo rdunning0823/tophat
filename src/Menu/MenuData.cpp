@@ -33,7 +33,8 @@ Menu::Clear()
 }
 
 void
-Menu::Add(const TCHAR *label, int location, unsigned event_id)
+Menu::Add(const TCHAR *label, int location, unsigned event_id,
+          bool background_transparent)
 {
   assert(location >= 0);
 
@@ -44,6 +45,7 @@ Menu::Add(const TCHAR *label, int location, unsigned event_id)
 
   item.label = label;
   item.event = event_id;
+  item.background_transparent = background_transparent;
 }
 
 int

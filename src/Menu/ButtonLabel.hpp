@@ -54,7 +54,8 @@ namespace ButtonLabel {
    * @param focused.  renders button in focused state if true
    * @return.  true if the expanded text is non-empty (label is visible)
    */
-  bool SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool focused);
+  bool SetLabelText(unsigned i, const TCHAR *text, unsigned event, bool focused,
+                    bool background_transparent);
 gcc_pure
   bool IsEnabled(unsigned i);
 
@@ -69,7 +70,7 @@ gcc_pure
    * @param full do a full update; if false, then only dynamic buttons
    * are updated (to reduce flickering)
    */
-  void Set(Menu &menu, Menu *overlay=NULL, bool full=true);
+  void Set(Menu &menu, Menu *overlay, bool full, bool background_transparent);
 };
 
 #endif
