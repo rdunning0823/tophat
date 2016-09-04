@@ -63,7 +63,8 @@ public:
   unsigned GetMinimumButtonWidth() const override;
 
   void DrawButton(Canvas &canvas, const PixelRect &rc,
-                  bool enabled, bool focused, bool pressed) const override;
+                  bool enabled, bool focused, bool pressed,
+                  bool force_transparent_background) const override;
 };
 
 unsigned
@@ -75,7 +76,8 @@ QuickMenuButtonRenderer::GetMinimumButtonWidth() const
 void
 QuickMenuButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
                                     bool enabled, bool focused,
-                                    bool pressed) const
+                                    bool pressed,
+                                    bool force_transparent_background) const
 {
   // Draw focus rectangle
   if (pressed) {

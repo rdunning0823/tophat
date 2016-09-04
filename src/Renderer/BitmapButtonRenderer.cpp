@@ -34,7 +34,8 @@ BitmapButtonRenderer::GetMinimumButtonWidth() const
 void
 BitmapButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
                                  bool enabled,
-                                 bool focused, bool pressed) const
+                                 bool focused, bool pressed,
+                                 bool force_transparent_backgroun) const
 {
   if (pressed)
     canvas.StretchNot(bitmap);

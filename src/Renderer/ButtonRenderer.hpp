@@ -54,8 +54,13 @@ public:
   gcc_const
   static unsigned GetMargin();
 
+  /**
+   * @param force_transparent_background: will draw dransparent background when
+   * not pressed, regardless of settings in look
+   */
   void DrawButton(Canvas &canvas, PixelRect rc,
-                  bool focused, bool pressed) const;
+                  bool focused, bool pressed,
+                  bool force_transparent_background = false) const;
 
   gcc_pure
   PixelRect GetDrawingRect(PixelRect rc, bool pressed) const;
@@ -69,7 +74,8 @@ public:
   virtual unsigned GetMinimumButtonWidth() const;
 
   virtual void DrawButton(Canvas &canvas, const PixelRect &rc,
-                          bool enabled, bool focused, bool pressed) const = 0;
+                          bool enabled, bool focused, bool pressed,
+                          bool force_transparent_background) const = 0;
 };
 
 #endif

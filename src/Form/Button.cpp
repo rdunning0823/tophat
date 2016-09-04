@@ -298,5 +298,6 @@ Button::OnPaint(Canvas &canvas)
     : pressed;
 
   renderer->DrawButton(canvas, GetClientRect(),
-                       IsEnabled(), focused, pressed);
+                       IsEnabled(), focused, pressed,
+                       transparent_background_force);
 }

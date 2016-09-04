@@ -319,9 +319,10 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
 void
 SymbolButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
                                  bool enabled,
-                                 bool focused, bool pressed) const
+                                 bool focused, bool pressed,
+                                 bool transparent_background_force) const
 {
-  frame_renderer.DrawButton(canvas, rc, focused, pressed);
+  frame_renderer.DrawButton(canvas, rc, focused, pressed, transparent_background_force);
 
   if (!caption.empty() || prefix_icon != PrefixIcon::NONE)
     DrawSymbol(canvas, frame_renderer.GetDrawingRect(rc, pressed),

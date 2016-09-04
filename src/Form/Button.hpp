@@ -46,6 +46,8 @@ class Button : public PaintWindow {
 
   ActionListener *listener;
   int id;
+  /** draw no background when not pressed, regardless of look */
+  bool transparent_background_force;
 
   /**
    * This flag specifies whether the button is "selected".  The
@@ -59,18 +61,20 @@ class Button : public PaintWindow {
 public:
   Button(ContainerWindow &parent, const PixelRect &rc,
          WindowStyle style, ButtonRenderer *_renderer,
-         ActionListener &_listener, int _id) {
+         ActionListener &_listener, int _id)
+  :transparent_background_force(false) {
     Create(parent, rc, style, _renderer, _listener, _id);
   }
 
   Button(ContainerWindow &parent, const ButtonLook &look,
          const TCHAR *caption, const PixelRect &rc,
          WindowStyle style,
-         ActionListener &_listener, int _id) {
+         ActionListener &_listener, int _id)
+  :transparent_background_force(false) {
     Create(parent, look, caption, rc, style, _listener, _id);
   }
 
-  Button():listener(nullptr) {}
+  Button():listener(nullptr), transparent_background_force(false) {}
 
   virtual ~Button();
 
@@ -115,6 +119,14 @@ public:
 
   gcc_pure
   unsigned GetMinimumWidth() const;
+
+  /**
+   * will not paint the background when not pressed regardless of
+   * settings in look
+   */
+  void SetForceTransparent(bool value) {
+    transparent_background_force = value;
+  }
 
   /**
    * Simulate a click on this button.

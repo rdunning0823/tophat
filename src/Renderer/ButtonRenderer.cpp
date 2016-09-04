@@ -36,13 +36,16 @@ ButtonFrameRenderer::GetMargin()
 
 void
 ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
-                                bool focused, bool pressed) const
+                                bool focused, bool pressed,
+                                bool force_transparent_background) const
 {
   const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+  const bool transparent = look.background_transparent
+      || force_transparent_background;
   if (rounded) {
     rc.right -= 1;
 
-    if (look.background_transparent && !pressed) {
+    if (transparent && !pressed) {
       canvas.Select(pressed ? _look.light_transparent_border_pen :
           _look.dark_transparent_border_pen);
       canvas.SelectHollowBrush();
@@ -57,7 +60,7 @@ ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
                               Layout::FontScale(12),
                               Layout::FontScale(12));
   } else {
-    if (!look.background_transparent || pressed)
+    if (!transparent || pressed)
       canvas.DrawFilledRectangle(rc, _look.background_color);
 
     const unsigned margin = GetMargin();

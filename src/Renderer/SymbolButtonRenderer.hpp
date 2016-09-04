@@ -60,7 +60,8 @@ public:
 
 private:
   virtual void DrawButton(Canvas &canvas, const PixelRect &rc,
-                          bool enabled, bool focused, bool pressed) const;
+                          bool enabled, bool focused, bool pressed,
+                          bool transparent_background_force) const;
 
   void DrawSymbol(Canvas &canvas, PixelRect rc,
                   bool enabled, bool focused, bool pressed) const;

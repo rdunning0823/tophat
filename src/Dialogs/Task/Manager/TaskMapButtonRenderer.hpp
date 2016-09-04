@@ -51,7 +51,8 @@ public:
   }
 
   void DrawButton(Canvas &canvas, const PixelRect &rc,
-                  bool enabled, bool focused, bool pressed) const override;
+                  bool enabled, bool focused, bool pressed,
+                  bool force_transparent_background) const override;
 
   void InvalidateBuffer() {
     size.cx = 0;

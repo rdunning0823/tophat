@@ -40,7 +40,8 @@ public:
   }
 
   void DrawButton(Canvas &canvas, const PixelRect &rc,
-                  bool enabled, bool focused, bool pressed) const override;
+                  bool enabled, bool focused, bool pressed,
+                  bool force_transparent_background) const override;
 };
 
 void
@@ -60,7 +61,8 @@ ShowMenuButton::OnClicked()
 void
 ShowMenuButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
                                    bool enabled, bool focused,
-                                   bool pressed) const
+                                   bool pressed,
+                                   bool force_transparent_background) const
 {
   const unsigned pen_width = Layout::ScalePenWidth(2);
   const unsigned padding = Layout::GetTextPadding() + pen_width;

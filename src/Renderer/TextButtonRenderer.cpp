@@ -68,9 +68,11 @@ TextButtonRenderer::GetMinimumButtonWidth() const
 
 void
 TextButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
-                               bool enabled, bool focused, bool pressed) const
+                               bool enabled, bool focused, bool pressed,
+                               bool force_transparent_background) const
 {
-  frame_renderer.DrawButton(canvas, rc, focused, pressed);
+  frame_renderer.DrawButton(canvas, rc, focused, pressed,
+                            force_transparent_background);
 
   if (!caption.empty())
     DrawCaption(canvas, frame_renderer.GetDrawingRect(rc, pressed),

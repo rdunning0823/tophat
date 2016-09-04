@@ -48,7 +48,8 @@ void
 TaskMapButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
                                   gcc_unused bool enabled,
                                   gcc_unused bool focused,
-                                  bool pressed) const
+                                  bool pressed,
+                                  bool force_transparent_background) const
 {
   if (task == nullptr) {
     canvas.ClearWhite();
