@@ -37,13 +37,7 @@ TaskButtonWidget::Prepare(ContainerWindow &parent,
                           const PixelRect &rc)
 {
   white_look.Initialise(Fonts::map_bold);
-/*
-  white_look.SetBackgroundColor(COLOR_WHITE);
-  white_look.button.standard.background_color = COLOR_WHITE;
-  white_look.button.focused.background_color = COLOR_WHITE;
-  white_look.button.focused.foreground_color = COLOR_BLACK;
-  white_look.button.focused.foreground_brush.Set(COLOR_BLACK);
-*/
+
   CreateButton(parent, white_look, rc);
   Move(rc);
 }
