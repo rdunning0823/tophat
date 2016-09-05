@@ -74,12 +74,6 @@ SymbolButtonRenderer::GetMinimumButtonWidth() const
   return icon_width + text_width;
 }
 
-static void
-DrawIconOrBitmap(Canvas &canvas, PixelRect rc, const MaskedIcon &icon, bool pressed)
-{
-  icon.Draw(canvas, rc, pressed);
-}
-
 const MaskedIcon*
 SymbolButtonRenderer::GetIcon(PrefixIcon prefix_icon) const
 {
@@ -120,6 +114,11 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
   const Font &font = *look.font;
   PixelSize sz_text_one_line = font.TextSize(text);
   UPixelScalar padding = Layout::GetTextPadding();
+#ifdef USE_GDI
+  bool supports_transparency = false;
+#else
+  bool supports_transparency = true;
+#endif
 
   PixelSize sz_icon;
   sz_icon.cx = sz_icon.cy = 0;
@@ -148,7 +147,32 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
   }
 
   if (icon != nullptr) {
-    icon->Draw(canvas, rc_icon, focused);
+    if (!focused && transparent_background_force && supports_transparency) {
+      // draw with outline
+
+      const int offset = icon->GetSize().cx / 12u;
+
+      PixelRect rc_shadow = rc_icon;
+      rc_shadow.Offset(offset, 0);
+      icon->Draw(canvas, rc_shadow, true);
+
+      rc_shadow = rc_icon;
+      rc_shadow.Offset(-1 * offset, 0);
+      icon->Draw(canvas, rc_shadow, true);
+
+      rc_shadow = rc_icon;
+      rc_shadow.Offset(0, offset);
+      icon->Draw(canvas, rc_shadow, true);
+
+      rc_shadow = rc_icon;
+      rc_shadow.Offset(0, -1 * offset);
+      icon->Draw(canvas, rc_shadow, true);
+
+      icon->Draw(canvas, rc_icon, false);
+    } else {
+      // draw once
+      icon->Draw(canvas, rc_icon, focused);
+    }
   }
   DrawCaption(canvas, text, rc_caption, enabled, focused, pressed, transparent_background_force);
 }
@@ -159,7 +183,6 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
                                  bool transparent_background_force) const
 {
   const ButtonLook &look = GetLook();
-
   // If button has text on it
   if (caption.empty() && prefix_icon == PrefixIcon::NONE)
     return;
@@ -234,13 +257,14 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
   //draw gear for set up icon
   } else if (caption == _("Setup")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &icon = icon_look.hBmpTabSettings;
-    DrawIconOrBitmap(canvas, rc, icon, focused);
-
+    const MaskedIcon *icon = &icon_look.hBmpTabSettings;
+    DrawIconAndText(canvas, rc, _T(""), icon,
+                    enabled, focused, pressed, transparent_background_force);
   } else if (caption == _("_SetupNavBar")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
-    const MaskedIcon &icon = icon_look.hBmpTabSettingsNavBar;
-    DrawIconOrBitmap(canvas, rc, icon, focused);
+    const MaskedIcon *icon = &icon_look.hBmpTabSettingsNavBar;
+    DrawIconAndText(canvas, rc, _T(""), icon,
+                    enabled, focused, pressed, transparent_background_force);
 
   } else if (caption == _("_NavBarToTarget")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
@@ -259,8 +283,9 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     if (!icon_look.valid) {
       DrawCaption(canvas, _("OK"), rc, enabled, focused, pressed, transparent_background_force);
     } else {
-      const MaskedIcon &bmp = icon_look.hBmpClose;
-      DrawIconOrBitmap(canvas, rc, bmp, focused);
+      const MaskedIcon *icon = &icon_look.hBmpClose;
+      DrawIconAndText(canvas, rc, _T(""), icon,
+                      enabled, focused, pressed, transparent_background_force);
     }
   } else if (caption == _("_TaskStats")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
