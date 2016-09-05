@@ -38,6 +38,11 @@ class Bitmap;
 class ActionListener;
 struct PixelRect;
 
+/**
+ * a derived class of button that makes buttons highly visible
+ * on the screen while minimally blocking the screen.
+ * Also allows for subscript text with smaller fonts
+ */
 class MapOverlayButton : public Button {
 
 protected:
