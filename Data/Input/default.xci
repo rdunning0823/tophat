@@ -126,7 +126,7 @@ mode=pan
 type=key
 data=APP1
 event=Pan off
-label=Pan\nOff
+label=_X
 location=28
 
 ###### main entry buttons
