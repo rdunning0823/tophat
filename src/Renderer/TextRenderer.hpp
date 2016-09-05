@@ -76,7 +76,11 @@ public:
   unsigned GetHeight(const Font &font, unsigned width,
                      const TCHAR *text) const;
 
-  void Draw(Canvas &canvas, const PixelRect &rc, const TCHAR *text) const;
+  /**
+   * @param outlined_text.  draws white outline around black text
+   */
+  void Draw(Canvas &canvas, const PixelRect &rc, const TCHAR *text,
+            bool outlined_text = false) const;
 };
 
 #endif

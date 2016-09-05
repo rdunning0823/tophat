@@ -33,16 +33,19 @@ Copyright_License {
 
 void
 TextButtonRenderer::DrawCaption(Canvas &canvas, const PixelRect &rc,
-                                bool enabled, bool focused, bool pressed) const
+                                bool enabled, bool focused, bool pressed,
+                                bool outlined_text) const
 {
-  DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed);
+  DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed,
+              outlined_text);
 }
 
 void
 TextButtonRenderer::DrawCaption(Canvas &canvas,
                                 StaticString<96>::const_pointer _caption,
                                 const PixelRect &rc, bool enabled,
-                                bool focused, bool pressed) const
+                                bool focused, bool pressed,
+                                bool outlined_text) const
 {
   const ButtonLook &look = GetLook();
 
@@ -55,8 +58,7 @@ TextButtonRenderer::DrawCaption(Canvas &canvas,
     canvas.SetTextColor(look.standard.foreground_color);
 
   canvas.Select(*look.font);
-
-  text_renderer.Draw(canvas, rc, _caption);
+  text_renderer.Draw(canvas, rc, _caption, outlined_text);
 }
 
 unsigned
@@ -76,6 +78,6 @@ TextButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
 
   if (!caption.empty())
     DrawCaption(canvas, frame_renderer.GetDrawingRect(rc, pressed),
-                enabled, focused, pressed);
+                enabled, focused, pressed, force_transparent_background);
 }
 

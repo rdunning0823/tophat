@@ -63,8 +63,12 @@ private:
                           bool enabled, bool focused, bool pressed,
                           bool transparent_background_force) const;
 
+  /**
+   * @param transparent_background_force. draws transparent background
+   */
   void DrawSymbol(Canvas &canvas, PixelRect rc,
-                  bool enabled, bool focused, bool pressed) const;
+                  bool enabled, bool focused, bool pressed,
+                  bool transparent_background_force) const;
 
   /**
    * @return. Pointer to icon with this prefix, or null
@@ -79,7 +83,8 @@ private:
   void DrawIconAndText(Canvas &canvas, PixelRect rc,
                        const TCHAR *text, const MaskedIcon *icon,
                        bool enabled, bool
-                       focused, bool pressed) const;
+                       focused, bool pressed,
+                       bool transparent_background_force) const;
 };
 
 #endif

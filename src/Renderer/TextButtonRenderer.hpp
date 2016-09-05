@@ -72,17 +72,26 @@ public:
   gcc_pure
   virtual unsigned GetMinimumButtonWidth() const;
 
+  /**
+   * @param force_transparent_background: draws transparent background and
+   * font with white outline around black text
+   */
   void DrawButton(Canvas &canvas, const PixelRect &rc,
                   bool enabled, bool focused, bool pressed,
                   bool force_transparent_background) const override;
 
 protected:
   void DrawCaption(Canvas &canvas, const PixelRect &rc,
-                   bool enabled, bool focused, bool pressed) const;
+                   bool enabled, bool focused, bool pressed,
+                   bool outlined_text = false) const;
 
+  /**
+   * @param outlined_text. draws white outline around black text
+   */
   void DrawCaption(Canvas &canvas, StaticString<96>::const_pointer _caption,
                    const PixelRect &rc,
-                   bool enabled, bool focused, bool pressed) const;
+                   bool enabled, bool focused, bool pressed,
+                   bool outlined_text) const;
 
 };
 

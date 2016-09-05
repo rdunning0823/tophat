@@ -25,6 +25,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/AnyCanvas.hpp"
+#include "Renderer/TextInBox.hpp"
 #include "Asset.hpp"
 
 #include <winuser.h>
@@ -56,7 +57,7 @@ TextRenderer::GetHeight(const Font &font, unsigned width,
 
 void
 TextRenderer::Draw(Canvas &canvas, const PixelRect &_rc,
-                   const TCHAR *text) const
+                   const TCHAR *text, bool outlined_text) const
 {
   PixelRect rc = _rc;
 
@@ -64,6 +65,7 @@ TextRenderer::Draw(Canvas &canvas, const PixelRect &_rc,
 
 #ifdef USE_GDI
   format |= DT_NOPREFIX | DT_NOCLIP;
+  bool supports_transparency = false;
 
   if (vcenter) {
     canvas.DrawFormattedText(&rc, text, format | DT_CALCRECT);
@@ -74,9 +76,36 @@ TextRenderer::Draw(Canvas &canvas, const PixelRect &_rc,
       rc.top += offset / 2;
   }
 #else
+  bool supports_transparency = true;
   if (vcenter)
     format |= DT_VCENTER;
 #endif
 
-  canvas.DrawFormattedText(&rc, text, format);
+  if (outlined_text && supports_transparency) {
+    canvas.SetTextColor(COLOR_WHITE);
+    const int offset = canvas.GetFontHeight() / 12u;
+
+    PixelRect rc_shadow = rc;
+    rc_shadow.Offset(offset, 0);
+    canvas.DrawFormattedText(&rc_shadow, text, format);
+
+    rc_shadow = rc;
+    rc_shadow.Offset(-1 * offset, 0);
+    canvas.DrawFormattedText(&rc_shadow, text, format);
+
+    rc_shadow = rc;
+    rc_shadow.Offset(0, offset);
+    canvas.DrawFormattedText(&rc_shadow, text, format);
+
+    rc_shadow = rc;
+    rc_shadow.Offset(0, -1 * offset);
+    canvas.DrawFormattedText(&rc_shadow, text, format);
+
+
+    canvas.SetTextColor(COLOR_BLACK);
+    canvas.DrawFormattedText(&rc, text, format);
+
+  } else {
+    canvas.DrawFormattedText(&rc, text, format);
+  }
 }

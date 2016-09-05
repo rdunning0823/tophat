@@ -40,8 +40,14 @@ ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
                                 bool force_transparent_background) const
 {
   const ButtonLook::StateLook &_look = focused ? look.focused : look.standard;
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  /** transparent buttons fails with WIN32 GDI */
+  const bool transparent = false;
+#else
   const bool transparent = look.background_transparent
       || force_transparent_background;
+#endif
+
   if (rounded) {
     rc.right -= 1;
 

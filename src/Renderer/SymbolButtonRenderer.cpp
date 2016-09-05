@@ -113,7 +113,8 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
                                       const TCHAR *text,
                                       const MaskedIcon *icon,
                                       bool enabled, bool
-                                      focused, bool pressed) const
+                                      focused, bool pressed,
+                                      bool transparent_background_force) const
 {
   const ButtonLook &look = GetLook();
   const Font &font = *look.font;
@@ -149,12 +150,13 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
   if (icon != nullptr) {
     icon->Draw(canvas, rc_icon, focused);
   }
-  DrawCaption(canvas, text, rc_caption, enabled, focused, pressed);
+  DrawCaption(canvas, text, rc_caption, enabled, focused, pressed, transparent_background_force);
 }
 
 inline void
 SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
-                                 bool focused, bool pressed) const
+                                 bool focused, bool pressed,
+                                 bool transparent_background_force) const
 {
   const ButtonLook &look = GetLook();
 
@@ -244,18 +246,18 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *icon = &icon_look.target_icon;
     DrawIconAndText(canvas, rc, _("Nav to target"), icon,
-                    enabled, focused, pressed);
+                    enabled, focused, pressed, transparent_background_force);
 
   } else if (caption == _("_NavBarToCenter")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *icon = &icon_look.task_turn_point_icon;
     DrawIconAndText(canvas, rc, _("Nav to center"), icon,
-                    enabled, focused, pressed);
+                    enabled, focused, pressed, transparent_background_force);
 
   } else if (caption == _("_X")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     if (!icon_look.valid) {
-      DrawCaption(canvas, _("OK"), rc, enabled, focused, pressed);
+      DrawCaption(canvas, _("OK"), rc, enabled, focused, pressed, transparent_background_force);
     } else {
       const MaskedIcon &bmp = icon_look.hBmpClose;
       DrawIconOrBitmap(canvas, rc, bmp, focused);
@@ -264,18 +266,18 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *icon = &icon_look.hBmpSpeedometer;
     DrawIconAndText(canvas, rc, _("Stats"), icon,
-                    enabled, focused, pressed);
+                    enabled, focused, pressed, transparent_background_force);
 
   } else if (caption == _("_EditTask")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon &icon = icon_look.hBmpTabTask;
     DrawIconAndText(canvas, rc, _("Edit task"), &icon,
-                    enabled, focused, pressed);
+                    enabled, focused, pressed, transparent_background_force);
 
   } else if (prefix_icon != PrefixIcon::NONE) {
     const MaskedIcon *icon = GetIcon(prefix_icon);
     DrawIconAndText(canvas, rc, caption.c_str(), icon,
-                    enabled, focused, pressed);
+                    enabled, focused, pressed, transparent_background_force);
 
   } else if (caption == _("More") || caption == _("Less")) {
     bool up = caption == _("Less");
@@ -313,7 +315,7 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     canvas.DrawCircle(left, (rc.top + rc.bottom) / 2, (UPixelScalar)(size * 1.5));
   } else
 
-    DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed);
+    DrawCaption(canvas, GetCaption(), rc, enabled, focused, pressed, transparent_background_force);
 }
 
 void
@@ -326,5 +328,5 @@ SymbolButtonRenderer::DrawButton(Canvas &canvas, const PixelRect &rc,
 
   if (!caption.empty() || prefix_icon != PrefixIcon::NONE)
     DrawSymbol(canvas, frame_renderer.GetDrawingRect(rc, pressed),
-               enabled, focused, pressed);
+               enabled, focused, pressed, transparent_background_force);
 }
