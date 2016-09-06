@@ -320,7 +320,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
   const Font &font = look.overlay_font;
   canvas.Select(font);
 
-  UPixelScalar padding = Layout::FastScale(4);
+  UPixelScalar padding = 0;
   UPixelScalar height = font.GetHeight();
   PixelScalar y = 0 + padding;
   PixelScalar x = render_projection.GetScreenWidth() - padding;
@@ -328,7 +328,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
   if (compass_visible)
     /* don't obscure the north arrow */
     /* TODO: obtain offset from CompassRenderer */
-    y += Layout::Scale(19) + Layout::FastScale(13);
+    y += Layout::Scale(19) + Layout::FastScale(15);
 
   fixed elevation = fixed(0);
   bool elevation_valid = false;
