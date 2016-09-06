@@ -318,7 +318,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
   mode.shape = LabelShape::FILLED;
   mode.align = TextInBoxMode::Alignment::RIGHT;
 
-  const Font &font = *look.overlay_font;
+  const Font &font = look.overlay_font;
   canvas.Select(font);
 
   UPixelScalar padding = Layout::FastScale(4);
@@ -438,7 +438,7 @@ GlueMapWindow::DrawGPSStatus(Canvas &canvas, const PixelRect &rc_unadjusted,
   TextInBoxMode mode;
   mode.shape = LabelShape::ROUNDED_BLACK;
 
-  const Font &font = *look.overlay_font;
+  const Font &font = look.overlay_font;
   canvas.Select(font);
   TextInBox(canvas, txt, x, y, mode, rc, nullptr);
 }

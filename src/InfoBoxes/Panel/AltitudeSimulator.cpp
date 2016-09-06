@@ -212,7 +212,7 @@ AltitudeSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const MapLook &map_look = UIGlobals::GetLook().map;
   big_dialog_look.Initialise(320);
-  big_button_look.Initialise(*map_look.overlay_font);
+  big_button_look.Initialise(map_look.overlay_font);
   value_font_height = big_dialog_look.text_font.GetHeight();
   CalculateLayout(rc, value_font_height);
 

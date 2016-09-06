@@ -24,6 +24,7 @@ Copyright_License {
 #include "MapLook.hpp"
 #include "MapSettings.hpp"
 #include "Screen/Layout.hpp"
+#include "FontDescription.hpp"
 #include "Resources.hpp"
 
 void
@@ -90,8 +91,6 @@ MapLook::Initialise(const MapSettings &settings,
   waiting_for_fix_icon.LoadResource(IDB_GPSSTATUS1, IDB_GPSSTATUS1_HD, IDB_GPSSTATUS1_HD2, false);
   no_gps_icon.LoadResource(IDB_GPSSTATUS2, IDB_GPSSTATUS2_HD, IDB_GPSSTATUS2_HD2, false);
 
-  overlay_font = &bold_font;
-
   airspace.Initialise(settings.airspace, topography.important_label_font);
   Reinitialise(settings, font_scale_map_waypoint_name, font_scale_map_place_name);
 }
@@ -101,6 +100,10 @@ MapLook::Reinitialise(const MapSettings &settings,
                       unsigned font_scale_map_waypoint_name,
                       unsigned font_scale_map_place_name)
 {
+  const FontDescription font_bold_d((Layout::FontScale(18) *
+                                         font_scale_map_waypoint_name / 100), true);
+  overlay_font.Load(font_bold_d);
+
   waypoint.Reinitialise(settings.waypoint, font_scale_map_waypoint_name);
   topography.Reinitialise(font_scale_map_place_name);
 }
