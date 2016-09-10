@@ -274,9 +274,7 @@ inline void
 TeamCodeFullScreen::OnCodeClicked()
 {
   TCHAR newTeammateCode[10];
-
-  CopyString(newTeammateCode,
-             CommonInterface::GetComputerSettings().team_code.team_code.GetCode(), 10);
+  newTeammateCode[0] = '\0';
 
   if (!TextEntryDialog(newTeammateCode, 7))
     return;
