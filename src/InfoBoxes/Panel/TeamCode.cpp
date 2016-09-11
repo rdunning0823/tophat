@@ -139,10 +139,14 @@ TeamCodeWidget2::Update(const MoreData &basic, const DerivedInfo &calculated)
 
   SetText(OWN_CODE, teamcode_info.own_teammate_code.GetCode());
   SetText(MATE_CODE, settings.team_code.GetCode());
-  SetText(FLARM_LOCK,
-          settings.team_flarm_id.IsDefined()
-          ? settings.team_flarm_callsign.c_str()
-          : _T(""));
+
+  buffer = settings.team_flarm_id.IsDefined()
+      ? settings.team_flarm_callsign.c_str()
+      : _T("");
+  if (settings.team_flarm_id.IsDefined()
+      && !teamcode_info.flarm_teammate_code_current)
+    buffer.AppendFormat(_T(" - %s"), _("Not current"));
+  SetText(FLARM_LOCK, buffer.c_str());
 }
 
 void
