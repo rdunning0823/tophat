@@ -310,6 +310,26 @@ ThreeCommandButtonWidgetLayout::CalculateLayout(const PixelRect &rc)
 }
 
 void
+FourCommandButtonWidgetLayout::CalculateLayout(const PixelRect &rc)
+{
+  const unsigned height = (GetFooterHeight() * 5) / 4;;
+  const unsigned width = (rc.right - rc.left) / 4;
+
+  widget_rc = left_button_rc = left_middle_button_rc = right_button_rc
+      = middle_button_rc = rc;
+
+  left_button_rc.top = left_middle_button_rc.top = right_button_rc.top
+      = middle_button_rc.top = rc.bottom - height;
+
+  left_button_rc.right = left_middle_button_rc.left = width;
+  left_middle_button_rc.right = middle_button_rc.left = width * 2;
+  middle_button_rc.right = right_button_rc.left = width * 3;
+
+  widget_rc.bottom = rc.bottom - height;
+}
+
+
+void
 TwoCommandButtonListLayout::CalculateLayout(const PixelRect &rc)
 {
   const UPixelScalar height = GetFooterHeight();
