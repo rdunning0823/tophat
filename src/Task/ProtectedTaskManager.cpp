@@ -115,6 +115,13 @@ ProtectedTaskManager::DoGoto(const Waypoint &wp)
   return lease->DoGoto(wp);
 }
 
+bool
+ProtectedTaskManager::DoTeammate(const Waypoint &wp)
+{
+  ExclusiveLease lease(*this);
+  return lease->DoTeammate(wp);
+}
+
 OrderedTask*
 ProtectedTaskManager::TaskClone() const
 {

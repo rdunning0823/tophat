@@ -45,7 +45,7 @@ namespace TophatMenu {
 
   /**
    * Shows or hides the Nav menu
-   * Either Goto or Ordered, whichever is current
+   * Either Goto, Teammate or Ordered, whichever is current
    */
   void RotateNavMenu();
 }

@@ -75,6 +75,7 @@ public:
   void IncrementActiveTaskPointArm(int offset);
 
   bool DoGoto(const Waypoint &wp);
+  bool DoTeammate(const Waypoint &wp);
 
   gcc_malloc
   OrderedTask* TaskClone() const;

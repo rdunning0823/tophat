@@ -29,6 +29,7 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "Look/WaypointLook.hpp"
 #include "Look/TaskLook.hpp"
+#include "Look/TrafficLook.hpp"
 #include "Renderer/WaypointIconRenderer.hpp"
 #include "Renderer/WaypointRendererSettings.hpp"
 #include "Screen/Canvas.hpp"
@@ -269,7 +270,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
+  const TrafficLook &traffic_look = UIGlobals::GetLook().traffic;
 
+  const bool is_teammate = (task_mode == TaskType::TEAMMATE);
   const bool is_ordered = (task_mode == TaskType::ORDERED);
   const bool is_aat = (task_factory_type ==  TaskFactoryType::AAT);
   const bool is_start = idx == 0;
@@ -336,6 +339,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
     break;
   case TaskType::GOTO:
+  case TaskType::TEAMMATE:
   case TaskType::ABORT:
     type_buffer = _("Goto:");
     break;
@@ -443,14 +447,18 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   // only draw target or turnpoint icon if no checkmark
   const TaskLook &task_look = UIGlobals::GetMapLook().task;
 
-  const bool draw_target =    !draw_checkmark && is_aat && navigate_to_target;
-  const bool draw_turnpoint = !draw_checkmark && !draw_target && twp != nullptr;
-  const bool draw_icon = (draw_checkmark || draw_target || draw_turnpoint);
+  const bool draw_teammate =  !draw_checkmark && is_teammate;
+  const bool draw_target =    !draw_checkmark && !draw_teammate && is_aat && navigate_to_target;
+  const bool draw_turnpoint = !draw_checkmark  && !draw_teammate && !draw_target && twp != nullptr;
+  const bool draw_icon = (draw_checkmark || draw_target || draw_turnpoint || draw_teammate);
   assert (!(draw_target && draw_turnpoint));
+  assert (!(draw_teammate && draw_turnpoint));
+  assert (!(draw_teammate && draw_target));
+  assert (!(draw_teammate && draw_checkmark));
 
   // icon is only used for target or checkmark.  WaypointRenderer is used otherwise
   const MaskedIcon *icon = draw_checkmark ? &icon_look.hBmpCheckMark :
-      &task_look.target_icon;
+      draw_teammate ? &traffic_look.teammate_icon : &task_look.target_icon;
 
   if (draw_icon)
     icon_size = icon->GetSize();
@@ -494,7 +502,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
         unsigned name_height = (unsigned)name_font.GetHeight() / 2;
         pt.y += name_height / 2;
 
-        if (draw_target) {
+        if (draw_target || draw_teammate) {
           icon->Draw(canvas, pt); // draws from center of icon
 
         } else if (draw_turnpoint) {

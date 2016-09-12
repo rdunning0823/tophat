@@ -115,6 +115,7 @@ MapTaskManager::AppendToTask(const Waypoint &waypoint)
     switch (task_manager->GetMode()) {
     case TaskType::NONE:
     case TaskType::ABORT:
+    case TaskType::TEAMMATE:
     case TaskType::ORDERED:
       result = task_manager->DoGoto(waypoint) ? MapTaskManager::MUTATED_TO_GOTO :
                               MapTaskManager::UNMODIFIED;
@@ -190,6 +191,7 @@ MapTaskManager::InsertInTask(const Waypoint &waypoint)
     switch (task_manager->GetMode()) {
     case TaskType::NONE:
     case TaskType::ABORT:
+    case TaskType::TEAMMATE:
     case TaskType::ORDERED:
       result = task_manager->DoGoto(waypoint) ? MapTaskManager::MUTATED_TO_GOTO :
                               MapTaskManager::UNMODIFIED;

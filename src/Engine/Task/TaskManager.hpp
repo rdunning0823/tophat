@@ -212,6 +212,14 @@ public:
   bool DoGoto(const Waypoint & wp);
 
   /**
+   * Sets active task to Teammate mode, to specified waypoint
+   *
+   * @param wp Waypoint to go to
+   * @return True if successful
+   */
+  bool DoTeammate(const Waypoint & wp);
+
+  /**
    * Updates internal state of task given new aircraft.
    * Only essential calculations are performed here;
    * other calculations and housekeeping may be performed

@@ -560,18 +560,22 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test
     if (!test) {
       StaticString<20> menu_ordered(_T("NavOrdered"));
       StaticString<20> menu_goto(_T("NavGoto"));
+      StaticString<20> menu_teammate(_T("NavTeammate"));
+
       TaskType task_mode;
       {
         ProtectedTaskManager::Lease task_manager(*protected_task_manager);
         task_mode = task_manager->GetMode();
       }
-
       if (InputEvents::IsMode(menu_ordered.buffer())
-          || InputEvents::IsMode(menu_goto.buffer()))
+          || InputEvents::IsMode(menu_goto.buffer())
+          || InputEvents::IsMode(menu_teammate.buffer()))
         InputEvents::HideMenu();
       else if (task_mode == TaskType::GOTO
           || task_mode == TaskType::ABORT)
         InputEvents::setMode(menu_goto.buffer());
+      else if (task_mode == TaskType::TEAMMATE)
+          InputEvents::setMode(menu_teammate.buffer());
       else
         InputEvents::setMode(menu_ordered.buffer());
     }

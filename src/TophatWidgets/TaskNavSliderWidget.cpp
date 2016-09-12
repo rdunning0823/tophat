@@ -107,6 +107,7 @@ TaskNavSliderWidget::ReadTask()
     waypoint_index = task_manager->GetActiveTaskPointIndex();
     break;
   case TaskType::GOTO:
+  case TaskType::TEAMMATE:
   case TaskType::ABORT:
   case TaskType::NONE:
     waypoint_index = 0;
@@ -128,6 +129,7 @@ TaskNavSliderWidget::RefreshList(TaskType mode)
     GetList().SetLength(1);
     break;
   case TaskType::GOTO:
+  case TaskType::TEAMMATE:
     waypoint_index = 0;
     GetList().SetLength(1);
     break;

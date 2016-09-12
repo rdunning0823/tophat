@@ -276,6 +276,9 @@ InputEvents::eventAbortTask(const TCHAR *misc)
     case TaskType::GOTO:
       Message::AddMessage(_("Go to target"));
       break;
+    case TaskType::TEAMMATE:
+      Message::AddMessage(_("Go to teammate"));
+      break;
     case TaskType::ORDERED:
       Message::AddMessage(_("Ordered task"));
       break;
@@ -289,6 +292,7 @@ InputEvents::eventAbortTask(const TCHAR *misc)
     case TaskType::ORDERED:
       task_manager->Abort();
       break;
+    case TaskType::TEAMMATE:
     case TaskType::GOTO:
       if (task_manager->CheckOrderedTask()) {
         task_manager->Resume();

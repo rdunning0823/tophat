@@ -99,6 +99,14 @@ TaskManager::SetMode(const TaskType _mode)
       break;
     }
 
+  case TaskType::TEAMMATE:
+    if (goto_task->GetActiveTaskPoint()) {
+      active_task = goto_task;
+      task_time_stamp = MonotonicClockMS();
+      mode = TaskType::TEAMMATE;
+      break;
+    }
+
   case TaskType::NONE:
     active_task = NULL;
     mode = TaskType::NONE;
@@ -394,6 +402,17 @@ TaskManager::DoGoto(const Waypoint &wp)
 }
 
 bool
+TaskManager::DoTeammate(const Waypoint &wp)
+{
+  if (goto_task->DoGoto(wp)) {
+    SetMode(TaskType::TEAMMATE);
+    return true;
+  }
+
+  return false;
+}
+
+bool
 TaskManager::CheckTask() const
 {
   if (active_task)
@@ -575,6 +594,7 @@ TaskManager::Commit(const OrderedTask &other)
       SetActiveTaskPoint(0); // then set tp
       break;
     case TaskType::GOTO:
+    case TaskType::TEAMMATE:
     case TaskType::ABORT:
       // resume on load
       SetMode(TaskType::ORDERED);

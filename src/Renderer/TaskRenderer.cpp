@@ -109,6 +109,7 @@ TaskRenderer::Draw(const TaskInterface &active_task,
     break;
 
   case TaskType::GOTO:
+  case TaskType::TEAMMATE:
     Draw((const GotoTask &)active_task);
     if (ordered_task.TaskSize() > 1) {
       show_only_ordered_outlines = true;

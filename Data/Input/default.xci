@@ -78,7 +78,7 @@ event=Beep 1
 # mode=default
 # ------------
 
-mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Info1 Info2 Menu Menu1 Menu2 MenuLast Vario1 Vario2 NavOrdered NavGoto Orientation
+mode=Nav1 Nav2 Display1 Display2 Config1 Config2 Info1 Info2 Menu Menu1 Menu2 MenuLast Vario1 Vario2 NavOrdered NavGoto NavTeammate Orientation
 type=key
 data=ESCAPE
 event=Mode default
@@ -499,6 +499,80 @@ label=Goto
 location=23
 
 mode=NavGoto
+type=key
+data=9
+event=WaypointDetails select
+event=Mode default
+label=Waypoint\nlist$(CheckWaypointFile)
+location=24
+
+# -------------
+# mode=NavTeammate
+# -------------
+
+mode=NavTeammate
+type=key
+data=6
+event=RotateTophatNavMenu
+
+mode=NavTeammate
+type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=NavTeammate
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=NavTeammate
+type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=NavTeammate
+type=key
+data=DOWN
+event=ChangeActiveLabel down
+
+mode=NavTeammate
+type=key
+data=RETURN
+event=DoActiveLabel
+
+mode=NavTeammate
+type=key
+data=0
+event=NavBarDestinationType toggle
+event=Mode default
+label=$(NavBarDestinationType)
+location=16
+
+mode=NavTeammate
+type=key
+data=0
+event=Calculator
+event=Mode default
+label=_EditTask
+location=19
+
+mode=NavTeammate
+type=key
+data=0
+event=Mode default
+event=AbortTask resume
+label=Resume task$(CheckTask)
+location=21
+
+mode=NavTeammate
+type=key
+data=0
+event=GotoLookup
+event=Mode default
+label=Goto
+location=23
+
+mode=NavTeammate
 type=key
 data=9
 event=WaypointDetails select

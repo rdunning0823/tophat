@@ -30,6 +30,10 @@ enum class TaskType : uint8_t {
   ORDERED,
   ABORT,
   GOTO,
+  /**
+   * just like a goto task, but specifically to a Teammate's location
+   */
+  TEAMMATE,
 };
 
 #endif //TASKINTERFACE_H

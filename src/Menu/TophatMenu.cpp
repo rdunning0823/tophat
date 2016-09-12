@@ -77,17 +77,23 @@ namespace TophatMenu {
   {
     StaticString<20> menu_ordered;
     StaticString<20> menu_goto;
+    StaticString<20> menu_teammate;
 
     menu_ordered = _T("NavOrdered");
     menu_goto = _T("NavGoto");
+    menu_teammate = _T("NavTeammate");
     TaskType mode = XCSoarInterface::Calculated().common_stats.task_type;
 
     if (InputEvents::IsMode(menu_ordered.buffer())
-        || InputEvents::IsMode(menu_goto.buffer()))
+        || InputEvents::IsMode(menu_goto.buffer())
+        || InputEvents::IsMode(menu_teammate.buffer()))
       InputEvents::HideMenu();
     else if (mode == TaskType::GOTO || mode == TaskType::ABORT) {
       InputEvents::ShowMenu();
       InputEvents::setMode(menu_goto.buffer());
+    } else if (mode == TaskType::TEAMMATE) {
+        InputEvents::ShowMenu();
+        InputEvents::setMode(menu_teammate.buffer());
     } else {
       InputEvents::ShowMenu();
       InputEvents::setMode(menu_ordered.buffer());
