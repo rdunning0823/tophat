@@ -83,21 +83,18 @@ TaskManager::SetMode(const TaskType _mode)
   case TaskType::ABORT:
     active_task = abort_task;
     mode = TaskType::ABORT;
-    task_time_stamp = MonotonicClockMS();
     break;
 
   case TaskType::ORDERED:
     if (ordered_task->TaskSize()) {
       active_task = ordered_task;
       mode = TaskType::ORDERED;
-      task_time_stamp = MonotonicClockMS();
       break;
     }
 
   case TaskType::GOTO:
     if (goto_task->GetActiveTaskPoint()) {
       active_task = goto_task;
-      task_time_stamp = MonotonicClockMS();
       mode = TaskType::GOTO;
       break;
     }
@@ -105,9 +102,9 @@ TaskManager::SetMode(const TaskType _mode)
   case TaskType::NONE:
     active_task = NULL;
     mode = TaskType::NONE;
-    task_time_stamp = MonotonicClockMS();
     break;
   };
+  task_time_stamp = MonotonicClockMS();
   return mode;
 }
 
@@ -390,7 +387,6 @@ TaskManager::DoGoto(const Waypoint &wp)
 {
   if (goto_task->DoGoto(wp)) {
     SetMode(TaskType::GOTO);
-    task_time_stamp = MonotonicClockMS();
     return true;
   }
 
