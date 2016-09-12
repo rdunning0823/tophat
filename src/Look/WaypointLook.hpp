@@ -40,6 +40,7 @@ struct WaypointLook {
   MaskedIcon airport_reachable_icon, airport_unreachable_icon;
   MaskedIcon airport_marginal_icon;
   MaskedIcon field_marginal_icon, field_reachable_icon, field_unreachable_icon;
+  MaskedIcon teammate_icon;
 
   Brush reachable_brush, terrain_unreachable_brush, unreachable_brush;
 

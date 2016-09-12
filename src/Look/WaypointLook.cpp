@@ -44,6 +44,7 @@ WaypointLook::Initialise(const WaypointRendererSettings &settings,
   obstacle_icon.LoadResource(IDB_OBSTACLE, IDB_OBSTACLE_HD, IDB_OBSTACLE_HD2);
   thermal_hotspot_icon.LoadResource(IDB_THERMAL_HOTSPOT, IDB_THERMAL_HOTSPOT_HD, IDB_THERMAL_HOTSPOT_HD2);
   marker_icon.LoadResource(IDB_MARK, IDB_MARK_HD, IDB_MARK_HD2);
+  teammate_icon.LoadResource(IDB_TEAMMATE_POS, IDB_TEAMMATE_POS_HD, IDB_TEAMMATE_POS_HD2);
   reachable_brush.Create(COLOR_GREEN);
   terrain_unreachable_brush.Create(LightColor(COLOR_RED));
   unreachable_brush.Create(COLOR_RED);

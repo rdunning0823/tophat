@@ -58,6 +58,7 @@ struct Waypoint {
     OBSTACLE,
     THERMAL_HOTSPOT,
     MARKER,
+    TEAMMATE,
   };
 
   /**

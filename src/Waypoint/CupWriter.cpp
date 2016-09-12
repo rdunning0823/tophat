@@ -101,6 +101,7 @@ WriteSeeYouFlags(TextWriter &writer, const Waypoint &wp)
     break;
 
   case Waypoint::Type::THERMAL_HOTSPOT:
+  case Waypoint::Type::TEAMMATE:
     break;
   }
 }
