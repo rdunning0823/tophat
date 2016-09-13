@@ -47,6 +47,9 @@ Copyright_License {
 #include "Blackboard/BlackboardListener.hpp"
 #include "Language/Language.hpp"
 #include "TeamActions.hpp"
+#include "Task/ProtectedTaskManager.hpp"
+#include "Waypoint/FlarmGlue.hpp"
+#include "Util/StringAPI.hxx"
 
 
 class TeamCodeWidget2 final
@@ -160,10 +163,13 @@ TeamCodeWidget2::OnCalculatedUpdate(const MoreData &basic,
 /**
  * wrapper class for TeamCodeWidget2 so it fits in an InfoBox panel
  */
-class TeamCodeFullScreen final : public BaseAccessPanel, ThreeCommandButtonWidgetLayout
+class TeamCodeFullScreen final
+  : public BaseAccessPanel, FourCommandButtonWidgetLayout,
+    NullBlackboardListener
 {
   enum Buttons {
     SET_CODE,
+    GOTO,
     SET_WAYPOINT,
     SET_FLARM_LOCK,
   };
@@ -172,7 +178,7 @@ protected:
   DockWindow widget_dock;
   TeamCodeWidget2 *team_code_widget2;
 
-  Button *set_code_button, *set_waypoint_button, *flarm_lock_button;
+  Button *set_code_button, *goto_button, *set_waypoint_button, *flarm_lock_button;
 
 public:
   TeamCodeFullScreen(unsigned _id)
@@ -190,11 +196,21 @@ protected:
   /* methods from ActionListener */
   virtual void OnAction(int id) override;
 
+  /* virtual methods from class BlackboardListener */
+  virtual void OnCalculatedUpdate(const MoreData &basic,
+                                  const DerivedInfo &calculated) override;
+
+  /**
+   * @return. true if teammate task is active
+   */
+  bool IsTeammateTask();
 
 private:
   void OnCodeClicked();
+  bool OnGotoClicked();
   void OnSetWaypointClicked();
   void OnFlarmLockClicked();
+  void UpdateLabels(const MoreData &basic, const DerivedInfo &calculated);
 };
 
 void
@@ -202,9 +218,10 @@ TeamCodeFullScreen::Move(const PixelRect &rc_unused)
 {
   PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
   BaseAccessPanel::Move(rc);
-  ThreeCommandButtonWidgetLayout::CalculateLayout(content_rc);
+  FourCommandButtonWidgetLayout::CalculateLayout(content_rc);
   widget_dock.Move(widget_rc);
   set_code_button->Move(left_button_rc);
+  goto_button->Move(left_middle_button_rc);
   set_waypoint_button->Move(middle_button_rc);
   flarm_lock_button->Move(right_button_rc);
 }
@@ -213,7 +230,7 @@ void
 TeamCodeFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   BaseAccessPanel::Prepare(parent, rc);
-  ThreeCommandButtonWidgetLayout::CalculateLayout(content_rc);
+  FourCommandButtonWidgetLayout::CalculateLayout(content_rc);
 
   const ButtonLook &button_look = UIGlobals::GetDialogLook().button;
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
@@ -232,6 +249,10 @@ TeamCodeFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                   left_button_rc,
                               button_style, *this, SET_CODE);
 
+  goto_button = new Button(GetClientAreaWindow(), button_look, _T("Goto"),
+                           left_middle_button_rc,
+                           button_style, *this, GOTO);
+
   set_waypoint_button = new Button(GetClientAreaWindow(), button_look, _T("Set WP"),
                                  middle_button_rc,
                                  button_style, *this, SET_WAYPOINT);
@@ -239,6 +260,8 @@ TeamCodeFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   flarm_lock_button = new Button(GetClientAreaWindow(), button_look, _T("Flarm lock"),
                                  right_button_rc,
                                  button_style, *this, SET_FLARM_LOCK);
+
+  UpdateLabels(CommonInterface::Basic(), CommonInterface::Calculated());
 }
 
 void
@@ -248,19 +271,30 @@ TeamCodeFullScreen::Unprepare()
   team_code_widget2->Unprepare();
   delete team_code_widget2;
   delete(set_code_button);
+  delete(goto_button);
   delete(set_waypoint_button);
   delete(flarm_lock_button);
+}
+
+void
+TeamCodeFullScreen::OnCalculatedUpdate(const MoreData &basic,
+                                       const DerivedInfo &calculated)
+{
+  UpdateLabels(basic, calculated);
 }
 
 void
 TeamCodeFullScreen::Show(const PixelRect &rc)
 {
   widget_dock.ShowOnTop();
+  CommonInterface::GetLiveBlackboard().AddListener(*this);
   BaseAccessPanel::Show(rc);
 }
+
 void
 TeamCodeFullScreen::Hide()
 {
+  CommonInterface::GetLiveBlackboard().RemoveListener(*this);
   team_code_widget2->Hide();
   widget_dock.Hide();
   BaseAccessPanel::Hide();
@@ -277,6 +311,29 @@ TeamCodeFullScreen::OnSetWaypointClicked()
   }
 }
 
+bool
+TeamCodeFullScreen::IsTeammateTask()
+{
+  // we could use common_stats.task to check this, but it might be delayed
+  // by a clock tick since this is called by the main thread
+  // and common_stats are updated in the calculation thread.
+  ProtectedTaskManager::Lease _task(*protected_task_manager);
+  return _task->GetMode() == TaskType::TEAMMATE;
+}
+
+void
+TeamCodeFullScreen::UpdateLabels(const MoreData &basic,
+                                 const DerivedInfo &calculated)
+{
+  if (IsTeammateTask())
+    goto_button->SetCaption(_("End goto"));
+  else
+    goto_button->SetCaption(_("Goto"));
+
+  goto_button->SetEnabled(calculated.teammate_available);
+}
+
+
 inline void
 TeamCodeFullScreen::OnCodeClicked()
 {
@@ -291,7 +348,10 @@ TeamCodeFullScreen::OnCodeClicked()
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;
   settings.team_code.Update(newTeammateCode);
+
   settings.team_flarm_id.Clear();
+
+  FlarmWaypointGlue::ClearTeammateTask(protected_task_manager);
 }
 
 inline void
@@ -322,6 +382,7 @@ TeamCodeFullScreen::OnFlarmLockClicked()
                    _("Not Found"), MB_OK | MB_ICONINFORMATION);
     return;
   }
+  FlarmWaypointGlue::ClearTeammateTask(protected_task_manager);
 
   const FlarmId id = PickFlarmTraffic(_("Set new teammate"), ids, count);
   if (!id.IsDefined())
@@ -330,12 +391,44 @@ TeamCodeFullScreen::OnFlarmLockClicked()
   TeamActions::TrackFlarm(id, newTeamFlarmCNTarget);
 }
 
+bool
+TeamCodeFullScreen::OnGotoClicked()
+{
+  if (IsTeammateTask()) {
+    FlarmWaypointGlue::ClearTeammateTask(protected_task_manager);
+    return false;
+  }
+  const TeamInfo &teamcode_info = CommonInterface::Calculated();
+
+  if (teamcode_info.teammate_location.IsValid()) {
+
+    const TeamCodeSettings &settings =
+      CommonInterface::GetComputerSettings().team_code;
+
+    FlarmWaypointGlue::AddTeammateTask(teamcode_info.teammate_location,
+                                       terrain,
+                                       protected_task_manager,
+                                       settings.team_flarm_id.IsDefined()
+                                       && !teamcode_info.flarm_teammate_code_current);
+    return true;
+  } else {
+    ShowMessageBox(_("Bad team code"),
+                   _("Can't goto team location"), MB_OK | MB_ICONINFORMATION);
+    return false;
+  }
+}
+
 void
 TeamCodeFullScreen::OnAction(int id)
 {
   switch (id) {
   case SET_CODE:
     OnCodeClicked();
+    break;
+
+  case GOTO:
+    if (OnGotoClicked())
+      Close();
     break;
 
   case SET_WAYPOINT:

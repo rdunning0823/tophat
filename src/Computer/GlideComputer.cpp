@@ -27,8 +27,14 @@ Copyright_License {
 #include "ConditionMonitor/ConditionMonitors.hpp"
 #include "GlideComputerInterface.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
+#include "Task/ProtectedTaskManager.hpp"
+#include "Waypoint/FlarmGlue.hpp"
+#include "Components.hpp"
 
 static PeriodClock last_team_code_update;
+static GeoPoint last_teammate_task;
+static TaskType last_teammate_task_type;
+static bool last_teammate_flarm_current;
 
 /**
  * Constructor of the GlideComputer class
@@ -229,6 +235,45 @@ GlideComputer::CalculateOwnTeamCode()
   SetCalculated().own_teammate_code.Update(v.bearing, v.distance);
 }
 
+inline void
+GlideComputer::UpdateTeammateTask()
+{
+  TaskType task_type = TaskType::NONE;
+
+  // No reference waypoint for teamcode calculation chosen -> cancel
+  if (!DetermineTeamCodeRefLocation())
+    return;
+
+  const TeamInfo &teamcode_info = Calculated();
+  if (!teamcode_info.teammate_available)
+    return;
+
+  assert(teamcode_info.teammate_location.IsValid());
+  {
+    ProtectedTaskManager::Lease _task(task_computer.GetProtectedTaskManager());
+    task_type = _task->GetMode();
+    if (task_type != TaskType::TEAMMATE) {
+      last_teammate_task_type = task_type;
+      return;
+    }
+  }
+  if (last_teammate_task == teamcode_info.teammate_location
+      && task_type == last_teammate_task_type
+      && last_teammate_flarm_current == teamcode_info.flarm_teammate_code_current)
+    return;
+
+  last_teammate_task_type = task_type;
+  last_teammate_task = teamcode_info.teammate_location;
+  last_teammate_flarm_current = teamcode_info.flarm_teammate_code_current;
+
+  const TeamCodeSettings &settings = GetComputerSettings().team_code;
+  FlarmWaypointGlue::AddTeammateTask(teamcode_info.teammate_location,
+                                     terrain,
+                                     protected_task_manager,
+                                     settings.team_flarm_id.IsDefined()
+                                     && !teamcode_info.flarm_teammate_code_current);
+}
+
 static void
 ComputeFlarmTeam(const GeoPoint &location, const GeoPoint &reference_location,
                  const TrafficList &traffic_list, const FlarmId target_id,
@@ -281,12 +326,14 @@ GlideComputer::CalculateTeammateBearingRange()
     ComputeFlarmTeam(basic.location, team_code_ref_location,
                      basic.flarm.traffic, settings.team_flarm_id,
                      teamcode_info);
+    UpdateTeammateTask();
   } else if (settings.team_code.IsDefined()) {
     teamcode_info.flarm_teammate_code.Clear();
 
     ComputeTeamCode(basic.location, team_code_ref_location,
                     settings.team_code,
                     teamcode_info);
+    UpdateTeammateTask();
   } else {
     teamcode_info.teammate_available = false;
     teamcode_info.flarm_teammate_code.Clear();

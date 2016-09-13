@@ -171,6 +171,12 @@ private:
 
   void CalculateTeammateBearingRange();
   void CalculateOwnTeamCode();
+
+  /**
+   * Updates Teammate task if active
+   */
+  void UpdateTeammateTask();
+
 };
 
 #endif
