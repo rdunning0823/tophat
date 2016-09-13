@@ -109,7 +109,7 @@ TaskManager::SetMode(const TaskType _mode)
 }
 
 const AATPoint*
-TaskManager::GetAATTaskPoint(unsigned tp_index)
+TaskManager::GetAATTaskPoint(unsigned tp_index) const
 {
   return ordered_task->GetAATTaskPoint(tp_index);
 }

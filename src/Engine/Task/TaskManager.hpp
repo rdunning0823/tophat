@@ -114,7 +114,7 @@ public:
    * @return const pointer to AAT task point or null if
    * the turnpoint is not an AAT task point
    */
-  const AATPoint* GetAATTaskPoint(unsigned tp_index);
+  const AATPoint* GetAATTaskPoint(unsigned tp_index) const;
 
   /**
    * Sets active taskpoint sequence for active task

@@ -496,7 +496,7 @@ TargetWidget::RefreshCalculator()
   bool is_aat;
 
   {
-    ProtectedTaskManager::ExclusiveLease lease(*protected_task_manager);
+    ProtectedTaskManager::Lease lease(*protected_task_manager);
 
     const AATPoint *ap = lease->GetAATTaskPoint(target_point);
 
