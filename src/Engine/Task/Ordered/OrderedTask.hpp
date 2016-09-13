@@ -477,7 +477,7 @@ public:
   /**
    * Are the saved start valid?
    */
-  bool SavedStartIsValid();
+  bool SavedStartIsValid() const;
 
   /** restores state of task from saved file */
   void RestoreTaskState();

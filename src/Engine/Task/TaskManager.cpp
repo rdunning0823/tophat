@@ -149,7 +149,7 @@ TaskManager::SavedStartRestore()
 }
 
 bool
-TaskManager::SavedStartIsValid()
+TaskManager::SavedStartIsValid() const
 {
   return ordered_task->SavedStartIsValid();
 }

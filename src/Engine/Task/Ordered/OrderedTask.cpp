@@ -660,7 +660,7 @@ OrderedTask::SavedStartInvalidate()
 }
 
 bool
-OrderedTask::SavedStartIsValid()
+OrderedTask::SavedStartIsValid() const
 {
   return saved_start_pushed_valid;
 }

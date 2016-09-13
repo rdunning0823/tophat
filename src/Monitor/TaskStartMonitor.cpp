@@ -147,7 +147,7 @@ TaskStartMonitor::Check()
   const CommonStats &common_stats = calculated.common_stats;
   const TaskStats &stats = calculated.ordered_task_stats;
   {
-    ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
+    ProtectedTaskManager::Lease task_manager(*protected_task_manager);
     if (!task_manager->SavedStartIsValid())
       return;
   }

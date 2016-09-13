@@ -153,7 +153,7 @@ public:
   /**
    * Is the saved start state valid?
    */
-  bool SavedStartIsValid();
+  bool SavedStartIsValid() const;
 
   /** restores task state from serialised data */
   void RestoreTaskState();
