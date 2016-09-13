@@ -132,6 +132,9 @@ TeamCodeWidget2::Update(const MoreData &basic, const DerivedInfo &calculated)
     FormatUserDistanceSmart(teamcode_info.teammate_vector.distance,
                             buffer.buffer());
     SetText(RANGE, buffer);
+  } else {
+    SetText(BEARING, _T("---"));
+    SetText(RANGE, _T("---"));
   }
 
   SetText(OWN_CODE, teamcode_info.own_teammate_code.GetCode());
