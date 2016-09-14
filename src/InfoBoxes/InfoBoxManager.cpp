@@ -266,13 +266,13 @@ InfoBoxManager::ShowInfoBoxPicker(const int id)
 
   ComboList list;
   for (unsigned j = InfoBoxFactory::MIN_TYPE_VAL; j < InfoBoxFactory::NUM_TYPES; j++) {
+    InfoBoxFactory::Type j_type = (InfoBoxFactory::Type) j;
+    if ((InfoBoxFactory::GetCategory(j_type) == InfoBoxFactory::Category::STANDARD)
+        || (old_type == j_type)) {
 
-    if (InfoBoxFactory::GetCategory((InfoBoxFactory::Type) j)
-      == InfoBoxFactory::Category::STANDARD) {
-
-      const TCHAR * desc = InfoBoxFactory::GetDescription((InfoBoxFactory::Type) j);
-      list.Append(j, gettext(InfoBoxFactory::GetName((InfoBoxFactory::Type) j)),
-                  gettext(InfoBoxFactory::GetName((InfoBoxFactory::Type) j)),
+      const TCHAR * desc = InfoBoxFactory::GetDescription(j_type);
+      list.Append(j, gettext(InfoBoxFactory::GetName(j_type)),
+                  gettext(InfoBoxFactory::GetName(j_type)),
                   desc != nullptr ? gettext(desc) : nullptr);
     }
   }
