@@ -291,8 +291,7 @@ TeamCodeFullScreen::OnCodeClicked()
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;
   settings.team_code.Update(newTeammateCode);
-  if (settings.team_code.IsDefined())
-    settings.team_flarm_id.Clear();
+  settings.team_flarm_id.Clear();
 }
 
 inline void
