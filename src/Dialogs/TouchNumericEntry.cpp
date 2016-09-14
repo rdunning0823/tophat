@@ -291,10 +291,10 @@ TouchNumericEntry(fixed &value,
   auto backspace_listener = MakeLambdaActionListener([](unsigned id){
     OnBackspace();
     });
-  Button backspace_button(client_area, look.button, _T("<-"),
-                             { backspace_left, padding, rc.right - padding,
-                               rc.top + button_height },
-                             button_style, backspace_listener, 0);
+  WndSymbolButton backspace_button(client_area, look.button, _T("_Backspace"),
+                                   { backspace_left, padding, rc.right - padding,
+                                     rc.top + button_height },
+                                   button_style, backspace_listener, 0);
 
   AllowedCharactersCallback = accb;
 

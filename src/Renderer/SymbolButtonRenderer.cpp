@@ -287,6 +287,11 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
       DrawIconAndText(canvas, rc, _T(""), icon,
                       enabled, focused, pressed, transparent_background_force);
     }
+  } else if (caption == _T("_Backspace")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon *icon = &icon_look.icon_backspace;
+    DrawIconAndText(canvas, rc, _(""), icon,
+                    enabled, focused, pressed, transparent_background_force);
   } else if (caption == _("_TaskStats")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *icon = &icon_look.hBmpSpeedometer;

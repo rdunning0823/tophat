@@ -265,10 +265,10 @@ TouchTextEntry(TCHAR *text, size_t width,
   auto backspace_listener = MakeLambdaActionListener([](unsigned id){
       OnBackspace();
     });
-  Button backspace_button(client_area, look.button, _T("<-"),
-                          { backspace_left, padding, rc.right - padding,
-                              editor_bottom },
-                          button_style, backspace_listener, 0);
+  WndSymbolButton backspace_button(client_area, look.button, _T("_Backspace"),
+                                   { backspace_left, padding, rc.right - padding,
+                                       editor_bottom },
+                                   button_style, backspace_listener, 0);
 
   AllowedCharactersCallback = accb;
 

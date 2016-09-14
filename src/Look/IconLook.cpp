@@ -45,6 +45,7 @@ IconLook::Initialise()
   hBmpBearingRightFour.LoadResource(IDB_BEARING_RIGHT_FOUR, IDB_BEARING_RIGHT_FOUR_HD, IDB_BEARING_RIGHT_FOUR_HD2);
   hBmpClose.LoadResource(IDB_CLOSE ,IDB_CLOSE_HD, IDB_CLOSE_HD2);
   icon_home.LoadResource(IDB_HOME ,IDB_HOME_HD, IDB_HOME_HD2);
+  icon_backspace.LoadResource(IDB_BACKSPACE ,IDB_BACKSPACE_HD, IDB_BACKSPACE_HD2);
 
   hBmpTabTask.LoadResource(IDB_TASK, IDB_TASK_HD, IDB_TASK_HD2);
   hBmpTabWrench.LoadResource(IDB_WRENCH, IDB_WRENCH_HD, IDB_WRENCH_HD2);
