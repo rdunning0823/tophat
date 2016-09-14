@@ -34,15 +34,15 @@ Copyright_License {
 #include <tchar.h>
 #include <stdio.h>
 
-static constexpr InfoBoxPanel team_code_infobox_panels[] = {
+static constexpr InfoBoxPanel team_infobox_panels[] = {
   { N_("Team Code"), LoadTeamCodePanelFullScreen },
   { nullptr, nullptr }
 };
 
 const InfoBoxPanel *
-InfoBoxContentTeamCode::GetDialogContent()
+InfoBoxContentTeam::GetDialogContent()
 {
-  return team_code_infobox_panels;
+  return team_infobox_panels;
 }
 
 void
@@ -73,7 +73,7 @@ InfoBoxContentTeamCode::Update(InfoBoxData &data)
 }
 
 bool
-InfoBoxContentTeamCode::HandleKey(const InfoBoxKeyCodes keycode)
+InfoBoxContentTeam::HandleKey(const InfoBoxKeyCodes keycode)
 {
   TeamCodeSettings &settings =
     CommonInterface::SetComputerSettings().team_code;
@@ -103,7 +103,7 @@ InfoBoxContentTeamCode::HandleKey(const InfoBoxKeyCodes keycode)
 }
 
 void
-UpdateInfoBoxTeamBearing(InfoBoxData &data)
+InfoBoxContentTeamBearing::Update(InfoBoxData &data)
 {
   const TeamCodeSettings &settings =
     CommonInterface::GetComputerSettings().team_code;
@@ -132,7 +132,7 @@ UpdateInfoBoxTeamBearing(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxTeamBearingDiff(InfoBoxData &data)
+InfoBoxContentTeamDiff::Update(InfoBoxData &data)
 {
   const TeamCodeSettings &settings =
     CommonInterface::GetComputerSettings().team_code;
@@ -162,7 +162,7 @@ UpdateInfoBoxTeamBearingDiff(InfoBoxData &data)
 }
 
 void
-UpdateInfoBoxTeamDistance(InfoBoxData &data)
+InfoBoxContentTeamDistance::Update(InfoBoxData &data)
 {
   const TeamCodeSettings &settings =
     CommonInterface::GetComputerSettings().team_code;

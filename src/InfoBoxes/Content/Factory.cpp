@@ -792,7 +792,7 @@ static constexpr MetaData meta_data[] = {
     N_("Team bearing"),
     N_("Team Brng"),
     N_("The bearing to the team aircraft location at the last team code report."),
-    UpdateInfoBoxTeamBearing,
+    IBFHelper<InfoBoxContentTeamBearing>::Create,
     e_Team_BearingDiff, // Team Bearing Diff
     e_Team_Code, // Team Code
     DEPRECATED,
@@ -803,7 +803,7 @@ static constexpr MetaData meta_data[] = {
     N_("Team bearing difference"),
     N_("Team BrngD"),
     N_("The relative bearing to the team aircraft location at the last reported team code."),
-    UpdateInfoBoxTeamBearingDiff,
+    IBFHelper<InfoBoxContentTeamDiff>::Create,
     e_Team_Range, // Team Range
     e_Team_Bearing, // Team Bearing
     DEPRECATED,
@@ -814,7 +814,7 @@ static constexpr MetaData meta_data[] = {
     N_("Team range"),
     N_("Team Dist"),
     N_("The range to the team aircraft location at the last reported team code."),
-    UpdateInfoBoxTeamDistance,
+    IBFHelper<InfoBoxContentTeamDistance>::Create,
     e_Team_Code, // Team Code
     e_Team_BearingDiff, // Team Bearing Diff
     DEPRECATED,

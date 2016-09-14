@@ -26,21 +26,35 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
-class InfoBoxContentTeamCode : public InfoBoxContent
+class InfoBoxContentTeam : public InfoBoxContent
 {
 public:
-  virtual void Update(InfoBoxData &data) override;
   virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
   virtual const InfoBoxPanel *GetDialogContent() override;
 };
 
-void
-UpdateInfoBoxTeamBearing(InfoBoxData &data);
+class InfoBoxContentTeamCode : public InfoBoxContentTeam
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
 
-void
-UpdateInfoBoxTeamBearingDiff(InfoBoxData &data);
+class InfoBoxContentTeamBearing : public InfoBoxContentTeam
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
 
-void
-UpdateInfoBoxTeamDistance(InfoBoxData &data);
+class InfoBoxContentTeamDiff : public InfoBoxContentTeam
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
+
+class InfoBoxContentTeamDistance : public InfoBoxContentTeam
+{
+public:
+  virtual void Update(InfoBoxData &data) override;
+};
 
 #endif
