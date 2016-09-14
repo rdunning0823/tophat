@@ -183,9 +183,9 @@ TouchTextEntry(TCHAR *text, size_t width,
   const PixelScalar client_height = rc.bottom - rc.top;
 
   const PixelScalar padding = Layout::Scale(2);
-  const PixelScalar backspace_width = Layout::Scale(36);
+  const PixelScalar backspace_width = Layout::Scale(46);
   const PixelScalar backspace_left = rc.right - padding - backspace_width;
-  const PixelScalar editor_height = Layout::Scale(22);
+  const PixelScalar editor_height = Layout::Scale(40);
   const PixelScalar editor_bottom = padding + editor_height;
   const PixelScalar button_height = Layout::Scale(40);
   constexpr unsigned keyboard_rows = 5;
