@@ -207,7 +207,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       tp_valid,
                       basic.location.Distance(otp->GetLocationRemaining()),
                       basic.location_available && otp->GetLocationRemaining().IsValid(),
-                      fixed(0),
+                      fixed(0), // altitude is irrelevant with targets
                       false,
                       basic.location.Bearing(otp->GetLocationRemaining()) - basic.track,
                       basic.location_available && otp->GetLocationRemaining().IsValid(),
