@@ -228,6 +228,10 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                                                     basic,
                                                     settings.task.safety_height_arrival_gr)
         : fixed(1000);
+
+    // Todo: fix this for negative MSL elevations (e.g. Netherlands)
+    bool elevation_valid = tp_valid && positive(twp->elevation);
+
     // draw to center with altitude and optional gradient
     slider_shape.Draw(canvas, rc_outer,
                       idx, GetList().GetCursorDownIndex() == (int)idx,
@@ -243,11 +247,12 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       basic.location_available && result.vector.IsValid(),
                       result.SelectAltitudeDifference(settings.task.glide) -
                           settings.task.safety_height_arrival,
-                      basic.NavAltitudeAvailable() && (result.IsOk() || result.vector.distance < fixed(0.01)),
+                      elevation_valid && basic.NavAltitudeAvailable() &&
+                          (result.IsOk() || result.vector.distance < fixed(0.01)),
                       result.vector.bearing - basic.track,
                       basic.location_available && result.vector.IsValid(),
                       gradient,
-                      result.IsOk() && GradientValid(gradient),
+                      elevation_valid && result.IsOk() && GradientValid(gradient),
                       use_wide_pen,
                       false);
   }
