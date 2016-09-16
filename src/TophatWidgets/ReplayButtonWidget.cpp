@@ -28,6 +28,7 @@ Copyright_License {
 #include "Dialogs/ReplayDialog.hpp"
 #include "Replay/Replay.hpp"
 #include "Components.hpp"
+#include "Input/InputEvents.hpp"
 
 void
 ReplayButtonWidget::UpdateVisibility(const PixelRect &rc,
@@ -82,5 +83,6 @@ ReplayButtonWidget::UpdateText(const TCHAR *text)
 void
 ReplayButtonWidget::OnAction(int id)
 {
+  InputEvents::HideMenu();
   ShowReplayDialog();
 }
