@@ -1,7 +1,7 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Top Hat Soaring 2.1.9 Beta 9/8/2016
+Top Hat Soaring 2.1.9 Beta 9/20/2016
 * Task:
  - Nav Bar: display icon for turnpoint, target or landable in Nav Bar
  - Nav Bar menu: add menu item to toggle between Target or Center navigation
@@ -9,14 +9,21 @@ Top Hat Soaring 2.1.9 Beta 9/8/2016
  - Task Restart - hide restart popup after 30 seconds (and accept restart)
  - Add Task open time to task editor (and Close time for European tasks)
  - Task computer settings - display effective mc for selected speed and vice versa
- - Task Stats - show time elapsed and remaining for FAI, Racing and MAT tasks 
-* FLARM mini radar - don't cover up North Up compass on map
+ - Task Stats - show time elapsed and remaining for FAI, Racing and MAT tasks
+ - Add Task Open and Close times to task editor.
+ - ILEC SN10 - Tophat reads task and targets from SN10
+* FLARM
+ - mini radar - don't cover up North Up compass on map
+ - Teammate infobox appears on all 4 Teammate infoboxes
+ - Teammate infobox has "Goto teammate" button that uses Nav Bar to track teammate
+ - Clear teamcode automatically when entering new code
 * OLC calculation
  - Enable for Kobo
  - Standardize OLC Infobox look
 * Pan mode
  - Make buttons transparent
  - Hide Screens button
+* Text entry - make backspace button larger
 
 Top Hat Soaring 2.1.7 Beta 7/23/2016
 * Kobo - support for Sunblind for Kobo mini 
