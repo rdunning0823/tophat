@@ -336,7 +336,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const WaypointLook &look,
                           const WaypointRendererSettings &renderer_settings)
 {
-  WaypointListRenderer::Draw(canvas, rc, item.waypoint,
+  WaypointListRenderer::Draw(canvas, rc, item.waypoint, nullptr,
                              dialog_look, look, renderer_settings);
 }
 

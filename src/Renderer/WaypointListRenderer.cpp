@@ -37,26 +37,6 @@ Copyright_License {
 
 #include <cstdio>
 
-namespace WaypointListRenderer
-{
-/**
- * Used for main waypoint list renderer
- */
-  void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-             const GeoVector *vector, fixed arrival_altitude,
-             const DialogLook &dialog_look, const WaypointLook &look,
-             const WaypointRendererSettings &settings, unsigned col_1_width,
-             unsigned col_2_width, unsigned col_3_width);
-
-  /**
-   *  * Used by MapItemList
-   */
-  void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-            const GeoVector *vector,
-            const DialogLook &dialog_look, const WaypointLook &look,
-            const WaypointRendererSettings &settings);
-
-}
 
 typedef StaticString<256u> Buffer;
 
@@ -73,38 +53,6 @@ WaypointListRenderer::GetHeight(const DialogLook &look)
 {
   return look.list.font->GetHeight() + Layout::Scale(6)
     + look.text_font.GetHeight();
-}
-
-/**
- * Used by the map items list
- */
-void
-WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
-                           const Waypoint &waypoint,
-                           const DialogLook &dialog_look,
-                           const WaypointLook &look,
-                           const WaypointRendererSettings &renderer_settings)
-{
-  Draw(canvas, rc, waypoint, NULL, dialog_look, look, renderer_settings);
-}
-
-
-/**
- * Calls Draw() that is used by main waypoint list
- */
-void
-WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
-                            const Waypoint &waypoint, const GeoVector &vector,
-                            fixed arrival_altitude,
-                            const DialogLook &dialog_look,
-                            const WaypointLook &look,
-                            const WaypointRendererSettings &settings,
-                            unsigned col_1_width,
-                            unsigned col_2_width,
-                            unsigned col_3_width)
-{
-  Draw2(canvas, rc, waypoint, &vector, arrival_altitude, dialog_look, look, settings,
-        col_1_width, col_2_width, col_3_width);
 }
 
 /**

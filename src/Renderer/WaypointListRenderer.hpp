@@ -43,16 +43,19 @@ namespace WaypointListRenderer
   /**
    * Used by the map items list
    */
-  void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-            const DialogLook &dialog_look, const WaypointLook &look,
-            const WaypointRendererSettings &renderer_settings);
+  void
+  Draw(Canvas &canvas, const PixelRect rc,
+       const Waypoint &waypoint, const GeoVector *vector,
+       const DialogLook &dialog_look,
+       const WaypointLook &look,
+       const WaypointRendererSettings &settings);
 
   /**
    * Calls Draw() that is used by main waypoint list
    * Uses 3 columns
    */
   void Draw2(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-             const GeoVector &vector, fixed arrival_altitude,
+             const GeoVector *vector, fixed arrival_altitude,
              const DialogLook &dialog_look, const WaypointLook &look,
              const WaypointRendererSettings &settings,
              unsigned col_1_width,

@@ -171,11 +171,11 @@ WaypointManagerWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   const auto &info = items[i];
 
   WaypointListRenderer::Draw(canvas, rc,
-                             *info.waypoint,
+                             *info.waypoint, nullptr,
                              UIGlobals::GetDialogLook(),
                              UIGlobals::GetMapLook().waypoint,
                              CommonInterface::GetMapSettings().waypoint);
-}
+  }
 
 void
 WaypointManagerWidget::OnActivateItem(unsigned i)

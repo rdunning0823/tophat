@@ -611,7 +611,7 @@ WaypointListSimpleDialog::OnPaintItem(Canvas &canvas, const PixelRect rc,
   const struct WaypointListItem &info = waypoint_list[i];
 
   WaypointListRenderer::Draw2(canvas, rc, *info.waypoint,
-                              info.GetVector(location),
+                              &info.GetVector(location),
                               CalcAltitudeDifferential(*info.waypoint),
                               UIGlobals::GetDialogLook(),
                               UIGlobals::GetMapLook().waypoint,
