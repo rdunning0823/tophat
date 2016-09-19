@@ -88,16 +88,6 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   Draw(canvas, rc, waypoint, NULL, dialog_look, look, renderer_settings);
 }
 
-void
-WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
-                           const Waypoint &waypoint,
-                           TwoTextRowsRenderer &row_renderer_dummy,
-                           const WaypointLook &look,
-                           const WaypointRendererSettings &renderer_settings) {
-  // TODO hack using UIGlobals
-  Draw(canvas, rc, waypoint, UIGlobals::GetDialogLook(), look, renderer_settings);
-}
-
 
 /**
  * Calls Draw() that is used by main waypoint list

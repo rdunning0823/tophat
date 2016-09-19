@@ -48,15 +48,6 @@ namespace WaypointListRenderer
             const WaypointRendererSettings &renderer_settings);
 
   /**
-   * dummy row_renderer support
-   * @param row_renderer_dummy: unused
-   */
-  void Draw(Canvas &canvas, const PixelRect rc, const Waypoint &waypoint,
-            TwoTextRowsRenderer &row_renderer_dummy,
-            const WaypointLook &look,
-            const WaypointRendererSettings &renderer_settings);
-
-  /**
    * Calls Draw() that is used by main waypoint list
    * Uses 3 columns
    */
