@@ -67,7 +67,7 @@ GlueMapWindow::OnMouseMove(PixelScalar x, PixelScalar y, unsigned keys)
     OnMouseDown(x, y);
 
   /* allow a bigger threshold on touch screens */
-  const unsigned threshold = Layout::Scale(IsEmbedded() ? 20 : 10);
+  const unsigned threshold = Layout::Scale(20);
   if (drag_mode != DRAG_NONE && arm_mapitem_list &&
       manhattan_distance(drag_start, RasterPoint{x, y}) > threshold)
     arm_mapitem_list = false;
