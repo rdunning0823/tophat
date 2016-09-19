@@ -56,6 +56,7 @@ Copyright_License {
 #include "Time/BrokenDateTime.hpp"
 #include "Task/Points/TaskPoint.hpp"
 #include "Renderer/TwoTextRowsRenderer.hpp"
+#include "Interface.hpp"
 
 #ifdef HAVE_NOAA
 #include "Renderer/NOAAListRenderer.hpp"
@@ -336,7 +337,15 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                           const WaypointLook &look,
                           const WaypointRendererSettings &renderer_settings)
 {
-  WaypointListRenderer::Draw(canvas, rc, item.waypoint, nullptr,
+  GeoVector *v = nullptr;
+  GeoVector vector;
+  if (CommonInterface::Basic().location_available &&
+      item.waypoint.location.IsValid()) {
+    vector = CommonInterface::Basic().location.DistanceBearing(item.waypoint.location);
+    v = &vector;
+  }
+
+  WaypointListRenderer::Draw(canvas, rc, item.waypoint, v,
                              dialog_look, look, renderer_settings);
 }
 

@@ -25,7 +25,10 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Look/DialogLook.hpp"
+#include "Look/Look.hpp"
 #include "Renderer/WaypointIconRenderer.hpp"
+#include "Renderer/NextArrowRenderer.hpp"
+#include "NMEA/Info.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Geo/GeoVector.hpp"
 #include "Formatter/UserUnits.hpp"
@@ -34,6 +37,7 @@ Copyright_License {
 #include "Util/StaticString.hxx"
 #include "Util/Macros.hpp"
 #include "UIGlobals.hpp"
+#include "Interface.hpp"
 
 #include <cstdio>
 
@@ -109,6 +113,19 @@ WaypointListRenderer::Draw3(Canvas &canvas, const PixelRect rc,
   wir.Draw(waypoint, pt, reachable);
 }
 
+static void
+DrawVectorArrow(Canvas &canvas, const PixelRect rc, const GeoVector *vector)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+
+  if (!vector->IsValid() || !basic.track_available)
+    return;
+
+  Angle bd = vector->bearing - basic.track;
+
+  NextArrowRenderer renderer(UIGlobals::GetLook().wind_arrow_info_box);
+  renderer.DrawArrow(canvas, rc, bd);
+}
 
 /**
  * Used by MapItemList
@@ -120,6 +137,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const WaypointLook &look,
                            const WaypointRendererSettings &settings)
 {
+  bool draw_vector_arrow = true;
   const unsigned padding = Layout::GetTextPadding();
   const PixelScalar line_height = rc.bottom - rc.top;
 
@@ -141,36 +159,50 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   // Draw leg distance
   UPixelScalar leg_info_width = 0;
   if (vector) {
+    unsigned arrow_width = 0;
+    if (draw_vector_arrow) {
+      PixelRect rc_arrow = rc;
+      rc_arrow.top += rc.GetSize().cy / 4;
+      rc_arrow.bottom -= rc.GetSize().cy / 4;
+      rc_arrow.right = rc.right - padding;
+      arrow_width = rc_arrow.GetSize().cy;
+      rc_arrow.left = rc_arrow.right - arrow_width;
+
+      DrawVectorArrow(canvas, rc_arrow, vector);
+      arrow_width += padding * 2;
+    } else
+      arrow_width = padding;
+
     FormatUserDistanceSmart(vector->distance, buffer.buffer(), true);
     UPixelScalar width = leg_info_width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.DrawText(rc.right - padding - width,
-                    rc.top + padding +
-                    (name_font.GetHeight() - text_font.GetHeight()) / 2,
+    canvas.DrawText(rc.right - arrow_width - width,
+                    top_middle,
                     buffer.c_str());
 
-    // Draw leg bearing
-    FormatBearing(buffer.buffer(), buffer.CAPACITY, vector->bearing);
-    width = canvas.CalcTextWidth(buffer.c_str());
-    canvas.DrawText(rc.right - padding - width, top2,
-                    buffer.c_str());
+    if (false) {
+      // Draw leg bearing
+      FormatBearing(buffer.buffer(), buffer.CAPACITY, vector->bearing);
+      width = canvas.CalcTextWidth(buffer.c_str());
+      canvas.DrawText(rc.right - arrow_width - width, top2,
+                      buffer.c_str());
 
-    if (width > leg_info_width)
-      leg_info_width = width;
-
+      if (width > leg_info_width)
+        leg_info_width = width;
+    }
     leg_info_width += padding;
-  } else {
-    // draw everything on one row
-    top1 = top2 = top_middle;
   }
+  top1 = top2 = top_middle;
 
 
   // Draw details line
-  FormatWaypointDetails(buffer, waypoint, waypoint.elevation);
-  PixelSize sz_details = text_font.TextSize(buffer.c_str());
+  if (vector == nullptr) {
+    FormatWaypointDetails(buffer, waypoint, waypoint.elevation);
+    PixelSize sz_details = text_font.TextSize(buffer.c_str());
 
-  PixelScalar details_left = rc.right - sz_details.cx - padding - leg_info_width;
-  canvas.DrawClippedText(details_left, top2, sz_details.cx,
-                         buffer.c_str());
+    PixelScalar details_left = rc.right - sz_details.cx - padding - leg_info_width;
+    canvas.DrawClippedText(details_left, top2, sz_details.cx,
+                           buffer.c_str());
+  }
 
   // Draw waypoint name
   canvas.Select(name_font);
