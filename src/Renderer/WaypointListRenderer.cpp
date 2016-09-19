@@ -111,7 +111,7 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
  * Used by Alternates screen.  Draws data in columns
  */
 void
-WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
+WaypointListRenderer::Draw3(Canvas &canvas, const PixelRect rc,
                             const Waypoint &waypoint, fixed distance,
                             fixed arrival_altitude,
                             const DialogLook &dialog_look,

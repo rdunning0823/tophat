@@ -55,7 +55,7 @@ AlternatesListWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
   const Waypoint &waypoint = alternates[index].waypoint;
   const GlideResult& solution = alternates[index].solution;
 
-  WaypointListRenderer::Draw2(canvas, rc, waypoint, solution.vector.distance,
+  WaypointListRenderer::Draw3(canvas, rc, waypoint, solution.vector.distance,
                               solution.SelectAltitudeDifference(settings.task.glide),
                               UIGlobals::GetDialogLook(),
                               UIGlobals::GetMapLook().waypoint,
