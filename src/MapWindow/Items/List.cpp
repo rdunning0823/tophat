@@ -27,31 +27,41 @@ Copyright_License {
 #include "Engine/Airspace/AbstractAirspace.hpp"
 #include "Weather/Features.hpp"
 
+static GeoPoint location_ship;
+
 static bool
 CompareWaypointItems(const WaypointMapItem *a, const WaypointMapItem *b)
 {
-  enum {
-    AIRPORT, LANDABLE, WAYPOINT,
-  } type1, type2;
+  if (location_ship.IsValid()) {
+    fixed distance1 = location_ship.Distance(a->waypoint.location);
+    fixed distance2 = location_ship.Distance(b->waypoint.location);
 
-  if (a->waypoint.IsAirport())
-    type1 = AIRPORT;
-  else if (a->waypoint.IsLandable())
-    type1 = LANDABLE;
-  else
-    type1 = WAYPOINT;
+    return distance1 < distance2;
+  } else {
 
-  if (b->waypoint.IsAirport())
-    type2 = AIRPORT;
-  else if (b->waypoint.IsLandable())
-    type2 = LANDABLE;
-  else
-    type2 = WAYPOINT;
+    enum {
+      AIRPORT, LANDABLE, WAYPOINT,
+    } type1, type2;
 
-  if (type1 != type2)
-    return type1 < type2;
+    if (a->waypoint.IsAirport())
+      type1 = AIRPORT;
+    else if (a->waypoint.IsLandable())
+      type1 = LANDABLE;
+    else
+      type1 = WAYPOINT;
 
-  return a->waypoint.id < b->waypoint.id;
+    if (b->waypoint.IsAirport())
+      type2 = AIRPORT;
+    else if (b->waypoint.IsLandable())
+      type2 = LANDABLE;
+    else
+      type2 = WAYPOINT;
+
+    if (type1 != type2)
+      return type1 < type2;
+
+    return a->waypoint.id < b->waypoint.id;
+  }
 }
 
 static bool
@@ -134,7 +144,8 @@ MapItemList::~MapItemList()
 }
 
 void
-MapItemList::Sort()
+MapItemList::Sort(const GeoPoint &location)
 {
+  location_ship = location;
   std::sort(begin(), end(), CompareMapItems);
 }

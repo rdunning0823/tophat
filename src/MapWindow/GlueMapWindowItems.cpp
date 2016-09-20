@@ -135,7 +135,7 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
 #endif
 
   // Sort the list of map items
-  list.Sort();
+  list.Sort(basic.location);
 
   // Show the list dialog
   if (list.empty()) {

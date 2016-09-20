@@ -27,13 +27,17 @@ Copyright_License {
 #include "Util/StaticArray.hpp"
 
 struct MapItem;
+struct GeoPoint;
 
 class MapItemList: public StaticArray<MapItem *, 32>
 {
 public:
   ~MapItemList();
 
-  void Sort();
+  /**
+   * @param location.  Location of ship
+   */
+  void Sort(const GeoPoint &location);
 };
 
 #endif
