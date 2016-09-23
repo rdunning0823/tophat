@@ -5,7 +5,7 @@ Top Hat Soaring 2.1.9 Beta 9/20/2016
 * Task:
  - Nav Bar: display icon for turnpoint, target or landable in Nav Bar
  - Nav Bar menu: add menu item to toggle between Target or Center navigation
-   see video: https://www.youtube.com/watch?v=_NSX8o9ng5s
+   see video: https://youtu.be/_NSX8o9ng5s
  - Nav Bar: prior to start, show distance to start point center
  - Task Restart - hide restart popup after 30 seconds (and accept restart)
  - Add Task open time to task editor (and Close time for European tasks)
@@ -28,7 +28,7 @@ Top Hat Soaring 2.1.9 Beta 9/20/2016
 
 Top Hat Soaring 2.1.7 Beta 7/23/2016
 * Kobo - support for Sunblind for Kobo mini 
-    https://www.youtube.com/watch?v=27GGbE5KEpg
+    https://youtu.be/27GGbE5KEpg
 * Nav Bar: always show finish altitude for AAT tasks
 * Map items list: increase height of list items to utilize white space
 * Waypoint dialog: Show waypoint name at top of screen instead of title bar
@@ -44,7 +44,7 @@ Top Hat Soaring 2.1.7 Beta 7/23/2016
 
 Top Hat Soaring 2.1.6 Beta 6/25/2016
 * Use task speed to optimize targets and plan task
-	video: https://www.youtube.com/watch?v=xZEQ-dsZn-w
+	video: https://youtu.be/xZEQ-dsZn-w
 * Add Task Calculator for Task Speed Infobox
 * Add icons and text to task menu
 * Kobo - power button will shutdown device without prompt
