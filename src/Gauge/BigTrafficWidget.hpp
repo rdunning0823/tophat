@@ -48,7 +48,7 @@ class TrafficWidget : public ContainerWidget,
   };
 
   Button *zoom_in_button, *zoom_out_button;
-  Button *previous_item_button, *next_item_button;
+  Button *next_item_button;
   Button *details_button;
   Button *close_button;
 #endif

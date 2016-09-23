@@ -511,7 +511,7 @@ private:
    * of the current task
    * @param glide_polar.  The polar.  The mc setting is irrelevant
    */
-  void UpdateTaskMC(const GlidePolar &_glide_polar);
+  void UpdateTaskMC(const GlidePolar &_glide_polar) override;
 
   /**
    * Optimise target ranges (for adjustable tasks) to produce an estimated

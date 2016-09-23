@@ -46,14 +46,14 @@ protected:
   void UpdateValues();
 
   /** Inherited from class Timer */
-  void OnTimer();
+  void OnTimer() override;
 
 public:
   /* methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
-  virtual bool Save(bool &changed) override;
-  void Hide();
-  void Show(const PixelRect &rc);
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  bool Save(bool &changed) override;
+  void Hide() override;
+  void Show(const PixelRect &rc) override;
 
 private:
   /* methods from DataFieldListener */

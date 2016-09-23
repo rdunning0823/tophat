@@ -351,7 +351,6 @@ class GlidePolarEquivalentMC final : public ZeroFinder {
   GlidePolar polar;
   const fixed distance;
   const fixed speed;
-  const fixed duration;
 
 public:
   /**
@@ -363,8 +362,7 @@ public:
    */
   GlidePolarEquivalentMC(const GlidePolar &_polar, const fixed _speed) :
     ZeroFinder(fixed(0.1), fixed(10.0), fixed(0.03)),
-    polar(_polar), distance(fixed(1000)), speed(_speed),
-                            duration(distance / speed)
+    polar(_polar), distance(fixed(1000)), speed(_speed)
   {
   }
 

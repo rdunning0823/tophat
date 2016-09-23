@@ -31,7 +31,7 @@ Copyright_License {
  */
 extern const struct DeviceRegister ilec_driver;
 
-class ComputerSettings;
+struct ComputerSettings;
 extern void ILEC_Process_Any_Pending_SN10_task_update(const ComputerSettings & settings_computer);
 
 #endif

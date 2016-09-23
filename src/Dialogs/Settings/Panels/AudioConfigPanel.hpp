@@ -40,10 +40,10 @@ public:
   /* methods from Widget */
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /* method from DataFieldListener */
-  void OnModified(DataField &df);
+  void OnModified(DataField &df) override;
 
 private:
   void UpdateSoundConfig();

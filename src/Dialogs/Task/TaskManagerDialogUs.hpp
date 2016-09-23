@@ -132,16 +132,16 @@ public:
   void UpdateButtons();
 
   /* virtual methods from Widget */
-  virtual void Prepare(ContainerWindow &parent, const PixelRect &rc);
-  virtual void Unprepare();
-  virtual void Show(const PixelRect &rc) {};
-  virtual void Hide() {};
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
+  void Unprepare() override;
+  void Show(const PixelRect &rc) override {};
+  void Hide() override {};
 
   /* overrides from WndForm */
-  virtual void OnResize(PixelSize new_size) override;
-  virtual void ReinitialiseLayout(const PixelRect &parent_rc) override;
+  void OnResize(PixelSize new_size) override;
+  void ReinitialiseLayout(const PixelRect &parent_rc) override;
 
-  virtual bool Save(bool &changed);
+  bool Save(bool &changed) override;
 
   /**
    * prompts pilot to declare to any attached loggers
@@ -150,7 +150,7 @@ public:
   /**
    * from ActionListener (WndForm)
    */
-  virtual void OnAction(int id);
+  virtual void OnAction(int id) override;
 
   /**
    * sets the caption on the dialog based on the task's name

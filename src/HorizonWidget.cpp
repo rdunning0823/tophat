@@ -64,7 +64,7 @@ protected:
     HorizonRenderer::Draw(canvas, canvas.GetRect(), look, attitude);
   }
 
-  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) {
+  virtual bool OnMouseUp(PixelScalar x, PixelScalar y) override {
     InputEvents::HideMenu();
     return AntiFlickerWindow::OnMouseUp(x, y);
   }

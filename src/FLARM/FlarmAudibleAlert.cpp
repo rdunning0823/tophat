@@ -80,7 +80,6 @@ void
 FlarmAudibleAlert::PlayAlarm()
 {
   ResetUserIdle();
-  StaticString<64> resource;
 
   switch (alarm_level) {
   case FlarmTraffic::AlarmType::NONE:

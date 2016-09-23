@@ -40,7 +40,7 @@ struct DialogLook;
 struct NavSliderLook;
 class Font;
 class Canvas;
-class Waypoint;
+struct Waypoint;
 enum class TaskType : uint8_t;
 
 class SliderShape {

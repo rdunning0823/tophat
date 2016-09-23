@@ -70,7 +70,7 @@ public:
   }
 
   gcc_pure
-  virtual unsigned GetMinimumButtonWidth() const;
+  virtual unsigned GetMinimumButtonWidth() const override;
 
   /**
    * @param force_transparent_background: draws transparent background and
