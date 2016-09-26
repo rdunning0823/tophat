@@ -275,8 +275,8 @@ thirdparty_libs = [
     ),
 
     AutotoolsProject(
-        'https://sourceforge.net/projects/libpng/files/libpng16/1.6.23/libpng-1.6.23.tar.xz',
-        '9b320a05ed4db1f3f0865c8a951fd9aa',
+        'https://sourceforge.net/projects/libpng/files/libpng16/1.6.24/libpng-1.6.24.tar.xz',
+        'ffcdbd549814787fa8010c372e35ff25',
         'lib/libpng.a',
         [
             '--disable-shared', '--enable-static',
