@@ -420,7 +420,7 @@ type=key
 data=9
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nlist$(CheckWaypointFile)
+label=Waypoint list$(CheckWaypointFile)
 location=24
 
 # -------------
@@ -503,7 +503,7 @@ type=key
 data=9
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nlist$(CheckWaypointFile)
+label=Waypoint list$(CheckWaypointFile)
 location=24
 
 # -------------
@@ -577,7 +577,7 @@ type=key
 data=9
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nlist$(CheckWaypointFile)
+label=Waypoint list$(CheckWaypointFile)
 location=24
 
 # -------------
@@ -618,7 +618,7 @@ type=key
 data=9
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nList$(CheckWaypointFile)
+label=Waypoint List$(CheckWaypointFile)
 location=8
 
 mode=Nav1
@@ -1647,7 +1647,7 @@ type=key
 data=0
 event=WaypointDetails select
 event=Mode default
-label=Waypoint\nList$(CheckWaypointFile)
+label=Waypoint List$(CheckWaypointFile)
 location=3
 
 mode=RemoteStick
