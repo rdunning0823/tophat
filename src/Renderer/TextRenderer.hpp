@@ -29,6 +29,7 @@ Copyright_License {
 #include <tchar.h>
 
 struct PixelRect;
+struct PixelSize;
 class Canvas;
 class Font;
 
@@ -65,6 +66,9 @@ public:
   }
 
   void InvalidateLayout() {}
+
+  gcc_pure
+  PixelSize GetSize(Canvas &canvas, PixelRect rc, const TCHAR *text) const;
 
   gcc_pure
   unsigned GetHeight(Canvas &canvas, PixelRect rc, const TCHAR *text) const;

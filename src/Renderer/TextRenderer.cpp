@@ -30,12 +30,20 @@ Copyright_License {
 
 #include <winuser.h>
 
-unsigned
-TextRenderer::GetHeight(Canvas &canvas, PixelRect rc,
+PixelSize
+TextRenderer::GetSize(Canvas &canvas, PixelRect rc,
                         const TCHAR *text) const
 {
   canvas.DrawFormattedText(&rc, text,
                            DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
+  return rc.GetSize();
+}
+
+unsigned
+TextRenderer::GetHeight(Canvas &canvas, PixelRect rc,
+                        const TCHAR *text) const
+{
+  return GetSize(canvas, rc, text).cy;
   return rc.bottom - rc.top;
 }
 

@@ -81,6 +81,13 @@ public:
                   bool force_transparent_background) const override;
 
 protected:
+  /**
+   * @param rc: rc of text
+   * @return rc required to print text (adjusts for multiple lines)
+   */
+  PixelSize GetCaptionSize(Canvas &canvas, PixelRect rc,
+                           const TCHAR *text) const;
+
   void DrawCaption(Canvas &canvas, const PixelRect &rc,
                    bool enabled, bool focused, bool pressed,
                    bool outlined_text = false) const;

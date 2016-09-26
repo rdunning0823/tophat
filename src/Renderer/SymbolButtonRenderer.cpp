@@ -110,9 +110,6 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
                                       focused, bool pressed,
                                       bool transparent_background_force) const
 {
-  const ButtonLook &look = GetLook();
-  const Font &font = *look.font;
-  PixelSize sz_text_one_line = font.TextSize(text);
   UPixelScalar padding = Layout::GetTextPadding();
 #ifdef USE_GDI
   bool supports_transparency = false;
@@ -125,15 +122,19 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
   if (icon != nullptr)
     sz_icon = icon->GetSize();
 
-  PixelRect rc_caption = rc;
   PixelRect rc_icon = rc;
+  PixelRect rc_caption = rc;
+  if (rc_caption.GetSize().cx > sz_icon.cx + 2 * (int)padding)
+    rc_caption.right -= (sz_icon.cx + 2 * padding);
+
+  PixelSize sz_text_one_line = GetCaptionSize(canvas, rc_caption, text);
 
   if (sz_text_one_line.cx + sz_icon.cx + (int)padding <= rc.GetSize().cx ) {
     rc_icon.left = (rc.GetSize().cx - sz_icon.cx - sz_text_one_line.cx - padding) / 2;
     rc_icon.right = rc_icon.left + sz_icon.cx;
 
     rc_caption.left = rc_icon.right +
-        (prefix_icon == PrefixIcon::NONE ? 0 : padding * 2);
+        (icon == nullptr ? 0 : padding * 2);
     rc_caption.right = std::min((int)rc_caption.left + (int)sz_text_one_line.cx, (int)rc.right) + (int)padding;
 
   } else {
@@ -142,7 +143,7 @@ SymbolButtonRenderer::DrawIconAndText(Canvas &canvas, PixelRect rc,
     rc_icon.right = rc_icon.left + sz_icon.cx;
 
     rc_caption.left = rc_icon.right +
-        (prefix_icon == PrefixIcon::NONE ? 0 : padding * 2);
+        (icon == nullptr ? 0 : padding * 2);
     rc_caption.right = rc.right;
   }
 

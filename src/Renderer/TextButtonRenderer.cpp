@@ -31,6 +31,15 @@ Copyright_License {
 
 #include <winuser.h>
 
+PixelSize
+TextButtonRenderer::GetCaptionSize(Canvas &canvas, PixelRect rc,
+                                   const TCHAR *text) const
+{
+  const ButtonLook &look = GetLook();
+  canvas.Select(*look.font);
+  return text_renderer.GetSize(canvas, rc, text);
+}
+
 void
 TextButtonRenderer::DrawCaption(Canvas &canvas, const PixelRect &rc,
                                 bool enabled, bool focused, bool pressed,
