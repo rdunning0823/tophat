@@ -64,7 +64,7 @@ Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
     return;
 
   unsigned skip = font->GetLineSpacing();
-  unsigned max_lines = (format & DT_CALCRECT) ? -1 :
+  unsigned max_lines = /*(format & DT_CALCRECT) ? -1 :*/
                        (rc->bottom - rc->top + skip - 1) / skip;
 
   size_t len = _tcslen(text);
@@ -94,6 +94,7 @@ Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
 
   // simple wordbreak algorithm. looks for single spaces only, no tabs,
   // no grouping of multiple spaces
+  int max_width = 0;
   if (format & DT_WORDBREAK) {
     for (size_t i = 0; i < len; i += _tcslen(duplicated + i) + 1) {
       PixelSize sz = CalcTextSize(duplicated + i);
@@ -108,6 +109,7 @@ Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
         prev_p = p;
         sz = CalcTextSize(duplicated + i);
       }
+      max_width = std::max(max_width, (int)sz.cx);
 
       if (prev_p) {
         lines++;
@@ -119,6 +121,7 @@ Canvas::DrawFormattedText(PixelRect *rc, const TCHAR *text, unsigned format)
 
   if (format & DT_CALCRECT) {
     rc->bottom = rc->top + lines * skip;
+    rc->right = rc->left + max_width;
     delete[] duplicated;
     return;
   }
