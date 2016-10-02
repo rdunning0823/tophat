@@ -65,29 +65,29 @@ WindComputer::Compute(const WindSettings &settings,
     if (result.IsValid())
       wind_store.SlotMeasurement(basic, result.wind, result.quality);
 
-  if (basic.airspeed_available && basic.airspeed_real) {
-    if (basic.true_airspeed > GetVTakeoffFallback(glide_polar)) {
-      WindEKFGlue::Result result = wind_ekf.Update(basic, calculated);
-      if (result.quality > 0) {
-        wind_store.SlotMeasurement(basic, result.wind, result.quality);
+    if (basic.airspeed_available && basic.airspeed_real) {
+      if (basic.true_airspeed > GetVTakeoffFallback(glide_polar)) {
+        WindEKFGlue::Result result = wind_ekf.Update(basic, calculated);
+        if (result.quality > 0) {
+          wind_store.SlotMeasurement(basic, result.wind, result.quality);
 
-        /* skip WindStore if EKF is used because EKF is already
-           filtered */
-        /* note that even though we don't use WindStore to obtain the
-           wind estimate, we still store the EKF wind vector to it for
-           the analysis dialog */
-        calculated.estimated_wind = result.wind;
-        calculated.estimated_wind_available.Update(basic.clock);
-        ekf_active = true;
+          /* skip WindStore if EKF is used because EKF is already
+             filtered */
+          /* note that even though we don't use WindStore to obtain the
+             wind estimate, we still store the EKF wind vector to it for
+             the analysis dialog */
+          calculated.estimated_wind = result.wind;
+          calculated.estimated_wind_available.Update(basic.clock);
+          ekf_active = true;
+        }
       }
-    }
-  } else
-    /* EKF cannot be used without airspeed */
-    ekf_active = false;
+    } else
+      /* EKF cannot be used without airspeed */
+      ekf_active = false;
 
-  /* skip WindStore? */
-  if (!ekf_active)
-    wind_store.SlotAltitude(basic, calculated);
+    /* skip WindStore? */
+    if (!ekf_active)
+      wind_store.SlotAltitude(basic, calculated);
   }
 }
 
