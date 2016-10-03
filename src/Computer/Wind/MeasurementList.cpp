@@ -63,10 +63,12 @@ WindMeasurementList::getWind(unsigned now, fixed alt, bool &found) const
          warps "should" be filtered at a higher level already */
       continue;
 
+    // disregard measurements more than one hour ago
     fixed timediff = fixed(now - m.time) / timeRange;
     if (timediff >= fixed(1))
       continue;
 
+    // disregard measurements outside of altitude range
     fixed altdiff = fabs(alt - m.altitude) / altRange;
     if (altdiff >= fixed(1))
       continue;
