@@ -63,7 +63,7 @@ struct WindSettings {
   }
 
   bool UseExternalWindIfEnabled() const {
-    return user_wind_source != UserWindSource::EXTERNAL_WIND_IF_AVAILABLE;
+    return user_wind_source == UserWindSource::EXTERNAL_WIND_IF_AVAILABLE;
   }
 
   UserWindSource GetUserWindSource() const {
