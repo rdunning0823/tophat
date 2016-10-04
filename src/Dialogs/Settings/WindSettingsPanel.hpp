@@ -25,35 +25,26 @@ Copyright_License {
 #define XCSOAR_WIND_SETTINGS_PANEL_HPP
 
 #include "Widget/RowFormWidget.hpp"
-#include "Form/ActionListener.hpp"
 #include "Form/DataField/Listener.hpp"
-#include "Blackboard/BlackboardListener.hpp"
 #include "Form/Form.hpp"
 
 class Button;
 
 class WindSettingsPanel final
-  : public RowFormWidget, public ActionListener,
-    private DataFieldListener, private NullBlackboardListener {
+  : public RowFormWidget,
+    private DataFieldListener {
   enum ControlIndex {
     WIND_SOURCE,
     TrailDrift,
-    SOURCE,
     Speed,
     Direction,
     WIND_ARROW_LOCATION,
-    CLEAR_MANUAL_BUTTON,
   };
 
-  const bool edit_manual_wind, clear_manual_button, edit_trail_drift;
+  const bool edit_manual_wind, edit_trail_drift;
 
   /** controls whether the wind location property is shown */
   const bool edit_wind_location;
-
-  /**
-   * Has the user modified the manual wind?
-   */
-  bool manual_modified;
 
   /**
    * pointer to the main choice: what type of wind shall we use
@@ -66,12 +57,6 @@ class WindSettingsPanel final
   WndForm *form;
 
 public:
-  enum Buttons {
-    /**
-     * Clears the manual wind.
-     */
-    CLEAR_MANUAL,
-  };
 
   /**
    * @param manual_wind edit the manual wind setting
@@ -86,25 +71,15 @@ public:
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual bool Save(bool &changed) override;
   virtual void Show(const PixelRect &rc) override;
-  virtual void Hide() override;
 
   void SetForm(WndForm *_form) {
     assert(_form != nullptr);
     form = _form;
   }
 
-  /* virtual methods from ActionListener */
-  virtual void OnAction(int id) override;
-
 private:
-  void UpdateVector();
-
   /* methods from DataFieldListener */
   virtual void OnModified(DataField &df) override;
-
-  /* virtual methods from class BlackboardListener */
-  virtual void OnCalculatedUpdate(const MoreData &basic,
-                                  const DerivedInfo &calculated) override;
 
   /**
    * show or hide the manual editing buttons based on whether

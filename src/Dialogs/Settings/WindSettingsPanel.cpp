@@ -39,7 +39,6 @@ WindSettingsPanel::WindSettingsPanel(bool _edit_manual_wind,
                                      bool _edit_wind_location)
   :RowFormWidget(UIGlobals::GetDialogLook()),
    edit_manual_wind(_edit_manual_wind),
-   clear_manual_button(false),
    edit_trail_drift(_edit_trail_drift),
    edit_wind_location(_edit_wind_location),
    form(nullptr) {}
@@ -80,17 +79,15 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   if (edit_manual_wind) {
     SpeedVector manual_wind = CommonInterface::Calculated().GetWindOrZero();
 
-    AddDummy();
-
     WndProperty *wp =
-      AddFloat(_("Speed"), _("Manual adjustment of wind speed."),
-               _T("%.0f %s"), _T("%.0f"),
-               fixed(0),
-               Units::ToUserWindSpeed(Units::ToSysUnit(fixed(200),
-                                                       Unit::KILOMETER_PER_HOUR)),
-               fixed(1), false,
-               Units::ToUserWindSpeed(manual_wind.norm),
-               this);
+        AddFloat(_("Speed"), _("Manual adjustment of wind speed."),
+                 _T("%.0f %s"), _T("%.0f"),
+                 fixed(0),
+                 Units::ToUserWindSpeed(Units::ToSysUnit(fixed(200),
+                                                         Unit::KILOMETER_PER_HOUR)),
+                 fixed(1), false,
+                 Units::ToUserWindSpeed(manual_wind.norm),
+                 this);
     DataFieldFloat &df = *(DataFieldFloat *)wp->GetDataField();
     df.SetUnits(Units::GetWindSpeedName());
     wp->RefreshDisplay();
@@ -98,10 +95,7 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
     wp = AddAngle(_("Direction"), _("Manual adjustment of wind direction."),
                   manual_wind.bearing, 5u, false,
                   this);
-
-    manual_modified = false;
   } else {
-    AddDummy();
     AddDummy();
     AddDummy();
   }
@@ -120,10 +114,6 @@ WindSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   else
     AddDummy();
 
-  if (clear_manual_button)
-    AddButton(_("Clear"), *this, CLEAR_MANUAL);
-
-  UpdateVector();
   UpdatetManualVisibility();
 }
 
@@ -147,22 +137,8 @@ WindSettingsPanel::UpdatetManualVisibility()
 void
 WindSettingsPanel::Show(const PixelRect &rc)
 {
-  if (edit_manual_wind) {
-    UpdateVector();
-    CommonInterface::GetLiveBlackboard().AddListener(*this);
-  }
-
   RowFormWidget::Show(rc);
   UpdatetManualVisibility();
-}
-
-void
-WindSettingsPanel::Hide()
-{
-  RowFormWidget::Hide();
-
-  if (edit_manual_wind)
-    CommonInterface::GetLiveBlackboard().RemoveListener(*this);
 }
 
 bool
@@ -179,6 +155,13 @@ WindSettingsPanel::Save(bool &_changed)
     changed = true;
   }
 
+  if (edit_manual_wind && settings.GetUserWindSource() == UserWindSource::MANUAL_WIND) {
+    const NMEAInfo &basic = CommonInterface::Basic();
+    settings.manual_wind.norm = Units::ToSysWindSpeed(GetValueFloat(Speed));
+    settings.manual_wind.bearing = GetValueAngle(Direction);
+    settings.manual_wind_available.Update(basic.clock);
+  }
+
   if (edit_trail_drift)
     changed |= SaveValue(TrailDrift, ProfileKeys::TrailDrift,
                          map_settings.trail.wind_drift_enabled);
@@ -189,18 +172,6 @@ WindSettingsPanel::Save(bool &_changed)
 
   _changed |= changed;
   return true;
-}
-
-void
-WindSettingsPanel::OnAction(int id)
-{
-  switch (id) {
-  case CLEAR_MANUAL:
-    CommonInterface::SetComputerSettings().wind.manual_wind_available.Clear();
-    manual_modified = false;
-    UpdateVector();
-    break;
-  }
 }
 
 void
@@ -215,68 +186,4 @@ WindSettingsPanel::OnModified(DataField &df)
         form != nullptr)
       form->SetModalResult(mrOK);
   }
-
-  if (!edit_manual_wind)
-    return;
-
-  const NMEAInfo &basic = CommonInterface::Basic();
-  WindSettings &settings = CommonInterface::SetComputerSettings().wind;
-
-  if (&df == &GetDataField(Speed) || &df == &GetDataField(Direction)) {
-    settings.manual_wind.norm = Units::ToSysWindSpeed(GetValueFloat(Speed));
-    settings.manual_wind.bearing = GetValueAngle(Direction);
-    settings.manual_wind_available.Update(basic.clock);
-    manual_modified = true;
-  }
-
-  UpdateVector();
 }
-
-void
-WindSettingsPanel::UpdateVector()
-{
-  return;
-
-  if (!edit_manual_wind)
-    return;
-
-  const DerivedInfo &calculated = CommonInterface::Calculated();
-  const WindSettings &settings = CommonInterface::SetComputerSettings().wind;
-
-  const TCHAR *source = nullptr;
-  switch (manual_modified
-          ? DerivedInfo::WindSource::MANUAL
-          : calculated.wind_source) {
-  case DerivedInfo::WindSource::NONE:
-    source = _("None");
-    break;
-
-  case DerivedInfo::WindSource::MANUAL:
-    source = _("Manual");
-    break;
-
-  case DerivedInfo::WindSource::AUTO:
-    source = _("Internal");
-    break;
-
-  case DerivedInfo::WindSource::EXTERNAL:
-    source = _("External");
-    break;
-  }
-
-  SetText(SOURCE, source);
-
-  if (!manual_modified && !settings.manual_wind_available) {
-    SpeedVector wind = CommonInterface::Calculated().GetWindOrZero();
-    LoadValue(Speed, Units::ToUserWindSpeed(wind.norm));
-    LoadValue(Direction, wind.bearing);
-  }
-}
-
-void
-WindSettingsPanel::OnCalculatedUpdate(const MoreData &basic,
-                                      const DerivedInfo &calculated)
-{
-  UpdateVector();
-}
-
