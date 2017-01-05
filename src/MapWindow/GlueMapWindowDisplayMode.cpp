@@ -206,18 +206,19 @@ GlueMapWindow::UpdateScreenAngle()
     : settings.cruise_orientation;
 
   if (orientation == MapOrientation::TARGET_UP) {
-    if (!calculated.task_stats.current_leg.vector_remaining.IsValid()) {
+    const ElementStat &current_leg = calculated.task_stats.current_leg;
+
+    if (!current_leg.vector_remaining.IsValid()) {
       visible_projection.SetScreenAngle(last_screen_angle);
     } else if (calculated.task_stats.active_index == 0 &&
-        positive(calculated.task_stats.current_leg.next_leg_vector.distance)) {
+        positive(current_leg.next_leg_vector.distance)) {
       // if in start cylinder, normal start target is nonsense
-      visible_projection.SetScreenAngle(
-          calculated.task_stats.current_leg.next_leg_vector.bearing);
-    } else if (calculated.task_stats.current_leg.
-        vector_remaining.distance == fixed(0)) {
+      visible_projection.SetScreenAngle(current_leg.next_leg_vector.bearing);
+
+    } else if (current_leg.vector_remaining.distance == fixed(0)) {
       // "pushing the target," so use track up
-      if (positive(calculated.task_stats.current_leg.next_leg_vector.distance)) {
-        visible_projection.SetScreenAngle(calculated.task_stats.current_leg.next_leg_vector.bearing);
+      if (positive(current_leg.next_leg_vector.distance)) {
+        visible_projection.SetScreenAngle(current_leg.next_leg_vector.bearing);
       } else {
         // fallback, keep pushing target smoothly
         visible_projection.SetScreenAngle(basic.track_available ?
@@ -225,10 +226,11 @@ GlueMapWindow::UpdateScreenAngle()
       }
 
     } else {
-      // Target up
-      visible_projection.SetScreenAngle(calculated.task_stats.current_leg.
+      // Normal Target up
+      visible_projection.SetScreenAngle(current_leg.
                                         vector_remaining.bearing);
     }
+
   } else if (orientation == MapOrientation::HEADING_UP) {
     visible_projection.SetScreenAngle(
       basic.attitude.IsHeadingUseable() ? basic.attitude.heading : Angle::Zero());
