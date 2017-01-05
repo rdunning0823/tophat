@@ -275,16 +275,6 @@ thirdparty_libs = [
     ),
 
     AutotoolsProject(
-        'https://sourceforge.net/projects/libpng/files/libpng16/1.6.26/libpng-1.6.26.tar.xz',
-        'faed9bb495d2e12dd0c9ec561ca60cd8',
-        'lib/libpng.a',
-        [
-            '--disable-shared', '--enable-static',
-            '--enable-arm-neon',
-        ]
-    ),
-
-    AutotoolsProject(
         'http://netcologne.dl.sourceforge.net/project/libjpeg-turbo/1.4.1/libjpeg-turbo-1.4.1.tar.gz',
         'b1f6b84859a16b8ebdcda951fa07c3f2',
         'lib/libjpeg.a',

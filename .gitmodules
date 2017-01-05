@@ -47,7 +47,9 @@
 [submodule "lib/boost/function_types"]
 	path = lib/boost/function_types
 	url = git://github.com/boostorg/function_types.git
-
 [submodule "lib/alsa-lib"]
 	path = lib/alsa-lib
 	url = git://git.alsa-project.org/alsa-lib.git
+[submodule "lib/libpng"]
+	path = lib/libpng
+	url = git://git.code.sf.net/p/libpng/code

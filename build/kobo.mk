@@ -58,6 +58,8 @@ ifeq ($(TARGET_IS_KOBO),y)
 kobo-libs: alsa-lib
 	./kobo/build.py $(TARGET_OUTPUT_DIR) $(HOST_ARCH) $(CC) $(CXX) $(AR) $(STRIP)
 
+$(XCSOAR_BIN) $(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN): libpng
+
 KOBO_POWER_OFF_SOURCES = \
 	$(SRC)/Version.cpp \
 	$(SRC)/Screen/Layout.cpp \
