@@ -206,6 +206,7 @@ GlueMapWindow::UpdateScreenAngle()
     : settings.cruise_orientation;
 
   if (orientation == MapOrientation::TARGET_UP) {
+
     const ElementStat &current_leg = calculated.task_stats.current_leg;
 
     if (!current_leg.vector_remaining.IsValid()) {
@@ -215,20 +216,25 @@ GlueMapWindow::UpdateScreenAngle()
       // if in start cylinder, normal start target is nonsense
       visible_projection.SetScreenAngle(current_leg.next_leg_vector.bearing);
 
-    } else if (current_leg.vector_remaining.distance == fixed(0)) {
-      // "pushing the target," so use track up
-      if (positive(current_leg.next_leg_vector.distance)) {
-        visible_projection.SetScreenAngle(current_leg.next_leg_vector.bearing);
-      } else {
-        // fallback, keep pushing target smoothly
-        visible_projection.SetScreenAngle(basic.track_available ?
-            basic.track : Angle::Zero());
-      }
+    } else if (current_leg.vector_remaining.distance < fixed(1600) &&
+        nav_to_target_frozen_index == -1) {
+      // just started to "push target" (or close to target) so freeze orientation
+      // until task index is advanced
+        nav_to_target_frozen_index = (int)calculated.task_stats.active_index;
+        visible_projection.SetScreenAngle(current_leg.vector_remaining.bearing);
+
+    } else if (nav_to_target_frozen_index != -1) {
+      // Orientation is frozen.  Do nothing
 
     } else {
       // Normal Target up
       visible_projection.SetScreenAngle(current_leg.
                                         vector_remaining.bearing);
+    }
+    if (nav_to_target_frozen_index != (int)calculated.task_stats.active_index &&
+        nav_to_target_frozen_index != -1) {
+      // task has advanced so unfreeze orientation
+      nav_to_target_frozen_index = -1;
     }
 
   } else if (orientation == MapOrientation::HEADING_UP) {

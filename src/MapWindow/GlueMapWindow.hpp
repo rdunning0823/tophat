@@ -140,6 +140,14 @@ class GlueMapWindow : public MapWindow {
   /** keep last angle to use if temporary INVALID status of vector_remaining */
   Angle last_screen_angle;
 
+  /**
+   * With TARGET_UP orientation, we freeze the orientation when target is reached
+   * until the NavBar is advanced by the user
+   * or the task index is incremented automatically
+   * -1 if not frozen
+   */
+  int nav_to_target_frozen_index;
+
   OffsetHistory offset_history;
 
 #ifndef ENABLE_OPENGL
