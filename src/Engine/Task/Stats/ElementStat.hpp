@@ -92,15 +92,27 @@ struct ElementStat
   /** Difference beteen planned and remaining_effective */
   DistanceStat pirker;
 
+  /**
+   * the planned, travelled and remaining glide solutions deal with distances
+   * for the task, which may use the task mc setting, which may be
+   * different from the main "safety mc" setting controlled by the MC Infobox
+   */
   /** Glide solution for planned element */
   GlideResult solution_planned;
   /** Glide solution for travelled element */
   GlideResult solution_travelled;
   /** Glide solution for remaining element */
   GlideResult solution_remaining;
+
   /** Glide solution for remaining element, MC=0 */
   GlideResult solution_mc0;
-  /** Glide solution for remaining element using safety mc instead of task_mc */
+
+  /**
+   * Glide solution for remaining element using safety mc instead of task mc
+   * that is controlled by the MC Infobox
+   * All altitude calculations should be made with this glide solution
+   * unless using solution_mc0
+   **/
   GlideResult solution_remaining_safety_mc;
   /** Rate of change of altitude difference (m/s) */
   TaskVario vario;
