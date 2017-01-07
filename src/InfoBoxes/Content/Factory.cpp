@@ -313,7 +313,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next altitude required"),
     N_("WP AltR"),
-    N_("Additional altitude required to reach the next turn point. For AAT tasks, the target within the AAT sector is used."),
+    N_("Absolute altitude MSL required to reach the next turn point. For AAT tasks, the target within the AAT sector is used."),
     UpdateInfoBoxNextAltitudeRequire,
     next_waypoint_infobox_panels,
     e_Fin_AltDiff, // Fin AltD
@@ -347,7 +347,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Final altitude required"),
     N_("Fin AltR"),
-    N_("Additional altitude required to finish the task."),
+    N_("Absolute altitude MSL required to finish the task."),
     UpdateInfoBoxFinalAltitudeRequire,
     e_SpeedTaskAvg, // V Task Av
     e_Fin_AltDiff, // Fin AltD
