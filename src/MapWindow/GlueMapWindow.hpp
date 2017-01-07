@@ -41,6 +41,7 @@ Copyright_License {
 struct Look;
 struct GestureLook;
 class TopographyThread;
+class MaskedIcon;
 
 class OffsetHistory
 {
@@ -247,6 +248,13 @@ protected:
    *
    * @param test if true then only tests location.  If false handles event
    */
+  virtual bool ButtonOverlaysOnMouseUp(PixelScalar x, PixelScalar y,
+                                         bool test);
+  /**
+   * returns true if handled by the button overlays.
+   *
+   * @param test if true then only tests location.  If false handles event
+   */
   virtual bool ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y,
                                          bool test);
 #endif
@@ -369,12 +377,40 @@ public:
   virtual void SetZoomButtonsRect();
 
   /**
+   * helper class for drawing Win PC map overlay buttons
+   */
+  class WinMapOverlayButton : public PixelRect
+  {
+    bool down;
+  public:
+    WinMapOverlayButton()
+    : down(false) {}
+
+    void Draw(Canvas &canvas, const MaskedIcon *icon) const;
+
+    void SetDown(bool _down) {
+      down = _down;
+    }
+    bool IsDown() const {
+      return down;
+    }
+
+    WinMapOverlayButton operator=(const PixelRect rect) {
+      left = rect.left;
+      right = rect.right;
+      top = rect.top;
+      bottom = rect.bottom;
+      return *this;
+    }
+  };
+
+  /**
    * locations of Map overlay buttons when not using
    * OPENGL or KOBO
    */
-  PixelRect rc_main_menu_button;
-  PixelRect rc_zoom_out_button;
-  PixelRect rc_zoom_in_button;
+  WinMapOverlayButton rc_main_menu_button;
+  WinMapOverlayButton rc_zoom_out_button;
+  WinMapOverlayButton rc_zoom_in_button;
 #endif
 
   /**

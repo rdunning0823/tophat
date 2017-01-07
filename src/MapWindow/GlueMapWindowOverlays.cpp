@@ -113,47 +113,49 @@ DrawRect(Canvas &canvas, const PixelRect &rc)
 }
 
 void
+GlueMapWindow::WinMapOverlayButton::Draw(Canvas &canvas, const MaskedIcon *icon) const
+{
+  const PixelSize icon_size = icon->GetSize();
+  const PixelRect rc ((PixelRect)*this);
+
+  canvas.Select(UIGlobals::GetLook().nav_slider.GetBackgroundBrush(down));
+  if (down)
+    canvas.DrawFilledRectangle(rc.left, rc.top, rc.right, rc.bottom, COLOR_BLACK);
+
+  //TODO: fix color of rect so it is black or while.  Currently it's brown
+  UPixelScalar pen_width = !HasColors() ? 2 : 1;
+  Color color = down ? COLOR_WHITE : COLOR_BLACK;
+  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), color));
+  DrawRect(canvas, rc);
+
+  const UPixelScalar button_height = rc.bottom -rc.top;
+  const UPixelScalar button_width = rc.right - rc.left;
+
+  const int offsetx = (button_width - icon_size.cx) / 2;
+  const int offsety = (button_height - icon_size.cy) / 2;
+
+  PixelRect rc_icon;
+  rc_icon.left = rc.left + offsetx;
+  rc_icon.top = rc.top + offsety;
+  rc_icon.right = rc_icon.left + icon_size.cx;
+  rc_icon.bottom = rc_icon.top + icon_size.cy;
+
+  icon->Draw(canvas, rc_icon, down);
+}
+
+void
 GlueMapWindow::DrawMainMenuButtonOverlay(Canvas &canvas) const
 {
   const IconLook &icons = UIGlobals::GetIconLook();
-  const MaskedIcon *icon = &icons.hBmpMenuButton;
-  const PixelSize icon_size = icon->GetSize();
-
-  UPixelScalar pen_width = !HasColors() ? 2 : 1;
-  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
-  DrawRect(canvas, rc_main_menu_button);
-
-  const UPixelScalar menu_button_height = rc_main_menu_button.bottom -
-      rc_main_menu_button.top;
-  const UPixelScalar menu_button_width = rc_main_menu_button.right -
-      rc_main_menu_button.left;
-
-  const int offsetx = (menu_button_width - icon_size.cx) / 2;
-  const int offsety = (menu_button_height - icon_size.cy) / 2;
-  icon->DrawUpperLeft(canvas, rc_main_menu_button.left + offsetx,
-                      rc_main_menu_button.top + offsety);
+  rc_main_menu_button.Draw(canvas, &icons.hBmpMenuButton);
 }
 
 void
 GlueMapWindow::DrawZoomButtonOverlays(Canvas &canvas) const
 {
-
-  UPixelScalar pen_width = !HasColors() ? 2 : 1;
-  canvas.Select(Pen((UPixelScalar)Layout::Scale(pen_width), COLOR_BLACK));
-  DrawRect(canvas, rc_zoom_out_button);
-  DrawRect(canvas, rc_zoom_in_button);
-
   const IconLook &icon_look = UIGlobals::GetIconLook();
-  const MaskedIcon *icon_zoom_in = &icon_look.hBmpZoomInButton;
-  const PixelSize icon_in_size = icon_zoom_in->GetSize();
-  const int offsetx = (rc_zoom_in_button.right - rc_zoom_in_button.left - icon_in_size.cx) / 2;
-  const int offsety = (rc_zoom_in_button.bottom - rc_zoom_in_button.top - icon_in_size.cy) / 2;
-  icon_zoom_in->DrawUpperLeft(canvas, rc_zoom_in_button.left + offsetx,
-                              rc_zoom_in_button.top + offsety);
-
-  const MaskedIcon *icon_zoom_out = &icon_look.hBmpZoomOutButton;
-  icon_zoom_out->DrawUpperLeft(canvas, rc_zoom_out_button.left + offsetx,
-                               rc_zoom_out_button.top + offsety);
+  rc_zoom_in_button.Draw(canvas, &icon_look.hBmpZoomInButton);
+  rc_zoom_out_button.Draw(canvas, &icon_look.hBmpZoomOutButton);
 }
 
 void
