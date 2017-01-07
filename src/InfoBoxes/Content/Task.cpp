@@ -360,7 +360,7 @@ UpdateInfoBoxNextAltitudeRequire(InfoBoxData &data)
   // pilots want this to be assuming terminal flight to this wp
 
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
-  const GlideResult &next_solution = task_stats.current_leg.solution_remaining;
+  const GlideResult &next_solution = task_stats.current_leg.solution_remaining_safety_mc;
   if (!task_stats.task_valid || !next_solution.IsAchievable()) {
     data.SetInvalid();
     return;
@@ -376,7 +376,7 @@ UpdateInfoBoxNextAltitudeArrival(InfoBoxData &data)
 
   const MoreData &basic = CommonInterface::Basic();
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
-  const GlideResult next_solution = task_stats.current_leg.solution_remaining;
+  const GlideResult next_solution = task_stats.current_leg.solution_remaining_safety_mc;
   if (!basic.NavAltitudeAvailable() ||
       !task_stats.task_valid || !next_solution.IsAchievable()) {
     data.SetInvalid();
@@ -478,7 +478,7 @@ UpdateInfoBoxFinalAltitudeDiff(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
 
-  SetValueFromAltDiff(data, task_stats, task_stats.total.solution_remaining);
+  SetValueFromAltDiff(data, task_stats, task_stats.total.solution_remaining_safety_mc);
 }
 
 void
@@ -495,12 +495,12 @@ UpdateInfoBoxFinalAltitudeRequire(InfoBoxData &data)
 {
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   if (!task_stats.task_valid ||
-      !task_stats.total.solution_remaining.IsOk()) {
+      !task_stats.total.solution_remaining_safety_mc.IsOk()) {
     data.SetInvalid();
     return;
   }
 
-  data.SetValueFromAltitude(task_stats.total.solution_remaining.GetRequiredAltitude());
+  data.SetValueFromAltitude(task_stats.total.solution_remaining_safety_mc.GetRequiredAltitude());
 }
 
 #ifdef __clang__
