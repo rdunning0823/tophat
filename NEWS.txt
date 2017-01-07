@@ -6,6 +6,7 @@ Tophat Soaring 2.2 Jan 8, 2017
 * Correct description for infoboxes with "altitude required"
 * Fix altitude calculations for infoboxes "next" and "final"
 * Sync timing of "final glide" message and mode shift with final glide bar
+* PC Build zoom and menu buttons draw inverse when "down"
 
 Top Hat Soaring 2.1.9 Beta 9/20/2016
 * Task:
