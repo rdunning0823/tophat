@@ -70,7 +70,7 @@ TaskStats::calc_flight_mode(const TaskBehaviour &settings)
      decide whether to switch to final glide */
   const GlideResult &solution_remaining = settings.IsAutoMCFinalGlideEnabled()
     ? total.solution_mc0
-    : total.solution_remaining;
+    : total.solution_remaining_safety_mc;
 
   const bool this_is_final = solution_remaining.IsOk() &&
     positive(solution_remaining.altitude_difference + fixed(margin));
