@@ -7,6 +7,7 @@ Tophat Soaring 2.2 Jan 8, 2017
 * Fix altitude calculations for infoboxes "next" and "final"
 * Sync timing of "final glide" message and mode shift with final glide bar
 * PC Build zoom and menu buttons draw inverse when "down"
+* PC Build default screen size 800x600
 
 Top Hat Soaring 2.1.9 Beta 9/20/2016
 * Task:
