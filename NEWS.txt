@@ -11,6 +11,8 @@ Tophat Soaring 2.2 Jan 28, 2017
  - Auto advance Turn Area Task (AAT) when exit turnpoint
 * Fix bug swapping wind internal and external preference
 * Simulator: glide descent simulated per polar and speed
+* PC Build default screen size 800x600
+* PC Build zoom and menu buttons draw inverse when "down"
 
 Top Hat Soaring 2.1.9 Beta 9/20/2016
 * Task:
