@@ -30,6 +30,8 @@ struct NMEAInfo;
 
 class Simulator {
 public:
+  fixed last_airspeed;
+
   void Init(NMEAInfo &basic);
 
   /**
