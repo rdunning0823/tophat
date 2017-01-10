@@ -46,6 +46,7 @@ Simulator::Init(NMEAInfo &basic)
   basic.track = Angle::Zero();
   basic.ground_speed = fixed(0);
   basic.gps_altitude = fixed(0);
+  last_airspeed = fixed(0);
 }
 
 void
@@ -85,8 +86,12 @@ Simulator::Process(NMEAInfo &basic)
 
     if (!positive(airspeed))
         airspeed = basic.ground_speed;
-    if (airspeed > polar.GetSMin()  / 2)
+
+    if (airspeed > (polar.GetSMin() / 2)) {
+      if (last_airspeed < (polar.GetSMin() / 2))
+        basic.gps_altitude += fixed(914); // 3000 ft agl start
       basic.gps_altitude = basic.gps_altitude - polar.SinkRate(airspeed);
+    }
 
     basic.ProvideNettoVario(fixed(0));
     last_airspeed = airspeed;
