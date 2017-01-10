@@ -24,6 +24,8 @@ Copyright_License {
 #ifndef XCSOAR_DEVICE_SIMULATOR_HPP
 #define XCSOAR_DEVICE_SIMULATOR_HPP
 
+#include "Math/fixed.hpp"
+
 struct NMEAInfo;
 
 class Simulator {
