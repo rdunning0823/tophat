@@ -113,7 +113,6 @@ DeviceBlackboard::SetSimulatorLocation(const GeoPoint &location)
   ScopeLock protect(mutex);
   NMEAInfo &basic = simulator_data;
 
-  simulator.Touch(basic);
   basic.track = location.Bearing(basic.location).Reciprocal();
   basic.location = location;
 
@@ -132,7 +131,6 @@ DeviceBlackboard::SetSpeed(fixed val)
   ScopeLock protect(mutex);
   NMEAInfo &basic = simulator_data;
 
-  simulator.Touch(basic);
   basic.ground_speed = val;
 
   ScheduleMerge();
@@ -148,7 +146,6 @@ void
 DeviceBlackboard::SetTrack(Angle val)
 {
   ScopeLock protect(mutex);
-  simulator.Touch(simulator_data);
   simulator_data.track = val.AsBearing();
 
   ScheduleMerge();
@@ -166,7 +163,6 @@ DeviceBlackboard::SetAltitude(fixed val)
   ScopeLock protect(mutex);
   NMEAInfo &basic = simulator_data;
 
-  simulator.Touch(basic);
   basic.gps_altitude = val;
 
   ScheduleMerge();
