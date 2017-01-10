@@ -27,6 +27,11 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "../Simulator.hpp"
 #include "Geo/Math.hpp"
+#include "GlideSolvers/GlidePolar.hpp"
+#include "Components.hpp"
+#include "Task/ProtectedTaskManager.hpp"
+#include "Thread/Guard.hpp"
+#include "Interface.hpp"
 
 #include <stdio.h>
 
@@ -72,4 +77,18 @@ Simulator::Process(NMEAInfo &basic)
 
   basic.location = FindLatitudeLongitude(basic.location, basic.track,
                                          basic.ground_speed);
+  {
+    assert(protected_task_manager != nullptr);
+    ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
+    const GlidePolar &polar = task_manager->GetGlidePolar();
+    fixed airspeed =  CommonInterface::Basic().true_airspeed;
+
+    if (!positive(airspeed))
+        airspeed = basic.ground_speed;
+    if (airspeed > polar.GetSMin()  / 2)
+      basic.gps_altitude = basic.gps_altitude - polar.SinkRate(airspeed);
+
+    basic.ProvideNettoVario(fixed(0));
+    last_airspeed = airspeed;
+  }
 }
