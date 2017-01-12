@@ -204,7 +204,7 @@ OrderedTask::UpdateGeometry()
       /// so stats are updated
     }
   }
-  SetLandoutDistanceGeometry();
+  SetLandoutDistanceGeometry(false);
 
   force_full_update = true;
 }
@@ -245,6 +245,45 @@ OrderedTask::ScoredAdjustmentStart() const {
   return !taskpoint_start->IsBoundaryScored();
 }
 
+/** calculates search points for max distance achieved and sets SetSearchMaxAchieved
+ * Does this for all points with samples, and up to the tp active index
+ * For tps before active index, this should be the same as SearchMin
+ * Nav Bar index should not affect VTask _except_ if you miss a turnpoint in
+ * case it will give you credit to the skipped TP's nominal point only after
+ * you advance the task bar beyond it.
+ */
+inline bool
+OrderedTask::RunDijsktraMaxAchieved()
+{
+  const unsigned task_size = TaskSize();
+  if (task_size < 2)
+    return false;
+
+  if (dijkstra_max == nullptr)
+    dijkstra_max = new TaskDijkstraMax();
+  TaskDijkstraMax &dijkstra = *dijkstra_max;
+
+  dijkstra.SetTaskSize(task_size);
+  for (unsigned i = 0; i != task_size; ++i) {
+    // returns nominal for unsampled tps.  ScanDistanceScored will need to
+    // calculate scored distance based on active_index and if sampled
+    // OTP::GetSearchPoints returns boundary points for future TPs so override
+    const SearchPointVector &boundary = task_points[i]->HasSampled() ?
+        ((SampledTaskPoint*)task_points[i])->GetSearchPoints() :
+        ((SampledTaskPoint*)task_points[i])->GetNominalPoints();
+    dijkstra.SetBoundary(i, boundary);
+  }
+
+  if (!dijkstra.DistanceMax()) {
+    return false;
+  }
+
+  for (unsigned i = 0; i != task_size; ++i) {
+    SetPointSearchMaxAchieved(i, dijkstra.GetSolution(i));
+  }
+  return true;
+}
+
 inline bool
 OrderedTask::RunDijsktraMin(const GeoPoint &location)
 {
@@ -277,15 +316,16 @@ OrderedTask::RunDijsktraMin(const GeoPoint &location)
 }
 
 void
-OrderedTask::SetLandoutDistanceGeometry()
+OrderedTask::SetLandoutDistanceGeometry(bool force)
 {
   if (taskpoint_start != nullptr)
-    taskpoint_start->ScanLandoutDistanceGeometry();
+    taskpoint_start->ScanLandoutDistanceGeometry(force);
 }
 
 inline fixed
 OrderedTask::ScanDistanceMin(const GeoPoint &location, bool full)
 {
+  assert(HasStart());
   if (!full && location.IsValid() && last_min_location.IsValid() &&
       DistanceIsSignificant(location, last_min_location)) {
     const TaskWaypoint *active = GetActiveTaskPoint();
@@ -305,7 +345,6 @@ OrderedTask::ScanDistanceMin(const GeoPoint &location, bool full)
         full = true;
     }
   }
-
   if (full) {
     /* updates SearchPointMin() for points including and ahead of ActiveTaskPoint() */
     /* e.g. start location (not time) */
@@ -435,11 +474,15 @@ OrderedTask::ScanDistanceNominal()
 }
 
 fixed
-OrderedTask::ScanDistanceScored(const GeoPoint &location)
+OrderedTask::ScanDistanceScored(const GeoPoint &location, bool full_update)
 {
-  return task_points.empty()
-    ? fixed(0)
-    : task_points.front()->ScanDistanceScored(location);
+  if (task_points.empty())
+    return fixed(0);
+
+  if (full_update)
+    RunDijsktraMaxAchieved();
+
+  return task_points.front()->ScanDistanceScored(location);
 }
 
 fixed
@@ -590,10 +633,10 @@ OrderedTask::CheckTransitions(const AircraftState &state,
   }
 
   SaveTaskState(transitioned, full_update, *this);
-  if (transitioned)
-    SetLandoutDistanceGeometry();
+  if (transitioned || full_update)
+    SetLandoutDistanceGeometry(transitioned);
 
-  return full_update;
+  return full_update || transitioned;
 }
 
 inline bool
@@ -1385,6 +1428,12 @@ void
 OrderedTask::SetPointSearchMin(unsigned tp, const SearchPoint &sol)
 {
   task_points[tp]->SetSearchMin(sol);
+}
+
+void
+OrderedTask::SetPointSearchMaxAchieved(unsigned tp, const SearchPoint &sol)
+{
+  task_points[tp]->SetSearchMaxAchieved(sol);
 }
 
 void

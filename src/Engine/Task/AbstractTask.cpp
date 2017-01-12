@@ -165,7 +165,7 @@ AbstractTask::UpdateStatsDistances(const GeoPoint &location,
 
   stats.total.travelled.SetDistance(ScanDistanceTravelled(location));
   stats.total.planned.SetDistance(ScanDistancePlanned());
-  stats.distance_scored = ScanDistanceScored(location);
+  stats.distance_scored = ScanDistanceScored(location, full_update);
 }
 
 static void

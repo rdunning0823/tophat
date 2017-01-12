@@ -203,7 +203,7 @@ UnorderedTask::ScanDistancePlanned()
 }
 
 fixed
-UnorderedTask::ScanDistanceScored(const GeoPoint &location)
+UnorderedTask::ScanDistanceScored(const GeoPoint &location, bool full_update)
 {
   return fixed(0);
 }

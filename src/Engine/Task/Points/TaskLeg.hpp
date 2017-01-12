@@ -200,7 +200,7 @@ public:
    * Calculate oz points farthest right and left for landout distance
    * calculations
    */
-  bool ScanLandoutDistanceGeometry();
+  bool ScanLandoutDistanceGeometry(bool force);
 
 private:
   gcc_pure

@@ -62,7 +62,7 @@ const GeoPoint &
 ScoredTaskPoint::GetLocationScored() const
 {
   if (IsBoundaryScored() || !HasEntered())
-    return GetLocationMin();
+    return GetLocationMaxAchieved();
 
   return GetLocation();
 }

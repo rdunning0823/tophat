@@ -23,7 +23,6 @@
 #include "TaskLeg.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 
-
 #include <assert.h>
 #include <algorithm>
 
@@ -235,6 +234,7 @@ TaskLeg::GetScoredLegDistanceLandout(const GeoPoint &ref) const
   assert(ref.IsValid());
 
   fixed distance_new = landout_distance.GetDistance(ref);
+
   return std::max(fixed(0),
                   distance_new - GetOrigin()->ScoreAdjustment());
 }
@@ -245,20 +245,23 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   if (!GetOrigin())
     return fixed(0);
 
+
   switch (destination.GetActiveState()) {
   case OrderedTaskPoint::BEFORE_ACTIVE:
     // this leg totally included
     if (destination.HasEntered()) {
-      return  std::max(fixed(0),
-                      memo_scored.Distance(GetOrigin()->GetLocationScored(),
-                                  destination.GetLocationScored())
-                                  - GetOrigin()->ScoreAdjustment()
-                                  - destination.ScoreAdjustment());
+      fixed leg_dist = std::max(fixed(0),
+                                memo_scored.Distance(GetOrigin()->GetLocationScored(),
+                                    destination.GetLocationScored())
+                                    - GetOrigin()->ScoreAdjustment()
+                                    - destination.ScoreAdjustment());
+      return leg_dist;
     } else {
       // if we missed an OZ in the past, or just advance the task bar fwd
       // then
       if (ref.IsValid()) {
-        return GetScoredLegDistanceLandout(ref);
+        fixed leg_dist = GetScoredLegDistanceLandout(ref);
+        return leg_dist;
       } else {
         return fixed(0);
       }
@@ -268,17 +271,21 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
   case OrderedTaskPoint::CURRENT_ACTIVE:
     // this leg partially included
     if (destination.HasEntered()) {
-      return std::max(fixed(0),
-                      memo_scored.Distance(GetOrigin()->GetLocationScored(),
-                                           destination.GetLocationScored())
-                      - GetOrigin()->ScoreAdjustment() - destination.ScoreAdjustment());
+      fixed leg_dist = std::max(fixed(0),
+                                memo_scored.Distance(GetOrigin()->GetLocationScored(),
+                                                     destination.GetLocationScored())
+                                - GetOrigin()->ScoreAdjustment() - destination.ScoreAdjustment());
+      return leg_dist;
     } else if (ref.IsValid()) {
+
       // not in cylinder (or has entered and left)
       // this provides vector with bearing to center (which is NOT bearing to plane)
       // and Dist from last travelled to center minus dist from glider to center.
-      return GetScoredLegDistanceLandout(ref);
-    } else
+      fixed leg_dist = GetScoredLegDistanceLandout(ref);
+      return leg_dist;
+    } else {
       return fixed(0);
+    }
 
   case OrderedTaskPoint::AFTER_ACTIVE:
 
@@ -286,13 +293,15 @@ TaskLeg::GetScoredDistance(const GeoPoint &ref) const
 
     if (GetOrigin()->HasEntered()) {
       if (destination.HasEntered()) {
-        return std::max(fixed(0),
+        fixed leg_dist = std::max(fixed(0),
                         memo_scored.Distance(GetOrigin()->GetLocationScored(),
                                              destination.GetLocationScored())
                         - GetOrigin()->ScoreAdjustment() - destination.ScoreAdjustment());
+        return leg_dist;
 
       } else if (ref.IsValid()) {
-        return GetScoredLegDistanceLandout(ref);
+        fixed leg_dist = GetScoredLegDistanceLandout(ref);
+        return leg_dist;
       }
     }
 
@@ -387,8 +396,8 @@ TaskLeg::ScanDistanceScored(const GeoPoint &ref) const
 }
 
 bool
-TaskLeg::ScanLandoutDistanceGeometry()
+TaskLeg::ScanLandoutDistanceGeometry(bool force)
 {
-  return landout_distance.SetLandoutDistanceGeometry() &&
-    (GetNext() ? GetNext()->ScanLandoutDistanceGeometry() : true);
+  return landout_distance.SetLandoutDistanceGeometry(force) &&
+    (GetNext() ? GetNext()->ScanLandoutDistanceGeometry(force) : true);
 }

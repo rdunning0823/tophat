@@ -116,6 +116,7 @@ StartPoint::find_best_start(const AircraftState &state,
       }
     }
 
+    SetSearchMaxAchieved(SearchPoint(best_location, projection));
     SetSearchMin(SearchPoint(best_location, projection));
     new_state.location = best_location;
   } else {
@@ -125,6 +126,7 @@ StartPoint::find_best_start(const AircraftState &state,
         (state.location.Distance(next_location) > Distance(next_location)) ?
         this->GetLocation() : state.location;
     SetSearchMin(SearchPoint(best_us_start, projection));
+    SetSearchMaxAchieved(SearchPoint(best_us_start, projection));
     new_state.location = best_us_start;
   }
   this->SetStateEntered(new_state);

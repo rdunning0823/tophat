@@ -42,6 +42,10 @@ public:
    * @return True if succeeded
    */
   bool DistanceMax();
+
+private:
+  bool DistanceMax(const SearchPoint *location);
+
 };
 
 #endif

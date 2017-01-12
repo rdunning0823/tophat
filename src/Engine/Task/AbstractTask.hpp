@@ -331,7 +331,7 @@ protected:
    *
    * @return Distance (m) achieved adjusted for scoring
    */
-  virtual fixed ScanDistanceScored(const GeoPoint &ref) = 0;
+  virtual fixed ScanDistanceScored(const GeoPoint &ref, bool full_update) = 0;
 
   /**
    * Calculate distance of achieved part of task.

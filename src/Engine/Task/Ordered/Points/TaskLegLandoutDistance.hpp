@@ -46,6 +46,8 @@ class TaskLegLandoutDistance {
   GeoPoint oz_point_farthest_right;
   GeoVector vector_to_oz_farthest_left;
   GeoVector vector_to_oz_farthest_right;
+  fixed last_distance_nominal;
+  Angle last_bearing_nominal;
 
   OrderedTaskPoint& destination;
 
@@ -67,10 +69,12 @@ public:
    * Find the location on the oz's boundary of the destination point
    * that are the farthest left and right with respect to the origin point's
    * location scored.
+   * @param force.  If true, will redo the geometry despite little movement
    * @return true
    */
-  bool SetLandoutDistanceGeometry();
+  bool SetLandoutDistanceGeometry(bool force);
 
+protected:
   /**
    * what is the point on the OZ boundary closest to the ref?
    * @return Geopoint

@@ -53,7 +53,7 @@ public:
   virtual fixed ScanDistanceNominal() override;
   virtual fixed ScanDistancePlanned() override;
   virtual fixed ScanDistanceRemaining(const GeoPoint &ref) override;
-  virtual fixed ScanDistanceScored(const GeoPoint &ref) override;
+  virtual fixed ScanDistanceScored(const GeoPoint &ref, bool full_update) override;
   virtual fixed ScanDistanceTravelled(const GeoPoint &ref) override;
   virtual void ScanDistanceMinMax(const GeoPoint &ref, bool full,
                                   fixed *dmin, fixed *dmax) override;

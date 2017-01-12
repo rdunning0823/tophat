@@ -431,6 +431,14 @@ protected:
   void SetPointSearchMin(unsigned tp, const SearchPoint &sol);
 
   /**
+   * Set task point's max achieved distance value (by TaskDijkstra).
+   *
+   * @param tp Index of task point to set
+   * @param sol Search point to be set for task point's max achieved distance
+   */
+  void SetPointSearchMaxAchieved(unsigned tp, const SearchPoint &sol);
+
+  /**
    * Set task point's maximum distance value (by TaskDijkstra).
    *
    * @param tp Index of task point to set max
@@ -487,9 +495,21 @@ private:
   /**
    * calculate angles for calculating landout distances for speed calculations
    */
-  void SetLandoutDistanceGeometry();
+  void SetLandoutDistanceGeometry(bool force);
 
   /**
+   * Computes the max achieved distance for the tps in the task
+   * that have been sampled or up to the current index whichever is greater
+   *
+   * @return true if a solution was found (and applied)
+   */
+  bool RunDijsktraMaxAchieved();
+
+  /**
+   * Sets the SearchMin points for each task point from the current to
+   * the end.
+   * shortest remaining solution. In other words, the current OZ will be
+   * the point that is closest to finish.
    * @return true if a solution was found (and applied)
    */
   bool RunDijsktraMin(const GeoPoint &location);
@@ -825,7 +845,7 @@ protected:
   fixed ScanDistanceNominal() override;
   fixed ScanDistancePlanned() override;
   fixed ScanDistanceRemaining(const GeoPoint &ref) override;
-  fixed ScanDistanceScored(const GeoPoint &ref) override;
+  fixed ScanDistanceScored(const GeoPoint &ref, bool full_update) override;
   fixed ScanDistanceTravelled(const GeoPoint &ref) override;
   void ScanDistanceMinMax(const GeoPoint &ref, bool full,
                           fixed *dmin, fixed *dmax) override;

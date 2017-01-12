@@ -63,6 +63,7 @@ class SampledTaskPoint {
   SearchPointVector boundary_points;
   SearchPoint search_max;
   SearchPoint search_min;
+  SearchPoint search_max_achieved;
 
 public:
   /**
@@ -95,6 +96,18 @@ public:
     assert(search_max.IsValid());
 
     return search_max.GetLocation();
+  };
+
+  /**
+   * Accessor to retrieve location of the sample polygon
+   * node that produces the maximum achieved distance.
+   *
+   * @return Location of maximum achieved distance node
+   */
+  const GeoPoint &GetLocationMaxAchieved() const {
+    assert(search_max_achieved.IsValid());
+
+    return search_max_achieved.GetLocation();
   };
 
   /**
@@ -235,6 +248,19 @@ public:
 
     search_min = locmin;
   }
+
+  /**
+   * Set the location of the sample polygon node
+   * that produces the maximum task distance.
+   *
+   * @param locmax Location of max distance node
+   */
+  void SetSearchMaxAchieved(const SearchPoint &locmax) {
+    assert(locmax.IsValid());
+
+    search_max_achieved = locmax;
+  }
+
 };
 
 #endif //SAMPLEDOBSERVATIONZONE_H

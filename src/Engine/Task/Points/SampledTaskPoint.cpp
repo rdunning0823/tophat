@@ -32,6 +32,7 @@ SampledTaskPoint::SampledTaskPoint(const GeoPoint &location,
 #ifndef NDEBUG
   search_max.SetInvalid();
   search_min.SetInvalid();
+  search_max_achieved.SetInvalid();
 #endif
 }
 
@@ -80,7 +81,7 @@ void
 SampledTaskPoint::UpdateOZ(const FlatProjection &projection,
                            const OZBoundary &_boundary)
 {
-  search_max = search_min = nominal_points.front();
+  search_max = search_min = search_max_achieved = nominal_points.front();
   boundary_points.clear();
 
   for (const SearchPoint sp : _boundary)
