@@ -83,6 +83,11 @@ Serialise(WritableDataNode &node,
     std::unique_ptr<WritableDataNode> ochild(child->AppendChild(_T("LocationMin")));
     Serialise(*ochild, data.GetLocationMin());
   }
+  if (data.HasSampled()) {
+    std::unique_ptr<WritableDataNode> ochild(child->AppendChild(_T("LocationMaxAchieved")));
+    Serialise(*ochild, data.GetLocationMaxAchieved());
+  }
+
 }
 
 void

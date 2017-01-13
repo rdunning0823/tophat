@@ -79,6 +79,11 @@ DeserialiseTaskpointState(PointStateDeserialiser &data,
     if (loc_node != nullptr)
       Deserialise(data.location_min, *loc_node);
   }
+  if (data.has_sampled) {
+    std::unique_ptr<ConstDataNode> loc_node(node.GetChildNamed(_T("LocationMaxAchieved")));
+    if (loc_node != nullptr)
+      Deserialise(data.location_max_achieved, *loc_node);
+  }
 
   return true;
 }

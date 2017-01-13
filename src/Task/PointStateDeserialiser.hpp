@@ -44,11 +44,13 @@ public:
   bool has_exited;
   AircraftState state_entered;
   GeoPoint location_min;
+  GeoPoint location_max_achieved;
   void Reset() {
     has_sampled = false;
     has_exited = false;
     state_entered.Reset();
     location_min = GeoPoint::Invalid();
+    location_max_achieved = GeoPoint::Invalid();
   }
   PointStateDeserialiser() {
     Reset();

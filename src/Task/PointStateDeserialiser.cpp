@@ -47,6 +47,8 @@ PointStateDeserialiser::UpdatePoint(OrderedTask &task, unsigned idx)
     // ScoredTaskPoint friend access
     p->SetSearchMin(SearchPoint(location_min,
                                 task.task_projection));
+    if (location_max_achieved.IsValid())
+      p->SetSearchMaxAchieved(location_max_achieved);
 
     AircraftState state_location_min = state_entered;
     state_location_min.location = location_min;
