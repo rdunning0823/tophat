@@ -74,8 +74,8 @@ Simulator::Process(NMEAInfo &basic)
   assert(is_simulator());
 
   Touch(basic);
-
-  basic.location = FindLatitudeLongitude(basic.location, basic.track,
+  Angle with_random(basic.track + Angle::Degrees(((int)basic.time % 2) - 1));
+  basic.location = FindLatitudeLongitude(basic.location, with_random,
                                          basic.ground_speed);
   {
     assert(protected_task_manager != nullptr);
