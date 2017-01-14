@@ -50,7 +50,7 @@ Direction(const GeoPoint &p0, const GeoPoint &p1, const GeoPoint &p2,
 
   if (negative(tolerance))
     /* auto-tolerance - this has been verified by experiment */
-    tolerance = std::max(fabs(a.Native()), fabs(b.Native())) / 10;
+    tolerance = std::max(fabs(a.Native()), fabs(b.Native())) / 100;
 
   return (a - b).Sign(tolerance);
 }
