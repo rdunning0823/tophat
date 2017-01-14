@@ -90,10 +90,16 @@ StartPoint::find_best_start(const AircraftState &state,
                             const OrderedTaskPoint &next,
                             const FlatProjection &projection)
 {
-  /* check which boundary point results in the smallest distance to
-     fly */
+  /**
+   * Check which boundary point results in the smallest distance to
+   * fly relative to TP1 nominal point
+   * The issue for US is when the target is near 90 degrees to the left and the
+   * start point is on the right of the start cylinder.
+   * TODO: calculate this distance in the distance scored as the minimum of
+   * the distance to the start point or to the start cylinder exit.
+   */
 
-  const GeoPoint &next_location = next.GetLocationRemaining();
+  const GeoPoint &next_location = next.GetLocation();
   AircraftState new_state = state;
 
   //FAI
