@@ -59,8 +59,11 @@ SmartTaskAdvance::CheckReadyToAdvance(const TaskPoint &tp,
       return state_ready;
     }
   }
-
   case TaskPointType::AAT:
+    // regardless of arming, if we've exited the AAT point, advance
+    if (x_exit)
+      return true;
+
     if (armed) {
       state = TaskAdvance::TURN_ARMED;
     } else {
