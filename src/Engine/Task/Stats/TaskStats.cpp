@@ -54,6 +54,7 @@ TaskStats::reset()
   inside_oz = false;
   need_to_arm = false;
   flight_mode_final_glide = false;
+  scored_speed_sync_offset = fixed(0);
   start.Reset();
   last_hour.Reset();
 }

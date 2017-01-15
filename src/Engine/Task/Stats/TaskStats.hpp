@@ -113,6 +113,10 @@ public:
   /** Whether the task is appoximately in final glide */
   bool flight_mode_final_glide;
 
+  /** syncs time w/ distance in scored speed calc if distance is behind
+   * a second */
+  mutable fixed scored_speed_sync_offset;
+
   StartStats start;
 
   WindowStats last_hour;
@@ -134,8 +138,12 @@ public:
   }
 
   fixed GetScoredSpeed() const {
+    // hack. distance stat is one second behind time stat so synchronize here
+    if (positive(distance_scored) && !positive(total.time_elapsed))
+      scored_speed_sync_offset = fixed(1);
+
     if (positive(total.time_elapsed))
-      return distance_scored / total.time_elapsed;
+      return distance_scored / (total.time_elapsed + scored_speed_sync_offset);
     else
       return fixed(0);
   }
