@@ -6,6 +6,10 @@ Tophat Soaring 2.2 Jan 8, 2017
 * Correct description for infoboxes with "altitude required"
 * Fix altitude calculations for infoboxes "next" and "final"
 * Sync timing of "final glide" message and mode shift with final glide bar
+* Task:
+ - Improve V Task calculation
+ - Auto advance Turn Area Task (AAT) when exit turnpoint
+* Simulator: glide descent simulated per polar and speed
 
 Top Hat Soaring 2.1.9 Beta 9/20/2016
 * Task:
