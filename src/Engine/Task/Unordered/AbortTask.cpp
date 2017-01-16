@@ -150,7 +150,12 @@ AbortTask::FillReachable(const AircraftState &state,
   reservable_priority_queue<AlternatePoint, AlternateList, AbortRank> q;
   q.reserve(32);
 
+  bool found_non_airfield_landables = false;
+
   for (auto v = approx_waypoints.begin(); v != approx_waypoints.end();) {
+    if (!v->waypoint.IsAirport())
+      found_non_airfield_landables = true;
+
     if (only_airfield && !v->waypoint.IsAirport()) {
       ++v;
       continue;
@@ -194,7 +199,7 @@ AbortTask::FillReachable(const AircraftState &state,
 
     q.pop();
   }
-
+  has_non_airfield_landables = found_non_airfield_landables;
   return found_final_glide;
 }
 

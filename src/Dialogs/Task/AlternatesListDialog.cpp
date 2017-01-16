@@ -40,6 +40,8 @@ Copyright_License {
 #include "Widget/TextWidget.hpp"
 #include "Engine/Task/TaskBehaviour.hpp"
 #include "Widget/CheckBoxWidget.hpp"
+#include "Engine/Waypoint/Waypoints.hpp"
+#include "NMEA/Derived.hpp"
 
 const TCHAR *distance_label_text = N_("Distance");
 const TCHAR *arrival_alt_label_text = N_("Arrival alt");
@@ -168,19 +170,27 @@ AlternatesListWidgetNoButtons::DoDetails()
   }
   return false;
 }
-
-
 /**
  * *******************************************
  * methods for AlternatListHeaderWidget
  * *******************************************
  */
-AlternatesListHeaderWidget::AlternatesListHeaderWidget()
-  :TwoWidgets(new CheckBoxWidget(UIGlobals::GetDialogLook(), _("Airports only"),
-                                 *this, AirFieldsOnly),
-              new TextWidget(), false, true), settings_computer(CommonInterface::SetComputerSettings())
+
+/**
+ * @return a CheckBox widget if nonlandable airports exist, else an empty TextWidget
+ */
+static Widget*
+CreateFirstWidget(AlternatesListHeaderWidget &listener, const DerivedInfo& calculated)
 {
+  if (calculated.common_stats.has_non_airfield_landables)
+        return new CheckBoxWidget(UIGlobals::GetDialogLook(), _("Airports only"), listener, AlternatesListHeaderWidget::AirFieldsOnly);
+        return new TextWidget();
 }
+
+AlternatesListHeaderWidget::AlternatesListHeaderWidget(const DerivedInfo& _calculated)
+  :TwoWidgets(CreateFirstWidget(*this, _calculated),
+              new TextWidget(), false, true), settings_computer(CommonInterface::SetComputerSettings())
+{}
 
 void
 AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
@@ -254,11 +264,12 @@ dlgAlternatesListShowModal()
   if (protected_task_manager == nullptr)
     return;
 
+  const DerivedInfo& calculated = CommonInterface::Calculated();
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
 
   AlternatesListWidgetNoButtons *widget = new AlternatesListWidgetNoButtons(dialog_look);
   widget->Update();
-  TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
+  TwoWidgets *two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(calculated),
                                            widget);
 
   WidgetDialog dialog(dialog_look);

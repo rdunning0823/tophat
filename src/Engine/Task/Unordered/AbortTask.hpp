@@ -80,6 +80,7 @@ protected:
 private:
   unsigned active_waypoint;
   bool reachable_landable;
+  bool has_non_airfield_landables;
 
 public:
   /** 
@@ -122,6 +123,13 @@ public:
   }
 
   /**
+   * @return true if abort task includes non_airfield_landables
+   */
+  bool HasNonAirfieldLandables() {
+    return has_non_airfield_landables;
+  }
+
+  /**
    * Calculate vector to home waypoint
    *
    * @param state State of aircraft
@@ -129,6 +137,7 @@ public:
    */
   GeoVector GetHomeVector(const AircraftState &state) const;
   const Waypoint *GetHome() const;
+
 
 protected:
   /**

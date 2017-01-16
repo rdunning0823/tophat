@@ -254,6 +254,7 @@ TaskManager::UpdateCommonStatsWaypoints(const AircraftState &state)
     : GeoVector::Invalid();
 
   common_stats.landable_reachable = abort_task->HasReachableLandable();
+  common_stats.has_non_airfield_landables = abort_task->HasNonAirfieldLandables();
 }
 
 void

@@ -128,7 +128,7 @@ AlternateFullScreen::Prepare(ContainerWindow &parent, const PixelRect &rc)
   alternates_list_widget2 = new AlternatesListWidgetNoButtons(dialog_look);
   alternates_list_widget2->Update();
   alternates_list_widget2->SetForm(this);
-  two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(),
+  two_widgets = new TwoWidgets(new AlternatesListHeaderWidget(CommonInterface::Calculated()),
                                alternates_list_widget2);
   // dock prepares/ unprepares/ deletes widget
   list_dock.SetWidget(two_widgets);

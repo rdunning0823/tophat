@@ -46,6 +46,8 @@ public:
 
   /** Whether the task found landable reachable waypoints (aliases abort) */
   bool landable_reachable;
+  /** Whether the abort task points include non-airports landable points */
+  bool has_non_airfield_landables;
   /** time UTC ship descended through max task start height */
   fixed TimeUnderStartMaxHeight;
   /** Time (s) until assigned minimum time is achieved */

@@ -40,6 +40,7 @@ class Canvas;
 class WndForm;
 
 struct DialogLook;
+struct DerivedInfo;
 
 enum Buttons {
   Goto = 100,
@@ -131,8 +132,9 @@ public:
  * A widget class that displays headers above the List Widget
  * when used with TwoWidgets
  */
-class AlternatesListHeaderWidget : public TwoWidgets, private ActionListener
+class AlternatesListHeaderWidget : public TwoWidgets, public ActionListener
 {
+public:
   enum Buttons {
     AirFieldsOnly = 100,
   };
@@ -140,7 +142,7 @@ class AlternatesListHeaderWidget : public TwoWidgets, private ActionListener
   ComputerSettings &settings_computer;
 
 public:
-  AlternatesListHeaderWidget();
+  AlternatesListHeaderWidget(const DerivedInfo& calculated);
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual void Unprepare() override;
   void Show(const PixelRect &rc) override;
@@ -160,8 +162,6 @@ public:
   void UpdateAirfieldsOnly(bool airfields_only);
   CheckBoxWidget &GetAirfieldsCheckbox();
 };
-
-
 
 #endif
 
