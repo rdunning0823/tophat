@@ -66,6 +66,7 @@ TaskBehaviour::SetDefaults()
   ordered_defaults.SetDefaults();
   route_planner.SetDefaults();
   abort_task_mode = AbortTaskMode::SIMPLE;
+  abort_task_airfield_only = false;
 }
 
 void

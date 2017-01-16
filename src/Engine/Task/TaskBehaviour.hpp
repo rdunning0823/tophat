@@ -163,6 +163,9 @@ struct TaskBehaviour {
    */
   AbortTaskMode abort_task_mode;
 
+  /* limit alternates list to airfields only */
+  bool abort_task_airfield_only;
+
   /** Route and reach planning */
   RoutePlannerConfig route_planner;
 

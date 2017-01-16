@@ -268,18 +268,20 @@ AbortTask::UpdateSample(const AircraftState &state,
   }
 
   // sort by arrival time
+  bool airfields_only = GetTaskBehaviour().abort_task_airfield_only;
 
   // first try with final glide only
   reachable_landable |=  FillReachable(state, approx_waypoints, glide_polar,
                                        true, true, true);
-  reachable_landable |=  FillReachable(state, approx_waypoints, glide_polar,
-                                       false, true, true);
+  if (!airfields_only)
+    reachable_landable |=  FillReachable(state, approx_waypoints, glide_polar,
+                                         false, true, true);
 
   // inform clients that the landable reachable scan has been performed 
   ClientUpdate(state, true);
 
   // now try without final glide constraint and not preferring airports
-  FillReachable(state, approx_waypoints, glide_polar, false, false, false);
+  FillReachable(state, approx_waypoints, glide_polar, airfields_only, false, false);
 
   // inform clients that the landable unreachable scan has been performed 
   ClientUpdate(state, false);
