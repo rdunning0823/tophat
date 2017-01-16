@@ -38,6 +38,8 @@ Copyright_License {
 #include "Form/Form.hpp"
 #include "Widget/TwoWidgets.hpp"
 #include "Widget/TextWidget.hpp"
+#include "Engine/Task/TaskBehaviour.hpp"
+#include "Widget/CheckBoxWidget.hpp"
 
 const TCHAR *distance_label_text = N_("Distance");
 const TCHAR *arrival_alt_label_text = N_("Arrival alt");
@@ -167,6 +169,19 @@ AlternatesListWidgetNoButtons::DoDetails()
   return false;
 }
 
+
+/**
+ * *******************************************
+ * methods for AlternatListHeaderWidget
+ * *******************************************
+ */
+AlternatesListHeaderWidget::AlternatesListHeaderWidget()
+  :TwoWidgets(new CheckBoxWidget(UIGlobals::GetDialogLook(), _("Airports only"),
+                                 *this, AirFieldsOnly),
+              new TextWidget(), false, true), settings_computer(CommonInterface::SetComputerSettings())
+{
+}
+
 void
 AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
 {
@@ -180,6 +195,8 @@ AlternatesListHeaderWidget::CalculateLayout(const PixelRect &rc)
                  gettext(arrival_alt_label_text));
 
   ((TextWidget&)GetSecond()).SetText(caption.c_str());
+
+  GetAirfieldsCheckbox().SetState(settings_computer.task.abort_task_airfield_only);
 }
 
 void
@@ -207,6 +224,28 @@ void
 AlternatesListHeaderWidget::Unprepare()
 {
   TwoWidgets::Unprepare();
+}
+
+void
+AlternatesListHeaderWidget::OnAction(int id)
+{
+  switch (id) {
+  case Buttons::AirFieldsOnly:
+    UpdateAirfieldsOnly(GetAirfieldsCheckbox().GetState());
+    break;
+  }
+}
+
+CheckBoxWidget &
+AlternatesListHeaderWidget::GetAirfieldsCheckbox()
+{
+  return (CheckBoxWidget&)TwoWidgets::GetFirst();
+}
+
+void
+AlternatesListHeaderWidget::UpdateAirfieldsOnly(bool airfields_only)
+{
+  settings_computer.task.abort_task_airfield_only = airfields_only;
 }
 
 void

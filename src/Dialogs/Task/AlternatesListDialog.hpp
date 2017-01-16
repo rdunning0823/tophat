@@ -30,8 +30,11 @@ Copyright_License {
 #include "Engine/Task/Unordered/AlternateList.hpp"
 #include "Form/ActionListener.hpp"
 #include "Screen/Layout.hpp"
+#include "Form/CheckBox.hpp"
+#include "Computer/Settings.hpp"
 
 class Button;
+class CheckBoxWidget;
 class WidgetDialog;
 class Canvas;
 class WndForm;
@@ -115,6 +118,7 @@ public:
   virtual void Move(const PixelRect &rc) override;
   bool DoDetails();
   bool DoGoto();
+  void UpdateAirfieldsOnly(bool airfields_only);
   const Waypoint* GetWaypoint();
 
   virtual void OnActivateItem(unsigned index) override;
@@ -124,15 +128,19 @@ public:
 
 
 /**
- * A widget class that displays header rows above the List Widget
+ * A widget class that displays headers above the List Widget
  * when used with TwoWidgets
  */
-class AlternatesListHeaderWidget : public TwoWidgets
+class AlternatesListHeaderWidget : public TwoWidgets, private ActionListener
 {
-public:
-  AlternatesListHeaderWidget()
-    :TwoWidgets(new TextWidget(), new TextWidget(), false, true) {}
+  enum Buttons {
+    AirFieldsOnly = 100,
+  };
 
+  ComputerSettings &settings_computer;
+
+public:
+  AlternatesListHeaderWidget();
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual void Unprepare() override;
   void Show(const PixelRect &rc) override;
@@ -145,6 +153,12 @@ public:
     return PixelSize { 25u, Layout::GetMaximumControlHeight() };
   }
   void CalculateLayout(const PixelRect &rc);
+
+  /* virtual inhereted ActionListener */
+  void OnAction(int id);
+
+  void UpdateAirfieldsOnly(bool airfields_only);
+  CheckBoxWidget &GetAirfieldsCheckbox();
 };
 
 
