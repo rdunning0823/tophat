@@ -159,6 +159,7 @@ protected:
    * Fill abort task list with candidate waypoints given a list of
    * waypoints satisfying approximate range queries.  Can be used
    * to add airfields only, or landpoints.
+   * Limited to task size (10).
    *
    * @param state Aircraft state
    * @param approx_waypoints List of candidate waypoints
@@ -219,6 +220,12 @@ public:
   virtual void Reset() override;
 
 protected:
+  /**
+   * Fills task_points (max_size 10) with:
+   * 1) Reachable airports, closest first
+   * 2) optionally reachable landables, closest first
+   * 3) Calls AlternateTask::ClientUpdate() which reads task_points
+   */
   virtual bool UpdateSample(const AircraftState &state_now,
                             const GlidePolar &glide_polar,
                             bool full_update) override;

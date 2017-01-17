@@ -95,6 +95,11 @@ public:
 protected:
   /* virtual methods from class AbortTask */
   virtual void Clear() override;
+
+  /**
+   * 1. Reads and prioritizes task_points based on task/home/no diversion factor
+   * 2. Sorts by diversion factor and pushes top 6 points into alternates list
+   */
   virtual void ClientUpdate(const AircraftState &state_now,
                             bool reachable) override;
 };
