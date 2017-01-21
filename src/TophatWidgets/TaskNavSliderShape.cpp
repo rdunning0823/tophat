@@ -476,6 +476,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     bearing = delta_bearing;
   }
 
+  if (do_bearing)
+    bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
+
   /**
    * Distance & GR
    * draw distance centered between label and altitude.
@@ -513,12 +516,6 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   } else { // just type type label
       canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
   }
-
-  /**
-   * Bearing
-   */
-  if (do_bearing)
-    bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
 
   /**
    * Name
