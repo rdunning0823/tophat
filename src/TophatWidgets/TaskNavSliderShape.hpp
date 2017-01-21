@@ -48,6 +48,9 @@ class SliderShape {
 public:
 
   typedef StaticString<120> TypeBuffer;
+  typedef StaticString<12> GRBuffer;
+  typedef StaticString<30> DistanceBuffer;
+
 
   // Direction of bearing to be drawn
   enum BearingDirection {
@@ -264,6 +267,21 @@ public:
   const Font& GetNameFont() const;
   const Font& GetAltitudeFont() const;
   const Font& GetDistanceFont() const;
+
+  /**
+   * text to be displayed as the distance plus option prefix
+   */
+  void GetDistanceText(DistanceBuffer &distance_buffer,
+                       fixed tp_distance, bool distance_valid,
+                       bool navigate_to_target,
+                       unsigned task_size,
+                       bool is_start,
+                       bool is_finish);
+
+  /**
+   * text to be displayed for gradient
+   */
+  void GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid);
 
   /**
    * sets the text to be used for the "type display" in

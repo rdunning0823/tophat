@@ -276,6 +276,47 @@ SliderShape::GetTypeFont(bool is_start, int time_under_max_start) const
 }
 
 void
+SliderShape::GetDistanceText(DistanceBuffer &distance_buffer,
+                             fixed tp_distance, bool distance_valid,
+                             bool navigate_to_target,
+                             unsigned task_size,
+                             bool is_start,
+                             bool is_finish)
+{
+  if (navigate_to_target &&
+      task_size > 0 &&
+      !is_start &&
+      !is_finish) {
+    distance_buffer.Format(_T("%s: "), _("Target"));
+  }
+
+  StaticString<30> distance_only_buffer(_T(""));
+  if (distance_valid) {
+    FormatUserDistance(tp_distance, distance_only_buffer.buffer(), true, 1);
+  }
+
+  distance_buffer.append(distance_only_buffer.c_str());
+}
+
+void
+SliderShape::GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid)
+{
+  if (!valid)
+    return;
+  if (gradient <= fixed(0)) {
+    gr_buffer = (_T("[##]"));
+  }
+  else if (gradient >= fixed(99.5)) {
+    gr_buffer = (_T("[00+]"));
+  }
+  else {
+    TCHAR temp[10];
+    FormatGlideRatio(temp, 10, gradient);
+    gr_buffer.Format(_T("[%s]"), temp);
+  }
+}
+
+void
 SliderShape::GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
                          unsigned idx, unsigned task_size, bool is_start,
                          bool is_finish, bool is_aat, bool navigate_to_target,
@@ -390,8 +431,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   UPixelScalar distance_width = 0u;
   UPixelScalar label_width = 0u;
   UPixelScalar height_width = 0u;
-  StaticString<30> distance_buffer(_T(""));
+  DistanceBuffer distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
+  GRBuffer gr_buffer(_T(""));
 
   /**
    * Type
@@ -439,33 +481,14 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
    * draw distance centered between label and altitude.
    * draw label if room
    **/
-  StaticString<30> distance_only_buffer(_T(""));
 
-  if (distance_valid) {
-    FormatUserDistance(tp_distance, distance_only_buffer.buffer(), true, 1);
-  }
+  GetDistanceText(distance_buffer, tp_distance, distance_valid,
+                  navigate_to_target, task_size, is_start, is_finish);
 
-  distance_buffer.clear();
-  if (navigate_to_target &&
-      task_size > 0 &&
-      !is_start &&
-      !is_finish) {
-    distance_buffer.Format(_T("%s: "), _("Target"));
-  }
-  distance_buffer.append(distance_only_buffer.c_str());
-  if (gr_valid && gr_enabled) {
-    if (gradient <= fixed(0)) {
-      distance_buffer.append(_T(" [##]"));
-    }
-    else if (gradient >= fixed(99.5)) {
-      distance_buffer.append(_T(" [99+]"));
-    }
-    else {
-      StaticString<10> glide_ratio_buffer(_T(""));
-      FormatGlideRatio(glide_ratio_buffer.buffer(), glide_ratio_buffer.capacity(), gradient);
-      distance_buffer.AppendFormat(_T(" [%s]"), glide_ratio_buffer.c_str());
-    }
-  }
+  GetGRText(gr_buffer, gradient, gr_valid && gr_enabled);
+
+  if (!gr_buffer.empty())
+    distance_buffer.AppendFormat(_T(" %s"), gr_buffer.c_str());
 
   if (distance_valid || (gr_valid && gr_enabled) ) {
     canvas.Select(GetDistanceFont());
