@@ -429,7 +429,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   const unsigned line_two_y_offset = rc.top + GetLine2Y();
 
   UPixelScalar distance_width = 0u;
-  UPixelScalar label_width = 0u;
+  UPixelScalar type_text_width = 0u;
   UPixelScalar height_width = 0u;
   DistanceBuffer distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
@@ -445,7 +445,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
               time_under_max_start);
 
   canvas.Select(GetTypeFont(is_start, time_under_max_start));
-  label_width = canvas.CalcTextWidth(type_buffer.c_str());
+  type_text_width = canvas.CalcTextWidth(type_buffer.c_str());
 
   // Draw arrival altitude right upper corner
   if (altitude_difference_valid) {
@@ -498,7 +498,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
     UPixelScalar offset = rc.left;
-    if ((PixelScalar)(distance_width + height_width + label_width +
+    if ((PixelScalar)(distance_width + height_width + type_text_width +
         Layout::FastScale(15)) < (rc.GetSize().cx)) {
       canvas.Select(GetTypeFont(is_start, time_under_max_start));
       left = rc.left;
