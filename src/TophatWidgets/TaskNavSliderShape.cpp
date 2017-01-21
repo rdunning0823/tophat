@@ -487,12 +487,15 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if (left > 0)
       canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
 
-    if (do_bearing)
-      bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
-
   } else { // just type type label
       canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
   }
+
+  /**
+   * Bearing
+   */
+  if (do_bearing)
+    bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
 
   /**
    * Name
