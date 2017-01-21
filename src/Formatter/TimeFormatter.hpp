@@ -72,6 +72,13 @@ FormatSignedTimeHHMM(int time)
 void FormatSignedTimeMMSS(TCHAR* buffer, int _time);
 
 /**
+ * precedes with "-" if time is negative
+ * @param buffer returns SMSS
+ * @param time input seconds
+ */
+void FormatSignedTimeMMSSCompact(TCHAR* buffer, int _time);
+
+/**
  * sets HHMMSSSmart and SSSmart
  * if hours > 0, returns HHMM in buffer1 and SS in buffer2
  * if hours == 0, returns MMSS in buffer1 and "" in buffer2

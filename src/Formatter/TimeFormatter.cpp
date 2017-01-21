@@ -89,6 +89,18 @@ FormatSignedTimeHHMM(TCHAR* buffer, int _time)
 }
 
 void
+FormatSignedTimeMMSSCompact(TCHAR* buffer, int _time)
+{
+  if (_time < 0) {
+    *buffer++ = _T('-');
+    _time = -_time;
+  }
+
+  const BrokenTime time = BrokenTime::FromSecondOfDayChecked(_time);
+  _stprintf(buffer, _T("%01u:%02u"), time.minute, time.second);
+}
+
+void
 FormatSignedTimeMMSS(TCHAR* buffer, int _time)
 {
   if (_time < 0) {
