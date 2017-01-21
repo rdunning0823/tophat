@@ -32,6 +32,7 @@ Copyright_License {
 #include "Look/Look.hpp"
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #include "MapSettings.hpp"
+#include "Util/StaticString.hxx"
 
 #include <assert.h>
 #include <stdint.h>
@@ -45,6 +46,9 @@ enum class TaskType : uint8_t;
 
 class SliderShape {
 public:
+
+  typedef StaticString<120> TypeBuffer;
+
   // Direction of bearing to be drawn
   enum BearingDirection {
     Left,
@@ -249,6 +253,26 @@ public:
             bool gr_valid,
             bool use_wide_pen,
             bool navigate_to_target);
+
+
+  /**
+   * returns the font to be used for the "type display" in
+   * upper left quadrant of bar
+   */
+  const Font& GetTypeFont(bool is_start) const;
+  const Font& GetNameFont() const;
+  const Font& GetAltitudeFont() const;
+  const Font& GetDistanceFont() const;
+
+  /**
+   * sets the text to be used for the "type display" in
+   * upper left quadrant of bar
+   *
+   * @param type_buffer: the buffer that holds the text
+   */
+  void GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
+                   unsigned idx, unsigned task_size, bool is_start,
+                   bool is_finish, bool is_aat, bool navigate_to_target);
 
 #ifdef _WIN32
   /**

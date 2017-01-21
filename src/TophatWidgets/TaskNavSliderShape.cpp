@@ -47,6 +47,7 @@ Copyright_License {
 #include "Formatter/AngleFormatter.hpp"
 #include "Formatter/GlideRatioFormatter.hpp"
 #include "Formatter/UserUnits.hpp"
+#include "Formatter/TimeFormatter.hpp"
 #include "Util/StringFormat.hpp"
 #include "Asset.hpp"
 
@@ -250,6 +251,67 @@ SliderShape::DrawInvalid(Canvas &canvas, const PixelRect rc_outer,
 #endif
 }
 
+const Font&
+SliderShape::GetNameFont() const
+{
+  return nav_slider_look.large_font;
+}
+
+const Font&
+SliderShape::GetAltitudeFont() const
+{
+  return nav_slider_look.small_font;
+}
+
+const Font&
+SliderShape::GetDistanceFont() const
+{
+  return nav_slider_look.medium_font;
+}
+
+const Font&
+SliderShape::GetTypeFont(bool is_start) const
+{
+  return nav_slider_look.small_font;
+}
+
+void
+SliderShape::GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
+                         unsigned idx, unsigned task_size, bool is_start,
+                         bool is_finish, bool is_aat, bool navigate_to_target)
+{
+  // calculate but don't yet draw label "goto" abort, tp#
+  switch (task_mode) {
+  case TaskType::ORDERED:
+    if (task_size == 0)
+      type_buffer = _("Go'n home:");
+
+    else if (is_start)
+        type_buffer = _("Start");
+    else if (is_finish)
+      type_buffer = _("Finish");
+    else if (is_aat && navigate_to_target)
+      // append "Target" text to distance in center
+      type_buffer.clear();
+    else if (is_aat)
+      type_buffer.Format(_T("%s %u"), _("Center"), idx);
+    else
+      type_buffer.Format(_T("%s %u"), _("TP"), idx);
+
+    break;
+  case TaskType::GOTO:
+  case TaskType::TEAMMATE:
+  case TaskType::ABORT:
+    type_buffer = _("Goto:");
+    break;
+
+  case TaskType::NONE:
+    type_buffer = _("Go'n home:");
+
+    break;
+  }
+}
+
 void
 SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   unsigned idx, bool selected, bool is_current_tp,
@@ -281,12 +343,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   bool draw_checkmark = is_ordered && (task_size > 1)
       && ((!is_start && has_entered) || (is_start && has_exited));
 
-  StaticString<120> type_buffer;
-
-  const Font &name_font = nav_slider_look.large_font;
-  const Font &distance_font = nav_slider_look.medium_font;
-  const Font &type_font = nav_slider_look.small_font;
-  const Font &altitude_font = nav_slider_look.small_font;
+  TypeBuffer type_buffer;
   UPixelScalar width;
   PixelScalar left;
   PixelRect rc = rc_outer;
@@ -319,43 +376,20 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   StaticString<30> distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
 
-  // calculate but don't yet draw label "goto" abort, tp#
-  switch (task_mode) {
-  case TaskType::ORDERED:
-    if (task_size == 0)
-      type_buffer = _("Go'n home:");
+  /**
+   * Type
+   * Draw type
+   **/
+  GetTypeText(type_buffer, task_mode, idx, task_size, is_start,
+              is_finish, is_aat, navigate_to_target);
 
-    else if (is_start)
-      type_buffer = _("Start");
-    else if (is_finish)
-      type_buffer = _("Finish");
-    else if (is_aat && navigate_to_target)
-      // append "Target" text to distance in center
-      type_buffer.clear();
-    else if (is_aat)
-      type_buffer.Format(_T("%s %u"), _("Center"), idx);
-    else
-      type_buffer.Format(_T("%s %u"), _("TP"), idx);
-
-    break;
-  case TaskType::GOTO:
-  case TaskType::TEAMMATE:
-  case TaskType::ABORT:
-    type_buffer = _("Goto:");
-    break;
-
-  case TaskType::NONE:
-    type_buffer = _("Go'n home:");
-
-    break;
-  }
-  canvas.Select(type_font);
+  canvas.Select(GetTypeFont(is_start));
   label_width = canvas.CalcTextWidth(type_buffer.c_str());
 
   // Draw arrival altitude right upper corner
   if (altitude_difference_valid) {
 
-    canvas.Select(altitude_font);
+    canvas.Select(GetAltitudeFont());
     FormatRelativeUserAltitude(tp_altitude_difference, height_buffer.buffer(),
                                true);
     height_width = canvas.CalcTextWidth(height_buffer.c_str());
@@ -364,8 +398,11 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       canvas.TextAutoClipped(left, line_one_y_offset, height_buffer.c_str());
   }
 
-  // bearing chevrons for ordered when not start
-  // or for non ordered task
+  /**
+   * Bearing
+   * bearing chevrons for ordered when not start
+   * or for non ordered task
+   **/
   BearingDirection bearing_direction = BearingDirection::None;
   bool do_bearing = false;
   Angle bearing;
@@ -378,8 +415,11 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     bearing = delta_bearing;
   }
 
-  // draw distance centered between label and altitude.
-  // draw label if room
+  /**
+   * Distance & GR
+   * draw distance centered between label and altitude.
+   * draw label if room
+   **/
   StaticString<30> distance_only_buffer(_T(""));
 
   if (distance_valid) {
@@ -409,23 +449,22 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   }
 
   if (distance_valid || (gr_valid && ui_settings.navbar_enable_gr) ) {
-    canvas.Select(distance_font);
+    canvas.Select(GetDistanceFont());
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
     UPixelScalar offset = rc.left;
     if ((PixelScalar)(distance_width + height_width) <
         (PixelScalar)(rc.right - rc.left - label_width -
             Layout::FastScale(15))) {
-      canvas.Select(type_font);
+      canvas.Select(GetTypeFont(is_start));
       left = rc.left;
       if (left > 0 && ui_settings.navbar_enable_tp_index)
         canvas.TextAutoClipped(left, line_one_y_offset, type_buffer.c_str());
       offset = rc.left +
           (rc.right - rc.left - distance_width) / 2;
-
     }
 
-    canvas.Select(distance_font);
+    canvas.Select(GetDistanceFont());
     left = offset;
     if (left > 0)
       canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
@@ -433,15 +472,17 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if (do_bearing)
       bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
 
-  }
-  else { // just type type label
+  } else { // just type type label
     if (ui_settings.navbar_enable_tp_index) {
       canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
     }
   }
 
-  // Draw tp name, truncated to leave space before rt. bearing if drawn
-  canvas.Select(name_font);
+  /**
+   * Name
+   * Draw tp name, truncated to leave space before rt. bearing if drawn
+   */
+  canvas.Select(GetNameFont());
   PixelSize icon_size {0, 0};
   UPixelScalar left_icon;
   // only draw target or turnpoint icon if no checkmark
@@ -499,7 +540,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       } else {
 
         RasterPoint pt = upper_left;
-        unsigned name_height = (unsigned)name_font.GetHeight() / 2;
+        unsigned name_height = (unsigned)GetNameFont().GetHeight() / 2;
         pt.y += name_height / 2;
 
         if (draw_target || draw_teammate) {
