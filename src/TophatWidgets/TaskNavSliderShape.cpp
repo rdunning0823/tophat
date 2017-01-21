@@ -447,7 +447,10 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   canvas.Select(GetTypeFont(is_start, time_under_max_start));
   type_text_width = canvas.CalcTextWidth(type_buffer.c_str());
 
-  // Draw arrival altitude right upper corner
+  /**
+   * Height
+   * Draw arrival altitude right upper corner
+   */
   if (altitude_difference_valid) {
 
     canvas.Select(GetAltitudeFont());
@@ -535,7 +538,10 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   assert (!(draw_teammate && draw_target));
   assert (!(draw_teammate && draw_checkmark));
 
-  // icon is only used for target or checkmark.  WaypointRenderer is used otherwise
+  /**
+   * Icon / checkmark
+   * icon is only used for target or checkmark.  WaypointRenderer is used otherwise
+   */
   const MaskedIcon *icon = draw_checkmark ? &icon_look.hBmpCheckMark :
       draw_teammate ? &traffic_look.teammate_icon : &task_look.target_icon;
 
