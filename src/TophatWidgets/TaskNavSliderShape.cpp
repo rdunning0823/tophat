@@ -446,6 +446,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   canvas.Select(GetTypeFont(is_start, time_under_max_start));
   type_text_width = canvas.CalcTextWidth(type_buffer.c_str());
+  canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
 
   /**
    * Height
@@ -484,8 +485,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   /**
    * Distance & GR
-   * draw distance centered between label and altitude.
-   * draw label if room
+   * draw distance centered between label and altitude,
+   *     or to right of type_text if that is long
    **/
 
   GetDistanceText(distance_buffer, tp_distance, distance_valid,
@@ -503,20 +504,13 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     UPixelScalar offset = rc.left;
     if ((PixelScalar)(distance_width + height_width + type_text_width +
         Layout::FastScale(15)) < (rc.GetSize().cx)) {
-      canvas.Select(GetTypeFont(is_start, time_under_max_start));
       left = rc.left;
-      if (left > 0)
-        canvas.TextAutoClipped(left, line_one_y_offset, type_buffer.c_str());
       offset = rc.left + (rc.GetSize().cx - distance_width) / 2;
     }
 
-    canvas.Select(GetDistanceFont());
     left = offset;
     if (left > 0)
       canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
-
-  } else { // just type type label
-      canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
   }
 
   /**
