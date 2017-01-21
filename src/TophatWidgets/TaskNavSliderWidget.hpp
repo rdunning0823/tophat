@@ -45,6 +45,13 @@ struct InfoBoxLook;
 class TaskStats;
 class ContainerWindow;
 
+/**
+ * @return -1 if time under is invalid and should not be displayed
+ */
+namespace TaskNavSlider {
+  int GetTimeUnderStart();
+}
+
 class TaskNavSliderWidget : public MapOverlayBaseWidget, ListItemRenderer,
   HorizontalListCursorHandler  {
 protected:
@@ -183,6 +190,7 @@ protected:
                        const DialogLook &dialog_look,
                        const PixelRect rc_outer);
 #endif
+
   /**
    * Inherited from ListControl::Handler
    */

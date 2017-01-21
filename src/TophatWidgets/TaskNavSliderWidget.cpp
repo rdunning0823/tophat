@@ -56,6 +56,26 @@ Copyright_License {
 #include <stdio.h>
 #include <stdlib.h>
 
+int
+TaskNavSlider::GetTimeUnderStart()
+{
+  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
+  const TaskStats &task_stats = CommonInterface::Calculated().ordered_task_stats;
+  const fixed maxheight = fixed(protected_task_manager->
+                                GetOrderedTaskSettings().start_constraints.max_height);
+  bool is_usa = CommonInterface::GetComputerSettings().task.contest_nationality
+      == ContestNationalities::AMERICAN;
+
+  if (!task_stats.task_valid || !positive(maxheight)
+      || !positive(common_stats.TimeUnderStartMaxHeight)
+      || !is_usa) {
+    return -1;
+  }
+
+  return (int)(CommonInterface::Basic().time -
+      common_stats.TimeUnderStartMaxHeight);
+}
+
 TaskNavSliderWidget::TaskNavSliderWidget()
   :task_manager_time_stamp(0u),
    ordered_task_size(0u),
@@ -152,6 +172,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool is_finish = false;
   bool is_start = false;
   TaskFactoryType factory_type = TaskFactoryType::AAT;
+  int time_under_max_start = TaskNavSlider::GetTimeUnderStart();
 
   TaskType mode;
   {
@@ -214,7 +235,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       fixed(0), // GR is irrelevant to Target which moves
                       false,
                       use_wide_pen,
-                      true);
+                      true,
+                      time_under_max_start);
   } else {
 
     const ComputerSettings &settings = CommonInterface::GetComputerSettings();
@@ -254,7 +276,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       gradient,
                       elevation_valid && result.IsOk() && GradientValid(gradient),
                       use_wide_pen,
-                      false);
+                      false,
+                      time_under_max_start);
   }
 }
 

@@ -252,14 +252,15 @@ public:
             fixed gradient,
             bool gr_valid,
             bool use_wide_pen,
-            bool navigate_to_target);
+            bool navigate_to_target,
+            int time_under_max_start);
 
 
   /**
    * returns the font to be used for the "type display" in
    * upper left quadrant of bar
    */
-  const Font& GetTypeFont(bool is_start) const;
+  const Font& GetTypeFont(bool is_start, int time_under_max_start) const;
   const Font& GetNameFont() const;
   const Font& GetAltitudeFont() const;
   const Font& GetDistanceFont() const;
@@ -269,10 +270,14 @@ public:
    * upper left quadrant of bar
    *
    * @param type_buffer: the buffer that holds the text
+   * @param enable_index: is the configuration enabled to show the tp indexes
+   * @param time_under_max_start: US task time under max start or -1 to hide
    */
   void GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
                    unsigned idx, unsigned task_size, bool is_start,
-                   bool is_finish, bool is_aat, bool navigate_to_target);
+                   bool is_finish, bool is_aat, bool navigate_to_target,
+                   bool enable_index,
+                   int time_under_max_start);
 
 #ifdef _WIN32
   /**

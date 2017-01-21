@@ -53,6 +53,7 @@ Copyright_License {
 #include "Input/InputEvents.hpp"
 #include "Task/Points/TaskWaypoint.hpp"
 #include "TophatWidgets/MapOverlayButton.hpp"
+#include "TophatWidgets/TaskNavSliderWidget.hpp"
 #include "Util/StaticString.hxx"
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"
@@ -215,7 +216,6 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
       bearing = vector.bearing;
       bearing_valid = true;
     }
-
   }
 
   const TerrainRendererSettings &terrain = GetMapSettings().terrain;
@@ -249,7 +249,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       fixed(0),
                       false,
                       use_wide_pen,
-                      true);
+                      true,
+                      TaskNavSlider::GetTimeUnderStart());
 
   } else {
     fixed gradient = ::CalculateGradient(*wp, distance,
@@ -271,7 +272,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       gradient,
                       ::GradientValid(gradient),
                       use_wide_pen,
-                      false);
+                      false,
+                      TaskNavSlider::GetTimeUnderStart());
   }
 }
 #endif

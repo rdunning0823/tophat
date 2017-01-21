@@ -270,7 +270,7 @@ SliderShape::GetDistanceFont() const
 }
 
 const Font&
-SliderShape::GetTypeFont(bool is_start) const
+SliderShape::GetTypeFont(bool is_start, int time_under_max_start) const
 {
   return nav_slider_look.small_font;
 }
@@ -278,24 +278,34 @@ SliderShape::GetTypeFont(bool is_start) const
 void
 SliderShape::GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
                          unsigned idx, unsigned task_size, bool is_start,
-                         bool is_finish, bool is_aat, bool navigate_to_target)
+                         bool is_finish, bool is_aat, bool navigate_to_target,
+                         bool enable_index,
+                         int time_under_max_start)
 {
   // calculate but don't yet draw label "goto" abort, tp#
+  type_buffer.clear();
   switch (task_mode) {
   case TaskType::ORDERED:
     if (task_size == 0)
       type_buffer = _("Go'n home:");
 
-    else if (is_start)
+    else if (is_start) {
+      if (time_under_max_start >= 0) {
+        TCHAR value[32];
+        FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
+        type_buffer.Format(_T("%s %s"), _("Below start"), value);
+      } else {
         type_buffer = _("Start");
+      }
+    }
     else if (is_finish)
       type_buffer = _("Finish");
     else if (is_aat && navigate_to_target)
       // append "Target" text to distance in center
       type_buffer.clear();
-    else if (is_aat)
+    else if (is_aat && enable_index)
       type_buffer.Format(_T("%s %u"), _("Center"), idx);
-    else
+    else if (enable_index)
       type_buffer.Format(_T("%s %u"), _("TP"), idx);
 
     break;
@@ -328,8 +338,13 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   fixed gradient,
                   bool gr_valid,
                   bool use_wide_pen,
-                  bool navigate_to_target)
+                  bool navigate_to_target,
+                  int time_under_max_start)
 {
+  /**
+   * seconds under max height.
+   * Displays in place of start point type if >= 0
+   */
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
   const IconLook &icon_look = UIGlobals::GetIconLook();
   const TrafficLook &traffic_look = UIGlobals::GetLook().traffic;
@@ -339,6 +354,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   const bool is_aat = (task_factory_type ==  TaskFactoryType::AAT);
   const bool is_start = idx == 0;
   const bool is_finish = idx + 1 == task_size;
+  const bool show_index = ui_settings.navbar_enable_tp_index;
+  const bool gr_enabled = ui_settings.navbar_enable_gr;
 
   bool draw_checkmark = is_ordered && (task_size > 1)
       && ((!is_start && has_entered) || (is_start && has_exited));
@@ -378,12 +395,14 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   /**
    * Type
-   * Draw type
+   * Draw type or for US Starts, time under max height
    **/
   GetTypeText(type_buffer, task_mode, idx, task_size, is_start,
-              is_finish, is_aat, navigate_to_target);
+              is_finish, is_aat, navigate_to_target,
+              show_index,
+              time_under_max_start);
 
-  canvas.Select(GetTypeFont(is_start));
+  canvas.Select(GetTypeFont(is_start, time_under_max_start));
   label_width = canvas.CalcTextWidth(type_buffer.c_str());
 
   // Draw arrival altitude right upper corner
@@ -434,7 +453,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     distance_buffer.Format(_T("%s: "), _("Target"));
   }
   distance_buffer.append(distance_only_buffer.c_str());
-  if (gr_valid && ui_settings.navbar_enable_gr) {
+  if (gr_valid && gr_enabled) {
     if (gradient <= fixed(0)) {
       distance_buffer.append(_T(" [##]"));
     }
@@ -448,7 +467,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     }
   }
 
-  if (distance_valid || (gr_valid && ui_settings.navbar_enable_gr) ) {
+  if (distance_valid || (gr_valid && gr_enabled) ) {
     canvas.Select(GetDistanceFont());
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
@@ -456,12 +475,11 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
     if ((PixelScalar)(distance_width + height_width) <
         (PixelScalar)(rc.right - rc.left - label_width -
             Layout::FastScale(15))) {
-      canvas.Select(GetTypeFont(is_start));
+      canvas.Select(GetTypeFont(is_start, time_under_max_start));
       left = rc.left;
-      if (left > 0 && ui_settings.navbar_enable_tp_index)
+      if (left > 0)
         canvas.TextAutoClipped(left, line_one_y_offset, type_buffer.c_str());
-      offset = rc.left +
-          (rc.right - rc.left - distance_width) / 2;
+      offset = rc.left + (rc.GetSize().cx - distance_width) / 2;
     }
 
     canvas.Select(GetDistanceFont());
@@ -473,9 +491,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
       bearing_direction = (BearingDirection)DrawBearing(canvas, rc_outer,bearing);
 
   } else { // just type type label
-    if (ui_settings.navbar_enable_tp_index) {
       canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
-    }
   }
 
   /**
