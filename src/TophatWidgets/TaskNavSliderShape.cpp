@@ -493,14 +493,13 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   if (!gr_buffer.empty())
     distance_buffer.AppendFormat(_T(" %s"), gr_buffer.c_str());
 
-  if (distance_valid || (gr_valid && gr_enabled) ) {
+  if (!distance_buffer.empty()) {
     canvas.Select(GetDistanceFont());
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
 
     UPixelScalar offset = rc.left;
-    if ((PixelScalar)(distance_width + height_width) <
-        (PixelScalar)(rc.right - rc.left - label_width -
-            Layout::FastScale(15))) {
+    if ((PixelScalar)(distance_width + height_width + label_width +
+        Layout::FastScale(15)) < (rc.GetSize().cx)) {
       canvas.Select(GetTypeFont(is_start, time_under_max_start));
       left = rc.left;
       if (left > 0)
