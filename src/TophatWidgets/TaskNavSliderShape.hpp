@@ -288,10 +288,12 @@ public:
    * upper left quadrant of bar
    *
    * @param type_buffer: the buffer that holds the text
+   * @param type_buffer_short: the buffer that holds the text.  Abbreviated
    * @param enable_index: is the configuration enabled to show the tp indexes
    * @param time_under_max_start: US task time under max start or -1 to hide
    */
-  void GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
+  void GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
+                   TaskType task_mode,
                    unsigned idx, unsigned task_size, bool is_start,
                    bool is_finish, bool is_aat, bool navigate_to_target,
                    bool enable_index,

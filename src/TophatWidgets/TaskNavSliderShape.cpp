@@ -304,26 +304,28 @@ SliderShape::GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid)
   if (!valid)
     return;
   if (gradient <= fixed(0)) {
-    gr_buffer = (_T("[##]"));
+    gr_buffer = (_T(" [##]"));
   }
   else if (gradient >= fixed(99.5)) {
-    gr_buffer = (_T("[00+]"));
+    gr_buffer = (_T(" [00+]"));
   }
   else {
     TCHAR temp[10];
     FormatGlideRatio(temp, 10, gradient);
-    gr_buffer.Format(_T("[%s]"), temp);
+    gr_buffer.Format(_T(" [%s]"), temp);
   }
 }
 
 void
-SliderShape::GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
+SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
+                         TaskType task_mode,
                          unsigned idx, unsigned task_size, bool is_start,
                          bool is_finish, bool is_aat, bool navigate_to_target,
                          bool enable_index,
                          int time_under_max_start)
 {
   // calculate but don't yet draw label "goto" abort, tp#
+  bool different_short_buffer = false;
   type_buffer.clear();
   switch (task_mode) {
   case TaskType::ORDERED:
@@ -332,9 +334,17 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
 
     else if (is_start) {
       if (time_under_max_start >= 0) {
-        TCHAR value[32];
-        FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
-        type_buffer.Format(_T("%s %s"), _("Below start"), value);
+        if (time_under_max_start < 120) {
+          TCHAR value[32];
+          FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
+          type_buffer.Format(_T("%s: %s"), _("2Minutes"), value);
+          type_buffer_short.Format(_T("%s: %s"), _("2Min"), value);
+        } else {
+          type_buffer.Format(_T("%s: %s"), _("2Minutes"), _("OK"));
+          type_buffer_short.Format(_T("%s: %s"), _("2Min"), _("OK"));
+        }
+        different_short_buffer = true;
+
       } else {
         type_buffer = _("Start");
       }
@@ -361,6 +371,8 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TaskType task_mode,
 
     break;
   }
+  if (!different_short_buffer)
+    type_buffer_short = type_buffer;
 }
 
 void
@@ -401,7 +413,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   bool draw_checkmark = is_ordered && (task_size > 1)
       && ((!is_start && has_entered) || (is_start && has_exited));
 
-  TypeBuffer type_buffer;
+  TypeBuffer type_buffer(_T(""));
+  TypeBuffer type_buffer_short(_T(""));
   UPixelScalar width;
   PixelScalar left;
   PixelRect rc = rc_outer;
@@ -430,6 +443,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   UPixelScalar distance_width = 0u;
   UPixelScalar type_text_width = 0u;
+  UPixelScalar type_text_width_short = 0u;
   UPixelScalar height_width = 0u;
   DistanceBuffer distance_buffer(_T(""));
   StaticString<100> height_buffer(_T(""));
@@ -437,16 +451,17 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
 
   /**
    * Type
-   * Draw type or for US Starts, time under max height
+   * Set type or for US Starts, time under max height
+   * Draw later after deciding whether to use the short buffer
    **/
-  GetTypeText(type_buffer, task_mode, idx, task_size, is_start,
-              is_finish, is_aat, navigate_to_target,
+  GetTypeText(type_buffer, type_buffer_short, task_mode, idx, task_size,
+              is_start, is_finish, is_aat, navigate_to_target,
               show_index,
               time_under_max_start);
 
   canvas.Select(GetTypeFont(is_start, time_under_max_start));
   type_text_width = canvas.CalcTextWidth(type_buffer.c_str());
-  canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer.c_str());
+  type_text_width_short = canvas.CalcTextWidth(type_buffer_short.c_str());
 
   /**
    * Height
@@ -487,31 +502,59 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
    * Distance & GR
    * draw distance centered between label and altitude,
    *     or to right of type_text if that is long
+   * If too long, first skips GR, then uses short version of type_buffer
    **/
-
   GetDistanceText(distance_buffer, tp_distance, distance_valid,
                   navigate_to_target, task_size, is_start, is_finish);
 
   GetGRText(gr_buffer, gradient, gr_valid && gr_enabled);
 
-  if (!gr_buffer.empty())
-    distance_buffer.AppendFormat(_T(" %s"), gr_buffer.c_str());
+  const unsigned hor_margin = Layout::FastScale(8);
+  bool use_short_type_text = false;
 
   if (!distance_buffer.empty()) {
     canvas.Select(GetDistanceFont());
     distance_width = canvas.CalcTextWidth(distance_buffer.c_str());
+    unsigned gr_width = canvas.CalcTextWidth(gr_buffer.c_str());
+    const int min_distance_offset = rc.left + type_text_width + hor_margin;
+    const int min_distance_offset_short = rc.left + type_text_width_short + hor_margin;
 
-    UPixelScalar offset = rc.left;
-    if ((PixelScalar)(distance_width + height_width + type_text_width +
-        Layout::FastScale(15)) < (rc.GetSize().cx)) {
-      left = rc.left;
-      offset = rc.left + (rc.GetSize().cx - distance_width) / 2;
+    left = rc.left;
+    if ((PixelScalar)(distance_width + gr_width + height_width +
+        type_text_width + 2 * hor_margin) < (rc.GetSize().cx)) {
+      // fits with GR
+      if (!gr_buffer.empty())
+        distance_buffer.append(gr_buffer.c_str());
+      left = rc.left + (rc.GetSize().cx - distance_width - gr_width) / 2;
+      if (left < min_distance_offset) {
+        left = min_distance_offset;
+      }
+    } else if ((PixelScalar)(distance_width + height_width +
+        type_text_width + 2 * hor_margin) < (rc.GetSize().cx)) {
+      // fits without GR
+      left = rc.left + (rc.GetSize().cx - distance_width) / 2;
+      if (left < min_distance_offset) {
+        left = min_distance_offset;
+      }
+    } else {
+      // still does not fit.  use short type buffer and no gradient
+      left = rc.left + (rc.GetSize().cx - distance_width) / 2;
+      if (left < min_distance_offset_short) {
+        left = min_distance_offset_short;
+      }
+      use_short_type_text = true;
     }
 
-    left = offset;
     if (left > 0)
       canvas.TextAutoClipped(left, line_one_y_offset, distance_buffer.c_str());
   }
+
+  // type buffer - print the regular or short one
+  canvas.Select(GetTypeFont(is_start, time_under_max_start));
+  const TypeBuffer& type_buffer_active = use_short_type_text ?
+      type_buffer_short : type_buffer;
+  canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer_active.c_str());
+
 
   /**
    * Name
