@@ -1,7 +1,7 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Tophat Soaring 2.2 Jan 8, 2017
+Tophat Soaring 2.2 Jan 28, 2017
 * Stabilize Target Up map orientation when close to target
 * Correct description for infoboxes with "altitude required"
 * Fix altitude calculations for infoboxes "next" and "final"
@@ -9,6 +9,7 @@ Tophat Soaring 2.2 Jan 8, 2017
 * Task:
  - Improve V Task calculation
  - Auto advance Turn Area Task (AAT) when exit turnpoint
+* Fix bug swapping wind internal and external preference
 * Simulator: glide descent simulated per polar and speed
 
 Top Hat Soaring 2.1.9 Beta 9/20/2016
