@@ -190,10 +190,12 @@ CheckBoxControl::OnPaint(Canvas &canvas)
     : cb_look.disabled;
 
   unsigned size = canvas.GetHeight() - 4;
+  PixelSize text_size = cb_look.font->TextSize(caption.c_str());
+  unsigned left = text_size.cx + Layout::Scale(4);
 
   canvas.Select(state_look.box_brush);
   canvas.Select(state_look.box_pen);
-  canvas.Rectangle(2, 2, size, size);
+  canvas.Rectangle(left, 2, left + size, size);
 
   if (checked) {
     canvas.Select(state_look.check_brush);
@@ -210,7 +212,7 @@ CheckBoxControl::OnPaint(Canvas &canvas)
 
     unsigned top = canvas.GetHeight() / 2;
     for (unsigned i = 0; i < ARRAY_SIZE(check_mark); ++i) {
-      check_mark[i].x = (check_mark[i].x * (int)size) / 24 + top;
+      check_mark[i].x = (check_mark[i].x * (int)size) / 24 + left + top;
       check_mark[i].y = (check_mark[i].y * (int)size) / 24 + top;
     }
 
@@ -220,5 +222,5 @@ CheckBoxControl::OnPaint(Canvas &canvas)
   canvas.Select(*cb_look.font);
   canvas.SetTextColor(state_look.text_color);
   canvas.SetBackgroundTransparent();
-  canvas.DrawText(canvas.GetHeight() + 2, 2, caption.c_str());
+  canvas.DrawText(Layout::Scale(2), (canvas.GetHeight() - text_size.cy) / 2, caption.c_str());
 }
