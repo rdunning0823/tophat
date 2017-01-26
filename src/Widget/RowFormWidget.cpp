@@ -24,6 +24,7 @@ Copyright_License {
 #include "RowFormWidget.hpp"
 #include "Form/Panel.hpp"
 #include "Form/Button.hpp"
+#include "Widget/CheckBoxWidget.hpp"
 #include "Renderer/SymbolButtonRenderer.hpp"
 #include "Form/HLine.hpp"
 #include "Look/DialogLook.hpp"
@@ -308,6 +309,17 @@ RowFormWidget::AddSymbolButton(const TCHAR *label, ActionListener &listener, int
 
   Add(Row::Type::BUTTON, button);
   return button;
+}
+
+void
+RowFormWidget::AddCheckBox(const TCHAR *label, bool checked,
+                           ActionListener &listener, int id)
+{
+  assert(IsDefined());
+
+  CheckBoxWidget *widget = new CheckBoxWidget(UIGlobals::GetDialogLook(),
+                                              label, listener, id);
+  Add(widget);
 }
 
 Button *

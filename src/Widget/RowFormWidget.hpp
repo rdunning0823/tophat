@@ -43,6 +43,7 @@ class Angle;
 class RoughTime;
 class RoughTimeDelta;
 class Button;
+class CheckBoxWidget;
 
 /**
  * A #Widget that contains #WndProperty controls, one in a row.
@@ -448,6 +449,8 @@ public:
 
   Button *AddSymbolButton(const TCHAR *label, ActionListener &listener, int id);
   Button *AddButton(const TCHAR *label, ActionListener &listener, int id);
+  void AddCheckBox(const TCHAR *label, bool checked,
+                   ActionListener &listener, int id);
 
   gcc_pure
   Widget &GetRowWidget(unsigned i) {
