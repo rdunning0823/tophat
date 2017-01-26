@@ -41,6 +41,11 @@ struct OrderedTaskSettings {
 
   FAITriangleSettings fai_triangle;
 
+  /**
+   * display the 2 minute time below start height
+   */
+  bool show_two_minute_start;
+
   void SetDefaults();
 };
 

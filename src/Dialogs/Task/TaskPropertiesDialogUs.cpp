@@ -40,7 +40,9 @@ Copyright_License {
 #include "Components.hpp"
 #include "Interface.hpp"
 #include "Widget/RowFormWidget.hpp"
+#include "Widget/CheckBoxWidget.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "Form/ActionListener.hpp"
 #include "Engine/Task/TaskBehaviour.hpp"
 #include "UIGlobals.hpp"
 #include "Screen/SingleWindow.hpp"
@@ -54,6 +56,7 @@ enum Controls {
   FINISH_HEIGHT_REF,
   START_OPEN_TIME,
   START_CLOSE_TIME,
+  HIDE_START_2_MINUTES,
 };
 
 /**
@@ -70,7 +73,8 @@ IsFaiTask(TaskFactoryType ftype)
 }
 
 class TaskPropertiesPanelUs : public RowFormWidget,
-                              private DataFieldListener {
+                              private DataFieldListener,
+                              public ActionListener {
   OrderedTask **ordered_task_pointer, *ordered_task;
   bool &task_changed;
 
@@ -103,6 +107,9 @@ protected:
    * returns true if using US Task rules
    */
   bool IsUs();
+
+  /* From ActionListener */
+  void OnAction(int id) {};
 
 private:
   /* virtual methods from DataFieldListener */
@@ -162,6 +169,11 @@ TaskPropertiesPanelUs::RefreshView()
 
   if (!IsUs())
     LoadValue(START_CLOSE_TIME, p.start_constraints.open_time_span.GetEnd());
+
+  if (IsUs()) {
+    CheckBoxWidget &w = (CheckBoxWidget&)GetRowWidget(HIDE_START_2_MINUTES);
+    w.SetState(!p.show_two_minute_start);
+  }
 }
 
 void
@@ -214,6 +226,11 @@ TaskPropertiesPanelUs::ReadValues()
   }
 
   p.finish_constraints.fai_finish = IsFaiTask(newtype);
+
+  if (IsUs()) {
+    CheckBoxWidget &w = (CheckBoxWidget&)GetRowWidget(HIDE_START_2_MINUTES);
+    p.show_two_minute_start = !w.GetState();
+  }
 
   ordered_task->SetOrderedTaskSettings(p);
 }
@@ -311,17 +328,22 @@ TaskPropertiesPanelUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
     AddRoughTime(_("Start close time"), nullptr, RoughTime::Invalid(), time_zone);
   else
     AddDummy();
+
+  if (IsUs())
+    AddCheckBox(_("Hide 2 min. under start"), false, *this, HIDE_START_2_MINUTES);
+  else
+    AddDummy();
+
 }
 
 void
 TaskPropertiesPanelUs::Show(const PixelRect &rc)
 {
+  RowFormWidget::Show(rc);
   ordered_task = *ordered_task_pointer;
   orig_taskType = ordered_task->GetFactoryType();
 
   RefreshView();
-
-  RowFormWidget::Show(rc);
 }
 
 void

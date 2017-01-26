@@ -274,6 +274,8 @@ Deserialise(OrderedTaskSettings &data, const ConstDataNode &node)
     GetHeightRef(node, _T("finish_min_height_ref"));
   node.GetAttribute(_T("fai_finish"), data.finish_constraints.fai_finish);
   data.start_constraints.fai_finish = data.finish_constraints.fai_finish;
+
+  node.GetAttribute(_T("show_two_minute_start"), data.show_two_minute_start);
 }
 
 static const TCHAR *

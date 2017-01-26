@@ -61,14 +61,16 @@ TaskNavSlider::GetTimeUnderStart()
 {
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
   const TaskStats &task_stats = CommonInterface::Calculated().ordered_task_stats;
-  const fixed maxheight = fixed(protected_task_manager->
-                                GetOrderedTaskSettings().start_constraints.max_height);
+  const OrderedTaskSettings &settings =
+      protected_task_manager->GetOrderedTaskSettings();
+  const fixed maxheight = fixed(settings.start_constraints.max_height);
+  const bool show_two_minute_start = bool(settings.show_two_minute_start);
   bool is_usa = CommonInterface::GetComputerSettings().task.contest_nationality
       == ContestNationalities::AMERICAN;
 
   if (!task_stats.task_valid || !positive(maxheight)
       || !positive(common_stats.TimeUnderStartMaxHeight)
-      || !is_usa) {
+      || !is_usa || !show_two_minute_start) {
     return -1;
   }
 

@@ -29,4 +29,5 @@ OrderedTaskSettings::SetDefaults()
   start_constraints.SetDefaults();
   finish_constraints.SetDefaults();
   fai_triangle.SetDefaults();
+  show_two_minute_start = true;
 }
