@@ -131,8 +131,10 @@ bool
 GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
-  if (ButtonOverlaysOnMouseDown(x, y, true))
+  if (ButtonOverlaysOnMouseDown(x, y, true)) {
+    QuickRedraw();
     return true;
+  }
 #endif
 
   map_item_timer.Cancel();
@@ -209,11 +211,6 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 bool
 GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 {
-#if !defined(ENABLE_OPENGL) & !defined(KOBO)
-  if (ButtonOverlaysOnMouseDown(x, y, false))
-    return true;
-#endif
-
   if (drag_mode != DRAG_NONE)
     ReleaseCapture();
 
@@ -222,6 +219,13 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     ignore_single_click = false;
     return true;
   }
+
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  if (ButtonOverlaysOnMouseUp(x, y, false)) {
+    QuickRedraw();
+    return true;
+  }
+#endif
 
   int click_time = mouse_down_clock.Elapsed();
   mouse_down_clock.Reset();
@@ -532,30 +536,51 @@ GlueMapWindow::Render(Canvas &canvas, const PixelRect &rc)
 }
 
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
+
 bool
-GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test)
+GlueMapWindow::ButtonOverlaysOnMouseUp(PixelScalar x, PixelScalar y, bool test)
 {
+  bool main_menu_button_down = rc_main_menu_button.IsDown();
+  bool zoom_out_button_down = rc_zoom_out_button.IsDown();
+  bool zoom_in_button_down =rc_zoom_in_button.IsDown();
   RasterPoint p {x, y};
 
-  if (rc_main_menu_button.IsInside(p)) {
+  rc_main_menu_button.SetDown(false);
+  rc_zoom_out_button.SetDown(false);
+  rc_zoom_in_button.SetDown(false);
+
+  if (main_menu_button_down && rc_main_menu_button.IsInside(p)) {
     if (!test)
       TophatMenu::RotateMenu();
     return true;
   }
-  if (rc_zoom_out_button.IsInside(p)) {
+  if (zoom_out_button_down && rc_zoom_out_button.IsInside(p)) {
     if (!test) {
       InputEvents::eventZoom(_T("-"));
       InputEvents::HideMenu();
     }
     return true;
   }
-  if (rc_zoom_in_button.IsInside(p)) {
+  if (zoom_in_button_down && rc_zoom_in_button.IsInside(p)) {
     if (!test) {
       InputEvents::eventZoom(_T("+"));
       InputEvents::HideMenu();
     }
     return true;
   }
+  return false;
+}
+
+bool
+GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test)
+{
+  RasterPoint p {x, y};
+
+  rc_main_menu_button.SetDown(rc_main_menu_button.IsInside(p));
+  rc_zoom_out_button.SetDown(rc_zoom_out_button.IsInside(p));
+  rc_zoom_in_button.SetDown(rc_zoom_in_button.IsInside(p));
+
+  //TODO: add mouse up logic to PPC slider shape (!HasDraggableScreen())
   if (!HasDraggableScreen() && slider_shape.GetInnerRect().IsInside(p)) {
     if (!test) {
       StaticString<20> menu_ordered(_T("NavOrdered"));
@@ -582,6 +607,8 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test
     return true;
   }
 
-  return false;
+  return rc_main_menu_button.IsDown() ||
+      rc_zoom_out_button.IsDown() ||
+      rc_zoom_in_button.IsDown();
 }
 #endif
