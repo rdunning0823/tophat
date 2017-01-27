@@ -40,8 +40,8 @@ Copyright_License {
 
 namespace CommandLine {
 #if !defined(_WIN32_WCE)
-  unsigned width = IsKobo() ? 600 : 640;
-  unsigned height = IsKobo() ? 800 : 480;
+  unsigned width = IsKobo() ? 600 : 480;
+  unsigned height = IsKobo() ? 800 : 640;
 #endif
 
 #ifdef HAVE_CMDLINE_FULLSCREEN
