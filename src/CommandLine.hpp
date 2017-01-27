@@ -36,7 +36,7 @@ namespace CommandLine {
 
 #ifdef KOBO
   static constexpr bool full_screen = false;
-#elif defined(ENABLE_SDL) || defined(USE_X11)
+#elif defined(ENABLE_SDL) || defined(USE_X11) || (defined(_WIN32) && !defined(_WIN32_WCE))
 #define HAVE_CMDLINE_FULLSCREEN
   extern bool full_screen;
 #else
