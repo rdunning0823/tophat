@@ -160,6 +160,13 @@ public:
   gcc_pure
   virtual bool CheckTask() const = 0;
 
+  /**
+   * For US ordered tasks, is the glider insider or within a 3 miles of
+   * the start cylinder
+   */
+  gcc_pure
+  virtual bool CheckGliderStartCylinderProximity() const = 0;
+
 protected:
 
   /**
@@ -376,6 +383,13 @@ protected:
    */
   virtual void UpdateNavBarStatistics(const AircraftState &aircraft,
                                       const GlidePolar &polar) = 0;
+
+  /**
+   * Updates information about whether the glider is close to the
+   * start cylinder for US tasks
+   */
+  virtual void UpdateGliderStartCylinderProximity(const GeoPoint &ref) = 0;
+
 
   /**
    * Calculate glide result from start of task to current state

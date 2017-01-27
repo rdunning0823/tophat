@@ -152,25 +152,45 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   TaskWaypoint *tp;
   TaskType task_mode = TaskType::GOTO;
   TaskFactoryType task_factory_type = TaskFactoryType::RACING;
-  const OrderedTask *ot;
   const Waypoint *wp = nullptr;
-  if (true) {
+  const OrderedTaskPoint *otp;
+  int time_under_max_start;
+  unsigned idx = 0;
+  unsigned task_size = 1;
+  bool is_ordered = false;
+
+  {
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
-    ot = &task_manager->GetOrderedTask();
+    const OrderedTask &ot = task_manager->GetOrderedTask();
     tp = task_manager->GetActiveTaskPoint();
     task_mode = task_manager->GetMode();
     task_factory_type = task_manager->GetOrderedTask().GetFactoryType();
+    is_ordered = (task_mode == TaskType::ORDERED);
+
+    const OrderedTaskSettings &settings = ot.GetOrderedTaskSettings();
+    int max_height = settings.start_constraints.max_height;
+    bool show_two_minute_start = settings.show_two_minute_start;
+    bool is_glider_close_to_start_cylinder = ot.CheckGliderStartCylinderProximity();
+
+    int raw_time_under = TaskNavSlider::GetTimeUnderStart(
+        max_height, show_two_minute_start);
+    time_under_max_start =
+        (is_ordered && (idx < 1 ||
+            (idx == 1 && is_glider_close_to_start_cylinder))) ?
+                raw_time_under  : -1;
+
+    if (is_ordered) {
+      task_size = ot.TaskSize();
+      idx = ot.GetActiveIndex();
+      otp = &ot.GetTaskPoint(idx);
+    }
   }
+
   StaticString<255> wp_name(_T(""));
-  unsigned task_size = 1;
   bool has_entered = false, has_exited = false;
-  unsigned idx = 0;
   bool tp_valid = tp != nullptr;
 
-  if (task_mode == TaskType::ORDERED) {
-    task_size = ot->TaskSize();
-    idx = ot->GetActiveIndex();
-    const OrderedTaskPoint *otp = &ot->GetTaskPoint(idx);
+  if (is_ordered) {
     if (otp != nullptr) {
       has_entered = otp->HasEntered();
       has_exited = otp->HasExited();
@@ -250,7 +270,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       false,
                       use_wide_pen,
                       true,
-                      TaskNavSlider::GetTimeUnderStart());
+                      time_under_max_start);
 
   } else {
     fixed gradient = ::CalculateGradient(*wp, distance,
@@ -273,7 +293,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       ::GradientValid(gradient),
                       use_wide_pen,
                       false,
-                      TaskNavSlider::GetTimeUnderStart());
+                      time_under_max_start);
   }
 }
 #endif

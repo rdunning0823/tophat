@@ -100,7 +100,8 @@ OrderedTask::OrderedTask(const TaskBehaviour &tb)
    ordered_settings(tb.ordered_defaults),
    dijkstra_min(nullptr), dijkstra_max(nullptr),
    saved_start_pushed_valid(false),
-   last_task_mc_speed(fixed(-1))
+   last_task_mc_speed(fixed(-1)),
+   is_glider_close_to_start_cylinder(false)
 {
   ClearName();
   active_factory = CreateTaskFactory(factory_mode, *this, task_behaviour);
@@ -1111,6 +1112,27 @@ OrderedTask::UpdateNavBarStatistics(const AircraftState &aircraft,
                                                 polar,
                                                 glide_state);
   }
+}
+
+void
+OrderedTask::UpdateGliderStartCylinderProximity(const GeoPoint &ref)
+{
+  if (task_points.empty()) {
+    is_glider_close_to_start_cylinder = false;
+    return;
+  }
+
+  const auto &start = *task_points.front();
+  fixed start_radius = GetCylinderRadiusOrMinusOne(start);
+
+  if (!positive(start_radius)) {
+    is_glider_close_to_start_cylinder = false;
+    return;
+  }
+
+  // closer than 3 miles to edge of cylinder
+  is_glider_close_to_start_cylinder =
+      (start.GetLocation().Distance(ref) - start_radius) < fixed(1609) * fixed(3);
 }
 
 void

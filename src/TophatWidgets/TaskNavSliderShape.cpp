@@ -316,6 +316,24 @@ SliderShape::GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid)
   }
 }
 
+static void
+SetTypeTextFor2MinuteCount(SliderShape::TypeBuffer &type_buffer,
+                           SliderShape::TypeBuffer &type_buffer_short,
+                           int time_under_max_start)
+{
+  assert(!negative(time_under_max_start));
+
+  if (time_under_max_start < 120) {
+    TCHAR value[32];
+    FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
+    type_buffer.Format(_T("%s: %s"), _("2Minutes"), value);
+    type_buffer_short.Format(_T("%s: %s"), _("2Min"), value);
+  } else {
+    type_buffer.Format(_T("%s: %s"), _("2Minutes"), _("OK"));
+    type_buffer_short.Format(_T("%s: %s"), _("2Min"), _("OK"));
+  }
+}
+
 void
 SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
                          TaskType task_mode,
@@ -334,15 +352,10 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
 
     else if (is_start) {
       if (time_under_max_start >= 0) {
-        if (time_under_max_start < 120) {
-          TCHAR value[32];
-          FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
-          type_buffer.Format(_T("%s: %s"), _("2Minutes"), value);
-          type_buffer_short.Format(_T("%s: %s"), _("2Min"), value);
-        } else {
-          type_buffer.Format(_T("%s: %s"), _("2Minutes"), _("OK"));
-          type_buffer_short.Format(_T("%s: %s"), _("2Min"), _("OK"));
-        }
+
+        SetTypeTextFor2MinuteCount(type_buffer,
+                                   type_buffer_short,
+                                   time_under_max_start);
         different_short_buffer = true;
 
       } else {
@@ -351,7 +364,12 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
     }
     else if (is_finish)
       type_buffer = _("Finish");
-    else if (is_aat && navigate_to_target)
+    else if (idx < 2 && time_under_max_start >= 0) {
+      SetTypeTextFor2MinuteCount(type_buffer,
+                                 type_buffer_short,
+                                 time_under_max_start);
+      different_short_buffer = true;
+    } else if (is_aat && navigate_to_target)
       // append "Target" text to distance in center
       type_buffer.clear();
     else if (is_aat && enable_index)

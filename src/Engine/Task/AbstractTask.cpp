@@ -218,6 +218,7 @@ AbstractTask::UpdateGlideSolutions(const AircraftState &state,
   }
 
   UpdateNavBarStatistics(state, glide_polar_safety);
+  UpdateGliderStartCylinderProximity(state.location);
 
   GlideSolutionTravelled(state, glide_polar_task,
                          stats.total.solution_travelled,

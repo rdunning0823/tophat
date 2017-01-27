@@ -104,6 +104,8 @@ private:
     /** name of task */
   StaticString<64> name;
 
+  bool is_glider_close_to_start_cylinder;
+
 public:
   /**
    * Constructor.
@@ -872,6 +874,18 @@ protected:
 
 public:
   void AcceptTaskPointVisitor(TaskPointConstVisitor &visitor) const override;
+
+  /**
+   * @param ref.  Location of glider
+   * checks whether the aircraft is within 3 miles of the edge of the start
+   * cylinder, or inside it
+   */
+  void UpdateGliderStartCylinderProximity(const GeoPoint &ref);
+  gcc_pure
+  bool CheckGliderStartCylinderProximity() const {
+    return is_glider_close_to_start_cylinder;
+  }
+
 };
 
 #endif //ORDEREDTASK_H

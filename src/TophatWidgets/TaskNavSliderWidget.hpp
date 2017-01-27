@@ -45,11 +45,12 @@ struct InfoBoxLook;
 class TaskStats;
 class ContainerWindow;
 
-/**
- * @return -1 if time under is invalid and should not be displayed
- */
 namespace TaskNavSlider {
-  int GetTimeUnderStart();
+/**
+ * @return -1 if time under is invalid and should not be displayed,
+ * else, elapsed seconds under start height
+ */
+  int GetTimeUnderStart(int max_height, bool show_two_minute_start);
 }
 
 class TaskNavSliderWidget : public MapOverlayBaseWidget, ListItemRenderer,

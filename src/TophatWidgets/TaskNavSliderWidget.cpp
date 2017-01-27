@@ -57,18 +57,15 @@ Copyright_License {
 #include <stdlib.h>
 
 int
-TaskNavSlider::GetTimeUnderStart()
+TaskNavSlider::GetTimeUnderStart(int max_height,
+                                 bool show_two_minute_start)
 {
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
   const TaskStats &task_stats = CommonInterface::Calculated().ordered_task_stats;
-  const OrderedTaskSettings &settings =
-      protected_task_manager->GetOrderedTaskSettings();
-  const fixed maxheight = fixed(settings.start_constraints.max_height);
-  const bool show_two_minute_start = bool(settings.show_two_minute_start);
   bool is_usa = CommonInterface::GetComputerSettings().task.contest_nationality
       == ContestNationalities::AMERICAN;
 
-  if (!task_stats.task_valid || !positive(maxheight)
+  if (!task_stats.task_valid || max_height <= 0
       || !positive(common_stats.TimeUnderStartMaxHeight)
       || !is_usa || !show_two_minute_start) {
     return -1;
@@ -166,6 +163,11 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 {
   // if task is not current (e.g. the tp being drawn may no longer exist) then abort drawing
   // hold lease on task_manager until drawing is done
+  const MoreData &basic = CommonInterface::Basic();
+  const MapSettings &settings_map = CommonInterface::GetMapSettings();
+  const TerrainRendererSettings &terrain = settings_map.terrain;
+
+  bool use_wide_pen = !terrain.enable;
   const Waypoint *twp = nullptr;
   const OrderedTaskPoint *otp = nullptr;
   bool is_ordered = false;
@@ -174,17 +176,21 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool is_finish = false;
   bool is_start = false;
   TaskFactoryType factory_type = TaskFactoryType::AAT;
-  int time_under_max_start = TaskNavSlider::GetTimeUnderStart();
+  int time_under_max_start;
 
   TaskType mode;
   {
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
 
-
     mode = task_manager->GetMode();
     is_ordered = (mode == TaskType::ORDERED);
     task_size = task_manager->TaskSize();
-    factory_type = task_manager->GetOrderedTask().GetFactoryType();
+    const OrderedTask &task = task_manager->GetOrderedTask();
+    const OrderedTaskSettings &settings = task.GetOrderedTaskSettings();
+    factory_type = task.GetFactoryType();
+    int max_height = settings.start_constraints.max_height;
+    bool show_two_minute_start = settings.show_two_minute_start;
+    bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
 
     if (idx > 0 && idx >= task_manager->TaskSize())
       return;
@@ -201,12 +207,14 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
       is_start = idx == 0;
     } else
       tp_valid = false;
-  }
 
-  const MoreData &basic = CommonInterface::Basic();
-  const MapSettings &settings_map = CommonInterface::GetMapSettings();
-  const TerrainRendererSettings &terrain = settings_map.terrain;
-  bool use_wide_pen = !terrain.enable;
+    int raw_time_under = TaskNavSlider::GetTimeUnderStart(
+        max_height, show_two_minute_start);
+    time_under_max_start =
+        (is_ordered && (idx < 1 ||
+            (idx == 1 && is_glider_close_to_start_cylinder))) ?
+                raw_time_under  : -1;
+  }
 
   bool has_entered = tp_valid && is_ordered && otp->HasEntered();
   bool has_exited = tp_valid && is_ordered && otp->HasExited();
