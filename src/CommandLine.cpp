@@ -154,6 +154,10 @@ CommandLine::Parse(Args &args)
   }
 
 #if !defined(_WIN32_WCE)
+  // Tophat layouts don't support square, so use portrait
+  if (width == height && width > 1)
+    --width;
+
   if (width < 240 || width > 4096 ||
       height < 240 || height > 4096)
     args.UsageError();
