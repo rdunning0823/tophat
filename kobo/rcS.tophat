@@ -148,44 +148,13 @@ mkdir /dev/pts
 /bin/mount -t devpts devpts /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
-if /bin/dd if=/dev/mmcblk0 bs=512 skip=2048 count=1 2>/dev/null | \
-  strings | grep -q USB-hot-plug; then
-    USB_hot_plug=Y
-else
-    USB_hot_plug=N
-    # save original uImage as uImage-KoboLabs
-    if [ ! -f ${DotKobo}/uImage-KoboLabs ]; then
-        dd if=/dev/mmcblk0 bs=512 skip=2048 count=4000 of=${DotKobo}/uImage-KoboLabs
-    fi
-fi
-
 if [ -f $ONBOARD/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
-    if [ "${USB_hot_plug}" == "Y" -a -f ${DotKobo}/uImage-KoboLabs ]; then
-        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
-        cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
-        touch ${DotKobo}/KoboRoot.tgz
-        reboot
-    fi
     rm -f $ONBOARD/XCSoarData/kobo/start_nickel
     /usr/local/Kobo/hindenburg &
 
     `grep /usr/local/Kobo/nickel /etc/init.d/rcS`
 else
-    if [ "${USB_hot_plug}" != "Y" -a -f ${DotKobo}/uImage-USB-hot-plug ]; then
-        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
-        cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
-        touch ${DotKobo}/KoboRoot.tgz
-        rm -f ${DotKobo}/force_uimage
-        reboot
-    fi
-    if [ -f ${DotKobo}/force_uimage -a -f ${DotKobo}/uImage-USB-hot-plug ] ; then
-        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
-        cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
-        touch ${DotKobo}/KoboRoot.tgz
-        rm -f ${DotKobo}/force_uimage
-        reboot
-    fi
     # disable the flashing led
     echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
     echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
