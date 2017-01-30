@@ -117,14 +117,35 @@ ifeq ($(KOBO_UIMAGE),y)
 	UIMAGE_CMD=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
 endif
 
-$(UIMAGE_BASE_DIR)/COPYING:
+KERNEL_CONFIG=$(UIMAGE_BASE_DIR)/arch/arm/configs/usb-host-config
+
+$(KERNEL_CONFIG):
 	git submodule update --init kobo/uimage
 
-UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
+$(UIMAGE_USB): $(KERNEL_CONFIG)
+	cp $(KERNEL_CONFIG) $(UIMAGE_BASE_DIR)/.config
 	make -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
 
 FORCE_UIMAGE:
 	touch $(TARGET_OUTPUT_DIR)/force_uimage
+
+$(UIMAGE_BASE_DIR)/drivers/usb-host.tar.gz $(UIMAGE_BASE_DIR)/sound.tar.gz: $(UIMAGE_USB)
+	make -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm modules
+	cd $(UIMAGE_BASE_DIR)/drivers/usb; tar czf ../usb-host.tar.gz `find . -name "*.ko"`
+	cd $(UIMAGE_BASE_DIR)/sound; tar czf ../sound.tar.gz `find . -name "*.ko"`
+
+$(UIMAGE_BASE_DIR)/drivers/usb-device.tar.gz: $(UIMAGE_BASE_DIR)/drivers/usb-host.tar.gz
+	sed -i \
+		-e "s/CONFIG_USB_EHCI_ARC_OTG=y/# CONFIG_USB_EHCI_ARC_OTG is not set/" \
+		-e "/\# CONFIG_USB_EHCI_FSL_MC13783 is not set/d" \
+		-e "/\# CONFIG_USB_EHCI_FSL_1301 is not set/d" \
+		-e "/\# CONFIG_USB_EHCI_FSL_1504 is not set/d" \
+		-e "/CONFIG_USB_EHCI_FSL_UTMI=y/d" \
+		$(UIMAGE_BASE_DIR)/.config
+	make -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm modules
+	cd $(UIMAGE_BASE_DIR)/drivers/usb; tar czf ../usb-device.tar.gz `find . -name "*.ko"`
+
+UIMAGE: $(UIMAGE_BASE_DIR)/drivers/usb-device.tar.gz
 
 AVCONF = avconv -y
 
@@ -168,6 +189,15 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 $(XCSOAR_BIN) $(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) $(@D)/KoboRoot/opt/tophat/bin
 	$(Q)$(UIMAGE_CMD)
 	$(Q)install -m 0644 $(TARGET_OUTPUT_DIR)/force_uimage $(@D)/KoboRoot/mnt/onboard/.kobo/force_uimage
+	$(Q)install -d 0755 $(@D)/KoboRoot/drivers/ntx508/sound
+	PWD=`pwd`; cd $(@D)/KoboRoot/drivers/ntx508/sound;\
+		tar xzf ${PWD}/$(UIMAGE_BASE_DIR)/sound.tar.gz
+	$(Q)install -d 0755 $(@D)/KoboRoot/drivers/ntx508/usb-host
+	PWD=`pwd`; cd $(@D)/KoboRoot/drivers/ntx508/usb-host;\
+		tar xzf ${PWD}/$(UIMAGE_BASE_DIR)/drivers/usb-host.tar.gz
+	$(Q)install -d 0755 $(@D)/KoboRoot/drivers/ntx508/usb-device
+	PWD=`pwd`; cd $(@D)/KoboRoot/drivers/ntx508/usb-device;\
+		tar xzf ${PWD}/$(UIMAGE_BASE_DIR)/drivers/usb-device.tar.gz
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc

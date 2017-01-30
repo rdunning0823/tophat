@@ -151,6 +151,40 @@ mkdir /dev/pts
 /bin/mount -t devpts devpts /dev/pts
 /usr/sbin/inetd /etc/inetd.conf &
 
+# install usb drivers
+cd /drivers/ntx508
+rm -rf usb
+if [ -f $ONBOARD/XCSoarData/kobo/start_nickel ]; then
+    ln -s usb-device usb
+else
+    ln -s usb-host usb
+fi
+cd usb
+/sbin/insmod core/usbcore.ko
+/sbin/insmod host/ehci-hcd.ko # don't change loading order. Otherwise hang on Test Sound
+/sbin/insmod serial/usbserial.ko
+/sbin/insmod serial/pl2303.ko
+#/sbin/insmod serial/cp210x.ko # conflict with USB audio device.
+/sbin/insmod serial/ftdi_sio.ko
+/sbin/insmod serial/aircable.ko
+/sbin/insmod serial/garmin_gps.ko
+/sbin/insmod serial/navman.ko
+/sbin/insmod class/cdc-acm.ko
+/sbin/insmod storage/usb-storage.ko
+
+# install sound core
+cd /drivers/ntx508/sound
+/sbin/insmod core/snd-hwdep.ko
+/sbin/insmod core/snd-rawmidi.ko
+/sbin/insmod core/snd-timer.ko
+/sbin/insmod core/snd-page-alloc.ko
+/sbin/insmod core/snd-pcm.ko
+
+# install sound usb
+cd /drivers/ntx508/sound
+/sbin/insmod usb/snd-usbmidi-lib.ko
+/sbin/insmod usb/snd-usb-audio.ko
+
 if [ -f $ONBOARD/XCSoarData/kobo/start_nickel \
     -o ! -x /opt/tophat/bin/KoboMenu ]; then
     rm -f $ONBOARD/XCSoarData/kobo/start_nickel
