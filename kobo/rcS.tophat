@@ -98,13 +98,16 @@ fi
                                
 if [ -e $DotKobo/KoboRoot.tgz ]; then
 	zcat $DotKobo/KoboRoot.tgz > /dev/null && tar zxf $DotKobo/KoboRoot.tgz -C /
-	if [ -e $DotKobo/upgrade ]; then
-		/etc/init.d/upgrade-generic.sh null null ${DotKobo}/upgrade/uImage mmcblk0
-		rm -rf $DotKobo/upgrade
-	fi
 	rm $DotKobo/KoboRoot.tgz
 	sync
 	reboot
+fi
+
+if [ -f $DotKobo/force_uimage ] ; then
+    /etc/init.d/upgrade-generic.sh null null $DotKobo/uImage-USB-hot-plug mmcblk0
+    rm -f $DotKobo/force_uimage
+    sync
+    reboot
 fi
 
 (
