@@ -22,10 +22,19 @@ Copyright_License {
 */
 
 #include "Settings.hpp"
+#include "Simulator.hpp"
+#include "Math/fixed.hpp"
+#include "Math/Angle.hpp"
 
 void
 WindSettings::SetDefaults()
 {
   user_wind_source = UserWindSource::EXTERNAL_WIND_IF_AVAILABLE;
-  manual_wind_available.Clear();
+  if (is_simulator()) {
+    manual_wind.norm = fixed(0);
+    manual_wind.bearing = Angle::Degrees(fixed(0));
+    manual_wind_available.Update(fixed(1));
+  } else {
+    manual_wind_available.Clear();
+  }
 }
