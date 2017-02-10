@@ -19,6 +19,9 @@ PRODUCT=`/bin/kobo_config.sh`;
 
 mount -o remount,noatime,nodiratime /dev/mmcblk0p1 /
 
+# clean up if ACTION=="remove" of udev rule did not work
+[ -d /media/usb_storage ] && rmdir /media/usb_storage
+
 PLATFORM=freescale
 if [ `dd if=/dev/mmcblk0 bs=512 skip=1024 count=1 | grep -c "HW CONFIG"` == 1 ]; then
 	PLATFORM=ntx508
