@@ -28,6 +28,9 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Look/ButtonLook.hpp"
 #include "Asset.hpp"
+#ifdef _WIN32_WCE
+#include "Util/StringAPI.hxx"
+#endif
 
 #include <winuser.h>
 
@@ -37,7 +40,12 @@ TextButtonRenderer::GetCaptionSize(Canvas &canvas, PixelRect rc,
 {
   const ButtonLook &look = GetLook();
   canvas.Select(*look.font);
-  return text_renderer.GetSize(canvas, rc, text);
+  PixelSize sz = text_renderer.GetSize(canvas, rc, text);
+#ifdef _WIN32_WCE
+  if (StringLength(text) == 0)
+    sz.cx = 0;
+#endif
+  return sz;
 }
 
 void
