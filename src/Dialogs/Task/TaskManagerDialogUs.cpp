@@ -171,7 +171,6 @@ void
 TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   NullWidget::Prepare(parent, rc);
-  WndForm::Move(rc);
   SetRectangles(rc);
 
   WindowStyle style_frame;
@@ -202,6 +201,7 @@ TaskManagerDialogUs::Prepare(ContainerWindow &parent, const PixelRect &rc)
   task_view.Create(GetClientAreaWindow(),rc_task_view, style);
   task_view.SetFullScreenRect(GetClientRect());
   task_view.SetPartialScreenRect(rc_task_view);
+  WndForm::Move(rc);
 
   SetDialogCaption();
 }
