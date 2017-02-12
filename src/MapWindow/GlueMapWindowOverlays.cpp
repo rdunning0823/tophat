@@ -773,4 +773,7 @@ void
 GlueMapWindow::SetTaskNavSliderShape()
 {
   slider_shape.Resize(GetClientRect().right - GetClientRect().left);
+#if !defined(ENABLE_OPENGL) & !defined(KOBO)
+  rc_nav_slider_shape_button = slider_shape.GetOuterRect();
+#endif
 }
