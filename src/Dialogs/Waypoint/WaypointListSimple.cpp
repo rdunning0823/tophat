@@ -339,7 +339,6 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const PixelRect rc_form = rc;
   NullWidget::Prepare(parent, rc_form);
-  WndForm::Move(rc_form);
 
   SetCaption(_("Select Waypoint"));
   SetRectangles(rc_form);
@@ -420,6 +419,7 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
   dialog_state.name = _T("");
   sort_direction = CommonInterface::SetUISettings().waypoint_sort_direction;
 
+  WndForm::Move(rc_form);
   UpdateList();
   UpdateHeaders();
 }

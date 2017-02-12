@@ -294,7 +294,6 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   const PixelRect rc_form = rc;
   NullWidget::Prepare(parent, rc_form);
-  WndForm::Move(rc_form);
 
   SetCaption(_("Top Hat Tips"));
   SetRectangles(rc_form);
@@ -327,7 +326,7 @@ StartupAssistant::Prepare(ContainerWindow &parent, const PixelRect &rc)
                       rc_chkb_decline, checkbox_style,
                       *this, DeclineCheckboxClick);
 
-
+  WndForm::Move(rc_form);
   SetTip(true);
 }
 
