@@ -487,7 +487,6 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   PixelRect rc_form = rc; //GetSize(rc);
   NullWidget::Prepare(parent, rc_form);
-  WndForm::Move(rc_form);
 
   SetRectangles(rc_form);
   StaticString<255> add_del_info_text(_T(""));
@@ -573,6 +572,7 @@ MatClickPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                 rc_cancel,
                 button_style, *this, CancelClick);
 
+  WndForm::Move(rc_form);
   if (modified_task.mat_mode != MAT_DELETE)
     RefreshFormForAdd();
 

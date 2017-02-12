@@ -481,7 +481,6 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   PixelRect rc_form = rc;
   NullWidget::Prepare(parent, rc_form);
-  WndForm::Move(rc_form);
 
   SetRectangles(rc_form);
 
@@ -563,6 +562,7 @@ SetupQuick::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            rc_advanced,
                            button_style, *this, ADVANCED);
 
+  WndForm::Move(rc_form);
   RefreshForm();
   Timer::Schedule(1000);
 }

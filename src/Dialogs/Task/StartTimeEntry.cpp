@@ -265,7 +265,6 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   PixelRect rc_form = rc; //GetSize(rc);
   NullWidget::Prepare(parent, rc_form);
-  WndForm::Move(rc_form);
 
   SetCaption(_("Adjust time you started the task"));
 
@@ -322,6 +321,8 @@ StartTimeEntry::Prepare(ContainerWindow &parent, const PixelRect &rc)
   label_start = new WndFrame(GetClientAreaWindow(), dialog_look,
                               rc_label_start, style_frame);
   label_start->SetCaption(start_label_text.c_str());
+
+  WndForm::Move(rc_form); // do this after controls are instantiated
 
   UpdateCurrentTime();
 

@@ -166,7 +166,6 @@ void
 BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
   NullWidget::Prepare(parent, rc);
-  WndForm::Move(rc);
 
   const DialogLook &look = UIGlobals::GetDialogLook();
 
@@ -190,6 +189,7 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   SetCaption();
 
   managed_widget.Move(content_rc);
+  WndForm::Move(rc);
 }
 
 void
