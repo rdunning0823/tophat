@@ -419,6 +419,7 @@ public:
    * locations of Map overlay buttons when not using
    * OPENGL or KOBO
    */
+  WinMapOverlayButton rc_nav_slider_shape_button;
   WinMapOverlayButton rc_main_menu_button;
   WinMapOverlayButton rc_zoom_out_button;
   WinMapOverlayButton rc_zoom_in_button;

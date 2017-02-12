@@ -131,7 +131,7 @@ bool
 GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
 {
 #if !defined(ENABLE_OPENGL) & !defined(KOBO)
-  if (ButtonOverlaysOnMouseDown(x, y, true)) {
+  if (ButtonOverlaysOnMouseDown(x, y, false)) {
     QuickRedraw();
     return true;
   }
@@ -542,12 +542,14 @@ GlueMapWindow::ButtonOverlaysOnMouseUp(PixelScalar x, PixelScalar y, bool test)
 {
   bool main_menu_button_down = rc_main_menu_button.IsDown();
   bool zoom_out_button_down = rc_zoom_out_button.IsDown();
-  bool zoom_in_button_down =rc_zoom_in_button.IsDown();
+  bool zoom_in_button_down = rc_zoom_in_button.IsDown();
+  bool slider_shape_button_down = rc_nav_slider_shape_button.IsDown();
   RasterPoint p {x, y};
 
   rc_main_menu_button.SetDown(false);
   rc_zoom_out_button.SetDown(false);
   rc_zoom_in_button.SetDown(false);
+  rc_nav_slider_shape_button.SetDown(false);
 
   if (main_menu_button_down && rc_main_menu_button.IsInside(p)) {
     if (!test)
@@ -568,20 +570,10 @@ GlueMapWindow::ButtonOverlaysOnMouseUp(PixelScalar x, PixelScalar y, bool test)
     }
     return true;
   }
-  return false;
-}
-
-bool
-GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test)
-{
-  RasterPoint p {x, y};
-
-  rc_main_menu_button.SetDown(rc_main_menu_button.IsInside(p));
-  rc_zoom_out_button.SetDown(rc_zoom_out_button.IsInside(p));
-  rc_zoom_in_button.SetDown(rc_zoom_in_button.IsInside(p));
 
   //TODO: add mouse up logic to PPC slider shape (!HasDraggableScreen())
-  if (!HasDraggableScreen() && slider_shape.GetInnerRect().IsInside(p)) {
+  if (!HasDraggableScreen() && slider_shape_button_down &&
+      rc_nav_slider_shape_button.IsInside(p)) {
     if (!test) {
       StaticString<20> menu_ordered(_T("NavOrdered"));
       StaticString<20> menu_goto(_T("NavGoto"));
@@ -607,8 +599,22 @@ GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test
     return true;
   }
 
+  return false;
+}
+
+bool
+GlueMapWindow::ButtonOverlaysOnMouseDown(PixelScalar x, PixelScalar y, bool test)
+{
+  RasterPoint p {x, y};
+
+  rc_main_menu_button.SetDown(rc_main_menu_button.IsInside(p));
+  rc_zoom_out_button.SetDown(rc_zoom_out_button.IsInside(p));
+  rc_zoom_in_button.SetDown(rc_zoom_in_button.IsInside(p));
+  rc_nav_slider_shape_button.SetDown(rc_nav_slider_shape_button.IsInside(p));
+
   return rc_main_menu_button.IsDown() ||
       rc_zoom_out_button.IsDown() ||
-      rc_zoom_in_button.IsDown();
+      rc_zoom_in_button.IsDown() ||
+      rc_nav_slider_shape_button.IsDown();
 }
 #endif
