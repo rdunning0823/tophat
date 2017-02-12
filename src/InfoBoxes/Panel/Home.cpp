@@ -38,6 +38,7 @@ Copyright_License {
 #include "Protection.hpp"
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
+#include "Screen/SingleWindow.hpp"
 #include "Computer/Settings.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
@@ -69,6 +70,7 @@ public:
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual void Unprepare() override;
+  virtual void Move(const PixelRect &rc) override;
 
   void Refresh();
 
@@ -77,6 +79,7 @@ protected:
   /* methods from ActionListener */
   virtual void OnAction(int id) override;
 };
+
 
 void
 HomePanel::OnAction(int action_id)
@@ -139,6 +142,18 @@ HomePanel::Refresh()
     name.Format(_T("%s: %s"), _("Home"), wp->name.c_str());
 
   home_name->SetCaption(name.c_str());
+}
+
+void
+HomePanel::Move(const PixelRect &rc_unused)
+{
+  PixelRect rc = UIGlobals::GetMainWindow().GetClientRect();
+
+  BaseAccessPanel::Move(rc);
+  ThreeButtonLayout::CalculateLayout(content_rc);
+  change->Move(lower_left_rc);
+  goto_home->Move(lower_right_rc);
+  home_name->Move(upper_rc);
 }
 
 void
