@@ -168,6 +168,8 @@ SliderShape::DrawOutline(Canvas &canvas, const PixelRect &rc, bool use_wide_pen)
     return false;
 
 #ifdef _WIN32
+  poly[0].y -= Layout::Scale(2);
+  poly[1].y -= Layout::Scale(2);
   canvas.Select(nav_slider_look.GetBorderPen(use_wide_pen));
   canvas.DrawPolygon(poly, 8);
   return true;
