@@ -1,6 +1,10 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Tophat Soaring 2.2a Feb 14, 2017
+* Fix possible freeze on dialog box exit
+* Fix PPC2003 Nav Menu and task edit crash
+
 Tophat Soaring 2.2 Jan 28, 2017
 * Stabilize Target Up map orientation when close to target
 * Correct description for infoboxes with "altitude required"
