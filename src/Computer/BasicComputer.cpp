@@ -176,6 +176,7 @@ ComputeAirspeed(NMEAInfo &basic, const DerivedInfo &calculated)
     /* got it already */
     return;
 
+  // pressure or baro then or gps altitude
   const auto any_altitude = basic.GetAnyAltitude();
 
   if (!basic.airspeed_available && any_altitude.first) {
