@@ -167,7 +167,7 @@ FormatSpeed(TCHAR *buffer,
 {
   value = Units::ToUserUnit(value, unit);
 
-  const int prec = precision && value < fixed(100);
+  const int prec = precision && value < fixed(20);
   if (include_unit)
     StringFormatUnsafe(buffer, _T("%.*f %s"), prec, (double)value,
                        Units::GetUnitName(unit));
