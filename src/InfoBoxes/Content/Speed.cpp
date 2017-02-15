@@ -22,14 +22,33 @@ Copyright_License {
 */
 
 #include "InfoBoxes/Content/Speed.hpp"
+#include "Factory.hpp"
 #include "InfoBoxes/Data.hpp"
+#include "InfoBoxes/Panel/Panel.hpp"
 #include "Interface.hpp"
+#include "InfoBoxes/Panel/SpeedSimulator.hpp"
+
 
 #include "Simulator.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Components.hpp"
 #include "Language/Language.hpp"
 #include "Units/Units.hpp"
+
+
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel ground_speed_simulator_infobox_panels[] = {
+  { N_("Simulator"), LoadGroundSpeedSimulatorPanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentSpeedGround::GetDialogContent() {
+  return ground_speed_simulator_infobox_panels;
+}
 
 void
 InfoBoxContentSpeedGround::Update(InfoBoxData &data)
@@ -41,39 +60,6 @@ InfoBoxContentSpeedGround::Update(InfoBoxData &data)
   }
 
   data.SetValueFromSpeed(basic.ground_speed, false);
-}
-
-bool
-InfoBoxContentSpeedGround::HandleKey(const InfoBoxKeyCodes keycode)
-{
-  if (!is_simulator())
-    return false;
-  if (!CommonInterface::Basic().gps.simulator)
-    return false;
-
-  fixed fixed_step = (fixed)Units::ToSysSpeed(fixed(10));
-  const Angle a5 = Angle::Degrees(5);
-
-  switch (keycode) {
-  case ibkUp:
-    device_blackboard->SetSpeed(
-        CommonInterface::Basic().ground_speed + fixed_step);
-    return true;
-
-  case ibkDown:
-    device_blackboard->SetSpeed(std::max(fixed(0), CommonInterface::Basic().ground_speed - fixed_step));
-    return true;
-
-  case ibkLeft:
-    device_blackboard->SetTrack(CommonInterface::Basic().track - a5);
-    return true;
-
-  case ibkRight:
-    device_blackboard->SetTrack(CommonInterface::Basic().track + a5);
-    return true;
-  }
-
-  return false;
 }
 
 void
@@ -88,8 +74,23 @@ UpdateInfoBoxSpeedIndicated(InfoBoxData &data)
   data.SetValueFromSpeed(basic.indicated_airspeed, false);
 }
 
+
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel true_speed_simulator_infobox_panels[] = {
+  { N_("Simulator"), LoadTrueSpeedSimulatorPanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentSpeed::GetDialogContent() {
+  return true_speed_simulator_infobox_panels;
+}
+
 void
-UpdateInfoBoxSpeed(InfoBoxData &data)
+InfoBoxContentSpeed::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   if (!basic.airspeed_available) {

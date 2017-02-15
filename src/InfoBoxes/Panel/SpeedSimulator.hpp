@@ -21,35 +21,18 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_INFOBOX_CONTENT_SPEED_HPP
-#define XCSOAR_INFOBOX_CONTENT_SPEED_HPP
+#ifndef TOPHAT_SPEED_SIMULATOR_FULL_SCREEN_PANEL_HPP
+#define TOPHAT_SPEED_SIMULATOR_FULL_SCREEN_PANEL_HPP
 
-#include "InfoBoxes/Content/Base.hpp"
-
-class InfoBoxContentSpeedGround : public InfoBoxContent
-{
-public:
-  virtual const InfoBoxPanel *GetDialogContent() override;
-  virtual void Update(InfoBoxData &data) override;
-};
-
-void
-UpdateInfoBoxSpeedIndicated(InfoBoxData &data);
+class Widget;
 
 /**
- * TAS
+ * @param is_true; yes if will manipulate TAS, else will be groundspeed
  */
-class InfoBoxContentSpeed : public InfoBoxContent
-{
-public:
-  virtual const InfoBoxPanel *GetDialogContent() override;
-  virtual void Update(InfoBoxData &data) override;
-};
+Widget *
+LoadGroundSpeedSimulatorPanel(unsigned id);
 
-void
-UpdateInfoBoxSpeedMacCready(InfoBoxData &data);
-
-void
-UpdateInfoBoxSpeedDolphin(InfoBoxData &data);
+Widget *
+LoadTrueSpeedSimulatorPanel(unsigned id);
 
 #endif

@@ -414,6 +414,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/Panel/Base.cpp \
 	$(SRC)/InfoBoxes/Panel/Altitude.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeSimulator.cpp \
+	$(SRC)/InfoBoxes/Panel/SpeedSimulator.cpp \
 	$(SRC)/InfoBoxes/Panel/AlternateFullScreen.cpp \
 	$(SRC)/InfoBoxes/Panel/BarometricPressure.cpp \
 	$(SRC)/InfoBoxes/Panel/Home.cpp \

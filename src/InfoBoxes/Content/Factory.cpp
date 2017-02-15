@@ -770,7 +770,7 @@ static constexpr MetaData meta_data[] = {
     N_("Airspeed TAS"),
     N_("V TAS"),
     N_("True Airspeed reported by a supported external intelligent vario."),
-    UpdateInfoBoxSpeed,
+    IBFHelper<InfoBoxContentSpeed>::Create,
     e_Horizon,
     e_WP_BearingDiff, // Bearing Diff
     STANDARD,
