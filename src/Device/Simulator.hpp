@@ -27,10 +27,13 @@ Copyright_License {
 #include "Math/fixed.hpp"
 
 struct NMEAInfo;
+struct DerivedInfo;
+struct GlidePolar;
 
 class Simulator {
 public:
   fixed last_airspeed;
+  fixed last_altitude;
 
   void Init(NMEAInfo &basic);
 
@@ -42,7 +45,36 @@ public:
    */
   void Touch(NMEAInfo &basic);
 
-  void Process(NMEAInfo &basic);
+  void Process(NMEAInfo &basic, const DerivedInfo &calculated);
+
+  /**
+   * updates altitude based on glide slope at TAS speed.
+   */
+  void UpdateGlideAltitude(NMEAInfo &basic, const GlidePolar &polar);
+
+  /**
+   * updates groundspeed of glide to keep IAS constant given decent rate of
+   * glide
+   */
+  void UpdateGlideSpeed(NMEAInfo &basic, const DerivedInfo &calculated);
+
+
+  /**
+   * sets the groundspeed from TAS by subtracting
+   * the wind
+   * @return groundspeed
+   */
+  fixed CalcSpeedFromTAS(const NMEAInfo &basic, const DerivedInfo &calculated,
+                         fixed true_air_speed);
+
+  /**
+   * Calculates groundspeed from ias / tas and altitude and wind
+   * @return groundspeed
+   */
+  fixed CalcSpeedFromIAS(const NMEAInfo &basic,
+                         const DerivedInfo &calculated, fixed ias);
+
+
 };
 
 #endif

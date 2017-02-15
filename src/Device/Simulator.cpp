@@ -32,6 +32,7 @@ Copyright_License {
 #include "Task/ProtectedTaskManager.hpp"
 #include "Thread/Guard.hpp"
 #include "Interface.hpp"
+#include "Atmosphere/AirDensity.hpp"
 
 #include <stdio.h>
 
@@ -70,7 +71,24 @@ Simulator::Touch(NMEAInfo &basic)
 }
 
 void
-Simulator::Process(NMEAInfo &basic)
+Simulator::UpdateGlideAltitude(NMEAInfo &basic, const GlidePolar &polar)
+{
+  basic.gps_altitude = basic.gps_altitude - polar.SinkRate(basic.true_airspeed);
+}
+
+void
+Simulator::UpdateGlideSpeed(NMEAInfo &basic, const DerivedInfo &calculated)
+{
+  fixed new_tas = basic.indicated_airspeed *
+      AirDensityRatio(basic.gps_altitude_available.IsValid() ?
+      basic.gps_altitude : fixed(0));
+
+  basic.ground_speed = CalcSpeedFromTAS(basic, calculated,
+                                        new_tas);
+}
+
+void
+Simulator::Process(NMEAInfo &basic, const DerivedInfo &calculated)
 {
   assert(is_simulator());
 
@@ -78,22 +96,55 @@ Simulator::Process(NMEAInfo &basic)
   Angle with_random(basic.track + Angle::Degrees(((int)basic.time % 2) - 1));
   basic.location = FindLatitudeLongitude(basic.location, with_random,
                                          basic.ground_speed);
+  if (!basic.airspeed_available.IsValid() || !positive(basic.true_airspeed))
+    return;
+
   {
     assert(protected_task_manager != nullptr);
     ProtectedTaskManager::ExclusiveLease task_manager(*protected_task_manager);
     const GlidePolar &polar = task_manager->GetGlidePolar();
-    fixed airspeed =  CommonInterface::Basic().true_airspeed;
-
-    if (!positive(airspeed))
-        airspeed = basic.ground_speed;
+    fixed airspeed =  basic.true_airspeed;
 
     if (airspeed > (polar.GetSMin() / 2)) {
-      if (last_airspeed < (polar.GetSMin() / 2))
-        basic.gps_altitude += fixed(914); // 3000 ft agl start
-      basic.gps_altitude = basic.gps_altitude - polar.SinkRate(airspeed);
+      if (last_airspeed < (polar.GetSMin() / 2)) {
+        // boost altitude to 3000ft
+        basic.gps_altitude += fixed(914);
+      } else {
+        // gliding
+        UpdateGlideAltitude(basic, polar);
+        UpdateGlideSpeed(basic, calculated);
+      }
     }
 
     basic.ProvideNettoVario(fixed(0));
     last_airspeed = airspeed;
   }
+}
+
+fixed
+Simulator::CalcSpeedFromIAS(const NMEAInfo &basic,
+                            const DerivedInfo &calculated, fixed ias)
+{
+  fixed tas = ias * AirDensityRatio(basic.gps_altitude_available.IsValid() ?
+      basic.gps_altitude : fixed(0));
+
+  return CalcSpeedFromTAS(basic, calculated, tas);
+}
+
+fixed
+Simulator::CalcSpeedFromTAS(const NMEAInfo &basic,
+                            const DerivedInfo &calculated,
+                            fixed true_air_speed)
+{
+  const SpeedVector wind = calculated.wind;
+
+  if (positive(true_air_speed) || wind.IsNonZero()) {
+    fixed x0 = basic.attitude.heading.fastsine() * true_air_speed;
+    fixed y0 = basic.attitude.heading.fastcosine() * true_air_speed;
+    x0 -= wind.bearing.fastsine() * wind.norm;
+    y0 -= wind.bearing.fastcosine() * wind.norm;
+
+    return SmallHypot(x0, y0);
+  }
+  return fixed(0);
 }

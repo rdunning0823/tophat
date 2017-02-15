@@ -93,6 +93,7 @@ public:
 
   void ReadBlackboard(const DerivedInfo &derived_info);
   void ReadComputerSettings(const ComputerSettings &settings);
+  void ReadSimulatorAirspeeds(const NMEAInfo &basic);
 
 protected:
   NMEAInfo &SetBasic() { return gps_info; }
@@ -133,6 +134,9 @@ public:
 
   void SetSimulatorLocation(const GeoPoint &location);
   void SetTrack(Angle val);
+  void SetSpeedFromTAS(fixed true_air_speed);
+  void SetSpeedFromIAS(fixed indicated_air_speed);
+
   void SetSpeed(fixed val);
   void SetAltitude(fixed alt);
 

@@ -524,7 +524,7 @@ static constexpr MetaData meta_data[] = {
     N_("Airspeed IAS"),
     N_("V IAS"),
     N_("Indicated Airspeed reported by a supported external intelligent vario."),
-    UpdateInfoBoxSpeedIndicated,
+    IBFHelper<InfoBoxContentSpeedIndicated>::Create,
     e_Load_G, // G load
     e_Track_GPS, // Track
     DEPRECATED,

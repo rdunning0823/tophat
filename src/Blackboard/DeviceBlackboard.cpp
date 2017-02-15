@@ -103,7 +103,7 @@ DeviceBlackboard::ProcessSimulation()
 
   ScopeLock protect(mutex);
 
-  simulator.Process(simulator_data);
+  simulator.Process(simulator_data, calculated_info);
   ScheduleMerge();
 }
 
@@ -117,6 +117,21 @@ DeviceBlackboard::SetSimulatorLocation(const GeoPoint &location)
   basic.location = location;
 
   ScheduleMerge();
+}
+
+void
+DeviceBlackboard::SetSpeedFromTAS(fixed true_air_speed)
+{
+  const NMEAInfo &basic = simulator_data;
+  SetSpeed(simulator.CalcSpeedFromTAS(basic, calculated_info, true_air_speed));
+}
+
+void
+DeviceBlackboard::SetSpeedFromIAS(fixed indicated_air_speed)
+{
+  const NMEAInfo &basic = simulator_data;
+  const DerivedInfo &calculated = calculated_info;
+  SetSpeed(simulator.CalcSpeedFromIAS(basic, calculated, indicated_air_speed));
 }
 
 /**
@@ -178,6 +193,23 @@ void
 DeviceBlackboard::ReadBlackboard(const DerivedInfo &derived_info)
 {
   calculated_info = derived_info;
+}
+
+/**
+ * in Sim mode, the simulator engine needs the airspeed info
+ * that is generated in the Basic Computer and written to NMEAInfo
+ * So copy it to the device blackboard
+ */
+void
+DeviceBlackboard::ReadSimulatorAirspeeds(const NMEAInfo &basic)
+{
+  assert(is_simulator());
+  simulator_data.airspeed_real = basic.airspeed_real; // always false for sim
+  simulator_data.airspeed_available = basic.airspeed_available;
+  simulator_data.indicated_airspeed = basic.indicated_airspeed;
+  simulator_data.true_airspeed = basic.true_airspeed;
+  simulator_data.attitude.heading = basic.attitude.heading;
+  simulator_data.attitude.heading_available = basic.attitude.heading_available;
 }
 
 /**

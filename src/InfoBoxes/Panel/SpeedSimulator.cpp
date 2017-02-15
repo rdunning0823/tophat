@@ -44,6 +44,13 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Screen/SingleWindow.hpp"
+#include "CalculationThread.hpp"
+
+enum SpeedType {
+  TAS = 0,
+  IAS,
+  GroundSpeed,
+};
 
 enum ControlIndex {
   BigPlus,
@@ -58,11 +65,11 @@ class SpeedSimulatorPanel : public BaseAccessPanel, NumberButton2SubNumberLayout
 
 protected:
   /**
-   * These buttons and the Speed_value and Speed_type frames use the layout rectangles
+   * These buttons and the Speed_value and speed_type_label frames use the layout rectangles
    * calculated in NumberButton2SubNumberLayout
    */
   Button *big_plus, *big_minus, *little_plus, *little_minus;
-  WndFrame *speed_value, *speed_type, *best_ld;
+  WndFrame *speed_value, *speed_type_label, *best_ld;
   unsigned value_font_height, sub_number_height;
 
   /**
@@ -80,12 +87,12 @@ protected:
    */
   ButtonLook big_button_look;
 
-  /* is the speed TAS or Ground? */
-  bool is_tas;
+  /* is the speed IAS, TAS or Ground? */
+  SpeedType speed_type;
 
 public:
-  SpeedSimulatorPanel(unsigned id, bool _is_tas)
-    :BaseAccessPanel(id), dialog_timer(*this), is_tas(_is_tas) {}
+  SpeedSimulatorPanel(unsigned id, SpeedType _speed_type)
+    :BaseAccessPanel(id), dialog_timer(*this), speed_type(_speed_type) {}
 
   virtual void Prepare(ContainerWindow &parent, const PixelRect &rc) override;
   virtual void Unprepare() override;
@@ -93,8 +100,10 @@ public:
   virtual void Move(const PixelRect &rc) override;
   void CalculateLayout(const PixelRect &rc);
   void Refresh();
-  /** Updates groundspeed based on TAS input */
-  void SetSpeed(fixed true_air_speed);
+
+  void SetSpeed(fixed user_air_speed);
+  /** Gets speed from blackboard based on SpeedType */
+  fixed GetBlackboardSpeed();
 
 protected:
   /**
@@ -117,12 +126,28 @@ SpeedSimulatorPanel::OnTimer(WindowTimer &timer)
   return BaseAccessPanel::OnTimer(timer);
 }
 
+fixed
+SpeedSimulatorPanel::GetBlackboardSpeed()
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+
+  switch (speed_type) {
+  case SpeedType::TAS:
+    return basic.airspeed_available.IsValid() ?
+        basic.true_airspeed : basic.ground_speed;
+  case SpeedType::IAS:
+    return basic.airspeed_available.IsValid() ?
+        basic.indicated_airspeed : basic.ground_speed;
+  case SpeedType::GroundSpeed:
+    return basic.ground_speed;
+  }
+  return basic.ground_speed;
+}
+
 void
 SpeedSimulatorPanel::OnAction(int action_id)
 {
-  const NMEAInfo &basic = CommonInterface::Basic();
-  fixed speed = basic.airspeed_available.IsValid() && is_tas ?
-      basic.true_airspeed : basic.ground_speed;
+  fixed speed = GetBlackboardSpeed();
 
   fixed step = Units::ToSysSpeed(fixed(1));
 
@@ -152,59 +177,58 @@ SpeedSimulatorPanel::OnAction(int action_id)
 
 void SpeedSimulatorPanel::SetSpeed(fixed speed)
 {
-  if (!is_tas) {
-    // groundspeed
+  switch (speed_type) {
+  case SpeedType::TAS:
+    device_blackboard->SetSpeedFromTAS(speed);
+    break;
+  case SpeedType::IAS:
+    device_blackboard->SetSpeedFromIAS(speed);
+    break;
+  case SpeedType::GroundSpeed:
     device_blackboard->SetSpeed(speed);
-    return;
+    break;
   }
-
-
-  // Calculate Groundspeed from TAS
-  fixed true_air_speed = speed;
-  const NMEAInfo &basic = CommonInterface::Basic();
-  const DerivedInfo &calculated = CommonInterface::Calculated();
-  const SpeedVector wind = calculated.wind;
-
-  if (positive(true_air_speed) || wind.IsNonZero()) {
-    fixed x0 = basic.track.fastsine() * true_air_speed;
-    fixed y0 = basic.track.fastcosine() * true_air_speed;
-    x0 -= wind.bearing.fastsine() * wind.norm;
-    y0 -= wind.bearing.fastcosine() * wind.norm;
-
-    fixed ground_speed_estimated = SmallHypot(x0, y0);
-    device_blackboard->SetSpeed(ground_speed_estimated);
-  } else {
-    device_blackboard->SetSpeed(fixed(0));
-  }
+  calculation_thread->ForceTrigger();
 }
 
 void
 SpeedSimulatorPanel::Refresh()
 {
-  const NMEAInfo &basic = CommonInterface::Basic();
   const ComputerSettings &settings_computer =
     CommonInterface::GetComputerSettings();
+  const NMEAInfo &basic = CommonInterface::Basic();
 
-  // before takeoff, there is to TAS, so use ground_speed
-  fixed speed = basic.airspeed_available.IsValid() && is_tas ?
-      basic.true_airspeed : basic.ground_speed;
+  fixed speed = GetBlackboardSpeed();
 
   StaticString<50> speed_string;
   FormatUserSpeed(speed, speed_string.buffer(), true);
 
   speed_value->SetCaption(speed_string.c_str());
-  speed_type->SetCaption(is_tas ? _("TAS") : _T(""));
+
+  switch (speed_type) {
+  case SpeedType::TAS:
+    speed_type_label->SetCaption(_("TAS"));
+    break;
+  case SpeedType::IAS:
+    speed_type_label->SetCaption(_("IAS"));
+    break;
+  case SpeedType::GroundSpeed:
+    speed_type_label->SetCaption(_("V GND"));
+    break;
+  }
 
   StaticString<10> ld_string;
 
-  if (is_tas &&
-      (speed > settings_computer.polar.glide_polar_task.GetVTakeoff() * 2)) {
-    fixed ld = speed / settings_computer.polar.glide_polar_task.SinkRate(speed);
+  fixed ias = basic.airspeed_available.IsValid() ?
+      basic.indicated_airspeed : basic.ground_speed;
+
+  if ((speed_type != SpeedType::GroundSpeed) &&
+      ias > settings_computer.polar.glide_polar_task.GetVTakeoff() * 2) {
+    fixed ld = ias / settings_computer.polar.glide_polar_task.SinkRate(ias);
     ld_string.Format(_T("LD %.0f:1"), (double)ld);
     best_ld->SetCaption(ld_string.c_str());
   } else {
     best_ld->SetCaption(_T(""));
-
   }
 }
 
@@ -220,7 +244,7 @@ SpeedSimulatorPanel::Move(const PixelRect &rc_unused)
   big_minus->Move(big_minus_rc);
   little_minus->Move(little_minus_rc);
   speed_value->Move(value_rc);
-  speed_type->Move(sub_number_top_rc);
+  speed_type_label->Move(sub_number_top_rc);
   best_ld->Move(sub_number_bottom_rc);
 }
 
@@ -273,11 +297,11 @@ SpeedSimulatorPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   speed_value->SetAlignCenter();
   speed_value->SetVAlignCenter();
 
-  speed_type = new WndFrame(GetClientAreaWindow(), dialog_look,
-                            sub_number_top_rc, style_frame);
+  speed_type_label = new WndFrame(GetClientAreaWindow(), dialog_look,
+                                  sub_number_top_rc, style_frame);
 
   best_ld = new WndFrame(GetClientAreaWindow(), dialog_look,
-                         is_tas ? sub_number_bottom_rc : sub_number_rc, style_frame);
+                         sub_number_bottom_rc, style_frame);
 
   dialog_timer.Schedule(500);
   Refresh();
@@ -292,7 +316,7 @@ SpeedSimulatorPanel::Unprepare()
   delete(big_minus);
   delete(little_minus);
   delete(speed_value);
-  delete(speed_type);
+  delete(speed_type_label);
   delete(best_ld);
 }
 
@@ -303,7 +327,17 @@ LoadTrueSpeedSimulatorPanel(unsigned id)
   if (!basic.gps.simulator)
     return nullptr;
 
-  return new SpeedSimulatorPanel(id, true);
+  return new SpeedSimulatorPanel(id, SpeedType::TAS);
+}
+
+Widget*
+LoadIndicatedSpeedSimulatorPanel(unsigned id)
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  if (!basic.gps.simulator)
+    return nullptr;
+
+  return new SpeedSimulatorPanel(id, SpeedType::IAS);
 }
 
 Widget*
@@ -313,5 +347,5 @@ LoadGroundSpeedSimulatorPanel(unsigned id)
   if (!basic.gps.simulator)
     return nullptr;
 
-  return new SpeedSimulatorPanel(id, false);
+  return new SpeedSimulatorPanel(id, SpeedType::GroundSpeed);
 }

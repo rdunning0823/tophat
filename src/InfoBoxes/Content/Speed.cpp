@@ -62,8 +62,22 @@ InfoBoxContentSpeedGround::Update(InfoBoxData &data)
   data.SetValueFromSpeed(basic.ground_speed, false);
 }
 
+#ifdef __clang__
+/* gcc gives "redeclaration differs in 'constexpr'" */
+constexpr
+#endif
+const InfoBoxPanel indicated_speed_simulator_infobox_panels[] = {
+  { N_("Simulator"), LoadIndicatedSpeedSimulatorPanel },
+  { nullptr, nullptr }
+};
+
+const InfoBoxPanel *
+InfoBoxContentSpeedIndicated::GetDialogContent() {
+  return indicated_speed_simulator_infobox_panels;
+}
+
 void
-UpdateInfoBoxSpeedIndicated(InfoBoxData &data)
+InfoBoxContentSpeedIndicated::Update(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
   if (!basic.airspeed_available) {

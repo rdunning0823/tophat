@@ -33,8 +33,15 @@ public:
   virtual void Update(InfoBoxData &data) override;
 };
 
-void
-UpdateInfoBoxSpeedIndicated(InfoBoxData &data);
+/**
+ * IAS
+ */
+class InfoBoxContentSpeedIndicated : public InfoBoxContent
+{
+public:
+  virtual const InfoBoxPanel *GetDialogContent() override;
+  virtual void Update(InfoBoxData &data) override;
+};
 
 /**
  * TAS

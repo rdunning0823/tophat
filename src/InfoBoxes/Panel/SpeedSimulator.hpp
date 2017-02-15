@@ -35,4 +35,7 @@ LoadGroundSpeedSimulatorPanel(unsigned id);
 Widget *
 LoadTrueSpeedSimulatorPanel(unsigned id);
 
+Widget*
+LoadIndicatedSpeedSimulatorPanel(unsigned id);
+
 #endif

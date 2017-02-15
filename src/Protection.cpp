@@ -31,6 +31,7 @@ Copyright_License {
 #include "MergeThread.hpp"
 #include "DrawThread.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
+#include "Simulator.hpp"
 
 #include <assert.h>
 
@@ -106,6 +107,8 @@ CreateCalculationThread()
 
   /* copy GlideComputer results to DeviceBlackboard */
   device_blackboard->ReadBlackboard(glide_computer->Calculated());
+  if (is_simulator())
+    device_blackboard->ReadSimulatorAirspeeds(glide_computer->Basic());
 
   calculation_thread = new CalculationThread(*glide_computer);
   calculation_thread->SetComputerSettings(CommonInterface::GetComputerSettings());

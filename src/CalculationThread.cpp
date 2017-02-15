@@ -28,6 +28,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "Hardware/CPU.hpp"
 #include "Device/Driver/ILEC.hpp"
+#include "Simulator.hpp"
 
 /**
  * Constructor of the CalculationThread class
@@ -102,6 +103,8 @@ CalculationThread::Tick()
   {
     ScopeLock protect(device_blackboard->mutex);
     device_blackboard->ReadBlackboard(glide_computer.Calculated());
+    if (is_simulator())
+      device_blackboard->ReadSimulatorAirspeeds(glide_computer.Basic());
   }
 
   // if (new GPS data)
