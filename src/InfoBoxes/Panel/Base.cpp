@@ -205,6 +205,27 @@ BaseAccessPanel::SetCaption()
   header_text->SetText(buffer);
 }
 
+void
+NumberButton2SubNumberLayout::CalculateLayout(const PixelRect &parent_rc,
+                                              unsigned min_value_height,
+                                              unsigned sub_number_height)
+{
+  NumberButtonSubNumberLayout::CalculateLayout(parent_rc, min_value_height);
+
+  // set left and right.  Now stack on top and center with big valud field
+  sub_number_top_rc = sub_number_bottom_rc = sub_number_rc;
+
+  // split into two sub numbers
+  unsigned middle = sub_number_rc.top + sub_number_rc.GetSize().cy / 2;
+  sub_number_top_rc.bottom = middle - Layout::GetTextPadding();
+  sub_number_top_rc.top = std::max(0, (int)sub_number_top_rc.bottom - (int)sub_number_height);
+  sub_number_bottom_rc.top = middle + Layout::GetTextPadding();
+  sub_number_bottom_rc.bottom = sub_number_bottom_rc.bottom + sub_number_height;
+
+  sub_number_rc = value_rc;
+  sub_number_rc.left = little_plus_rc.right + Layout::GetTextPadding();
+  sub_number_rc.right = parent_rc.right;
+}
 
 void
 NumberButtonSubNumberLayout::CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height)

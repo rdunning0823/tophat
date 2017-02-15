@@ -178,7 +178,6 @@ protected:
   void CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height);
 };
 
-
 /**
  * Layout class that inherits NumberButtonLayout, and adds a sub_number to
  * the right of the value
@@ -199,6 +198,32 @@ protected:
    * @param value_height.  If > 0, defines min value height
    */
   void CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height);
+};
+
+/**
+ * Layout class that inherits SubNumberButtonLayout, and splits the sub_number int
+ * two vertically stacked numbers to the right of the value
+ */
+class NumberButton2SubNumberLayout : public NumberButtonSubNumberLayout {
+protected:
+/**
+ *  positioned flush right on screen, at same X as big value
+ *  Layout looks like (where yy and zz are the two sub number).
+ *    +    +
+ *     xxxx  yy
+ *           zz
+ *    -    -
+ */
+  PixelRect sub_number_top_rc;
+  PixelRect sub_number_bottom_rc;
+protected:
+  /*
+   * Sizes the rectangles for the layout
+   * @param value_height.  If > 0, defines min value height
+   * @param sub_number_height. height of each of the two sub numbers on the right
+   */
+  void CalculateLayout(const PixelRect &parent_rc, unsigned min_value_height,
+                       unsigned sub_number_height);
 };
 
 /**

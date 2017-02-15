@@ -56,7 +56,7 @@ enum ControlIndex {
 };
 
 
-class MacCreadyEditPanel : public BaseAccessPanel, NumberButtonSubNumberLayout {
+class MacCreadyEditPanel : public BaseAccessPanel, NumberButton2SubNumberLayout {
   class FinalGlideChart: public PaintWindow
   {
   public:
@@ -101,12 +101,6 @@ protected:
    * Area where canvas will draw the final glide bar
    */
   PixelRect fg_rc;
-
-  /**
-   * Two small numbers to right of value, speed and ld
-   */
-  PixelRect speed_to_fly_rc;
-  PixelRect best_ld_rc;
 
   /**
    * This timer updates the data for the final glide
@@ -239,8 +233,8 @@ MacCreadyEditPanel::Move(const PixelRect &rc_unused)
 
   mc_value->Move(value_rc);
 
-  speed_to_fly->Move(speed_to_fly_rc);
-  best_ld->Move(best_ld_rc);
+  speed_to_fly->Move(sub_number_top_rc);
+  best_ld->Move(sub_number_bottom_rc);
   auto_mc.Move(checkbox_rc);
 }
 
@@ -248,7 +242,10 @@ void
 MacCreadyEditPanel::CalculateLayout(const PixelRect &rc, unsigned value_height)
 {
   const DialogLook &dialog_look = UIGlobals::GetDialogLook();
-  NumberButtonSubNumberLayout::CalculateLayout(content_rc, value_height);
+  unsigned sub_number_height =
+      dialog_look.text_font.GetHeight() + Layout::GetTextPadding();
+  NumberButton2SubNumberLayout::CalculateLayout(content_rc, value_height,
+                                                sub_number_height);
 
   PixelRect content_right_rc = content_rc;
   PixelRect content_left_rc = content_rc;
@@ -256,7 +253,8 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc, unsigned value_height)
   // split content area into two columns, buttons on the right, fg on left
   content_right_rc.left += Layout::Scale(50);
 
-  NumberButtonSubNumberLayout::CalculateLayout(content_right_rc, value_height);
+  NumberButton2SubNumberLayout::CalculateLayout(content_right_rc, value_height,
+                                                sub_number_height);
   content_left_rc.right = big_plus_rc.left - 1;
   fg_rc = content_left_rc;
 
@@ -266,15 +264,6 @@ MacCreadyEditPanel::CalculateLayout(const PixelRect &rc, unsigned value_height)
     (content_rc.bottom - big_minus_rc.bottom) / 4;
   checkbox_rc.left = big_minus_rc.left;
   checkbox_rc.right = little_minus_rc.right;
-
-  // set left and right.  Now stack on top and center with big valud field
-  unsigned text_height = dialog_look.text_font.GetHeight() + Layout::GetTextPadding();
-  speed_to_fly_rc = best_ld_rc = sub_number_rc;
-  unsigned middle = sub_number_rc.top + sub_number_rc.GetSize().cy / 2;
-  speed_to_fly_rc.bottom = middle - Layout::GetTextPadding();
-  speed_to_fly_rc.top = std::max(0, (int)speed_to_fly_rc.bottom - (int)text_height);
-  best_ld_rc.top = middle + Layout::GetTextPadding();
-  best_ld_rc.bottom = best_ld_rc.bottom + text_height;
 }
 
 void
@@ -325,10 +314,10 @@ MacCreadyEditPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
 
   speed_to_fly = new WndFrame(GetClientAreaWindow(), dialog_look,
-                              speed_to_fly_rc, style_frame);
+                              sub_number_top_rc, style_frame);
 
   best_ld = new WndFrame(GetClientAreaWindow(), dialog_look,
-                         best_ld_rc, style_frame);
+                         sub_number_bottom_rc, style_frame);
 
   WindowStyle checkbox_style;
   checkbox_style.TabStop();
