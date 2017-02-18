@@ -234,7 +234,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Speed ground"),
     N_("V GND"),
-    N_("Ground speed measured by the GPS. If this InfoBox is active in simulation mode, pressing the up and down arrows adjusts the speed, and left and right turn the glider."),
+    N_("Ground speed measured by the GPS. In Simulator mode can be manipulated and will descrease as simulator glides and descends keeping IAS constant."),
     IBFHelper<InfoBoxContentSpeedGround>::Create,
     e_Track_GPS, // Track
     e_Bearing, // Bearing
@@ -523,7 +523,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Airspeed IAS"),
     N_("V IAS"),
-    N_("Indicated Airspeed reported by a supported external intelligent vario."),
+    N_("Indicated Airspeed reported by a supported external intelligent vario or estimated from air density.  In Simulator mode can be manipulated and IAS will remain constant as simulator glides and descends.  LD is relative to air at current IAS."),
     IBFHelper<InfoBoxContentSpeedIndicated>::Create,
     e_Load_G, // G load
     e_Track_GPS, // Track
@@ -769,7 +769,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Airspeed TAS"),
     N_("V TAS"),
-    N_("True Airspeed reported by a supported external intelligent vario."),
+    N_("True Airspeed reported by a supported external intelligent vario or estimated based on air density.  In Simulator mode can be manipulated and will decrease as simulator glides and descends keeping IAS constant.  LD is relative to air at current IAS."),
     IBFHelper<InfoBoxContentSpeed>::Create,
     e_Horizon,
     e_WP_BearingDiff, // Bearing Diff
