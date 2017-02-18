@@ -5,6 +5,9 @@ Tophat Soaring 2.2.1_beta TBD
 * Display "2 minutes under start" for US Tasks in Nav Bar
 * Alternates infobox - option to display airports only
 * MC Infobox - show L/D
+* Sim mode: allow adjustment of IAS, TAS and VGND through infoboxes
+* Infoboxes: add "Help" button
+
 Tophat Soaring 2.2 Jan 28, 2017
 * Stabilize Target Up map orientation when close to target
 * Correct description for infoboxes with "altitude required"
