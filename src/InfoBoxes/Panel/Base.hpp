@@ -28,6 +28,7 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Form/Form.hpp"
 #include "Widget/ManagedWidget.hpp"
+#include "Util/StaticString.hxx"
 
 class Button;
 class WndFrame;
@@ -45,6 +46,9 @@ class BaseAccessPanel : public NullWidget, public WndForm
 protected:
   unsigned id;
 
+  // only visible if infobox HasCustomContent() == true
+  Button *help_button;
+
   Button *setup_button;
   Button *close_button;
   WndFrame *header_text;
@@ -52,6 +56,11 @@ protected:
 
   /* rectangles for items on the base page */
   PixelRect base_rc, close_button_rc, setup_button_rc, frame_rc;
+  PixelRect help_button_rc;
+
+  /* caption text for infobox */
+  StaticString<64> caption_text;
+
   /**
    * Follow widget API for calling.
    */
@@ -81,6 +90,19 @@ protected:
    * Caption for InfoBox dialog
    */
   virtual void SetCaption();
+
+  /**
+   * Display dialog popup showing help text
+   * Only used when Infobox has a custom panel
+   */
+  virtual void ShowHelp();
+
+  /** Does this infobox have custom content
+   * or does it just display the helptext in the content area
+   */
+  virtual bool HasCustomContent() {
+    return true;
+  }
 
 public:
   BaseAccessPanel(unsigned _id);

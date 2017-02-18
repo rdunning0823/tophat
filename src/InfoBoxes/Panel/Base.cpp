@@ -25,6 +25,7 @@ Copyright_License {
 #include "Form/Button.hpp"
 #include "Form/Frame.hpp"
 #include "Form/Form.hpp"
+#include "Dialogs/HelpDialog.hpp"
 #include "Interface.hpp"
 #include "Units/Units.hpp"
 #include "Units/Group.hpp"
@@ -41,7 +42,8 @@ Copyright_License {
 
 enum ControlIndex {
   SetUp = 1000,
-  CloseButton = 1001,
+  HelpButton = 1001,
+  CloseButton = 1002,
 };
 
 gcc_const
@@ -101,11 +103,32 @@ BaseAccessPanel::Hide()
 void
 BaseAccessPanel::OnAction(int action_id)
 {
-  if (action_id == SetUp) {
+  switch (action_id) {
+  case SetUp:
     InfoBoxManager::ShowInfoBoxPicker(id);
     Close();
-  } else if (action_id == CloseButton)
+    break;
+  case CloseButton:
     Close();
+    break;
+  case HelpButton:
+    ShowHelp();
+  }
+}
+
+void
+BaseAccessPanel::ShowHelp()
+{
+  assert(HasCustomContent());
+
+  InfoBoxSettings &settings = CommonInterface::SetUISettings().info_boxes;
+  const unsigned panel_index = CommonInterface::GetUIState().panel_index;
+  const InfoBoxSettings::Panel &panel = settings.panels[panel_index];
+  const InfoBoxFactory::Type old_type = panel.contents[id];
+
+  StaticString<256> help_text;
+  help_text = gettext(InfoBoxFactory::GetDescription(old_type));
+  HelpDialog(caption_text.c_str(), help_text.c_str());
 }
 
 void
@@ -126,6 +149,9 @@ BaseAccessPanel::Move(const PixelRect &rc_unused)
 
   close_button->Move(close_button_rc);
   setup_button->Move(setup_button_rc);
+  if (HasCustomContent())
+    help_button->Move(help_button_rc);
+
   header_text->Move(frame_rc);
 
   managed_widget.Move(content_rc);
@@ -142,12 +168,16 @@ BaseAccessPanel::CalculateLayout(const PixelRect &rc)
   close_button_rc.top = close_button_rc.bottom - GetFooterHeight();
 
   PixelScalar setup_button_width = 0.2 * (rc.right - rc.left);
-  setup_button_rc = base_rc;
+  setup_button_rc = help_button_rc = base_rc;
   setup_button_rc.left = setup_button_rc.right - setup_button_width;
-  setup_button_rc.bottom = setup_button_rc.top + GetHeaderHeight();
+  setup_button_rc.bottom = help_button_rc.bottom =
+      setup_button_rc.top + GetHeaderHeight();
+
+  help_button_rc.right = setup_button_rc.left;
+  help_button_rc.left = help_button_rc.right - setup_button_width;
 
   frame_rc = base_rc;
-  frame_rc.right = setup_button_rc.left - 1;
+  frame_rc.right = HasCustomContent() ? help_button_rc.left : setup_button_rc.left;
   frame_rc.bottom = setup_button_rc.bottom;
 
   content_rc = base_rc;
@@ -157,6 +187,9 @@ BaseAccessPanel::CalculateLayout(const PixelRect &rc)
 
 void BaseAccessPanel::Unprepare()
 {
+  if (HasCustomContent())
+    delete(help_button);
+
   delete(close_button);
   delete(setup_button);
   delete(header_text);
@@ -182,6 +215,13 @@ BaseAccessPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
                                      _("Setup"), setup_button_rc,
                                      button_style,
                                      *this, SetUp);
+
+  if (HasCustomContent())
+    help_button = new WndSymbolButton(GetClientAreaWindow(), look.button,
+                                      _("Help"), help_button_rc,
+                                      button_style,
+                                      *this, HelpButton);
+
   WindowStyle style_frame;
   header_text = new WndFrame(GetClientAreaWindow(), look,
                              frame_rc, style_frame);
@@ -200,9 +240,8 @@ BaseAccessPanel::SetCaption()
   const InfoBoxSettings::Panel &panel = settings.panels[panel_index];
   const InfoBoxFactory::Type old_type = panel.contents[id];
 
-  StaticString<64> buffer;
-  buffer = gettext(InfoBoxFactory::GetName(old_type));
-  header_text->SetText(buffer);
+  caption_text = gettext(InfoBoxFactory::GetName(old_type));
+  header_text->SetText(caption_text);
 }
 
 void

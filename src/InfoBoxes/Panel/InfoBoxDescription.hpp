@@ -51,5 +51,10 @@ public:
  /* Move must discard rc and use GetMainWindow()'s ClientRect */
  virtual void Move(const PixelRect &rc) override;
  virtual void CalculateLayout(const PixelRect &rc);
+
+ bool HasCustomContent() {
+   return false;
+ }
+
 };
 #endif
