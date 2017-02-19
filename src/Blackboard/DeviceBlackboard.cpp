@@ -122,16 +122,27 @@ DeviceBlackboard::SetSimulatorLocation(const GeoPoint &location)
 void
 DeviceBlackboard::SetSpeedFromTAS(fixed true_air_speed)
 {
-  const NMEAInfo &basic = simulator_data;
-  SetSpeed(simulator.CalcSpeedFromTAS(basic, calculated_info, true_air_speed));
+  fixed vgnd;
+  {
+    ScopeLock protect(mutex);
+    const NMEAInfo &basic = simulator_data;
+    const DerivedInfo &calculated = calculated_info;
+    vgnd = simulator.CalcSpeedFromTAS(basic, calculated, true_air_speed);
+  }
+  SetSpeed(vgnd);
 }
 
 void
 DeviceBlackboard::SetSpeedFromIAS(fixed indicated_air_speed)
 {
-  const NMEAInfo &basic = simulator_data;
-  const DerivedInfo &calculated = calculated_info;
-  SetSpeed(simulator.CalcSpeedFromIAS(basic, calculated, indicated_air_speed));
+  fixed vgnd;
+  {
+    ScopeLock protect(mutex);
+    const NMEAInfo &basic = simulator_data;
+    const DerivedInfo &calculated = calculated_info;
+    vgnd = simulator.CalcSpeedFromIAS(basic, calculated, indicated_air_speed);
+  }
+  SetSpeed(vgnd);
 }
 
 /**
