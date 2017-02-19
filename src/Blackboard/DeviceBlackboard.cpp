@@ -26,6 +26,7 @@ Copyright_License {
 #include "Device/MultipleDevices.hpp"
 #include "Simulator.hpp"
 #include "RadioFrequency.hpp"
+#include "Computer/BasicComputer.hpp"
 
 #include <algorithm>
 
@@ -289,6 +290,7 @@ DeviceBlackboard::Merge()
        trigger its time warp checks */
     replay_clock.Normalise(basic);
   } else if (simulator_data.alive) {
+    ComputeHeading(simulator_data.attitude, simulator_data, calculated_info);
     simulator_data.UpdateClock();
     simulator_data.Expire();
     basic = simulator_data;

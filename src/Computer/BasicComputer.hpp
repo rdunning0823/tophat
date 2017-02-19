@@ -31,6 +31,7 @@ struct DerivedInfo;
 class AtmosphericPressure;
 struct FeaturesSettings;
 struct ComputerSettings;
+struct AttitudeState;
 
 /**
  * A computer which adds missing values to #NMEA_INFO.  It performs
@@ -60,5 +61,11 @@ public:
   void Compute(MoreData &data, const MoreData &last, const MoreData &last_gps,
                const DerivedInfo &calculated);
 };
+
+/**
+ * called by simulator also
+ */
+void ComputeHeading(AttitudeState &attitude, const NMEAInfo &basic,
+                    const DerivedInfo &calculated);
 
 #endif
