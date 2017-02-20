@@ -34,6 +34,10 @@ class Simulator {
 public:
   fixed last_airspeed;
   fixed last_altitude;
+  /**
+   * if true, the sim process will skip the next glide speed calculation
+   */
+  bool skip_next_glide_speed_calc;
 
   void Init(NMEAInfo &basic);
 

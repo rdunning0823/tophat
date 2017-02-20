@@ -265,18 +265,19 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
       GeoPoint location = visible_projection.ScreenToGeo(x, y);
 
       double distance = hypot(drag_start.x - x, drag_start.y - y);
-
       // This drag moves the aircraft (changes speed and direction)
       const Angle old_bearing = CommonInterface::Basic().track;
       const fixed min_speed = fixed(1.1) *
         CommonInterface::GetComputerSettings().polar.glide_polar_task.GetVMin();
       const Angle new_bearing = drag_start_geopoint.Bearing(location);
       if (((new_bearing - old_bearing).AsDelta().AbsoluteDegrees() < fixed(30)) ||
-          (CommonInterface::Basic().ground_speed < min_speed))
+          (CommonInterface::Basic().ground_speed < min_speed)) {
         device_blackboard->SetSpeed(Clamp(fixed(distance) / Layout::FastScale(3),
                                           min_speed, fixed(100)));
-
+        device_blackboard->SkipNextGlideSpeedCalculation();
+      }
       device_blackboard->SetTrack(new_bearing);
+
       // change bearing without changing speed if direction change > 30
       // 20080815 JMW prevent dragging to stop glider
       gesture_zone.ClearZoneHelp();

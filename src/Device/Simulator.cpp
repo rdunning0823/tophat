@@ -48,6 +48,7 @@ Simulator::Init(NMEAInfo &basic)
   basic.ground_speed = fixed(0);
   basic.gps_altitude = fixed(0);
   last_airspeed = fixed(0);
+  skip_next_glide_speed_calc = false;
 }
 
 void
@@ -112,7 +113,10 @@ Simulator::Process(NMEAInfo &basic, const DerivedInfo &calculated)
       } else {
         // gliding
         UpdateGlideAltitude(basic, polar);
-        UpdateGlideSpeed(basic, calculated);
+        if (!skip_next_glide_speed_calc)
+          UpdateGlideSpeed(basic, calculated);
+        else
+          skip_next_glide_speed_calc = false;
       }
     }
 

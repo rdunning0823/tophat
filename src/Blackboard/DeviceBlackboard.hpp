@@ -137,6 +137,14 @@ public:
   void SetSpeedFromTAS(fixed true_air_speed);
   void SetSpeedFromIAS(fixed indicated_air_speed);
 
+  /**
+   * tell the simulator to skip the next glide speed calculation
+   * probably because we've changed the speed via dragging
+   */
+  void SkipNextGlideSpeedCalculation() {
+    simulator.skip_next_glide_speed_calc = true;
+  }
+
   void SetSpeed(fixed val);
   void SetAltitude(fixed alt);
 

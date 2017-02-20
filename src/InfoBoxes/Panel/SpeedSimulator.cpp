@@ -44,7 +44,6 @@ Copyright_License {
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Screen/SingleWindow.hpp"
-#include "CalculationThread.hpp"
 
 enum SpeedType {
   TAS = 0,
@@ -188,7 +187,7 @@ void SpeedSimulatorPanel::SetSpeed(fixed speed)
     device_blackboard->SetSpeed(speed);
     break;
   }
-  calculation_thread->ForceTrigger();
+  device_blackboard->SkipNextGlideSpeedCalculation();
 }
 
 void
