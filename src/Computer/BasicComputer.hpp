@@ -62,10 +62,4 @@ public:
                const DerivedInfo &calculated);
 };
 
-/**
- * called by simulator also
- */
-void ComputeHeading(AttitudeState &attitude, const NMEAInfo &basic,
-                    const DerivedInfo &calculated);
-
 #endif

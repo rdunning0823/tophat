@@ -54,6 +54,7 @@ MergeThread::Process()
 
   flarm_computer.Process(device_blackboard.SetBasic().flarm,
                          last_fix.flarm, basic);
+  device_blackboard.MergeSimulatorComputed();
 }
 
 void

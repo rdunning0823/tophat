@@ -183,6 +183,12 @@ public:
    * Caller must lock the blackboard.
    */
   void Merge();
+
+  /**
+   * merges computed data back into the Simulator's gps_info
+   */
+  void MergeSimulatorComputed();
+
 };
 
 #endif

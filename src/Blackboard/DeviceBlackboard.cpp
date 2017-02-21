@@ -290,13 +290,18 @@ DeviceBlackboard::Merge()
        trigger its time warp checks */
     replay_clock.Normalise(basic);
   } else if (simulator_data.alive) {
-    ComputeHeading(simulator_data.attitude, simulator_data, calculated_info);
     simulator_data.UpdateClock();
     simulator_data.Expire();
     basic = simulator_data;
   } else {
     basic = real_data;
   }
+}
+
+void
+DeviceBlackboard::MergeSimulatorComputed()
+{
+  simulator_data.attitude = gps_info.attitude;
 }
 
 void

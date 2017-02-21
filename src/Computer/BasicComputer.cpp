@@ -130,7 +130,7 @@ ComputeTrack(NMEAInfo &basic, const NMEAInfo &last)
 /**
  * Fallback heading calculation if no compass is connected.
  */
-void
+static void
 ComputeHeading(AttitudeState &attitude, const NMEAInfo &basic,
                const DerivedInfo &calculated)
 {
