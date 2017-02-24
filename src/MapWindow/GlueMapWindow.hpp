@@ -35,6 +35,7 @@ Copyright_License {
 #include "Screen/Features.hpp"
 #include "TophatWidgets/TaskNavSliderShape.hpp"
 #include "UIUtil/GestureZone.hpp"
+#include "Engine/Task/TaskType.hpp"
 
 #include <array>
 
@@ -148,6 +149,9 @@ class GlueMapWindow : public MapWindow {
    * -1 if not frozen
    */
   int nav_to_target_frozen_index;
+
+  /* the type of task the last time the screen orientation was calculated */
+  TaskType last_task_type;
 
   OffsetHistory offset_history;
 

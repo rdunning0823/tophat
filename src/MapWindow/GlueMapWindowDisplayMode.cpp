@@ -211,12 +211,14 @@ GlueMapWindow::UpdateScreenAngle()
 
     if (!current_leg.vector_remaining.IsValid()) {
       visible_projection.SetScreenAngle(last_screen_angle);
-    } else if (calculated.task_stats.active_index == 0 &&
-        positive(current_leg.next_leg_vector.distance)) {
+    } else if (calculated.common_stats.task_type == TaskType::ORDERED &&
+        calculated.task_stats.active_index == 0 &&
+        positive(current_leg.next_leg_vector.distance) ) {
       // if in start cylinder, normal start target is nonsense
       visible_projection.SetScreenAngle(current_leg.next_leg_vector.bearing);
-
     } else if (current_leg.vector_remaining.distance < fixed(1600) &&
+        !(calculated.common_stats.task_type == TaskType::ORDERED &&
+            calculated.task_stats.active_index == 0) &&
         nav_to_target_frozen_index == -1) {
       // just started to "push target" (or close to target) so freeze orientation
       // until task index is advanced
@@ -225,13 +227,13 @@ GlueMapWindow::UpdateScreenAngle()
 
     } else if (nav_to_target_frozen_index != -1) {
       // Orientation is frozen.  Do nothing
-
     } else {
       // Normal Target up
       visible_projection.SetScreenAngle(current_leg.
                                         vector_remaining.bearing);
     }
-    if (nav_to_target_frozen_index != (int)calculated.task_stats.active_index &&
+    if ((nav_to_target_frozen_index != (int)calculated.task_stats.active_index ||
+        last_task_type != calculated.common_stats.task_type) &&
         nav_to_target_frozen_index != -1) {
       // task has advanced so unfreeze orientation
       nav_to_target_frozen_index = -1;
@@ -252,6 +254,7 @@ GlueMapWindow::UpdateScreenAngle()
       basic.track_available ? basic.track : Angle::Zero());
   }
   OnProjectionModified();
+  last_task_type = calculated.common_stats.task_type;
   last_screen_angle = visible_projection.GetScreenAngle();
   compass_visible = orientation != MapOrientation::NORTH_UP;
 }
