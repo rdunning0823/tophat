@@ -233,7 +233,8 @@ GlueMapWindow::UpdateScreenAngle()
                                         vector_remaining.bearing);
     }
     if ((nav_to_target_frozen_index != (int)calculated.task_stats.active_index ||
-        last_task_type != calculated.common_stats.task_type) &&
+        last_task_type != calculated.common_stats.task_type ||
+        current_leg.vector_remaining.distance > fixed(1600)) &&
         nav_to_target_frozen_index != -1) {
       // task has advanced so unfreeze orientation
       nav_to_target_frozen_index = -1;
