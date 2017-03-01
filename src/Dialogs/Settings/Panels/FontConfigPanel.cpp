@@ -67,7 +67,7 @@ FontConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
   const unsigned max_scale_range = 150;
-  const unsigned min_scale_range = 75;
+  const unsigned min_scale_range = 40;
 
   AddInteger(_("Nav bar waypoint name"),
              nullptr,

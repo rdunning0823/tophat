@@ -116,7 +116,7 @@ Profile::Load(const ProfileMap &map, SoundSettings &settings)
 
 static void CheckFontScale(unsigned &scale)
 {
-  if (scale < 75 || scale > 150)
+  if (scale < 40 || scale > 150)
     scale = 100;
 }
 
