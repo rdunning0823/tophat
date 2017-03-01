@@ -98,6 +98,7 @@ struct TrailSettings {
     VARIO_2_DOTS,
     VARIO_DOTS_AND_LINES,
     SIMPLE,
+    VARIO_BW,
   } type;
 
   enum class Length: uint8_t {

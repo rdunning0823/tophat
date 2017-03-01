@@ -68,6 +68,17 @@ GetAltitudeColor(short ramp_h) {
                          ARRAY_SIZE(snail_colors_alt));
 }
 
+static RGB8Color
+GetVario1BWColor(short ramp_h) {   //lift and Sink black for B&W Devices - but Width will be variable
+  static constexpr ColorRamp snail_colors_vario[] = {
+    {0,   0x00, 0x00, 0x00}, // sinkColor
+    {200, 0x00, 0x00, 0x00} // liftColor
+  };
+
+  return ColorRampLookup(ramp_h, snail_colors_vario,
+                         ARRAY_SIZE(snail_colors_vario));
+}
+
 gcc_const
 static RGB8Color
 GetPortableColor(TrailSettings::Type type, short ramp_h)
@@ -79,6 +90,8 @@ GetPortableColor(TrailSettings::Type type, short ramp_h)
   case TrailSettings::Type::VARIO_2_DOTS:
   case TrailSettings::Type::VARIO_DOTS_AND_LINES:
     return GetVario2Color(ramp_h);
+  case TrailSettings::Type::VARIO_BW:
+    return GetVario1BWColor(ramp_h);
   default:
     return GetVario1Color(ramp_h);
   }

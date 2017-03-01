@@ -106,6 +106,7 @@ static constexpr StaticEnumChoice trail_type_list[] = {
   { (unsigned)TrailSettings::Type::SIMPLE,
     N_("Simple"),
     N_("Simple, fixed-width black line suitable for low contrast displays like the Nook Simple Touch.") },
+  { (unsigned)TrailSettings::Type::VARIO_BW, N_("Vario Black")  , N_("Within lift areas the line gets thicker, colour is always black.")},
   { 0 }
 };
 
