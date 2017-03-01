@@ -114,6 +114,9 @@ struct InfoBoxSettings {
     /** 16 infoboxes along right side (2x8) */
     RIGHT_16 = 19,
 
+    /** infoboxes (7) along top or right side  */
+    TOP_RIGHT_7 = 20,
+
   } geometry;
 
   bool inverse, use_colors;

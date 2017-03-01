@@ -35,7 +35,7 @@ static constexpr unsigned char geometry_counts[] = {
   8, 8, 8, 8, 8, 8,
   9, 5, 12, 24, 12,
   12, 9, 8, 4, 4, 4, 4,
-  8, 16,
+  8, 16, 7,
 };
 
 namespace InfoBoxLayout
@@ -276,6 +276,15 @@ InfoBoxLayout::Calculate(PixelRect rc, InfoBoxSettings::Geometry geometry)
                                rc.right, rc.top, rc.bottom);
     break;
 
+  case InfoBoxSettings::Geometry::TOP_RIGHT_7:
+    if (layout.landscape)
+      rc.right = MakeRightColumn(layout, layout.positions, 7,
+                                 rc.right, rc.top, rc.bottom);
+    else
+      rc.top = MakeTopRow(layout, layout.positions, 7,
+                          rc.left, rc.right, rc.top);
+    break;
+
   case InfoBoxSettings::Geometry::TOP_LEFT_4:
   case InfoBoxSettings::Geometry::OBSOLETE_TOP_LEFT_4:
     if (layout.landscape)
@@ -321,6 +330,7 @@ InfoBoxLayout::ValidateGeometry(InfoBoxSettings::Geometry geometry,
     case InfoBoxSettings::Geometry::OBSOLETE_BOTTOM_RIGHT_8:
     case InfoBoxSettings::Geometry::RIGHT_9_VARIO:
     case InfoBoxSettings::Geometry::RIGHT_5:
+    case InfoBoxSettings::Geometry::TOP_RIGHT_7:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
     case InfoBoxSettings::Geometry::RIGHT_16:
     case InfoBoxSettings::Geometry::RIGHT_24:
@@ -360,6 +370,7 @@ InfoBoxLayout::ValidateGeometry(InfoBoxSettings::Geometry geometry,
       return InfoBoxSettings::Geometry::BOTTOM_8_VARIO;
 
     case InfoBoxSettings::Geometry::RIGHT_5:
+    case InfoBoxSettings::Geometry::TOP_RIGHT_7:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
       break;
 
@@ -428,6 +439,7 @@ InfoBoxLayout::HasInfoBoxesOnBottom(InfoBoxSettings::Geometry geometry)
   case InfoBoxSettings::Geometry::TOP_LEFT_4:
   case InfoBoxSettings::Geometry::TOP_8_VARIO:
   case InfoBoxSettings::Geometry::RIGHT_5:
+  case InfoBoxSettings::Geometry::TOP_RIGHT_7:
   case InfoBoxSettings::Geometry::RIGHT_16:
   case InfoBoxSettings::Geometry::RIGHT_24:
   case InfoBoxSettings::Geometry::RIGHT_9_VARIO:
@@ -475,7 +487,18 @@ InfoBoxLayout::CalcInfoBoxSizes(Layout &layout, PixelSize screen_size,
       layout.control_size.cy = CalculateInfoBoxRowHeight(screen_size.cy,
                                                          layout.control_size.cx);
     }
+    break;
 
+  case InfoBoxSettings::Geometry::TOP_RIGHT_7:
+    // calculate control dimensions
+    if (landscape) {
+      layout.control_size.cx = screen_size.cx / 7;
+      layout.control_size.cy = screen_size.cy / 7;
+    } else {
+      layout.control_size.cx = screen_size.cx / layout.count;
+      layout.control_size.cy = CalculateInfoBoxRowHeight(screen_size.cy,
+                                                         layout.control_size.cx);
+    }
     break;
 
   case InfoBoxSettings::Geometry::BOTTOM_8_VARIO:
@@ -612,6 +635,20 @@ InfoBoxLayout::GetBorder(InfoBoxSettings::Geometry geometry, bool landscape,
         border |= BORDERRIGHT;
     }
 
+    break;
+
+  case InfoBoxSettings::Geometry::TOP_RIGHT_7:
+    if (landscape) {
+      if (i != 6)
+        border |= BORDERBOTTOM;
+
+      border |= BORDERLEFT;
+    } else {
+      border |= BORDERBOTTOM;
+
+      if (i != 6)
+        border |= BORDERRIGHT;
+    }
     break;
 
   case InfoBoxSettings::Geometry::BOTTOM_8_VARIO:
