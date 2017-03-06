@@ -584,7 +584,7 @@ ParseTSK(NMEAInputLine &line)
     return false;
   if (!line.ReadChecked(task_settings.start_radius))
     return false;
-  /*if (!line.ReadChecked(task_settings.start_height)) return false*/; // v2.41 does not yet provide start_height - nil/zero is OK...
+  line.ReadChecked(task_settings.start_height); // v2.41 does not yet provide start_height - nil/zero is OK...
   char finish_type_code = line.ReadOneChar(); // "NCFL"; // None, Cylinder, FAI, Line
   if (!SN10taskInfo_T::SN10taskSettings_T::GetPointType(task_settings.finish_type, finish_type_code))
     return false;
