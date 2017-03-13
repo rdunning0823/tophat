@@ -116,7 +116,7 @@ TaskStartMonitor::GetMessage1(const StartStats &start, message_string &message)
   message.Format(_T("%s:   %s    %s"), task_start, altitude_start , time_start);
   if (task_behaviour.contest_nationality == ContestNationalities::AMERICAN) {
     TCHAR time_under[32];
-    const int dd = (int)(start.time - common_stats.TimeUnderStartMaxHeight);
+    const int dd = (int)(start.time - common_stats.time_transition_below_max_start_height);
     FormatSignedTimeMMSS(time_under, dd);
 
     if (dd < 120)

@@ -50,7 +50,7 @@ public:
   bool has_non_airfield_landables;
   /** time UTC ship last descended through max task start height
    * (may be above at current time!) */
-  fixed TimeUnderStartMaxHeight;
+  fixed time_transition_below_max_start_height;
   /** is the ship currently under the max task start height? */
   bool is_under_start_max_height;
   /** Time (s) until assigned minimum time is achieved */

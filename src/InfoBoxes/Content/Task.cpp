@@ -926,13 +926,13 @@ UpdateInfoBoxTaskTimeUnderMaxHeight(InfoBoxData &data)
   if (!task_stats.task_valid || !positive(maxheight)
       || !protected_task_manager
       || !common_stats.is_under_start_max_height
-      || !positive(common_stats.TimeUnderStartMaxHeight)) {
+      || !positive(common_stats.time_transition_below_max_start_height)) {
     data.SetInvalid();
     return;
   }
 
   const int dd = (int)(CommonInterface::Basic().time -
-      common_stats.TimeUnderStartMaxHeight);
+      common_stats.time_transition_below_max_start_height);
 
   TCHAR value[32];
   FormatSignedTimeMMSS(value, dd);

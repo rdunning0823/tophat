@@ -72,7 +72,7 @@ TaskNavSlider::GetTimeUnderStart(int max_height,
   }
 
   return (int)(CommonInterface::Basic().time -
-      common_stats.TimeUnderStartMaxHeight);
+      common_stats.time_transition_below_max_start_height);
 }
 
 TaskNavSliderWidget::TaskNavSliderWidget()

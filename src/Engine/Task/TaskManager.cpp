@@ -231,18 +231,18 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
       if (!common_stats.is_under_start_max_height &&
           state.altitude < start_max_height) {
         // transition below max start height
-        common_stats.TimeUnderStartMaxHeight = state.time;
+        common_stats.time_transition_below_max_start_height = state.time;
         common_stats.is_under_start_max_height = true;
       } else if (common_stats.is_under_start_max_height &&
-          !positive(common_stats.TimeUnderStartMaxHeight)) {
+          !positive(common_stats.time_transition_below_max_start_height)) {
         // takeoff condition
-        common_stats.TimeUnderStartMaxHeight = state.time;
+        common_stats.time_transition_below_max_start_height = state.time;
       }
       if (state.altitude > start_max_height) {
         common_stats.is_under_start_max_height = false;
       }
     } else {
-      common_stats.TimeUnderStartMaxHeight = fixed(-1);
+      common_stats.time_transition_below_max_start_height = fixed(-1);
       common_stats.is_under_start_max_height = true;
     }
 
