@@ -48,8 +48,11 @@ public:
   bool landable_reachable;
   /** Whether the abort task points include non-airports landable points */
   bool has_non_airfield_landables;
-  /** time UTC ship descended through max task start height */
+  /** time UTC ship last descended through max task start height
+   * (may be above at current time!) */
   fixed TimeUnderStartMaxHeight;
+  /** is the ship currently under the max task start height? */
+  bool is_under_start_max_height;
   /** Time (s) until assigned minimum time is achieved */
   fixed aat_time_remaining;
   /** Average speed over target task distance at minimum assigned time + margin (m/s) */

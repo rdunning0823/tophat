@@ -228,15 +228,22 @@ TaskManager::UpdateCommonStatsTimes(const AircraftState &state)
        : ordered_task->GetPoint(0).GetElevation());
     if (positive(start_max_height) &&
         state.location.IsValid() && state.flying) {
-      if (!positive(common_stats.TimeUnderStartMaxHeight) &&
+      if (!common_stats.is_under_start_max_height &&
           state.altitude < start_max_height) {
+        // transition below max start height
+        common_stats.TimeUnderStartMaxHeight = state.time;
+        common_stats.is_under_start_max_height = true;
+      } else if (common_stats.is_under_start_max_height &&
+          !positive(common_stats.TimeUnderStartMaxHeight)) {
+        // takeoff condition
         common_stats.TimeUnderStartMaxHeight = state.time;
       }
       if (state.altitude > start_max_height) {
-          common_stats.TimeUnderStartMaxHeight = fixed(-1);
+        common_stats.is_under_start_max_height = false;
       }
     } else {
       common_stats.TimeUnderStartMaxHeight = fixed(-1);
+      common_stats.is_under_start_max_height = true;
     }
 
     ordered_task->UpdateSummary(common_stats.ordered_summary);

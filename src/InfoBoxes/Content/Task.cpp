@@ -925,6 +925,7 @@ UpdateInfoBoxTaskTimeUnderMaxHeight(InfoBoxData &data)
 
   if (!task_stats.task_valid || !positive(maxheight)
       || !protected_task_manager
+      || !common_stats.is_under_start_max_height
       || !positive(common_stats.TimeUnderStartMaxHeight)) {
     data.SetInvalid();
     return;

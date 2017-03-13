@@ -66,7 +66,7 @@ TaskNavSlider::GetTimeUnderStart(int max_height,
       == ContestNationalities::AMERICAN;
 
   if (!task_stats.task_valid || max_height <= 0
-      || !positive(common_stats.TimeUnderStartMaxHeight)
+      || !common_stats.is_under_start_max_height
       || !is_usa || !show_two_minute_start) {
     return -1;
   }
