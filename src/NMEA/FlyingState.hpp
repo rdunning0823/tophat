@@ -53,6 +53,13 @@ struct FlyingState
   GeoPoint takeoff_location;
 
   /**
+   * The altitude of the aircraft when it took off.  This attribute is
+   * only valid if #flying is true.
+   * set to -1000 if invalid
+   */
+  fixed takeoff_altitude;
+
+  /**
    * The time stamp when the aircraft released from towing.  This is
    * an estimate based on sink.  If the aircraft was never seen on
    * ground (i.e. XCSoar was switched on while flying), this value is

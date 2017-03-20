@@ -221,17 +221,16 @@ void
 UpdateInfoBoxAltitudeQFE(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
+  const FlyingState &flight = CommonInterface::Calculated().flight;
 
-  if (!basic.gps_altitude_available) {
+  if (!basic.gps_altitude_available ||
+      !flight.flying ||
+      flight.takeoff_altitude < fixed(-999)) {
     data.SetInvalid();
     return;
   }
 
-  fixed Value = basic.gps_altitude;
-
-  const Waypoint *home_waypoint = way_points.GetHome();
-  if (home_waypoint)
-    Value -= home_waypoint->elevation;
+  fixed Value = basic.gps_altitude - flight.takeoff_altitude;
 
   data.SetValueFromAltitude(Value);
 }

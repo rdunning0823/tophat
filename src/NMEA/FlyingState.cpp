@@ -31,6 +31,7 @@ FlyingState::Reset()
   powered = false;
   flight_time = takeoff_time = fixed(0);
   takeoff_location.SetInvalid();
+  takeoff_altitude = fixed(-1000);
   release_time = fixed(-1);
   release_location.SetInvalid();
   power_on_time = fixed(-1);
