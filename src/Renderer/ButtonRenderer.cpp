@@ -26,13 +26,13 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Look/ButtonLook.hpp"
 #include "Util/Macros.hpp"
+#include "Asset.hpp"
 
 unsigned
 ButtonFrameRenderer::GetMargin()
 {
-  return Layout::VptScale(2);
+  return Layout::VptScale(HasColors() ? 2 : 1);
 }
-
 
 void
 ButtonFrameRenderer::DrawButton(Canvas &canvas, PixelRect rc,
