@@ -83,7 +83,7 @@ public:
 
   void Create(ContainerWindow &parent, const ButtonLook &look,
               const TCHAR *caption, const PixelRect &rc,
-              WindowStyle style);
+              WindowStyle style, bool use_large_font = false);
 
   void Create(ContainerWindow &parent, const PixelRect &rc,
               WindowStyle style, ButtonRenderer *_renderer,

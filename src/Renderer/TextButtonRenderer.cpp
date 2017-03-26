@@ -38,8 +38,7 @@ PixelSize
 TextButtonRenderer::GetCaptionSize(Canvas &canvas, PixelRect rc,
                                    const TCHAR *text) const
 {
-  const ButtonLook &look = GetLook();
-  canvas.Select(*look.font);
+  canvas.Select(GetFont());
   PixelSize sz = text_renderer.GetSize(canvas, rc, text);
 #ifdef _WIN32_WCE
   if (StringLength(text) == 0)
@@ -74,15 +73,21 @@ TextButtonRenderer::DrawCaption(Canvas &canvas,
   else
     canvas.SetTextColor(look.standard.foreground_color);
 
-  canvas.Select(*look.font);
+  canvas.Select(GetFont());
   text_renderer.Draw(canvas, rc, _caption, outlined_text);
+}
+
+const Font&
+TextButtonRenderer::GetFont() const
+{
+  return use_large_font ? GetLook().font_large : *GetLook().font;
 }
 
 unsigned
 TextButtonRenderer::GetMinimumButtonWidth() const
 {
   return 2 * (frame_renderer.GetMargin() + Layout::GetTextPadding())
-    + GetLook().font->TextSize(caption.c_str()).cx;
+    + GetFont().TextSize(caption.c_str()).cx;
 }
 
 void

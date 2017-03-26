@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "ButtonLook.hpp"
+#include "FontDescription.hpp"
 #include "Asset.hpp"
 
 
@@ -42,6 +43,8 @@ void
 ButtonLook::Initialise(const Font &_font)
 {
   font = &_font;
+  const FontDescription font_large_d(font->GetHeight() * 1.5);
+  font_large.Load(font_large_d);
   background_transparent = false;
 
   standard.foreground_color = COLOR_BLACK;

@@ -28,11 +28,12 @@ Copyright_License {
 #include "Screen/Brush.hpp"
 #include "Screen/Pen.hpp"
 #include "Screen/Layout.hpp"
+#include "Screen/Font.hpp"
 
-class Font;
 
 struct ButtonLook {
   const Font *font;
+  Font font_large;
   bool background_transparent;
 
   struct StateLook {

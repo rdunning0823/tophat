@@ -28,6 +28,8 @@ Copyright_License {
 #include "TextRenderer.hpp"
 #include "Util/StaticString.hxx"
 
+class Font;
+
 /**
  * A #ButtonRenderer instance that renders a regular button frame and
  * some text.
@@ -40,17 +42,22 @@ protected:
 
   StaticString<96> caption;
 
+  bool use_large_font;
+
 public:
   explicit TextButtonRenderer(const ButtonLook &_look)
-    :frame_renderer(_look) {
+    :frame_renderer(_look),
+     use_large_font(false) {
     text_renderer.SetCenter();
     text_renderer.SetVCenter();
     text_renderer.SetControl();
   }
 
   TextButtonRenderer(const ButtonLook &_look,
-                     StaticString<96>::const_pointer _caption)
-    :frame_renderer(_look), caption(_caption) {
+                     StaticString<96>::const_pointer _caption,
+                     bool _use_large_font = false)
+    :frame_renderer(_look), caption(_caption),
+     use_large_font(_use_large_font) {
     text_renderer.SetCenter();
     text_renderer.SetVCenter();
     text_renderer.SetControl();
@@ -72,6 +79,8 @@ public:
   gcc_pure
   virtual unsigned GetMinimumButtonWidth() const override;
 
+
+
   /**
    * @param force_transparent_background: draws transparent background and
    * font with white outline around black text
@@ -81,6 +90,9 @@ public:
                   bool force_transparent_background) const override;
 
 protected:
+
+  const Font& GetFont() const;
+
   /**
    * @param rc: rc of text
    * @return rc required to print text (adjusts for multiple lines)

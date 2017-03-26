@@ -93,9 +93,10 @@ Button::Create(ContainerWindow &parent,
 void
 Button::Create(ContainerWindow &parent, const ButtonLook &look,
                const TCHAR *caption, const PixelRect &rc,
-               WindowStyle style)
+               WindowStyle style, bool use_large_font)
 {
-  Create(parent, rc, style, new TextButtonRenderer(look, caption));
+  Create(parent, rc, style,
+         new TextButtonRenderer(look, caption, use_large_font));
 }
 
 void
