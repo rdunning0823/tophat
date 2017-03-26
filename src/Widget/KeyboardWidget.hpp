@@ -44,13 +44,22 @@ protected:
   };
 
   static constexpr unsigned MAX_BUTTONS = 40;
+  static constexpr unsigned MAX_SPACERS = 10;
 
   const ButtonLook &look;
 
   OnCharacterCallback_t on_character;
 
   unsigned button_width;
-  unsigned button_height;
+  const unsigned button_height;
+
+  const bool portrait_keyboard;
+
+  /** show punctuation keys e.g. -. , */
+  const bool show_punctuation;
+
+  /** rows before which a horizontal small spacer is displayed, or -1 for none */
+  bool spacer_before_row[10];
 
   unsigned num_buttons;
   CharacterButton buttons[MAX_BUTTONS];
@@ -63,11 +72,18 @@ protected:
 public:
   KeyboardWidget(const ButtonLook &_look,
                  OnCharacterCallback_t _on_character,
+                 unsigned _button_height,
+                 bool _portrait_keyboard,
+                 bool _show_punctuation,
                  bool _show_shift_button,
                  bool _default_shift_state = true)
-    :look(_look), on_character(_on_character), num_buttons(0),
+    :look(_look), on_character(_on_character),
+     button_height(_button_height),
+     portrait_keyboard(_portrait_keyboard),
+     show_punctuation(_show_punctuation),
+     num_buttons(0),
      shift_state(_default_shift_state),
-     show_shift_button(_show_shift_button) {}
+     show_shift_button(_show_shift_button && _show_punctuation){}
 
   /**
    * Show only the buttons representing the specified character list.
@@ -85,15 +101,11 @@ private:
   void ResizeButton(unsigned ch, unsigned width, unsigned height);
   void ResizeButtons();
   void SetButtonsSize();
+  unsigned GetRowTop(const PixelRect &rc, unsigned row);
   void MoveButtonsToRow(const PixelRect &rc,
                         const TCHAR *buttons, unsigned row,
                         int offset_left = 0);
   void MoveButtons(const PixelRect &rc);
-
-  gcc_pure
-  static bool IsLandscape(const PixelRect &rc) {
-    return rc.right - rc.left >= rc.bottom - rc.top;
-  }
 
   /* updates UI based on value of shift_state property */
   void UpdateShiftState();

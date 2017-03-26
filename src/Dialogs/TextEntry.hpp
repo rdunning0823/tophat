@@ -35,13 +35,13 @@ class WndProperty;
 typedef std::function<const TCHAR *(const TCHAR *)> AllowedCharacters;
 typedef void (*HelpCallback)();
 
-
 bool
 TextEntryDialog(TCHAR *text, size_t size,
                 const TCHAR *caption=nullptr,
                 AllowedCharacters ac=AllowedCharacters(),
                 bool show_shift_key = true,
-                bool default_shift_state = true);
+                bool default_shift_state = true,
+                bool show_punctionation_keys = true);
 
 template<size_t N>
 static inline bool
@@ -58,11 +58,12 @@ template<size_t N>
 static inline bool
 TextEntryDialog(StringBuffer<TCHAR, N> &text,
                 const TCHAR *caption,
+                bool show_shift_key,
                 bool default_shift_state)
 {
   AllowedCharacters accb=AllowedCharacters();
   return TextEntryDialog(text.data(), text.capacity(),
-                         caption, accb, default_shift_state);
+                         caption, accb, show_shift_key, default_shift_state);
 }
 
 void
@@ -71,6 +72,7 @@ KnobTextEntry(TCHAR *text, size_t width,
 
 bool
 TouchTextEntry(TCHAR *text, size_t size,
+               bool show_punctuation,
                const TCHAR *caption=nullptr,
                AllowedCharacters ac=AllowedCharacters(),
                bool show_shift_keyy = true,
