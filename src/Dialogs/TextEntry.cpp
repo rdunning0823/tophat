@@ -29,13 +29,15 @@ Copyright_License {
 bool
 TextEntryDialog(TCHAR *text, size_t width,
                 const TCHAR *caption, AllowedCharacters accb,
+                bool show_shift_key,
                 bool default_shift_state)
 {
   switch (UIGlobals::GetDialogSettings().text_input_style) {
   case DialogSettings::TextInputStyle::Default:
   case DialogSettings::TextInputStyle::Keyboard:
     if (HasPointer())
-      return TouchTextEntry(text, width, caption, accb, default_shift_state);
+      return TouchTextEntry(text, width, caption, accb, show_shift_key,
+                            default_shift_state);
     else {
       KnobTextEntry(text, width, caption);
       return true;

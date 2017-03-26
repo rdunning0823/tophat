@@ -281,7 +281,7 @@ WifiListWidget::Connect()
     passphrase.clear();
     if (info.security == OPEN_SECURITY)
       passphrase.clear();
-    else if (!TextEntryDialog(passphrase, caption, false))
+    else if (!TextEntryDialog(passphrase, caption, true, false))
       return;
 
     if (!WifiConnect(info.security, wpa_supplicant, info.ssid, passphrase))

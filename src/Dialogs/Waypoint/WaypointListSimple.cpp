@@ -544,7 +544,7 @@ WaypointListSimpleDialog::OnSearchClicked()
 
   TextEntryDialog(new_name_filter, WaypointFilter::NAME_LENGTH,
                   _("Waypoint name"),
-                  WaypointNameAllowedCharacters);
+                  WaypointNameAllowedCharacters, false);
 
   int i = _tcslen(new_name_filter) - 1;
   while (i >= 0) {

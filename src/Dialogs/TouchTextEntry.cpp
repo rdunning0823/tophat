@@ -162,6 +162,7 @@ bool
 TouchTextEntry(TCHAR *text, size_t width,
                const TCHAR *caption,
                AllowedCharacters accb,
+               bool show_shift_key,
                bool default_shift_state)
 {
   if (width == 0)
@@ -248,8 +249,8 @@ TouchTextEntry(TCHAR *text, size_t width,
                       button_style, clear_listener, 0);
 
 
-  KeyboardWidget keyboard(look.button, FormCharacter, !accb,
-                          default_shift_state);
+  KeyboardWidget keyboard(look.button, FormCharacter,
+                          show_shift_key, default_shift_state);
 
   const PixelRect keyboard_rc = {
     padding, keyboard_top,
