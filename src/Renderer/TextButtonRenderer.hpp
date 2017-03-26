@@ -76,6 +76,10 @@ public:
     text_renderer.InvalidateLayout();
   }
 
+  void SetRounded(bool rounded) override {
+    frame_renderer.SetRounded(rounded);
+  }
+
   gcc_pure
   virtual unsigned GetMinimumButtonWidth() const override;
 

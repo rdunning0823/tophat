@@ -70,6 +70,8 @@ class ButtonRenderer {
 public:
   virtual ~ButtonRenderer() {}
 
+  virtual void SetRounded(bool rounded) {};
+
   gcc_pure
   virtual unsigned GetMinimumButtonWidth() const;
 
