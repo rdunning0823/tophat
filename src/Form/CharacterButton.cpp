@@ -43,6 +43,7 @@ CharacterButton::Create(ContainerWindow &parent, const ButtonLook &look,
   character = _character;
 
   Button::Create(parent, look, text, rc, style, true);
+  GetRenderer().SetRounded(false);
 }
 
 unsigned

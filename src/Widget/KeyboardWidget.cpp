@@ -64,6 +64,7 @@ KeyboardWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     shift_button.Create(parent, { 0, 0, 16, 16 }, style,
                         new SymbolButtonRenderer(look, _T("v")),
                         *this, SHIFT);
+    shift_button.GetRenderer().SetRounded(false);
   }
   UpdateShiftState();
 }
