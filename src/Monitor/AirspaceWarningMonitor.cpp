@@ -39,6 +39,7 @@ Copyright_License {
 #include "Airspace/ProtectedAirspaceWarningManager.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
+#include "Input/InputQueue.hpp"
 
 class AirspaceWarningWidget final
   : public QuestionWidget, private ActionListener {
@@ -194,6 +195,14 @@ AirspaceWarningMonitor::Check()
     if (w != lease->end() && w->IsAckExpired()) {
       airspace = &w->GetAirspace();
       state = w->GetWarningState();
+      
+      if(airspace->IsActive())
+      {
+        if(state==AirspaceWarning::WARNING_INSIDE)
+          InputEvents::processGlideComputer(GCE_AIRSPACE_INSIDE);
+        else if(state==AirspaceWarning::WARNING_FILTER)
+          InputEvents::processGlideComputer(GCE_AIRSPACE_NEAR);
+      }
       solution = w->GetSolution();
     }
   }
