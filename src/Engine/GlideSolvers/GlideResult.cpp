@@ -150,6 +150,6 @@ GlideResult::DumpGlideResult(const TCHAR *label) const
            (double)vector.bearing.AbsoluteDegrees());
 
   LogDebug("          : height_climb:%4.0f  height_glide:%4.0f       t_elapsed:%4.0f            t_virtual:%4.0f    pure_glide_min_arriv_alt:%4.0f  valid:%i",
-           (double)height_climb, (double)height_glide, (double)time_elapsed, (double)time_virtual, (double)pure_glide_min_arrival_altitude, validity);
+           (double)height_climb, (double)height_glide, (double)time_elapsed, (double)time_virtual, (double)pure_glide_min_arrival_altitude, (int)validity);
 }
 
