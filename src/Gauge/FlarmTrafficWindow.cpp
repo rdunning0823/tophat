@@ -501,10 +501,10 @@ FlarmTrafficWindow::PaintTargetInfoSmall(
   // Prepare the triangular polygon
   RasterPoint triangle[4];
   triangle[0].x = 0;
-  triangle[0].y = -4;
-  triangle[1].x = 3;
+  triangle[0].y = -5;
+  triangle[1].x = 4;
   triangle[1].y = 0;
-  triangle[2].x = -3;
+  triangle[2].x = -4;
   triangle[2].y = 0;
 
   // Flip = -1 for arrow pointing downwards

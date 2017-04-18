@@ -71,7 +71,7 @@ FlarmTrafficLook::Initialise(const TrafficLook &other, bool small, bool inverse)
 
   no_traffic_font.Load(FontDescription(Layout::FontScale(22)));
   label_font.Load(FontDescription(Layout::FontScale(12)));
-  side_info_font.Load(FontDescription(Layout::FontScale(small ? 8 : 12),
+  side_info_font.Load(FontDescription(Layout::FontScale(small ? 10 : 12),
                                       true));
 
   info_labels_font.Load(FontDescription(Layout::FontScale(14), false));
