@@ -323,9 +323,11 @@ SetTypeTextFor2MinuteCount(SliderShape::TypeBuffer &type_buffer,
                            SliderShape::TypeBuffer &type_buffer_short,
                            int time_under_max_start)
 {
-  assert(!negative(time_under_max_start));
-
-  if (time_under_max_start < 120) {
+  if (negative(time_under_max_start)) {
+    type_buffer = _("Above Start");
+    type_buffer_short = _("Above");
+  }
+  else if (time_under_max_start < 120) {
     TCHAR value[32];
     FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
     type_buffer.Format(_T("%s: %s"), _("2Minutes"), value);
@@ -342,7 +344,8 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
                          unsigned idx, unsigned task_size, bool is_start,
                          bool is_finish, bool is_aat, bool navigate_to_target,
                          bool enable_index,
-                         int time_under_max_start)
+                         int time_under_max_start,
+                         bool show_time_under_max_start)
 {
   // calculate but don't yet draw label "goto" abort, tp#
   bool different_short_buffer = false;
@@ -354,23 +357,15 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
 
     else if (is_finish) {
       type_buffer = _("Finish");
-    } else if (is_start) {
-      if (time_under_max_start >= 0) {
 
+    } else if ((is_start || idx == 1) && show_time_under_max_start) {
         SetTypeTextFor2MinuteCount(type_buffer,
                                    type_buffer_short,
                                    time_under_max_start);
         different_short_buffer = true;
 
-      } else {
+    } else if (is_start) {
         type_buffer = _("Start");
-      }
-    }
-    else if (idx < 2 && time_under_max_start >= 0) {
-      SetTypeTextFor2MinuteCount(type_buffer,
-                                 type_buffer_short,
-                                 time_under_max_start);
-      different_short_buffer = true;
     } else if (is_aat && navigate_to_target)
       // append "Target" text to distance in center
       type_buffer.clear();
@@ -412,7 +407,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   bool gr_valid,
                   bool use_wide_pen,
                   bool navigate_to_target,
-                  int time_under_max_start)
+                  int time_under_max_start,
+                  bool show_time_under_max_start)
 {
   /**
    * seconds under max height.
@@ -477,7 +473,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   GetTypeText(type_buffer, type_buffer_short, task_mode, idx, task_size,
               is_start, is_finish, is_aat, navigate_to_target,
               show_index,
-              time_under_max_start);
+              time_under_max_start, show_time_under_max_start);
 
   canvas.Select(GetTypeFont(is_start, time_under_max_start));
   type_text_width = canvas.CalcTextWidth(type_buffer.c_str());

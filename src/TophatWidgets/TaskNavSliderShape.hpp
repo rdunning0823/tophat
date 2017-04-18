@@ -256,7 +256,8 @@ public:
             bool gr_valid,
             bool use_wide_pen,
             bool navigate_to_target,
-            int time_under_max_start);
+            int time_under_max_start,
+            bool show_time_under_max_start);
 
 
   /**
@@ -290,14 +291,16 @@ public:
    * @param type_buffer: the buffer that holds the text
    * @param type_buffer_short: the buffer that holds the text.  Abbreviated
    * @param enable_index: is the configuration enabled to show the tp indexes
-   * @param time_under_max_start: US task time under max start or -1 to hide
+   * @param time_under_max_start: US task time under max start
+   * @param show_time_under_max_start true if show time under message
    */
   void GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
                    TaskType task_mode,
                    unsigned idx, unsigned task_size, bool is_start,
                    bool is_finish, bool is_aat, bool navigate_to_target,
                    bool enable_index,
-                   int time_under_max_start);
+                   int time_under_max_start,
+                   bool show_time_under_max_start);
 
 #ifdef _WIN32
   /**

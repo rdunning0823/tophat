@@ -177,6 +177,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool is_start = false;
   TaskFactoryType factory_type = TaskFactoryType::AAT;
   int time_under_max_start;
+  bool show_two_minute_start = false;
 
   TaskType mode;
   {
@@ -189,7 +190,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     const OrderedTaskSettings &settings = task.GetOrderedTaskSettings();
     factory_type = task.GetFactoryType();
     int max_height = settings.start_constraints.max_height;
-    bool show_two_minute_start = settings.show_two_minute_start;
+    show_two_minute_start = settings.show_two_minute_start;
     bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
 
     if (idx > 0 && idx >= task_manager->TaskSize())
@@ -246,7 +247,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       false,
                       use_wide_pen,
                       true,
-                      time_under_max_start);
+                      time_under_max_start,
+                      show_two_minute_start);
   } else {
 
     const ComputerSettings &settings = CommonInterface::GetComputerSettings();
@@ -287,7 +289,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       elevation_valid && result.IsOk() && GradientValid(gradient),
                       use_wide_pen,
                       false,
-                      time_under_max_start);
+                      time_under_max_start,
+                      show_two_minute_start);
   }
 }
 

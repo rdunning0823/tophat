@@ -155,6 +155,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   const Waypoint *wp = nullptr;
   const OrderedTaskPoint *otp;
   int time_under_max_start;
+  bool show_two_minute_start = false;
   unsigned idx = 0;
   unsigned task_size = 1;
   bool is_ordered = false;
@@ -169,7 +170,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
 
     const OrderedTaskSettings &settings = ot.GetOrderedTaskSettings();
     int max_height = settings.start_constraints.max_height;
-    bool show_two_minute_start = settings.show_two_minute_start;
+    show_two_minute_start = settings.show_two_minute_start;
     bool is_glider_close_to_start_cylinder = ot.CheckGliderStartCylinderProximity();
 
     int raw_time_under = TaskNavSlider::GetTimeUnderStart(
@@ -270,7 +271,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       false,
                       use_wide_pen,
                       true,
-                      time_under_max_start);
+                      time_under_max_start,
+                      show_two_minute_start);
 
   } else {
     fixed gradient = ::CalculateGradient(*wp, distance,
@@ -293,7 +295,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       ::GradientValid(gradient),
                       use_wide_pen,
                       false,
-                      time_under_max_start);
+                      time_under_max_start,
+                      show_two_minute_start);
   }
 }
 #endif
