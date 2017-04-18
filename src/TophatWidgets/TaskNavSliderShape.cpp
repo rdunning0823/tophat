@@ -352,7 +352,9 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
     if (task_size == 0)
       type_buffer = _("Go'n home:");
 
-    else if (is_start) {
+    else if (is_finish) {
+      type_buffer = _("Finish");
+    } else if (is_start) {
       if (time_under_max_start >= 0) {
 
         SetTypeTextFor2MinuteCount(type_buffer,
@@ -364,8 +366,6 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
         type_buffer = _("Start");
       }
     }
-    else if (is_finish)
-      type_buffer = _("Finish");
     else if (idx < 2 && time_under_max_start >= 0) {
       SetTypeTextFor2MinuteCount(type_buffer,
                                  type_buffer_short,
