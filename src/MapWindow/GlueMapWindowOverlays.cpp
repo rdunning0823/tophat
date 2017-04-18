@@ -62,6 +62,7 @@ Copyright_License {
 #include "Look/OverlayButtonLook.hpp"
 #include "UISettings.hpp"
 #include "Replay/Replay.hpp"
+#include "NMEA/FlyingState.hpp"
 #ifndef ENABLE_OPENGL
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #endif
@@ -152,6 +153,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   TaskWaypoint *tp;
   TaskType task_mode = TaskType::GOTO;
   TaskFactoryType task_factory_type = TaskFactoryType::RACING;
+  const FlyingState &flying = CommonInterface::Calculated().flight;
   const Waypoint *wp = nullptr;
   const OrderedTaskPoint *otp;
   int time_under_max_start;
@@ -170,7 +172,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
 
     const OrderedTaskSettings &settings = ot.GetOrderedTaskSettings();
     int max_height = settings.start_constraints.max_height;
-    show_two_minute_start = settings.show_two_minute_start;
+    show_two_minute_start = settings.show_two_minute_start && flying.flying;
     bool is_glider_close_to_start_cylinder = ot.CheckGliderStartCylinderProximity();
 
     int raw_time_under = TaskNavSlider::GetTimeUnderStart(

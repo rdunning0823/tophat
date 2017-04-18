@@ -45,6 +45,7 @@ Copyright_License {
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
 #include "Engine/Util/Gradient.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "NMEA/FlyingState.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -164,6 +165,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   // if task is not current (e.g. the tp being drawn may no longer exist) then abort drawing
   // hold lease on task_manager until drawing is done
   const MoreData &basic = CommonInterface::Basic();
+  const FlyingState &flying = CommonInterface::Calculated().flight;
   const MapSettings &settings_map = CommonInterface::GetMapSettings();
   const TerrainRendererSettings &terrain = settings_map.terrain;
 
@@ -190,7 +192,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     const OrderedTaskSettings &settings = task.GetOrderedTaskSettings();
     factory_type = task.GetFactoryType();
     int max_height = settings.start_constraints.max_height;
-    show_two_minute_start = settings.show_two_minute_start;
+    show_two_minute_start = settings.show_two_minute_start && flying.flying;
     bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
 
     if (idx > 0 && idx >= task_manager->TaskSize())
