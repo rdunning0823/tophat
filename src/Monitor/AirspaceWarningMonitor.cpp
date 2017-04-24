@@ -38,8 +38,13 @@ Copyright_License {
 #include "Engine/Airspace/AbstractAirspace.hpp"
 #include "Airspace/ProtectedAirspaceWarningManager.hpp"
 #include "Formatter/TimeFormatter.hpp"
+#include "Formatter/AirspaceFormatter.hpp"
+#include "Formatter/Units.hpp"
+#include "Formatter/UserUnits.hpp"
 #include "Blackboard/DeviceBlackboard.hpp"
 #include "Input/InputQueue.hpp"
+#include "Util/StringUtil.hpp"
+#include "Util/Macros.hpp"
 
 class AirspaceWarningWidget final
   : public QuestionWidget, private ActionListener {
@@ -56,18 +61,41 @@ class AirspaceWarningWidget final
   AirspaceWarning::State state;
 
   StaticString<256> buffer;
+  TCHAR basebuf[24];
+  TCHAR topbuf[24];
+  TCHAR distDirbuf[24];
+  TCHAR distNumbuf[24];
+  TCHAR timebuf[24];
+  fixed dist;
+
 
   gcc_pure
   const TCHAR *MakeMessage(const AbstractAirspace &airspace,
                            AirspaceWarning::State state,
-                           const AirspaceInterceptSolution &solution) {
-    if (state == AirspaceWarning::WARNING_INSIDE)
-      buffer.Format(_T("%s: %s"), _("Inside airspace"), airspace.GetName());
-    else
-      buffer.Format(_T("%s: %s (%s)"), _("Near airspace"), airspace.GetName(),
-                    FormatTimespanSmart(int(solution.elapsed_time),
-                                        2).c_str());
+                           const AirspaceInterceptSolution &solution)
+  {
+    AirspaceFormatter::FormatAltitudeShort(basebuf, airspace.GetBase());
+    AirspaceFormatter::FormatAltitudeShort(topbuf, airspace.GetTop());
 
+    if (state == AirspaceWarning::WARNING_INSIDE) {
+      buffer.Format(_T("Inside %s: %s (%s-%s)"),
+                    AirspaceFormatter::GetClass(airspace), airspace.GetName(),
+                    basebuf, topbuf);
+    } else {
+      if (solution.distance == fixed(0)) {
+        CopyString(distDirbuf, _("Vertical"), ARRAY_SIZE(distDirbuf));
+        dist = solution.altitude - CommonInterface::Basic().nav_altitude;
+        FormatUserAltitude(dist, distNumbuf, true);
+      } else {
+        CopyString(distDirbuf, _("Horizontal"), ARRAY_SIZE(distDirbuf));
+        dist = solution.distance;
+        FormatUserDistanceSmart(dist, distNumbuf, true);
+      }
+      FormatSignedTimeMMSSCompact(timebuf, iround(solution.elapsed_time));
+      buffer.Format(_T("Near %s: %s (%s - %s) %s %s (%s)"),
+                    AirspaceFormatter::GetClass(airspace), airspace.GetName(),
+                    basebuf, topbuf, distDirbuf, distNumbuf, timebuf);
+    }
     return buffer;
   }
 
@@ -80,9 +108,10 @@ public:
     :QuestionWidget(MakeMessage(_airspace, _state, solution), *this),
      monitor(_monitor), manager(_manager),
      airspace(_airspace), state(_state) {
-    AddButton(_("ACK"), ACK);
-    AddButton(_("ACK Day"), ACK_DAY);
-    AddButton(_("More"), MORE);
+
+      AddButton(_("ACK"), ACK);
+      AddButton(_("ACK Day"), ACK_DAY);
+      AddButton(_("More"), MORE);
   }
 
   ~AirspaceWarningWidget() {
