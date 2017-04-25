@@ -33,7 +33,7 @@ Copyright_License {
  */
 class AtmosphericPressure 
 {
-  /** Pressure in hPa */
+  /** Pressure in hPa (1 hPa = 1 millibar) */
   fixed value;
 
   /**
