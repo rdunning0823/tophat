@@ -35,7 +35,7 @@ static constexpr unsigned char geometry_counts[] = {
   8, 8, 8, 8, 8, 8,
   9, 5, 12, 24, 12,
   12, 9, 8, 4, 4, 4, 4,
-  8, 16, 7,
+  8, 16, 7, 10
 };
 
 namespace InfoBoxLayout
@@ -228,6 +228,21 @@ InfoBoxLayout::Calculate(PixelRect rc, InfoBoxSettings::Geometry geometry)
 
     break;
 
+  case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
+    if (layout.landscape) {
+      rc.right = MakeRightColumn(layout, layout.positions + 5, 5,
+                                 rc.right, rc.top, rc.bottom);
+      rc.right = MakeRightColumn(layout, layout.positions, 5,
+                                 rc.right, rc.top, rc.bottom);
+    } else {
+      rc.bottom = MakeBottomRow(layout, layout.positions + 5, 5,
+                                rc.left, rc.right, rc.bottom);
+      rc.bottom = MakeBottomRow(layout, layout.positions, 5,
+                                rc.left, rc.right, rc.bottom);
+    }
+
+    break;
+
   case InfoBoxSettings::Geometry::TOP_LEFT_12:
     if (layout.landscape) {
       rc.left = MakeLeftColumn(layout, layout.positions, 6,
@@ -331,6 +346,7 @@ InfoBoxLayout::ValidateGeometry(InfoBoxSettings::Geometry geometry,
     case InfoBoxSettings::Geometry::RIGHT_9_VARIO:
     case InfoBoxSettings::Geometry::RIGHT_5:
     case InfoBoxSettings::Geometry::TOP_RIGHT_7:
+    case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
     case InfoBoxSettings::Geometry::RIGHT_16:
     case InfoBoxSettings::Geometry::RIGHT_24:
@@ -371,6 +387,7 @@ InfoBoxLayout::ValidateGeometry(InfoBoxSettings::Geometry geometry,
 
     case InfoBoxSettings::Geometry::RIGHT_5:
     case InfoBoxSettings::Geometry::TOP_RIGHT_7:
+    case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
       break;
 
@@ -422,6 +439,7 @@ InfoBoxLayout::HasInfoBoxesOnBottom(InfoBoxSettings::Geometry geometry)
   switch (geometry) {
   case InfoBoxSettings::Geometry::SPLIT_8:
   case InfoBoxSettings::Geometry::BOTTOM_RIGHT_8:
+  case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
   case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
   case InfoBoxSettings::Geometry::BOTTOM_RIGHT_4:
   case InfoBoxSettings::Geometry::BOTTOM_8_VARIO:
@@ -461,6 +479,7 @@ InfoBoxLayout::CalcInfoBoxSizes(Layout &layout, PixelSize screen_size,
   switch (geometry) {
   case InfoBoxSettings::Geometry::SPLIT_8:
   case InfoBoxSettings::Geometry::BOTTOM_RIGHT_8:
+  case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
   case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
   case InfoBoxSettings::Geometry::TOP_LEFT_8:
   case InfoBoxSettings::Geometry::TOP_LEFT_12:
@@ -588,6 +607,20 @@ InfoBoxLayout::GetBorder(InfoBoxSettings::Geometry geometry, bool landscape,
       border |= BORDERTOP;
 
       if (i != 3 && i != 7)
+        border |= BORDERRIGHT;
+    }
+
+    break;
+
+  case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
+    if (landscape) {
+      if (i % 5 != 0)
+        border |= BORDERTOP;
+      border |= BORDERLEFT;
+    } else {
+      border |= BORDERTOP;
+
+      if (i != 4 && i != 9)
         border |= BORDERRIGHT;
     }
 

@@ -111,6 +111,8 @@ static constexpr StaticEnumChoice info_box_geometry_list[] = {
     N_("8 split") },
   { (unsigned)InfoBoxSettings::Geometry::BOTTOM_RIGHT_8,
     N_("8 bottom or right") },
+  { (unsigned)InfoBoxSettings::Geometry::BOTTOM_RIGHT_10,
+    N_("10 bottom or right") },
   { (unsigned)InfoBoxSettings::Geometry::BOTTOM_8_VARIO,
     N_("8 bottom + vario (portrait)") },
   { (unsigned)InfoBoxSettings::Geometry::TOP_LEFT_8,

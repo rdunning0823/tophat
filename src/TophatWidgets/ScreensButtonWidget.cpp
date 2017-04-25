@@ -54,6 +54,7 @@ ScreensButtonWidget::GetButtonPosition(InfoBoxSettings::Geometry geometry,
         return ScreensButtonWidget::ButtonPosition::Bottom;
 
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_8:
+    case InfoBoxSettings::Geometry::BOTTOM_RIGHT_10:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_12:
     case InfoBoxSettings::Geometry::BOTTOM_RIGHT_4:
     case InfoBoxSettings::Geometry::BOTTOM_8_VARIO:
