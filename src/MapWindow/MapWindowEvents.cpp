@@ -28,6 +28,7 @@ Copyright_License {
 #endif
 
 #include "Weather/Features.hpp"
+#include "Asset.hpp"
 
 void
 MapWindow::OnResize(PixelSize new_size)
@@ -84,7 +85,8 @@ MapWindow::OnPaint(Canvas &canvas)
 #else /* !ENABLE_OPENGL */
   if (buffer_generation == ui_generation)
     DoubleBufferWindow::OnPaint(canvas);
-  else if (scale_buffer > 0 && visible_projection.IsValid() &&
+  /* Hack: causes sporadic pan crash on Kobo, especially under load.  Cause? */
+  else if (!IsKobo() && scale_buffer > 0 && visible_projection.IsValid() &&
            buffer_projection.IsValid()) {
     /* while zooming/panning, project the current buffer into the
        Canvas */
@@ -136,16 +138,11 @@ MapWindow::OnPaint(Canvas &canvas)
                        bottom_right.x, canvas.GetHeight());
 
     /* now stretch the buffer into the window Canvas */
-
     ScopeLock protect(DoubleBufferWindow::mutex);
     const Canvas &src = GetVisibleCanvas();
     canvas.Stretch(top_left.x, top_left.y,
                    bottom_right.x - top_left.x, bottom_right.y - top_left.y,
                    src, 0, 0, buffer_width, buffer_height);
-  } else
-    /* the UI has changed since the last DrawThread iteration has
-       started: the buffer has invalid data, paint a white window
-       instead */
-    canvas.ClearWhite();
+  }
 #endif /* !ENABLE_OPENGL */
 }
