@@ -44,11 +44,6 @@ enum ControlIndex {
   Altitude,
 };
 
-enum Actions {
-  DUMP = 100,
-};
-
-
 static QNHPanel *instance;
 
 void
