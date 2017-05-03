@@ -30,8 +30,8 @@ Copyright_License {
 #include <tchar.h>
 
 struct DialogLook;
-struct CheckBoxControl;
 struct CheckBoxLook;
+class CheckBoxControl;
 class ActionListener;
 
 /**
