@@ -96,10 +96,7 @@ ComputePressure(NMEAInfo &basic, const AtmosphericPressure qnh)
         qnh.PressureAltitudeToQNHAltitude(basic.pressure_altitude);
       basic.baro_altitude_available = basic.pressure_altitude_available;
     }
-  } else if (!basic.baro_altitude_available && pressure_altitude_available)
-    /* no QNH, but let's fill in the best fallback value we can get,
-       without setting BaroAltitudeAvailable */
-    basic.baro_altitude = basic.pressure_altitude;
+  }
 }
 
 static void
