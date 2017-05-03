@@ -28,7 +28,7 @@ Copyright_License {
 
 struct NMEAInfo;
 struct DerivedInfo;
-struct GlidePolar;
+class GlidePolar;
 
 class Simulator {
 public:
