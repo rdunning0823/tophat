@@ -52,7 +52,7 @@ public:
  virtual void Move(const PixelRect &rc) override;
  virtual void CalculateLayout(const PixelRect &rc);
 
- bool HasCustomContent() {
+ bool HasCustomContent() override {
    return false;
  }
 

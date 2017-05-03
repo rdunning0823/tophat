@@ -75,8 +75,8 @@ public:
                                     const GlideResult &solution_remaining_leg) override;
   virtual bool IsScored() const override { return false; }
   virtual bool IsOptimizable() const override { return false; }
-  virtual bool CheckGliderStartCylinderProximity() const { return false; }
-  void UpdateGliderStartCylinderProximity(const GeoPoint &ref) { };
+  virtual bool CheckGliderStartCylinderProximity() const override { return false; }
+  void UpdateGliderStartCylinderProximity(const GeoPoint &ref) override { };
 };
 
 #endif

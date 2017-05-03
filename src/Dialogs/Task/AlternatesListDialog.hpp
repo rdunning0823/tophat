@@ -157,7 +157,7 @@ public:
   void CalculateLayout(const PixelRect &rc);
 
   /* virtual inhereted ActionListener */
-  void OnAction(int id);
+  void OnAction(int id) override;
 
   void UpdateAirfieldsOnly(bool airfields_only);
   CheckBoxWidget &GetAirfieldsCheckbox();

@@ -880,9 +880,9 @@ public:
    * checks whether the aircraft is within 3 miles of the edge of the start
    * cylinder, or inside it
    */
-  void UpdateGliderStartCylinderProximity(const GeoPoint &ref);
+  void UpdateGliderStartCylinderProximity(const GeoPoint &ref) override;
   gcc_pure
-  bool CheckGliderStartCylinderProximity() const {
+  bool CheckGliderStartCylinderProximity() const override {
     return is_glider_close_to_start_cylinder;
   }
 
