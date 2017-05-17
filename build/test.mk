@@ -1546,6 +1546,7 @@ RUN_WIND_COMPUTER_SOURCES = \
 	$(SRC)/Computer/Wind/CirclingWind.cpp \
 	$(SRC)/Computer/Wind/Computer.cpp \
 	$(SRC)/Computer/Wind/MeasurementList.cpp \
+    $(SRC)/Computer/Wind/WindForecast.cpp \
 	$(SRC)/Computer/Wind/Store.cpp \
 	$(SRC)/Formatter/TimeFormatter.cpp \
 	$(TEST_SRC_DIR)/RunWindComputer.cpp
@@ -1634,6 +1635,7 @@ ANALYSE_FLIGHT_SOURCES = \
 	$(SRC)/Computer/Wind/CirclingWind.cpp \
 	$(SRC)/Computer/Wind/Computer.cpp \
 	$(SRC)/Computer/Wind/MeasurementList.cpp \
+    $(SRC)/Computer/Wind/WindForecast.cpp \
 	$(SRC)/Computer/Wind/Store.cpp \
 	$(SRC)/Formatter/TimeFormatter.cpp \
 	$(SRC)/NMEA/Aircraft.cpp \
@@ -2183,6 +2185,7 @@ RUN_ANALYSIS_SOURCES = \
 	$(SRC)/Computer/Wind/CirclingWind.cpp \
 	$(SRC)/Computer/Wind/Store.cpp \
 	$(SRC)/Computer/Wind/MeasurementList.cpp \
+    $(SRC)/Computer/Wind/WindForecast.cpp \
 	$(SRC)/Computer/Wind/WindEKF.cpp \
 	$(SRC)/Computer/Wind/WindEKFGlue.cpp \
 	$(SRC)/Projection/Projection.cpp \

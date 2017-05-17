@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_WIND_COMPUTER_HPP
 
 #include "CirclingWind.hpp"
+#include "WindForecast.hpp"
 #include "WindEKFGlue.hpp"
 #include "Store.hpp"
 
@@ -41,6 +42,7 @@ struct DerivedInfo;
  */
 class WindComputer {
   CirclingWind circling_wind;
+  WindForecast wind_fc;
   WindEKFGlue wind_ekf;
 
   // TODO: protect with a Mutex
