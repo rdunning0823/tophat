@@ -323,7 +323,7 @@ SetTypeTextFor2MinuteCount(SliderShape::TypeBuffer &type_buffer,
                            SliderShape::TypeBuffer &type_buffer_short,
                            int time_under_max_start)
 {
-  if (negative(time_under_max_start)) {
+  if (time_under_max_start < 0) {
     type_buffer = _("Above Start");
     type_buffer_short = _("Above");
   }
