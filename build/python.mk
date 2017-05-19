@@ -16,6 +16,7 @@ PYTHON_SOURCES = \
         $(SRC)/Computer/Wind/CirclingWind.cpp \
         $(SRC)/Computer/Wind/Computer.cpp \
         $(SRC)/Computer/Wind/MeasurementList.cpp \
+        $(SRC)/Computer/Wind/WindForecast.cpp \
         $(SRC)/Computer/Wind/Store.cpp \
 	$(TEST_SRC_DIR)/FlightPhaseDetector.cpp \
 	$(PYTHON_SRC)/Flight/Flight.cpp \

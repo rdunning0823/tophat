@@ -351,6 +351,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Waypoint/Factory.cpp \
 	$(SRC)/Computer/Wind/CirclingWind.cpp \
 	$(SRC)/Computer/Wind/MeasurementList.cpp \
+	$(SRC)/Computer/Wind/WindForecast.cpp \
 	$(SRC)/Computer/Wind/Store.cpp \
 	$(SRC)/Computer/Wind/WindEKF.cpp \
 	$(SRC)/Computer/Wind/WindEKFGlue.cpp \
