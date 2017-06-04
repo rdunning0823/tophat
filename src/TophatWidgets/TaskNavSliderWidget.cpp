@@ -158,6 +158,13 @@ TaskNavSliderWidget::RefreshList(TaskType mode)
   GetList().Invalidate();
 }
 
+static bool ShowTwoMinutes(bool is_ordered, unsigned idx,
+                           bool is_glider_close_to_start_cylinder)
+{
+  return is_ordered &&
+      (idx < 1 || (idx == 1 && is_glider_close_to_start_cylinder));
+}
+
 void
 TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                                  unsigned idx)
@@ -192,8 +199,9 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     const OrderedTaskSettings &settings = task.GetOrderedTaskSettings();
     factory_type = task.GetFactoryType();
     int max_height = settings.start_constraints.max_height;
-    show_two_minute_start = settings.show_two_minute_start && flying.flying;
     bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
+    show_two_minute_start = settings.show_two_minute_start && flying.flying &&
+        ShowTwoMinutes(is_ordered, idx, is_glider_close_to_start_cylinder);
 
     if (idx > 0 && idx >= task_manager->TaskSize())
       return;
@@ -211,12 +219,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     } else
       tp_valid = false;
 
-    int raw_time_under = TaskNavSlider::GetTimeUnderStart(
+    time_under_max_start = TaskNavSlider::GetTimeUnderStart(
         max_height, show_two_minute_start);
-    time_under_max_start =
-        (is_ordered && (idx < 1 ||
-            (idx == 1 && is_glider_close_to_start_cylinder))) ?
-                raw_time_under  : -1;
   }
 
   bool has_entered = tp_valid && is_ordered && otp->HasEntered();
