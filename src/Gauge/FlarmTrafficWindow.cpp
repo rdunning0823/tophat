@@ -378,34 +378,59 @@ FlarmTrafficWindow::PaintRadarTarget(Canvas &canvas,
       canvas.DrawCircle(sc[i].x, sc[i].y, Layout::FastScale(small ? 10 : 19));
   }
 
+  const unsigned arrow_size = traffic.IsPowered() ? 10 : 5;
   // Create an arrow polygon
-  RasterPoint Arrow[5];
+  RasterPoint Arrow[10];
   if (small) {
-    Arrow[0].x = -3;
-    Arrow[0].y = 4;
-    Arrow[1].x = 0;
-    Arrow[1].y = -5;
-    Arrow[2].x = 3;
-    Arrow[2].y = 4;
-    Arrow[3].x = 0;
-    Arrow[3].y = 2;
-    Arrow[4].x = -3;
-    Arrow[4].y = 4;
+    Arrow[0].x = 0;
+    Arrow[0].y = -5;
+    Arrow[1].x = 3;
+    Arrow[1].y = 4;
+    Arrow[2].x = 0;
+    Arrow[2].y = 2;
+    Arrow[3].x = -3;
+    Arrow[3].y = 4;
+    Arrow[4].x = 0;
+    Arrow[4].y = -5;
+
+    // propeller
+    Arrow[5].x = 3;
+    Arrow[5].y = -5;
+    Arrow[6].x = 3;
+    Arrow[6].y = -6;
+    Arrow[7].x = -3;
+    Arrow[7].y = -6;
+    Arrow[8].x = -3;
+    Arrow[8].y = -5;
+    Arrow[9].x = 0;
+    Arrow[9].y = -5;
   } else {
-    Arrow[0].x = -6;
-    Arrow[0].y = 8;
-    Arrow[1].x = 0;
-    Arrow[1].y = -10;
-    Arrow[2].x = 6;
-    Arrow[2].y = 8;
-    Arrow[3].x = 0;
-    Arrow[3].y = 5;
-    Arrow[4].x = -6;
-    Arrow[4].y = 8;
+    Arrow[0].x = 0;
+    Arrow[0].y = -10;
+    Arrow[1].x = 6;
+    Arrow[1].y = 8;
+    Arrow[2].x = 0;
+    Arrow[2].y = 5;
+    Arrow[3].x = -6;
+    Arrow[3].y = 8;
+    Arrow[4].x = 0;
+    Arrow[4].y = -10;
+
+    // propeller
+    Arrow[5].x = 6;
+    Arrow[5].y = -10;
+    Arrow[6].x = 6;
+    Arrow[6].y = -9;
+    Arrow[7].x = -6;
+    Arrow[7].y = -9;
+    Arrow[8].x = -6;
+    Arrow[8].y = -10;
+    Arrow[9].x = 0;
+    Arrow[9].y = -10;
   }
 
   // Rotate and shift the arrow
-  PolygonRotateShift(Arrow, 5, sc[i],
+  PolygonRotateShift(Arrow, arrow_size, sc[i],
                      traffic.track - (enable_north_up ?
                                              Angle::Zero() : heading));
 
@@ -417,7 +442,7 @@ FlarmTrafficWindow::PaintRadarTarget(Canvas &canvas,
     canvas.Select(*target_brush);
 
   // Draw the polygon
-  canvas.DrawPolygon(Arrow, 5);
+  canvas.DrawPolygon(Arrow, arrow_size);
 
   if (small) {
     if (!WarningMode() || traffic.HasAlarm())
