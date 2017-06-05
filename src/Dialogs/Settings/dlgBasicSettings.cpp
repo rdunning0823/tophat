@@ -48,6 +48,7 @@ enum ControlIndex {
   Ballast,
   WingLoading,
   Bugs,
+  MaxBallast,
 };
 
 enum Actions {
@@ -155,6 +156,12 @@ FlightSetupPanel::SetBallast()
       MessageOperationEnvironment env;
       device_blackboard->SetBallast(fraction, overload, env);
     }
+
+    SetRowVisible(MaxBallast, ballastable);
+    if (ballastable) {
+      LoadValue(MaxBallast, plane.max_ballast);
+    }
+
   }
 }
 
@@ -219,13 +226,13 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
   AddFloat(_("Ballast"),
-           _("The amount of water ballast currently in the glider.  Affects the glide polar.  A 'Dump' button shows on the main menu if ballast > 0.  See 'Setup Plane.'"),
+           _("The amount of water ballast currently in the glider.  Affects the glide polar.  A 'Dump' button shows on the main menu if ballast > 0.  See 'Setup Plane.'  If flying with a smart vario, Max Ballast must also be configured in Tophat > Plane > Setup"),
            _T("%.0f L"), _T("%.0f"),
            fixed(0), fixed(500), fixed(5), false,
            fixed(0),
            this);
 
-  WndProperty *wing_loading = AddFloat(_("Wing loading"), nullptr,
+  WndProperty *wing_loading = AddFloat(_("Wing loading"), _("The current wing loading with the current ballast."),
                                        _T("%.1f %s"), _T("%.0f"), fixed(0),
                                        fixed(300), fixed(5),
                                        false, UnitGroup::WING_LOADING,
@@ -239,6 +246,15 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(0), fixed(50), fixed(1), false,
            (fixed(1) - polar_settings.bugs) * 100,
            this);
+
+  WndProperty *max_ballast =  AddFloat(_("Max ballast"),
+                                       _("The maximum amount of water ballast allowed for your glider.  If flying with a smart vario, Max Ballast must be configured in both Tophat > Plane > Setup and separately in your smart vario."),
+                                       _T("%.0f L"), _T("%.0f"),
+                                       fixed(0), fixed(500), fixed(5), false,
+                                       fixed(0),
+                                       this);
+
+  max_ballast->SetReadOnly(true);
 }
 
 bool
