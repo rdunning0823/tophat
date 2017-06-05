@@ -203,7 +203,7 @@ PlaneEditMoreWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
            false, plane.wing_area);
 
   AddFloat(_("Max. Ballast"),
-           _("The max water ballast your ship holds.  See 'Max ballast dump time.'"),
+           _("The max water ballast your ship holds.  Required to sync ballast with vario devices!"),
            _T("%.0f L"), _T("%.0f"),
            fixed(0), fixed(500), fixed(5),
            false, plane.max_ballast);
