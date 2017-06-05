@@ -37,6 +37,7 @@ namespace ActionInterface {
    * Configure a new Ballast setting in #ComputerSettings, and
    * forward it to all XCSoar modules that want it.
    *
+   * @param ballast. The new ballast setting (proportion of possible ballast, [0-1])
    * @param to_devices send the new settings to all devices?
    */
   void SetBallast(fixed ballast, bool to_devices=true);

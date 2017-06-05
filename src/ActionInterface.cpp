@@ -106,7 +106,7 @@ ActionInterface::SendGetComputerSettings()
 void
 ActionInterface::SetBallast(fixed ballast, bool to_devices)
 {
-  // write ballast into settings
+  // write ballast (ratio) into settings
   GlidePolar &polar = SetComputerSettings().polar.glide_polar_task;
   polar.SetBallast(ballast);
 
