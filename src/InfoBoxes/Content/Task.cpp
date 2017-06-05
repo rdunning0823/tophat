@@ -758,8 +758,7 @@ UpdateInfoBoxTaskAATime(InfoBoxData &data)
   const TaskStats &task_stats = calculated.ordered_task_stats;
   const CommonStats &common_stats = calculated.common_stats;
 
-  if (!task_stats.has_targets ||
-      !task_stats.total.IsAchievable()) {
+  if (!task_stats.has_targets) {
     data.SetInvalid();
     return;
   }
