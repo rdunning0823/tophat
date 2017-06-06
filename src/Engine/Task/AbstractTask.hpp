@@ -263,7 +263,8 @@ protected:
    * That is used for task calculations;
    */
   gcc_pure
-  virtual void UpdateTaskMC(const GlidePolar &glide_polar);
+  virtual void UpdateTaskMC(const GlidePolar &glide_polar,
+                            const GlidePolar &glide_polar_safety);
 
   /**
    * Calculate angle from aircraft to destination of current leg

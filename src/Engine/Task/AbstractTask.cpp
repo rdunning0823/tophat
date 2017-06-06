@@ -253,7 +253,7 @@ AbstractTask::Update(const AircraftState &state,
 {
   // use the task_mc setting for all task calculations
   GlidePolar glide_polar_task = glide_polar_safety;
-  UpdateTaskMC(glide_polar_task);
+  UpdateTaskMC(glide_polar_task, glide_polar_safety);
   glide_polar_task.SetMC(stats.task_mc);
 
   stats.active_index = GetActiveTaskPointIndex();
@@ -361,7 +361,8 @@ AbstractTask::CalcEffectiveMC(const AircraftState &state_now,
 }
 
 void
-AbstractTask::UpdateTaskMC(const GlidePolar &glide_polar)
+AbstractTask::UpdateTaskMC(const GlidePolar &glide_polar,
+                           const GlidePolar &glide_polar_safety)
 {
   stats.task_mc = glide_polar.GetMC();
 }

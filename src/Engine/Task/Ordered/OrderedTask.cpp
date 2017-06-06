@@ -1276,10 +1276,41 @@ UpdateTaskMCIfChanged(const fixed last_mc, fixed& last_speed, const fixed speed,
   }
 }
 
-void
-OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
+// 0 means use average speed only,
+// 1 means use safety MC equivalent speed only
+
+fixed
+OrderedTask::GetBlendRatioWhenTooCloseToStartForAverageSpeedCalc() const
 {
-  GlidePolar glide_polar = _glide_polar;
+  if (!positive(stats.distance_nominal) || !positive(stats.distance_scored)) {
+    return fixed(1); // use safety MC speed only
+  }
+
+  fixed ratio = stats.distance_scored / stats.distance_nominal;
+
+  if (ratio > fixed(0.15))
+    return fixed(0);
+
+  return fixed(1) - (ratio / fixed(0.15));
+}
+
+fixed
+OrderedTask::BlendAchievedTaskSpeedWithSafetyMCSpeed(fixed achieved_speed,
+                                                     fixed blend_ratio,
+                                                     const GlidePolar &safety_polar) const
+{
+  if (!positive(blend_ratio)) // 0.0
+    return achieved_speed;
+
+  fixed safety_speed = safety_polar.GetMCEffectiveSpeed();
+  return blend_ratio * safety_speed + (fixed(1) - blend_ratio) * achieved_speed;
+}
+
+void
+OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar_task,
+                          const GlidePolar &glide_polar_safety)
+{
+  GlidePolar glide_polar_task = _glide_polar_task;
 
   switch (task_behaviour.task_planning_speed_mode) {
 
@@ -1287,7 +1318,7 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
     fixed speed = Clamp(task_behaviour.task_planning_speed_override, fixed(5), fixed(200));
 
     stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
-                                          speed, glide_polar);
+                                          speed, glide_polar_task);
     stats.task_mc_effective_speed = speed;
     break;
   }
@@ -1295,22 +1326,28 @@ OrderedTask::UpdateTaskMC(const GlidePolar &_glide_polar)
   {
     // use current mc setting for speed proxy prior to starting task
     if (task_points.empty() || !task_points.front()->HasEntered()) {
-      stats.task_mc = glide_polar.GetMC();
+      stats.task_mc = glide_polar_task.GetMC();
 
     } else {
       // use overall speed if time less than one hour, else speed last hour
       fixed speed = (stats.total.time_elapsed > fixed(3600) &&
-          !negative(stats.last_hour.duration)) ? stats.last_hour.speed : stats.GetScoredSpeed();
+          !negative(stats.last_hour.duration)) ? stats.last_hour.speed :
+              stats.GetScoredSpeed();
+      fixed blend_ratio = GetBlendRatioWhenTooCloseToStartForAverageSpeedCalc();
+      speed = BlendAchievedTaskSpeedWithSafetyMCSpeed(speed,
+                                                      blend_ratio,
+                                                      glide_polar_safety);
+
       stats.task_mc = UpdateTaskMCIfChanged(stats.task_mc, last_task_mc_speed,
-                                            speed, glide_polar);
-      glide_polar.SetMC(stats.task_mc);
+                                            speed, glide_polar_task);
+      glide_polar_task.SetMC(stats.task_mc);
     }
-    stats.task_mc_effective_speed = glide_polar.GetMCEffectiveSpeed();
+    stats.task_mc_effective_speed = glide_polar_task.GetMCEffectiveSpeed();
     break;
   }
   case TaskBehaviour::TaskPlanningSpeedMode::MacCreadyValue:
-    stats.task_mc = glide_polar.GetMC();
-    stats.task_mc_effective_speed = glide_polar.GetMCEffectiveSpeed();
+    stats.task_mc = glide_polar_task.GetMC();
+    stats.task_mc_effective_speed = glide_polar_task.GetMCEffectiveSpeed();
     break;
   }
 }

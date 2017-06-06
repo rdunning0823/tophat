@@ -529,11 +529,30 @@ private:
   fixed ScanDistanceMax();
 
   /**
+   * are we close enough to the start so that achieved task speed is unreliable?
+   * @return: ratio [0..1].  0 means use average speed only,
+   *                         1 means use safety MC equivalent speed only
+   */
+  fixed GetBlendRatioWhenTooCloseToStartForAverageSpeedCalc() const;
+
+  /**
+   * @param achieved_speed
+   * @param blend_ratio
+   * @param glide polar for safety mc
+   * @return: speed blended from SafetyMC equivalent speed and VTaskAchieved
+   */
+  fixed BlendAchievedTaskSpeedWithSafetyMCSpeed(fixed achieved_speed,
+                                                fixed blend_ratio,
+                                                const GlidePolar &safety_polar) const;
+
+  /**
    * Updates the TaskStats.task_mc value based on the task planning behaviour
    * of the current task
-   * @param glide_polar.  The polar.  The mc setting is irrelevant
+   * @param glide_polar_task.  The task polar.  The mc setting is irrelevant
+   * @param glide_polar_safety.  The safety MC setting.
    */
-  void UpdateTaskMC(const GlidePolar &_glide_polar) override;
+  void UpdateTaskMC(const GlidePolar &_glide_polar,
+                    const GlidePolar &glide_polar_safety) override;
 
   /**
    * Optimise target ranges (for adjustable tasks) to produce an estimated
