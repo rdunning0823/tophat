@@ -50,6 +50,8 @@ struct UnitSetting
   Unit wing_loading_unit;
   /** Unit for mass */
   Unit mass_unit;
+  /** Unit for volume */
+  Unit volume_unit;
 
   void SetDefaults();
 

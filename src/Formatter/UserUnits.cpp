@@ -43,6 +43,12 @@ FormatUserMass(fixed value, TCHAR *buffer, bool include_unit)
 }
 
 void
+FormatUserVolume(fixed value, TCHAR *buffer, bool include_unit)
+{
+  FormatVolume(buffer, value, Units::GetUserVolumeUnit(), include_unit);
+}
+
+void
 FormatUserAltitude(fixed value, TCHAR *buffer, bool include_unit)
 {
   FormatAltitude(buffer, value, Units::GetUserAltitudeUnit(), include_unit);

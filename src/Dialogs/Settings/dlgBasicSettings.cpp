@@ -139,7 +139,8 @@ FlightSetupPanel::SetBallast()
   const bool ballastable = polar_settings.glide_polar_task.IsBallastable();
   SetRowVisible(Ballast, ballastable);
   if (ballastable)
-    LoadValue(Ballast, polar_settings.glide_polar_task.GetBallastLitres());
+    LoadValue(Ballast, polar_settings.glide_polar_task.GetBallastLitres(),
+              UnitGroup::VOLUME);
 
   const fixed wl = polar_settings.glide_polar_task.GetWingLoading();
   SetRowVisible(WingLoading, positive(wl));
@@ -159,7 +160,7 @@ FlightSetupPanel::SetBallast()
 
     SetRowVisible(MaxBallast, ballastable);
     if (ballastable) {
-      LoadValue(MaxBallast, plane.max_ballast);
+      LoadValue(MaxBallast, plane.max_ballast, UnitGroup::VOLUME);
     }
 
   }
@@ -212,8 +213,9 @@ void
 FlightSetupPanel::OnModified(DataField &df)
 {
   if (IsDataField(Ballast, df)) {
-    const DataFieldFloat &dff = (const DataFieldFloat &)df;
-    SetBallastLitres(dff.GetAsFixed());
+    fixed ballast = fixed(0);
+    if (SaveValue(Ballast, UnitGroup::VOLUME, ballast))
+      SetBallastLitres(ballast);
   } else if (IsDataField(Bugs, df)) {
     const DataFieldFloat &dff = (const DataFieldFloat &)df;
     SetBugs(fixed(1) - (dff.GetAsFixed() / 100));
@@ -227,10 +229,9 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddFloat(_("Ballast"),
            _("The amount of water ballast currently in the glider.  Affects the glide polar.  A 'Dump' button shows on the main menu if ballast > 0.  See 'Setup Plane.'  If flying with a smart vario, Max Ballast must also be configured in Tophat > Plane > Setup"),
-           _T("%.0f L"), _T("%.0f"),
+           _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(500), fixed(5), false,
-           fixed(0),
-           this);
+           UnitGroup::VOLUME, fixed(0), this);
 
   WndProperty *wing_loading = AddFloat(_("Wing loading"), _("The current wing loading with the current ballast."),
                                        _T("%.1f %s"), _T("%.0f"), fixed(0),
@@ -249,10 +250,9 @@ FlightSetupPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   WndProperty *max_ballast =  AddFloat(_("Max ballast"),
                                        _("The maximum amount of water ballast allowed for your glider.  If flying with a smart vario, Max Ballast must be configured in both Tophat > Plane > Setup and separately in your smart vario."),
-                                       _T("%.0f L"), _T("%.0f"),
+                                       _T("%.0f %s"), _T("%.0f"),
                                        fixed(0), fixed(500), fixed(5), false,
-                                       fixed(0),
-                                       this);
+                                       UnitGroup::VOLUME, fixed(0));
 
   max_ballast->SetReadOnly(true);
 }

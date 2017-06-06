@@ -204,9 +204,8 @@ PlaneEditMoreWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddFloat(_("Max. Ballast"),
            _("The max water ballast your ship holds.  Required to sync ballast with vario devices!"),
-           _T("%.0f L"), _T("%.0f"),
-           fixed(0), fixed(500), fixed(5),
-           false, plane.max_ballast);
+           _T("%.0f %s"), _T("%.0f"), fixed(0), fixed(500), fixed(5),
+           false, UnitGroup::VOLUME, plane.max_ballast);
 
   AddInteger(_("Dump Time"),
              _("This amount of time it takes to dump full water ballast.  See 'Max ballast.'"),
@@ -226,7 +225,7 @@ PlaneEditMoreWidget::Show(const PixelRect &rc)
   /* reload attributes that may have been modified by polar */
   LoadValue(HANDICAP, (int)plane.handicap);
   LoadValue(WING_AREA, plane.wing_area);
-  LoadValue(MAX_BALLAST, plane.max_ballast);
+  LoadValue(MAX_BALLAST, plane.max_ballast, UnitGroup::VOLUME);
   LoadValue(MAX_SPEED, plane.max_speed, UnitGroup::HORIZONTAL_SPEED);
 }
 
@@ -237,7 +236,7 @@ PlaneEditMoreWidget::Hide()
   /* save attributes that may have been modified by polar */
   SaveValue(HANDICAP, plane.handicap);
   SaveValue(WING_AREA, plane.wing_area);
-  SaveValue(MAX_BALLAST, plane.max_ballast);
+  SaveValue(MAX_BALLAST, UnitGroup::VOLUME, plane.max_ballast);
   SaveValue(MAX_SPEED, UnitGroup::HORIZONTAL_SPEED,
             plane.max_speed);
 }
@@ -249,7 +248,7 @@ PlaneEditMoreWidget::Save(bool &_changed)
 
   changed |= SaveValue(HANDICAP, plane.handicap);
   changed |= SaveValue(WING_AREA, plane.wing_area);
-  changed |= SaveValue(MAX_BALLAST, plane.max_ballast);
+  changed |= SaveValue(MAX_BALLAST, UnitGroup::VOLUME, plane.max_ballast);
   changed |= SaveValue(DUMP_TIME, plane.dump_time);
   changed |= SaveValue(MAX_SPEED, UnitGroup::HORIZONTAL_SPEED,
                        plane.max_speed);

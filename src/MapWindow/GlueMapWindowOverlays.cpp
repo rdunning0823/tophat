@@ -537,11 +537,13 @@ GlueMapWindow::DrawFlightMode(Canvas &canvas, const PixelRect &rc,
     buffer += _("Simulator");
   }
 
-  if (GetComputerSettings().polar.ballast_timer_active)
+  if (GetComputerSettings().polar.ballast_timer_active) {
+
+    StaticString<20>units;
+    FormatUserVolume(GetComputerSettings().polar.glide_polar_task.GetBallastLitres(), units.buffer(), true);
     buffer.AppendFormat(
-        _T(" %s %d %s"), _("Ballast"),
-        (int)GetComputerSettings().polar.glide_polar_task.GetBallastLitres(),
-        _("Liters"));
+        _T(" %s %s"), _("Ballast"), units.c_str());
+  }
 
   if (!buffer.empty()) {
     TextInBoxMode mode;

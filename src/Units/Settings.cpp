@@ -36,6 +36,7 @@ UnitSetting::SetDefaults()
   pressure_unit = Unit::HECTOPASCAL;
   wing_loading_unit = Unit::LB_PER_FT2;
   mass_unit = Unit::LB;
+  volume_unit = Unit::LITER;
 }
 
 Unit
@@ -74,6 +75,10 @@ UnitSetting::GetByGroup(UnitGroup group) const
 
   case UnitGroup::MASS:
     return mass_unit;
+
+  case UnitGroup::VOLUME:
+    return volume_unit;
+
   }
 
   return Unit::UNDEFINED;
@@ -91,5 +96,6 @@ UnitSetting::operator==(const UnitSetting &right) const
       task_speed_unit == right.task_speed_unit &&
       pressure_unit == right.pressure_unit &&
       wing_loading_unit == right.wing_loading_unit &&
-      mass_unit == right.mass_unit);
+      mass_unit == right.mass_unit &&
+      volume_unit == right.volume_unit);
 }

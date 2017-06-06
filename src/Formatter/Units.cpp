@@ -50,6 +50,13 @@ FormatMass(TCHAR *buffer, fixed value, Unit unit,
 }
 
 void
+FormatVolume(TCHAR *buffer, fixed value, Unit unit,
+             bool include_unit)
+{
+  FormatInteger(buffer, value, unit, include_unit, false);
+}
+
+void
 FormatWingLoading(TCHAR *buffer, fixed value, Unit unit,
                   bool include_unit)
 {

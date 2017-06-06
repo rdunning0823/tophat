@@ -42,6 +42,7 @@ Copyright_License {
 #include "Net/HTTP/Features.hpp"
 #include "UIState.hpp"
 #include "GlideSolvers/GlidePolar.hpp"
+#include "Formatter/UserUnits.hpp"
 
 #include <stdlib.h>
 
@@ -745,13 +746,15 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
   } else if (_tcsstr(OutBuffer, _T("$(Dump)"))) {
     fixed ballast = GetComputerSettings().polar.glide_polar_task.GetBallastLitres();
     if (!positive(ballast)) {
-      ReplaceInString(OutBuffer, _T("$(Dump)"), _T(""), Size);
+      ReplaceInString(OutBuffer, _T("$(Dump)"), _T(""), Size); //hide button
     }
     else if (GetComputerSettings().polar.ballast_timer_active)
       ReplaceInString(OutBuffer, _T("$(Dump)"), _("Dump stop"), Size);
     else {
       StaticString<50>buffer;
-      buffer.Format(_T("%s %.0f L"), _("Dump"), (double)ballast);
+      StaticString<20>units;
+      FormatUserVolume(ballast, units.buffer(), true);
+      buffer.Format(_T("%s %s"), _("Dump"), units.c_str());
       ReplaceInString(OutBuffer, _T("$(Dump)"), buffer.c_str(), Size);
     }
   }

@@ -36,6 +36,7 @@ UnitSetting Units::current = {
   Unit::HECTOPASCAL,
   Unit::KG_PER_M2,
   Unit::KG,
+  Unit::LITER,
 };
 
 void
@@ -54,6 +55,12 @@ Unit
 Units::GetUserMassUnit()
 {
   return current.mass_unit;
+}
+
+Unit
+Units::GetUserVolumeUnit()
+{
+  return current.volume_unit;
 }
 
 Unit

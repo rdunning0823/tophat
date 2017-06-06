@@ -60,6 +60,13 @@ namespace Units
   Unit GetUserMassUnit();
 
   /**
+   * Returns the user-specified unit for volume
+   * @return The user-specified unit for volume
+   */
+  gcc_pure
+  Unit GetUserVolumeUnit();
+
+  /**
    * Returns the user-specified unit for a horizontal distance
    * @return The user-specified unit for a horizontal distance
    */

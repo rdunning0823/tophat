@@ -54,6 +54,8 @@ const UnitDescriptor Units::unit_descriptors[] = {
   { _T("lb/ft²"), fixed(0.204816144), fixed(0) },
   { _T("kg"), fixed(1), fixed(0) },
   { _T("lb"), fixed(2.20462), fixed(0) },
+  { _T("gallon"), fixed(0.264172), fixed(0) },
+  { _T("liter"), fixed(1), fixed(0) },
 };
 
 static_assert(ARRAY_SIZE(Units::unit_descriptors) == (size_t)Unit::COUNT,

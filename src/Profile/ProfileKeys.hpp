@@ -35,6 +35,7 @@ extern const char LiftUnitsValue[];
 extern const char PressureUnitsValue[];
 extern const char WingLoadingUnitValue[];
 extern const char MassUnitValue[];
+extern const char VolumeUnitsValue[];
 extern const char TaskSpeedUnitsValue[];
 extern const char DisplayUpValue[];
 extern const char OrientationCruise[];

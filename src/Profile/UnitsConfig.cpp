@@ -336,6 +336,23 @@ GetMassUnit(const ProfileMap &map, const char *key, Unit &value)
   return true;
 }
 
+static constexpr bool
+ValidVolumeUnit(Unit unit)
+{
+  return unit == Unit::GALLON || unit == Unit::LITER;
+}
+
+static bool
+GetVolumeUnit(const ProfileMap &map, const char *key, Unit &value)
+{
+  Unit tmp;
+  if (!map.GetEnum(key, tmp) || !ValidVolumeUnit(tmp))
+    return false;
+
+  value = tmp;
+  return true;
+}
+
 void
 Profile::LoadUnits(const ProfileMap &map, UnitSetting &config)
 {
@@ -357,4 +374,5 @@ Profile::LoadUnits(const ProfileMap &map, UnitSetting &config)
   GetWingLoadingUnit(map, ProfileKeys::WingLoadingUnitValue,
                      config.wing_loading_unit);
   GetMassUnit(map, ProfileKeys::MassUnitValue, config.mass_unit);
+  GetVolumeUnit(map, ProfileKeys::VolumeUnitsValue, config.volume_unit);
 }

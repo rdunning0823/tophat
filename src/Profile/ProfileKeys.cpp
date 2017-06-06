@@ -69,6 +69,7 @@ const char LiftUnitsValue[] = "LiftUnit";
 const char PressureUnitsValue[] = "Pressure";
 const char WingLoadingUnitValue[] = "WingLoadingUnits";
 const char MassUnitValue[] = "MassUnits";
+const char VolumeUnitsValue[] = "VolumeUnits";
 const char LatLonUnits[] = "LatLonUnits";
 const char PolarID[] = "Polar";
 const char Polar[] = "PolarInformation";

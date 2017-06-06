@@ -54,6 +54,17 @@ void FormatMass(TCHAR *buffer, fixed value, Unit unit,
                 bool include_unit = true);
 
 /**
+ * Converts a Volume into a formatted string
+ * @param buffer buffer string to write to (pointer)
+ * @param size Size of the buffer
+ * @param value the Volume
+ * @param unit the Volume unit (e.g. liter, gallon)
+ * @param include_unit include the unit into the string?
+ */
+void FormatVolume(TCHAR *buffer, fixed value, Unit unit,
+                  bool include_unit = true);
+
+/**
  * Converts a wing loading into a formatted string
  * @param buffer buffer string to write to (pointer)
  * @param size Size of the buffer

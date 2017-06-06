@@ -46,6 +46,7 @@ enum ControlIndex {
   UnitsTaskSpeed,
   UnitsPressure,
   UnitsMass,
+  UnitsVolume,
   UnitsWingLoading,
   UnitsLatLon
 };
@@ -79,6 +80,7 @@ UnitsConfigPanel::UpdateUnitFields(const UnitSetting &units)
   LoadValueEnum(UnitsTaskSpeed, units.task_speed_unit);
   LoadValueEnum(UnitsPressure, units.pressure_unit);
   LoadValueEnum(UnitsMass, units.mass_unit);
+  LoadValueEnum(UnitsVolume, units.volume_unit);
   LoadValueEnum(UnitsWingLoading, units.wing_loading_unit);
 
   // Ignore the coord.format for the preset selection.
@@ -231,6 +233,17 @@ UnitsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
           (unsigned)config.mass_unit, this);
   SetExpertRow(UnitsMass);
 
+  static constexpr StaticEnumChoice volume_labels_list[] = {
+    { (unsigned)Unit::GALLON, _T("Gallon") },
+    { (unsigned)Unit::LITER, _T("Liter") },
+    { 0 }
+  };
+  AddEnum(_("Volume"), _("Units used ballast volume."),
+          volume_labels_list,
+          (unsigned)config.volume_unit, this);
+  SetExpertRow(UnitsVolume);
+
+
   static constexpr StaticEnumChoice wing_loading_labels_list[] = {
     { (unsigned)Unit::KG_PER_M2, _T("kg/m²") },
     { (unsigned)Unit::LB_PER_FT2, _T("lb/ft²") },
@@ -284,6 +297,9 @@ UnitsConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(UnitsMass, ProfileKeys::MassUnitValue,
                            config.mass_unit);
+
+  changed |= SaveValueEnum(UnitsVolume, ProfileKeys::VolumeUnitsValue,
+                           config.volume_unit);
 
   changed |= SaveValueEnum(UnitsWingLoading, ProfileKeys::WingLoadingUnitValue,
                            config.wing_loading_unit);

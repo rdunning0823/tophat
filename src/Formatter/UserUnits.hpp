@@ -51,6 +51,15 @@ void FormatUserMass(fixed value, TCHAR *buffer,
                     bool include_unit = true);
 
 /**
+ * Converts a double-based Volume into a formatted string
+ * @param value The double-based Volume
+ * @param buffer buffer string to write to (pointer)
+ * @param size Size of the buffer
+ */
+void FormatUserVolume(fixed value, TCHAR *buffer,
+                      bool include_unit = true);
+
+/**
  * Converts a double-based Altitude into a formatted string
  * @param Altitude The double-based Altitude
  * @param buffer buffer string to write to (pointer)
