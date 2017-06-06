@@ -248,7 +248,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       fixed(0), // altitude is irrelevant with targets
                       false,
                       basic.location.Bearing(otp->GetLocationRemaining()) - basic.track,
-                      basic.location_available && otp->GetLocationRemaining().IsValid(),
+                      basic.location_available && otp->GetLocationRemaining().IsValid() && basic.track_available,
                       fixed(0), // GR is irrelevant to Target which moves
                       false,
                       use_wide_pen,
@@ -290,7 +290,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       elevation_valid && basic.NavAltitudeAvailable() &&
                           (result.IsOk() || result.vector.distance < fixed(0.01)),
                       result.vector.bearing - basic.track,
-                      basic.location_available && result.vector.IsValid(),
+                      basic.location_available && result.vector.IsValid() && basic.track_available,
                       gradient,
                       elevation_valid && result.IsOk() && GradientValid(gradient),
                       use_wide_pen,
