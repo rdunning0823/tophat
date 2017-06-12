@@ -127,11 +127,12 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
 
   static constexpr StaticEnumChoice wp_label_list[] = {
     { (unsigned)LabelShape::ROUNDED_BLACK, N_("Rounded rectangle"), nullptr },
-    { (unsigned)LabelShape::OUTLINED_INVERTED, N_("Outlined"), nullptr },
+    { (unsigned)LabelShape::OUTLINED_INVERTED, N_("Outlined text"), nullptr },
     { 0 }
   };
 
-  AddEnum(_("Label style"), nullptr, wp_label_list,
+  AddEnum(_("Landable label style"), _("Style of landable waypoint labels"),
+          wp_label_list,
           (unsigned)settings.landable_render_mode);
   SetExpertRow(WaypointLabelStyle);
 
