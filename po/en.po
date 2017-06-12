@@ -1176,11 +1176,6 @@ msgstr ""
 msgid "Next altitude difference"
 msgstr "Next arrival altitude AGL"
 
-#: src/InfoBoxes/Content/Factory.cpp:303
-#, no-c-format
-msgid "WP AltD"
-msgstr "WP AltA"
-
 #: src/InfoBoxes/Content/Factory.cpp:304
 #, no-c-format
 msgid ""
@@ -1217,19 +1212,6 @@ msgstr ""
 #, no-c-format
 msgid "Next WP"
 msgstr ""
-
-#: src/InfoBoxes/Content/Factory.cpp:328
-#, no-c-format
-msgid ""
-"The name of the currently selected turn point. When this InfoBox is active, "
-"using the up/down cursor keys selects the next/previous waypoint in the "
-"task. (Touch-screen/PC only) Pressing the enter cursor key brings up the "
-"waypoint details."
-msgstr ""
-"The name of the currently selected turn point. When this infobox is active, "
-"using the up/down cursor keys selects the next/previous waypoint in the "
-"task. (Touch-screen/PC only) Pressing the enter cursor key brings up the "
-"waypoint details."
 
 #: src/InfoBoxes/Content/Factory.cpp:337
 #, no-c-format
