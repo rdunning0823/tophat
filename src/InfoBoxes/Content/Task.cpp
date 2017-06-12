@@ -163,7 +163,7 @@ InfoBoxContentNextWaypoint::Update(InfoBoxData &data)
   const NMEAInfo &basic = CommonInterface::Basic();
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   const GlideResult &solution_remaining =
-    task_stats.current_leg.solution_remaining;
+    task_stats.current_leg.solution_remaining_safety_mc;
   const GeoVector &vector_remaining = task_stats.current_leg.vector_remaining;
   if (!basic.track_available || !task_stats.task_valid ||
       !vector_remaining.IsValid()) {
@@ -310,7 +310,7 @@ UpdateInfoBoxNextETA(InfoBoxData &data)
   }
 
   const BrokenTime t = now_local +
-    unsigned(task_stats.current_leg.solution_remaining.time_elapsed);
+    unsigned(task_stats.current_leg.solution_remaining_safety_mc.time_elapsed);
 
   // Set Value
   data.UnsafeFormatValue(_T("%02u:%02u"), t.hour, t.minute);
@@ -338,9 +338,10 @@ void
 UpdateInfoBoxNextAltitudeDiff(InfoBoxData &data)
 {
   // pilots want this to be assuming terminal flight to this wp
+  // altitude AGL
 
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
-  const GlideResult &next_solution = task_stats.current_leg.solution_remaining;
+  const GlideResult &next_solution = task_stats.current_leg.solution_remaining_safety_mc;
 
   SetValueFromAltDiff(data, task_stats, next_solution);
 }
@@ -373,6 +374,7 @@ void
 UpdateInfoBoxNextAltitudeArrival(InfoBoxData &data)
 {
   // pilots want this to be assuming terminal flight to this wp
+  // arrival target msl.  Or cross finish line msl
 
   const MoreData &basic = CommonInterface::Basic();
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
@@ -464,7 +466,7 @@ UpdateInfoBoxFinalETA(InfoBoxData &data)
   }
 
   const BrokenTime t = now_local +
-    unsigned(task_stats.total.solution_remaining.time_elapsed);
+    unsigned(task_stats.total.solution_remaining_safety_mc.time_elapsed);
 
   // Set Value
   data.UnsafeFormatValue(_T("%02u:%02u"), t.hour, t.minute);
@@ -1073,6 +1075,7 @@ UpdateInfoBoxStartOpenArrival(InfoBoxData &data)
   const NMEAInfo &basic = CommonInterface::Basic();
   const auto &calculated = CommonInterface::Calculated();
   const TaskStats &task_stats = calculated.ordered_task_stats;
+  // This uses the task_macready, not the safety mc but it makes no difference
   const GlideResult &current_remaining =
     task_stats.current_leg.solution_remaining;
   const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
