@@ -200,7 +200,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next Bearing"),
     N_("Bearing"),
-    N_("True bearing of the next waypoint.  For AAT tasks, this is the true bearing to the target within the AAT sector."),
+    N_("True bearing of the next waypoint.  For AAT tasks, this is the true bearing to the target within the AAT sector.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxBearing,
     next_waypoint_infobox_panels,
     e_Speed_GPS, // V GND
@@ -289,7 +289,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next distance"),
     N_("WP Dist"),
-    N_("The distance to the currently selected waypoint. For AAT tasks, this is the distance to the target within the AAT sector."),
+    N_("The distance to the currently selected waypoint. For AAT tasks, this is the distance to the target within the AAT sector.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxNextDistance,
     next_waypoint_infobox_panels,
     WP_NOMINAL_DIST, // WP Dist-N
@@ -301,7 +301,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next altitude difference"),
     N_("WP AltD"),
-    N_("Arrival altitude at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used."),
+    N_("Arrival altitude at the next waypoint relative to the safety arrival height. For AAT tasks, the target within the AAT sector is used.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxNextAltitudeDiff,
     next_waypoint_infobox_panels,
     e_WP_MC0AltDiff, // WP MC0 AltD
@@ -313,7 +313,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next altitude required"),
     N_("WP AltR"),
-    N_("Absolute altitude MSL required to reach the next turn point. For AAT tasks, the target within the AAT sector is used."),
+    N_("Absolute altitude MSL required to reach the next turn point. For AAT tasks, the target within the AAT sector is used.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxNextAltitudeRequire,
     next_waypoint_infobox_panels,
     e_Fin_AltDiff, // Fin AltD
@@ -325,7 +325,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next waypoint"),
     N_("Next WP"),
-    N_("The name of the currently selected turn point. When this InfoBox is active, using the up/down cursor keys selects the next/previous waypoint in the task. (Touch-screen/PC only) Pressing the enter cursor key brings up the waypoint details."),
+    N_("The name of the currently selected turn point."),
     IBFHelper<InfoBoxContentNextWaypoint>::Create,
     e_TimeSinceTakeoff, // Time flt
     e_TaskMaxHeightTime, // Start height
@@ -1016,7 +1016,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next altitude arrival"),
     N_("WP AltA"),
-    N_("Absolute arrival altitude at the next waypoint in final glide.  For AAT tasks, the target within the AAT sector is used."),
+    N_("Absolute arrival altitude at the next waypoint in final glide.  For AAT tasks, the target within the AAT sector is used.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxNextAltitudeArrival,
     next_waypoint_infobox_panels,
     e_WP_AltReq, // WP AltR
@@ -1184,7 +1184,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next MC0 altitude difference"),
     N_("WP MC0 AltD"),
-    N_("Arrival altitude at the next waypoint with MC 0 setting relative to the safety arrival height.  For AAT tasks, the target within the AAT sector is used."),
+    N_("Arrival altitude at the next waypoint with MC 0 setting relative to the safety arrival height.  For AAT tasks, the target within the AAT sector is used.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxNextMC0AltitudeDiff,
     next_waypoint_infobox_panels,
     e_WP_H, // WP AltA
@@ -1346,7 +1346,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next distance (nominal)"),
     N_("WP Dist-N"),
-    N_("The distance to the currently selected waypoint. For AAT tasks, this is the distance to the origin of the AAT sector."),
+    N_("The distance to the currently selected waypoint. For AAT tasks, this is the distance to the origin of the AAT sector.  For finish cylinders, the point is on the cylinder edge."),
     UpdateInfoBoxNextDistanceNominal,
     next_waypoint_infobox_panels,
     e_WP_AltDiff, // WP AltD
