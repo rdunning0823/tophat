@@ -128,6 +128,8 @@ BaseAccessPanel::ShowHelp()
 
   StaticString<256> help_text;
   help_text = gettext(InfoBoxFactory::GetDescription(old_type));
+  /* get caption in case it is not already set */
+  caption_text = gettext(InfoBoxFactory::GetName(old_type));
   HelpDialog(caption_text.c_str(), help_text.c_str());
 }
 

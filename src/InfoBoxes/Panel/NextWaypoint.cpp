@@ -50,6 +50,7 @@ public:
 void
 NextWaypointPanel::SetCaption()
 {
+  BaseAccessPanel::SetCaption();
   assert(waypoint != nullptr);
   StaticString<255> caption;
   caption.Format(_T("%s: %s"), _("Next waypoint"), waypoint->name.c_str());
