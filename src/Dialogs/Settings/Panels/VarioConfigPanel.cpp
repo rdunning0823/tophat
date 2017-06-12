@@ -68,7 +68,7 @@ VarioConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings.show_average);
   SetExpertRow(AppGaugeVarioAvgText);
 
-  AddBoolean(_("Show MacReady"), _("Whether to show the MacCready setting."), settings.show_mc);
+  AddBoolean(_("Show MacCready"), _("Whether to show the MacCready setting."), settings.show_mc);
   SetExpertRow(AppGaugeVarioMc);
 
   AddBoolean(_("Show bugs"), _("Whether to show the bugs percentage."), settings.show_bugs);

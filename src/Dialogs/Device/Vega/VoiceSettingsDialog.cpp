@@ -71,7 +71,7 @@ VoiceSettingsPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
              settings.voice_task_altitude_difference_enabled);
 
   AddBoolean(_("MacCready"),
-             _("Enable voice read-back of MacReady setting after it is adjusted."),
+             _("Enable voice read-back of MacCready setting after it is adjusted."),
              settings.voice_mac_cready_enabled);
 
   AddBoolean(_("New waypoint"),
