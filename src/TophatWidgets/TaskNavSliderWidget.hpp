@@ -28,7 +28,6 @@ Copyright_License {
 #include "TophatWidgets/TaskNavSliderShape.hpp"
 #include "Form/HorizontalList.hpp"
 #include "Task/Ordered/OrderedTask.hpp"
-#include "Time/PeriodClock.hpp"
 #include "Engine/Task/TaskManager.hpp"
 #include "Util/StaticString.hxx"
 #include "Task/TaskType.hpp"
@@ -81,11 +80,6 @@ protected:
    * time the TaskManager is updated.
    */
   unsigned waypoint_index;
-
-  /**
-   * clock to limit the refresh rate of the task points
-   */
-  PeriodClock altitude_cache_clock;
 
 public:
   TaskNavSliderWidget();

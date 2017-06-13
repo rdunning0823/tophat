@@ -24,7 +24,6 @@ Copyright_License {
 #include "TophatWidgets/TaskNavSliderWidget.hpp"
 #include "Input/InputEvents.hpp"
 #include "Util/StaticString.hxx"
-#include "OS/Clock.hpp"
 
 #include "UIGlobals.hpp"
 #include "Look/Look.hpp"
