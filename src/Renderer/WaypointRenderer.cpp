@@ -51,7 +51,15 @@ Copyright_License {
 #include "Look/MapLook.hpp"
 #include "UIGlobals.hpp"
 #include "Look/WaypointLook.hpp"
+#include "Renderer/LabelArranger.hpp"
+#include "Screen/Layout.hpp"
 
+// #define PRINT_AVERAGE_ENERGY /* Displays label energy in label on map */
+#ifdef PRINT_AVERAGE_ENERGY
+#include "LogFile.hpp"
+#include "Util/StringUtil.hpp"
+#include "Util/StringFormat.hpp"
+#endif
 
 #include <assert.h>
 #include <stdio.h>
@@ -174,10 +182,10 @@ public:
      task_look(UIGlobals::GetMapLook().task),
      basic(_basic),
      is_mat(false),
-     task_valid(false),
-     labels(projection.GetScreenWidth(), projection.GetScreenHeight())
+     task_valid(false)
   {
     _tcscpy(sAltUnit, Units::GetAltitudeName());
+    labels.Init(projection.GetScreenWidth(), projection.GetScreenHeight());
   }
 
   /**
@@ -366,15 +374,20 @@ protected:
     FormatLabel(Buffer, way_point, vwp.reach);
 
     RasterPoint sc = vwp.point;
-    if ((vwp.reachable != WaypointRenderer::Unreachable &&
-         settings.landable_style == WaypointRendererSettings::LandableStyle::PURPLE_CIRCLE) ||
-        settings.vector_landable_rendering)
+    unsigned enlarged_icon = 0;
+    if (vwp.reachable != WaypointRenderer::Unreachable &&
+         (settings.landable_style == WaypointRendererSettings::LandableStyle::PURPLE_CIRCLE ||
+        settings.vector_landable_rendering))
       // make space for the green circle
-      sc.x += 5;
+      enlarged_icon = Layout::Scale(1);
 
-    labels.Add(Buffer, sc.x + 5, sc.y, text_mode, bold, vwp.reach.direct,
-               vwp.in_task, way_point.IsLandable(), way_point.IsAirport(),
-               watchedWaypoint);
+    unsigned radius = Layout::Scale(2) + enlarged_icon;
+    int half_label_height = canvas.CalcTextSize(Buffer).cy / 2;
+    labels.Add(vwp.waypoint != nullptr ? vwp.waypoint->id : 0, Buffer,
+        sc.x + radius + Layout::Scale(2), sc.y + radius - half_label_height, sc,
+        Layout::Scale(4) + enlarged_icon, text_mode, bold,
+        vwp.reach.direct, vwp.in_task, way_point.IsLandable(),
+        way_point.IsAirport(), watchedWaypoint);
   }
 
   void AddWaypoint(const Waypoint &way_point, bool in_task) {
@@ -465,21 +478,131 @@ public:
   }
 };
 
-static void
-MapWaypointLabelRender(Canvas &canvas, UPixelScalar width, UPixelScalar height,
-                       LabelBlock &label_block,
-                       WaypointLabelList &labels,
-                       const WaypointLook &look)
+#ifdef PRINT_AVERAGE_ENERGY
+/**
+ * Updates the text of the label to replace the ending letters with its energy
+ * @param l. label to be updated
+ * @param scaled_energy
+ * @return scaled energy for the label
+ */
+static int
+UpdateLabelTextWithEnergy(WaypointLabelList::Label &l)
 {
-  labels.Sort();
+  if (l.energy.energy < 0)
+    return 0;
 
-  for (const auto &l : labels) {
-    canvas.Select(l.bold ? *look.bold_font : *look.font);
+  TCHAR text[NAME_SIZE+1];
 
-    TextInBox(canvas, l.Name, l.Pos.x, l.Pos.y, l.Mode,
-              width, height, &label_block);
+  CopyString(text, l.Name, std::max(3, int(StringLength(l.Name) - 5)));
+  StringFormat(l.Name, NAME_SIZE, _T("%s.%i"), text, l.energy.ScaledEnergy());
+
+  return l.energy.ScaledEnergy();
+}
+#endif
+
+static void
+DrawLabel(Canvas &canvas, const WaypointLabelList::Label &l,
+          UPixelScalar width, UPixelScalar height, const WaypointLook &look,
+          LabelBlock &label_block)
+{
+  canvas.Select(l.bold ? *look.bold_font : *look.font);
+  if (TextInBox(canvas, l.Name, l.Pos.x, l.Pos.y, l.Mode,
+            width, height, &label_block/*, true*/)) {
+//#define DRAW_LINE
+#ifdef DRAW_LINE
+    RasterPoint corner;
+    if (l.GetCornerForLine(corner)) {
+      //corner += (l.anchor - l.Pos_arranged);
+      canvas.SelectBlackPen();
+      canvas.DrawLine(l.Pos + l.anchor - l.Pos_arranged, corner);
+    }
+#endif
   }
 }
+/**
+ * Merges labels_new into labels last, and redisplays combined list without recalculating.
+ * The new labels use their default positions by the anchors
+ * The old labels (labels_last) are translated by the delta x,y of the screen.
+ * @param recaulculate_labels.  true if the labels should be recalculated using labels_new
+ *                      false if labels_new should be merged into labels_last.
+ * @param labels_new.  List of labels from most current list of waypoints.  Unsized.
+ * @param labels_last.  The list of labels used when last calculated, with energy.
+ */
+static void
+MapWaypointLabelRenderMerge(Canvas &canvas, UPixelScalar width, UPixelScalar height,
+                            LabelBlock &label_block,
+                            WaypointLabelList &labels_new,
+                            WaypointLabelList &labels_last,
+                            const WaypointLook &look,
+                            const WaypointRendererSettings::DisplayTextType display_text_type)
+{
+  labels_last.MergeLists(labels_new, false);
+  labels_last.Sort();
+
+#ifdef PRINT_AVERAGE_ENERGY
+  for (unsigned i = 0; i < labels_last.GetLabels().size(); ++i) {
+    WaypointLabelList::Label &l = labels_last.GetLabels()[i]; // non-const ref
+#else
+    for (const auto &l : labels_last) {
+#endif
+
+#ifdef PRINT_AVERAGE_ENERGY
+      UpdateLabelTextWithEnergy(l); // so they're displayed on map
+#endif
+    if (l.Visible()) {
+      DrawLabel(canvas, l, width, height, look, label_block);
+    }
+  }
+}
+
+/**
+ *
+  * @param recaulculate_labels.  true if the labels should be recalculated using labels_new
+  *                      false if labels_new should be merged into labels_last.
+  * @param labels_new.  List of labels from most current list of waypoints.  Unsized.
+  * @param labels_last.  The list of labels used when last calculated, with energy.
+  */
+static void
+MapWaypointLabelRenderCalculate(Canvas &canvas, UPixelScalar width, UPixelScalar height,
+                                LabelBlock &label_block,
+                                WaypointLabelList &labels_new,
+                                WaypointLabelList &labels_last,
+                                const WaypointLook &look,
+                                const WaypointRendererSettings::DisplayTextType display_text_type)
+{
+#ifdef PRINT_AVERAGE_ENERGY
+  int energy_total = 0;
+  unsigned energy_count = 0;
+#endif
+
+  labels_last.MergeLists(labels_new, true);
+  labels_last.SetSize(canvas, *look.font, *look.bold_font);
+  labels_last.SortY();
+
+  Labeler label_arranger(canvas, labels_last);
+  label_arranger.Start();
+  labels_last.Sort();
+
+  for (unsigned i = 0; i < labels_last.GetLabels().size(); ++i) {
+    WaypointLabelList::Label &l = labels_last.GetLabels()[i]; // non-const ref
+
+    if (l.Visible()) {
+#ifdef PRINT_AVERAGE_ENERGY // defined above MapWaypointLabelRenderMerge
+      energy_total += UpdateLabelTextWithEnergy(l);
+      ++energy_count;
+#endif
+      DrawLabel(canvas, l, width, height, look, label_block);
+    }
+  }
+#ifdef PRINT_AVERAGE_ENERGY
+  LogFormat(_T("Calc count:%u Average Energy:%i"), energy_count, energy_total / energy_count);
+#endif
+}
+
+WaypointRenderer::WaypointRenderer(const Waypoints *_way_points,
+                 const WaypointLook &_look)
+  :way_points(_way_points), look(_look), angle_margin_degrees(fixed(4))
+   {}
 
 void
 WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
@@ -521,8 +644,47 @@ WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
 
   v.Draw(canvas);
 
-  MapWaypointLabelRender(canvas,
-                         projection.GetScreenWidth(),
-                         projection.GetScreenHeight(),
-                         label_block, v.labels, look);
+  Angle delta_angle(map_angle_last - projection.GetScreenAngle());
+  PixelSize sample_text_size = canvas.CalcTextSize(_T("WWW"));
+
+  v.labels.Dedupe();
+  bool screen_projection_changed = fabs(map_scale_last - projection.GetMapScale()) > fixed(0.1)
+      || fabs(delta_angle.Degrees()) > angle_margin_degrees
+      || v.labels.GetLabels().size() != labels_last.GetLabels().size()
+      || last_sample_text_size != sample_text_size;
+
+  bool recalculate_labels = screen_projection_changed && !mouse_down;
+
+//#define SHOW_LABEL_BORDERS
+#ifdef SHOW_LABEL_BORDERS
+  for (unsigned i = 0; i < v.labels.GetLabels().size(); ++i)
+    v.labels.GetLabels()[i].Mode.shape = LabelShape::ROUNDED_WHITE;
+#endif
+
+  if (sample_text_size.cy > 4) {
+    if (recalculate_labels) {
+      MapWaypointLabelRenderCalculate(canvas,
+                                      projection.GetScreenWidth(),
+                                      projection.GetScreenHeight(),
+                                      label_block, v.labels,
+                                      labels_last,
+                                      look,
+                                      settings.display_text_type);
+
+      map_scale_last = projection.GetMapScale();
+      map_angle_last = projection.GetScreenAngle();
+      map_geo_center_last = projection.GetGeoScreenCenter();
+      last_sample_text_size = sample_text_size;
+
+    } else {
+      MapWaypointLabelRenderMerge(canvas,
+                                  projection.GetScreenWidth(),
+                                  projection.GetScreenHeight(),
+                                  label_block, v.labels,
+                                  labels_last,
+                                  look,
+                                  settings.display_text_type);
+
+    }
+  }
 }

@@ -25,6 +25,9 @@ Copyright_License {
 #define XCSOAR_WAY_POINT_RENDERER_HPP
 
 #include "Util/NonCopyable.hpp"
+#include "Renderer/WaypointLabelList.hpp"
+#include "Math/Angle.hpp"
+#include "Geo/GeoPoint.hpp"
 
 struct WaypointRendererSettings;
 struct WaypointLook;
@@ -55,9 +58,17 @@ public:
     ReachableTerrain,
   };
 
+  WaypointLabelList labels_last;
+
+  /** copied from the map window */
+  fixed map_scale_last; /* scale when labels last calculated */
+  Angle map_angle_last; /* map angle when labels last calculated */
+  const fixed angle_margin_degrees; /* margin when map angle change forces recalc */
+  GeoPoint map_geo_center_last; /* map center when labels last calculated */
+  PixelSize last_sample_text_size; /* last sample text size */
+
   WaypointRenderer(const Waypoints *_way_points,
-                   const WaypointLook &_look)
-    :way_points(_way_points), look(_look) {}
+                   const WaypointLook &_look);
 
   void set_way_points(const Waypoints *_way_points) {
     way_points = _way_points;

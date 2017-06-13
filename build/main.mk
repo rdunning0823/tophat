@@ -214,6 +214,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Renderer/GlassRenderer.cpp \
 	$(SRC)/Renderer/TransparentRendererCache.cpp \
 	$(SRC)/Renderer/LabelBlock.cpp \
+	$(SRC)/Renderer/LabelArranger.cpp \
 	$(SRC)/Renderer/TextInBox.cpp \
 	$(SRC)/Renderer/TraceHistoryRenderer.cpp \
 	$(SRC)/Renderer/ThermalBandRenderer.cpp \
