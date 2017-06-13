@@ -60,6 +60,16 @@ struct TextInBoxMode {
      move_in_view(false), opaque(false) {}
 };
 
+/**
+ * Calculates and returns box perimiter size and text size
+ * @param text text to be printed
+ * @param mode
+ * @param tssize set to size of text
+ * @return outer perimeter size of label box
+ */
+PixelSize
+TextInBoxGetSize(const Canvas &canvas, const TCHAR *text, TextInBoxMode mode, PixelSize &tsize);
+
 bool
 TextInBox(Canvas &canvas, const TCHAR *value,
           PixelScalar x, PixelScalar y,

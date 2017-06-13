@@ -91,14 +91,27 @@ RenderShadowedText(Canvas &canvas, const TCHAR *text,
   canvas.DrawText(x, y, text);
 }
 
+PixelSize
+TextInBoxGetSize(const Canvas &canvas, const TCHAR *text, TextInBoxMode mode, PixelSize &tsize)
+{
+  const unsigned padding = Layout::GetTextPadding();
+  tsize = canvas.CalcTextSize(text);
+  PixelSize perimeter_size = tsize;
+  perimeter_size.cx += padding * 2 + 1;
+  perimeter_size.cy += 1;
+  return perimeter_size;
+}
+
 // returns true if really wrote something
+// TODO: optimize so GetBoxSize parameters can be passed to this to avoid recalculation
 bool
 TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
           TextInBoxMode mode, const PixelRect &map_rc, LabelBlock *label_block)
 {
   // landable waypoint label inside white box
 
-  PixelSize tsize = canvas.CalcTextSize(text);
+  PixelSize tsize;
+  TextInBoxGetSize(canvas, text, mode, tsize);
 
   if (mode.align == TextInBoxMode::Alignment::RIGHT)
     x -= tsize.cx;
