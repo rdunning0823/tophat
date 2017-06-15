@@ -61,6 +61,12 @@ struct TextInBoxMode {
 };
 
 /**
+ * returns the padding to the left of the text
+ * left of the X parameter passed to TextInBox)
+ */
+unsigned TextInBoxGetLeftPadding();
+
+/**
  * Calculates and returns box perimiter size and text size
  * @param text text to be printed
  * @param mode

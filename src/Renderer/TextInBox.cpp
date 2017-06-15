@@ -102,6 +102,12 @@ TextInBoxGetSize(const Canvas &canvas, const TCHAR *text, TextInBoxMode mode, Pi
   return perimeter_size;
 }
 
+unsigned
+TextInBoxGetLeftPadding()
+{
+  return Layout::GetTextPadding() + 1;
+}
+
 // returns true if really wrote something
 // TODO: optimize so GetBoxSize parameters can be passed to this to avoid recalculation
 bool
@@ -125,7 +131,7 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
 
   const unsigned padding = Layout::GetTextPadding();
   PixelRect rc;
-  rc.left = x - padding - 1;
+  rc.left = x - TextInBoxGetLeftPadding();
   rc.right = x + tsize.cx + padding;
   rc.top = y;
   rc.bottom = y + tsize.cy + 1;
