@@ -50,10 +50,15 @@ GetLogDebugEnabled()
   return !disable_debug_logging;
 }
 
-static inline void
+/**
+ * @return: true if it was enabled before.  else false.
+ */
+static inline bool
 LogDebugEnable(bool val)
 {
+  bool temp = disable_debug_logging;
   disable_debug_logging = !val;
+  return !temp;
 }
 
 #ifdef _UNICODE
