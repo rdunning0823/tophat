@@ -166,6 +166,18 @@ StringCollate(const char *a, const char *b)
 #endif
 }
 
+gcc_pure gcc_nonnull_all
+static inline int
+StringCollate(const char *a, const char *b, size_t size)
+{
+#ifdef _WIN32_WCE
+  /* WinCE doesn't have strcoll() */
+  return strncasecmp(a, b, size);
+#else
+  return strncasecmp(a, b, size);
+#endif
+}
+
 /**
  * Copy the string to a new allocation.  The return value must be
  * freed with free().

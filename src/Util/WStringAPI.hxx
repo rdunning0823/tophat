@@ -165,6 +165,19 @@ StringCollate(const wchar_t *a, const wchar_t *b)
 #endif
 }
 
+gcc_pure gcc_nonnull_all
+static inline int
+StringCollate(const wchar_t *a, const wchar_t *b, size_t size)
+{
+#ifdef _WIN32_WCE
+  /* WinCE doesn't have wcscoll() */
+  return wcsncmp(a, b, size);
+#else
+  //TODO: fix this so it considers size
+  return wcscoll(a, b);
+#endif
+}
+
 gcc_malloc gcc_nonnull_all
 static inline wchar_t *
 DuplicateString(const wchar_t *p)
