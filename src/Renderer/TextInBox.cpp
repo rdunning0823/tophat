@@ -112,7 +112,8 @@ TextInBoxGetLeftPadding()
 // TODO: optimize so GetBoxSize parameters can be passed to this to avoid recalculation
 bool
 TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
-          TextInBoxMode mode, const PixelRect &map_rc, LabelBlock *label_block)
+          TextInBoxMode mode, const PixelRect &map_rc, LabelBlock *label_block,
+          bool label_block_skip_check)
 {
   // landable waypoint label inside white box
 
@@ -142,7 +143,7 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
     y += offset.y;
   }
 
-  if (label_block != nullptr && !label_block->check(rc))
+  if (label_block != nullptr && !label_block->check(rc, label_block_skip_check))
     return false;
 
   if (mode.shape == LabelShape::ROUNDED_BLACK ||
@@ -183,7 +184,8 @@ bool
 TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
           TextInBoxMode mode,
           UPixelScalar screen_width, UPixelScalar screen_height,
-          LabelBlock *label_block)
+          LabelBlock *label_block,
+          bool label_block_skip_check)
 {
   PixelRect rc;
   rc.left = 0;
@@ -191,5 +193,6 @@ TextInBox(Canvas &canvas, const TCHAR *text, PixelScalar x, PixelScalar y,
   rc.right = screen_width;
   rc.bottom = screen_height;
 
-  return TextInBox(canvas, text, x, y, mode, rc, label_block);
+  return TextInBox(canvas, text, x, y, mode, rc, label_block,
+                   label_block_skip_check);
 }

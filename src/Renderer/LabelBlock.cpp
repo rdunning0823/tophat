@@ -52,7 +52,7 @@ void LabelBlock::reset()
     buckets[i].Clear();
 }
 
-bool LabelBlock::check(const PixelRect rc)
+bool LabelBlock::check(const PixelRect rc, bool add_no_check)
 {
   unsigned top = rc.top >> BUCKET_SHIFT;
   unsigned bottom = rc.bottom >> BUCKET_SHIFT;
@@ -60,11 +60,13 @@ bool LabelBlock::check(const PixelRect rc)
   if (top >= BUCKET_COUNT)
     top = BUCKET_COUNT - 1;
 
-  if (bottom < BUCKET_COUNT && !buckets[bottom].Check(rc))
-    return false;
+  if (!add_no_check) {
+    if (bottom < BUCKET_COUNT && !buckets[bottom].Check(rc))
+      return false;
 
-  if (top < bottom && !buckets[top].Check(rc))
-    return false;
+    if (top < bottom && !buckets[top].Check(rc))
+      return false;
+  }
 
   buckets[top].Add(rc);
   if (bottom < BUCKET_COUNT && top != bottom)

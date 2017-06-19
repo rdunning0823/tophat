@@ -76,16 +76,22 @@ unsigned TextInBoxGetLeftPadding();
 PixelSize
 TextInBoxGetSize(const Canvas &canvas, const TCHAR *text, TextInBoxMode mode, PixelSize &tsize);
 
+/**
+ * @param label_block_skip_check.  If true, and label_block no null,
+ *    will add to the label_block without checking for overlap
+ */
 bool
 TextInBox(Canvas &canvas, const TCHAR *value,
           PixelScalar x, PixelScalar y,
           TextInBoxMode mode, const PixelRect &map_rc,
-          LabelBlock *label_block=nullptr);
+          LabelBlock *label_block=nullptr,
+          bool label_block_skip_check = false);
 
 bool
 TextInBox(Canvas &canvas, const TCHAR *value, PixelScalar x, PixelScalar y,
           TextInBoxMode mode,
           UPixelScalar screen_width, UPixelScalar screen_height,
-          LabelBlock *label_block=nullptr);
+          LabelBlock *label_block=nullptr,
+          bool label_block_skip_check = false);
 
 #endif

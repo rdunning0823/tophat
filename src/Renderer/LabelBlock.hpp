@@ -72,7 +72,10 @@ class LabelBlock {
   Bucket buckets[BUCKET_COUNT];
 
 public:
-  bool check(const PixelRect rc);
+  /**
+   * @param add_no_check.  adds the label regardless of overlap
+   */
+  bool check(const PixelRect rc, bool add_no_check = false);
   void reset();
 };
 
