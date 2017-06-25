@@ -46,11 +46,11 @@ enum class AircraftSymbol : uint8_t {
 };
 
 enum class MapOrientation : uint8_t {
-  TRACK_UP,
-  NORTH_UP,
-  TARGET_UP,
-  HEADING_UP,
-  WIND_UP,
+  TRACK_UP,  // 0
+  NORTH_UP,  // 1
+  TARGET_UP, // 2
+  HEADING_UP,// 3
+  WIND_UP,   // 4
 };
 
 enum class MapShiftBias : uint8_t {
