@@ -242,7 +242,8 @@ GlueMapWindow::UpdateScreenAngle()
 
   } else if (orientation == MapOrientation::HEADING_UP) {
     visible_projection.SetScreenAngle(
-      basic.attitude.IsHeadingUseable() ? basic.attitude.heading : Angle::Zero());
+      (basic.attitude.IsHeadingUseable() && calculated.flight.flying) ?
+          basic.attitude.heading : Angle::Zero());
   } else if (orientation == MapOrientation::NORTH_UP) {
     visible_projection.SetScreenAngle(Angle::Zero());
   } else if (orientation == MapOrientation::WIND_UP &&
@@ -252,7 +253,8 @@ GlueMapWindow::UpdateScreenAngle()
   } else {
     // normal, glider forward TRACK_UP
     visible_projection.SetScreenAngle(
-      basic.track_available ? basic.track : Angle::Zero());
+      (basic.track_available && calculated.flight.flying) ?
+          basic.track : Angle::Zero());
   }
   OnProjectionModified();
   last_task_type = calculated.common_stats.task_type;
