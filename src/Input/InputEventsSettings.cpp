@@ -375,20 +375,23 @@ InputEvents::eventOrientation(const TCHAR *misc)
   if (StringIsEqual(misc, _T("northup"))) {
     settings_map.cruise_orientation = MapOrientation::NORTH_UP;
     settings_map.circling_orientation = MapOrientation::NORTH_UP;
-  } else if (StringIsEqual(misc, _T("northcircle"))) {
-    settings_map.cruise_orientation = MapOrientation::TRACK_UP;
-    settings_map.circling_orientation = MapOrientation::NORTH_UP;
-  } else if (StringIsEqual(misc, _T("trackcircle"))) {
-    settings_map.cruise_orientation = MapOrientation::NORTH_UP;
-    settings_map.circling_orientation = MapOrientation::TRACK_UP;
+  } else if (StringIsEqual(misc, _T("targetup"))) {
+    settings_map.cruise_orientation = MapOrientation::TARGET_UP;
+    settings_map.circling_orientation = MapOrientation::TARGET_UP;
+  } else if (StringIsEqual(misc, _T("headingup"))) {
+    settings_map.cruise_orientation = MapOrientation::HEADING_UP;
+    settings_map.circling_orientation = MapOrientation::HEADING_UP;
   } else if (StringIsEqual(misc, _T("trackup"))) {
     settings_map.cruise_orientation = MapOrientation::TRACK_UP;
     settings_map.circling_orientation = MapOrientation::TRACK_UP;
+  } else if (StringIsEqual(misc, _T("trackcircle"))) {
+    settings_map.cruise_orientation = MapOrientation::TRACK_UP;
+    settings_map.circling_orientation = MapOrientation::NORTH_UP;
+  } else if (StringIsEqual(misc, _T("headingcircle"))) {
+    settings_map.cruise_orientation = MapOrientation::HEADING_UP;
+    settings_map.circling_orientation = MapOrientation::NORTH_UP;
   } else if (StringIsEqual(misc, _T("northtrack"))) {
     settings_map.cruise_orientation = MapOrientation::TRACK_UP;
-    settings_map.circling_orientation = MapOrientation::TARGET_UP;
-  } else if (StringIsEqual(misc, _T("targetup"))) {
-    settings_map.cruise_orientation = MapOrientation::TARGET_UP;
     settings_map.circling_orientation = MapOrientation::TARGET_UP;
   }
 

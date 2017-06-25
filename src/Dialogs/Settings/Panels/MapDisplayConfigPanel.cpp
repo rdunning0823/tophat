@@ -48,6 +48,8 @@ static constexpr StaticEnumChoice orientation_list[] = {
     N_("The moving map display will always be orientated north to south and the glider icon will be rotated to show its course.") },
   { (unsigned)MapOrientation::TARGET_UP, N_("Target up"),
     N_("The moving map display will be rotated so the navigation target is oriented up.") },
+  { (unsigned)MapOrientation::HEADING_UP, N_("Heading up"),
+    N_("The moving map display will be rotated so the map up is oriented to the heading or nose of the glider.") },
   { (unsigned)MapOrientation::WIND_UP, N_("Wind up"),
     N_("The moving map display will be rotated so the wind is always oriented up to down. (can be useful for wave flying)") },
   { 0 }
