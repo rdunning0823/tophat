@@ -28,6 +28,7 @@ Copyright_License {
 
 #include "Util/StaticArray.hpp"
 #include "LogFile.hpp"
+#include "Util/StringAPI.hxx"
 
 #ifdef HAVE_POSIX
 #include <time.h>
@@ -58,9 +59,19 @@ class ScreenStopWatch {
     cpu_stamp_t cpu;
 
     void Set(const char *_text) {
-      text = _text;
+      if (_text != nullptr)
+        text = DuplicateString(_text);
+      else
+        text = nullptr;
       clock = GetCurrentClock();
       cpu = GetCurrentCPU();
+    }
+    Marker()
+    :text(nullptr){}
+
+    ~Marker() {
+      if (text != nullptr)
+        delete text;
     }
   };
 
