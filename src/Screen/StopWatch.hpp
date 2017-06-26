@@ -150,16 +150,16 @@ public:
       const Marker &start = markers[i];
       const Marker &end = markers[i + 1];
 
-      LogFormat("StopWatch '%s': clock=%lu cpu=%lu", start.text,
-                (unsigned long)(end.clock - start.clock),
-                (unsigned long)(end.cpu - start.cpu));
+      LogDebug("StopWatch '%s': clock=%lu cpu=%lu", start.text,
+               (unsigned long)(end.clock - start.clock),
+               (unsigned long)(end.cpu - start.cpu));
     }
 
     const Marker &start = markers.front();
     const Marker &end = markers.back();
-    LogFormat("StopWatch total: clock=%lu cpu=%lu",
-              (unsigned long)(end.clock - start.clock),
-              (unsigned long)(end.cpu - start.cpu));
+    LogDebug("StopWatch total: clock=%lu cpu=%lu",
+             (unsigned long)(end.clock - start.clock),
+             (unsigned long)(end.cpu - start.cpu));
 
     markers.clear();
   }
