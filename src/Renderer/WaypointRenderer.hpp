@@ -70,7 +70,8 @@ public:
               const TaskBehaviour &task_behaviour,
               const MoreData &basic, const DerivedInfo &calculated,
               const ProtectedTaskManager *task,
-              const ProtectedRoutePlanner *route_planner);
+              const ProtectedRoutePlanner *route_planner,
+              bool mouse_down);
 
   const WaypointLook &GetLook() const {
     return look;

@@ -175,7 +175,7 @@ TargetMapWindow::DrawWaypoints(Canvas &canvas)
                             GetComputerSettings().polar,
                             GetComputerSettings().task,
                             Basic(), Calculated(),
-                            task, nullptr);
+                            task, nullptr, false);
 }
 
 void

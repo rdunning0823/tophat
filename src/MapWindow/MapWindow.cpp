@@ -40,6 +40,7 @@ MapWindow::MapWindow(const MapLook &_look,
                      const TrafficLook &_traffic_look)
   :look(_look),
    follow_mode(FOLLOW_SELF),
+   mouse_down(false),
    waypoints(nullptr),
    topography(nullptr), topography_renderer(nullptr),
    terrain(nullptr),

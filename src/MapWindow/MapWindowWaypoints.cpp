@@ -31,5 +31,5 @@ MapWindow::DrawWaypoints(Canvas &canvas)
                            GetComputerSettings().polar,
                             GetComputerSettings().task,
                            Basic(), Calculated(),
-                            task, route_planner);
+                            task, route_planner, mouse_down);
 }

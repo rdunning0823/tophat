@@ -91,6 +91,9 @@ protected:
 
   FollowMode follow_mode;
 
+  /** is the mouse down? */
+  bool mouse_down;
+
   /**
    * The projection as currently visible on the screen.  This object
    * is being edited by the user.
@@ -192,6 +195,13 @@ public:
    */
   bool IsNearSelf() const {
     return follow_mode == FOLLOW_SELF;
+  }
+
+  /**
+   * Is the mouse currently down?
+   */
+  bool IsMouseDown() const {
+    return mouse_down;
   }
 
   /**

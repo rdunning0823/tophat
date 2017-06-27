@@ -489,7 +489,8 @@ WaypointRenderer::render(Canvas &canvas, LabelBlock &label_block,
                          const TaskBehaviour &task_behaviour,
                          const MoreData &basic, const DerivedInfo &calculated,
                          const ProtectedTaskManager *task,
-                         const ProtectedRoutePlanner *route_planner)
+                         const ProtectedRoutePlanner *route_planner,
+                         bool mouse_down)
 {
   if (way_points == nullptr || way_points->IsEmpty())
     return;

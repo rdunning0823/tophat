@@ -156,6 +156,7 @@ GlueMapWindow::OnMouseDown(PixelScalar x, PixelScalar y)
   }
 
   mouse_down_clock.Update();
+  mouse_down = true;
   arm_mapitem_list = HasFocus();
 
   SetFocus();
@@ -229,6 +230,7 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
 
   int click_time = mouse_down_clock.Elapsed();
   mouse_down_clock.Reset();
+  mouse_down = false;
 
   DragMode old_drag_mode = drag_mode;
   drag_mode = DRAG_NONE;
@@ -255,6 +257,7 @@ GlueMapWindow::OnMouseUp(PixelScalar x, PixelScalar y)
     kinetic_x.MouseUp(x);
     kinetic_y.MouseUp(y);
     kinetic_timer.Schedule(30);
+    mouse_down = true; // still actively changing pan
 #endif
     break;
 
@@ -496,6 +499,7 @@ GlueMapWindow::OnTimer(WindowTimer &timer)
   } else if (timer == kinetic_timer) {
     if (kinetic_x.IsSteady() && kinetic_y.IsSteady()) {
       kinetic_timer.Cancel();
+      mouse_down = false; // stopped actively changing pan
     } else {
       auto location = drag_projection.ScreenToGeo(kinetic_x.GetPosition(),
                                                   kinetic_y.GetPosition());
