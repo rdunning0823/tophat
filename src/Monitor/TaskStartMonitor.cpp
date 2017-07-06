@@ -57,6 +57,7 @@ public:
   }
 
   ~TaskStartWidget() {
+    Timer::Cancel();
     assert(monitor.widget == this);
     monitor.widget = nullptr;
   }
