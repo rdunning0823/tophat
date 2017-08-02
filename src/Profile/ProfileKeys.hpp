@@ -43,6 +43,7 @@ extern const char OrientationCircling[];
 extern const char MapShiftBias[];
 extern const char DisplayText[];
 extern const char WaypointArrivalHeightDisplay[];
+extern const char WaypointArrivalHeightUnitDisplay[];
 extern const char WaypointLabelSelection[];
 extern const char WaypointLabelStyle[];
 extern const char WeatherStations[];

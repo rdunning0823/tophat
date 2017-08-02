@@ -184,7 +184,11 @@ public:
      is_mat(false),
      task_valid(false)
   {
-    _tcscpy(sAltUnit, Units::GetAltitudeName());
+    if (settings.arrival_height_unit_display) {
+      _tcscpy(sAltUnit, Units::GetAltitudeName());
+    } else {
+      sAltUnit[0] = '\0';
+    }
     labels.Init(projection.GetScreenWidth(), projection.GetScreenHeight());
   }
 

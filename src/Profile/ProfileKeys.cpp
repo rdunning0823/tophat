@@ -44,6 +44,7 @@ const char MaxAutoZoomDistance[] = "MaxAutoZoomDistance";
 const char ClipAlt[] = "ClipAlt";
 const char DisplayText[] = "DisplayText";
 const char WaypointArrivalHeightDisplay[] = "WaypointArrivalHeightDisplay";
+const char WaypointArrivalHeightUnitDisplay[] = "WaypointArrivalHeightUnitDisplay";
 const char WaypointLabelSelection[] = "WayPointLabelSelection";
 const char WaypointLabelStyle[] = "WayPointLabelStyle";
 const char WeatherStations[] = "WeatherStations";

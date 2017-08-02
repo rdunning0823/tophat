@@ -50,6 +50,9 @@ struct WaypointRendererSettings {
     REQUIRED_GR,
   } arrival_height_display;
 
+  /** Display the unit after the arrival height */
+  bool arrival_height_unit_display;
+
   /** What type of waypoint labels to render */
   enum class LabelSelection : uint8_t {
     ALL,
@@ -77,6 +80,7 @@ struct WaypointRendererSettings {
   void SetDefaults() {
     display_text_type = DisplayTextType::FIRST_FIVE;
     arrival_height_display = ArrivalHeightDisplay::GLIDE;
+    arrival_height_unit_display = false;
     label_selection = LabelSelection::ALL;
     landable_render_mode = LabelShape::ROUNDED_BLACK;
 

@@ -33,6 +33,7 @@ Copyright_License {
 enum ControlIndex {
   WaypointLabels,
   WaypointArrivalHeightDisplay,
+  WaypointArrivalHeightUnitDisplay,
   WaypointLabelStyle,
   WaypointLabelSelection,
   AppIndLandable,
@@ -125,6 +126,12 @@ WaypointDisplayConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc
           wp_arrival_list, (unsigned)settings.arrival_height_display);
   SetExpertRow(WaypointArrivalHeightDisplay);
 
+  AddBoolean(_("Show arrival height unit"),
+             _("[Off] Display waypoint arrival heights on map with no unit.\n"
+               "[On] Display unit after arrival heights on map."),
+             settings.arrival_height_unit_display, this);
+  SetExpertRow(WaypointArrivalHeightUnitDisplay);
+
   static constexpr StaticEnumChoice wp_label_list[] = {
     { (unsigned)LabelShape::ROUNDED_BLACK, N_("Rounded rectangle"), nullptr },
     { (unsigned)LabelShape::OUTLINED_INVERTED, N_("Outlined text"), nullptr },
@@ -212,6 +219,9 @@ WaypointDisplayConfigPanel::Save(bool &_changed)
 
   changed |= SaveValueEnum(WaypointArrivalHeightDisplay, ProfileKeys::WaypointArrivalHeightDisplay,
                            settings.arrival_height_display);
+
+  changed |= SaveValueEnum(WaypointArrivalHeightUnitDisplay, ProfileKeys::WaypointArrivalHeightUnitDisplay,
+                           settings.arrival_height_unit_display);
 
   changed |= SaveValueEnum(WaypointLabelStyle, ProfileKeys::WaypointLabelStyle,
                            settings.landable_render_mode);

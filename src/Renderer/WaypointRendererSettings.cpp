@@ -46,6 +46,7 @@ WaypointRendererSettings::LoadFromProfile()
   //       due to pref migration dependencies!
   GetEnum(ProfileKeys::WaypointLabelSelection, label_selection);
   GetEnum(ProfileKeys::WaypointArrivalHeightDisplay, arrival_height_display);
+  GetEnum(ProfileKeys::WaypointArrivalHeightUnitDisplay, arrival_height_unit_display);
   GetEnum(ProfileKeys::WaypointLabelStyle, landable_render_mode);
 
   GetEnum(ProfileKeys::AppIndLandable, landable_style);

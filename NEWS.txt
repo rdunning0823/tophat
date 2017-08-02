@@ -1,7 +1,10 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
-Tophat Soaring 2.2.1_beta TBD
+Tophat Soaring 2.2.2b_beta
+* Arrange map labels intelligently
+* Optionally show / hide unit in map label arrival height
+* Fix crash on restart start bug
 * Display "2 minutes under start" for US Tasks in Nav Bar
 * Alternates infobox - option to display airports only
 * MC Infobox - show L/D
