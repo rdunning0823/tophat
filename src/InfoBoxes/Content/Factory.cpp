@@ -938,7 +938,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Alternate 1 GR"),
     N_("Altn1 GR"),
-    N_("Geometric gradient to the arrival height above the best alternate. This is not adjusted for total energy."),
+    N_("Geometric gradient to the arrival height above the best alternate."),
     IBFHelperInt<InfoBoxContentAlternateGR, 0>::Create,
     e_Alternate_1_Name, // Altern1 name
     e_Alternate_2_Name, // Altern2 name
