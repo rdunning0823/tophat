@@ -1303,7 +1303,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Next radial"),
     N_("Radial"),
-    N_("True bearing from the next waypoint to your position."),
+    N_("True bearing from the next waypoint to your position.  For AAT tasks, the bearing is from the target within the AAT sector."),
     UpdateInfoBoxRadial,
     next_waypoint_infobox_panels,
     ATC_RADIAL,
