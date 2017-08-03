@@ -43,20 +43,15 @@ KeyboardWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   TCHAR caption[] = _T(" ");
 
-  for (unsigned i = 0; i < MAX_SPACERS; i++)
-    spacer_before_row[i] = false;
-
   for (const TCHAR *i = keyboard_letters; !StringIsEmpty(i); ++i) {
     caption[0] = *i;
     AddButton(parent, caption, *i);
   }
 
-  if (show_punctuation) {
-    AddButton(parent, _T("Space"), ' ');
-    AddButton(parent, _T("."), '.');
-    AddButton(parent, _T(","), ',');
-    AddButton(parent, _T("-"), '-');
-  }
+  AddButton(parent, _T("Space"), ' ');
+  AddButton(parent, _T("."), '.');
+  AddButton(parent, _T(","), ',');
+  AddButton(parent, _T("-"), '-');
 
   if (show_shift_button) {
     WindowStyle style;
@@ -161,18 +156,6 @@ KeyboardWidget::ResizeButtons()
     shift_button.Resize(button_width, button_height);
 }
 
-unsigned
-KeyboardWidget::GetRowTop(const PixelRect &rc, unsigned row)
-{
-  unsigned spacer_count = 0;
-  for (unsigned i = 0; i <= row; i++) {
-    if (spacer_before_row[i])
-      ++spacer_count;
-  }
-  return rc.top + row * button_height +
-      spacer_count * Layout::Scale(2);
-}
-
 void
 KeyboardWidget::MoveButtonsToRow(const PixelRect &rc,
                                  const TCHAR *buttons, unsigned row,
@@ -181,91 +164,51 @@ KeyboardWidget::MoveButtonsToRow(const PixelRect &rc,
   if (StringIsEmpty(buttons))
     return;
 
-  unsigned spacer_count = 0;
-  for (unsigned i = 0; i <= row; i++) {
-    if (spacer_before_row[i])
-      ++spacer_count;
-  }
-
   for (unsigned i = 0; buttons[i] != _T('\0'); i++) {
     MoveButton(buttons[i],
                rc.left + i * button_width + offset,
-               rc.top + row * button_height +
-               spacer_count * Layout::Scale(2));
+               rc.top + row * button_height);
   }
 }
 
 void
 KeyboardWidget::MoveButtons(const PixelRect &rc)
 {
-  if (!portrait_keyboard) {
-    spacer_before_row[1] = true;
-    MoveButtonsToRow(rc, _T("1234567890"), 0);
-    MoveButtonsToRow(rc, _T("QWERTYUIOP"), 1);
-    MoveButtonsToRow(rc, _T("ASDFGHJKL"), 2, button_width / 3);
-    MoveButtonsToRow(rc, _T("ZXCVBNM,."), 3, button_width);
+  MoveButtonsToRow(rc, _T("1234567890"), 0);
+  MoveButtonsToRow(rc, _T("QWERTYUIOP"), 1);
+  MoveButtonsToRow(rc, _T("ASDFGHJKL"), 2, button_width / 3);
+  MoveButtonsToRow(rc, _T("ZXCVBNM,."), 3, button_width);
+
+  if (IsLandscape(rc)) {
+    MoveButton(_T('-'),
+               rc.left + button_width * 9,
+               rc.top + Layout::Scale(160));
+
+    MoveButton(_T(' '),
+               rc.left + Layout::Scale(80),
+               rc.top + Layout::Scale(160));
+    ResizeButton(_T(' '), Layout::Scale(93), Layout::Scale(40));
   } else {
-    spacer_before_row[2] = spacer_before_row[6] = true;
-    MoveButtonsToRow(rc, _T("01234"), 0);
-    MoveButtonsToRow(rc, _T("56789"), 1);
-    MoveButtonsToRow(rc, _T("ABCDE"), 2);
-    MoveButtonsToRow(rc, _T("FGHIJ"), 3);
-    MoveButtonsToRow(rc, _T("KLMNO"), 4);
-    MoveButtonsToRow(rc, _T("PQRST"), 5);
-    MoveButtonsToRow(rc, _T("UVWXY"), 6);
-    MoveButtonsToRow(rc, _T("Z"), 7, (show_shift_button || show_punctuation) ?
-        button_width : 0u);
+    MoveButton(_T('-'),
+               rc.left + button_width * 8,
+               rc.top + button_height * 4);
+
+    MoveButton(_T(' '),
+               rc.left + button_width * 2,
+               rc.top + button_height * 4);
+    ResizeButton(_T(' '), button_width * 11 / 2, button_height);
   }
 
-  if (show_punctuation) {
-    if (!portrait_keyboard) {
-      unsigned punctuation_top = GetRowTop(rc, 4);
-      unsigned space_width = button_width * 4;
-      MoveButton(_T(' '),
-                 rc.left + (rc.GetSize().cx - space_width - button_width) / 2,
-                 punctuation_top);
-      ResizeButton(_T(' '), space_width, button_height);
-
-      MoveButton(_T('-'),
-                 rc.left + (rc.GetSize().cx + space_width - button_width) / 2,
-                 punctuation_top);
-      if (show_shift_button)
-        shift_button.Move(rc.left, GetRowTop(rc, 3)); // always to left of 'Z'
-
-    } else { //portrait
-
-      unsigned punctuation_top = GetRowTop(rc, 7);
-      MoveButton(_T(' '),
-                 rc.left + button_width * 2, punctuation_top);
-      ResizeButton(_T(' '), button_width, button_height);
-
-      MoveButton(_T('-'),
-                 rc.left + button_width * 3,
-                 punctuation_top);
-
-      MoveButton(_T('.'),
-                 rc.left + button_width * 4,
-                 punctuation_top);
-
-      MoveButton(_T(','),
-                 rc.left + button_width * 4,
-                 GetRowTop(rc, 8));
-      if (show_shift_button)
-        shift_button.Move(rc.left, GetRowTop(rc, 7)); // always to left of 'Z'
-    }
-  }
-
+  if (show_shift_button)
+    shift_button.Move(rc.left, rc.top + 3 * button_height);
 }
 
 void
 KeyboardWidget::PrepareSize(const PixelRect &rc)
 {
   const PixelSize new_size = rc.GetSize();
-  if (!portrait_keyboard) {
-    button_width = new_size.cx / 10;
-  } else {
-    button_width = new_size.cx / 5;
-  }
+  button_width = new_size.cx / 10;
+  button_height = new_size.cy / 5;
 }
 
 void

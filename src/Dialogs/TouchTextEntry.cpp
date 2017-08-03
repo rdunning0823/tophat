@@ -160,7 +160,6 @@ ClearText()
 
 bool
 TouchTextEntry(TCHAR *text, size_t width,
-               bool show_punctuation,
                const TCHAR *caption,
                AllowedCharacters accb,
                bool show_shift_key,
@@ -182,38 +181,46 @@ TouchTextEntry(TCHAR *text, size_t width,
   ContainerWindow &client_area = form.GetClientAreaWindow();
   const PixelRect rc = client_area.GetClientRect();
 
-  const bool portrait_keyboard = rc.GetSize().cy > rc.GetSize().cx;
+  const PixelScalar client_height = rc.bottom - rc.top;
+
   const PixelScalar padding = Layout::Scale(2);
-  const unsigned control_button_height = Layout::GetMinimumControlHeight();
-  const unsigned keyboard_rows = (portrait_keyboard ? 8 : 5) + ((portrait_keyboard && show_punctuation) ?
-      1u : 0u);
-  const unsigned total_rows_on_form = keyboard_rows + 1u;
-
-  const PixelScalar button_height =
-      std::min((int)(control_button_height * fixed(1.2)), (int)
-               ((rc.GetSize().cy - form.GetTitleHeight() - control_button_height - padding * 4)
-                   / total_rows_on_form));
-
-  const PixelScalar editor_bottom = padding + button_height;
+  const PixelScalar backspace_width = Layout::Scale(46);
+  const PixelScalar backspace_left = rc.right - padding - backspace_width;
+  const PixelScalar editor_height = Layout::Scale(40);
+  const PixelScalar editor_bottom = padding + editor_height;
+  const PixelScalar button_height = Layout::Scale(40);
+  constexpr unsigned keyboard_rows = 5;
   const PixelScalar keyboard_top = editor_bottom + padding;
   const PixelScalar keyboard_height = keyboard_rows * button_height;
   const PixelScalar keyboard_bottom = keyboard_top + keyboard_height;
 
-  // buttons on bottom of screen
-  const PixelScalar button_top = rc.bottom - control_button_height;
-  const PixelScalar button_bottom = rc.bottom;
+  const bool vertical = client_height >= keyboard_bottom + button_height;
 
-  const PixelScalar ok_left = rc.left;
-  const PixelScalar ok_right = rc.right / 3;
+  const PixelScalar button_top = vertical
+    ? rc.bottom - button_height
+    : keyboard_bottom - button_height;
+  const PixelScalar button_bottom = vertical
+    ? rc.bottom
+    : keyboard_bottom;
 
-  const PixelScalar cancel_left = ok_right;
-  const PixelScalar cancel_right = rc.right * 2 / 3;
+  const PixelScalar ok_left = vertical ? 0 : padding;
+  const PixelScalar ok_right = vertical
+    ? rc.right / 3
+    : ok_left + Layout::Scale(80);
 
-  const PixelScalar clear_left = cancel_right;
-  const PixelScalar clear_right = rc.right;
+  const PixelScalar cancel_left = vertical
+    ? ok_right
+    : Layout::Scale(175);
+  const PixelScalar cancel_right = vertical
+    ? rc.right * 2 / 3
+    : cancel_left + Layout::Scale(60);
 
-  const PixelScalar backspace_width = Layout::Scale(46);
-  const PixelScalar backspace_left = rc.right - padding - backspace_width;
+  const PixelScalar clear_left = vertical
+    ? cancel_right
+    : Layout::Scale(235);
+  const PixelScalar clear_right = vertical
+    ? rc.right
+    : clear_left + Layout::Scale(50);
 
   WndProperty _editor(client_area, look, _T(""),
                       { 0, padding, backspace_left - padding, editor_bottom },
@@ -238,13 +245,12 @@ TouchTextEntry(TCHAR *text, size_t width,
     });
   Button clear_button(client_area, look.button, _("Clear"),
                       { clear_left, button_top,
-                        clear_right, button_bottom },
+                          clear_right, button_bottom },
                       button_style, clear_listener, 0);
 
+
   KeyboardWidget keyboard(look.button, FormCharacter,
-                          button_height, portrait_keyboard,
-                          show_punctuation, show_shift_key,
-                          default_shift_state);
+                          show_shift_key, default_shift_state);
 
   const PixelRect keyboard_rc = {
     padding, keyboard_top,

@@ -172,7 +172,7 @@ TeamCodeWidget::OnCodeClicked()
   CopyString(newTeammateCode,
              CommonInterface::GetComputerSettings().team_code.team_code.GetCode(), 10);
 
-  if (!TextEntryDialog(newTeammateCode, 7, nullptr, nullptr, false, true, false))
+  if (!TextEntryDialog(newTeammateCode, 7))
     return;
 
   StripRight(newTeammateCode);
@@ -192,7 +192,7 @@ TeamCodeWidget::OnFlarmLockClicked()
   TCHAR newTeamFlarmCNTarget[settings.team_flarm_callsign.capacity()];
   _tcscpy(newTeamFlarmCNTarget, settings.team_flarm_callsign.c_str());
 
-  if (!TextEntryDialog(newTeamFlarmCNTarget, 4, nullptr, nullptr, false, true, false))
+  if (!TextEntryDialog(newTeamFlarmCNTarget, 4))
     return;
 
   if (StringIsEmpty(newTeamFlarmCNTarget)) {

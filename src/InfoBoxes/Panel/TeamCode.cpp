@@ -340,7 +340,7 @@ TeamCodeFullScreen::OnCodeClicked()
   TCHAR newTeammateCode[10];
   newTeammateCode[0] = '\0';
 
-  if (!TextEntryDialog(newTeammateCode, 7, nullptr, nullptr, false, true, false))
+  if (!TextEntryDialog(newTeammateCode, 7))
     return;
 
   StripRight(newTeammateCode);
@@ -362,7 +362,7 @@ TeamCodeFullScreen::OnFlarmLockClicked()
   TCHAR newTeamFlarmCNTarget[settings.team_flarm_callsign.CAPACITY];
   _tcscpy(newTeamFlarmCNTarget, settings.team_flarm_callsign.c_str());
 
-  if (!TextEntryDialog(newTeamFlarmCNTarget, 4, nullptr, nullptr, false, true, false))
+  if (!TextEntryDialog(newTeamFlarmCNTarget, 4))
     return;
 
   if (StringIsEmpty(newTeamFlarmCNTarget)) {
