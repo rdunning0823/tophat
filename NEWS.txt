@@ -2,14 +2,28 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Tophat Soaring 2.2.2b_beta
-* Arrange map labels intelligently
-* Optionally show / hide unit in map label arrival height
-* Fix crash on restart start bug
+* Improve waypoint label placement on map
+* Smooth AAT/TAT Task optimization near start
+* Add Heading Up map orientation
+* Fix internet METAR/TAF connection
+* Add volume unit for ballast (liters, gallons)
+* Fix max ballast integration with device
+* Fix pressure altitude reading from device
+* Fix crash during pan and restart
+* Airspace warning: show more information (class / top / bottom)
+* FLARM:
+  - increase font size on map and radar
+  - Add propeller to power plane image
+* Bluefly glide computer support
+* New snail trail for eink devices
+* Allow custom smaller fonts
+* Optionally hide unit in map labels for arrival height
 * Display "2 minutes under start" for US Tasks in Nav Bar
-* Alternates infobox - option to display airports only
+* Alternates Infobox - option to display airports only
 * MC Infobox - show L/D
-* Sim mode: allow adjustment of IAS, TAS and VGND through infoboxes
 * Infoboxes: add "Help" button
+* Additional Infobox layouts
+* Simulator mode: allow adjustment of IAS, TAS and VGND through Infoboxes
 
 Tophat Soaring 2.2b March 6, 2017
 * Fix Ilec SN10 task integration bug
