@@ -67,7 +67,7 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(0), fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival);
 
-  AddFloat(_("Arrival height for GR"),
+  AddFloat(_("Arrival height for GR calculation"),
            _("For gradient (GR) calculations. The safety height above terrain at the destination used to calculated the gradient (slope) to arrive there."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
