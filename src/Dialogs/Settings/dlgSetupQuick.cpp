@@ -439,16 +439,11 @@ SetupQuick::RefreshForm()
   const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
   const TaskBehaviour &task_behaviour = settings_computer.task;
   StaticString<25> terrain_height;
-  StaticString<25> safety_height_arrival_gr;
   FormatRelativeUserAltitude(
       task_behaviour.route_planner.safety_height_terrain, terrain_height.buffer(), true);
-  FormatRelativeUserAltitude(
-      task_behaviour.safety_height_arrival_gr, safety_height_arrival_gr.buffer(), true);
-
   FormatRelativeUserAltitude(task_behaviour.safety_height_arrival, text.buffer(),
                              true);
 
-  text.AppendFormat(_T(" / %s"), safety_height_arrival_gr.c_str());
   text.AppendFormat(_T(" / %s"), terrain_height.c_str());
   safety_text->SetCaption(text.c_str());
 
