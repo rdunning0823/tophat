@@ -144,7 +144,7 @@ InfoBoxContentAlternateGR::Update(InfoBoxData &data)
   data.SetComment(alternate->waypoint.name.c_str());
 
   fixed gradient = ::CalculateGradient(alternate->waypoint, alternate->solution.vector.distance,
-                                       basic, CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
+                                       basic, CommonInterface::GetComputerSettings().task.GRSafetyHeight());
   if (negative(gradient)) {
     data.SetValueColor(0);
     data.SetValue(_T("+++"));

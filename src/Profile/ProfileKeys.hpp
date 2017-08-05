@@ -48,7 +48,7 @@ extern const char WaypointLabelSelection[];
 extern const char WaypointLabelStyle[];
 extern const char WeatherStations[];
 extern const char SafetyAltitudeArrival[];
-extern const char SafetyAltitudeArrivalGR[];
+extern const char SafetyAltitudeArrivalGRMode[];
 extern const char SafetyAltitudeTerrain[];
 extern const char SafteySpeed[];
 extern const char DryMass[];

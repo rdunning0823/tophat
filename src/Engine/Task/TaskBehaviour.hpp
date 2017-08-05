@@ -141,8 +141,13 @@ struct TaskBehaviour {
   /** Minimum height above terrain for arrival height at landable waypoint (m) */
   fixed safety_height_arrival;
 
-  /** Minimum height above terrain for arrival height at landable waypoint (m) - for GR calculations */
-  fixed safety_height_arrival_gr;
+  enum class GRSafetyHeightMode: uint8_t {
+    Zero_Safety_Height,
+    Arrival_Safety_Height,
+  };
+
+  /** Safety height above destination for GR calculations */
+  GRSafetyHeightMode safety_height_arrival_gr_mode;
 
   /** Default task type to use for new tasks */
   TaskFactoryType task_type_default;
@@ -180,6 +185,11 @@ struct TaskBehaviour {
   bool IsAutoMCFinalGlideEnabled() const {
     return auto_mc && auto_mc_mode != AutoMCMode::CLIMBAVERAGE;
   }
+
+  /**
+   * @return: Safety Height for GR calculations
+   */
+  fixed GRSafetyHeight() const;
 
   bool IsAutoMCCruiseEnabled() const {
     return auto_mc && auto_mc_mode != AutoMCMode::FINALGLIDE;

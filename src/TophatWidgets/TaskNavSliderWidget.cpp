@@ -265,7 +265,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
 
     fixed gradient = tp_valid ? ::CalculateGradient(*twp, result.vector.distance,
                                                     basic,
-                                                    settings.task.safety_height_arrival_gr)
+                                                    settings.task.GRSafetyHeight())
         : fixed(1000);
 
     // Todo: fix this for negative MSL elevations (e.g. Netherlands)

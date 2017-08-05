@@ -253,7 +253,7 @@ protected:
       if (!basic.location_available || !basic.NavAltitudeAvailable())
         return;
 
-      const fixed safety_height_gr = task_behaviour.safety_height_arrival_gr;
+      const fixed safety_height_gr = task_behaviour.GRSafetyHeight();
       const fixed target_altitude_gr = way_point.elevation + safety_height_gr;
       const fixed delta_h_gr = basic.nav_altitude - target_altitude_gr;
       if (!positive(delta_h_gr))

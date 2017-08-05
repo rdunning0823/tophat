@@ -278,7 +278,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
 
   } else {
     fixed gradient = ::CalculateGradient(*wp, distance,
-                                         Basic(), CommonInterface::GetComputerSettings().task.safety_height_arrival_gr);
+                                         Basic(), CommonInterface::GetComputerSettings().task.GRSafetyHeight());
 
     slider_shape.Draw(canvas, outer_rect,
                       idx, false, false,

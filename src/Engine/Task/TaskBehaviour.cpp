@@ -59,7 +59,7 @@ TaskBehaviour::SetDefaults()
   task_planning_speed_mode = TaskPlanningSpeedMode::PastPerformanceSpeed;
   task_planning_speed_override = fixed(25);
   safety_height_arrival = fixed(0);
-  safety_height_arrival_gr = fixed(0);
+  safety_height_arrival_gr_mode = GRSafetyHeightMode::Arrival_Safety_Height;
   task_type_default = TaskFactoryType::RACING;
   start_margins.SetDefaults();
   sector_defaults.SetDefaults();
@@ -78,4 +78,11 @@ TaskBehaviour::DisableAll()
   calc_cruise_efficiency = false;
   calc_glide_required = false;
   route_planner.mode = RoutePlannerConfig::Mode::NONE;
+}
+
+fixed
+TaskBehaviour::GRSafetyHeight() const
+{
+  return (safety_height_arrival_gr_mode == GRSafetyHeightMode::Arrival_Safety_Height) ?
+      safety_height_arrival : fixed(0);
 }

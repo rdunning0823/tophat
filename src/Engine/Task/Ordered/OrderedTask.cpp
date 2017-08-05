@@ -1393,7 +1393,7 @@ OrderedTask::CalcGradient(const AircraftState &state) const
 
   // Calculate gradient to the last turnpoint of the remaining task
   return (state.altitude -
-      task_points.back()->GetRequiredElevation(task_behaviour.safety_height_arrival_gr)) / distance;
+      task_points.back()->GetRequiredElevation(task_behaviour.GRSafetyHeight())) / distance;
 }
 
 static void

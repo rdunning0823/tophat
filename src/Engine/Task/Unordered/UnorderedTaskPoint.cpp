@@ -29,13 +29,13 @@ UnorderedTaskPoint::UnorderedTaskPoint(const Waypoint &wp,
                                        const TaskBehaviour &tb)
   :TaskWaypoint(TaskPointType::UNORDERED, wp),
    safety_height_arrival(tb.safety_height_arrival),
-   safety_height_arrival_gr(tb.safety_height_arrival_gr){}
+   safety_height_arrival_gr(tb.GRSafetyHeight()){}
 
 void
 UnorderedTaskPoint::SetTaskBehaviour(const TaskBehaviour &tb)
 {
   safety_height_arrival = tb.safety_height_arrival;
-  safety_height_arrival_gr = tb.safety_height_arrival_gr;
+  safety_height_arrival_gr = tb.GRSafetyHeight();
 }
 
 GeoVector

@@ -34,6 +34,7 @@ Copyright_License {
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "UIGlobals.hpp"
+#include "Engine/Task/TaskBehaviour.hpp"
 
 enum ControlIndex {
   ArrivalHeight,
@@ -67,11 +68,16 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
            fixed(0), fixed(10000), fixed(100), false,
            UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival);
 
-  AddFloat(_("Arrival height for GR calculation"),
-           _("For gradient (GR) calculations. The safety height above terrain at the destination used to calculated the gradient (slope) to arrive there."),
-           _T("%.0f %s"), _T("%.0f"),
-           fixed(0), fixed(10000), fixed(100), false,
-           UnitGroup::ALTITUDE, task_behaviour.safety_height_arrival_gr);
+  static constexpr StaticEnumChoice gr_calc_safety_height_list[] = {
+    { (unsigned)TaskBehaviour::GRSafetyHeightMode::Zero_Safety_Height, N_("Terrain elevation"),
+      N_("GR calculations will be made to the airport or terrain height.") },
+    { (unsigned)TaskBehaviour::GRSafetyHeightMode::Arrival_Safety_Height, N_("Arrival safety height"),
+      N_("GR calculations will be made to Safety Arrival Height above the airport or terrain.") },
+    { 0 }
+  };
+  AddEnum(_("Arrival height for GR calculation"),
+           _("For gradient (GR) calculations to destination.  The safety height above terrain at the destination used to calculated the gradient (slope) to arrive there.  Use 0 feet, or use the Arrival Safety height. "),
+           gr_calc_safety_height_list, (unsigned)task_behaviour.safety_height_arrival_gr_mode);
   SetExpertRow(ArrivalHeightGR);
 
   AddFloat(_("Terrain height"),
@@ -124,9 +130,8 @@ SafetyFactorsConfigPanel::Save(bool &_changed)
                        ProfileKeys::SafetyAltitudeArrival,
                        task_behaviour.safety_height_arrival);
 
-  changed |= SaveValue(ArrivalHeightGR, UnitGroup::ALTITUDE,
-                       ProfileKeys::SafetyAltitudeArrivalGR,
-                       task_behaviour.safety_height_arrival_gr);
+  changed |= SaveValueEnum(ArrivalHeightGR, ProfileKeys::SafetyAltitudeArrivalGRMode,
+                           task_behaviour.safety_height_arrival_gr_mode);
 
   changed |= SaveValue(TerrainHeight, UnitGroup::ALTITUDE,
                        ProfileKeys::SafetyAltitudeTerrain,

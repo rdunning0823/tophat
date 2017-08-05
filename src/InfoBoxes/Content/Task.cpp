@@ -696,7 +696,7 @@ InfoBoxContentHomeGR::Update(InfoBoxData &data)
   }
   fixed gradient = ::AngleToGradient((more_data.nav_altitude -
       settings.poi.home_elevation -
-      settings.task.safety_height_arrival_gr) / d);
+      settings.task.GRSafetyHeight()) / d);
 
   // Set Value
   if (!positive(gradient)) {
