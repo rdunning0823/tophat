@@ -905,7 +905,7 @@ static constexpr MetaData meta_data[] = {
   {
     N_("Final GR"),
     N_("Fin GR"),
-    N_("The required glide ratio over ground to finish the task, given by the distance to go divided by the height required to arrive at the safety arrival height."),
+    N_("The required glide ratio over ground to finish the task.  For ordered task, to edge of finish cylinder at task finish height.  For unordered/goto task, to point plus GR Safety Height"),
     UpdateInfoBoxFinalGR,
     e_WP_GR, // Next GR
     e_Fin_GR_TE, // Fin GR
