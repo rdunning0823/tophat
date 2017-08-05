@@ -405,7 +405,7 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
     StaticString<15> gradient_buffer_long;
     StaticString<10> gradient_buffer(_T("++"));
 
-    fixed height = Basic().nav_altitude - elevation - GetComputerSettings().task.safety_height_arrival;
+    fixed height = Basic().nav_altitude - elevation - GetComputerSettings().task.GRSafetyHeight();
     fixed gradient = height / dist;
     if (::GradientValid(gradient)) {
       if(positive(gradient)) {
