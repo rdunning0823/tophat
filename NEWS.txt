@@ -2,6 +2,7 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Tophat Soaring 2.2.2b_beta
+* Move GR Arrival Safety Height to "Advanced", change to enum {0 or Arrival Height}
 * Improve waypoint label placement on map
 * Smooth AAT/TAT Task optimization near start
 * Add Heading Up map orientation
