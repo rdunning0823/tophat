@@ -28,14 +28,12 @@
 UnorderedTaskPoint::UnorderedTaskPoint(const Waypoint &wp,
                                        const TaskBehaviour &tb)
   :TaskWaypoint(TaskPointType::UNORDERED, wp),
-   safety_height_arrival(tb.safety_height_arrival),
-   safety_height_arrival_gr(tb.GRSafetyHeight()){}
+   safety_height_arrival(tb.safety_height_arrival){}
 
 void
 UnorderedTaskPoint::SetTaskBehaviour(const TaskBehaviour &tb)
 {
   safety_height_arrival = tb.safety_height_arrival;
-  safety_height_arrival_gr = tb.GRSafetyHeight();
 }
 
 GeoVector
@@ -53,7 +51,7 @@ UnorderedTaskPoint::GetRequiredElevation(fixed safety_limit) const
   return GetBaseElevation() + safety_limit;
 }
 
-fixed 
+fixed
 UnorderedTaskPoint::GetElevation() const
 {
   return UnorderedTaskPoint::GetRequiredElevation(safety_height_arrival);
