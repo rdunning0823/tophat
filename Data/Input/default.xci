@@ -1201,25 +1201,16 @@ location=18
 mode=Menu
 type=key
 data=0
-event=TerrainTopography terrain toggle
-event=Mode default
-label=$(TerrainToggleActionName) terrain
+event=Mode MapLayers
+label=_MapLayers
 location=21
-
-mode=Menu
-type=key
-data=9
-event=TerrainTopography topography toggle
-event=Mode default
-label=$(TopographyToggleActionName) roads, cities, water
-location=22
 
 mode=Menu
 type=key
 data=0
 event=Mode Orientation
 label=Map orientation
-location=23
+location=22
 
 # -------------
 # mode=Menu1
@@ -1511,6 +1502,56 @@ event=Orientation headingup
 event=Mode default
 label=$(OrientationHeadingUp)
 location=19
+
+# -------------
+# mode=MapLayers
+# -------------
+mode=MapLayers
+type=key
+data=LEFT
+event=ChangeActiveLabel up
+
+mode=MapLayers
+type=key
+data=RIGHT
+event=ChangeActiveLabel down
+
+mode=MapLayers
+type=key
+data=UP
+event=ChangeActiveLabel up
+
+mode=MapLayers
+type=key
+data=DOWN
+event=ChangeActiveLabel down
+
+mode=MapLayers
+type=key
+data=RETURN
+event=DoActiveLabel
+
+mode=MapLayers
+type=key
+data=0
+event=TerrainTopography terrain toggle
+label=$(TerrainToggleActionName) terrain
+location=16
+
+mode=MapLayers
+type=key
+data=9
+event=TerrainTopography topography toggle
+label=$(TopographyToggleActionName) roads, cities, water
+location=17
+
+mode=MapLayers
+type=key
+data=9
+event=AirSpace toggle
+label=$(AirspaceToggleActionName) Airspace
+location=18
+
 
 # -------------
 # mode=DeclutterLabels
