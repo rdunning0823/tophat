@@ -261,6 +261,11 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const MaskedIcon *icon = &icon_look.hBmpTabSettings;
     DrawIconAndText(canvas, rc, _T(""), icon,
                     enabled, focused, pressed, transparent_background_force);
+  } else if (caption == _("_MapLayers")) {
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon *icon = &icon_look.hBmpLayers;
+    DrawIconAndText(canvas, rc, _T("Layers"), icon,
+                    enabled, focused, pressed, transparent_background_force);
   } else if (caption == _("_SetupNavBar")) {
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *icon = &icon_look.hBmpTabSettingsNavBar;
