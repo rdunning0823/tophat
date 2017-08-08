@@ -1535,21 +1535,21 @@ mode=MapLayers
 type=key
 data=0
 event=TerrainTopography terrain toggle
-label=$(TerrainToggleActionName) terrain
+label=$(TerrainToggleActionName)
 location=16
 
 mode=MapLayers
 type=key
 data=9
 event=TerrainTopography topography toggle
-label=$(TopographyToggleActionName) roads, cities, water
+label=$(TopographyToggleActionName)
 location=17
 
 mode=MapLayers
 type=key
 data=9
 event=AirSpace toggle
-label=$(AirspaceToggleActionName) Airspace
+label=$(AirspaceToggleActionName)
 location=18
 
 
