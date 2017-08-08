@@ -47,28 +47,6 @@ Copyright_License {
 #include <stdlib.h>
 
 /**
- * Replaces ToReplace with ReplaceWith in String
- * @param String Buffer string
- * @param ToReplace The string that will be replaced
- * @param ReplaceWith The replacement
- * @param Size (?)
- */
-static void
-ReplaceInString(TCHAR *String, const TCHAR *ToReplace,
-                const TCHAR *ReplaceWith, size_t Size)
-{
-  TCHAR TmpBuf[MAX_PATH];
-  size_t iR = _tcslen(ToReplace);
-  TCHAR *pC;
-
-  while ((pC = _tcsstr(String, ToReplace)) != nullptr) {
-    _tcscpy(TmpBuf, pC + iR);
-    _tcscpy(pC, ReplaceWith);
-    _tcscat(pC, TmpBuf);
-  }
-}
-
-/**
  * If Condition is true, Macro in Buffer will be replaced by TrueText,
  * otherwise by FalseText.
  * @param Condition Condition to be checked

@@ -50,7 +50,7 @@ StringFind(const wchar_t *haystack, const wchar_t *needle)
 
 gcc_pure gcc_nonnull_all
 static inline const wchar_t *
-StringFind(const wchar_t *haystack, wchar_t needle, size_t size)
+StringFind(const wchar_t *haystack, const wchar_t needle, size_t size)
 {
   return wmemchr(haystack, needle, size);
 }

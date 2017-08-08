@@ -26,7 +26,7 @@ Copyright_License {
 #include "WCharUtil.hpp"
 
 #include <algorithm>
-
+#include <string.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -238,4 +238,19 @@ DuplicateString(const wchar_t *p, size_t length)
   if (q != nullptr)
     *std::copy_n(p, length, q) = L'\0';
   return q;
+}
+
+void
+ReplaceInString(wchar_t *String, const wchar_t *ToReplace,
+                const wchar_t *ReplaceWith, size_t Size)
+{
+  static wchar_t TmpBuf[4096];
+  size_t iR = StringLength(ToReplace);
+  wchar_t *pC;
+
+  while ((pC = wcsstr(String, ToReplace)) != nullptr) {
+    CopyString(TmpBuf, pC + iR, Size);
+    CopyString(pC, ReplaceWith, Size);
+    wcscat(pC, TmpBuf);
+  }
 }

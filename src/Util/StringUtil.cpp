@@ -222,3 +222,18 @@ DuplicateString(const char *p, size_t length)
     *std::copy_n(p, length, q) = '\0';
   return q;
 }
+
+void
+ReplaceInString(char *String, const char *ToReplace,
+                const char *ReplaceWith, size_t Size)
+{
+  static char TmpBuf[4096];
+  size_t iR = StringLength(ToReplace);
+  char *pC;
+
+  while ((pC = strstr(String, ToReplace)) != nullptr) {
+    CopyString(TmpBuf, pC + iR, Size);
+    CopyString(pC, ReplaceWith, Size);
+    strcat(pC, TmpBuf);
+  }
+}

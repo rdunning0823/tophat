@@ -188,4 +188,14 @@ gcc_malloc gcc_nonnull_all
 char *
 DuplicateString(const char *p, size_t length);
 
+/**
+ * Replaces ToReplace with ReplaceWith in String
+ * @param String Buffer string
+ * @param ToReplace The string that will be replaced
+ * @param ReplaceWith The replacement
+ * @param Size (?)
+ */
+void
+ReplaceInString(char *String, const char *ToReplace,
+                const char *ReplaceWith, size_t Size);
 #endif

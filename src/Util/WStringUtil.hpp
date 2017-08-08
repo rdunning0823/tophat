@@ -146,4 +146,14 @@ gcc_malloc gcc_nonnull_all
 wchar_t *
 DuplicateString(const wchar_t *p, size_t length);
 
+/**
+ * Replaces ToReplace with ReplaceWith in String
+ * @param String Buffer string
+ * @param ToReplace The string that will be replaced
+ * @param ReplaceWith The replacement
+ * @param Size (?)
+ */
+void
+ReplaceInString(wchar_t *String, const wchar_t *ToReplace,
+                const wchar_t *ReplaceWith, size_t Size);
 #endif
