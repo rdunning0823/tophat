@@ -570,38 +570,36 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
   CondReplaceInString(GetMapSettings().auto_zoom_enabled, OutBuffer,
                       _T("$(ZoomAutoToggleActionName)"),
                       _("Manual"), _("Auto"), Size);
-  CondReplaceInString(GetMapSettings().topography_enabled, OutBuffer,
-                      _T("$(TopologyToggleActionName)"),
-                      _("Hide"), _("Show"), Size);
+
   CondReplaceInString(GetMapSettings().topography_enabled, OutBuffer,
                       _T("$(TopographyToggleActionName)"),
-                      _("Hide"), _("Show"), Size);
+                      _T("_CheckMark "), _("Roads, cities, water"), _("Roads, cities, water"), Size);
   CondReplaceInString(GetMapSettings().terrain.enable, OutBuffer,
                       _T("$(TerrainToggleActionName)"),
-                      _("Hide"), _("Show"), Size);
+                      _T("_CheckMark "), _("Terrain"), _("Terrain"), Size);
   CondReplaceInString(GetMapSettings().airspace.enable, OutBuffer,
                       _T("$(AirspaceToggleActionName)"),
-                      _("Hide"), _("Show"), Size);
+                      _T("_CheckMark "), _("Airspace"), _("Airspace"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       MapOrientation::NORTH_UP, OutBuffer,
                       _T("$(OrientationNorthUp)"),
-                      _T("* "), _("North up"), _("North up"), Size);
+                      _T("_CheckMark "), _("North up"), _("North up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       MapOrientation::TARGET_UP, OutBuffer,
                       _T("$(OrientationTargetUp)"),
-                      _T("* "), _("Target up"), _("Target up"), Size);
+                      _T("_CheckMark "), _("Target up"), _("Target up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       MapOrientation::HEADING_UP, OutBuffer,
                       _T("$(OrientationHeadingUp)"),
-                      _T("* "), _("Heading up"), _("Heading up"), Size);
+                      _T("_CheckMark "), _("Heading up"), _("Heading up"), Size);
 
   CondReplaceInString(GetMapSettings().cruise_orientation ==
       MapOrientation::TRACK_UP, OutBuffer,
                       _T("$(OrientationTrackUp)"),
-                      _T("* "), _("Track up"), _("Track up"), Size);
+                      _T("_CheckMark "), _("Track up"), _("Track up"), Size);
 
   if (_tcsstr(OutBuffer, _T("$(MapLabelsToggleActionName)"))) {
     static const TCHAR *const labels[] = {
@@ -624,27 +622,27 @@ ButtonLabel::ExpandMacros(const TCHAR *In, TCHAR *OutBuffer, size_t Size)
   CondReplaceInString(wls ==
       WaypointRendererSettings::LabelSelection::ALL, OutBuffer,
                       _T("$(DeclutterLabelsAll)"),
-                      _T("* "), _("All"), _("All"), Size);
+                      _T("_CheckMark "), _("All"), _("All"), Size);
 
   CondReplaceInString(wls ==
       WaypointRendererSettings::LabelSelection::TASK_AND_LANDABLE, OutBuffer,
                       _T("$(DeclutterLabelsTaskLandables)"),
-                      _T("* "), _("Task, Landables"), _("Task, Landables"), Size);
+                      _T("_CheckMark "), _("Task, Landables"), _("Task, Landables"), Size);
 
   CondReplaceInString(wls ==
       WaypointRendererSettings::LabelSelection::TASK, OutBuffer,
                       _T("$(DeclutterLabelsTask)"),
-                      _T("* "), _("Task"), _("Task"), Size);
+                      _T("_CheckMark "), _("Task"), _("Task"), Size);
 
   CondReplaceInString(wls ==
       WaypointRendererSettings::LabelSelection::NONE, OutBuffer,
                       _T("$(DeclutterLabelsNone)"),
-                      _T("* "), _("None"), _("None"), Size);
+                      _T("_CheckMark "), _("None"), _("None"), Size);
 
   CondReplaceInString(wls ==
       WaypointRendererSettings::LabelSelection::TASK_AND_AIRFIELD, OutBuffer,
                       _T("$(DeclutterLabelsTaskAirfields)"),
-                      _T("* "), _("Task, Airfields"), _("Task, Airfields"), Size);
+                      _T("_CheckMark "), _("Task, Airfields"), _("Task, Airfields"), Size);
 
   CondReplaceInString(GetComputerSettings().task.auto_mc,
                       OutBuffer, _T("$(MacCreadyToggleActionName)"),
