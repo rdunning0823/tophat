@@ -62,7 +62,7 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
   const TaskBehaviour &task_behaviour = settings_computer.task;
 
-  AddFloat(_("Arrival height"),
+  AddFloat(_("Arrival safety height"),
            _("The height above terrain that the glider should arrive at for a safe landing.  This is also added to height to complete a task."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
@@ -75,12 +75,12 @@ SafetyFactorsConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
       N_("GR calculations will be made to Safety Arrival Height above the airport or terrain.") },
     { 0 }
   };
-  AddEnum(_("Arrival height for GR calculation"),
+  AddEnum(_("Safety height for GR calculation"),
            _("For gradient (GR) calculations to destination.  The safety height above terrain at the destination used to calculated the gradient (slope) to arrive there.  Use 0 feet, or use the Arrival Safety height. "),
            gr_calc_safety_height_list, (unsigned)task_behaviour.safety_height_arrival_gr_mode);
   SetExpertRow(ArrivalHeightGR);
 
-  AddFloat(_("Terrain height"),
+  AddFloat(_("Terrain safety height"),
            _("The height above terrain that the glider must clear during final glide.  This does not affect arrival height, but displays warnings on the screen where a mountain will be hit or an X in the final glide bar."),
            _T("%.0f %s"), _T("%.0f"),
            fixed(0), fixed(10000), fixed(100), false,
