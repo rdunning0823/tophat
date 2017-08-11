@@ -35,6 +35,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "UIGlobals.hpp"
 #include "Formatter/HexColor.hpp"
+#include "Util/StringUtil.hpp"
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
 #include "Screen/OpenGL/Scope.hpp"
@@ -276,6 +277,15 @@ SymbolButtonRenderer::DrawSymbol(Canvas &canvas, PixelRect rc, bool enabled,
     const IconLook &icon_look = UIGlobals::GetIconLook();
     const MaskedIcon *icon = &icon_look.target_icon;
     DrawIconAndText(canvas, rc, _("Nav to target"), icon,
+                    enabled, focused, pressed, transparent_background_force);
+
+  } else if (StringStartsWith(caption.c_str(), _T("_CheckMark"))) {
+    StaticString <96>caption2(caption);
+    ReplaceInString(caption2.buffer(), _T("_CheckMark"), _T(""),
+                    caption2.length());
+    const IconLook &icon_look = UIGlobals::GetIconLook();
+    const MaskedIcon *icon = &icon_look.hBmpCheckMark;
+    DrawIconAndText(canvas, rc, caption2, icon,
                     enabled, focused, pressed, transparent_background_force);
 
   } else if (caption == _("_NavBarToCenter")) {
