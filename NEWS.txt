@@ -5,11 +5,13 @@ Tophat Soaring 2.2.2b_beta
 * Move GR Arrival Safety Height to "Advanced", change to enum {0 or Arrival Height}
 * Improve waypoint label placement on map
 * Smooth AAT/TAT Task optimization near start
+* Added "Map layers" menu for airspace, terrain, topo visibility
 * Add Heading Up map orientation
-* Fix internet METAR/TAF connection
+* Display checkmarks in menus to denote selected items
+* Fix internet download for METAR/TAF
 * Add volume unit for ballast (liters, gallons)
-* Fix max ballast integration with device
-* Fix pressure altitude reading from device
+* Fix max ballast integration with devices
+* Fix pressure altitude reading from devices
 * Fix crash during pan and restart
 * Airspace warning: show more information (class / top / bottom)
 * FLARM:
