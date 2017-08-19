@@ -2,30 +2,35 @@
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
 Tophat Soaring 2.2.2b_beta
-* Move GR Arrival Safety Height to "Advanced", change to enum {0 or Arrival Height}
-* Improve waypoint label placement on map
+* Map:
+ - Improve waypoint label placement on map
+ - Optionally hide unit in map labels for arrival height
 * Smooth AAT/TAT Task optimization near start
-* Added "Map layers" menu for airspace, terrain, topo visibility
-* Add Heading Up map orientation
-* Display checkmarks in menus to denote selected items
-* Fix internet download for METAR/TAF
-* Add volume unit for ballast (liters, gallons)
-* Fix max ballast integration with devices
-* Fix pressure altitude reading from devices
-* Fix crash during pan and restart
-* Airspace warning: show more information (class / top / bottom)
 * FLARM:
-  - increase font size on map and radar
   - Add propeller to power plane image
+  - Increase font size on map and radar
+* Menus: 
+ - Added "Map layers" menu for airspace, terrain, topo visibility
+ - Add Heading Up map orientation
+ - Display checkmarks in menus to denote selected items
+* Display "2 minutes under start" for US Tasks in Nav Bar
+* Fixes:
+ - Max ballast integration with devices
+ - Pressure altitude reading from devices
+ - Crash during pan
+ - Internet download for METAR/TAF
+* Settings:
+ - Add volume unit for ballast (liters, gallons)
+ - Move GR Arrival Safety Height to "Advanced"
+ - Allow custom smaller fonts
+* Infoboxes:
+ - MC Infobox - show L/D
+ - Add "Help" button
+ - Additional layouts
+ - Alternates - option to display airports only
+* Airspace warning: show more information (class / top / bottom)
 * Bluefly glide computer support
 * New snail trail for eink devices
-* Allow custom smaller fonts
-* Optionally hide unit in map labels for arrival height
-* Display "2 minutes under start" for US Tasks in Nav Bar
-* Alternates Infobox - option to display airports only
-* MC Infobox - show L/D
-* Infoboxes: add "Help" button
-* Additional Infobox layouts
 * Simulator mode: allow adjustment of IAS, TAS and VGND through Infoboxes
 
 Tophat Soaring 2.2b March 6, 2017
