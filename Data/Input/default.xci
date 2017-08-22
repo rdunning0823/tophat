@@ -1179,13 +1179,6 @@ event=DoActiveLabel
 mode=Menu
 type=key
 data=0
-event=Mode DeclutterLabels
-label=Map labels
-location=16
-
-mode=Menu
-type=key
-data=0
 event=ScreenModes next
 label=$(SwitchScreen)
 location=17
@@ -1211,6 +1204,13 @@ data=0
 event=Mode Orientation
 label=Map orientation
 location=22
+
+mode=Menu
+type=key
+data=0
+event=Mode DeclutterLabels
+label=Map labels
+location=23
 
 # -------------
 # mode=Menu1
