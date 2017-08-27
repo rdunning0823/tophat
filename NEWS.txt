@@ -31,6 +31,7 @@ Tophat Soaring 2.2.2b_beta
 * Airspace warning: show more information (class / top / bottom)
 * Bluefly glide computer support
 * New snail trail for eink devices
+* In igc file name, use 3 chars of pilot name instead of "AAA"
 * Simulator mode: allow adjustment of IAS, TAS and VGND through Infoboxes
 
 Tophat Soaring 2.2b March 6, 2017
