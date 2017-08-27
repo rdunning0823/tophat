@@ -32,6 +32,7 @@
 #include "Formatter/IGCFilenameFormatter.hpp"
 #include "Interface.hpp"
 #include "Util/CharUtil.hpp"
+#include "Util/StringAPI.hxx"
 #include "IGCFileCleanup.hpp"
 #include "IGC/IGCWriter.hpp"
 
@@ -292,8 +293,8 @@ LoggerImpl::StartLogger(const NMEAInfo &gps_info,
                         const LoggerSettings &settings,
                         const TCHAR *asset_number, const Declaration &decl)
 {
-  if (!settings.logger_id.empty())
-    asset_number = settings.logger_id.c_str();
+  if (StringLength(settings.GetLoggerID()) > 0)
+    asset_number = settings.GetLoggerID();
 
   // chars must be legal in file names
   char logger_id[4];

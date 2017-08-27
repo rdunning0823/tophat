@@ -69,6 +69,11 @@ struct LoggerSettings {
    * returns competition_id if exists, else glider_id
    */
   const TCHAR *GetCompetitionID() const;
+
+  /**
+   * returns logger_id if exists, else pilot name
+   */
+  const TCHAR* GetLoggerID() const;
 };
 
 #endif

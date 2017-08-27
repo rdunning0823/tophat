@@ -49,3 +49,13 @@ LoggerSettings::GetCompetitionID() const
   else
     return competition_id.c_str();
 }
+
+const TCHAR*
+LoggerSettings::GetLoggerID() const
+{
+  if (logger_id.empty()) {
+    return pilot_name.c_str();
+  } else {
+    return logger_id.c_str();
+  }
+}
