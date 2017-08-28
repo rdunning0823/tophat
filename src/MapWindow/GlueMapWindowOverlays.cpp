@@ -401,7 +401,8 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
     start = newline + 1;
   }
 
-  if (Basic().location_available && elevation_valid && Basic().NavAltitudeAvailable()) {
+  if (Basic().location_available && elevation_valid && Basic().NavAltitudeAvailable()
+      && Calculated().flight.flying) {
     StaticString<15> gradient_buffer_long;
     StaticString<10> gradient_buffer(_T("++"));
 
@@ -411,13 +412,13 @@ GlueMapWindow::DrawPanInfo(Canvas &canvas) const
       if(positive(gradient)) {
         FormatGlideRatio(gradient_buffer.buffer(), gradient_buffer.capacity(),
                          ::AngleToGradient(gradient));
-      }
-      gradient_buffer_long.Format(_T("GR: %s"), gradient_buffer.c_str());
+        gradient_buffer_long.Format(_T("GR: %s"), gradient_buffer.c_str());
 
-      TextInBox(canvas, gradient_buffer_long, x, y, mode,
-                render_projection.GetScreenWidth(),
-                render_projection.GetScreenHeight());
-      y += PixelScalar(height);
+        TextInBox(canvas, gradient_buffer_long, x, y, mode,
+                  render_projection.GetScreenWidth(),
+                  render_projection.GetScreenHeight());
+        y += PixelScalar(height);
+      }
     }
   }
 }
