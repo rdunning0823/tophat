@@ -40,11 +40,13 @@ class QNHPanel
   : public RowFormWidget, DataFieldListener, private Timer
 {
   fixed last_altitude;
+  bool show_double_units_checkbox;
 
 public:
-  QNHPanel()
+  QNHPanel(bool _show_double_units_checkbox)
     :RowFormWidget(UIGlobals::GetDialogLook()),
-     last_altitude(-2)
+     last_altitude(-2),
+     show_double_units_checkbox(_show_double_units_checkbox)
   {}
 
   void ShowAltitude(fixed altitude);

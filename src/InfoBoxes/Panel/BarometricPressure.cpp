@@ -29,7 +29,7 @@ class BarometricPressurePanel : public BaseAccessPanel {
 public:
 
   BarometricPressurePanel(unsigned _id)
-    :BaseAccessPanel(_id, new QNHPanel) {}
+    :BaseAccessPanel(_id, new QNHPanel(true)) {}
 };
 
 Widget *

@@ -28,6 +28,7 @@ Copyright_License {
 #include "Units/Units.hpp"
 #include "Formatter/UserUnits.hpp"
 #include "Form/DataField/Float.hpp"
+#include "Form/DataField/Boolean.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
 #include "Form/Button.hpp"
@@ -42,6 +43,7 @@ Copyright_License {
 enum ControlIndex {
   QNH,
   Altitude,
+  ShowDoubleUnits,
 };
 
 static QNHPanel *instance;
@@ -101,6 +103,12 @@ QNHPanel::OnModified(DataField &df)
   if (IsDataField(QNH, df)) {
     const DataFieldFloat &dff = (const DataFieldFloat &)df;
     SetQNH(Units::FromUserPressure(dff.GetAsFixed()));
+  } else {
+    if (IsDataField(ShowDoubleUnits, df)) {
+      InfoBoxSettings &settings_info_boxes = CommonInterface::SetUISettings().info_boxes;
+      const DataFieldBoolean &dfb = (const DataFieldBoolean &)df;
+      settings_info_boxes.show_alternative_altitude_units = dfb.GetAsBoolean();
+    }
   }
 }
 
@@ -110,6 +118,7 @@ QNHPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   RowFormWidget::Prepare(parent, rc);
 
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+  const InfoBoxSettings &settings_info_boxes = CommonInterface::GetUISettings().info_boxes;
 
   WndProperty *wp;
   wp = AddFloat(_("QNH"),
@@ -127,6 +136,13 @@ QNHPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddReadOnly(_("Altitude"), NULL, _T("%.0f %s"),
               UnitGroup::ALTITUDE, fixed(0));
+  if (show_double_units_checkbox) {
+    AddBoolean(_("Show feet and meters"),
+               _("Display second set of units in the bottom of altitude Infoboxes"),
+               settings_info_boxes.show_alternative_altitude_units, this);
+  } else {
+    AddDummy();
+  }
 }
 
 bool
@@ -138,7 +154,7 @@ QNHPanel::Save(bool &changed)
 void
 dlgQNHShowModal()
 {
-  instance = new QNHPanel();
+  instance = new QNHPanel(false);
 
   StaticString<128> caption(_("QNH"));
   WidgetDialog dialog(UIGlobals::GetDialogLook());
