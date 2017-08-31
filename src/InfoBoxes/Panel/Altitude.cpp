@@ -90,7 +90,8 @@ AltitudeConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   AddBoolean(_("Show feet and meters"),
              _("Display second set of units in the bottom of the Infobox"),
-             settings_info_boxes.show_alternative_altitude_units, this);}
+             settings_info_boxes.show_alternative_altitude_units, this);
+}
 
 void
 AltitudeConfigPanel::OnModified(DataField &df)
