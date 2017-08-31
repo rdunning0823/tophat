@@ -74,7 +74,6 @@ static constexpr StaticEnumChoice display_orientation_list[] = {
   { 0 }
 };
 
-#if defined(ENABLE_OPENGL) | defined(KOBO)
 static constexpr StaticEnumChoice screens_button_location_list[] = {
   { (unsigned)UISettings::ScreensButtonLocation::MAP,
     N_("On the map"),
@@ -84,7 +83,6 @@ static constexpr StaticEnumChoice screens_button_location_list[] = {
     N_("Show the Screens button on the menu.") },
   { 0 }
 };
-#endif
 
 static constexpr StaticEnumChoice popup_msg_position_list[] = {
   { (unsigned)UISettings::PopupMessagePosition::CENTER, N_("Center"),
@@ -206,14 +204,17 @@ LayoutConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc)
   SetExpertRow(AppStatusMessageAlignment);
 
   if (!quick_setup) {
-#if !defined(ENABLE_OPENGL) & !defined(KOBO)
   // WIN32 does not support screens button on map
-  AddDummy();
-#else
-  AddEnum(_("Screens button location"),
+#if !defined(ENABLE_OPENGL) && !defined(KOBO)
+  WndProperty *screens_button =
+#endif
+      AddEnum(_("Screens button location"),
              _("Show the 'S' Screens button on the map or in the first menu."),
              screens_button_location_list, (unsigned)ui_settings.screens_button_location);
+#if !defined(ENABLE_OPENGL) && !defined(KOBO)
+  screens_button->SetEnabled(false);
 #endif
+
   } else
     AddDummy();
 
