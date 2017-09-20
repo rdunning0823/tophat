@@ -39,11 +39,6 @@ Copyright_License {
 #include "InfoBoxes/Panel/Home.hpp"
 #include "InfoBoxes/Panel/TaskComputerSetupInfoBox.hpp"
 #include "InfoBoxes/Panel/NextWaypoint.hpp"
-#include "Renderer/BestCruiseArrowRenderer.hpp"
-#include "Look/TaskLook.hpp"
-#include "Look/MapLook.hpp"
-#include "Screen/Canvas.hpp"
-#include "Math/Angle.hpp"
 #include "Look/Look.hpp"
 #include "Widget/CallbackWidget.hpp"
 #include "Renderer/NextArrowRenderer.hpp"
@@ -77,23 +72,6 @@ UpdateInfoBoxBearing(InfoBoxData &data)
   data.SetValueColor(task_stats.inside_oz ? 3 : 0);
 }
 
-void
-InfoBoxContentBearingDiff::OnCustomPaint(Canvas &canvas, const PixelRect &rc)
-{
-  const RasterPoint pos { canvas.GetRect().left + (PixelScalar)canvas.GetWidth() / 2,
-    canvas.GetRect().top + (PixelScalar)canvas.GetHeight() / 2 };
-
-  const NMEAInfo &basic = CommonInterface::Basic();
-  const TaskLook &task_look = UIGlobals::GetMapLook().task;
-  const auto &info = CommonInterface::Calculated();
-  Angle angle = basic.attitude.heading;
-  if (basic.location_available)
-    BestCruiseArrowRenderer::Draw(canvas,
-                                  task_look,
-                                  angle,
-                                  pos, info, true);
-}
-
 const InfoBoxPanel *
 InfoBoxContentBearingDiff::GetDialogContent()
 {
@@ -103,17 +81,18 @@ InfoBoxContentBearingDiff::GetDialogContent()
 void
 InfoBoxContentBearingDiff::Update(InfoBoxData &data)
 {
-  data.SetCustom();
   const NMEAInfo &basic = CommonInterface::Basic();
   const TaskStats &task_stats = CommonInterface::Calculated().task_stats;
   const GeoVector &vector_remaining = task_stats.current_leg.vector_remaining;
   if (!basic.track_available || !task_stats.task_valid ||
       !vector_remaining.IsValid() || vector_remaining.distance <= fixed(10)) {
-    data.SetCommentInvalid();
+    data.SetInvalid();
     return;
   }
 
-  data.SetCommentFromDistance(vector_remaining.distance);
+  Angle value = vector_remaining.bearing - basic.track;
+  data.SetValueFromBearingDifference(value);
+  data.SetValueColor(task_stats.inside_oz ? 3 : 0);
 }
 
 void

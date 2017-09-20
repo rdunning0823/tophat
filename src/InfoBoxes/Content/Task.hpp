@@ -66,7 +66,6 @@ class InfoBoxContentBearingDiff: public InfoBoxContent
 public:
   virtual void Update(InfoBoxData &data) override;
   virtual const InfoBoxPanel *GetDialogContent() override;
-  virtual void OnCustomPaint(Canvas &canvas, const PixelRect &rc) override;
 };
 
 void

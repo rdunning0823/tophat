@@ -28,6 +28,7 @@ Tophat Soaring 2.2.2b_beta
  - Add "Help" button
  - Additional layouts
  - Alternates - option to display airports only
+ - Add "Bearing difference" infobox
 * Airspace warning: show more information (class / top / bottom)
 * Bluefly glide computer support
 * New snail trail for eink devices
