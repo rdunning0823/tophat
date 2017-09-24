@@ -62,7 +62,7 @@ TextEntryDialog(StringBuffer<TCHAR, N> &text,
 {
   AllowedCharacters accb=AllowedCharacters();
   return TextEntryDialog(text.data(), text.capacity(),
-                         caption, accb, default_shift_state);
+                         caption, accb, true, default_shift_state);
 }
 
 void
