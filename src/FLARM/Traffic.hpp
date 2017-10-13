@@ -181,7 +181,7 @@ struct FlarmTraffic {
    * @return true if the object is still valid
    */
   bool Refresh(fixed Time) {
-    valid.Expire(Time, fixed(2));
+    valid.Expire(Time, fixed(5));
     return valid;
   }
 
