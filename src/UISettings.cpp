@@ -22,6 +22,7 @@ Copyright_License {
 */
 
 #include "UISettings.hpp"
+#include "Waypoint/WaypointFilter.hpp"
 
 void
 UISettings::SetDefaults()
@@ -33,6 +34,8 @@ UISettings::SetDefaults()
   show_waypoints_list_warning = true;
 
   waypoint_sort_direction = UISettings::WaypointSortDirection::NAME;
+
+  waypoint_list_filter_type = TypeFilter::ALL;
 
 #ifndef GNAV
   scale = 100;

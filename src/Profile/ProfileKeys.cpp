@@ -291,6 +291,7 @@ const char FilePickAndDownloadAreaFilter[] = "FilePickAndDownloadAreaFilter";
 const char FilePickAndDownloadSubAreaFilter[] = "FilePickAndDownloadSubAreaFilter";
 const char ScreensButtonLocation[] = "ScreensButtonLocation";
 const char WaypointSortDirection[] = "WaypointSortDirection";
+const char WaypointListFilterType[] = "WaypointListFilterType";
 const char WaveAssistant[] = "WaveAssistant";
 
 const char SystemSoundVolume [] = "SystemSoundVolume";

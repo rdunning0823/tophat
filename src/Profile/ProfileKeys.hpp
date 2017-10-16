@@ -288,6 +288,7 @@ extern const char FilePickAndDownloadAreaFilter[];
 extern const char FilePickAndDownloadSubAreaFilter[];
 extern const char ScreensButtonLocation[];
 extern const char WaypointSortDirection[];
+extern const char WaypointListFilterType[];
 extern const char WaveAssistant[];
 
 extern const char SystemSoundVolume [];

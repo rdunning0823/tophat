@@ -33,6 +33,7 @@ Copyright_License {
 #include "Dialogs/DialogSettings.hpp"
 #include "DisplaySettings.hpp"
 #include "Audio/Settings.hpp"
+#include "Waypoint/WaypointFilter.hpp"
 
 #include <type_traits>
 
@@ -78,6 +79,9 @@ struct UISettings {
 
   /** Direction of sort in waypoint list */
   WaypointSortDirection waypoint_sort_direction;
+
+  /** the waypoint list will only show these types of waypoints */
+  TypeFilter waypoint_list_filter_type;
 
   /** show the Screens map overlay button instead of the menu with Screens */
   enum class ScreensButtonLocation : uint8_t {

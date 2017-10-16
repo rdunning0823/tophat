@@ -130,6 +130,7 @@ Profile::Load(const ProfileMap &map, UISettings &settings)
   map.Get(ProfileKeys::StartupTipId, settings.last_startup_tip);
 
   map.GetEnum(ProfileKeys::WaypointSortDirection, settings.waypoint_sort_direction);
+  map.GetEnum(ProfileKeys::WaypointListFilterType, settings.waypoint_list_filter_type);
   // hard code to default
   //map.Get(ProfileKeys::MenuTimeout, settings.menu_timeout);
 

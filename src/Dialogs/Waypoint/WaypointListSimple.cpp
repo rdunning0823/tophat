@@ -215,6 +215,14 @@ public:
   const Waypoint* GetSelectedWaypoint();
   void ItemSelected(unsigned index);
   void SaveSortDirection();
+  void SaveTypeFilter();
+  /**
+   * ensures type_index is valid
+   * @param type_index.  value being checked
+   * @return. validated value
+   */
+  TypeFilter CheckWaypointFilterType(TypeFilter type_index);
+
   void FillList(WaypointList &list, const Waypoints &src,
                 GeoPoint location, Angle heading,
                 const WaypointListDialogState &state);
@@ -443,11 +451,22 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
   waypoint_list_control.SetCursorHandler(this);
 
   dialog_state.name = _T("");
-  sort_direction = CommonInterface::SetUISettings().waypoint_sort_direction;
+  sort_direction = CommonInterface::GetUISettings().waypoint_sort_direction;
+  dialog_state.type_index = CheckWaypointFilterType(
+      CommonInterface::GetUISettings().waypoint_list_filter_type);
 
   WndForm::Move(rc_form);
   UpdateList();
   UpdateHeaders();
+}
+
+TypeFilter
+WaypointListSimpleDialog::CheckWaypointFilterType(TypeFilter type_index)
+{
+/*  if (type_index != TypeFilter::ALL && type_index != TypeFilter::LANDABLE)
+    return TypeFilter::ALL;*/
+
+  return type_index;
 }
 
 void
@@ -508,6 +527,7 @@ WaypointListSimpleDialog::UpdateButtons()
     search_button.SetPrefixIcon(SymbolButtonRenderer::PrefixIcon::SEARCH);
   else
     search_button.SetPrefixIcon(SymbolButtonRenderer::PrefixIcon::SEARCH_CHECKED);
+  landables_only.SetState(dialog_state.type_index == TypeFilter::LANDABLE ? true : false);
 }
 
 /**
@@ -672,6 +692,16 @@ WaypointListSimpleDialog::SaveSortDirection()
 }
 
 void
+WaypointListSimpleDialog::SaveTypeFilter()
+{
+  if (dialog_state.type_index != CommonInterface::GetUISettings().waypoint_list_filter_type) {
+    CommonInterface::SetUISettings().waypoint_list_filter_type = dialog_state.type_index;
+    Profile::Set(ProfileKeys::WaypointListFilterType, (int)dialog_state.type_index);
+    Profile::SetModified(true);
+  }
+}
+
+void
 WaypointListSimpleDialog::ReinitialiseLayout(const PixelRect &parent_rc)
 {
   WndForm::Move(parent_rc);
@@ -731,5 +761,6 @@ ShowWaypointListDialog(const GeoPoint &location,
   managed_widget.Show();
   int result = instance->ShowModal();
   instance->SaveSortDirection();
+  instance->SaveTypeFilter();
   return (result == ModalResult::mrCancel) ? nullptr : instance->GetSelectedWaypoint();
 }
