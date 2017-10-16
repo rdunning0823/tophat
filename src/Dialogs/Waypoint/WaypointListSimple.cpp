@@ -57,6 +57,7 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Widget/ManagedWidget.hpp"
 #include "Screen/SingleWindow.hpp"
+#include "Form/CheckBox.hpp"
 
 #include <algorithm>
 #include <list>
@@ -73,6 +74,7 @@ enum ControlIndex {
   List,
   Select,
   Close,
+  LandablesOnly,
 };
 
 enum Actions {
@@ -82,6 +84,7 @@ enum Actions {
   DistanceHeaderClick,
   SelectClick,
   CloseClick,
+  LandablesOnlyClick,
 };
 
 gcc_const
@@ -125,7 +128,7 @@ protected:
     void ToFilter(WaypointFilter &filter, Angle heading) const {
       assert(distance_index == 0);
       assert(direction_index == 0);
-      assert(type_index == TypeFilter::ALL);
+      assert(type_index == TypeFilter::ALL || type_index == TypeFilter::LANDABLE);
 
       filter.name = name;
       filter.distance =
@@ -158,6 +161,7 @@ protected:
   WndSymbolButton distance_header;
   WndSymbolButton select_button;
   WndSymbolButton cancel_button;
+  CheckBoxControl landables_only;
 
   PixelRect rc_list;
   PixelRect rc_search_button;
@@ -166,6 +170,7 @@ protected:
   PixelRect rc_distance_header;
   PixelRect rc_select_button;
   PixelRect rc_cancel_button;
+  PixelRect rc_landables_only;
 
 public:
   WaypointListSimpleDialog(const GeoPoint &_location,
@@ -243,6 +248,10 @@ WaypointListSimpleDialog::OnAction(int id)
   case SelectClick:
     ItemSelected(waypoint_list_control.GetCursorIndex());
     break;
+  case LandablesOnlyClick:
+    dialog_state.type_index = landables_only.GetState() ? TypeFilter::LANDABLE : TypeFilter::ALL;
+    UpdateList();
+    break;
   case CloseClick:
    SetModalResult(mrCancel);
     break;
@@ -270,6 +279,10 @@ WaypointListSimpleDialog::SetRectangles(const PixelRect &rc_outer)
     rc_search_button.top = 0;
     rc_search_button.bottom = control_height;
 
+    rc_landables_only = rc_search_button;
+    rc_landables_only.top = rc_search_button.bottom;
+    rc_landables_only.bottom = rc_landables_only.top + control_height;
+
     rc_name_header.top = 0;
     rc_name_header.bottom = control_height;
 
@@ -295,10 +308,14 @@ WaypointListSimpleDialog::SetRectangles(const PixelRect &rc_outer)
     rc_list.top = Layout::Scale(70);
     rc_list.bottom = rc.bottom - control_height;
 
-    rc_search_button.left = Layout::Scale(160);
+    rc_search_button.left = rc_list.left;
     rc_search_button.right = rc_search_button.left + Layout::Scale(80);
     rc_search_button.top = 0;
     rc_search_button.bottom = control_height;
+
+    rc_landables_only = rc_search_button;
+    rc_landables_only.left = rc_search_button.right;
+    rc_landables_only.right = rc_list.right;
 
     rc_name_header.top = Layout::Scale(35);
     rc_name_header.bottom = rc_name_header.top + control_height;
@@ -375,24 +392,33 @@ WaypointListSimpleDialog::Prepare(ContainerWindow &parent, const PixelRect &rc)
                            rc_distance_header,
                            button_style, *this, DistanceHeaderClick);
 
+    landables_only.Create(GetClientAreaWindow(), dialog_look, _("Landables\nonly"),
+                           rc_landables_only,
+                           button_style, *this, LandablesOnlyClick);
+
     select_button.Create(GetClientAreaWindow(), button_look,
                          (goto_mode ? _("Goto") : _("Select")),
                           rc_select_button,
                           button_style, *this, SelectClick);
 
   } else {
-    cancel_button.Create(GetClientAreaWindow(), button_look, _("Cancel"),
-                         rc_cancel_button,
-                         button_style, *this, CloseClick);
-
     select_button.Create(GetClientAreaWindow(), button_look,
                          (goto_mode ? _("Goto") : _("Select")),
                           rc_select_button,
                           button_style, *this, SelectClick);
 
+    cancel_button.Create(GetClientAreaWindow(), button_look, _("Cancel"),
+                         rc_cancel_button,
+                         button_style, *this, CloseClick);
+
     search_button.Create(GetClientAreaWindow(), button_look, _T(""),
                           rc_search_button,
                           button_style, *this, SearchClick);
+
+    landables_only.Create(GetClientAreaWindow(), dialog_look, _("Landables only"),
+                           rc_landables_only,
+                           button_style, *this, LandablesOnlyClick);
+    landables_only.SetAignment(Layout::landscape ? CheckBoxControl::Full : CheckBoxControl::Right);
 
     name_header.Create(GetClientAreaWindow(), button_look, _("Name"),
                         rc_name_header,
@@ -461,7 +487,7 @@ WaypointListSimpleDialog::FillList(WaypointList &list, const Waypoints &src,
       list.SortByName();
     break;
   case UISettings::WaypointSortDirection::DISTANCE:
-    if (size < MAX_LIST_SIZE || !state.name.empty())
+    if (size < MAX_LIST_SIZE || !state.name.empty() || state.type_index != TypeFilter::ALL)
       list.SortByDistance(location);
     break;
   case UISettings::WaypointSortDirection::ELEVATION:
@@ -663,6 +689,9 @@ WaypointListSimpleDialog::OnResize(PixelSize new_size)
   distance_header.Move(rc_distance_header);
   select_button.Move(rc_select_button);
   cancel_button.Move(rc_cancel_button);
+  landables_only.SetAignment(Layout::landscape ? CheckBoxControl::Full : CheckBoxControl::Right);
+
+  landables_only.Move(rc_landables_only);
 }
 
 void
