@@ -40,6 +40,11 @@ CheckBoxControl::Create(ContainerWindow &parent, const DialogLook &_look,
   look = &_look;
   caption = _caption;
 
+  text_renderer.SetCenter(false);
+  text_renderer.SetVCenter();
+  text_renderer.SetControl();
+
+  align_style = BoxAlignment::Left;
   listener = &_listener;
   id = _id;
   PaintWindow::Create(parent, rc, style);
@@ -173,8 +178,9 @@ void
 CheckBoxControl::OnPaint(Canvas &canvas)
 {
   const auto &cb_look = look->check_box;
-
   const bool focused = HasCursorKeys() && HasFocus();
+
+  canvas.Select(*cb_look.font);
 
   if (focused)
     canvas.Clear(cb_look.focus_background_brush);
@@ -189,13 +195,48 @@ CheckBoxControl::OnPaint(Canvas &canvas)
           : cb_look.standard))
     : cb_look.disabled;
 
-  unsigned size = canvas.GetHeight() - 4;
-  PixelSize text_size = cb_look.font->TextSize(caption.c_str());
-  unsigned left = text_size.cx + Layout::Scale(4);
+  unsigned box_size = canvas.GetHeight() - Layout::Scale(4);
 
+  PixelRect rc_text_max = canvas.GetRect();
+  rc_text_max.right = std::max((int)rc_text_max.left, (int)rc_text_max.right - (int)box_size);
+  PixelSize text_size = text_renderer.GetSize(canvas, rc_text_max, caption.c_str());
+  if (rc_text_max.GetSize().cx < text_size.cx + (int)box_size)
+    box_size /= 2;
+
+  const int margin = Layout::Scale(2);
+  PixelRect rc_text = canvas.GetRect();
+  switch (align_style) {
+  case Right:
+    rc_text.right = rc_text.right - box_size - margin;
+    break;
+  case Left:
+  case Full:
+    rc_text.right = rc_text.left + text_size.cx;
+    break;
+  }
+  rc_text.left = std::max((int)rc_text.left, std::max(0, (int)rc_text.right - (int)text_size.cx));
+  rc_text.top = (int)canvas.GetHeight() > rc_text.GetSize().cy ?
+      (canvas.GetHeight() - rc_text.GetSize().cy) / 2
+      : 0;
+  rc_text.bottom = canvas.GetHeight();
+
+  unsigned box_left;
+  switch (align_style) {
+  case Right:
+  case Full:
+    box_left = std::max(0, (int)canvas.GetRect().right - (int)box_size - margin);
+    break;
+  case Left:
+  default:
+    box_left = std::max(0, std::min((int)rc_text.right, (int)canvas.GetWidth() - (int)box_size));
+    break;
+  }
+
+  assert(canvas.GetHeight() > box_size);
+  unsigned box_top = (canvas.GetHeight() - box_size) / 2;
   canvas.Select(state_look.box_brush);
   canvas.Select(state_look.box_pen);
-  canvas.Rectangle(left, 2, left + size, size);
+  canvas.Rectangle(box_left, box_top, box_left + box_size, box_top + box_size);
 
   if (checked) {
     canvas.Select(state_look.check_brush);
@@ -212,15 +253,14 @@ CheckBoxControl::OnPaint(Canvas &canvas)
 
     unsigned top = canvas.GetHeight() / 2;
     for (unsigned i = 0; i < ARRAY_SIZE(check_mark); ++i) {
-      check_mark[i].x = (check_mark[i].x * (int)size) / 24 + left + top;
-      check_mark[i].y = (check_mark[i].y * (int)size) / 24 + top;
+      check_mark[i].x = (check_mark[i].x * (int)box_size) / 24 + box_left + box_size / 2;
+      check_mark[i].y = (check_mark[i].y * (int)box_size) / 24 + top;
     }
 
     canvas.DrawPolygon(check_mark, ARRAY_SIZE(check_mark));
   }
 
-  canvas.Select(*cb_look.font);
   canvas.SetTextColor(state_look.text_color);
   canvas.SetBackgroundTransparent();
-  canvas.DrawText(Layout::Scale(2), (canvas.GetHeight() - text_size.cy) / 2, caption.c_str());
+  text_renderer.Draw(canvas, rc_text, caption.c_str(), false);
 }

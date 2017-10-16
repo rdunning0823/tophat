@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Screen/PaintWindow.hpp"
 #include "Util/tstring.hpp"
+#include "Renderer/TextRenderer.hpp"
 
 struct DialogLook;
 class ContainerWindow;
@@ -35,12 +36,26 @@ class ActionListener;
  * This class is used for creating buttons.
  */
 class CheckBoxControl : public PaintWindow {
+public:
+  enum BoxAlignment {
+    /* text on left of canvas, box next to text on right */
+    Left,
+    /* box on right of canvas, text to left of box */
+    Right,
+    /* text on left of canvas, box on right edge of canvas */
+    Full,
+  };
+private:
   bool checked, dragging, pressed;
 
   const DialogLook *look;
   tstring caption;
 
+  /* how to align the text and box on the canvas */
+  BoxAlignment align_style;
+
   ActionListener *listener;
+  TextRenderer text_renderer;
   int id;
 
 public:
@@ -64,6 +79,11 @@ public:
   }
 
   void SetState(bool value);
+
+  /* align text and box according to the style */
+  void SetAignment(BoxAlignment value) {
+    align_style = value;
+  }
 
 protected:
   void SetPressed(bool value);
