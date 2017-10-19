@@ -30,6 +30,7 @@ Copyright_License {
 #include <tchar.h>
 
 class Color;
+class DialogLook;
 
 /**
  * A #Widget implementation that displays multi-line text.
@@ -38,14 +39,28 @@ class TextWidget : public WindowWidget {
 public:
   PixelScalar fixed_height;
   unsigned num_rows_text;
+protected:
+  bool bold;
+  bool v_center;
+public:
+
   void SetText(const TCHAR *text);
   void SetColor(Color _color);
+  void SetBold(bool val) {
+    bold = val;
+  }
+  void SetVAlignCenter()
+  {
+    v_center = true;
+  }
 
   TextWidget()
-  : fixed_height(0u), num_rows_text(1u) {}
+  : fixed_height(0u), num_rows_text(1u),
+    bold(false), v_center(false){}
 
   TextWidget(unsigned _rows_text)
-  : fixed_height(0u), num_rows_text(_rows_text) {}
+  : fixed_height(0u), num_rows_text(_rows_text),
+    bold(false), v_center(false){}
 
   /* virtual methods from class Widget */
   PixelSize GetMinimumSize() const override;
