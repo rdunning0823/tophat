@@ -37,6 +37,7 @@ class WndFrame : public PaintWindow {
   const DialogLook &look;
 
   Color caption_color;
+  bool bold;
 
   TextRenderer text_renderer;
 
@@ -57,6 +58,9 @@ public:
   void SetVAlignCenter();
 
   void SetText(const TCHAR *_text);
+  void SetBold(bool val) {
+    bold = val;
+  }
 
   const TCHAR *GetCaption() const {
     return text.c_str();

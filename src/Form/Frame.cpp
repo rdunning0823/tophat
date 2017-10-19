@@ -30,7 +30,8 @@ Copyright_License {
 
 WndFrame::WndFrame(const DialogLook &_look)
   :look(_look),
-   caption_color(look.text_color)
+   caption_color(look.text_color),
+   bold(false)
 {
   text.clear();
 }
@@ -39,7 +40,8 @@ WndFrame::WndFrame(ContainerWindow &parent, const DialogLook &_look,
                    PixelRect rc,
                    const WindowStyle style)
   :look(_look),
-   caption_color(look.text_color)
+   caption_color(look.text_color),
+   bold(false)
 {
   text.clear();
 
@@ -75,7 +77,7 @@ WndFrame::GetTextHeight() const
   rc.Grow(-padding);
 
   AnyCanvas canvas;
-  canvas.Select(look.text_font);
+  canvas.Select(bold ? look.bold_font : look.text_font);
 
   return text_renderer.GetHeight(canvas, rc, text.c_str());
 }
@@ -89,7 +91,7 @@ WndFrame::OnPaint(Canvas &canvas)
   canvas.SetTextColor(caption_color);
   canvas.SetBackgroundTransparent();
 
-  canvas.Select(look.text_font);
+  canvas.Select(bold ? look.bold_font : look.text_font);
 
   PixelRect rc = GetClientRect();
   const int padding = Layout::GetTextPadding();
