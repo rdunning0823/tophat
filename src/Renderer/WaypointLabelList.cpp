@@ -28,6 +28,7 @@ Copyright_License {
 #include "Screen/Canvas.hpp"
 #include "Screen/Layout.hpp"
 #include "Screen/Font.hpp"
+#include "Util/Macros.hpp"
 
 #include <string.h>
 
@@ -158,7 +159,7 @@ WaypointLabelList::Add(unsigned wp_id,
 
   auto &l = labels.append();
 
-  _tcscpy(l.Name, Name);
+  CopyString(l.Name, Name, ARRAY_SIZE(l.Name));
   l.Pos.x = X;
   l.Pos.y = Y;
   l.Pos_arranged = l.Pos;
