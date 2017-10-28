@@ -6,6 +6,7 @@ BOOST_CPPFLAGS = \
 	-DBOOST_NO_WSTREAMBUF \
 	-DBOOST_NO_IOSTREAM \
 	-DBOOST_MATH_NO_LEXICAL_CAST \
+	-DBOOST_UBLAS_NO_STD_CERR \
 	-isystem $(BOOST)/assert/include \
 	-isystem $(BOOST)/core/include \
 	-isystem $(BOOST)/detail/include \
