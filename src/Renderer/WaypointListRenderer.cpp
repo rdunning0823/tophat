@@ -290,5 +290,11 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   RasterPoint pt = { (PixelScalar)(rc.left + line_height / 2),
                      (PixelScalar)(rc.top + line_height / 2) };
   WaypointIconRenderer wir(settings, look, canvas);
+  WaypointIconRenderer::Reachability reachability =
+      (arrival_altitude > fixed(0)) ?
+          WaypointIconRenderer::Reachability::ReachableTerrain :
+          WaypointIconRenderer::Reachability::Unreachable;
+
+  wir.Draw(waypoint, pt, reachability);
   wir.Draw(waypoint, pt);
 }
