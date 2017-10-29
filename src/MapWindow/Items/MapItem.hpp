@@ -33,6 +33,7 @@ Copyright_License {
 #include "Engine/Route/ReachResult.hpp"
 #include "Tracking/SkyLines/Features.hpp"
 #include "Util/StaticString.hxx"
+#include "Renderer/WaypointIconRenderer.hpp"
 
 #ifdef HAVE_NOAA
 #include "Weather/NOAAStore.hpp"
@@ -134,9 +135,11 @@ struct AirspaceMapItem: public MapItem
 struct WaypointMapItem: public MapItem
 {
   const Waypoint &waypoint;
+  WaypointIconRenderer::Reachability reachability;
 
   WaypointMapItem(const Waypoint &_waypoint)
-    :MapItem(WAYPOINT), waypoint(_waypoint) {}
+    :MapItem(WAYPOINT), waypoint(_waypoint),
+     reachability(WaypointIconRenderer::Reachability::Unreachable) {}
 };
 
 #ifdef HAVE_NOAA

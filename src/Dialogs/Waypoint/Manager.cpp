@@ -26,6 +26,7 @@ Copyright_License {
 #include "Dialogs/WidgetDialog.hpp"
 #include "Widget/ListWidget.hpp"
 #include "Renderer/WaypointListRenderer.hpp"
+#include "Renderer/WaypointIconRenderer.hpp"
 #include "Renderer/TwoTextRowsRenderer.hpp"
 #include "Look/MapLook.hpp"
 #include "Look/DialogLook.hpp"
@@ -172,6 +173,7 @@ WaypointManagerWidget::OnPaintItem(Canvas &canvas, const PixelRect rc,
 
   WaypointListRenderer::Draw(canvas, rc,
                              *info.waypoint, nullptr,
+                             WaypointIconRenderer::Reachability::Unreachable,
                              UIGlobals::GetDialogLook(),
                              UIGlobals::GetMapLook().waypoint,
                              CommonInterface::GetMapSettings().waypoint);

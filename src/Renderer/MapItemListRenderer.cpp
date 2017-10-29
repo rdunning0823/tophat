@@ -346,6 +346,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   }
 
   WaypointListRenderer::Draw(canvas, rc, item.waypoint, v,
+                             item.reachability,
                              dialog_look, look, renderer_settings);
 }
 
