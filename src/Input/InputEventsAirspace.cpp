@@ -74,7 +74,7 @@ InputEvents::eventAirSpace(const TCHAR *misc)
   }
 
   /* Save new values to profile */
-  Profile::Set(ProfileKeys::EnableAirspace, settings.enable);
+  Profile::Set(ProfileKeys::DisplayAirspace, settings.enable);
 
   ActionInterface::SendMapSettings(true);
 }
