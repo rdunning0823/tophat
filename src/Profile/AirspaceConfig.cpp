@@ -75,6 +75,7 @@ GetAirspaceColor(const ProfileMap &map, unsigned i, RGB8Color &color)
 void
 Profile::Load(const ProfileMap &map, AirspaceRendererSettings &settings)
 {
+  map.GetEnum(ProfileKeys::EnableAirspace, settings.enable);
   map.GetEnum(ProfileKeys::AirspaceLabelSelection, settings.label_selection);
   map.Get(ProfileKeys::AirspaceBlackOutline, settings.black_outline);
   map.GetEnum(ProfileKeys::AltMode, settings.altitude_mode);

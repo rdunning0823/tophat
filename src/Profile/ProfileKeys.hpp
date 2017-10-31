@@ -77,6 +77,7 @@ extern const char SlopeShadingType[];
 extern const char TerrainContours[];
 extern const char FinalGlideTerrain[];
 extern const char UserWindSource[];
+extern const char EnableAirspace[];
 extern const char AirspaceWarning[];
 extern const char AirspaceWarningDialog[];
 extern const char AirspaceBlackOutline[];

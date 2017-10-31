@@ -24,6 +24,8 @@ Copyright_License {
 #include "InputEvents.hpp"
 #include "Language/Language.hpp"
 #include "Message.hpp"
+#include "Profile/Profile.hpp"
+#include "Profile/ProfileKeys.hpp"
 #include "MapSettings.hpp"
 #include "Interface.hpp"
 #include "ActionInterface.hpp"
@@ -70,6 +72,9 @@ InputEvents::eventAirSpace(const TCHAR *misc)
     ShowAirspaceListDialog(airspace_database, GetAirspaceWarnings());
     return;
   }
+
+  /* Save new values to profile */
+  Profile::Set(ProfileKeys::EnableAirspace, settings.enable);
 
   ActionInterface::SendMapSettings(true);
 }
