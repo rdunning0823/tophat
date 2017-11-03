@@ -68,7 +68,7 @@ BigThermalAssistantWidget::Prepare(ContainerWindow &parent,
   const PixelRect rc = GetContainer().GetClientRect();
 
 #ifndef GNAV
-  close_button.Create(parent, rc, WindowStyle(),
+  close_button.Create(GetContainer(), rc, WindowStyle(),
                      new SymbolButtonRenderer(UIGlobals::GetDialogLook().button,
                                               _T("_X")),
                      *this, CLOSE);
