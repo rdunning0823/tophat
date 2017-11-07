@@ -32,6 +32,7 @@ Copyright_License {
 #include "UIState.hpp"
 #include "Interface.hpp"
 #include "PageActions.hpp"
+#include "Input/InputEvents.hpp"
 
 void
 BigThermalAssistantWidget::UpdateLayout()
@@ -97,16 +98,7 @@ BigThermalAssistantWidget::Show(const PixelRect &rc)
   UpdateLayout();
 
 #ifndef GNAV
-  /* show the "Close" button only if this is a "special" page */
-
-#if defined(ENABLE_OPENGL) | defined(KOBO)
-  /* hide close button on OPENGL where we have the screens button */
-  close_button.SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined() &&
-                           CommonInterface::GetUISettings().screens_button_location ==
-                                     UISettings::ScreensButtonLocation::MENU);
-#else
-  close_button.SetVisible(CommonInterface::GetUIState().pages.special_page.IsDefined());
-#endif
+  close_button.SetVisible(true);
 #endif
 
   blackboard.AddListener(*this);
@@ -140,7 +132,12 @@ BigThermalAssistantWidget::OnAction(int id)
 {
   switch ((Action)id) {
   case CLOSE:
-    PageActions::Restore();
+    if (CommonInterface::GetUIState().pages.special_page.IsDefined()) {
+      PageActions::Restore();
+    } else {
+      InputEvents::HideMenu();
+      InputEvents::eventScreenModes(_T("next"));
+    }
     break;
   }
 }
