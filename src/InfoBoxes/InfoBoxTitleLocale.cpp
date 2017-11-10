@@ -38,8 +38,17 @@
 #include "Profile/File.hpp"
 #include "LocalPath.hpp"
 #include "Util/Macros.hpp"
-
+#include "Util/ConvertString.hpp"
+#include "LogFile.hpp"
 #include <windef.h> /* for MAX_PATH */
+
+#ifdef _UNICODE
+#include "Util/tstring.hpp"
+#include <map>
+#include <windows.h>
+typedef std::map<std::string,tstring> unicode_map_string;
+static unicode_map_string map_titles_locale_unicode; // Store localised titles for unicode
+#endif
 
 #define INFOBOX_LOCALE_FILE "infoBoxTitle.locale"
 
@@ -68,11 +77,11 @@ InfoBoxTitleLocale::LoadFile()
   static TCHAR path[MAX_PATH];
   LocalPath(path, _T(INFOBOX_LOCALE_FILE));
 
-  if (!Profile::LoadFile(mapTitleLocale, path))
+  if (!Profile::LoadFile(map_title_locale, path))
     LogFormat(_T("%s : File not found, will use default values"), path);
   else {
     LogFormat(_T("Loaded %d InfoBox Titles locale from: %s"),
-              (int)mapTitleLocale.size(), path);
+              (int)map_title_locale.size(), path);
   }
 
   return true;
@@ -84,9 +93,27 @@ InfoBoxTitleLocale::LoadFile()
  * @param key name of the value
  * @return the value or null if it cannot be found
  */
-const char*
-InfoBoxTitleLocale::GetLocale(const char *key)
+const TCHAR*
+InfoBoxTitleLocale::GetLocale(const TCHAR *caption)
 {
-  return mapTitleLocale.Get(key, nullptr);
+  if (caption == nullptr)
+    return nullptr;
+
+  WideToUTF8Converter key(caption);
+
+  const char* locale = map_title_locale.Get(key, nullptr);
+  if (locale == nullptr)
+    return nullptr;
+
+#ifdef _UNICODE
+  TCHAR wide_locale[strlen(locale) + 1];
+  map_title_locale.Get(key, wide_locale, ARRAY_SIZE(wide_locale));
+
+  // Add the translated TCHAR string to the map so that we can send a pointer back
+  map_titles_locale_unicode[(const char*)key] = wide_locale;
+  return map_titles_locale_unicode[(const char*)key].c_str();
+#else
+  return locale;
+#endif
 }
 
