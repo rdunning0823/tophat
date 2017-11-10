@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Screen/Point.hpp"
 #include "Math/fixed.hpp"
+#include "Renderer/WaypointIconRenderer.hpp"
 
 class Canvas;
 struct Waypoint;
@@ -46,6 +47,7 @@ namespace WaypointListRenderer
   void
   Draw(Canvas &canvas, const PixelRect rc,
        const Waypoint &waypoint, const GeoVector *vector,
+       const WaypointIconRenderer::Reachability &reachability,
        const DialogLook &dialog_look,
        const WaypointLook &look,
        const WaypointRendererSettings &settings);

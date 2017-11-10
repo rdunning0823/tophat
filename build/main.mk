@@ -84,6 +84,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/StatusPanels/TimesStatusPanel.cpp \
 	\
 	$(SRC)/Dialogs/Waypoint/WaypointInfoWidget.cpp \
+	$(SRC)/Dialogs/Waypoint/WaypointNameAndIconWidget.cpp \
 	$(SRC)/Dialogs/Waypoint/WaypointCommandsWidget.cpp \
 	$(SRC)/Dialogs/Waypoint/dlgWaypointDetails.cpp \
 	$(SRC)/Dialogs/Waypoint/Manager.cpp \

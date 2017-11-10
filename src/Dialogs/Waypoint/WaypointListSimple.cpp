@@ -615,10 +615,6 @@ WaypointListSimpleDialog::CalcAltitudeDifferential(const Waypoint &waypoint)
   const NMEAInfo &basic = CommonInterface::Basic();
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
 
-/*    assert(basic.location_available);
-  assert(more_data.NavAltitudeAvailable());
-  assert(settings.polar.glide_polar_task.IsValid());*/
-
   // altitude differential
   const GlideState glide_state(
     basic.location.DistanceBearing(waypoint.location),

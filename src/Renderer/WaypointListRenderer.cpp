@@ -26,7 +26,6 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/Look.hpp"
-#include "Renderer/WaypointIconRenderer.hpp"
 #include "Renderer/NextArrowRenderer.hpp"
 #include "NMEA/Info.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
@@ -133,6 +132,7 @@ DrawVectorArrow(Canvas &canvas, const PixelRect rc, const GeoVector *vector)
 void
 WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
                            const Waypoint &waypoint, const GeoVector *vector,
+                           const WaypointIconRenderer::Reachability &reachability,
                            const DialogLook &dialog_look,
                            const WaypointLook &look,
                            const WaypointRendererSettings &settings)
@@ -214,7 +214,7 @@ WaypointListRenderer::Draw(Canvas &canvas, const PixelRect rc,
   RasterPoint pt = { (PixelScalar)(rc.left + line_height / 2),
                      (PixelScalar)(rc.top + line_height / 2) };
   WaypointIconRenderer wir(settings, look, canvas);
-  wir.Draw(waypoint, pt);
+  wir.Draw(waypoint, pt, reachability);
 }
 
 /**
@@ -290,5 +290,11 @@ WaypointListRenderer::Draw2(Canvas &canvas, const PixelRect rc,
   RasterPoint pt = { (PixelScalar)(rc.left + line_height / 2),
                      (PixelScalar)(rc.top + line_height / 2) };
   WaypointIconRenderer wir(settings, look, canvas);
+  WaypointIconRenderer::Reachability reachability =
+      (arrival_altitude > fixed(0)) ?
+          WaypointIconRenderer::Reachability::ReachableTerrain :
+          WaypointIconRenderer::Reachability::Unreachable;
+
+  wir.Draw(waypoint, pt, reachability);
   wir.Draw(waypoint, pt);
 }

@@ -82,8 +82,8 @@ static constexpr UnitStoreItem Presets[] =
     Unit::KNOTS,
     Unit::KILOMETER_PER_HOUR,
     Unit::HECTOPASCAL,
-    Unit::LB_PER_FT2,
-    Unit::LB,
+    Unit::KG_PER_M2,
+    Unit::KG,
     Unit::LITER,
   } }
 };

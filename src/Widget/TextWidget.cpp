@@ -48,7 +48,8 @@ TextWidget::GetMinimumSize() const
     if (fixed_height > 0)
       return { PixelScalar(0), fixed_height };
 
-  const Font &font = UIGlobals::GetDialogLook().text_font;
+  const Font &font = bold ? UIGlobals::GetDialogLook().bold_font :
+      UIGlobals::GetDialogLook().text_font;
   const PixelScalar height = Layout::GetTextPadding() + num_rows_text *
       (Layout::GetTextPadding() + font.GetHeight());
 
@@ -80,6 +81,9 @@ TextWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
   style.Hide();
 
   WndFrame *w = new WndFrame(parent, UIGlobals::GetDialogLook(), rc, style);
+  w->SetBold(bold);
+  if (v_center)
+    w->SetVAlignCenter();
   SetWindow(w);
 }
 

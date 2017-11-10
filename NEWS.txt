@@ -1,6 +1,12 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Tophat Soaring 2.2.2c_beta
+* Kobo: fix wifi password to accept lower case
+Android
+ - improve Bluetooth LE compatibility (#3745)
+
+
 Tophat Soaring 2.2.2b_beta
 * Map:
  - Improve waypoint label placement on map

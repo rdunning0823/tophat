@@ -50,6 +50,8 @@ Copyright_License {
 #include "Dialogs/Dialogs.h"
 #include "Terrain/TerrainSettings.hpp"
 #include "Renderer/TwoTextRowsRenderer.hpp"
+#include "GlideSolvers/GlideState.hpp"
+#include "GlideSolvers/MacCready.hpp"
 
 #ifdef HAVE_NOAA
 #include "Dialogs/Weather/WeatherDialogs.hpp"
@@ -283,6 +285,9 @@ public:
 
   /* virtual methods from class ActionListener */
   virtual void OnAction(int id) override;
+
+  /* @updates reachability of all WaypointMapItem items in the list */
+  void CalculateWaypointArrivals();
 };
 
 void
@@ -392,6 +397,43 @@ MapItemListWidget::OnAction(int id)
   }
 }
 
+static WaypointIconRenderer::Reachability
+CalcAltitudeDifferential(const Waypoint &waypoint)
+{
+  const MoreData &more_data = CommonInterface::Basic();
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const ComputerSettings &settings = CommonInterface::GetComputerSettings();
+
+  // altitude differential
+  const GlideState glide_state(
+    basic.location.DistanceBearing(waypoint.location),
+    waypoint.elevation + settings.task.safety_height_arrival,
+    more_data.nav_altitude,
+    calculated.GetWindOrZero());
+
+  const GlideResult &result =
+    MacCready::Solve(settings.task.glide,
+                     settings.polar.glide_polar_task,
+                     glide_state);
+  return result.SelectAltitudeDifference(settings.task.glide) > fixed(0) ?
+      WaypointIconRenderer::Reachability::ReachableTerrain :
+      WaypointIconRenderer::Reachability::Unreachable;
+}
+
+void
+MapItemListWidget::CalculateWaypointArrivals()
+{
+  for (unsigned i = 0; i < list.size(); i++) {
+    MapItem &item = *list[i];
+    if (item.type == MapItem::Type::WAYPOINT) {
+      WaypointMapItem& waypoint_item = (WaypointMapItem&)item;
+      waypoint_item.reachability =
+          CalcAltitudeDifferential(waypoint_item.waypoint);
+    }
+  }
+}
+
 /**
  * Populates footer_list with items the belong in the footer
  * Populates list_list with items that belong in the lists
@@ -433,6 +475,8 @@ ShowMapItemListDialog(const MapItemList &list,
   MapItemListWidget widget(list_list, dialog_look, look,
                            traffic_look, final_glide_look,
                            settings);
+  widget.CalculateWaypointArrivals();
+
   MapItemListDialog dialog(dialog_look, settings, footer_list);
 
   dialog.CreateFull(UIGlobals::GetMainWindow(), _("Nearby items:"), &widget,

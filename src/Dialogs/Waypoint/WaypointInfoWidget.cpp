@@ -39,6 +39,9 @@ Copyright_License {
 #include "Formatter/AngleFormatter.hpp"
 #include "Formatter/UserGeoPointFormatter.hpp"
 #include "Formatter/GlideRatioFormatter.hpp"
+#include "WaypointNameAndIconWidget.hpp"
+#include "UIGlobals.hpp"
+#include "Look/MapLook.hpp"
 
 static const TCHAR *
 FormatGlideResult(TCHAR *buffer, size_t size,
@@ -104,7 +107,14 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 
   StaticString<64> buffer;
 
-  AddReadOnly(_T(""), nullptr, waypoint.name.c_str());
+  const WaypointLook &waypoint_look = UIGlobals::GetMapLook().waypoint;
+  const DialogLook &dialog_look = UIGlobals::GetDialogLook();
+  const WaypointRendererSettings &wp_renderer_settings = CommonInterface::GetMapSettings().waypoint;
+
+  WaypointNameAndIconWidget *name_icon_widget =
+      new WaypointNameAndIconWidget(waypoint, waypoint_look, dialog_look,
+                                    wp_renderer_settings);
+  Add(name_icon_widget);
 
   if (basic.location_available) {
     const GeoVector vector = basic.location.DistanceBearing(waypoint.location);
@@ -129,10 +139,11 @@ WaypointInfoWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
     StaticString<10>mc_value;
     FormatUserVerticalSpeed(mc, mc_value.buffer(), false, false);
     buffer.Format(_T("%s. %s %s"), _("Arrival alt"), _("MC"), mc_value.c_str());
-    AddGlideResult(buffer.c_str(),
-                   MacCready::Solve(settings.task.glide,
-                                    settings.polar.glide_polar_task,
-                                    glide_state));
+    GlideResult r = MacCready::Solve(settings.task.glide,
+                                     settings.polar.glide_polar_task,
+                                     glide_state);
+    AddGlideResult(buffer.c_str(), r);
+    name_icon_widget->SetArrivalAltitude(r.pure_glide_altitude_difference);
   }
 
   if (basic.location_available && basic.NavAltitudeAvailable()) {
