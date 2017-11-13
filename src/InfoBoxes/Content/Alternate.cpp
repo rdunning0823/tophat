@@ -25,6 +25,8 @@ Copyright_License {
 #include "InfoBoxes/Panel/Panel.hpp"
 #include "InfoBoxes/Panel/AlternateFullScreen.hpp"
 #include "InfoBoxes/Data.hpp"
+#include "InfoBoxes/InfoBoxTitleLocale.hpp"
+#include "Util/StringFormat.hpp"
 #include "Interface.hpp"
 #include "Components.hpp"
 #include "Task/ProtectedTaskManager.hpp"
@@ -64,7 +66,8 @@ InfoBoxContentAlternateName::Update(InfoBoxData &data)
     alternate = NULL;
   }
 
-  data.FormatTitle(_("Altn %d"), index + 1);
+  // Get localised custom title and Format it
+  InfoBoxContentAlternateGR::FormatAlternateTitle(data, index, _T("Altn %d"), _T("Altn %d"));
 
   if (alternate == NULL || !CommonInterface::Basic().track_available) {
     data.SetInvalid();
@@ -134,7 +137,8 @@ InfoBoxContentAlternateGR::Update(InfoBoxData &data)
     alternate = NULL;
   }
 
-  data.FormatTitle(_T("Altn %d GR"), index + 1);
+  // Get localised custom title and Format it
+  FormatAlternateTitle(data, index, _T("Altn%d GR"), _T("Altn %d GR"));
 
   if (alternate == NULL) {
     data.SetInvalid();
@@ -158,6 +162,30 @@ InfoBoxContentAlternateGR::Update(InfoBoxData &data)
 
   // Set Color (blue/black)
   data.SetValueColor(alternate->solution.IsFinalGlide() ? 2 : 0);
+}
+
+/**
+ * Format title.
+ * Replace default string with locale string if available
+ *
+ * @param data
+ * @param index
+ * @param locale_key The key to use to lookup the localised custom title
+ * @param default_title name The default title to use if no custom title is found
+ */
+void
+InfoBoxContentAlternateGR::FormatAlternateTitle(InfoBoxData &data, unsigned index, const TCHAR* locale_key, const TCHAR* default_title)
+{
+  // Get localised custom key
+  StaticString<20> locale_key_indexed;
+  locale_key_indexed.Format(locale_key, index+1);
+
+  // Use localised title if any, fall back to default otherwise
+  const TCHAR* title_locale = InfoBoxTitleLocale::GetLocale(locale_key_indexed); // Get localised custom title
+  if (title_locale!=nullptr)
+    data.FormatTitle(title_locale,index + 1);
+  else
+    data.FormatTitle(default_title, index + 1);
 }
 
 bool

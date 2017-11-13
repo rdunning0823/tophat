@@ -82,6 +82,22 @@ InfoBoxTitleLocale::LoadFile()
   else {
     LogFormat(_T("Loaded %d InfoBox Titles locale from: %s"),
               (int)map_title_locale.size(), path);
+
+    // Save file so that items are in alphabetical order
+    Profile::SaveFile(map_title_locale, path);
+
+#ifdef _UNICODE
+    // Populate a map with tstring
+    for (auto iter : map_title_locale) {  // Browse through previously loaded map
+      std::string key = iter.first;
+      std::string value = iter.second;
+
+      UTF8ToWideConverter wide_locale(value.c_str());
+      // Add the translated TCHAR string to the unicode map so that we can send a pointer back
+      map_titles_locale_unicode[key.c_str()] = wide_locale;
+    }
+#endif
+
   }
 
   return true;
@@ -106,11 +122,6 @@ InfoBoxTitleLocale::GetLocale(const TCHAR *caption)
     return nullptr;
 
 #ifdef _UNICODE
-  TCHAR wide_locale[strlen(locale) + 1];
-  map_title_locale.Get(key, wide_locale, ARRAY_SIZE(wide_locale));
-
-  // Add the translated TCHAR string to the map so that we can send a pointer back
-  map_titles_locale_unicode[(const char*)key] = wide_locale;
   return map_titles_locale_unicode[(const char*)key].c_str();
 #else
   return locale;
