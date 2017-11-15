@@ -1,0 +1,82 @@
+# infoBoxTitle.locale
+# This file can be used to customise or localise the title displayed on the 
+# upper part of an InfoBox. The format is a simple text file containing
+# <label>=<value> pairs. Values are text strings delimited by double quotes.
+# For example:
+# V GND="GS"
+# V TAS="TAS"
+#
+# Where <label> is the msgid as defined in the tophat source in tophat/po/en.po
+#
+# When the file is loaded at startup, only the settings present in that
+# file overwrite the titles defined for the configured language setting;
+# all other InfoBox titles are unaffected.
+#
+# How to use:
+# -----------
+# To help you customise the InboBox titles we have added this file as a sample.
+# All existing msgids are included, all you need to do is:
+# - uncomment (remove the #) the line you're interested in 
+# - fill in your desired title between the ""
+# - copy the file to your XCSoarData directory
+
+#% Climb=""
+#AAT Dtgt="Task D rem"
+#AAT Time=""
+#AAT dT="Task dT"
+#ATC radial=""
+#Alt Baro=""
+#Alt GPS=""
+#Altn 1=""
+#Altn 2=""
+#Altn1 GR=""
+#Battery=""
+#Bearing=""
+#Brng D=""
+#Circle D=""
+#FL=""
+#Fin Dist=""
+#Fin ETA=""
+#Fin ETE VMG=""
+#Fin MC0 AltD=""
+#Flt Duration=""
+#GR Avg="E Avg"
+#GR Cruise=""
+#GR Inst=""
+#H AGL="Alt AGL"
+#Head Wind=""
+#Home AltA=""
+#Home Dist=""
+#Home GR=""
+#MC=""
+#Netto=""
+#OAT=""
+#OLC Dist=""
+#OLC Speed=""
+#Radial=""
+#Start Height="Start height"
+#Start open=""
+#Start reach=""
+#T Avg=""
+#TC 30s=""
+#TC Avg=""
+#TC Gain=""
+#TL Avg=""
+#TL Gain=""
+#TL duration=""
+#Takeoff Dist=""
+#Team Code=""
+#Terr Elev=""
+#Thermal=""
+#Time loc=""
+#Track=""
+#V GND=""
+#V TAS=""
+#V Task=""
+#V Task H=""
+#Vopt=""
+#WP ETA=""
+#WP ETE=""
+#WP ETE VMG=""
+#WP MC0 AltD=""
+#Wind=""
