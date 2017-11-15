@@ -83,8 +83,7 @@ InfoBoxTitleLocale::LoadFile()
     LogFormat(_T("Loaded %d InfoBox Titles locale from: %s"),
               (int)map_title_locale.size(), path);
 
-    // Save file so that items are in alphabetical order
-    Profile::SaveFile(map_title_locale, path);
+    // TODO: Save file but preserve comments. The labels should be sorted by alphabetical orders, but the comments preserved
 
 #ifdef _UNICODE
     // Populate a map with tstring
