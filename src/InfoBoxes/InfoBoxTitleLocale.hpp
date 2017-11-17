@@ -42,7 +42,15 @@ bool
 LoadFile();
 const TCHAR*
 GetLocale(const TCHAR *caption);
+
+// This file containing this function is generated automatically by generate.mk
+// It should be in /output/include/TextResources.c
+extern "C"
+{
+const char*
+find_embedded_file(const char *name, size_t *size);
 }
-;
+
+};
 
 #endif /* SRC_INFOBOXES_INFOBOXTITLELOCALE_HPP_ */
