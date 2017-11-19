@@ -74,10 +74,6 @@ LogoView::draw(Canvas &canvas, const PixelRect &rc_outer)
 #endif
 #ifdef KOBO
   WriteSystemInfo();
-  if (IsKoboUsbHostKernel()) {
-    y += 2 + text_height;
-    canvas.DrawText(2, y, _T("USB host supported"));
-  }
 #endif
 #ifdef NO_HORIZON
   y += 2 + text_height;

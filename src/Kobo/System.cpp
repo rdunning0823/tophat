@@ -38,6 +38,7 @@ Copyright_License {
 
 #include <sys/mount.h>
 #include <errno.h>
+#include "Model.hpp"
 
 template<typename... Args>
 static bool
@@ -127,12 +128,16 @@ bool
 KoboExportUSBStorage()
 {
 #ifdef KOBO
+  char module[64];
+
   RmMod("g_ether");
   RmMod("g_file_storage");
 
-  InsMod("/drivers/ntx508/usb/gadget/arcotg_udc.ko");
-  return InsMod("/drivers/ntx508/usb/gadget/g_file_storage.ko",
-                "file=/dev/mmcblk0p3", "stall=0");
+  InsMod(model_concat(module, sizeof(module),
+			"/drivers/", "/usb/gadget/arcotg_udc.ko"));
+  return InsMod(model_concat(module, sizeof(module),
+			      "/drivers/", "/usb/gadget/g_file_storage.ko"),
+		"file=/dev/mmcblk0p3", "stall=0");
 #else
   return true;
 #endif
@@ -162,16 +167,37 @@ bool
 KoboWifiOn()
 {
 #ifdef KOBO
-  InsMod("/drivers/ntx508/wifi/sdio_wifi_pwr.ko");
-  InsMod("/drivers/ntx508/wifi/dhd.ko");
+  char module[64];
+
+  InsMod(model_concat(module, sizeof(module),
+		      "/drivers/", "/wifi/sdio_wifi_pwr.ko"));
+  switch (DetectKoboModel()) {
+  case KoboModel::UNKNOWN: // Let unknown try the old device
+  case KoboModel::MINI:
+  case KoboModel::TOUCH:
+  case KoboModel::AURA:
+  case KoboModel::GLO: // TODO: is this correct?
+  case KoboModel::TOUCH2:
+  case KoboModel::GLO_HD:
+    InsMod(model_concat(module, sizeof(module),
+			"/drivers/", "/wifi/dhd.ko"));
+    break;
+  case KoboModel::AURA2:
+    InsMod(model_concat(module, sizeof(module),
+			"/drivers/", "/wifi/8189fs.ko"));
+    break;
+  }
+
+  KoboRunInetd(); /* enable telnet/ftp daemon */
 
   Sleep(2000);
 
   Run("/sbin/ifconfig", "eth0", "up");
+  Run("/sbin/iwconfig", "eth0", "power", "off");
   Run("/bin/wlarm_le", "-i", "eth0", "up");
   Run("/bin/wpa_supplicant", "-i", "eth0",
       "-c", "/etc/wpa_supplicant/wpa_supplicant.conf",
-      "-C", "/var/run/wpa_supplicant", "-B");
+      "-C", "/var/run/wpa_supplicant", "-B", "-D", "wext");
 
   Sleep(2000);
 
@@ -193,6 +219,7 @@ KoboWifiOff()
   Run("/bin/wlarm_le", "-i", "eth0", "down");
   Run("/sbin/ifconfig", "eth0", "down");
 
+  RmMod("8189fs");
   RmMod("dhd");
   RmMod("sdio_wifi_pwr");
 
@@ -233,33 +260,14 @@ KoboRunXCSoar(const char *mode)
 }
 
 void
-KoboRunTelnetd()
+KoboRunInetd()
 {
 #ifdef KOBO
-  /* telnetd requires /dev/pts - mount it (if it isn't already) */
+  /* inetd requires /dev/pts - mount it (if it isn't already) */
   if (mkdir("/dev/pts", 0777) == 0)
     mount("none", "/dev/pts", "devpts", MS_RELATIME, NULL);
 
-  Run("/usr/sbin/telnetd", "-l", "/bin/sh");
-#endif
-}
-
-bool IsKoboUsbHostKernel()
-{
-#ifdef KOBO
-  static char cmd_find_ip[] = "/bin/dd if=/dev/mmcblk0 bs=1M bs=512 skip=2048 count=1 2>/dev/null | strings | grep";
-  static char search_string[] = "USB-hot-plug";
-
-  const char *local_path = "/tmp/usb_host.txt";
-  TCHAR command[256];
-  _stprintf(command, _T("%s %s > %s"), cmd_find_ip, search_string, local_path);
-  if (system(command) != 0)
-    return false;
-  StaticString <256> buffer;
-  File::ReadString(local_path, buffer.buffer(), 256);
-  return buffer.Contains(search_string);
-#else
-  return false;
+  Run("/usr/sbin/inetd", "/etc/inetd.conf");
 #endif
 }
 
@@ -448,14 +456,5 @@ InstallKoboRootTgz()
   return retval && Run("/bin/sync");
 #else
   return false;
-#endif
-}
-
-void
-KoboRunFtpd()
-{
-#ifdef KOBO
-  /* ftpd needs to be fired through tcpsvd (or inetd) */
-  Start("/usr/bin/tcpsvd", "-E", "0.0.0.0", "21", "ftpd", "-w", "/mnt/onboard");
 #endif
 }

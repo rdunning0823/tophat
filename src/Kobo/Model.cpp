@@ -56,8 +56,14 @@ static constexpr struct {
   KoboModel model;
 } kobo_model_ids[] = {
   { "SN-N514", KoboModel::AURA },
+  { "SN-N236", KoboModel::AURA2 },
   { "SN-N705", KoboModel::MINI },
   { "SN-N905", KoboModel::TOUCH },
+  { "SN-N587", KoboModel::TOUCH2 },
+  { "SN-613A4", KoboModel::GLO },
+  { "SN-R13A5", KoboModel::GLO },
+  { "SN-N437", KoboModel::GLO_HD },
+  { "SN-RN437", KoboModel::GLO_HD },
 };
 
 static KoboModel
@@ -78,4 +84,32 @@ DetectKoboModel()
     return KoboModel::UNKNOWN;
 
   return DetectKoboModel(buffer);
+}
+
+const char *
+linux_model_str()
+{
+  switch (DetectKoboModel()) {
+  case KoboModel::UNKNOWN: // Let unknown try the old device
+  case KoboModel::MINI:
+  case KoboModel::TOUCH:
+  case KoboModel::AURA:
+  case KoboModel::GLO: // TODO: is this correct?
+    return "ntx508";
+  case KoboModel::TOUCH2:
+  case KoboModel::GLO_HD:
+  case KoboModel::AURA2:
+    return "mx6sl-ntx";
+  }
+  return NULL;
+}
+
+char *
+model_concat(char *buff, short size,
+	     const char *prologue, const char *epilogue)
+{
+  strncpy(buff, prologue, size);
+  strncat(buff, linux_model_str(), size);
+  strncat(buff, epilogue, size);
+  return buff;
 }

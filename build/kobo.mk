@@ -110,21 +110,44 @@ KOBO_SYS_LIB_NAMES = libc.so.6 libm.so.6 libpthread.so.0 librt.so.1 \
 
 # Optionally, uImage files which supports USB HOST mode are created
 # The installation is managed by the KoboMenu and rcS.tophat
-UIMAGE_BASE_DIR=$(topdir)/kobo/uimage/hw/imx507/linux-2.6.35.3-USBHOST
-UIMAGE_USB=$(UIMAGE_BASE_DIR)/arch/arm/boot/uImage
+UIMAGE_BASE_DIR=$(topdir)/kobo/uimage
+UIMAGE_DIR=$(UIMAGE_BASE_DIR)/arch/arm/boot
 ifeq ($(KOBO_UIMAGE),y)
 	UIMAGE_PREREQUISITES=UIMAGE
-	UIMAGE_CMD=$(Q)install -m 0644 $(UIMAGE_USB) $(@D)/KoboRoot/mnt/onboard/.kobo/uImage-USB-hot-plug
+	UIMAGE_CMD_NTX508_KOBO=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-ntx508.kobo \
+		$(@D)/KoboRoot/opt/tophat/lib/kernel/ntx508/uImage.kobo
+	UIMAGE_CMD_NTX508_OTG=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-ntx508.otg \
+		$(@D)/KoboRoot/opt/tophat/lib/kernel/ntx508/uImage.otg
+	UIMAGE_CMD_MX6SL_NTX_KOBO=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-mx6sl-ntx.kobo \
+		$(@D)/KoboRoot/opt/tophat/lib/kernel/mx6sl-ntx/uImage.kobo
+	UIMAGE_CMD_MX6SL_NTX_OTG=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-mx6sl-ntx.otg \
+		$(@D)/KoboRoot/opt/tophat/lib/kernel/mx6sl-ntx/uImage.otg
 endif
+
+J := -j$(shell grep proc /proc/cpuinfo | wc -l)
+
+UIMAGE: UIMAGE_MX6SL_NTX
+
+UIMAGE_MX6SL_NTX: UIMAGE_NTX508
+	cd $(UIMAGE_BASE_DIR); git checkout origin/kobo-aura2
+	cp $(topdir)/kobo/kernel/aura2.config $(UIMAGE_BASE_DIR)/.config
+	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+	cd $(UIMAGE_DIR); mv uImage uImage-mx6sl-ntx.kobo
+	cp $(topdir)/kobo/kernel/aura2.otg.config $(UIMAGE_BASE_DIR)/.config
+	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+	cd $(UIMAGE_DIR); mv uImage uImage-mx6sl-ntx.otg
+
+UIMAGE_NTX508: $(UIMAGE_BASE_DIR)/COPYING
+	cd $(UIMAGE_BASE_DIR); git checkout origin/kobo
+	cp $(topdir)/kobo/kernel/kobo.config $(UIMAGE_BASE_DIR)/.config
+	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+	cd $(UIMAGE_DIR); mv uImage uImage-ntx508.kobo
+	cp $(topdir)/kobo/kernel/otg.config $(UIMAGE_BASE_DIR)/.config
+	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+	cd $(UIMAGE_DIR); mv uImage uImage-ntx508.otg
 
 $(UIMAGE_BASE_DIR)/COPYING:
 	git submodule update --init kobo/uimage
-
-UIMAGE: $(UIMAGE_BASE_DIR)/COPYING
-	make -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
-
-FORCE_UIMAGE:
-	touch $(TARGET_OUTPUT_DIR)/force_uimage
 
 AVCONF = avconv -y
 
@@ -152,7 +175,6 @@ DEJAVU_FONT_PATHS = $(addprefix $(TARGET_OUTPUT_DIR)/lib/$(HOST_ARCH)/root/share
 # /etc/init.d/rcS, extracted to / on each boot; we can use it to
 # install TopHat
 $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
-	FORCE_UIMAGE \
 	$(UIMAGE_PREREQUISITES) \
 	$(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) \
 	$(BITSTREAM_VERA_FILES) \
@@ -166,8 +188,12 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/etc $(@D)/KoboRoot/opt/tophat/bin $(@D)/KoboRoot/opt/tophat/share/fonts $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/mnt/onboard/.kobo
 	$(Q)install -m 0755 $(XCSOAR_BIN) $(KOBO_MENU_BIN) $(KOBO_POWER_OFF_BIN) $(@D)/KoboRoot/opt/tophat/bin
-	$(Q)$(UIMAGE_CMD)
-	$(Q)install -m 0644 $(TARGET_OUTPUT_DIR)/force_uimage $(@D)/KoboRoot/mnt/onboard/.kobo/force_uimage
+	$(Q)install -d 0755 $(@D)/KoboRoot/opt/tophat/lib/kernel/ntx508
+	$(Q)$(UIMAGE_CMD_NTX508_KOBO)
+	$(Q)$(UIMAGE_CMD_NTX508_OTG)
+	$(Q)install -d 0755 $(@D)/KoboRoot/opt/tophat/lib/kernel/mx6sl-ntx
+	$(Q)$(UIMAGE_CMD_MX6SL_NTX_KOBO)
+	$(Q)$(UIMAGE_CMD_MX6SL_NTX_OTG)
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
 	$(Q)install -m 0755 -d $(@D)/KoboRoot/opt/tophat/share/sounds
 	$(Q)install -m 0644 $(topdir)/kobo/inittab $(@D)/KoboRoot/etc
