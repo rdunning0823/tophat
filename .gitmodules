@@ -1,10 +1,6 @@
 [submodule "android/ioio"]
 	path = android/ioio
 	url = git://git.xcsoar.org/xcsoar/master/ioio.git
-[submodule "kobo/uimage"]
-	path = kobo/uimage
-	url = https://github.com/ifly7charlie/XCSoar-Kobo-Build
-	ignore = dirty
 [submodule "lib/boost/config"]
 	path = lib/boost/config
 	url = git://github.com/boostorg/config.git
@@ -53,3 +49,6 @@
 [submodule "lib/libpng"]
 	path = lib/libpng
 	url = git://git.code.sf.net/p/libpng/code
+[submodule "kobo/uimage"]
+	path = kobo/uimage
+	url = https://github.com/CazYokoyama/kobo-linux.git

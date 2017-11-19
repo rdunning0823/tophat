@@ -28,7 +28,7 @@ Copyright_License {
 #include <stdlib.h>
 #include <assert.h>
 #ifdef KOBO
-static char cmd_find_ip[] = "/sbin/ifconfig eth0|grep inet|awk {'print $2'}|cut -d\":\" -f2";
+static char cmd_find_ip[] = "/sbin/ifconfig|grep inet|awk {'print $2'}|cut -d\":\" -f2|tr \"\\n\" \"/\"";
 
 bool
 IpAddress::GetFormattedIpAddress(char *buffer)

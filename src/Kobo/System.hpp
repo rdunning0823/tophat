@@ -62,13 +62,7 @@ void
 KoboRunXCSoar(const char *mode);
 
 void
-KoboRunTelnetd();
-
-/**
- * returns true if the current kernel supports USB Host mode
- */
-bool
-IsKoboUsbHostKernel();
+KoboRunInetd();
 
 /**
  * Writes uname -a info and dd if=/dev/mmcblk0 bs=8 count=1 skip=64

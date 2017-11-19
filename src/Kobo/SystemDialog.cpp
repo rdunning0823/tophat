@@ -35,7 +35,7 @@ Copyright_License {
 class SystemWidget final
   : public RowFormWidget, ActionListener {
   enum Buttons {
-    REBOOT,
+    NICKEL,
     SWITCH_KERNEL,
     USB_STORAGE,
   };
@@ -58,29 +58,35 @@ private:
 void
 SystemWidget::Prepare(ContainerWindow &parent, const PixelRect &rc)
 {
-  AddButton("Reboot", *this, REBOOT);
-  AddButton(IsKoboOTGKernel() ? "Disable USB-OTG" : "Enable USB-OTG",
+  bool otg_kernel = IsKoboOTGKernel();
+
+  AddButton("start nickel", *this, NICKEL);
+  SetRowEnabled(NICKEL, !otg_kernel);
+  AddButton(otg_kernel ? "Disable USB host" : "Ensable USB host",
             *this, SWITCH_KERNEL);
 
   AddButton("Export USB storage", *this, USB_STORAGE);
-  SetRowEnabled(USB_STORAGE, !IsKoboOTGKernel());
+  SetRowEnabled(USB_STORAGE, !otg_kernel);
 }
 
 inline void
 SystemWidget::SwitchKernel()
 {
 #ifdef KOBO
-  if (DetectKoboModel() != KoboModel::MINI &&
-      ShowMessageBox(_T("This feature was designed for the Kobo Mini, but this is not one.  Use at your own risk.  Continue?"),
+  KoboModel model = DetectKoboModel();
+  if (model != KoboModel::MINI &&
+      model != KoboModel::GLO &&
+      model != KoboModel::AURA2 &&
+      ShowMessageBox(_T("This feature was designed for the Kobo Mini, Glo and Aura 2, but this is not one.  Use at your own risk.  Continue?"),
                      _T("USB-OTG"), MB_YESNO) != IDYES)
     return;
 
-  const char *otg_kernel_image = "/opt/xcsoar/lib/kernel/uImage.otg";
-  const char *kobo_kernel_image = "/opt/xcsoar/lib/kernel/uImage.kobo";
-
-  const char *kernel_image = IsKoboOTGKernel()
-    ? kobo_kernel_image
-    : otg_kernel_image;
+  char kobo_kernel[64];
+  char *kernel_image = IsKoboOTGKernel()
+    ? model_concat(kobo_kernel, sizeof(kobo_kernel),
+		   "/opt/tophat/lib/kernel/", "/uImage.kobo")
+    : model_concat(kobo_kernel, sizeof(kobo_kernel),
+		   "/opt/tophat/lib/kernel/", "/uImage.otg");
 
   if (!KoboInstallKernel(kernel_image)) {
       ShowMessageBox(_T("Failed to activate kernel."), _("Error"), MB_OK);
@@ -119,8 +125,8 @@ void
 SystemWidget::OnAction(int id)
 {
   switch (id) {
-  case REBOOT:
-    KoboReboot();
+  case NICKEL:
+    KoboExecNickel();
     break;
 
   case SWITCH_KERNEL:
@@ -139,8 +145,8 @@ ShowSystemDialog()
   const DialogLook &look = UIGlobals::GetDialogLook();
   SystemWidget widget(look);
   WidgetDialog dialog(look);
-  dialog.CreateFull(UIGlobals::GetMainWindow(), "System", &widget);
-  dialog.AddButton(_T("_X"), mrOK);
+  dialog.CreateFull(UIGlobals::GetMainWindow(), "PC connect", &widget);
+  dialog.AddSymbolButton(_T("_X"), mrOK);
   dialog.ShowModal();
   dialog.StealWidget();
 }

@@ -39,7 +39,7 @@ gcc_pure
 static const TCHAR *
 GetWifiToggleCaption()
 {
-  return IsKoboWifiOn() ? _T("Disable Wifi") : _T("Enable Wifi");
+  return IsKoboWifiOn() ? _T("Disable network") : _T("Enable network");
 }
 
 class NetworkWidget final
@@ -87,7 +87,7 @@ NetworkWidget::UpdateIpAddress()
     unsigned i = strlen(buffer);
     buffer[i - 1] = '\0';
     char caption[256];
-    _stprintf(caption, _T("\nConnected\nLog in with username='root'\n  telnet %s or ftp %s"), buffer, buffer);
+    _stprintf(caption, _T("\nConnected\nLog in with username='root'\n  telnet/ftp %s"), buffer);
     SetMultiLineText(IPADDRESS, caption);
   } else
     SetMultiLineText(IPADDRESS, _T("\nNot connected"));
