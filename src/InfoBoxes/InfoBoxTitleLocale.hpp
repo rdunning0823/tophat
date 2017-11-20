@@ -36,10 +36,23 @@ namespace InfoBoxTitleLocale
 {
 static ProfileMap map_title_locale;
 
+// Special cases where the caption already has a "translation" in en.po
+static std::map<std::string, std::string> map_title_locale_existing_en_po = {
+                                                                             {"AAT Dtgt", "Task D rem"},
+                                                                             {"AAT dT","Task dT"},
+                                                                             {"H AGL","Alt AGL"},
+                                                                             {"Start Height","Start height"},
+                                                                            };
+
 bool
 Initialise();
+
 bool
 LoadFile();
+
+void
+CreateDefaultFile(TCHAR* filePath);
+
 const TCHAR*
 GetLocale(const TCHAR *caption);
 
