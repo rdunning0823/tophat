@@ -188,6 +188,13 @@ KoboWifiOn()
     break;
   }
 
+  InsMod(model_concat(module, sizeof(module),
+		      "/drivers/", "/net/mii.ko"));
+  InsMod(model_concat(module, sizeof(module),
+		      "/drivers/", "/net/usb/usbnet.ko"));
+  InsMod(model_concat(module, sizeof(module),
+		      "/drivers/", "/net/usb/asix.ko"));
+
   KoboRunInetd(); /* enable telnet/ftp daemon */
 
   Sleep(2000);
@@ -215,6 +222,10 @@ bool
 KoboWifiOff()
 {
 #ifdef KOBO
+  RmMod("asix");
+  RmMod("usbnet");
+  RmMod("mii");
+
   Run("/usr/bin/killall", "wpa_supplicant", "udhcpc");
   Run("/bin/wlarm_le", "-i", "eth0", "down");
   Run("/sbin/ifconfig", "eth0", "down");

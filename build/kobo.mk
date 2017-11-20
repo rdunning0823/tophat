@@ -118,10 +118,14 @@ ifeq ($(KOBO_UIMAGE),y)
 		$(@D)/KoboRoot/opt/tophat/lib/kernel/ntx508/uImage.kobo
 	UIMAGE_CMD_NTX508_OTG=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-ntx508.otg \
 		$(@D)/KoboRoot/opt/tophat/lib/kernel/ntx508/uImage.otg
+	UIMAGE_CMD_NTX508_NET=tar xzf $(UIMAGE_BASE_DIR)/drivers/net-ntx508.tar.gz \
+		-C $(@D)/KoboRoot/drivers/ntx508/net
 	UIMAGE_CMD_MX6SL_NTX_KOBO=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-mx6sl-ntx.kobo \
 		$(@D)/KoboRoot/opt/tophat/lib/kernel/mx6sl-ntx/uImage.kobo
 	UIMAGE_CMD_MX6SL_NTX_OTG=$(Q)install -m 0644 $(UIMAGE_DIR)/uImage-mx6sl-ntx.otg \
 		$(@D)/KoboRoot/opt/tophat/lib/kernel/mx6sl-ntx/uImage.otg
+	UIMAGE_CMD_MX6SL_NTX_NET=tar xzf $(UIMAGE_BASE_DIR)/drivers/net-mx6sl-ntx.tar.gz \
+		-C $(@D)/KoboRoot/drivers/mx6sl-ntx/net
 endif
 
 J := -j$(shell grep proc /proc/cpuinfo | wc -l)
@@ -134,8 +138,9 @@ UIMAGE_MX6SL_NTX: UIMAGE_NTX508
 	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
 	cd $(UIMAGE_DIR); mv uImage uImage-mx6sl-ntx.kobo
 	cp $(topdir)/kobo/kernel/aura2.otg.config $(UIMAGE_BASE_DIR)/.config
-	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage modules
 	cd $(UIMAGE_DIR); mv uImage uImage-mx6sl-ntx.otg
+	cd $(UIMAGE_BASE_DIR)/drivers/net; tar czf ../net-mx6sl-ntx.tar.gz `find . -name "*.ko"`
 
 UIMAGE_NTX508: $(UIMAGE_BASE_DIR)/COPYING
 	cd $(UIMAGE_BASE_DIR); git checkout origin/kobo
@@ -143,8 +148,9 @@ UIMAGE_NTX508: $(UIMAGE_BASE_DIR)/COPYING
 	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
 	cd $(UIMAGE_DIR); mv uImage uImage-ntx508.kobo
 	cp $(topdir)/kobo/kernel/otg.config $(UIMAGE_BASE_DIR)/.config
-	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage
+	make $(J) -C $(UIMAGE_BASE_DIR) CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm uImage modules
 	cd $(UIMAGE_DIR); mv uImage uImage-ntx508.otg
+	cd $(UIMAGE_BASE_DIR)/drivers/net; tar czf ../net-ntx508.tar.gz `find . -name "*.ko"`
 
 $(UIMAGE_BASE_DIR)/COPYING:
 	git submodule update --init kobo/uimage
@@ -191,9 +197,13 @@ $(TARGET_OUTPUT_DIR)/KoboRoot.tgz: $(XCSOAR_BIN) \
 	$(Q)install -d 0755 $(@D)/KoboRoot/opt/tophat/lib/kernel/ntx508
 	$(Q)$(UIMAGE_CMD_NTX508_KOBO)
 	$(Q)$(UIMAGE_CMD_NTX508_OTG)
+	$(Q)install -d 0755 $(@D)/KoboRoot/drivers/ntx508/net
+	$(Q)$(UIMAGE_CMD_NTX508_NET)
 	$(Q)install -d 0755 $(@D)/KoboRoot/opt/tophat/lib/kernel/mx6sl-ntx
 	$(Q)$(UIMAGE_CMD_MX6SL_NTX_KOBO)
 	$(Q)$(UIMAGE_CMD_MX6SL_NTX_OTG)
+	$(Q)install -d 0755 $(@D)/KoboRoot/drivers/mx6sl-ntx/net
+	$(Q)$(UIMAGE_CMD_MX6SL_NTX_NET)
 	$(Q)install -d 0755 $(@D)/KoboRoot//lib/modules/3.0.35
 	$(Q)install -d 0755 $(@D)/KoboRoot//lib/modules/3.0.35+
 	$(Q)install -m 0755 $(KOBO_SYS_LIB_PATHS) $(@D)/KoboRoot/opt/tophat/lib
