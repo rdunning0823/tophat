@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_IO_ZIP_SOURCE_HPP
 
 #include "BufferedSource.hpp"
+#include <zzip/util.h>
 
 #include <tchar.h>
 
@@ -34,9 +35,11 @@ struct zzip_dir;
 class ZipSource : public BufferedSource<char, 4096u> {
 private:
   struct zzip_file *file;
+  ZZIP_DIR* zzipDir;
 
 public:
   ZipSource(struct zzip_dir *dir, const char *path);
+  ZipSource(const char* path, bool isZipArchiveDirectory);
   ZipSource(const char *path);
 #ifdef _UNICODE
   ZipSource(const TCHAR *path);
@@ -49,6 +52,7 @@ public:
   }
 
 public:
+  void Unzip(const char* targetDirectory);
   /* virtual methods from class Source */
   long GetSize() const override;
 
