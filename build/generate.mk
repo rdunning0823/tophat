@@ -91,9 +91,3 @@ $(call SRC_TO_OBJ,$(SRC)/Screen/Android/Bitmap.cpp): $(TARGET_OUTPUT_DIR)/includ
 endif
 
 endif
-
-$(OUT)/include/TextResources.c: $(topdir)/Data/text/infoBoxTitle.locale \
-	tools/txt2cpp.pl $(OUT)/include/dirstamp
-	@$(NQ)echo "  GEN     $@"
-	$(Q)$(PERL) tools/txt2cpp.pl $< >$@.tmp
-	@mv $@.tmp $@

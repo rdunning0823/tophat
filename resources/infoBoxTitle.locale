@@ -14,12 +14,11 @@
 #
 # How to use:
 # -----------
-# If this file doesn't exist at startup, it is created automatically in your
-# XCSoarData directory.
 # To help you customise the InboBox titles we have added this file as a sample.
 # All existing msgids are included, all you need to do is:
 # - uncomment (remove the #) the line you're interested in 
 # - fill in your desired title between the ""
+# - copy the file to your XCSoarData directory
 
 #% Climb=""
 #AAT Dtgt="Task D rem"
