@@ -27,6 +27,8 @@ Copyright_License {
 #include "Settings.hpp"
 #include "Atmosphere/AirDensity.hpp"
 
+#include "LogFile.hpp" //debug
+
 #define fixed_inv_g fixed(1.0/9.81)
 #define fixed_inv_2g fixed(1.0/(2.0*9.81))
 #define fixed_small fixed(0.001)
@@ -57,6 +59,13 @@ ComputePressure(NMEAInfo &basic, const AtmosphericPressure qnh)
   const bool qnh_available = qnh.IsPlausible();
   const bool static_pressure_available = basic.static_pressure_available;
   const bool pressure_altitude_available = basic.pressure_altitude_available;
+
+/*
+  LogFormat("ComputePressure ENTER qnh_available:%u static_pressure_available:%u pressure_altitude_available:%u",
+      qnh.IsPlausible(),
+      basic.static_pressure_available.IsValid(),
+      basic.pressure_altitude_available.IsValid());
+*/
 
   if (!static_pressure_available) {
     if (pressure_altitude_available) {
@@ -97,6 +106,9 @@ ComputePressure(NMEAInfo &basic, const AtmosphericPressure qnh)
       basic.baro_altitude_available = basic.pressure_altitude_available;
     }
   }
+/*  LogFormat("ComputePressure EXIT qnh_available:%u static_pressure_available:%u pressure_altitude_available:%u",
+      qnh.IsPlausible(), basic.static_pressure_available.IsValid(), basic.pressure_altitude_available.IsValid());*/
+
 }
 
 static void
