@@ -45,6 +45,9 @@ Copyright_License {
 #include "Input/InputQueue.hpp"
 #include "Util/StringUtil.hpp"
 #include "Util/Macros.hpp"
+#include "Util/StringAPI.hxx"
+
+#include "LogFile.hpp" //debug
 
 class AirspaceWarningWidget final
   : public QuestionWidget, private ActionListener {
@@ -181,17 +184,23 @@ AirspaceWarningMonitor::Check()
 {
   const auto &calculated = CommonInterface::Calculated();
 
+  LogFormat("AirspaceWarningMonitor::Check() latest==last:%u, last_near_name:%s",
+            calculated.airspace_warnings.latest == last,
+            last_near_name.c_str());
+
   if (widget == nullptr && calculated.airspace_warnings.latest == last)
     return;
 
   /* there's a new airspace warning */
 
   last = calculated.airspace_warnings.latest;
+
   auto *airspace_warnings = GetAirspaceWarnings();
 
   if (airspace_warnings == nullptr) {
     alarmClear();
     HideWidget();
+    last_near_name.clear();
     return;
   }
 
@@ -214,6 +223,7 @@ AirspaceWarningMonitor::Check()
     return;
   }
 
+
   const AbstractAirspace *airspace = nullptr;
   AirspaceWarning::State state;
   AirspaceInterceptSolution solution;
@@ -225,13 +235,6 @@ AirspaceWarningMonitor::Check()
       airspace = &w->GetAirspace();
       state = w->GetWarningState();
       
-      if(airspace->IsActive())
-      {
-        if(state==AirspaceWarning::WARNING_INSIDE)
-          InputEvents::processGlideComputer(GCE_AIRSPACE_INSIDE);
-        else if(state==AirspaceWarning::WARNING_FILTER)
-          InputEvents::processGlideComputer(GCE_AIRSPACE_NEAR);
-      }
       solution = w->GetSolution();
     }
   }
@@ -239,6 +242,7 @@ AirspaceWarningMonitor::Check()
   if (airspace == nullptr) {
     alarmClear();
     HideWidget();
+    last_near_name.clear();
     return;
   }
 
@@ -255,6 +259,25 @@ AirspaceWarningMonitor::Check()
                                        *airspace, state, solution);
     PageActions::SetCustomTop(widget);
     alarmSet();
+    if(airspace->IsActive())
+    {
+      last_GCE = calculated.airspace_warnings.latest;
+
+      if(state==AirspaceWarning::WARNING_INSIDE) {
+        LogFormat("AirspaceWarningMonitor::Check() sending AIRSPACE_INSIDE:[%s] last:[%s]", airspace->GetName(), last_near_name.c_str());
+        InputEvents::processGlideComputer(GCE_AIRSPACE_INSIDE);
+        last_near_name = airspace->GetName();
+
+      } else if(state==AirspaceWarning::WARNING_GLIDE) {
+        LogFormat("AirspaceWarningMonitor::Check() sending AIRSPACE_GLIDE:[%s] last:[%s]", airspace->GetName(), last_near_name.c_str());
+        last_near_name = airspace->GetName();
+
+      } else if(state==AirspaceWarning::WARNING_FILTER) {
+        LogFormat("AirspaceWarningMonitor::Check() sending AIRSPACE_FILTER:[%s] last:[%s]", airspace->GetName(), last_near_name.c_str());
+        InputEvents::processGlideComputer(GCE_AIRSPACE_NEAR);
+        last_near_name = airspace->GetName();
+      }
+    }
   }
 
   // un-blank the display, play a sound
