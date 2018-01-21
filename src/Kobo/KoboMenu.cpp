@@ -159,7 +159,7 @@ KoboMenuWidget::CreateButtons(WidgetDialog &buttons)
   pc_conn_button = (WndSymbolButton*)buttons.AddSymbolButton(
     "PC conn", *this, PC_CONNECT);
   pc_conn_button->SetPrefixIcon(SymbolButtonRenderer::NONE);
-  wifi_button = (WndSymbolButton*)buttons.AddSymbolButton("network", *this, NETWORK);
+  wifi_button = (WndSymbolButton*)buttons.AddSymbolButton("Wifi", *this, NETWORK);
   wifi_button->SetPrefixIcon(SymbolButtonRenderer::NONE);
   poweroff_button = buttons.AddButton(GetPowerOffCaption(false), *this, POWEROFF);
   UpdateButtons();
