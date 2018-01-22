@@ -42,6 +42,7 @@ Copyright_License {
 #include "Task/Ordered/OrderedTask.hpp"
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #include "Engine/Task/Factory/AbstractTaskFactory.hpp"
+#include "Engine/Task/TaskNationalities.hpp"
 #include "Engine/Util/Gradient.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "NMEA/FlyingState.hpp"
@@ -191,6 +192,9 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   {
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
 
+    const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+    const TaskBehaviour &task_behaviour = settings_computer.task;
+
     mode = task_manager->GetMode();
     is_ordered = (mode == TaskType::ORDERED);
     task_size = task_manager->TaskSize();
@@ -200,6 +204,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     int max_height = settings.start_constraints.max_height;
     bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
     show_two_minute_start = settings.show_two_minute_start && flying.flying &&
+        task_behaviour.contest_nationality == ContestNationalities::AMERICAN &&
         ShowTwoMinutes(is_ordered, idx, is_glider_close_to_start_cylinder);
 
     if (idx > 0 && idx >= task_manager->TaskSize())
