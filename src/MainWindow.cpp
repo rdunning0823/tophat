@@ -768,6 +768,8 @@ MainWindow::OnTimer(WindowTimer &_timer)
     thermal_assistant.Hide();
   } else if (InputEvents::IsFlavour(_T("Traffic"))) {
     thermal_assistant.Hide();
+  } else if (IsPanning()) {
+    thermal_assistant.Hide();
   } else if (!HasDialog()) {
     if (!thermal_assistant.IsDefined())
       thermal_assistant.Set(new GaugeThermalAssistant(CommonInterface::GetLiveBlackboard(),
