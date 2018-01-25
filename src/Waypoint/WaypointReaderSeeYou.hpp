@@ -34,17 +34,36 @@ Copyright_License {
  */
 class WaypointReaderSeeYou final : public WaypointReaderBase {
   bool first;
+  bool pre_parse_first;
 
   bool ignore_following;
+  bool pre_parse_ignore_following;
+  /** do we flag all waypoints as turnpoints? */
+  bool all_waypoints_are_turnpoints;
 
 public:
   explicit WaypointReaderSeeYou(WaypointFactory _factory)
     :WaypointReaderBase(_factory),
-     first(true), ignore_following(false) {}
+     first(true), pre_parse_first(true),
+     ignore_following(false), pre_parse_ignore_following(false),
+     all_waypoints_are_turnpoints(true) {}
 
 protected:
   /* virtual methods from class WaypointReaderBase */
   bool ParseLine(const TCHAR* line, Waypoints &way_points) override;
+
+  /**
+   * scans line description for "Turn Point"
+   * @return True if text is found, else false
+   */
+  bool PreParseLine(const TCHAR* line, Waypoints &way_points);
+
+  /**
+   * detects whether Description field contains "Turn point" for any waypoints.
+   * Sets all_waypoints_are_turnpoints = false if text is found
+   */
+  virtual void PreParse(Waypoints &way_points, TLineReader &reader,
+                        OperationEnvironment &operation) override;
 };
 
 #endif

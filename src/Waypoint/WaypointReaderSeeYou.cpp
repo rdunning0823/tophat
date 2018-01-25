@@ -26,8 +26,23 @@ Copyright_License {
 #include "Waypoint/Waypoints.hpp"
 #include "Util/ExtractParameters.hpp"
 #include "Util/Macros.hpp"
+#include "Util/StringAPI.hxx"
+#include "Operation/Operation.hpp"
+#include "IO/LineReader.hpp"
 
 #include <stdlib.h>
+
+enum {
+  iName = 0,
+  iLatitude = 3,
+  iLongitude = 4,
+  iElevation = 5,
+  iStyle = 6,
+  iRWDir = 7,
+  iRWLen = 8,
+  iFrequency = 9,
+  iDescription = 10,
+};
 
 static bool
 ParseAngle(const TCHAR* src, Angle& dest, const bool lat)
@@ -107,6 +122,14 @@ ParseDistance(const TCHAR* src, fixed& dest)
   return true;
 }
 
+static
+bool PreParseDescriptionForTurnPointText(const TCHAR* src)
+{
+  if (StringFind(src, _T("Turn Point")))
+    return true;
+  return false;
+}
+
 static bool
 ParseStyle(const TCHAR* src, Waypoint::Type &type)
 {
@@ -160,20 +183,53 @@ ParseStyle(const TCHAR* src, Waypoint::Type &type)
 }
 
 bool
+WaypointReaderSeeYou::PreParseLine(const TCHAR* line, Waypoints &waypoints)
+{
+  if (pre_parse_first) {
+    pre_parse_first = false;
+
+    /* skip first line if it doesn't begin with a quotation character
+       (usually the field order line) */
+    if (line[0] != _T('\"'))
+      return false;
+  }
+
+  // If (end-of-file or comment)
+  if (StringIsEmpty(line) ||
+      StringStartsWith(line, _T("*")))
+    // -> return without error condition
+    return false;
+
+  TCHAR ctemp[4096];
+  if (_tcslen(line) >= ARRAY_SIZE(ctemp))
+    /* line too long for buffer */
+    return false;
+
+  // If task marker is reached ignore all following lines
+  if (StringStartsWith(line, _T("-----Related Tasks-----")))
+    pre_parse_ignore_following = true;
+  if (pre_parse_ignore_following)
+    return false;
+
+  // Get fields
+  const TCHAR *params[20];
+  size_t n_params = ExtractParameters(line, ctemp, params,
+                                      ARRAY_SIZE(params), true, _T('"'));
+
+  if (iDescription < n_params) {
+    /* WW TP Exchange puts "Turn Point" text in description to denote
+     * that the Waypoint is a "control point" for a contest
+     */
+    if (PreParseDescriptionForTurnPointText(params[iDescription]))
+      return true;
+  }
+  return false;
+
+}
+
+bool
 WaypointReaderSeeYou::ParseLine(const TCHAR* line, Waypoints &waypoints)
 {
-  enum {
-    iName = 0,
-    iLatitude = 3,
-    iLongitude = 4,
-    iElevation = 5,
-    iStyle = 6,
-    iRWDir = 7,
-    iRWLen = 8,
-    iFrequency = 9,
-    iDescription = 10,
-  };
-
   if (first) {
     first = false;
 
@@ -241,7 +297,11 @@ WaypointReaderSeeYou::ParseLine(const TCHAR* line, Waypoints &waypoints)
   if (iStyle < n_params)
     ParseStyle(params[iStyle], new_waypoint.type);
 
-  new_waypoint.flags.turn_point = true;
+  if (all_waypoints_are_turnpoints)
+    new_waypoint.flags.turn_point = true;
+  else
+    new_waypoint.flags.turn_point =
+        PreParseDescriptionForTurnPointText(params[iDescription]);
 
   // Frequency & runway direction/length (for airports and landables)
   // and description (e.g. "Some Description")
@@ -282,4 +342,25 @@ WaypointReaderSeeYou::ParseLine(const TCHAR* line, Waypoints &waypoints)
 
   waypoints.Append(std::move(new_waypoint));
   return true;
+}
+
+void
+WaypointReaderSeeYou::PreParse(Waypoints &way_points, TLineReader &reader,
+                               OperationEnvironment &operation)
+{
+  const long filesize = std::max(reader.GetSize(), 1l);
+  operation.SetProgressRange(100);
+
+  // Read through the lines of the file
+  TCHAR *line;
+  for (unsigned i = 0; (line = reader.ReadLine()) != nullptr; i++) {
+    // and parse them
+    if (PreParseLine(line, way_points)) {
+      all_waypoints_are_turnpoints = false;
+      break;
+    }
+
+    if ((i & 0x3f) == 0)
+      operation.SetProgressPosition(reader.Tell() * 100 / filesize);
+  }
 }

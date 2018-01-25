@@ -56,6 +56,12 @@ public:
   void Parse(Waypoints &way_points, TLineReader &reader,
              OperationEnvironment &operation);
 
+  /**
+   * Performs any preparsing for each file type prior to running Parse()
+   */
+  virtual void PreParse(Waypoints &way_points, TLineReader &reader,
+                        OperationEnvironment &operation) {};
+
 protected:
   /**
    * Parse a file line
