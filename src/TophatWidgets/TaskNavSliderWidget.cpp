@@ -205,6 +205,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
     show_two_minute_start = settings.show_two_minute_start && flying.flying &&
         task_behaviour.contest_nationality == ContestNationalities::AMERICAN &&
+        settings.start_constraints.max_height > fixed(0) &&
         ShowTwoMinutes(is_ordered, idx, is_glider_close_to_start_cylinder);
 
     if (idx > 0 && idx >= task_manager->TaskSize())
