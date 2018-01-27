@@ -27,7 +27,6 @@ Copyright_License {
 #include "NMEA/Validity.hpp"
 #include "Airspace/ProtectedAirspaceWarningManager.hpp"
 #include "Time/BrokenDateTime.hpp"
-#include "Util/tstring.hpp"
 
 /**
  * Check for new airspace warnings and show the airspace warning
@@ -39,12 +38,7 @@ class AirspaceWarningMonitor {
   bool alarm_active;
 
   Validity last;
-  /** the last warning for which a GCE event was created */
-  Validity last_GCE;
   BrokenDateTime last_alarm_time;
-
-  /** last near warning name (identifier) */
-  tstring last_near_name;
 
 public:
   AirspaceWarningMonitor():widget(nullptr) {
@@ -64,7 +58,6 @@ private:
 
   void Schedule() {
     last.Clear();
-    last_GCE.Clear();
   }
 };
 
