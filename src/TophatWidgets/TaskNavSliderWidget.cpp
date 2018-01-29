@@ -46,6 +46,7 @@ Copyright_License {
 #include "Engine/Util/Gradient.hpp"
 #include "Task/Ordered/Points/OrderedTaskPoint.hpp"
 #include "NMEA/FlyingState.hpp"
+#include "TaskNavSliderStartTime.hpp"
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Scope.hpp"
@@ -57,24 +58,6 @@ Copyright_License {
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-TaskNavSlider::GetTimeUnderStart(int max_height,
-                                 bool show_two_minute_start)
-{
-  const CommonStats &common_stats = CommonInterface::Calculated().common_stats;
-  const TaskStats &task_stats = CommonInterface::Calculated().ordered_task_stats;
-  bool is_usa = CommonInterface::GetComputerSettings().task.contest_nationality
-      == ContestNationalities::AMERICAN;
-
-  if (!task_stats.task_valid || max_height <= 0
-      || !common_stats.is_under_start_max_height
-      || !is_usa || !show_two_minute_start) {
-    return -1;
-  }
-
-  return (int)(CommonInterface::Basic().time -
-      common_stats.time_transition_below_max_start_height);
-}
 
 TaskNavSliderWidget::TaskNavSliderWidget()
   :task_manager_time_stamp(0u),
@@ -158,13 +141,6 @@ TaskNavSliderWidget::RefreshList(TaskType mode)
   GetList().Invalidate();
 }
 
-static bool ShowTwoMinutes(bool is_ordered, unsigned idx,
-                           bool is_glider_close_to_start_cylinder)
-{
-  return is_ordered &&
-      (idx < 1 || (idx == 1 && is_glider_close_to_start_cylinder));
-}
-
 void
 TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                                  unsigned idx)
@@ -185,8 +161,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
   bool is_finish = false;
   bool is_start = false;
   TaskFactoryType factory_type = TaskFactoryType::AAT;
-  int time_under_max_start;
-  bool show_two_minute_start = false;
+  SliderStartTime slider_start_time;
 
   TaskType mode;
   {
@@ -202,11 +177,13 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     const OrderedTaskSettings &settings = task.GetOrderedTaskSettings();
     factory_type = task.GetFactoryType();
     int max_height = settings.start_constraints.max_height;
-    bool is_glider_close_to_start_cylinder = task.CheckGliderStartCylinderProximity();
-    show_two_minute_start = settings.show_two_minute_start && flying.flying &&
-        task_behaviour.contest_nationality == ContestNationalities::AMERICAN &&
-        settings.start_constraints.max_height > fixed(0) &&
-        ShowTwoMinutes(is_ordered, idx, is_glider_close_to_start_cylinder);
+    slider_start_time.Init(is_ordered, idx,
+                           task.CheckGliderStartCylinderProximity(),
+                           settings.show_two_minute_start,
+                           flying.flying,
+                           task_behaviour.contest_nationality ==
+                               ContestNationalities::AMERICAN,
+                           max_height);
 
     if (idx > 0 && idx >= task_manager->TaskSize())
       return;
@@ -224,8 +201,6 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
     } else
       tp_valid = false;
 
-    time_under_max_start = TaskNavSlider::GetTimeUnderStart(
-        max_height, show_two_minute_start);
   }
 
   bool has_entered = tp_valid && is_ordered && otp->HasEntered();
@@ -258,8 +233,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       false,
                       use_wide_pen,
                       true,
-                      time_under_max_start,
-                      show_two_minute_start);
+                      slider_start_time);
   } else {
 
     const ComputerSettings &settings = CommonInterface::GetComputerSettings();
@@ -300,8 +274,7 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                       elevation_valid && result.IsOk() && GradientValid(gradient),
                       use_wide_pen,
                       false,
-                      time_under_max_start,
-                      show_two_minute_start);
+                      slider_start_time);
   }
 }
 

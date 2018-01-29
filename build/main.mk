@@ -698,6 +698,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/TophatWidgets/MapOverlayButton.cpp \
 	$(SRC)/TophatWidgets/TaskNavSliderWidget.cpp \
 	$(SRC)/TophatWidgets/TaskNavSliderShape.cpp \
+	$(SRC)/TophatWidgets/TaskNavSliderStartTime.cpp \
 	$(SRC)/TophatWidgets/ZoomOutButtonWidget.cpp \
 	$(SRC)/TophatWidgets/ZoomInButtonWidget.cpp \
 	$(SRC)/TophatWidgets/TaskButtonWidget.cpp \

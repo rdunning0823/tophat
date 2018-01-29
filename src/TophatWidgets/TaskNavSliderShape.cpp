@@ -272,7 +272,7 @@ SliderShape::GetDistanceFont() const
 }
 
 const Font&
-SliderShape::GetTypeFont(bool is_start, int time_under_max_start) const
+SliderShape::GetTypeFont() const
 {
   return nav_slider_look.small_font;
 }
@@ -319,33 +319,13 @@ SliderShape::GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid)
 }
 
 static void
-SetTypeTextFor2MinuteCount(SliderShape::TypeBuffer &type_buffer,
-                           SliderShape::TypeBuffer &type_buffer_short,
-                           int time_under_max_start)
-{
-  if (negative(fixed(time_under_max_start))) {
-    type_buffer = _("Above Start");
-    type_buffer_short = _("Above");
-  }
-  else if (time_under_max_start < 120) {
-    TCHAR value[32];
-    FormatSignedTimeMMSSCompact(value, 120 - time_under_max_start);
-    type_buffer.Format(_T("%s: %s"), _("2Minutes"), value);
-    type_buffer_short.Format(_T("%s: %s"), _("2Min"), value);
-  } else {
-    type_buffer.Format(_T("%s: %s"), _("2Minutes"), _("OK"));
-    type_buffer_short.Format(_T("%s: %s"), _("2Min"), _("OK"));
-  }
-}
-
-void
-SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
-                         TaskType task_mode,
-                         unsigned idx, unsigned task_size, bool is_start,
-                         bool is_finish, bool is_aat, bool navigate_to_target,
-                         bool enable_index,
-                         int time_under_max_start,
-                         bool show_time_under_max_start)
+GetTypeText(SliderStartTime::TypeBuffer &type_buffer,
+            SliderStartTime::TypeBuffer &type_buffer_short,
+            TaskType task_mode,
+            unsigned idx, unsigned task_size, bool is_start,
+            bool is_finish, bool is_aat, bool navigate_to_target,
+            bool enable_index,
+            const SliderStartTime &slider_start_time)
 {
   // calculate but don't yet draw label "goto" abort, tp#
   bool different_short_buffer = false;
@@ -358,10 +338,9 @@ SliderShape::GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
     else if (is_finish) {
       type_buffer = _("Finish");
 
-    } else if ((is_start || idx == 1) && show_time_under_max_start) {
-        SetTypeTextFor2MinuteCount(type_buffer,
-                                   type_buffer_short,
-                                   time_under_max_start);
+    } else if ((is_start || idx == 1) && slider_start_time.ShowTwoMinutes()) {
+        slider_start_time.SetTypeTextFor2MinuteCount(type_buffer,
+                                                     type_buffer_short);
         different_short_buffer = true;
 
     } else if (is_start) {
@@ -407,8 +386,7 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   bool gr_valid,
                   bool use_wide_pen,
                   bool navigate_to_target,
-                  int time_under_max_start,
-                  bool show_time_under_max_start)
+                  const SliderStartTime &slider_start_time)
 {
   /**
    * seconds under max height.
@@ -429,8 +407,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   bool draw_checkmark = is_ordered && (task_size > 1)
       && ((!is_start && has_entered) || (is_start && has_exited));
 
-  TypeBuffer type_buffer(_T(""));
-  TypeBuffer type_buffer_short(_T(""));
+  SliderStartTime::TypeBuffer type_buffer(_T(""));
+  SliderStartTime::TypeBuffer type_buffer_short(_T(""));
   UPixelScalar width;
   PixelScalar left;
   PixelRect rc = rc_outer;
@@ -472,10 +450,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
    **/
   GetTypeText(type_buffer, type_buffer_short, task_mode, idx, task_size,
               is_start, is_finish, is_aat, navigate_to_target,
-              show_index,
-              time_under_max_start, show_time_under_max_start);
+              show_index, slider_start_time);
 
-  canvas.Select(GetTypeFont(is_start, time_under_max_start));
+  canvas.Select(GetTypeFont());
   type_text_width = canvas.CalcTextWidth(type_buffer.c_str());
   type_text_width_short = canvas.CalcTextWidth(type_buffer_short.c_str());
 
@@ -566,8 +543,8 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
   }
 
   // type buffer - print the regular or short one
-  canvas.Select(GetTypeFont(is_start, time_under_max_start));
-  const TypeBuffer& type_buffer_active = use_short_type_text ?
+  canvas.Select(GetTypeFont());
+  const SliderStartTime::TypeBuffer& type_buffer_active = use_short_type_text ?
       type_buffer_short : type_buffer;
   canvas.TextAutoClipped(rc.left, line_one_y_offset, type_buffer_active.c_str());
 

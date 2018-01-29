@@ -33,6 +33,7 @@ Copyright_License {
 #include "Engine/Task/Factory/TaskFactoryType.hpp"
 #include "MapSettings.hpp"
 #include "Util/StaticString.hxx"
+#include "TaskNavSliderStartTime.hpp"
 
 #include <assert.h>
 #include <stdint.h>
@@ -47,7 +48,6 @@ enum class TaskType : uint8_t;
 class SliderShape {
 public:
 
-  typedef StaticString<120> TypeBuffer;
   typedef StaticString<12> GRBuffer;
   typedef StaticString<30> DistanceBuffer;
 
@@ -256,15 +256,14 @@ public:
             bool gr_valid,
             bool use_wide_pen,
             bool navigate_to_target,
-            int time_under_max_start,
-            bool show_time_under_max_start);
+            const SliderStartTime &slider_start_time);
 
 
   /**
    * returns the font to be used for the "type display" in
    * upper left quadrant of bar
    */
-  const Font& GetTypeFont(bool is_start, int time_under_max_start) const;
+  const Font& GetTypeFont() const;
   const Font& GetNameFont() const;
   const Font& GetAltitudeFont() const;
   const Font& GetDistanceFont() const;
@@ -283,24 +282,6 @@ public:
    * text to be displayed for gradient
    */
   void GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid);
-
-  /**
-   * sets the text to be used for the "type display" in
-   * upper left quadrant of bar
-   *
-   * @param type_buffer: the buffer that holds the text
-   * @param type_buffer_short: the buffer that holds the text.  Abbreviated
-   * @param enable_index: is the configuration enabled to show the tp indexes
-   * @param time_under_max_start: US task time under max start
-   * @param show_time_under_max_start true if show time under message
-   */
-  void GetTypeText(TypeBuffer &type_buffer, TypeBuffer &type_buffer_short,
-                   TaskType task_mode,
-                   unsigned idx, unsigned task_size, bool is_start,
-                   bool is_finish, bool is_aat, bool navigate_to_target,
-                   bool enable_index,
-                   int time_under_max_start,
-                   bool show_time_under_max_start);
 
 #ifdef _WIN32
   /**

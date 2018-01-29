@@ -54,6 +54,7 @@ Copyright_License {
 #include "Task/Points/TaskWaypoint.hpp"
 #include "TophatWidgets/MapOverlayButton.hpp"
 #include "TophatWidgets/TaskNavSliderWidget.hpp"
+#include "TophatWidgets/TaskNavSliderStartTime.hpp"
 #include "Util/StaticString.hxx"
 #include "Components.hpp"
 #include "GlideSolvers/MacCready.hpp"
@@ -156,11 +157,10 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
   const FlyingState &flying = CommonInterface::Calculated().flight;
   const Waypoint *wp = nullptr;
   const OrderedTaskPoint *otp;
-  int time_under_max_start;
-  bool show_two_minute_start = false;
   unsigned idx = 0;
   unsigned task_size = 1;
   bool is_ordered = false;
+  SliderStartTime slider_start_time;
 
   {
     ProtectedTaskManager::Lease task_manager(*protected_task_manager);
@@ -170,17 +170,18 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
     task_factory_type = task_manager->GetOrderedTask().GetFactoryType();
     is_ordered = (task_mode == TaskType::ORDERED);
 
+    const ComputerSettings &settings_computer = CommonInterface::GetComputerSettings();
+    const TaskBehaviour &task_behaviour = settings_computer.task;
     const OrderedTaskSettings &settings = ot.GetOrderedTaskSettings();
     int max_height = settings.start_constraints.max_height;
-    show_two_minute_start = settings.show_two_minute_start && flying.flying;
-    bool is_glider_close_to_start_cylinder = ot.CheckGliderStartCylinderProximity();
 
-    int raw_time_under = TaskNavSlider::GetTimeUnderStart(
-        max_height, show_two_minute_start);
-    time_under_max_start =
-        (is_ordered && (idx < 1 ||
-            (idx == 1 && is_glider_close_to_start_cylinder))) ?
-                raw_time_under  : -1;
+    slider_start_time.Init(is_ordered, idx,
+                           ot.CheckGliderStartCylinderProximity(),
+                           settings.show_two_minute_start,
+                           flying.flying,
+                           task_behaviour.contest_nationality ==
+                               ContestNationalities::AMERICAN,
+                           max_height);
 
     if (is_ordered) {
       task_size = ot.TaskSize();
@@ -273,8 +274,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       false,
                       use_wide_pen,
                       true,
-                      time_under_max_start,
-                      show_two_minute_start);
+                      slider_start_time);
 
   } else {
     fixed gradient = ::CalculateGradient(*wp, distance,
@@ -297,8 +297,7 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                       ::GradientValid(gradient),
                       use_wide_pen,
                       false,
-                      time_under_max_start,
-                      show_two_minute_start);
+                      slider_start_time);
   }
 }
 #endif
