@@ -183,7 +183,8 @@ TaskNavSliderWidget::OnPaintItem(Canvas &canvas, const PixelRect rc_outer,
                            flying.flying,
                            task_behaviour.contest_nationality ==
                                ContestNationalities::AMERICAN,
-                           max_height);
+                           max_height,
+                           settings.start_constraints.open_time_span);
 
     if (idx > 0 && idx >= task_manager->TaskSize())
       return;

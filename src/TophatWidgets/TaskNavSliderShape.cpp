@@ -50,6 +50,8 @@ Copyright_License {
 #include "Formatter/TimeFormatter.hpp"
 #include "Util/StringFormat.hpp"
 #include "Asset.hpp"
+#include "Time/RoughTime.hpp"
+
 
 #ifdef ENABLE_OPENGL
 #include "Screen/OpenGL/Texture.hpp"
@@ -318,57 +320,6 @@ SliderShape::GetGRText(GRBuffer &gr_buffer, fixed gradient, bool valid)
   }
 }
 
-static void
-GetTypeText(SliderStartTime::TypeBuffer &type_buffer,
-            SliderStartTime::TypeBuffer &type_buffer_short,
-            TaskType task_mode,
-            unsigned idx, unsigned task_size, bool is_start,
-            bool is_finish, bool is_aat, bool navigate_to_target,
-            bool enable_index,
-            const SliderStartTime &slider_start_time)
-{
-  // calculate but don't yet draw label "goto" abort, tp#
-  bool different_short_buffer = false;
-  type_buffer.clear();
-  switch (task_mode) {
-  case TaskType::ORDERED:
-    if (task_size == 0)
-      type_buffer = _("Go'n home:");
-
-    else if (is_finish) {
-      type_buffer = _("Finish");
-
-    } else if ((is_start || idx == 1) && slider_start_time.ShowTwoMinutes()) {
-        slider_start_time.SetTypeTextFor2MinuteCount(type_buffer,
-                                                     type_buffer_short);
-        different_short_buffer = true;
-
-    } else if (is_start) {
-        type_buffer = _("Start");
-    } else if (is_aat && navigate_to_target)
-      // append "Target" text to distance in center
-      type_buffer.clear();
-    else if (is_aat && enable_index)
-      type_buffer.Format(_T("%s %u"), _("Center"), idx);
-    else if (enable_index)
-      type_buffer.Format(_T("%s %u"), _("TP"), idx);
-
-    break;
-  case TaskType::GOTO:
-  case TaskType::TEAMMATE:
-  case TaskType::ABORT:
-    type_buffer = _("Goto:");
-    break;
-
-  case TaskType::NONE:
-    type_buffer = _("Go'n home:");
-
-    break;
-  }
-  if (!different_short_buffer)
-    type_buffer_short = type_buffer;
-}
-
 void
 SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
                   unsigned idx, bool selected, bool is_current_tp,
@@ -448,9 +399,9 @@ SliderShape::Draw(Canvas &canvas, const PixelRect rc_outer,
    * Set type or for US Starts, time under max height
    * Draw later after deciding whether to use the short buffer
    **/
-  GetTypeText(type_buffer, type_buffer_short, task_mode, idx, task_size,
-              is_start, is_finish, is_aat, navigate_to_target,
-              show_index, slider_start_time);
+  slider_start_time.GetTypeText(type_buffer, type_buffer_short, task_mode, idx,
+                                task_size, is_start, is_finish, is_aat,
+                                navigate_to_target, show_index);
 
   canvas.Select(GetTypeFont());
   type_text_width = canvas.CalcTextWidth(type_buffer.c_str());

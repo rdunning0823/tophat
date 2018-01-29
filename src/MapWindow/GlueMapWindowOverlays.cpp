@@ -181,7 +181,8 @@ GlueMapWindow::DrawTaskNavSliderShape(Canvas &canvas)
                            flying.flying,
                            task_behaviour.contest_nationality ==
                                ContestNationalities::AMERICAN,
-                           max_height);
+                           max_height,
+                           settings.start_constraints.open_time_span);
 
     if (is_ordered) {
       task_size = ot.TaskSize();
