@@ -87,9 +87,6 @@ namespace Directory
    */
   void VisitSpecificFiles(const TCHAR* path, const TCHAR* filter,
                           File::Visitor &visitor, bool recursive = false);
-
-  bool Delete(const TCHAR *path);
-  bool IsDots(const TCHAR* str);
 }
 
 namespace File

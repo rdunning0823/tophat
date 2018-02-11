@@ -2,9 +2,6 @@
 
 .stgit*
 .together/*
-.settings/*
-.Parent/*
-.AppleDouble/*
 .deps
 *.gcov
 *~

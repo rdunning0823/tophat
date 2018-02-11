@@ -1,26 +1,25 @@
 /*
- Copyright_License {
+Copyright_License {
 
- Top Hat Soaring Glide Computer - http://www.tophatsoaring.org/
- Copyright (C) 2000-2016 The Top Hat Soaring Project
- A detailed list of copyright holders can be found in the file "AUTHORS".
+  Top Hat Soaring Glide Computer - http://www.tophatsoaring.org/
+  Copyright (C) 2000-2016 The Top Hat Soaring Project
+  A detailed list of copyright holders can be found in the file "AUTHORS".
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version 2
- of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- }
- */
-
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+}
+*/
 
 #include "WaypointGlue.hpp"
 #include "Factory.hpp"
@@ -31,17 +30,12 @@
 #include "Language/Language.hpp"
 #include "LocalPath.hpp"
 #include "Operation/Operation.hpp"
-#include "Waypoint/CupxDecompressor.h"
-
-#include "OS/FileUtil.hpp"
-#include "IO/ZipSource.hpp"
 
 #include <windef.h> /* for MAX_PATH */
 
-using namespace std;
-
 static bool
-LoadWaypointFile(Waypoints &waypoints, const TCHAR *path, WaypointOrigin origin,
+LoadWaypointFile(Waypoints &waypoints, const TCHAR *path,
+                 WaypointOrigin origin,
                  const RasterTerrain *terrain, OperationEnvironment &operation)
 {
   if (!ReadWaypointFile(path, waypoints, WaypointFactory(origin, terrain),
@@ -54,7 +48,8 @@ LoadWaypointFile(Waypoints &waypoints, const TCHAR *path, WaypointOrigin origin,
 }
 
 bool
-WaypointGlue::LoadWaypoints(Waypoints &way_points, const RasterTerrain *terrain,
+WaypointGlue::LoadWaypoints(Waypoints &way_points,
+                            const RasterTerrain *terrain,
                             OperationEnvironment &operation)
 {
   LogFormat("ReadWaypoints");
@@ -69,24 +64,6 @@ WaypointGlue::LoadWaypoints(Waypoints &way_points, const RasterTerrain *terrain,
 
   LocalPath(path, _T("user.cup"));
   LoadWaypointFile(way_points, path, WaypointOrigin::USER, terrain, operation);
-
-  // #################### Work in progress: cupx file format support ###########################
-////  const char* CUPX_FILE = "/home/rob/.xcsoar/small.cupx";
-//  //const char* CUPX_FILE = "/home/rob/XCSoarData/small.cupx";
-//  CupxDecompressor cupxDecompressor = CupxDecompressor(CUPX_FILE);
-//
-//  // Make sure that cupx file directory and point are deleted from last use
-//  // This is necessary in case the file was updated
-//  CupxDecompressor::Clean();
-//
-//  bool is_cupx = cupxDecompressor.IsCupxFile(string(CUPX_FILE));
-//  if (is_cupx)
-//  {
-//    string filename = cupxDecompressor.GetCupxFileNameWithoutExtension();
-//    cupxDecompressor.Decompress();
-//  }
-
-
 
   // ### FIRST FILE ###
   if (Profile::GetPath(ProfileKeys::WaypointFile, path))
@@ -110,12 +87,12 @@ WaypointGlue::LoadWaypoints(Waypoints &way_points, const RasterTerrain *terrain,
     TCHAR *tail = path + _tcslen(path);
 
     _tcscpy(tail, _T("/waypoints.xcw"));
-    found |= LoadWaypointFile(way_points, path, WaypointOrigin::MAP, terrain,
-                              operation);
+    found |= LoadWaypointFile(way_points, path, WaypointOrigin::MAP,
+                              terrain, operation);
 
     _tcscpy(tail, _T("/waypoints.cup"));
-    found |= LoadWaypointFile(way_points, path, WaypointOrigin::MAP, terrain,
-                              operation);
+    found |= LoadWaypointFile(way_points, path, WaypointOrigin::MAP,
+                              terrain, operation);
   }
 
   // Optimise the waypoint list after attaching new waypoints

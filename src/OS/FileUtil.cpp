@@ -42,7 +42,6 @@ Copyright_License {
 #include <windows.h>
 #endif
 
-
 void
 Directory::Create(const TCHAR* path)
 {
@@ -68,58 +67,6 @@ Directory::Exists(const TCHAR* path)
   return attributes != INVALID_FILE_ATTRIBUTES &&
     (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 #endif
-}
-
-/**
- * Delete
- * Delete a directory, subdirectories, and files
- */
-bool
-Directory::Delete(const TCHAR *path)
-{
-#ifdef HAVE_POSIX
-  struct dirent *entry = NULL;
-          DIR *dir = NULL;
-          dir = opendir(path);
-          while((entry = readdir(dir)))
-          {
-                  DIR *sub_dir = NULL;
-                  FILE *file = NULL;
-                  char abs_path[100] = {0};
-                  if(*(entry->d_name) != '.')
-                  {
-                          sprintf(abs_path, "%s/%s", path, entry->d_name);
-                          if((sub_dir = opendir(abs_path)))
-                          {
-                                  closedir(sub_dir);
-                                  Directory::Delete(abs_path);
-                          }
-                          else
-                          {
-                                  if((file = fopen(abs_path, "r")))
-                                  {
-                                          fclose(file);
-                                          remove(abs_path);
-                                  }
-                          }
-                  }
-          }
-          remove(path);
-#else
-
-
-// TODO: Implement a recursive directory delete for windows
-
-
-
-
-#endif
-return true;
-}
-
-bool Directory::IsDots(const TCHAR* str) {
-   if(_tcscmp(str,(const TCHAR*)".") && _tcscmp(str,(const TCHAR*)"..")) return false;
-   return true;
 }
 
 /**
