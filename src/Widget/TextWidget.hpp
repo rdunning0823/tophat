@@ -30,7 +30,7 @@ Copyright_License {
 #include <tchar.h>
 
 class Color;
-class DialogLook;
+struct DialogLook;
 
 /**
  * A #Widget implementation that displays multi-line text.
