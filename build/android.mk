@@ -38,20 +38,13 @@ endif
 
 JAVA_PACKAGE = org.tophat
 
-NATIVE_CLASSES := \
-	NativeView \
-	EventBridge \
-	InternalGPS \
-	NonGPSSensors \
-	NativeInputListener \
-	DownloadUtil \
-	BatteryReceiver \
-	NativePortListener \
-	NativeLeScanCallback \
-	NativeBMP085Listener \
-	NativeI2CbaroListener \
-	NativeNunchuckListener \
-	NativeVoltageListener
+NATIVE_CLASSES = NativeView EventBridge InternalGPS NonGPSSensors NativeInputListener DownloadUtil BatteryReceiver
+NATIVE_CLASSES += NativePortListener
+NATIVE_CLASSES += NativeLeScanCallback
+NATIVE_CLASSES += NativeBMP085Listener
+NATIVE_CLASSES += NativeI2CbaroListener
+NATIVE_CLASSES += NativeNunchuckListener
+NATIVE_CLASSES += NativeVoltageListener
 NATIVE_SOURCES = $(patsubst %,android/src/%.java,$(NATIVE_CLASSES))
 NATIVE_PREFIX = $(TARGET_OUTPUT_DIR)/include/$(subst .,_,$(JAVA_PACKAGE))_
 NATIVE_HEADERS = $(patsubst %,$(NATIVE_PREFIX)%.h,$(NATIVE_CLASSES))
@@ -204,28 +197,25 @@ ifeq ($(FAT_BINARY),y)
 # generate a "fat" APK file with binaries for all ABIs
 
 ANDROID_LIB_BUILD =
-ANDROID_THIRDPARTY_STAMPS =
 
 # Example: $(eval $(call generate-abi,tophat,armeabi-v7a,ANDROID7))
 define generate-abi
 
 ANDROID_LIB_BUILD += $$(ANDROID_BUILD)/lib/$(2)/lib$(1).so
 
+$$(ANDROID_BUILD)/libs/$(2)/lib$(1).so: $$(OUT)/$(3)/$$(XCSOAR_ABI)/bin/lib$(1).so | $$(ANDROID_BUILD)/libs/$(2)/dirstamp
+
 $$(ANDROID_BUILD)/lib/$(2)/lib$(1).so: $$(OUT)/$(3)/$$(XCSOAR_ABI)/bin/lib$(1).so | $$(ANDROID_BUILD)/lib/$(2)/dirstamp
 	$$(Q)cp $$< $$@
 
-
-ANDROID_THIRDPARTY_STAMPS += $$(OUT)/$(3)/thirdparty.stamp
-$$(OUT)/$(3)/thirdparty.stamp:
-       $$(Q)$$(MAKE) TARGET=$(3) DEBUG=$$(DEBUG) USE_CCACHE=$$(USE_CCACHE) libs
-
-$$(OUT)/$(3)/$$(XCSOAR_ABI)/bin/lib$(1).so: $$(OUT)/$(3)/thirdparty.stamp
+$$(OUT)/$(3)/bin/lib$(1).so:
 	$$(Q)$$(MAKE) TARGET=$(3) DEBUG=$$(DEBUG) USE_CCACHE=$$(USE_CCACHE) $$@
 
 endef
 
 # Example: $(eval $(call generate-abi,tophat))
 define generate-all-abis
+$(eval $(call generate-abi,$(1),armeabi,ANDROID))
 $(eval $(call generate-abi,$(1),armeabi-v7a,ANDROID7))
 $(eval $(call generate-abi,$(1),x86,ANDROID86))
 $(eval $(call generate-abi,$(1),mips,ANDROIDMIPS))
@@ -235,9 +225,6 @@ $(eval $(call generate-abi,$(1),x86_64,ANDROIDX64))
 endef
 
 $(foreach NAME,$(ANDROID_LIB_NAMES),$(eval $(call generate-all-abis,$(NAME))))
-
-.PHONY: libs
-libs: $(ANDROID_THIRDPARTY_STAMPS)
 
 else # !FAT_BINARY
 
@@ -256,7 +243,7 @@ $(call SRC_TO_OBJ,$(SRC)/Android/NativeNunchuckListener.cpp): $(NATIVE_HEADERS)
 $(call SRC_TO_OBJ,$(SRC)/Android/NativeVoltageListener.cpp): $(NATIVE_HEADERS)
 
 ANDROID_LIB_BUILD = $(patsubst %,$(ANDROID_ABI_DIR)/lib%.so,$(ANDROID_LIB_NAMES))
-$(ANDROID_LIB_BUILD): $(ANDROID_ABI_DIR)/lib%.so: $(ABI_BIN_DIR)/lib%.so | $(ANDROID_ABI_DIR)/dirstamp
+$(ANDROID_LIB_BUILD): $(ANDROID_ABI_DIR)/lib%.so: $(TARGET_BIN_DIR)/lib%.so $(ANDROID_ABI_DIR)/dirstamp
 	$(Q)cp $< $@
 
 endif # !FAT_BINARY
@@ -264,7 +251,7 @@ endif # !FAT_BINARY
 
 $(NATIVE_HEADERS): $(NATIVE_PREFIX)%.h: $(ANDROID_BUILD)/classes.dex
 	@$(NQ)echo "  JAVAH   $@"
-	(Q)$(JAVAH) -classpath $(ANDROID_SDK_PLATFORM_DIR)/android.jar:$(JAVA_CLASSFILES_DIR) -d $(@D) $(subst _,.,$(patsubst $(patsubst ./%,%,$(TARGET_OUTPUT_DIR))/include/%.h,%,$@))
+	$(Q)javah -classpath $(ANDROID_SDK_PLATFORM_DIR)/android.jar:$(JAVA_CLASSFILES_DIR) -d $(@D) $(subst _,.,$(patsubst $(patsubst ./%,%,$(TARGET_OUTPUT_DIR))/include/%.h,%,$@))
 	@touch $@
 
 .DELETE_ON_ERROR: $(ANDROID_BUILD)/unsigned.apk
@@ -273,22 +260,7 @@ $(ANDROID_BUILD)/unsigned.apk: $(ANDROID_BUILD)/classes.dex $(ANDROID_BUILD)/res
 	$(Q)cp $(ANDROID_BUILD)/resources.apk $@
 	$(Q)cd $(dir $@) && zip -q -r $(notdir $@) classes.dex lib
 
-# Generate ~/.android/debug.keystore, if it does not exists, as the official
-# Android build tools do it:
-$(HOME)/.android/debug.keystore:
-	@$(NQ)echo "  KEYTOOL $@"
-	$(Q)-$(MKDIR) -p $(HOME)/.android
-	$(Q)$(KEYTOOL) -genkey -noprompt \
-		-keystore $@ \
-		-storepass android \
-		-alias androiddebugkey \
-		-keypass android \
-		-dname "CN=Android Debug" \
-		-keyalg RSA -keysize 2048 -validity 10000
-
-$(ANDROID_BIN)/XCSoar-debug.apk: $(ANDROID_BUILD)/unsigned.apk $(HOME)/.android/debug.keystore | $(ANDROID_BIN)/dirstamp
-
-$(ANDROID_BIN)/XCSoar-debug.apk: $(ANDROID_BUILD)/unsigned.apk $(HOME)/.android/debug.keystore | $(ANDROID_BIN)/dirstamp
+$(ANDROID_BIN)/XCSoar-debug.apk: $(ANDROID_BUILD)/unsigned.apk | $(ANDROID_BIN)/dirstamp
 	@$(NQ)echo "  SIGN    $@"
 	$(Q)$(JARSIGNER) -keystore $(HOME)/.android/debug.keystore -storepass android -signedjar $@ $< androiddebugkey
 
