@@ -9,13 +9,13 @@ CXXFLAGS += -Wmissing-noreturn
 
 # disable some warnings, we're not ready for them yet
 CXXFLAGS += -Wno-unused-parameter
-CXXFLAGS += -Wno-missing-field-initializers 
+CXXFLAGS += -Wno-missing-field-initializers -Wno-error=shift-negative-value
 CXXFLAGS += -Wcast-align
 
 # plain C warnings
 
 CFLAGS += $(WARNINGS)
-CFLAGS += -Wmissing-prototypes -Wstrict-prototypes
+CFLAGS += -Wmissing-prototypes -Wstrict-prototypes -Wno-error=shift-negative-value
 CFLAGS += -Wnested-externs
 
 # make warnings fatal (for perfectionists)
