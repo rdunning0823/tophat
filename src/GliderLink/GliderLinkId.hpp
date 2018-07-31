@@ -1,5 +1,5 @@
 /*
- Copyright_License {
+Copyright_License {
 
   Top Hat Soaring Glide Computer - http://www.tophatsoaring.org/
   Copyright (C) 2000-2016 The Top Hat Soaring Project
@@ -19,30 +19,32 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
+*/
+
+#ifndef XCSOAR_GLIDER_LINK_ID_HPP
+#define XCSOAR_GLIDER_LINK_ID_HPP
+
+#include <stdint.h>
+
+/**
+ * The identification number of a GLIDER_LINK traffic.
  */
+class GliderLinkId {
+  uint32_t value;
 
-#ifndef XCSOAR_TRAFFIC_RENDERER_HPP
-#define XCSOAR_TRAFFIC_RENDERER_HPP
+public:
+  constexpr
+  GliderLinkId(uint32_t _value):value(_value) {}
 
-#include "FLARM/Color.hpp"
+  GliderLinkId() = default;
 
-struct RasterPoint;
-class Canvas;
-struct TrafficLook;
-struct FlarmTraffic;
-struct GliderLinkTraffic;
-class Angle;
+  bool operator==(GliderLinkId other) const {
+    return value == other.value;
+  }
 
-namespace TrafficRenderer
-{
-void
-Draw(Canvas &canvas, const TrafficLook &traffic_look,
-     const FlarmTraffic &traffic, Angle angle,
-     const FlarmColor color, const RasterPoint pt);
-
-void
-Draw(Canvas &canvas, const TrafficLook &traffic_look,
-     const GliderLinkTraffic &traffic, Angle angle, const RasterPoint pt);
-}
+  bool operator<(GliderLinkId other) const {
+    return value < other.value;
+  }
+};
 
 #endif

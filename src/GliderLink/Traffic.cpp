@@ -1,5 +1,5 @@
 /*
- Copyright_License {
+Copyright_License {
 
   Top Hat Soaring Glide Computer - http://www.tophatsoaring.org/
   Copyright (C) 2000-2016 The Top Hat Soaring Project
@@ -19,30 +19,17 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
- */
+*/
 
-#ifndef XCSOAR_TRAFFIC_RENDERER_HPP
-#define XCSOAR_TRAFFIC_RENDERER_HPP
+#include "GliderLink/Traffic.hpp"
 
-#include "FLARM/Color.hpp"
-
-struct RasterPoint;
-class Canvas;
-struct TrafficLook;
-struct FlarmTraffic;
-struct GliderLinkTraffic;
-class Angle;
-
-namespace TrafficRenderer
+void
+GliderLinkTraffic::Update(const GliderLinkTraffic &other)
 {
-void
-Draw(Canvas &canvas, const TrafficLook &traffic_look,
-     const FlarmTraffic &traffic, Angle angle,
-     const FlarmColor color, const RasterPoint pt);
-
-void
-Draw(Canvas &canvas, const TrafficLook &traffic_look,
-     const GliderLinkTraffic &traffic, Angle angle, const RasterPoint pt);
+  track = other.track;
+  track_received = other.track_received;
+  speed = other.speed;
+  speed_received = other.speed_received;
+  climb_rate = other.climb_rate;
+  climb_rate_received = other.climb_rate_received;
 }
-
-#endif
