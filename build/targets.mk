@@ -435,8 +435,6 @@ endif
 
 ifeq ($(TARGET),ANDROID)
   ANDROID_NDK ?= $(HOME)/opt/android-ndk-r10e
-  # when upgrade to 15c, also change: ANDROID_TOOLCHAIN_NAME = llvm-3.6 to "= llvm"
-  # may have to also upgrade to build-tools/26.0.0 in android.mk
 
   ANDROID_SDK_PLATFORM = android-22
   ANDROID_NDK_PLATFORM = android-19
@@ -493,6 +491,22 @@ ifeq ($(TARGET),ANDROID)
   ANDROID_TARGET_ROOT = $(ANDROID_NDK_PLATFORM_DIR)/arch-$(ANDROID_ARCH)
 
   ANDROID_GCC_TOOLCHAIN_NAME = $(ANDROID_ABI2)-$(ANDROID_GCC_VERSION)
+
+  ifeq ($(ANDROID_ARCH),arm)
+    # on ARMv6, LLVM/clang generates the "movw" instruction which
+    # however requires ARMv7 and leads to a SIGILL crash
+    # (http://llvm.org/bugs/show_bug.cgi?id=18364 and
+    # http://bugs.xcsoar.org/ticket/3339); until this LLVM bug is
+    # fixed, we keep using gcc
+
+    # on ARM, LLVM/clang generates "str" opcodes with Rd=Rn and
+    # post-index (FlexOffset), which is illegal
+    # (http://llvm.org/bugs/show_bug.cgi?id=20323 and
+    # http://bugs.xcsoar.org/ticket/3356); until this LLVM bug is
+    # fixed, we keep using gcc
+
+    CLANG ?= n
+  endif
 
   # clang is the default compiler on Android
   CLANG ?= y
