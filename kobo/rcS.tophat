@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #  XCSoar Glide Computer - http://www.xcsoar.org/
-#  Copyright (C) 2000-2015 The XCSoar Project
+#  Copyright (C) 2000-2013 The XCSoar Project
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,42 +14,39 @@
 # General Public License for more details.
 #
 
-# This script is launched by /etc/inittab on boot.  It initialises the
-# Kobo Mini and launches XCSoar's KoboMenu.
+PRODUCT=`/bin/kobo_config.sh`;
+[ $PRODUCT != trilogy ] && PREFIX=$PRODUCT-
 
-/bin/mount -o remount,noatime,nodiratime /dev/mmcblk0p1 /
+mount -o remount,noatime,nodiratime /dev/mmcblk0p1 /
 
-export PATH=/sbin:/bin:/usr/sbin:/usr/bin
-umask 022
+# clean up if ACTION=="remove" of udev rule did not work
+[ -d /media/usb_storage ] && rmdir /media/usb_storage
 
-# mount the data partition
-/bin/dosfsck -a -w /dev/mmcblk0p3
-/bin/mkdir -p /mnt/onboard
-/bin/mount -t vfat -o iocharset=utf8 /dev/mmcblk0p3 /mnt/onboard
-/bin/rm -rf /mnt/onboard/fsck* /mnt/onboard/FSCK*
-
-# launch the original Kobo init script if:
-# - there's a pending update
-# - Nickel start was scheduled
-# - the XCSoar installation is broken
-if [ -f /mnt/onboard/.kobo/Kobo.tgz -o -f /mnt/onboard/.kobo/KoboRoot.tgz \
-    -o -f /mnt/onboard/XCSoarData/kobo/start_nickel \
-    -o ! -x /opt/xcsoar/bin/KoboMenu ]; then
-
-    rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
-    # launch user script before nickel start
-    if [ -f /mnt/onboard/XCSoarData/kobo/init_nickel.sh ]; then
-        source /mnt/onboard/XCSoarData/kobo/init_nickel.sh
-    fi
-    umount -l /mnt/onboard
-    exec /etc/init.d/rcS
+PLATFORM=freescale
+if [ `dd if=/dev/mmcblk0 bs=512 skip=1024 count=1 | grep -c "HW CONFIG"` == 1 ]; then
+	PLATFORM=ntx508
 fi
 
-# prepare file system
+if [ $PLATFORM == freescale ]; then
+	if [ ! -s /lib/firmware/imx/epdc_E60_V220.fw ]; then
+		mkdir -p /lib/firmware/imx
+		dd if=/dev/mmcblk0 bs=512K skip=10 count=1 | zcat > /lib/firmware/imx/epdc_E60_V220.fw
+		sync
+	fi
+fi
 
-/bin/mkdir -p /proc /dev /root /tmp /sys /var/lib /var/log /var/run
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/lib:
+runlevel=S
+prevlevel=N
+umask 022
+export PATH runlevel prevlevel
+DotKobo=/mnt/onboard/.kobo
 
-/bin/mount -t proc none /proc
+for i in /proc /dev /root /tmp /sys /mnt/sd /mnt/onboard /mnt/user /var/lib /var/log /var/run /lib/modules/`uname -r`; do
+	[ ! -d $i ] && mkdir -p $i
+done;
+
+/bin/mount -t proc  none  /proc
 /bin/mount -t tmpfs none -o size=16m /tmp
 /bin/mount -t tmpfs none /dev
 /bin/mount -t tmpfs none -o size=16k /var/lib
@@ -57,48 +54,168 @@ fi
 /bin/mount -t tmpfs none -o size=128k /var/run
 /bin/mount -t sysfs none -o size=500k /sys
 
-# WORKAROUND: /dev/null might be needed in udev rules, before /dev/null is
-# created by udev, therefore create it before starting udev.
-/bin/mknod /dev/null c 1 3
-/bin/chmod 666 /dev/null
+for i in /var/run/dbus /var/lib/dbus; do
+	mkdir -p $i
+done
 
-/sbin/udevd --daemon
-/sbin/udevadm trigger
+mkfifo /tmp/nickel-hardware-status
+rm -rf /etc/udev/rules.d/70-persistent-net.rules
 
-/sbin/hwclock -s -u
-
-# workaround for kernel crash "scheduling while atomic"
 echo -e '\000\000\000\000' > /proc/sys/kernel/hotplug
+/sbin/udevd -d
 
-# disable the flashing led
-echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
-echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
-echo "dc 0" > /sys/devices/platform/pmic_light.1/lit
-
-# enable crash dumps
-/bin/mkdir -p /mnt/onboard/XCSoarData/crash
-echo '/mnt/onboard/XCSoarData/crash/core.%p' >/proc/sys/kernel/core_pattern
-ulimit -c unlimited
-
-# launch user script
-if [ -f /mnt/onboard/XCSoarData/kobo/init.sh ]; then
-    source /mnt/onboard/XCSoarData/kobo/init.sh
+if [ $PLATFORM == freescale ] || [ ! -e /etc/udev.tgz ]; then
+	/sbin/udevadm control --env=STARTUP=1
+	/sbin/udevadm trigger
+	/sbin/udevadm settle --timeout=2
+	/sbin/udevadm control --env=STARTUP=
+	[ $PLATFORM != freescale ] && tar cpzf /etc/udev.tgz /dev &
+else
+	zcat /etc/udev.tgz > /dev/null || ( rm -rf /etc/udev.tgz; reboot )
+	tar zxf /etc/udev.tgz -C /
 fi
+
+( usleep 400000; /etc/init.d/on-animator.sh ) &
+
+dosfsck -a -w /dev/mmcblk0p3
+mount -t vfat -o noatime,nodiratime,shortname=mixed,utf8 /dev/mmcblk0p3 /mnt/onboard
+rm -rf /mnt/onboard/fsck*
+rm -rf /mnt/onboard/FSCK*
+rm -rf /usr/local/Kobo/db.tgz
+
+echo -n 8192 > /proc/sys/vm/min_free_kbytes
+echo -n 67108864 > /proc/sys/kernel/shmmax
+if [ ! -e /mnt/onboard/.kobo ]; then
+	mkdir -p /mnt/onboard/.kobo
+	tar zxf /usr/local/Kobo/db.tgz -C /mnt/onboard
+	sync
+	echo "Decompressed database"
+fi
+
+if [ -e /mnt/onboard/.kobo/Kobo.tgz ]; then
+	zcat /mnt/onboard/.kobo/Kobo.tgz > /dev/null && tar zxf /mnt/onboard/.kobo/Kobo.tgz -C /usr/local/Kobo/
+	rm /mnt/onboard/.kobo/Kobo.tgz
+	echo "Done upgrading..."
+fi
+                               
+if [ -e /mnt/onboard/.kobo/KoboRoot.tgz ]; then
+	zcat /mnt/onboard/.kobo/KoboRoot.tgz > /dev/null && tar zxf /mnt/onboard/.kobo/KoboRoot.tgz -C /
+	if [ -e /mnt/onboard/.kobo/upgrade ]; then
+		/etc/init.d/upgrade-generic.sh null null ${DotKobo}/upgrade/uImage mmcblk0
+		rm -rf /mnt/onboard/.kobo/upgrade
+	fi
+	rm /mnt/onboard/.kobo/KoboRoot.tgz
+	sync
+	reboot
+fi
+
+(
+	/usr/local/Kobo/pickel disable.rtc.alarm
+
+	if [ ! -e /etc/wpa_supplicant/wpa_supplicant.conf ]; then
+		cp /etc/wpa_supplicant/wpa_supplicant.conf.template /etc/wpa_supplicant/wpa_supplicant.conf
+	fi
+
+	echo 1 > /sys/devices/platform/mxc_dvfs_core.0/enable
+
+	/sbin/hwclock -s -u
+) &
+
+INTERFACE=wlan0
+WIFI_MODULE=ar6000
+if [ $PLATFORM == ntx508 ]; then
+	INTERFACE=eth0
+	WIFI_MODULE=dhd
+fi
+
+export INTERFACE
+export WIFI_MODULE
+
+export QWS_MOUSE_PROTO="tslib_nocal:/dev/input/event1"
+export QWS_KEYBOARD=imx508kbd:/dev/input/event0
+export QWS_DISPLAY=Transformed:imx508:Rot90
+export NICKEL_HOME=/mnt/onboard/.kobo
+export LD_LIBRARY_PATH=/usr/local/Kobo
+export WIFI_MODULE_PATH=/drivers/$PLATFORM/wifi/$WIFI_MODULE.ko
+export LANG=en_US.UTF-8
+export UBOOT_MMC=/etc/u-boot/$PLATFORM/u-boot.mmc
+export UBOOT_RECOVERY=/etc/u-boot/$PLATFORM/u-boot.recovery
+
+/bin/dbus-uuidgen > /var/lib/dbus/machine-id
+/bin/dbus-daemon --system &
+export DBUS_SESSION_BUS_ADDRESS=`/bin/dbus-daemon --session --print-address --fork`
+
+# for WiFi network
+mkdir /dev/pts
+/bin/mount -t devpts devpts /dev/pts
+/usr/sbin/inetd /etc/inetd.conf &
+
+if /bin/dd if=/dev/mmcblk0 bs=512 skip=2048 count=1 2>/dev/null | \
+  strings | grep -q USB-hot-plug; then
+    USB_hot_plug=Y
+else
+    USB_hot_plug=N
+    # save original uImage as uImage-KoboLabs
+    if [ ! -f ${DotKobo}/uImage-KoboLabs ]; then
+        dd if=/dev/mmcblk0 bs=512 skip=2048 count=4000 of=${DotKobo}/uImage-KoboLabs
+    fi
+fi
+
+if [ -f /mnt/onboard/XCSoarData/kobo/start_nickel \
+    -o ! -x /opt/tophat/bin/KoboMenu ]; then
+    if [ "${USB_hot_plug}" == "Y" -a -f ${DotKobo}/uImage-KoboLabs ]; then
+        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+        cp ${DotKobo}/uImage-KoboLabs ${DotKobo}/upgrade/uImage
+        touch ${DotKobo}/KoboRoot.tgz
+        reboot
+    fi
+    rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
+    /usr/local/Kobo/hindenburg &
+
+    `grep /usr/local/Kobo/nickel /etc/init.d/rcS`
+else
+    if [ "${USB_hot_plug}" != "Y" -a -f ${DotKobo}/uImage-USB-hot-plug ]; then
+        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+        cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
+        touch ${DotKobo}/KoboRoot.tgz
+        rm -f ${DotKobo}/force_uimage
+        reboot
+    fi
+    if [ -f ${DotKobo}/force_uimage -a -f ${DotKobo}/uImage-USB-hot-plug ] ; then
+        [ -e ${DotKobo}/upgrade ] || mkdir ${DotKobo}/upgrade
+        cp ${DotKobo}/uImage-USB-hot-plug ${DotKobo}/upgrade/uImage
+        touch ${DotKobo}/KoboRoot.tgz
+        rm -f ${DotKobo}/force_uimage
+        reboot
+    fi
+    # disable the flashing led
+    echo "ch 3" > /sys/devices/platform/pmic_light.1/lit
+    echo "cur 0" > /sys/devices/platform/pmic_light.1/lit
+    echo "dc 0" > /sys/devices/platform/pmic_light.1/lit
+
+    # kill off the start screen
+    killall on-animator.sh
 
 # workaround for Kobo Touch N905B kernel bug: the mxc_fb driver
 # crashes when KoboMenu tries to rotate the display too early after
 # boot
-if [ `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` = "SN-N905B" ]; then
-    sleep 1
+    if [ `dd if=/dev/mmcblk0 bs=8 count=1 skip=64` = "SN-N905B" ]; then
+        sleep 1
+    fi
+
+# add link so ftp users can find XCSoarData more easily
+    if ! [ -f /XCSoarData ]; then
+      ln -s /mnt/onboard/XCSoarData /XCSoarData;
+    fi
+
+    # launch user script
+    if [ -f /mnt/onboard/XCSoarData/kobo/init.sh ]; then
+      source /mnt/onboard/XCSoarData/kobo/init.sh
+    fi
+
+    echo 3 > /sys/class/graphics/fb0/rotate
+    /opt/tophat/bin/KoboMenu 1> /dev/null 2> /dev/null &
+    /sbin/udevadm control --env=STARTUP=1
+    killall plug
 fi
-
-# WORKAROUND: USB devices which require USB mode switching might not
-# suffesscully switched, if simple_modeswitch was called too early (before the
-# USB device files were created). Call it again to make sure.
-/opt/xcsoar/bin/simple_usbmodeswitch
-
-# finally, open the menu
-exec /opt/xcsoar/bin/KoboMenu
-
-# just in case launching KoboMenu fails: try xcsoar
-exec /opt/xcsoar/bin/xcsoar
+[ $PLATFORM != freescale ] && udevadm trigger &
