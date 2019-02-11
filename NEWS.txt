@@ -1,6 +1,16 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Tophat Soaring 2.2.3_beta
+* FLARM: Maintain targets 5 sec after signal lost
+* Waypoint List - add Landables only option
+* Waypoint List - draw icon type next to waypoint name
+* Allow custom infobox titles via InfoBoxTitle.locale file
+* Hide thermal assistant when panning
+* Don't show time below start if max height = 0
+* Plane dialog: fix bug where not updating info on "More" page
+* US Task: radius for Racing and Mat tasks is 0.5 mile
+
 Tophat Soaring 2.2.2c_beta
 * Kobo: fix wifi password to accept lower case
 Android
