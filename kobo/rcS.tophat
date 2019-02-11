@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-#  tophat Glide Computer - http://www.tophatsoaring.org/
+#  XCSoar Glide Computer - http://www.xcsoar.org/
 #  Copyright (C) 2000-2015 The XCSoar Project
-#  Copyright (C) 2017-2017 caz@caztech.com
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +15,7 @@
 #
 
 # This script is launched by /etc/inittab on boot.  It initialises the
-# Kobo Mini and launches tophat's KoboMenu.
+# Kobo Mini and launches XCSoar's KoboMenu.
 
 /bin/mount -o remount,noatime,nodiratime /dev/mmcblk0p1 /
 
@@ -32,10 +31,10 @@ umask 022
 # launch the original Kobo init script if:
 # - there's a pending update
 # - Nickel start was scheduled
-# - the tophat installation is broken
+# - the XCSoar installation is broken
 if [ -f /mnt/onboard/.kobo/Kobo.tgz -o -f /mnt/onboard/.kobo/KoboRoot.tgz \
     -o -f /mnt/onboard/XCSoarData/kobo/start_nickel \
-    -o ! -x /opt/tophat/bin/KoboMenu ]; then
+    -o ! -x /opt/xcsoar/bin/KoboMenu ]; then
 
     rm -f /mnt/onboard/XCSoarData/kobo/start_nickel
     # launch user script before nickel start
@@ -98,11 +97,8 @@ fi
 # USB device files were created). Call it again to make sure.
 /opt/xcsoar/bin/simple_usbmodeswitch
 
-# clean up if ACTION=="remove" of udev rule did not work
-[ -d /media/usb_storage ] && rmdir /media/usb_storage
-
 # finally, open the menu
-exec /opt/tophat/bin/KoboMenu
+exec /opt/xcsoar/bin/KoboMenu
 
-# just in case launching KoboMenu fails: try tophat
-exec /opt/tophat/bin/tophat
+# just in case launching KoboMenu fails: try xcsoar
+exec /opt/xcsoar/bin/xcsoar

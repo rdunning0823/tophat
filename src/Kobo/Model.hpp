@@ -30,18 +30,11 @@ enum class KoboModel {
   UNKNOWN,
   MINI,
   TOUCH,
-  TOUCH2,
   AURA,
-  AURA2,
-  GLO,
-  GLO_HD,
 };
 
 gcc_const
 KoboModel
 DetectKoboModel();
-const char *linux_model_str();
-char *model_concat(char *buff, short size, const char *prologue,
-		   const char *epilogue);
 
 #endif

@@ -50,11 +50,9 @@ Copyright_License {
 #include "CommandLine.hpp"
 #include "OS/Args.hpp"
 #include "Simulator.hpp"
-#include "SystemDialog.hpp"
-#include "Kernel.hpp"
 
 enum Buttons {
-  PC_CONNECT = 100,
+  LAUNCH_NICKEL = 100,
   NETWORK,
   REBOOT,
   POWEROFF
@@ -100,7 +98,6 @@ class KoboMenuWidget final : public WindowWidget, ActionListener, Timer {
   SimulatorPromptWindow w;
   Button *poweroff_button;
   WndSymbolButton *wifi_button;
-  WndSymbolButton *pc_conn_button;
 
   /* should poweroff button behave as a reboot button ? */
   bool do_reboot;
@@ -146,6 +143,10 @@ public:
     CheckUSBStorage();
   }
 
+  const TCHAR *GetWifiCaption() {
+      return IsKoboWifiOn() ? _T("_chkmark_ Wifi") : _T("Wifi");
+  }
+
   const TCHAR *
   GetPowerOffCaption(bool do_reboot)
   {
@@ -156,10 +157,8 @@ public:
 void
 KoboMenuWidget::CreateButtons(WidgetDialog &buttons)
 {
-  pc_conn_button = (WndSymbolButton*)buttons.AddSymbolButton(
-    "PC conn", *this, PC_CONNECT);
-  pc_conn_button->SetPrefixIcon(SymbolButtonRenderer::NONE);
-  wifi_button = (WndSymbolButton*)buttons.AddSymbolButton("network", *this, NETWORK);
+  buttons.AddButton(("PC connect"), *this, LAUNCH_NICKEL);
+  wifi_button = (WndSymbolButton*)buttons.AddSymbolButton("Wifi", *this, NETWORK);
   wifi_button->SetPrefixIcon(SymbolButtonRenderer::NONE);
   poweroff_button = buttons.AddButton(GetPowerOffCaption(false), *this, POWEROFF);
   UpdateButtons();
@@ -177,9 +176,6 @@ KoboMenuWidget::CheckUSBStorage()
 void
 KoboMenuWidget::UpdateButtons()
 {
-  pc_conn_button->SetPrefixIcon(IsKoboOTGKernel() ?
-    SymbolButtonRenderer::PrefixIcon::NONE :
-    SymbolButtonRenderer::PrefixIcon::CHECK_MARK);
   wifi_button->SetPrefixIcon(IsKoboWifiOn() ?
       SymbolButtonRenderer::PrefixIcon::CHECK_MARK :
       SymbolButtonRenderer::PrefixIcon::NONE);
@@ -234,9 +230,14 @@ KoboMenuWidget::OnAction(int id)
     else
       dialog.OnAction(POWEROFF);
     break;
-  case PC_CONNECT:
-    ShowSystemDialog();
-    break;
+  case LAUNCH_NICKEL:
+    if (ShowMessageBox(_("Connect to PC with USB cable?  \n\nThis takes a minute.  "
+        "Disconnect cable now.  The screen will flash. Click 'Computer Setup' and connect cable"), _("USB cable connect"),
+                       MB_YESNO | MB_ICONQUESTION) == IDYES)
+      if (ShowMessageBox(_("Important!\n\n"
+          "Do not use the 'Wireless setup' option.  You cannot use the Kobo as an Book reader.  Doing so will break Top Hat!"), _("Warning!"),
+                         MB_OKCANCEL | MB_ICONWARNING) != IDCANCEL)
+        dialog.OnAction(LAUNCH_NICKEL);
   }
 }
 
@@ -337,9 +338,9 @@ int main(int argc, char **argv)
 
   while (true) {
     switch (Main()) {
-    case PC_CONNECT:
-      ShowSystemDialog();
-      break;
+    case LAUNCH_NICKEL:
+      KoboExecNickel();
+      return EXIT_FAILURE;
 
     case SimulatorPromptWindow::FLY:
       KoboRunXCSoar("-fly");
