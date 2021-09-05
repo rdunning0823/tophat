@@ -371,3 +371,31 @@ delay=1500
 hide=yes
 \end{verbatim}
 % 
+
+\section{InfoBox custom title}
+
+The InfoBox title customisation file (\verb|infoBoxTitle.locale|) can be used
+to customise or localise the title displayed on the upper part of an InfoBox. 
+The format is a simple text file containing \verb|<label>=<value>| pairs.  Values are text
+strings delimited by double quotes, for example:
+\begin{verbatim}
+V GND="GS"
+V TAS="TAS"
+\end{verbatim}  
+
+The \verb|<label>| is the default title used in the English language.
+
+For example:
+\begin{verbatim}
+V GND
+V TAS
+GR Avg
+Fin Dist
+...
+\end{verbatim}  
+
+When the file is loaded at startup, only the settings present in that file
+overwrite the titles defined for the configured language setting; all
+other InfoBox titles are unaffected.
+
+The file is not generated automatically it must be created or copied.

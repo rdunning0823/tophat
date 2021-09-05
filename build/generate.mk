@@ -15,6 +15,14 @@ $(OUT)/include/InputEvents_Text2Event.cpp: $(SRC)/Input/InputEvents.hpp \
 	@$(NQ)echo "  GEN     $@"
 	$(Q)$(PERL) $(topdir)/tools/Text2Event.pl $< >$@.tmp
 	@mv $@.tmp $@
+	@$(NQ)echo "  GEN     $(OUT)/include/TextResources.c"
+	$(Q)$(PERL) tools/txt2cpp.pl $(topdir)/Data/text/infoBoxTitle.locale >$(OUT)/include/TextResources.c 
+
+# TODO: Find out why I need to add the above 2 lines !
+# This should not be like this but I can't find out why...	
+$(OUT)/include/TextResources.c: $(topdir)/Data/text/infoBoxTitle.locale
+	@$(NQ)echo "  GEN     $@"
+	$(Q)$(PERL) tools/txt2cpp.pl $(topdir)/Data/text/infoBoxTitle.locale >$(OUT)/include/TextResources.c 
 
 $(OUT)/include/InputEvents_Text2GCE.cpp: $(SRC)/Input/InputQueue.hpp \
 	$(topdir)/tools/Text2GCE.pl | $(OUT)/include/dirstamp

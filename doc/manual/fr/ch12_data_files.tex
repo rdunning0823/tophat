@@ -285,3 +285,33 @@ delay=1500
 hide=yes
 \end{verbatim}
 % 
+
+\section{InfoBox: Personnalisation du titre}
+
+Le fichier de personnalisation du titre des "InfoBox"
+(\verb|infoBoxTitle.locale|) peut être utilisé pour personnaliser ou localiser
+le titre affiché en haut d'une "InfoBox".
+Le format est un simple fichier texte contenant des paires
+\verb|<etiquette>=<valeur>|. Les valeurs sont des chaines de caractères
+délimitées par des doubles guillemets. Par exemple:
+\begin{verbatim}
+V GND="GS"
+V TAS="TAS"
+\end{verbatim}  
+
+L' \verb|<etiquette>| est le titre par défaut utilisé en Anglais.
+
+Par exemple:
+\begin{verbatim}
+V GND
+V TAS
+GR Avg
+Fin Dist
+...
+\end{verbatim}  
+
+Le fichier est chargé au démarrage. Seules les configurations presentes dans le
+fichier sont pris. Les titres des autres "InfoBox" restent comme définis par la
+langue utilisée.
+
+Le fichier n'est pas généré automatiquement. Il doit être créé ou copié.

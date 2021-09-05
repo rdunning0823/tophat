@@ -30,6 +30,7 @@ Copyright_License {
 #include "Asset.hpp"
 #include "Simulator.hpp"
 #include "InfoBoxes/InfoBoxManager.hpp"
+#include "InfoBoxes/InfoBoxTitleLocale.hpp"
 #include "Terrain/RasterTerrain.hpp"
 #include "Terrain/RasterWeatherStore.hpp"
 #include "Input/InputEvents.hpp"
@@ -464,6 +465,10 @@ Startup()
 
   // Read the waypoint files
   WaypointGlue::LoadWaypoints(way_points, terrain, operation);
+
+  // Read the file for InfoBox custom titles
+  operation.SetText(_("Loading custom InfoBox titles from file..."));
+  InfoBoxTitleLocale::Initialise();
 
   // Read and parse the airfield info file
   WaypointDetails::ReadFileFromProfile(way_points, operation);

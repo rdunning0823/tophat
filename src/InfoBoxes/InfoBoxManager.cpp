@@ -25,6 +25,7 @@ Copyright_License {
 #include "InfoBoxes/InfoBoxManager.hpp"
 #include "InfoBoxes/InfoBoxWindow.hpp"
 #include "InfoBoxes/InfoBoxLayout.hpp"
+#include "InfoBoxes/InfoBoxTitleLocale.hpp"
 #include "InfoBoxes/Content/Factory.hpp"
 #include "InfoBoxes/Content/Base.hpp"
 #include "Screen/Layout.hpp"
@@ -169,7 +170,14 @@ InfoBoxManager::DisplayInfoBox()
     bool needupdate = ((DisplayType != DisplayTypeLast[i]) || first);
 
     if (needupdate) {
-      infoboxes[i]->SetTitle(gettext(InfoBoxFactory::GetCaption(DisplayType)));
+      // Title
+      const TCHAR *caption = InfoBoxFactory::GetCaption(DisplayType);
+      const TCHAR *title = InfoBoxTitleLocale::GetLocale(caption); // Get localised custom title
+      if (title == nullptr) // No custom title found, fallback to standard title
+        title = gettext(caption);
+      infoboxes[i]->SetTitle(title);
+
+      // Content
       infoboxes[i]->SetContentProvider(InfoBoxFactory::Create(DisplayType));
       DisplayTypeLast[i] = DisplayType;
     }

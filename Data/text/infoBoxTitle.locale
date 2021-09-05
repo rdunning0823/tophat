@@ -1,0 +1,23 @@
+# infoBoxTitle.locale
+# This file can be used to customise or localise the title displayed on the 
+# upper part of an InfoBox. The format is a simple text file containing
+# <label>=<value> pairs. Values are text strings delimited by double quotes.
+# For example:
+# V GND="GS"
+# V TAS="TAS"
+#
+# Where <label> is the msgid as defined in the tophat source in tophat/po/en.po
+#
+# When the file is loaded at startup, only the settings present in that
+# file overwrite the titles defined for the configured language setting;
+# all other InfoBox titles are unaffected.
+#
+# How to use:
+# -----------
+# If this file doesn't exist at startup, it is created automatically in your
+# XCSoarData directory.
+# To help you customise the InboBox titles we have added this file as a sample.
+# All existing msgids are included, all you need to do is:
+# - uncomment (remove the #) the line you're interested in 
+# - fill in your desired title between the ""
+
