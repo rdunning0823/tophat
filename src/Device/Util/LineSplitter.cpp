@@ -49,7 +49,12 @@ void
 PortLineSplitter::DataReceived(const void *_data, size_t length)
 {
   assert(_data != nullptr);
+#ifdef ANDROID
+  if (length <= 0)
+    return;
+#else
   assert(length > 0);
+#endif
 
   const char *data = (const char *)_data, *end = data + length;
 
