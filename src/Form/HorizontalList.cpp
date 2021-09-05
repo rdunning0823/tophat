@@ -544,7 +544,7 @@ HorizontalListControl::ScrollAdvance(bool forward)
   if (!HasDraggableScreen())
     return false;
 
-    unsigned old_item = GetItemFromPixelOrigin(GetPixelOrigin());
+  unsigned old_item = GetItemFromPixelOrigin(GetPixelOrigin());
   if ((forward && (old_item >= (GetLength() - 1))) ||
       (!forward && old_item == 0))
     return false;
