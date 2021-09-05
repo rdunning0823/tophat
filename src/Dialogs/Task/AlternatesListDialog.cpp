@@ -184,7 +184,7 @@ CreateFirstWidget(AlternatesListHeaderWidget &listener, const DerivedInfo& calcu
 {
   if (calculated.common_stats.has_non_airfield_landables)
         return new CheckBoxWidget(UIGlobals::GetDialogLook(), _("Airports only"), listener, AlternatesListHeaderWidget::AirFieldsOnly);
-        return new TextWidget();
+  return new TextWidget();
 }
 
 AlternatesListHeaderWidget::AlternatesListHeaderWidget(const DerivedInfo& _calculated)
