@@ -241,7 +241,7 @@ thirdparty_libs = [
     ),
 
     FreeTypeProject(
-        'http://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.bz2',
+        'https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.bz2',
         'b3230110e0cab777e0df7631837ac36e',
         'lib/libfreetype.a',
         [
