@@ -41,11 +41,6 @@ public:
 
   // virtual methods from class Device
   bool ParseNMEA(const char *line, struct NMEAInfo &info) override;
-
-  bool PutMacCready(double mc, OperationEnvironment &env) override;
-  bool PutBugs(double bugs, OperationEnvironment &env) override;
-  bool PutBallast(double fraction, double overload, OperationEnvironment &env) override;
-  bool PutQNH(const AtmosphericPressure &pres, OperationEnvironment &env) override;
 };
 
 /*
@@ -158,52 +153,6 @@ XVCDevice::ParseNMEA(const char *String, NMEAInfo &info)
     return PXCV(line, info);
   else
     return false;
-}
-
-// For documentation refer to chapter 10.1.3 Device Driver/XCVario in mulilingual handbook: https://xcvario.de/handbuch
-
-bool 
-XVCDevice::PutQNH(const AtmosphericPressure &pres, OperationEnvironment &env)
-{
-  /* the XCVario understands "!g,q<NNNN>" command for QNH updates with recent builds */
-  char buffer[32];
-  unsigned qnh = uround(pres.GetHectoPascal());
-  int msg_len = sprintf(buffer,"!g,q%u\r", std::min(qnh,(unsigned)2000));
-  port.FullWrite(buffer, msg_len, env, std::chrono::seconds(2) );
-  return true;
-}
-
-
-
-bool
-XVCDevice::PutMacCready(double mac_cready, OperationEnvironment &env)
-{
-  /* the XCVario understands the CAI302 "!g" command for
-     MacCready, ballast and bugs */
-
-  return CAI302::PutMacCready(port, mac_cready, env);
-}
-
-bool
-XVCDevice::PutBugs(double bugs, OperationEnvironment &env)
-{
-  /* the XCVario understands the CAI302 "!g" command for
-     MacCready, ballast and bugs */
-
-  return CAI302::PutBugs(port, bugs, env);
-}
-
-bool
-XVCDevice::PutBallast(double fraction, gcc_unused double overload,
-                      OperationEnvironment &env)
-{
-  /* the XCVario understands CAI302 like command for ballast "!g,b" with
-     float precision */
-   char buffer[32];
-   double ballast = fraction * 10.;
-   int msg_len = sprintf(buffer,"!g,b%.3f\r", ballast );
-   port.FullWrite(buffer, msg_len, env, std::chrono::seconds(2) );
-  return true;
 }
 
 static Device *
