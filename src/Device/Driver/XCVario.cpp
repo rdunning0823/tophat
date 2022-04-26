@@ -29,7 +29,7 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "Device/Port/Port.hpp"
 #include "NMEA/InputLine.hpp"
-#include "util/Clamp.hpp"
+#include "Util/Clamp.hpp"
 #include "Atmosphere/Pressure.hpp"
 #include <math.h>
 
