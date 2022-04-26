@@ -112,6 +112,7 @@ DRIVER_SOURCES = \
 	$(DRIVER_SRC_DIR)/NmeaOut.cpp \
 	$(DRIVER_SRC_DIR)/OpenVario.cpp \
 	$(DRIVER_SRC_DIR)/PosiGraph.cpp \
+	$(DRIVER_SRC_DIR)/XCVario.cpp \
 	$(DRIVER_SRC_DIR)/XCOM760.cpp \
 	$(DRIVER_SRC_DIR)/ILEC.cpp \
 	$(DRIVER_SRC_DIR)/Westerboer.cpp \

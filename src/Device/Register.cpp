@@ -35,6 +35,7 @@ Copyright_License {
 #include "Device/Driver/GTAltimeter.hpp"
 #include "Device/Driver/PosiGraph.hpp"
 #include "Device/Driver/BorgeltB50.hpp"
+#include "Device/Driver/XCVario.hpp"
 #include "Device/Driver/Volkslogger.hpp"
 #include "Device/Driver/EWMicroRecorder.hpp"
 #include "Device/Driver/LX.hpp"
@@ -78,6 +79,7 @@ static const struct DeviceRegister *const driver_list[] = {
   &ew_microrecorder_driver,
   &lx_driver,
   &zander_driver,
+  &xcv_driver,
   &flymaster_f1_driver,
   &xcom760_driver,
   &condor_driver,
