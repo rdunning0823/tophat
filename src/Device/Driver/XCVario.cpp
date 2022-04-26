@@ -31,7 +31,14 @@ Copyright_License {
 #include "NMEA/InputLine.hpp"
 #include "Util/Clamp.hpp"
 #include "Atmosphere/Pressure.hpp"
+#include "Atmosphere/Temperature.hpp"
 #include <math.h>
+
+inline fixed
+SpaceDiagonal(double a, double b, double c)
+{
+  return fixed(sqrt((a * a) + (b * b) + (c * c)));
+}
 
 class XVCDevice : public AbstractDevice {
   Port &port;
@@ -74,11 +81,11 @@ PXCV(NMEAInputLine &line, NMEAInfo &info)
 
   // Kalman filtered TE Vario value in m/s
   if (line.ReadChecked(value))
-    info.ProvideTotalEnergyVario(value);
+    info.ProvideTotalEnergyVario(fixed(value));
 
   // MC value as set in XCVario in m/s
   if (line.ReadChecked(value))
-    info.settings.ProvideMacCready(value, info.clock);
+    info.settings.ProvideMacCready(fixed(value), info.clock);
 
   // RMN: Changed bugs-calculation, swapped ballast and bugs to suit
   // the XVC-string for Borgelt, it's % degradation, for us, it is %
@@ -86,13 +93,13 @@ PXCV(NMEAInputLine &line, NMEAInfo &info)
 
   // Bugs setting as entered in XCVario
   if (line.ReadChecked(value))
-    info.settings.ProvideBugs(1 - Clamp(value, 0., 30.) / 100.,
-                              info.clock);
+    info.settings.ProvideBugs(fixed(1 - Clamp(value, 0., 30.) / 100.),
+                              fixed(info.clock));
 
   // Ballast overload value in %
   double ballast_overload;
   if (line.ReadChecked(ballast_overload))
-    info.settings.ProvideBallastOverload(ballast_overload, info.clock);
+    info.settings.ProvideBallastOverload(fixed(ballast_overload), fixed(info.clock));
 
   // inclimb/incruise 1=cruise,0=climb, OAT
   switch (line.Read(-1)) {
@@ -108,33 +115,33 @@ PXCV(NMEAInputLine &line, NMEAInfo &info)
   // Outside air temperature
   info.temperature_available = line.ReadChecked(value);
   if (info.temperature_available)
-    info.temperature = Temperature::FromCelsius(value);
+    info.temperature = FromCelsius(fixed(value));
 
   // QNH as set or autoset in XCVario
   if (line.ReadChecked(value))
-    info.settings.ProvideQNH(AtmosphericPressure::HectoPascal(value), info.clock);
+    info.settings.ProvideQNH(AtmosphericPressure::HectoPascal(fixed(value)), info.clock);
 
   // Barometric pressure
   if (line.ReadChecked(value))
-    info.ProvideStaticPressure(AtmosphericPressure::HectoPascal(value));
+    info.ProvideStaticPressure(AtmosphericPressure::HectoPascal(fixed(value)));
 
   // Pitot tube dynamic airspeed pressure
   if (line.ReadChecked(value))
-    info.ProvideDynamicPressure(AtmosphericPressure::Pascal(value));
+    info.ProvideDynamicPressure(AtmosphericPressure::Pascal(fixed(value)));
 
   // Roll respect to Earth system - Phi [°] (i.e. +110)
   if (line.ReadChecked(value)) {
     info.attitude.bank_angle_available.Update(info.clock);
-    info.attitude.bank_angle = Angle::Degrees(value);
+    info.attitude.bank_angle = Angle::Degrees(fixed(value));
   }
   // Pitch angle respect to Earth system - Theta [°] (i.e.+020)
   if (line.ReadChecked(value)) {
     info.attitude.pitch_angle_available.Update(info.clock);
-    info.attitude.pitch_angle = Angle::Degrees(value);
+    info.attitude.pitch_angle = Angle::Degrees(fixed(value));
   }
   // Space diagonal acceleration in X,Y,Z axes measure
   if ( line.ReadChecked(x) && line.ReadChecked(y) && line.ReadChecked(z) )
-    info.acceleration.ProvideGLoad(SpaceDiagonal(x, y, z));
+    info.acceleration.ProvideGLoad(SpaceDiagonal(x, y, z), true);
 
   return true;
 }

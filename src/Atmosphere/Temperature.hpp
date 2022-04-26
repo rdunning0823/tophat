@@ -51,4 +51,11 @@ CelsiusToKelvin(fixed celsius)
   return celsius + CELSIUS_OFFSET;
 }
 
+constexpr
+static inline fixed
+FromCelsius(fixed celsius)
+{
+    return CelsiusToKelvin(celsius);
+}
+
 #endif
