@@ -25,6 +25,7 @@ Copyright_License {
 #define XCSOAR_INFOBOX_CONTENT_ALTERNATE_HPP
 
 #include "InfoBoxes/Content/Base.hpp"
+#include <tchar.h>
 
 class InfoBoxContentAlternateName : public InfoBoxContent
 {
@@ -47,6 +48,7 @@ public:
   virtual void Update(InfoBoxData &data) override;
   virtual bool HandleKey(const InfoBoxKeyCodes keycode) override;
   virtual const InfoBoxPanel *GetDialogContent() override;
+  static void FormatAlternateTitle(InfoBoxData &data, unsigned index, const TCHAR* locale_key, const TCHAR* default_title);
 
 private:
   unsigned index;

@@ -109,7 +109,7 @@ RawPlayback::playback_chunk(short *buff, int count)
     rc = snd_pcm_writei(handle, p, len);
     if (rc == -EPIPE) {
       /* EPIPE means underrun */
-      LogFormat("underrun occurred\n");
+      //LogFormat("underrun occurred\n");
       ++underrun_count;
       snd_pcm_prepare(handle);
     } else if (rc < 0) {

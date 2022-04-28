@@ -75,6 +75,12 @@ ReadWaypointFile(const TCHAR *path, Waypoints &way_points,
 
   bool success = false;
 
+  auto *pre_line_reader = OpenTextFile(path, Charset::AUTO);
+  if (pre_line_reader != nullptr) {
+    reader->PreParse(way_points, *pre_line_reader, operation);
+    delete pre_line_reader;
+  }
+
   auto *line_reader = OpenTextFile(path, Charset::AUTO);
   if (line_reader != nullptr) {
     reader->Parse(way_points, *line_reader, operation);

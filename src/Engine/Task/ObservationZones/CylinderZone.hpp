@@ -38,7 +38,7 @@ class CylinderZone : public ObservationZonePoint
   fixed radius;
 
 public:
-  static constexpr double MAT_RADIUS = 1609.344;
+  static constexpr double MAT_RADIUS = 804.672;
 
 protected:
   CylinderZone(Shape _shape, bool _can_start_through_top,

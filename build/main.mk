@@ -413,6 +413,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/InfoBoxes/InfoBoxWindow.cpp \
 	$(SRC)/InfoBoxes/InfoBoxLayout.cpp \
 	$(SRC)/InfoBoxes/InfoBoxManager.cpp \
+	$(SRC)/InfoBoxes/InfoBoxTitleLocale.cpp \
 	$(SRC)/InfoBoxes/Panel/Base.cpp \
 	$(SRC)/InfoBoxes/Panel/Altitude.cpp \
 	$(SRC)/InfoBoxes/Panel/AltitudeSimulator.cpp \
@@ -697,6 +698,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/TophatWidgets/MapOverlayButton.cpp \
 	$(SRC)/TophatWidgets/TaskNavSliderWidget.cpp \
 	$(SRC)/TophatWidgets/TaskNavSliderShape.cpp \
+	$(SRC)/TophatWidgets/TaskNavSliderStartTime.cpp \
 	$(SRC)/TophatWidgets/ZoomOutButtonWidget.cpp \
 	$(SRC)/TophatWidgets/ZoomInButtonWidget.cpp \
 	$(SRC)/TophatWidgets/TaskButtonWidget.cpp \

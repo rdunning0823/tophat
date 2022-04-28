@@ -29,10 +29,11 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Math/fixed.hpp"
 
-class Waypoint;
-class WaypointLook;
-class DialogLook;
-class WaypointRendererSettings;
+struct Waypoint;
+struct WaypointLook;
+struct DialogLook;
+struct WaypointRendererSettings;
+
 class WaypointIconRendererWidget;
 class ContainerWindow;
 class WindowWidget;
