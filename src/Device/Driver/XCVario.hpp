@@ -1,8 +1,8 @@
 /*
 Copyright_License {
 
-  Top Hat Soaring Glide Computer - http://www.tophatsoaring.org/
-  Copyright (C) 2000-2016 The Top Hat Soaring Project
+  XCSoar Glide Computer - http://www.xcsoar.org/
+  Copyright (C) 2000-2021 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,41 +21,10 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_ATMOSPHERE_TEMPERATURE_HPP
-#define XCSOAR_ATMOSPHERE_TEMPERATURE_HPP
+#ifndef XCSOAR_DEVICE_DRIVER_XCVARIOS21_HPP
+#define XCSOAR_DEVICE_DRIVER_XCVARIOS21_HPP
 
-#include "Math/fixed.hpp"
-
-/**
- * The offset between 0 Kelvin and 0 degrees Celsius [K].
- */
-static constexpr fixed CELSIUS_OFFSET(273.15);
-
-/**
- * Convert a temperature from Kelvin to degrees Celsius.
- */
-constexpr
-static inline fixed
-KelvinToCelsius(fixed kelvin)
-{
-  return kelvin - CELSIUS_OFFSET;
-}
-
-/**
- * Convert a temperature from degrees Celsius to Kelvin.
- */
-constexpr
-static inline fixed
-CelsiusToKelvin(fixed celsius)
-{
-  return celsius + CELSIUS_OFFSET;
-}
-
-constexpr
-static inline fixed
-FromCelsius(fixed celsius)
-{
-    return CelsiusToKelvin(celsius);
-}
+extern const struct DeviceRegister xcv_driver;
 
 #endif
+
