@@ -32,6 +32,7 @@ Copyright_License {
 #include "Util/Macros.hpp"
 #include "org_tophat_DownloadUtil.h"
 
+#include <string.h>
 #include <algorithm>
 
 #include <windef.h> /* for MAX_PATH */

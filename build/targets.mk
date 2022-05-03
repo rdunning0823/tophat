@@ -434,10 +434,10 @@ ifeq ($(TARGET),UNIX)
 endif
 
 ifeq ($(TARGET),ANDROID)
-  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r10e
+  ANDROID_NDK ?= $(HOME)/opt/android-ndk-r16b
 
   ANDROID_SDK_PLATFORM = android-22
-  ANDROID_NDK_PLATFORM = android-19
+  ANDROID_NDK_PLATFORM = android-27
   ANDROID_NDK_PLATFORM_64 = android-21
 
   ANDROID_ARCH = arm
@@ -448,7 +448,7 @@ ifeq ($(TARGET),ANDROID)
   ANDROID_GCC_VERSION = 4.9
 
   ifeq ($(ARMV7),y)
-    ANDROID_ABI3 = armeabi-v7a-hard
+    ANDROID_ABI3 = armeabi-v7a
     ANDROID_ABI5 = armeabi-v7a
   endif
 
@@ -681,7 +681,7 @@ ifeq ($(TARGET_IS_KOBO),y)
 endif
 
 ifeq ($(TARGET),ANDROID)
-  TARGET_CPPFLAGS += --sysroot=$(ANDROID_TARGET_ROOT)
+  TARGET_CPPFLAGS += --sysroot=$(ANDROID_NDK)/sysroot -I$(ANDROID_NDK)/sysroot/usr/include/$(ANDROID_ABI2)
   TARGET_CPPFLAGS += -DANDROID
   CXXFLAGS += -D__STDC_VERSION__=199901L
 
@@ -816,13 +816,10 @@ ifeq ($(TARGET),UNIX)
 endif
 
 ifeq ($(TARGET),ANDROID)
-  TARGET_LDLIBS += -lc
+  TARGET_LDLIBS += -lm -lc
 
   ifeq ($(ARMV7),y)
-    TARGET_LDLIBS += -lm_hard
     TARGET_LDLIBS += -Wl,--no-warn-mismatch
-  else
-    TARGET_LDLIBS += -lm
   endif
 
   TARGET_LDLIBS += -llog
