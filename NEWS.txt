@@ -1,6 +1,12 @@
 ============================================================================
 SUMMARY OF NEW FEATURES AND CHANGES
 ============================================================================
+Tophat Soaring 2.2.4 March 2023
+* Add XCVario connection trough WIFI
+* Adjust URL for andrioid/ioio submodule
+* Adjust URL with https to access METAR/TAF informations
+
+
 Tophat Soaring 2.2.3_beta
 * FLARM: Maintain targets 5 sec after signal lost
 * Waypoint List - add Landables only option
